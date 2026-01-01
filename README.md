@@ -2,6 +2,10 @@
 
 A Roslyn Source Generator for creating unit test stubs. Unlike Moq's fluent runtime configuration, KnockOff uses partial classes for compile-time setup—trading flexibility for readability and performance.
 
+## Documentation
+
+- [KnockOff vs Moq Comparison](docs/knockoff-vs-moq.md) - Side-by-side comparison for supported scenarios
+
 ## Concept
 
 Mark a partial class with `[KnockOff]` that implements an interface. The source generator:

@@ -52,22 +52,22 @@
 - [x] Create test: generator produces output file
 - [x] Verify generated file appears in `Generated/` folder
 
-## Phase 2-4: Strongly-Typed ExecutionDetails ✅ COMPLETE
+## Phase 2-4: Strongly-Typed Handler ✅ COMPLETE
 
-*Refactored: Generate per-member ExecutionDetails classes with named tuples instead of shared class with object[].*
+*Refactored: Generate per-member Handler classes with named tuples instead of shared class with object[].*
 
-### 2.1 Per-Member ExecutionDetails Classes (Generated)
-- [x] Generate `{MemberName}ExecutionDetails` class for each interface member
+### 2.1 Per-Member Handler Classes (Generated)
+- [x] Generate `{MemberName}Handler` class for each interface member
 - [x] Properties: `GetCount`, `SetCount`, `LastSetValue` (strongly typed)
 - [x] Methods (0 params): `CallCount`, `WasCalled`
 - [x] Methods (1 param): `LastCallArg` (typed), `AllCalls` (typed list)
 - [x] Methods (2+ params): `LastCallArgs` (named tuple), `AllCalls` (tuple list)
 - [x] All classes include `Reset()` method
-- [x] Removed old `src/KnockOff/ExecutionDetails.cs` - everything is generated
+- [x] Removed old `src/KnockOff/Handler.cs` - everything is generated
 
-### 3.1 ExecutionInfo Class Generation
-- [x] Generate nested `{ClassName}ExecutionInfo` class
-- [x] Use generated per-member ExecutionDetails types
+### 3.1 Spy Class Generation
+- [x] Generate nested `{ClassName}Spy` class
+- [x] Use generated per-member Handler types
 
 ### 3.2 Backing Property Generation
 - [x] Generate `protected {Type} {Name}Backing { get; set; }` for each property
@@ -150,39 +150,100 @@
 - [x] Run tests before publishing
 - [x] Push to NuGet.org with `NUGET_API_KEY` secret
 
-## Phase 7: Multiple Interfaces
+## Phase 7: Multiple Interfaces ✅ COMPLETE
 
 ### 7.1 Multiple Interface Support
-- [ ] Generate explicit implementations for all interfaces
-- [ ] Single backing method for identical signatures across interfaces
-- [ ] Document behavior: same signature = same backing = same tracking
-- [ ] Test: Two interfaces, different methods
-- [ ] Test: Two interfaces, same method signature (single backing)
+- [x] Generate explicit implementations for all interfaces
+- [x] Single backing property/method for identical signatures across interfaces
+- [x] Behavior: same signature = same backing = same tracking (documented in tests)
+- [x] Test: Two interfaces, different methods (MultiInterfaceKnockOff)
+- [x] Test: Two interfaces, same method signature (SharedSignatureKnockOff)
+- [x] Test: Shared properties across interfaces with different accessors
+- [x] Test: AsXYZ() methods work for all interfaces
 
-## Phase 8: Extended Features
+## Phase 8: Extended Features ✅ COMPLETE
 
 ### 8.1 Async Methods
-- [ ] Handle `Task` return (void async)
-- [ ] Handle `Task<T>` return
-- [ ] Handle `ValueTask<T>` return
+- [x] Handle `Task` return (void async) - returns `Task.CompletedTask`
+- [x] Handle `Task<T>` return - returns `Task.FromResult<T>(default!)` or user method
+- [x] Handle `ValueTask` return - returns `default` (completed)
+- [x] Handle `ValueTask<T>` return - returns `default` or user method
+- [x] Proper nullability detection for generic type arguments
+- [x] Tests: Task, Task<T>, Task<T?>, ValueTask, ValueTask<T>
 
 ### 8.2 Generic Interfaces
-- [ ] Support `IRepository<T>` style interfaces
-- [ ] Handle type parameter constraints
+- [x] Support `IRepository<T>` style interfaces (works out of the box)
+- [x] Concrete type arguments correctly substituted in generated code
+- [x] Type constraints respected (where T : class)
+- [x] Tests: IRepository<User> with methods and async methods
 
 ### 8.3 Interface Inheritance
-- [ ] Walk full interface hierarchy
-- [ ] Generate for inherited members
+- [x] Walk full interface hierarchy (uses `AllInterfaces` which includes inherited)
+- [x] Generate for inherited members automatically
+- [x] Generate AsXYZ() for both derived and base interfaces
+- [x] Tests: IAuditableEntity inheriting IBaseEntity
 
-## Phase 9: Callbacks
+## Phase 9: Callbacks ✅ COMPLETE
 
-### 9.1 ExecutionDetails Callback Support
-- [ ] Add `OnCall` delegate property to ExecutionDetails
-- [ ] Signature includes knockoff instance: `Func<TKnockOff, TArgs..., TReturn>`
-- [ ] Generated code checks OnCall before user method / default behavior
-- [ ] Test: Callback invoked with correct args
-- [ ] Test: Callback receives knockoff instance
-- [ ] Test: Callback can access ExecutionInfo of other members
+### 9.1 Handler Callback Support
+- [x] Add `OnCall` delegate property to Handler
+- [x] Add `OnGet`/`OnSet` delegate properties for properties
+- [x] Signature includes knockoff instance: `Func<TKnockOff, TArgs..., TReturn>`
+- [x] Methods with 2+ params use tuple: `Func<TKnockOff, (TArg1, TArg2), TReturn>`
+- [x] Generated code checks OnCall/OnGet/OnSet before user method / default behavior
+- [x] Reset() clears callback along with tracking state
+- [x] Test: Callback invoked with correct args (10 new tests)
+- [x] Test: Callback receives knockoff instance
+- [x] Test: Callback can access Spy of other members
+- [x] Test: OnGet returns callback value
+- [x] Test: OnSet intercepts setter
+- [x] Test: Async method callbacks work
+- [x] Test: Generic interface callbacks work
+- [x] Test: Inherited property callbacks work
+
+## Phase 10: Indexer Support ✅ COMPLETE
+
+### 10.1 Indexer Detection and Generation
+- [x] Detect indexer properties in interface (`IsIndexer = true`)
+- [x] Extract indexer key type and return type
+- [x] Generate `StringIndexerHandler` class (named by parameter type)
+- [x] Generate `OnGet` callback: `Func<TKnockOff, TKey, TReturn>?`
+- [x] Generate `OnSet` callback: `Action<TKnockOff, TKey, TValue>?` for settable indexers
+- [x] Generate backing dictionary for default values (`public Dictionary<TKey, TReturn>`)
+- [x] Generate explicit indexer implementation with proper fallback chain
+
+### 10.2 Handler for Indexers
+- [x] Track `GetCount`, `LastGetKey`, `AllGetKeys` for getter
+- [x] Track `SetCount`, `LastSetEntry`, `AllSetEntries` for setter
+- [x] `RecordGet(key)` and `RecordSet(key, value)` methods
+- [x] `Reset()` clears tracking state and callbacks
+
+### 10.3 Verification (10 new tests)
+- [x] Test: Indexer get is tracked (`Indexer_Get_TracksKeyAccessed`)
+- [x] Test: Multiple keys tracked (`Indexer_Get_MultipleKeys_TracksAllKeys`)
+- [x] Test: OnGet callback works (`Indexer_OnGet_CallbackReturnsValue`)
+- [x] Test: OnGet receives knockoff instance (`Indexer_OnGet_CallbackCanAccessKnockOffInstance`)
+- [x] Test: Indexer set is tracked (`Indexer_Set_TracksKeyAndValue`)
+- [x] Test: Set stores in backing dictionary (`Indexer_Set_StoresInBackingDictionary`)
+- [x] Test: OnSet callback intercepts setter (`Indexer_OnSet_CallbackInterceptsSetter`)
+- [x] Test: Reset clears indexer state (`Indexer_Reset_ClearsAllState`)
+- [x] Test: Nullable return when not found (`Indexer_NullableReturn_ReturnsDefaultWhenNotFound`)
+
+## Phase 11: Verify Helpers (Planned - Convenience)
+
+### 11.1 Fluent Verification Methods
+- [ ] Add `VerifyCalledOnce()` to Handler
+- [ ] Add `VerifyNeverCalled()` to Handler
+- [ ] Add `VerifyCalledTimes(int expected)`
+- [ ] Add `VerifyCalledAtLeast(int minimum)`
+- [ ] Property-specific: `VerifyGetterCalledOnce()`, `VerifySetterCalledOnce()`
+
+## Phase 12: ReturnsValue Shorthand (Planned - Convenience)
+
+### 12.1 Static Return Value Property
+- [ ] Add `ReturnsValue` property to Handler
+- [ ] Check ReturnsValue before OnCall in generated code
+- [ ] Reset clears ReturnsValue
 
 ## Definition of Done
 
