@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<RootNamespace>KnockOff</RootNamespace>
+		<AssemblyName>KnockOff</AssemblyName>
+		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+		<DebugType>embedded</DebugType>
+		<Description>A Roslyn Source Generator for creating unit test stubs. Unlike Moq's fluent runtime configuration, KnockOff uses partial classes for compile-time setup—trading flexibility for readability and performance.</Description>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<EnforceExtendedAnalyzerRules>false</EnforceExtendedAnalyzerRules>
+		<GenerateDocumentationFile>false</GenerateDocumentationFile>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageId>KnockOff</PackageId>
+		<!-- This is a compile-time only package (source generator) -->
+		<DevelopmentDependency>true</DevelopmentDependency>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\README.md" Pack="true" PackagePath="" />
+		<None Include="..\..\LICENSE" Pack="true" PackagePath="" />
+		<!-- Generator targets netstandard2.0 - path is relative to this project -->
+		<None Include="..\Generator\bin\$(Configuration)\netstandard2.0\KnockOff.Generator.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Generator\Generator.csproj" PrivateAssets="all" />
+	</ItemGroup>
+
+</Project>

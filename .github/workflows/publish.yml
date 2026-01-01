@@ -1,0 +1,80 @@
+name: Publish to NuGet
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version_suffix:
+        description: 'Version suffix for pre-release (e.g., alpha, beta, rc1). Leave empty for release.'
+        required: false
+        type: string
+        default: ''
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup .NET SDKs
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: |
+          8.0.x
+          9.0.x
+          10.0.x
+        cache: true
+
+    - name: Extract version from tag
+      if: startsWith(github.ref, 'refs/tags/v')
+      id: tag_version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+    - name: Restore dependencies
+      run: dotnet restore src/KnockOff.sln
+
+    - name: Build (tag release)
+      if: startsWith(github.ref, 'refs/tags/v')
+      run: dotnet build src/KnockOff.sln --configuration Release --no-restore -p:Version=${{ steps.tag_version.outputs.VERSION }}
+
+    - name: Build (manual pre-release)
+      if: github.event_name == 'workflow_dispatch' && inputs.version_suffix != ''
+      run: dotnet build src/KnockOff.sln --configuration Release --no-restore --version-suffix "${{ inputs.version_suffix }}.${{ github.run_number }}"
+
+    - name: Build (manual release)
+      if: github.event_name == 'workflow_dispatch' && inputs.version_suffix == ''
+      run: dotnet build src/KnockOff.sln --configuration Release --no-restore
+
+    - name: Test
+      run: dotnet test src/KnockOff.sln --configuration Release --no-build --verbosity normal
+
+    - name: Pack (tag release)
+      if: startsWith(github.ref, 'refs/tags/v')
+      run: dotnet pack src/KnockOff/KnockOff.csproj --configuration Release --no-build -p:PackageVersion=${{ steps.tag_version.outputs.VERSION }} --output ./artifacts
+
+    - name: Pack (manual pre-release)
+      if: github.event_name == 'workflow_dispatch' && inputs.version_suffix != ''
+      run: dotnet pack src/KnockOff/KnockOff.csproj --configuration Release --no-build --version-suffix "${{ inputs.version_suffix }}.${{ github.run_number }}" --output ./artifacts
+
+    - name: Pack (manual release)
+      if: github.event_name == 'workflow_dispatch' && inputs.version_suffix == ''
+      run: dotnet pack src/KnockOff/KnockOff.csproj --configuration Release --no-build --output ./artifacts
+
+    - name: Upload NuGet package artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: nuget-package
+        path: ./artifacts/*.nupkg
+        retention-days: 30
+
+    - name: Push to NuGet.org
+      run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
