@@ -4,215 +4,170 @@ A Roslyn Source Generator for creating unit test stubs. Unlike Moq's fluent runt
 
 ## Documentation
 
+- [Getting Started](docs/getting-started.md) - Installation and first steps
+- [Customization Patterns](docs/concepts/customization-patterns.md) - The two ways to customize stub behavior
 - [KnockOff vs Moq Comparison](docs/knockoff-vs-moq.md) - Side-by-side comparison for supported scenarios
+- [Migration from Moq](docs/migration-from-moq.md) - Step-by-step migration guide
 
 ## Concept
 
 Mark a partial class with `[KnockOff]` that implements an interface. The source generator:
 1. Generates explicit interface implementations for all interface members
-2. Tracks invocations via `ExecutionInfo` for test verification
+2. Tracks invocations via `Spy` for test verification
 3. Detects user-defined methods in the partial class and calls them from the generated intercepts
+4. Provides `OnCall`/`OnGet`/`OnSet` callbacks for runtime customization
 
-## Example
+## Quick Example
 
 ```csharp
 public interface IUserService
 {
-    Role Role { get; set; }
-    void SomeMethod();
+    string Name { get; set; }
     User GetUser(int id);
 }
 
-// User writes this:
+// Define your KnockOff stub
 [KnockOff]
 public partial class UserServiceKnockOff : IUserService
 {
-    // Optional: Override behavior for specific members
-    protected User GetUser(int id)
-    {
-        return new User { Id = id, Name = "Test User" };
-    }
+    // Optional: Define default behavior (compile-time)
+    protected User GetUser(int id) => new User { Id = id, Name = "Default" };
 }
 
-// Source generator produces:
+// Use in tests
+[Fact]
+public void Test_UserService()
+{
+    var knockOff = new UserServiceKnockOff();
+    IUserService service = knockOff;
+
+    // Override behavior for this test (runtime)
+    knockOff.Spy.GetUser.OnCall = (ko, id) => new User { Id = id, Name = "Mocked" };
+
+    var user = service.GetUser(42);
+
+    Assert.Equal("Mocked", user.Name);
+    Assert.Equal(1, knockOff.Spy.GetUser.CallCount);
+    Assert.Equal(42, knockOff.Spy.GetUser.LastCallArg);
+}
+```
+
+## Two Ways to Customize Behavior
+
+KnockOff provides two complementary patterns for customizing stub behavior:
+
+### Pattern 1: User-Defined Methods (Compile-Time)
+
+Define protected methods in your stub class for consistent behavior across all tests:
+
+```csharp
+[KnockOff]
+public partial class UserServiceKnockOff : IUserService
+{
+    protected User GetUser(int id) => new User { Id = id, Name = "Test User" };
+}
+```
+
+### Pattern 2: Callbacks (Runtime)
+
+Set callbacks for test-specific behavior:
+
+```csharp
+knockOff.Spy.GetUser.OnCall = (ko, id) => new User { Id = id, Name = "Custom" };
+knockOff.Spy.Name.OnGet = (ko) => "FromCallback";
+knockOff.Spy.Name.OnSet = (ko, value) => { /* custom logic */ };
+```
+
+### Priority Order
+
+When an interface member is invoked:
+1. **Callback** (if set) — takes precedence
+2. **User method** (if defined) — fallback for methods
+3. **Default** — backing field for properties, `default(T)` for methods
+
+Use `Reset()` to clear callbacks and return to user method behavior.
+
+## Verification
+
+```csharp
+// Check invocation
+Assert.True(knockOff.Spy.GetUser.WasCalled);
+Assert.Equal(3, knockOff.Spy.GetUser.CallCount);
+
+// Check arguments
+Assert.Equal(42, knockOff.Spy.GetUser.LastCallArg);
+var allCalls = knockOff.Spy.GetUser.AllCalls; // [1, 2, 42]
+
+// Check properties
+Assert.Equal(2, knockOff.Spy.Name.SetCount);
+Assert.Equal("LastValue", knockOff.Spy.Name.LastSetValue);
+```
+
+## Features
+
+| Feature | Status |
+|---------|--------|
+| Properties (get/set, get-only, set-only) | Supported |
+| Void methods | Supported |
+| Methods with return values | Supported |
+| Methods with parameters (single and multiple) | Supported |
+| Async methods (Task, Task&lt;T&gt;, ValueTask, ValueTask&lt;T&gt;) | Supported |
+| Generic interfaces | Supported |
+| Multiple interface implementation | Supported |
+| Interface inheritance | Supported |
+| Indexers (get-only, get/set) | Supported |
+| User-defined method detection | Supported |
+| OnCall/OnGet/OnSet callbacks | Supported |
+| Named tuple argument tracking | Supported |
+
+## Generated Code
+
+For each interface member, KnockOff generates:
+- **Handler class** in `Spy` with tracking properties and callbacks
+- **Explicit interface implementation** that records invocations
+- **Backing storage** (field for properties, dictionary for indexers)
+- **`AsXYZ()` helper** for typed interface access
+
+Example generated structure:
+```csharp
 public partial class UserServiceKnockOff
 {
-    public ExecutionInfo ExecutionInfo { get; } = new ExecutionInfo();
+    public UserServiceKnockOffSpy Spy { get; } = new();
 
-    public class ExecutionInfo
+    public sealed class UserServiceKnockOffSpy
     {
-        public ExecutionDetails<Role> Role { get; } = new();
-        public ExecutionDetails SomeMethod { get; } = new();
-        public ExecutionDetails<User, int> GetUser { get; } = new();
+        public GetUserHandler GetUser { get; } = new();
+        public NameHandler Name { get; } = new();
+        // ... handlers for each member
     }
 
-    // Backing member for property
-    protected Role Role { get; set; }
-
-    Role IUserService.Role
-    {
-        get
-        {
-            ExecutionInfo.Role.RecordGet();
-            return this.Role;
-        }
-        set
-        {
-            ExecutionInfo.Role.RecordSet(value);
-            this.Role = value;
-        }
-    }
-
-    // Void method - user didn't define, so just tracks
-    void IUserService.SomeMethod()
-    {
-        ExecutionInfo.SomeMethod.RecordCall();
-    }
-
-    // Method with return - user defined override
     User IUserService.GetUser(int id)
     {
-        ExecutionInfo.GetUser.RecordCall(id);
-        return this.GetUser(id);  // Calls user-defined method
+        Spy.GetUser.RecordCall(id);
+        if (Spy.GetUser.OnCall is { } callback)
+            return callback(this, id);
+        return GetUser(id); // Calls user method
     }
 }
 ```
 
-## Test Usage
+## Installation
 
-```csharp
-[Fact]
-public void OrderService_CallsUserService()
-{
-    var userKnockOff = new UserServiceKnockOff();
-    IUserService userService = userKnockOff;
-
-    var orderService = new OrderService(userService);
-    orderService.ProcessOrder(42);
-
-    // Verify the service was called correctly
-    Assert.True(userKnockOff.ExecutionInfo.GetUser.WasCalled);
-    Assert.Equal(42, userKnockOff.ExecutionInfo.GetUser.LastCallArgs);
-}
+```bash
+dotnet add package KnockOff
 ```
 
-## ExecutionDetails
-
-```csharp
-// For void methods
-public class ExecutionDetails
-{
-    public int CallCount { get; }
-    public bool WasCalled => CallCount > 0;
-    public void RecordCall();
-}
-
-// For methods with parameters and/or return values
-public class ExecutionDetails<TReturn, TArg1, ...>
-{
-    public int CallCount { get; }
-    public bool WasCalled => CallCount > 0;
-    public (TArg1, ...) LastCallArgs { get; }
-    public List<(TArg1, ...)> AllCalls { get; }
-    public void RecordCall(TArg1 arg1, ...);
-}
-
-// For properties
-public class ExecutionDetails<TValue>
-{
-    public int GetCount { get; }
-    public int SetCount { get; }
-    public TValue? LastSetValue { get; }
-    public void RecordGet();
-    public void RecordSet(TValue value);
-}
+Or add to your `.csproj`:
+```xml
+<PackageReference Include="KnockOff" Version="1.0.0" />
 ```
 
-## Scope - Phase 1 (MVP)
+## Viewing Generated Code
 
-- Void methods (no parameters)
-- Void methods (with parameters)
-- Methods with return values
-- Properties (get/set, get-only, set-only)
+Enable in your test project:
+```xml
+<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+<CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
+```
 
-## Scope - Phase 2
-
-- Async methods (`Task`, `Task<T>`, `ValueTask<T>`)
-- Generic interfaces
-- Multiple interface implementation
-- Interface inheritance
-
-## Scope - Phase 3 (If Needed)
-
-- Generic methods
-- Events
-- Indexers
-- ref/out parameters
-
-## Open Questions
-
-1. **User method detection**: Should user-defined overrides be `protected`? Must signature match exactly?
-2. **Naming conflicts**: What prefix for generated backing members? (`_` could conflict)
-3. **Callbacks**: Should ExecutionDetails support callback registration for dynamic behavior?
-4. **Default returns**: For non-overridden methods returning values, return `default(T)`?
-
-## Implementation Steps
-
-### Phase 0: Project Setup
-- [ ] Create solution structure (mirror RemoteFactory)
-- [ ] Create `Directory.Build.props` with target frameworks (net8.0, net9.0, net10.0)
-- [ ] Create `Directory.Packages.props` for central package management
-- [ ] Create Generator project (netstandard2.0)
-- [ ] Create KnockOff core library project
-- [ ] Create test project with generator reference
-- [ ] Create sandbox project for manual testing
-
-### Phase 1: Core Generator Infrastructure
-- [ ] Define `[KnockOff]` attribute in core library
-- [ ] Create `IIncrementalGenerator` skeleton
-- [ ] Implement predicate: classes with `[KnockOff]` implementing interfaces
-- [ ] Define transform model types (must be equatable/serializable):
-  - [ ] `KnockOffTypeInfo` - target class info
-  - [ ] `InterfaceMemberInfo` - property/method info
-  - [ ] `ParameterInfo` - method parameters
-- [ ] Implement transform: extract interface members
-
-### Phase 2: ExecutionDetails Infrastructure
-- [ ] Define `ExecutionDetails` base class (void, no args)
-- [ ] Define `ExecutionDetails<TReturn>` for return values
-- [ ] Define `ExecutionDetails<TReturn, TArgs...>` variants (up to reasonable arity)
-- [ ] Define property-specific tracking
-
-### Phase 3: Code Generation - Properties
-- [ ] Generate backing properties
-- [ ] Generate explicit interface property implementations
-- [ ] Generate ExecutionInfo property entries
-- [ ] Handle get-only properties
-- [ ] Handle set-only properties
-- [ ] Test: property get/set tracking works
-
-### Phase 4: Code Generation - Methods
-- [ ] Generate explicit interface method implementations
-- [ ] Generate ExecutionInfo method entries
-- [ ] Detect user-defined method overrides in partial class
-- [ ] Call user method when defined
-- [ ] Return `default(T)` when not defined
-- [ ] Test: void methods tracked
-- [ ] Test: return value methods work
-- [ ] Test: user overrides called
-
-### Phase 5: NuGet Packaging
-- [ ] Configure Generator.csproj for NuGet embedding
-- [ ] Configure KnockOff.csproj as main package
-- [ ] Create package metadata
-- [ ] Test package installation in separate project
-
-### Phase 6: CI/CD
-- [ ] Create GitHub Actions workflow (build, test)
-- [ ] Add NuGet publish on version tags
-
-### Phase 7: Phase 2 Scope (Async, Generics, etc.)
-- [ ] Async method support
-- [ ] Generic interface support
-- [ ] Multiple interfaces
-- [ ] Interface inheritance
+Generated files appear in `Generated/KnockOff.Generator/KnockOff.KnockOffGenerator/`.
