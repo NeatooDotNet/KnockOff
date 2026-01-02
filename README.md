@@ -20,32 +20,52 @@ Mark a partial class with `[KnockOff]` that implements an interface. The source 
 ## Quick Example
 
 ```csharp
-public interface IUserService
+public interface IDataService
 {
     string Name { get; set; }
-    User GetUser(int id);
+    string? GetDescription(int id);
+    int GetCount();
 }
 
-// Define your stub with behavior built-in
+// Define your stub with behavior
 [KnockOff]
-public partial class UserServiceKnockOff : IUserService
+public partial class DataServiceKnockOff : IDataService
 {
-    protected User GetUser(int id) => new User { Id = id, Name = "Test User" };
+    private readonly int _count;
+
+    public DataServiceKnockOff(int count = 42)
+    {
+        _count = count;
+    }
+
+    // Non-nullable method - define to return meaningful value
+    protected int GetCount() => _count;
+
+    // GetDescription not defined - generated code returns null by default
 }
 
 // Use in tests
 [Fact]
-public void Test_GetUser_ReturnsUserWithCorrectId()
+public void Test_DataService()
 {
-    var knockOff = new UserServiceKnockOff();
-    IUserService service = knockOff;
+    var knockOff = new DataServiceKnockOff(count: 100);
+    IDataService service = knockOff;
 
-    var user = service.GetUser(42);
+    // Property - uses generated backing field
+    service.Name = "Test";
+    Assert.Equal("Test", service.Name);
+    Assert.Equal(1, knockOff.Spy.Name.SetCount);
 
-    Assert.Equal(42, user.Id);
-    Assert.Equal("Test User", user.Name);
-    Assert.Equal(1, knockOff.Spy.GetUser.CallCount);
-    Assert.Equal(42, knockOff.Spy.GetUser.LastCallArg);
+    // Nullable method - returns null, call is still verified
+    var description = service.GetDescription(5);
+    Assert.Null(description);
+    Assert.True(knockOff.Spy.GetDescription.WasCalled);
+    Assert.Equal(5, knockOff.Spy.GetDescription.LastCallArg);
+
+    // Non-nullable method - returns constructor value
+    var count = service.GetCount();
+    Assert.Equal(100, count);
+    Assert.Equal(1, knockOff.Spy.GetCount.CallCount);
 }
 ```
 
@@ -131,7 +151,7 @@ Assert.Equal("LastValue", knockOff.Spy.Name.LastSetValue);
 | User-defined method detection | Supported |
 | OnCall/OnGet/OnSet callbacks | Supported |
 | Named tuple argument tracking | Supported |
-| Events | [Planned](docs/design/events.md) |
+| Events | Supported |
 | Generic methods | Not yet |
 | ref/out parameters | Not yet |
 

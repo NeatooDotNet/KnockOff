@@ -28,7 +28,7 @@ KnockOff provides a subset of mocking functionality focused on interface stubbin
 | Call verification | Yes | Yes |
 | Argument capture | Yes | Yes (automatic) |
 | Indexers | Yes | Yes |
-| Events | Yes | Not yet |
+| Events | Yes | Yes |
 | ref/out parameters | Yes | Not yet |
 | Generic methods | Yes | Not yet |
 | Setup sequences | Yes | Manual |
