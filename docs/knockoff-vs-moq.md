@@ -8,48 +8,11 @@ KnockOff provides a subset of mocking functionality focused on interface stubbin
 
 | Aspect | Moq | KnockOff |
 |--------|-----|----------|
-| Configuration | Runtime fluent API | Compile-time source generation |
+| Configuration | Runtime fluent API | Compile-time partial class |
 | Type safety | Expression-based | Strongly-typed generated classes |
-| Setup location | Test method only | Partial class (defaults) + callbacks (per-test) |
+| Setup location | Test method | Partial class (reusable across tests) |
 | Flexibility | High (dynamic proxy) | Lower (generated code) |
 | Debugging | Expression trees | Standard C# code |
-
-## The Duality: Two Ways to Customize
-
-Unlike Moq which only offers runtime configuration, KnockOff provides **two complementary patterns**:
-
-### Pattern 1: User-Defined Methods (Compile-Time Defaults)
-
-```csharp
-[KnockOff]
-public partial class UserServiceKnockOff : IUserService
-{
-    // Default behavior for all tests using this stub
-    protected User GetUser(int id) => new User { Id = id, Name = "Default" };
-}
-```
-
-### Pattern 2: Callbacks (Runtime Overrides)
-
-```csharp
-// Override for this specific test
-knockOff.Spy.GetUser.OnCall = (ko, id) => new User { Id = id, Name = "Custom" };
-```
-
-### Priority Order
-
-1. **Callback** (if set) — takes precedence
-2. **User method** (if defined) — fallback
-3. **Default** — `default(T)` for methods, backing field for properties
-
-### When to Use Each
-
-| Scenario | Moq | KnockOff |
-|----------|-----|----------|
-| Same behavior across tests | Setup in shared method | User-defined method |
-| Per-test behavior | Setup in test | OnCall callback |
-| Static return value | `.Returns(value)` | User method or callback |
-| Dynamic return | `.Returns((args) => ...)` | OnCall callback |
 
 ## Feature Support Matrix
 
@@ -63,13 +26,12 @@ knockOff.Spy.GetUser.OnCall = (ko, id) => new User { Id = id, Name = "Custom" };
 | Multiple interfaces | Yes | Yes |
 | Interface inheritance | Yes | Yes |
 | Call verification | Yes | Yes |
-| Argument capture | Yes | Yes |
-| Dynamic return values | Yes | Yes (OnCall) |
+| Argument capture | Yes | Yes (automatic) |
 | Indexers | Yes | Yes |
 | Events | Yes | Not yet |
 | ref/out parameters | Yes | Not yet |
 | Generic methods | Yes | Not yet |
-| Setup sequences | Yes | Manual (queue in callback) |
+| Setup sequences | Yes | Manual |
 | Strict/Loose modes | Yes | No |
 
 ## Side-by-Side Examples
@@ -89,15 +51,17 @@ mock.Verify(x => x.GetUser(42), Times.Once);
 
 **KnockOff**
 ```csharp
-// Define stub once (typically in a shared file)
+// Define stub with behavior
 [KnockOff]
-public partial class UserServiceKnockOff : IUserService { }
+public partial class UserServiceKnockOff : IUserService
+{
+    protected User GetUser(int id) => new User { Id = id, Name = "Test User" };
+}
 
 // Use in test
 var knockOff = new UserServiceKnockOff();
-knockOff.Spy.GetUser.OnCall = (ko, id) => new User { Id = id };
-
 IUserService service = knockOff;
+
 var user = service.GetUser(42);
 
 Assert.Equal(1, knockOff.Spy.GetUser.CallCount);
@@ -120,15 +84,18 @@ mock.VerifySet(x => x.CurrentUser = It.IsAny<User>(), Times.Once);
 
 **KnockOff**
 ```csharp
-// Define stub
+// Define stub with property behavior
 [KnockOff]
-public partial class UserServiceKnockOff : IUserService { }
+public partial class UserServiceKnockOff : IUserService
+{
+    protected User GetCurrentUser() => new User { Name = "Test" };
+    protected void SetCurrentUser(User value) { /* custom logic */ }
+}
 
 // Use in test
 var knockOff = new UserServiceKnockOff();
-knockOff.Spy.CurrentUser.OnGet = (ko) => new User { Name = "Test" };
-
 IUserService service = knockOff;
+
 var user = service.CurrentUser;
 service.CurrentUser = new User { Name = "New" };
 
@@ -150,15 +117,16 @@ var entity = await mock.Object.GetByIdAsync(42);
 
 **KnockOff**
 ```csharp
-// Define stub
+// Define stub with async behavior
 [KnockOff]
-public partial class RepositoryKnockOff : IRepository { }
+public partial class RepositoryKnockOff : IRepository
+{
+    protected Task<Entity?> GetByIdAsync(int id) =>
+        Task.FromResult<Entity?>(new Entity { Id = id });
+}
 
 // Use in test
 var knockOff = new RepositoryKnockOff();
-knockOff.Spy.GetByIdAsync.OnCall = (ko, id) =>
-    Task.FromResult<Entity?>(new Entity { Id = id });
-
 var entity = await knockOff.AsRepository().GetByIdAsync(42);
 ```
 
@@ -178,11 +146,14 @@ Assert.Equal(1, captured?.Id);
 
 **KnockOff**
 ```csharp
-// Define stub
+// Define stub - arguments are captured automatically
 [KnockOff]
-public partial class RepositoryKnockOff : IRepository { }
+public partial class RepositoryKnockOff : IRepository
+{
+    protected void Save(Entity entity) { /* optional logic */ }
+}
 
-// Use in test - no setup needed, arguments captured automatically
+// Use in test - no callback setup needed
 var knockOff = new RepositoryKnockOff();
 IRepository repo = knockOff;
 
@@ -210,14 +181,15 @@ var unitOfWork = mock.As<IUnitOfWork>().Object;
 
 **KnockOff**
 ```csharp
-// Define once
+// Define once with behavior for both interfaces
 [KnockOff]
-public partial class EmployeeRepoKnockOff : IEmployeeRepository, IUnitOfWork { }
+public partial class EmployeeRepoKnockOff : IEmployeeRepository, IUnitOfWork
+{
+    protected Task<int> SaveChangesAsync(CancellationToken ct) => Task.FromResult(1);
+}
 
 // Use in tests
 var knockOff = new EmployeeRepoKnockOff();
-knockOff.Spy.SaveChangesAsync.OnCall = (ko, ct) => Task.FromResult(1);
-
 IEmployeeRepository repo = knockOff.AsEmployeeRepository();
 IUnitOfWork unitOfWork = knockOff.AsUnitOfWork();
 ```
@@ -239,20 +211,10 @@ var name = mock.Object["Name"];
 [KnockOff]
 public partial class PropertyStoreKnockOff : IPropertyStore { }
 
-// Use in test
+// Use in test - pre-populate backing dictionary
 var knockOff = new PropertyStoreKnockOff();
-
-// Option 1: Pre-populate backing dictionary
 knockOff.StringIndexerBacking["Name"] = new PropertyInfo { Value = "Test" };
 knockOff.StringIndexerBacking["Age"] = new PropertyInfo { Value = "25" };
-
-// Option 2: Use callback for dynamic behavior
-knockOff.Spy.StringIndexer.OnGet = (ko, key) => key switch
-{
-    "Name" => new PropertyInfo { Value = "Test" },
-    "Age" => new PropertyInfo { Value = "25" },
-    _ => null
-};
 
 IPropertyStore store = knockOff;
 var name = store["Name"];
@@ -283,25 +245,9 @@ Assert.True(knockOff.Spy.GetAll.WasCalled);        // Times.AtLeastOnce
 Assert.Equal(3, knockOff.Spy.Update.CallCount);    // Times.Exactly(3)
 ```
 
-### Static Return via User Method
+## Dynamic Behavior with Callbacks
 
-KnockOff supports defining behavior in the partial class for consistent returns:
-
-**KnockOff**
-```csharp
-[KnockOff]
-public partial class UserServiceKnockOff : IUserService
-{
-    // Generator calls this when IUserService.GetUser is invoked
-    protected User GetUser(int id) => new User { Id = id, Name = "Test User" };
-}
-
-// Test usage - no callback setup needed
-var knockOff = new UserServiceKnockOff();
-var user = knockOff.AsUserService().GetUser(42);
-
-Assert.Equal(42, user.Id);
-```
+For scenarios requiring per-test dynamic behavior, KnockOff provides `OnCall` callbacks:
 
 ### Sequential Returns
 
@@ -315,25 +261,43 @@ mock.SetupSequence(x => x.GetNext())
 
 **KnockOff**
 ```csharp
-// Define stub
 [KnockOff]
 public partial class SequenceKnockOff : ISequence { }
 
-// Use in test
 var knockOff = new SequenceKnockOff();
 var returnValues = new Queue<int>([1, 2, 3]);
 knockOff.Spy.GetNext.OnCall = (ko) => returnValues.Dequeue();
+```
+
+### Per-Test Overrides
+
+When the stub's default behavior isn't right for a specific test:
+
+```csharp
+[KnockOff]
+public partial class UserServiceKnockOff : IUserService
+{
+    // Default behavior for most tests
+    protected User GetUser(int id) => new User { Id = id, Name = "Default" };
+}
+
+[Fact]
+public void Test_WithSpecialCase()
+{
+    var knockOff = new UserServiceKnockOff();
+
+    // Override just for this test
+    knockOff.Spy.GetUser.OnCall = (ko, id) => new User { Id = id, Name = "Special" };
+
+    var user = knockOff.AsUserService().GetUser(42);
+    Assert.Equal("Special", user.Name);
+}
 ```
 
 ### Reset and Reuse
 
 **KnockOff** (no Moq equivalent - Moq requires new mock)
 ```csharp
-// Define stub
-[KnockOff]
-public partial class UserServiceKnockOff : IUserService { }
-
-// Use in test
 var knockOff = new UserServiceKnockOff();
 IUserService service = knockOff;
 
@@ -346,6 +310,14 @@ knockOff.Spy.GetUser.Reset(); // Clears callback and tracking
 var user2 = service.GetUser(2);
 Assert.Equal(0, knockOff.Spy.GetUser.CallCount); // Reset cleared count
 ```
+
+## Callback Priority
+
+When both a user method and callback are defined, the callback takes precedence:
+
+1. **Callback** (if set) — takes precedence
+2. **User method** (if defined) — fallback
+3. **Default** — `default(T)` for methods, backing field for properties
 
 ## When to Use Each
 
@@ -363,42 +335,13 @@ Assert.Equal(0, knockOff.Spy.GetUser.CallCount); // Reset cleared count
 - Debugging generated code is easier than expression trees
 - Your test dependencies are primarily interfaces
 - You want strongly-typed argument tracking with named tuple access
-- You want the layered customization of user methods + callbacks
 
 ## Migration Path
 
 For teams migrating from Moq to KnockOff:
 
 1. **Start with verification-only tests** - Tests that only check `WasCalled`/`CallCount` migrate directly
-2. **Add `OnCall` for returns** - Replace `.Setup().Returns()` with `OnCall` callbacks
-3. **Use partial class for stable stubs** - Move common setups to protected methods
-4. **Defer unsupported features** - Keep Moq for tests using events or ref/out
-
-## But Wait, I Just Want Moq-Style Per-Test Setup
-
-If you prefer Moq's per-test configuration style, KnockOff supports that too. Just define an empty stub and use callbacks:
-
-```csharp
-// Define once - no behavior, just the stub
-[KnockOff]
-public partial class UserServiceKnockOff : IUserService { }
-
-// Configure per-test, just like Moq
-[Fact]
-public void Test_WithMoqStyle()
-{
-    var knockOff = new UserServiceKnockOff();
-
-    // This feels like Moq's Setup().Returns()
-    knockOff.Spy.GetUser.OnCall = (ko, id) => new User { Id = id, Name = "Mocked" };
-    knockOff.Spy.Name.OnGet = (ko) => "Test Name";
-
-    IUserService service = knockOff;
-    var user = service.GetUser(42);
-
-    Assert.Equal("Mocked", user.Name);
-    Assert.Equal(1, knockOff.Spy.GetUser.CallCount);
-}
-```
-
-The difference from Moq: callbacks are simple delegate assignments, not expression trees. You get IntelliSense, compile-time checking, and easier debugging.
+2. **Create stub classes** - Define `[KnockOff]` partial classes for each interface
+3. **Add user methods for stable behavior** - Move common `.Returns()` setups to protected methods
+4. **Use `OnCall` for dynamic cases** - Sequential returns, test-specific overrides
+5. **Defer unsupported features** - Keep Moq for tests using events or ref/out

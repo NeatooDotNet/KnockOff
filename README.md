@@ -131,6 +131,9 @@ Assert.Equal("LastValue", knockOff.Spy.Name.LastSetValue);
 | User-defined method detection | Supported |
 | OnCall/OnGet/OnSet callbacks | Supported |
 | Named tuple argument tracking | Supported |
+| Events | [Planned](docs/design/events.md) |
+| Generic methods | Not yet |
+| ref/out parameters | Not yet |
 
 ## Generated Code
 
