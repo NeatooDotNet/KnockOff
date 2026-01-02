@@ -12,5 +12,6 @@ Releases with notable changes.
 
 ## All Releases
 
+- [v10.1.0](v10.1.0.md) - 2026-01-01 - Documentation fixes
 - [v10.0.1](v10.0.1.md) - 2026-01-01 - Documentation and repository URL fix
 - [v10.0.0](v10.0.0.md) - 2026-01-01 - Initial release

@@ -82,12 +82,6 @@ service.Name = "Third";
 
 Assert.Equal(3, knockOff.Spy.Name.SetCount);
 Assert.Equal("Third", knockOff.Spy.Name.LastSetValue);
-
-// All set values
-Assert.Equal(3, knockOff.Spy.Name.AllSetValues.Count);
-Assert.Equal("First", knockOff.Spy.Name.AllSetValues[0]);
-Assert.Equal("Second", knockOff.Spy.Name.AllSetValues[1]);
-Assert.Equal("Third", knockOff.Spy.Name.AllSetValues[2]);
 ```
 
 ## Customization

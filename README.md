@@ -95,22 +95,16 @@ public partial class CalculatorKnockOff : ICalculator
 }
 ```
 
-**Custom property getters/setters** use `Get`/`Set` prefix:
+**Properties** use auto-generated backing fields. For custom behavior, use `OnGet`/`OnSet` callbacks:
 
 ```csharp
-public interface ICounter
-{
-    int Value { get; set; }
-}
+var knockOff = new UserServiceKnockOff();
 
-[KnockOff]
-public partial class CounterKnockOff : ICounter
-{
-    private int _calls;
+// Custom getter behavior
+knockOff.Spy.Name.OnGet = (ko) => "Dynamic Value";
 
-    protected int GetValue() => ++_calls;  // Custom getter
-    protected void SetValue(int value) { } // Custom setter
-}
+// Custom setter with side effects
+knockOff.Spy.Name.OnSet = (ko, value) => Console.WriteLine($"Set to: {value}");
 ```
 
 ## Runtime Callbacks (Optional)

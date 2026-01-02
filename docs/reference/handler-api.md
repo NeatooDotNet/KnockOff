@@ -83,7 +83,6 @@ For interface properties: `T Prop { get; }`, `T Prop { set; }`, `T Prop { get; s
 | `GetCount` | `int` | Number of getter invocations |
 | `SetCount` | `int` | Number of setter invocations |
 | `LastSetValue` | `T?` | Last value passed to setter |
-| `AllSetValues` | `List<T>` | All values passed to setter in order |
 
 ### Callbacks
 
@@ -96,7 +95,7 @@ For interface properties: `T Prop { get; }`, `T Prop { set; }`, `T Prop { get; s
 
 | Method | Description |
 |--------|-------------|
-| `Reset()` | Clears counts, `AllSetValues`, `OnGet`, and `OnSet` |
+| `Reset()` | Clears counts, `LastSetValue`, `OnGet`, and `OnSet` |
 | `RecordGet()` | Internal - records getter invocation |
 | `RecordSet(T value)` | Internal - records setter invocation |
 
@@ -300,7 +299,7 @@ knockOff.Spy.DataReceived.Clear();  // Clears tracking AND handlers
 | Handler Type | Reset Clears | Reset Does NOT Clear |
 |--------------|--------------|----------------------|
 | Method | `CallCount`, `AllCalls`, `OnCall` | — |
-| Property | `GetCount`, `SetCount`, `AllSetValues`, `OnGet`, `OnSet` | Backing field |
+| Property | `GetCount`, `SetCount`, `LastSetValue`, `OnGet`, `OnSet` | Backing field |
 | Indexer | `GetCount`, `SetCount`, `AllGetKeys`, `AllSetEntries`, `OnGet`, `OnSet` | Backing dictionary |
 | Event | `SubscribeCount`, `UnsubscribeCount`, `RaiseCount`, `AllRaises` | Handlers (use `Clear()` to remove) |
 

@@ -84,17 +84,16 @@ mock.VerifySet(x => x.CurrentUser = It.IsAny<User>(), Times.Once);
 
 **KnockOff**
 ```csharp
-// Define stub with property behavior
+// Define stub - properties use auto-generated backing fields
 [KnockOff]
-public partial class UserServiceKnockOff : IUserService
-{
-    protected User GetCurrentUser() => new User { Name = "Test" };
-    protected void SetCurrentUser(User value) { /* custom logic */ }
-}
+public partial class UserServiceKnockOff : IUserService { }
 
 // Use in test
 var knockOff = new UserServiceKnockOff();
 IUserService service = knockOff;
+
+// Optional: customize getter behavior
+knockOff.Spy.CurrentUser.OnGet = (ko) => new User { Name = "Test" };
 
 var user = service.CurrentUser;
 service.CurrentUser = new User { Name = "New" };
@@ -382,4 +381,4 @@ For teams migrating from Moq to KnockOff:
 2. **Create stub classes** - Define `[KnockOff]` partial classes for each interface
 3. **Add user methods for stable behavior** - Move common `.Returns()` setups to protected methods
 4. **Use `OnCall` for dynamic cases** - Sequential returns, test-specific overrides
-5. **Defer unsupported features** - Keep Moq for tests using events or ref/out
+5. **Defer unsupported features** - Keep Moq for tests using ref/out or generic methods

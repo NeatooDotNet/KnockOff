@@ -72,12 +72,9 @@ public partial class UserServiceKnockOff
         // Handler for Name property
         public sealed class NameHandler
         {
-            private readonly List<string> _setValues = new();
-
             public int GetCount { get; private set; }
             public int SetCount { get; private set; }
             public string? LastSetValue { get; private set; }
-            public IReadOnlyList<string> AllSetValues => _setValues;
 
             public Func<UserServiceKnockOff, string>? OnGet { get; set; }
             public Action<UserServiceKnockOff, string>? OnSet { get; set; }
@@ -87,7 +84,6 @@ public partial class UserServiceKnockOff
             {
                 SetCount++;
                 LastSetValue = value;
-                _setValues.Add(value);
             }
 
             public void Reset()
@@ -95,7 +91,6 @@ public partial class UserServiceKnockOff
                 GetCount = 0;
                 SetCount = 0;
                 LastSetValue = default;
-                _setValues.Clear();
                 OnGet = null;
                 OnSet = null;
             }
@@ -254,4 +249,4 @@ void IAuditor.Log(string msg) { Spy.Log.RecordCall(msg); ... }
 
 - Nullable reference types are respected
 - Default return values use `default(T)` which is `null` for reference types
-- Backing fields for reference types default to `"" ` for strings, `null` for others
+- Backing fields for reference types default to `""` for strings, `null` for others
