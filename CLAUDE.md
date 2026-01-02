@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Key concept: A class marked with `[KnockOff]` that implements an interface will have:
 1. Explicit interface implementations generated for all members
-2. `ExecutionInfo` property for test verification (call counts, args)
+2. `Spy` property for test verification (call counts, args, callbacks)
 3. User-defined methods detected and called from generated intercepts
 
 ## Project Status
@@ -112,14 +112,14 @@ Central configuration via `Directory.Build.props` and `Directory.Packages.props`
 
 For a `[KnockOff]` class implementing an interface:
 
-1. **ExecutionInfo property** - Contains ExecutionDetails for each interface member
-2. **ExecutionDetails variants**:
-   - `ExecutionDetails` - void methods (CallCount, WasCalled, RecordCall)
-   - `ExecutionDetails<TValue>` - properties (GetCount, SetCount, LastSetValue)
-   - `ExecutionDetails<TReturn, TArgs...>` - methods with params (LastCallArgs, AllCalls)
+1. **Spy property** - Contains Handler classes for each interface member
+2. **Handler types**:
+   - Method handlers (CallCount, WasCalled, LastCallArg(s), AllCalls, OnCall)
+   - Property handlers (GetCount, SetCount, LastSetValue, OnGet, OnSet)
+   - Indexer handlers (GetCount, SetCount, LastGetKey, LastSetEntry, OnGet, OnSet)
 3. **Protected backing members** - Properties get backing field, allows override
-4. **Explicit interface implementations** - Record invocation, delegate to backing/user method
-5. **User method detection** - If user defines matching method, generated code calls it
+4. **Explicit interface implementations** - Record invocation, delegate to callback/user method/default
+5. **User method detection** - If user defines matching protected method, generated code calls it
 
 ## Open Design Questions
 
