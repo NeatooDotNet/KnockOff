@@ -172,8 +172,8 @@ public partial class OrderKnockOff : IOrder { }
 
 // Configure validation
 knockOff.Spy.IsValid.OnGet = (ko) => ko.Spy.Total.GetCount > 0;
-knockOff.Spy.GetErrors.OnCall = (ko) =>
-    ko.Spy.IsValid.OnGet!(ko) ? [] : ["No total calculated"];
+knockOff.Spy.GetErrors.OnCall((ko) =>
+    ko.Spy.IsValid.OnGet!(ko) ? [] : ["No total calculated"]);
 ```
 
 ### Repository Hierarchy
@@ -195,8 +195,8 @@ public interface IWriteRepository<T> : IReadRepository<T>
 public partial class UserWriteRepositoryKnockOff : IWriteRepository<User> { }
 
 // All methods available
-knockOff.Spy.GetById.OnCall = (ko, id) => users.FirstOrDefault(u => u.Id == id);
-knockOff.Spy.GetAll.OnCall = (ko) => users;
-knockOff.Spy.Add.OnCall = (ko, user) => users.Add(user);
-knockOff.Spy.Delete.OnCall = (ko, id) => users.RemoveAll(u => u.Id == id);
+knockOff.Spy.GetById.OnCall((ko, id) => users.FirstOrDefault(u => u.Id == id));
+knockOff.Spy.GetAll.OnCall((ko) => users);
+knockOff.Spy.Add.OnCall((ko, user) => users.Add(user));
+knockOff.Spy.Delete.OnCall((ko, id) => users.RemoveAll(u => u.Id == id));
 ```

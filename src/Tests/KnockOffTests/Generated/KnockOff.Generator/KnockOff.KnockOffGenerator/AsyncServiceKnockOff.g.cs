@@ -8,25 +8,37 @@ partial class AsyncServiceKnockOff
 	/// <summary>Tracks and configures behavior for DoWorkAsync.</summary>
 	public sealed class DoWorkAsyncHandler
 	{
+		/// <summary>Delegate for DoWorkAsync().</summary>
+		public delegate global::System.Threading.Tasks.Task DoWorkAsyncDelegate(AsyncServiceKnockOff ko);
+
+		private DoWorkAsyncDelegate? _onCall;
+
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when the method is called. If set (and returns non-null for Func), its result is used.</summary>
-		public global::System.Func<AsyncServiceKnockOff, global::System.Threading.Tasks.Task>? OnCall { get; set; }
+		/// <summary>Sets callback for DoWorkAsync(parameterless) overload.</summary>
+		public void OnCall(DoWorkAsyncDelegate callback) => _onCall = callback;
+
+		internal DoWorkAsyncDelegate? GetCallback() => _onCall;
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; OnCall = null; }
+		public void Reset() { CallCount = 0; _onCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for GetValueAsync.</summary>
 	public sealed class GetValueAsyncHandler
 	{
+		/// <summary>Delegate for GetValueAsync(int input).</summary>
+		public delegate global::System.Threading.Tasks.Task<int> GetValueAsyncDelegate(AsyncServiceKnockOff ko, int input);
+
+		private GetValueAsyncDelegate? _onCall;
+
 		private readonly global::System.Collections.Generic.List<int> _calls = new();
 
 		/// <summary>Number of times this method was called.</summary>
@@ -41,76 +53,104 @@ partial class AsyncServiceKnockOff
 		/// <summary>All recorded calls with their arguments.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<int> AllCalls => _calls;
 
-		/// <summary>Callback invoked when the method is called. If set (and returns non-null for Func), its result is used.</summary>
-		public global::System.Func<AsyncServiceKnockOff, int, global::System.Threading.Tasks.Task<int>>? OnCall { get; set; }
+		/// <summary>Sets callback for GetValueAsync(input) overload.</summary>
+		public void OnCall(GetValueAsyncDelegate callback) => _onCall = callback;
+
+		internal GetValueAsyncDelegate? GetCallback() => _onCall;
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall(int input) => _calls.Add(input);
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { _calls.Clear(); _onCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for GetOptionalAsync.</summary>
 	public sealed class GetOptionalAsyncHandler
 	{
+		/// <summary>Delegate for GetOptionalAsync().</summary>
+		public delegate global::System.Threading.Tasks.Task<string?> GetOptionalAsyncDelegate(AsyncServiceKnockOff ko);
+
+		private GetOptionalAsyncDelegate? _onCall;
+
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when the method is called. If set (and returns non-null for Func), its result is used.</summary>
-		public global::System.Func<AsyncServiceKnockOff, global::System.Threading.Tasks.Task<string?>>? OnCall { get; set; }
+		/// <summary>Sets callback for GetOptionalAsync(parameterless) overload.</summary>
+		public void OnCall(GetOptionalAsyncDelegate callback) => _onCall = callback;
+
+		internal GetOptionalAsyncDelegate? GetCallback() => _onCall;
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; OnCall = null; }
+		public void Reset() { CallCount = 0; _onCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for GetRequiredAsync.</summary>
 	public sealed class GetRequiredAsyncHandler
 	{
+		/// <summary>Delegate for GetRequiredAsync().</summary>
+		public delegate global::System.Threading.Tasks.Task<string> GetRequiredAsyncDelegate(AsyncServiceKnockOff ko);
+
+		private GetRequiredAsyncDelegate? _onCall;
+
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when the method is called. If set (and returns non-null for Func), its result is used.</summary>
-		public global::System.Func<AsyncServiceKnockOff, global::System.Threading.Tasks.Task<string>>? OnCall { get; set; }
+		/// <summary>Sets callback for GetRequiredAsync(parameterless) overload.</summary>
+		public void OnCall(GetRequiredAsyncDelegate callback) => _onCall = callback;
+
+		internal GetRequiredAsyncDelegate? GetCallback() => _onCall;
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; OnCall = null; }
+		public void Reset() { CallCount = 0; _onCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for DoWorkValueTaskAsync.</summary>
 	public sealed class DoWorkValueTaskAsyncHandler
 	{
+		/// <summary>Delegate for DoWorkValueTaskAsync().</summary>
+		public delegate global::System.Threading.Tasks.ValueTask DoWorkValueTaskAsyncDelegate(AsyncServiceKnockOff ko);
+
+		private DoWorkValueTaskAsyncDelegate? _onCall;
+
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when the method is called. If set (and returns non-null for Func), its result is used.</summary>
-		public global::System.Func<AsyncServiceKnockOff, global::System.Threading.Tasks.ValueTask>? OnCall { get; set; }
+		/// <summary>Sets callback for DoWorkValueTaskAsync(parameterless) overload.</summary>
+		public void OnCall(DoWorkValueTaskAsyncDelegate callback) => _onCall = callback;
+
+		internal DoWorkValueTaskAsyncDelegate? GetCallback() => _onCall;
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; OnCall = null; }
+		public void Reset() { CallCount = 0; _onCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for GetValueValueTaskAsync.</summary>
 	public sealed class GetValueValueTaskAsyncHandler
 	{
+		/// <summary>Delegate for GetValueValueTaskAsync(int input).</summary>
+		public delegate global::System.Threading.Tasks.ValueTask<int> GetValueValueTaskAsyncDelegate(AsyncServiceKnockOff ko, int input);
+
+		private GetValueValueTaskAsyncDelegate? _onCall;
+
 		private readonly global::System.Collections.Generic.List<int> _calls = new();
 
 		/// <summary>Number of times this method was called.</summary>
@@ -125,14 +165,16 @@ partial class AsyncServiceKnockOff
 		/// <summary>All recorded calls with their arguments.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<int> AllCalls => _calls;
 
-		/// <summary>Callback invoked when the method is called. If set (and returns non-null for Func), its result is used.</summary>
-		public global::System.Func<AsyncServiceKnockOff, int, global::System.Threading.Tasks.ValueTask<int>>? OnCall { get; set; }
+		/// <summary>Sets callback for GetValueValueTaskAsync(input) overload.</summary>
+		public void OnCall(GetValueValueTaskAsyncDelegate callback) => _onCall = callback;
+
+		internal GetValueValueTaskAsyncDelegate? GetCallback() => _onCall;
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall(int input) => _calls.Add(input);
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { _calls.Clear(); _onCall = null; }
 	}
 
 	/// <summary>Spy for AsyncServiceKnockOff - tracks invocations and configures behavior.</summary>
@@ -161,7 +203,7 @@ partial class AsyncServiceKnockOff
 	global::System.Threading.Tasks.Task KnockOff.Tests.IAsyncService.DoWorkAsync()
 	{
 		Spy.DoWorkAsync.RecordCall();
-		if (Spy.DoWorkAsync.OnCall is { } onCallCallback)
+		if (Spy.DoWorkAsync.GetCallback() is { } onCallCallback)
 			return onCallCallback(this);
 		return global::System.Threading.Tasks.Task.CompletedTask;
 	}
@@ -169,7 +211,7 @@ partial class AsyncServiceKnockOff
 	global::System.Threading.Tasks.Task<int> KnockOff.Tests.IAsyncService.GetValueAsync(int input)
 	{
 		Spy.GetValueAsync.RecordCall(input);
-		if (Spy.GetValueAsync.OnCall is { } onCallCallback)
+		if (Spy.GetValueAsync.GetCallback() is { } onCallCallback)
 			return onCallCallback(this, input);
 		return GetValueAsync(input);
 	}
@@ -177,7 +219,7 @@ partial class AsyncServiceKnockOff
 	global::System.Threading.Tasks.Task<string?> KnockOff.Tests.IAsyncService.GetOptionalAsync()
 	{
 		Spy.GetOptionalAsync.RecordCall();
-		if (Spy.GetOptionalAsync.OnCall is { } onCallCallback)
+		if (Spy.GetOptionalAsync.GetCallback() is { } onCallCallback)
 			return onCallCallback(this);
 		return global::System.Threading.Tasks.Task.FromResult<string?>(default!);
 	}
@@ -185,7 +227,7 @@ partial class AsyncServiceKnockOff
 	global::System.Threading.Tasks.Task<string> KnockOff.Tests.IAsyncService.GetRequiredAsync()
 	{
 		Spy.GetRequiredAsync.RecordCall();
-		if (Spy.GetRequiredAsync.OnCall is { } onCallCallback)
+		if (Spy.GetRequiredAsync.GetCallback() is { } onCallCallback)
 			return onCallCallback(this);
 		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'GetRequiredAsync' in your partial class, or set Spy.GetRequiredAsync.OnCall.");
 	}
@@ -193,7 +235,7 @@ partial class AsyncServiceKnockOff
 	global::System.Threading.Tasks.ValueTask KnockOff.Tests.IAsyncService.DoWorkValueTaskAsync()
 	{
 		Spy.DoWorkValueTaskAsync.RecordCall();
-		if (Spy.DoWorkValueTaskAsync.OnCall is { } onCallCallback)
+		if (Spy.DoWorkValueTaskAsync.GetCallback() is { } onCallCallback)
 			return onCallCallback(this);
 		return default;
 	}
@@ -201,7 +243,7 @@ partial class AsyncServiceKnockOff
 	global::System.Threading.Tasks.ValueTask<int> KnockOff.Tests.IAsyncService.GetValueValueTaskAsync(int input)
 	{
 		Spy.GetValueValueTaskAsync.RecordCall(input);
-		if (Spy.GetValueValueTaskAsync.OnCall is { } onCallCallback)
+		if (Spy.GetValueValueTaskAsync.GetCallback() is { } onCallCallback)
 			return onCallCallback(this, input);
 		return GetValueValueTaskAsync(input);
 	}

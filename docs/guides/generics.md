@@ -44,14 +44,14 @@ Assert.Same(user, savedUser);
 Callbacks also use concrete types:
 
 ```csharp
-knockOff.Spy.GetById.OnCall = (ko, id) =>
-    new User { Id = id, Name = $"User-{id}" };
+knockOff.Spy.GetById.OnCall((ko, id) =>
+    new User { Id = id, Name = $"User-{id}" });
 
-knockOff.Spy.Save.OnCall = (ko, user) =>
+knockOff.Spy.Save.OnCall((ko, user) =>
 {
     // user is typed as User, not T
     Assert.NotNull(user.Name);
-};
+});
 ```
 
 ## Multiple Generic Parameters
@@ -72,17 +72,17 @@ Usage:
 ```csharp
 var knockOff = new StringCacheKnockOff();
 
-knockOff.Spy.Get.OnCall = (ko, key) => key switch
+knockOff.Spy.Get.OnCall((ko, key) => key switch
 {
     "admin" => new User { Name = "Admin" },
     _ => null
-};
+});
 
-knockOff.Spy.Set.OnCall = (ko, args) =>
+knockOff.Spy.Set.OnCall((ko, key, value) =>
 {
-    var (key, value) = args;  // string key, User value
+    // string key, User value
     Console.WriteLine($"Cached {key}: {value.Name}");
-};
+});
 ```
 
 ## Constrained Generics
@@ -114,7 +114,7 @@ public interface IFactory<T> where T : new()
 public partial class UserFactoryKnockOff : IFactory<User> { }
 
 // Usage
-knockOff.Spy.Create.OnCall = (ko) => new User { Name = "Created" };
+knockOff.Spy.Create.OnCall((ko) => new User { Name = "Created" });
 ```
 
 ### Collection Repositories
@@ -136,10 +136,10 @@ var products = new List<Product>
     new Product { Id = 2, Name = "Gadget" }
 };
 
-knockOff.Spy.GetAll.OnCall = (ko) => products;
+knockOff.Spy.GetAll.OnCall((ko) => products);
 
-knockOff.Spy.FindFirst.OnCall = (ko, predicate) =>
-    products.FirstOrDefault(predicate);
+knockOff.Spy.FindFirst.OnCall((ko, predicate) =>
+    products.FirstOrDefault(predicate));
 ```
 
 ### Async Generic Repositories
@@ -156,11 +156,11 @@ public interface IAsyncRepository<T> where T : class
 public partial class AsyncUserRepositoryKnockOff : IAsyncRepository<User> { }
 
 // Usage
-knockOff.Spy.GetByIdAsync.OnCall = (ko, id) =>
-    Task.FromResult<User?>(new User { Id = id });
+knockOff.Spy.GetByIdAsync.OnCall((ko, id) =>
+    Task.FromResult<User?>(new User { Id = id }));
 
-knockOff.Spy.GetAllAsync.OnCall = (ko) =>
-    Task.FromResult<IEnumerable<User>>(users);
+knockOff.Spy.GetAllAsync.OnCall((ko) =>
+    Task.FromResult<IEnumerable<User>>(users));
 ```
 
 ## Limitations

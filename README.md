@@ -115,7 +115,7 @@ If you need per-test behavior without creating a new stub class, use callbacks:
 var knockOff = new DataServiceKnockOff();
 
 // Override for this specific test
-knockOff.Spy.GetCount.OnCall = (ko) => 999;
+knockOff.Spy.GetCount.OnCall((ko) => 999);
 knockOff.Spy.Name.OnGet = (ko) => "FromCallback";
 knockOff.Spy.Name.OnSet = (ko, value) => { /* custom logic */ };
 ```
@@ -155,6 +155,7 @@ Assert.Equal("Second", knockOff.Spy.Name.LastSetValue);
 | Void methods | Supported |
 | Methods with return values | Supported |
 | Methods with parameters (single and multiple) | Supported |
+| Method overloads | Supported |
 | Async methods (Task, Task&lt;T&gt;, ValueTask, ValueTask&lt;T&gt;) | Supported |
 | Generic interfaces | Supported |
 | Multiple interface implementation | Supported |
@@ -191,7 +192,7 @@ public partial class UserServiceKnockOff
     User IUserService.GetUser(int id)
     {
         Spy.GetUser.RecordCall(id);
-        if (Spy.GetUser.OnCall is { } callback)
+        if (Spy.GetUser.GetCallback() is { } callback)
             return callback(this, id);
         return GetUser(id); // Calls user method
     }

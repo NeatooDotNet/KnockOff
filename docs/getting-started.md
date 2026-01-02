@@ -136,10 +136,10 @@ public void RejectsEmail_WhenNotConnected()
     knockOff.Spy.IsConnected.OnGet = (ko) => false;
 
     // Configure method to throw
-    knockOff.Spy.SendEmail.OnCall = (ko, args) =>
+    knockOff.Spy.SendEmail.OnCall((ko, to, subject, body) =>
     {
         throw new InvalidOperationException("Not connected");
-    };
+    });
 
     // ... test code
 }
@@ -179,7 +179,7 @@ Generated files appear in `Generated/KnockOff.Generator/KnockOff.KnockOffGenerat
 
 ```csharp
 // Via callback
-knockOff.Spy.GetUser.OnCall = (ko, id) => new User { Id = id, Name = "Test" };
+knockOff.Spy.GetUser.OnCall((ko, id) => new User { Id = id, Name = "Test" });
 
 // Via user method (in stub class)
 protected User GetUser(int id) => new User { Id = id, Name = "Default" };
@@ -188,8 +188,8 @@ protected User GetUser(int id) => new User { Id = id, Name = "Default" };
 ### Simulating Failures
 
 ```csharp
-knockOff.Spy.SaveAsync.OnCall = (ko, entity) =>
-    Task.FromException<int>(new DbException("Connection lost"));
+knockOff.Spy.SaveAsync.OnCall((ko, entity) =>
+    Task.FromException<int>(new DbException("Connection lost")));
 ```
 
 ### Capturing Arguments for Later Assertions
@@ -197,10 +197,10 @@ knockOff.Spy.SaveAsync.OnCall = (ko, entity) =>
 ```csharp
 List<string> sentEmails = new();
 
-knockOff.Spy.SendEmail.OnCall = (ko, args) =>
+knockOff.Spy.SendEmail.OnCall((ko, to, subject, body) =>
 {
-    sentEmails.Add(args.to);
-};
+    sentEmails.Add(to);
+});
 
 // ... run test ...
 

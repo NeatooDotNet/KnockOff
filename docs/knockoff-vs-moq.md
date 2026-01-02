@@ -303,7 +303,7 @@ public partial class SequenceKnockOff : ISequence { }
 
 var knockOff = new SequenceKnockOff();
 var returnValues = new Queue<int>([1, 2, 3]);
-knockOff.Spy.GetNext.OnCall = (ko) => returnValues.Dequeue();
+knockOff.Spy.GetNext.OnCall((ko) => returnValues.Dequeue());
 ```
 
 ### Per-Test Overrides
@@ -324,7 +324,7 @@ public void Test_WithSpecialCase()
     var knockOff = new UserServiceKnockOff();
 
     // Override just for this test
-    knockOff.Spy.GetUser.OnCall = (ko, id) => new User { Id = id, Name = "Special" };
+    knockOff.Spy.GetUser.OnCall((ko, id) => new User { Id = id, Name = "Special" });
 
     var user = knockOff.AsUserService().GetUser(42);
     Assert.Equal("Special", user.Name);
@@ -338,7 +338,7 @@ public void Test_WithSpecialCase()
 var knockOff = new UserServiceKnockOff();
 IUserService service = knockOff;
 
-knockOff.Spy.GetUser.OnCall = (ko, id) => new User { Name = "First" };
+knockOff.Spy.GetUser.OnCall((ko, id) => new User { Name = "First" });
 var user1 = service.GetUser(1);
 
 knockOff.Spy.GetUser.Reset(); // Clears callback and tracking

@@ -99,6 +99,9 @@ public partial class UserServiceKnockOff
         // Handler for GetUser method
         public sealed class GetUserHandler
         {
+            public delegate User? GetUserDelegate(UserServiceKnockOff ko, int id);
+
+            private GetUserDelegate? _onCall;
             private readonly List<int> _calls = new();
 
             public int CallCount => _calls.Count;
@@ -106,14 +109,15 @@ public partial class UserServiceKnockOff
             public int? LastCallArg => _calls.Count > 0 ? _calls[^1] : null;
             public IReadOnlyList<int> AllCalls => _calls;
 
-            public Func<UserServiceKnockOff, int, User?>? OnCall { get; set; }
+            public void OnCall(GetUserDelegate callback) => _onCall = callback;
+            internal GetUserDelegate? GetCallback() => _onCall;
 
             public void RecordCall(int id) => _calls.Add(id);
 
             public void Reset()
             {
                 _calls.Clear();
-                OnCall = null;
+                _onCall = null;
             }
         }
     }
@@ -142,7 +146,7 @@ public partial class UserServiceKnockOff
     User? IUserService.GetUser(int id)
     {
         Spy.GetUser.RecordCall(id);
-        if (Spy.GetUser.OnCall is { } onCallCallback)
+        if (Spy.GetUser.GetCallback() is { } onCallCallback)
             return onCallCallback(this, id);
         return GetUser(id);  // Calls user-defined method
     }

@@ -36,25 +36,37 @@ partial class SampleKnockOff
 	/// <summary>Tracks and configures behavior for DoSomething.</summary>
 	public sealed class DoSomethingHandler
 	{
+		/// <summary>Delegate for DoSomething().</summary>
+		public delegate void DoSomethingDelegate(SampleKnockOff ko);
+
+		private DoSomethingDelegate? _onCall;
+
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when the method is called. If set (and returns non-null for Func), its result is used.</summary>
-		public global::System.Action<SampleKnockOff>? OnCall { get; set; }
+		/// <summary>Sets callback for DoSomething(parameterless) overload.</summary>
+		public void OnCall(DoSomethingDelegate callback) => _onCall = callback;
+
+		internal DoSomethingDelegate? GetCallback() => _onCall;
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; OnCall = null; }
+		public void Reset() { CallCount = 0; _onCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for GetValue.</summary>
 	public sealed class GetValueHandler
 	{
+		/// <summary>Delegate for GetValue(int input).</summary>
+		public delegate int GetValueDelegate(SampleKnockOff ko, int input);
+
+		private GetValueDelegate? _onCall;
+
 		private readonly global::System.Collections.Generic.List<int> _calls = new();
 
 		/// <summary>Number of times this method was called.</summary>
@@ -69,19 +81,26 @@ partial class SampleKnockOff
 		/// <summary>All recorded calls with their arguments.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<int> AllCalls => _calls;
 
-		/// <summary>Callback invoked when the method is called. If set (and returns non-null for Func), its result is used.</summary>
-		public global::System.Func<SampleKnockOff, int, int>? OnCall { get; set; }
+		/// <summary>Sets callback for GetValue(input) overload.</summary>
+		public void OnCall(GetValueDelegate callback) => _onCall = callback;
+
+		internal GetValueDelegate? GetCallback() => _onCall;
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall(int input) => _calls.Add(input);
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { _calls.Clear(); _onCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for Calculate.</summary>
 	public sealed class CalculateHandler
 	{
+		/// <summary>Delegate for Calculate(string name, int value, bool flag).</summary>
+		public delegate void CalculateDelegate(SampleKnockOff ko, string name, int value, bool flag);
+
+		private CalculateDelegate? _onCall;
+
 		private readonly global::System.Collections.Generic.List<(string name, int value, bool flag)> _calls = new();
 
 		/// <summary>Number of times this method was called.</summary>
@@ -90,39 +109,48 @@ partial class SampleKnockOff
 		/// <summary>True if this method was called at least once.</summary>
 		public bool WasCalled => _calls.Count > 0;
 
-		/// <summary>The arguments from the most recent call.</summary>
+		/// <summary>Arguments from the most recent call (nullable for params not in all overloads).</summary>
 		public (string name, int value, bool flag)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
 
 		/// <summary>All recorded calls with their arguments.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<(string name, int value, bool flag)> AllCalls => _calls;
 
-		/// <summary>Callback invoked when the method is called. If set (and returns non-null for Func), its result is used.</summary>
-		public global::System.Action<SampleKnockOff, (string name, int value, bool flag)>? OnCall { get; set; }
+		/// <summary>Sets callback for Calculate(name, value, flag) overload.</summary>
+		public void OnCall(CalculateDelegate callback) => _onCall = callback;
+
+		internal CalculateDelegate? GetCallback() => _onCall;
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall(string name, int value, bool flag) => _calls.Add((name, value, flag));
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { _calls.Clear(); _onCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for GetOptional.</summary>
 	public sealed class GetOptionalHandler
 	{
+		/// <summary>Delegate for GetOptional().</summary>
+		public delegate string? GetOptionalDelegate(SampleKnockOff ko);
+
+		private GetOptionalDelegate? _onCall;
+
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when the method is called. If set (and returns non-null for Func), its result is used.</summary>
-		public global::System.Func<SampleKnockOff, string?>? OnCall { get; set; }
+		/// <summary>Sets callback for GetOptional(parameterless) overload.</summary>
+		public void OnCall(GetOptionalDelegate callback) => _onCall = callback;
+
+		internal GetOptionalDelegate? GetCallback() => _onCall;
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; OnCall = null; }
+		public void Reset() { CallCount = 0; _onCall = null; }
 	}
 
 	/// <summary>Spy for SampleKnockOff - tracks invocations and configures behavior.</summary>
@@ -171,14 +199,14 @@ partial class SampleKnockOff
 	void KnockOff.Tests.ISampleService.DoSomething()
 	{
 		Spy.DoSomething.RecordCall();
-		if (Spy.DoSomething.OnCall is { } onCallCallback)
+		if (Spy.DoSomething.GetCallback() is { } onCallCallback)
 		{ onCallCallback(this); return; }
 	}
 
 	int KnockOff.Tests.ISampleService.GetValue(int input)
 	{
 		Spy.GetValue.RecordCall(input);
-		if (Spy.GetValue.OnCall is { } onCallCallback)
+		if (Spy.GetValue.GetCallback() is { } onCallCallback)
 			return onCallCallback(this, input);
 		return GetValue(input);
 	}
@@ -186,14 +214,14 @@ partial class SampleKnockOff
 	void KnockOff.Tests.ISampleService.Calculate(string name, int value, bool flag)
 	{
 		Spy.Calculate.RecordCall(name, value, flag);
-		if (Spy.Calculate.OnCall is { } onCallCallback)
-		{ onCallCallback(this, (name, value, flag)); return; }
+		if (Spy.Calculate.GetCallback() is { } onCallCallback)
+		{ onCallCallback(this, name, value, flag); return; }
 	}
 
 	string? KnockOff.Tests.ISampleService.GetOptional()
 	{
 		Spy.GetOptional.RecordCall();
-		if (Spy.GetOptional.OnCall is { } onCallCallback)
+		if (Spy.GetOptional.GetCallback() is { } onCallCallback)
 			return onCallCallback(this);
 		return default!;
 	}

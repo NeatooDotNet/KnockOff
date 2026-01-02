@@ -127,52 +127,52 @@ Rules:
 
 ```csharp
 // No parameters
-knockOff.Spy.Initialize.OnCall = (ko) =>
+knockOff.Spy.Initialize.OnCall((ko) =>
 {
     // Custom initialization logic
-};
+});
 
 // Single parameter
-knockOff.Spy.Log.OnCall = (ko, message) =>
+knockOff.Spy.Log.OnCall((ko, message) =>
 {
     Console.WriteLine($"Logged: {message}");
-};
+});
 
-// Multiple parameters (receives tuple)
-knockOff.Spy.LogError.OnCall = (ko, args) =>
+// Multiple parameters (individual params)
+knockOff.Spy.LogError.OnCall((ko, message, ex) =>
 {
-    var (message, ex) = args;
     Console.WriteLine($"Error: {message} - {ex.Message}");
-};
+});
 ```
 
 ### Return Method Callbacks
 
 ```csharp
 // No parameters
-knockOff.Spy.Count.OnCall = (ko) => 42;
+knockOff.Spy.Count.OnCall((ko) => 42);
 
 // Single parameter
-knockOff.Spy.GetById.OnCall = (ko, id) => new User { Id = id };
+knockOff.Spy.GetById.OnCall((ko, id) => new User { Id = id });
 
 // Multiple parameters
-knockOff.Spy.Find.OnCall = (ko, args) =>
+knockOff.Spy.Find.OnCall((ko, name, includeInactive) =>
 {
-    var (name, includeInactive) = args;
     return users.Where(u => u.Name == name).ToList();
-};
+});
 ```
 
 ### Callback Signatures
 
-| Method Signature | OnCall Type |
-|------------------|-------------|
-| `void M()` | `Action<TKnockOff>` |
-| `void M(T1 a)` | `Action<TKnockOff, T1>` |
-| `void M(T1 a, T2 b, ...)` | `Action<TKnockOff, (T1 a, T2 b, ...)>` |
-| `R M()` | `Func<TKnockOff, R>` |
-| `R M(T1 a)` | `Func<TKnockOff, T1, R>` |
-| `R M(T1 a, T2 b, ...)` | `Func<TKnockOff, (T1 a, T2 b, ...), R>` |
+Each method gets a generated delegate type with individual parameters:
+
+| Method Signature | OnCall Delegate |
+|------------------|-----------------|
+| `void M()` | `MDelegate(TKnockOff ko)` |
+| `void M(T1 a)` | `MDelegate(TKnockOff ko, T1 a)` |
+| `void M(T1 a, T2 b)` | `MDelegate(TKnockOff ko, T1 a, T2 b)` |
+| `R M()` | `MDelegate(TKnockOff ko) → R` |
+| `R M(T1 a)` | `MDelegate(TKnockOff ko, T1 a) → R` |
+| `R M(T1 a, T2 b)` | `MDelegate(TKnockOff ko, T1 a, T2 b) → R` |
 
 ## Priority Order
 
@@ -194,7 +194,7 @@ IService service = knockOff;
 Assert.Equal(10, service.Calculate(5));  // 5 * 2
 
 // Callback → overrides user method
-knockOff.Spy.Calculate.OnCall = (ko, x) => x * 100;
+knockOff.Spy.Calculate.OnCall((ko, x) => x * 100);
 Assert.Equal(500, service.Calculate(5));  // callback
 
 // Reset → back to user method
@@ -207,32 +207,32 @@ Assert.Equal(10, service.Calculate(5));  // user method again
 ### Simulating Failures
 
 ```csharp
-knockOff.Spy.Save.OnCall = (ko, entity) =>
+knockOff.Spy.Save.OnCall((ko, entity) =>
 {
     throw new DbException("Connection failed");
-};
+});
 ```
 
 ### Conditional Returns
 
 ```csharp
-knockOff.Spy.GetById.OnCall = (ko, id) => id switch
+knockOff.Spy.GetById.OnCall((ko, id) => id switch
 {
     1 => new User { Id = 1, Name = "Admin" },
     2 => new User { Id = 2, Name = "Guest" },
     _ => null
-};
+});
 ```
 
 ### Capturing Arguments
 
 ```csharp
 var capturedIds = new List<int>();
-knockOff.Spy.GetById.OnCall = (ko, id) =>
+knockOff.Spy.GetById.OnCall((ko, id) =>
 {
     capturedIds.Add(id);
     return new User { Id = id };
-};
+});
 ```
 
 ### Verifying Call Order
@@ -240,9 +240,9 @@ knockOff.Spy.GetById.OnCall = (ko, id) =>
 ```csharp
 var callOrder = new List<string>();
 
-knockOff.Spy.Initialize.OnCall = (ko) => callOrder.Add("Initialize");
-knockOff.Spy.Process.OnCall = (ko) => callOrder.Add("Process");
-knockOff.Spy.Cleanup.OnCall = (ko) => callOrder.Add("Cleanup");
+knockOff.Spy.Initialize.OnCall((ko) => callOrder.Add("Initialize"));
+knockOff.Spy.Process.OnCall((ko) => callOrder.Add("Process"));
+knockOff.Spy.Cleanup.OnCall((ko) => callOrder.Add("Cleanup"));
 
 // ... run code under test ...
 
@@ -253,7 +253,7 @@ Assert.Equal(["Initialize", "Process", "Cleanup"], callOrder);
 
 ```csharp
 var results = new Queue<int>([1, 2, 3]);
-knockOff.Spy.GetNext.OnCall = (ko) => results.Dequeue();
+knockOff.Spy.GetNext.OnCall((ko) => results.Dequeue());
 
 Assert.Equal(1, service.GetNext());
 Assert.Equal(2, service.GetNext());
@@ -263,9 +263,9 @@ Assert.Equal(3, service.GetNext());
 ### Accessing Other Spy State
 
 ```csharp
-knockOff.Spy.Process.OnCall = (ko) =>
+knockOff.Spy.Process.OnCall((ko) =>
 {
     if (!ko.Spy.Initialize.WasCalled)
         throw new InvalidOperationException("Not initialized");
-};
+});
 ```

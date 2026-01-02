@@ -12,11 +12,11 @@ public class CallbackTests
 		ISampleService service = knockOff;
 
 		var callbackInvoked = false;
-		knockOff.Spy.DoSomething.OnCall = (ko) =>
+		knockOff.Spy.DoSomething.OnCall((ko) =>
 		{
 			callbackInvoked = true;
 			Assert.Same(knockOff, ko);
-		};
+		});
 
 		service.DoSomething();
 
@@ -30,7 +30,7 @@ public class CallbackTests
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		knockOff.Spy.GetValue.OnCall = (ko, input) => input * 10;
+		knockOff.Spy.GetValue.OnCall((ko, input) => input * 10);
 
 		var result = service.GetValue(5);
 
@@ -40,23 +40,26 @@ public class CallbackTests
 	}
 
 	[Fact]
-	public void OnCall_WithTupleParams_ReceivesTuple()
+	public void OnCall_WithMultipleParams_ReceivesAllParams()
 	{
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		(string, int, bool)? capturedArgs = null;
-		knockOff.Spy.Calculate.OnCall = (ko, args) =>
+		string? capturedName = null;
+		int? capturedValue = null;
+		bool? capturedFlag = null;
+		knockOff.Spy.Calculate.OnCall((ko, name, value, flag) =>
 		{
-			capturedArgs = args;
-		};
+			capturedName = name;
+			capturedValue = value;
+			capturedFlag = flag;
+		});
 
 		service.Calculate("test", 42, true);
 
-		Assert.NotNull(capturedArgs);
-		Assert.Equal("test", capturedArgs.Value.Item1);
-		Assert.Equal(42, capturedArgs.Value.Item2);
-		Assert.True(capturedArgs.Value.Item3);
+		Assert.Equal("test", capturedName);
+		Assert.Equal(42, capturedValue);
+		Assert.True(capturedFlag);
 	}
 
 	[Fact]
@@ -67,11 +70,11 @@ public class CallbackTests
 
 		service.DoSomething();
 
-		knockOff.Spy.GetValue.OnCall = (ko, input) =>
+		knockOff.Spy.GetValue.OnCall((ko, input) =>
 		{
 			Assert.True(ko.Spy.DoSomething.WasCalled);
 			return input * 100;
-		};
+		});
 
 		var result = service.GetValue(3);
 
@@ -121,7 +124,7 @@ public class CallbackTests
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		knockOff.Spy.GetValue.OnCall = (ko, input) => 999;
+		knockOff.Spy.GetValue.OnCall((ko, input) => 999);
 
 		var resultBefore = service.GetValue(1);
 		Assert.Equal(999, resultBefore);
@@ -139,8 +142,8 @@ public class CallbackTests
 		var knockOff = new AsyncServiceKnockOff();
 		IAsyncService service = knockOff;
 
-		knockOff.Spy.GetValueAsync.OnCall = (ko, input) =>
-			Task.FromResult(input * 100);
+		knockOff.Spy.GetValueAsync.OnCall((ko, input) =>
+			Task.FromResult(input * 100));
 
 		var result = await service.GetValueAsync(7);
 
@@ -155,11 +158,11 @@ public class CallbackTests
 		IRepository<User> repo = knockOff;
 
 		var mockUser = new User { Id = 42, Name = "MockUser" };
-		knockOff.Spy.GetById.OnCall = (ko, id) =>
+		knockOff.Spy.GetById.OnCall((ko, id) =>
 		{
 			if (id == 42) return mockUser;
 			return null;
-		};
+		});
 
 		var result = repo.GetById(42);
 

@@ -386,6 +386,82 @@ public class KnockOffGenerator : IIncrementalGenerator
 	}
 
 	/// <summary>
+	/// Groups methods by name to handle overloads, creating combined parameter tuples
+	/// </summary>
+	private static Dictionary<string, MethodGroupInfo> GroupMethodsByName(IEnumerable<InterfaceMemberInfo> methods)
+	{
+		var groups = new Dictionary<string, List<InterfaceMemberInfo>>();
+
+		foreach (var method in methods.Where(m => !m.IsProperty))
+		{
+			if (!groups.TryGetValue(method.Name, out var list))
+			{
+				list = new List<InterfaceMemberInfo>();
+				groups[method.Name] = list;
+			}
+			list.Add(method);
+		}
+
+		var result = new Dictionary<string, MethodGroupInfo>();
+
+		foreach (var kvp in groups)
+		{
+			var methodName = kvp.Key;
+			var overloads = kvp.Value;
+			var first = overloads[0];
+
+			// Build combined parameters: union of all params across overloads
+			// Params not in all overloads become nullable
+			var allParamNames = new Dictionary<string, (string Type, int Count)>();
+			var totalOverloads = overloads.Count;
+
+			foreach (var overload in overloads)
+			{
+				foreach (var param in overload.Parameters)
+				{
+					if (allParamNames.TryGetValue(param.Name, out var existing))
+					{
+						// Same name exists - increment count (param appears in multiple overloads)
+						allParamNames[param.Name] = (existing.Type, existing.Count + 1);
+					}
+					else
+					{
+						allParamNames[param.Name] = (param.Type, 1);
+					}
+				}
+			}
+
+			// Create combined parameters
+			var combinedParams = new List<CombinedParameterInfo>();
+			foreach (var kvp2 in allParamNames)
+			{
+				var paramName = kvp2.Key;
+				var paramType = kvp2.Value.Type;
+				var count = kvp2.Value.Count;
+				var isNullable = count < totalOverloads; // Not in all overloads = nullable
+				var nullableType = isNullable ? MakeNullable(paramType) : paramType;
+
+				combinedParams.Add(new CombinedParameterInfo(paramName, paramType, nullableType, isNullable));
+			}
+
+			// Create overload infos
+			var overloadInfos = overloads
+				.Select(o => new MethodOverloadInfo(o.Parameters))
+				.ToArray();
+
+			result[methodName] = new MethodGroupInfo(
+				Name: methodName,
+				ReturnType: first.ReturnType,
+				IsVoid: first.ReturnType == "void",
+				IsNullable: first.IsNullable,
+				Overloads: new EquatableArray<MethodOverloadInfo>(overloadInfos),
+				CombinedParameters: new EquatableArray<CombinedParameterInfo>(combinedParams.ToArray()));
+		}
+
+		return result;
+	}
+
+	/// <summary>
 	/// Generate the partial class with explicit interface implementations
 	/// </summary>
 	private static void GenerateKnockOff(SourceProductionContext context, KnockOffTypeInfo typeInfo)
@@ -406,20 +482,25 @@ public class KnockOffGenerator : IIncrementalGenerator
 		sb.AppendLine("{");
 
 		// Collect unique members across all interfaces
-		var processedMembers = new Dictionary<string, InterfaceMemberInfo>();
+		var processedProperties = new Dictionary<string, InterfaceMemberInfo>();
+		var processedMethods = new Dictionary<string, InterfaceMemberInfo>(); // key = signature
 		var processedEvents = new Dictionary<string, EventMemberInfo>();
 
 		foreach (var iface in typeInfo.Interfaces)
 		{
 			foreach (var member in iface.Members)
 			{
-				var memberKey = member.IsProperty
-					? $"prop:{member.Name}"
-					: GetMethodSignature(member.Name, member.ReturnType, member.Parameters);
-
-				if (!processedMembers.ContainsKey(memberKey))
+				if (member.IsProperty)
 				{
-					processedMembers[memberKey] = member;
+					var propKey = $"prop:{member.Name}";
+					if (!processedProperties.ContainsKey(propKey))
+						processedProperties[propKey] = member;
+				}
+				else
+				{
+					var methodKey = GetMethodSignature(member.Name, member.ReturnType, member.Parameters);
+					if (!processedMethods.ContainsKey(methodKey))
+						processedMethods[methodKey] = member;
 				}
 			}
 
@@ -427,26 +508,33 @@ public class KnockOffGenerator : IIncrementalGenerator
 			{
 				var eventKey = $"event:{evt.Name}";
 				if (!processedEvents.ContainsKey(eventKey))
-				{
 					processedEvents[eventKey] = evt;
-				}
 			}
 		}
 
-		// 1. Generate per-member Handler classes
-		foreach (var kvp in processedMembers)
+		// Group methods by name to handle overloads
+		var methodGroups = GroupMethodsByName(processedMethods.Values);
+
+		// 1. Generate per-property Handler classes
+		foreach (var kvp in processedProperties)
 		{
 			GenerateMemberHandlerClass(sb, kvp.Value, typeInfo.ClassName);
 		}
 
-		// 1b. Generate per-event Handler classes
+		// 1b. Generate per-method-group Handler classes (delegate-based for all methods)
+		foreach (var group in methodGroups.Values)
+		{
+			GenerateMethodGroupHandlerClass(sb, group, typeInfo.ClassName);
+		}
+
+		// 1c. Generate per-event Handler classes
 		foreach (var kvp in processedEvents)
 		{
 			GenerateEventHandlerClass(sb, kvp.Value, typeInfo.ClassName);
 		}
 
 		// 2. Generate Spy class
-		GenerateSpyClass(sb, typeInfo.ClassName, processedMembers.Values, processedEvents.Values);
+		GenerateSpyClass(sb, typeInfo.ClassName, processedProperties.Values, methodGroups.Values, processedEvents.Values);
 
 		// 3. Generate Spy property
 		sb.AppendLine("\t/// <summary>Tracks invocations and configures behavior for all interface members.</summary>");
@@ -469,10 +557,10 @@ public class KnockOffGenerator : IIncrementalGenerator
 
 		// 5. Generate backing properties/dictionaries ONCE per unique property name
 		var generatedBackingProperties = new HashSet<string>();
-		foreach (var kvp in processedMembers)
+		foreach (var kvp in processedProperties)
 		{
 			var member = kvp.Value;
-			if (member.IsProperty && !generatedBackingProperties.Contains(member.Name))
+			if (!generatedBackingProperties.Contains(member.Name))
 			{
 				generatedBackingProperties.Add(member.Name);
 				if (member.IsIndexer)
@@ -501,7 +589,9 @@ public class KnockOffGenerator : IIncrementalGenerator
 				}
 				else
 				{
-					GenerateMethod(sb, iface.FullName, member, typeInfo);
+					// All methods use delegate-based handler
+					var group = methodGroups[member.Name];
+					GenerateMethod(sb, iface.FullName, member, typeInfo, group);
 				}
 			}
 
@@ -790,6 +880,215 @@ public class KnockOffGenerator : IIncrementalGenerator
 	}
 
 	/// <summary>
+	/// Generate handler class for a method group (handles overloads)
+	/// </summary>
+	private static void GenerateMethodGroupHandlerClass(System.Text.StringBuilder sb, MethodGroupInfo group, string className)
+	{
+		sb.AppendLine($"\t/// <summary>Tracks and configures behavior for {group.Name}.</summary>");
+		sb.AppendLine($"\tpublic sealed class {group.Name}Handler");
+		sb.AppendLine("\t{");
+
+		var hasOverloads = group.Overloads.Count > 1;
+		var combinedParams = group.CombinedParameters;
+		var hasCombinedParams = combinedParams.Count > 0;
+
+		// 1. Generate delegate types for each overload
+		var delegateIndex = 0;
+		foreach (var overload in group.Overloads)
+		{
+			var delegateName = hasOverloads
+				? $"{group.Name}Delegate{delegateIndex}"
+				: $"{group.Name}Delegate";
+
+			var paramList = string.Join(", ", overload.Parameters.Select(p => $"{p.Type} {p.Name}"));
+			var fullParamList = string.IsNullOrEmpty(paramList)
+				? $"{className} ko"
+				: $"{className} ko, {paramList}";
+
+			sb.AppendLine($"\t\t/// <summary>Delegate for {group.Name}({paramList}).</summary>");
+			if (group.IsVoid)
+			{
+				sb.AppendLine($"\t\tpublic delegate void {delegateName}({fullParamList});");
+			}
+			else
+			{
+				sb.AppendLine($"\t\tpublic delegate {group.ReturnType} {delegateName}({fullParamList});");
+			}
+			sb.AppendLine();
+			delegateIndex++;
+		}
+
+		// 2. Private callback storage for each overload
+		delegateIndex = 0;
+		foreach (var overload in group.Overloads)
+		{
+			var delegateName = hasOverloads
+				? $"{group.Name}Delegate{delegateIndex}"
+				: $"{group.Name}Delegate";
+			var fieldName = hasOverloads ? $"_onCall{delegateIndex}" : "_onCall";
+
+			sb.AppendLine($"\t\tprivate {delegateName}? {fieldName};");
+			delegateIndex++;
+		}
+		sb.AppendLine();
+
+		// 3. Combined tracking list
+		if (combinedParams.Count == 1)
+		{
+			// Single parameter - store directly (tuples require 2+ elements)
+			var param = combinedParams.GetArray()![0];
+
+			sb.AppendLine($"\t\tprivate readonly global::System.Collections.Generic.List<{param.Type}> _calls = new();");
+			sb.AppendLine();
+
+			sb.AppendLine("\t\t/// <summary>Number of times this method was called.</summary>");
+			sb.AppendLine("\t\tpublic int CallCount => _calls.Count;");
+			sb.AppendLine();
+
+			sb.AppendLine("\t\t/// <summary>True if this method was called at least once.</summary>");
+			sb.AppendLine("\t\tpublic bool WasCalled => _calls.Count > 0;");
+			sb.AppendLine();
+
+			var nullableType = MakeNullable(param.Type);
+			sb.AppendLine($"\t\t/// <summary>The '{param.Name}' argument from the most recent call.</summary>");
+			sb.AppendLine($"\t\tpublic {nullableType} LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : default;");
+			sb.AppendLine();
+
+			sb.AppendLine("\t\t/// <summary>All recorded calls with their arguments.</summary>");
+			sb.AppendLine($"\t\tpublic global::System.Collections.Generic.IReadOnlyList<{param.Type}> AllCalls => _calls;");
+			sb.AppendLine();
+		}
+		else if (combinedParams.Count > 1)
+		{
+			// Multiple parameters - use tuple
+			var tupleElements = combinedParams.Select(p => $"{p.NullableType} {p.Name}");
+			var tupleType = $"({string.Join(", ", tupleElements)})";
+
+			sb.AppendLine($"\t\tprivate readonly global::System.Collections.Generic.List<{tupleType}> _calls = new();");
+			sb.AppendLine();
+
+			sb.AppendLine("\t\t/// <summary>Number of times this method was called.</summary>");
+			sb.AppendLine("\t\tpublic int CallCount => _calls.Count;");
+			sb.AppendLine();
+
+			sb.AppendLine("\t\t/// <summary>True if this method was called at least once.</summary>");
+			sb.AppendLine("\t\tpublic bool WasCalled => _calls.Count > 0;");
+			sb.AppendLine();
+
+			sb.AppendLine("\t\t/// <summary>Arguments from the most recent call (nullable for params not in all overloads).</summary>");
+			sb.AppendLine($"\t\tpublic {tupleType}? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;");
+			sb.AppendLine();
+
+			sb.AppendLine("\t\t/// <summary>All recorded calls with their arguments.</summary>");
+			sb.AppendLine($"\t\tpublic global::System.Collections.Generic.IReadOnlyList<{tupleType}> AllCalls => _calls;");
+			sb.AppendLine();
+		}
+		else
+		{
+			// No parameters - just track count
+			sb.AppendLine("\t\t/// <summary>Number of times this method was called.</summary>");
+			sb.AppendLine("\t\tpublic int CallCount { get; private set; }");
+			sb.AppendLine();
+
+			sb.AppendLine("\t\t/// <summary>True if this method was called at least once.</summary>");
+			sb.AppendLine("\t\tpublic bool WasCalled => CallCount > 0;");
+			sb.AppendLine();
+		}
+
+		// 4. OnCall methods for each overload (uses delegates so compiler can resolve by signature)
+		delegateIndex = 0;
+		foreach (var overload in group.Overloads)
+		{
+			var delegateName = hasOverloads
+				? $"{group.Name}Delegate{delegateIndex}"
+				: $"{group.Name}Delegate";
+			var fieldName = hasOverloads ? $"_onCall{delegateIndex}" : "_onCall";
+			var paramDesc = overload.Parameters.Count == 0
+				? "parameterless"
+				: string.Join(", ", overload.Parameters.Select(p => p.Name));
+
+			sb.AppendLine($"\t\t/// <summary>Sets callback for {group.Name}({paramDesc}) overload.</summary>");
+			sb.AppendLine($"\t\tpublic void OnCall({delegateName} callback) => {fieldName} = callback;");
+			sb.AppendLine();
+			delegateIndex++;
+		}
+
+		// 5. Internal TryGetCallback methods for generated code to use
+		delegateIndex = 0;
+		foreach (var overload in group.Overloads)
+		{
+			var delegateName = hasOverloads
+				? $"{group.Name}Delegate{delegateIndex}"
+				: $"{group.Name}Delegate";
+			var fieldName = hasOverloads ? $"_onCall{delegateIndex}" : "_onCall";
+			var methodSuffix = hasOverloads ? delegateIndex.ToString() : "";
+
+			sb.AppendLine($"\t\tinternal {delegateName}? GetCallback{methodSuffix}() => {fieldName};");
+			delegateIndex++;
+		}
+		sb.AppendLine();
+
+		// 6. RecordCall methods for each overload
+		delegateIndex = 0;
+		foreach (var overload in group.Overloads)
+		{
+			var paramList = string.Join(", ", overload.Parameters.Select(p => $"{p.Type} {p.Name}"));
+
+			sb.AppendLine($"\t\t/// <summary>Records a method call.</summary>");
+			if (combinedParams.Count == 1)
+			{
+				// Single parameter - add directly
+				var param = combinedParams.GetArray()![0];
+				var matchingParam = overload.Parameters.FirstOrDefault(p => p.Name == param.Name);
+				var addValue = matchingParam != null ? matchingParam.Name : "default";
+				sb.AppendLine($"\t\tpublic void RecordCall({paramList}) => _calls.Add({addValue});");
+			}
+			else if (combinedParams.Count > 1)
+			{
+				// Build tuple with nulls for missing params
+				var tupleValues = new List<string>();
+				foreach (var combinedParam in combinedParams)
+				{
+					var matchingParam = overload.Parameters.FirstOrDefault(p => p.Name == combinedParam.Name);
+					tupleValues.Add(matchingParam != null ? matchingParam.Name : "default");
+				}
+				var tupleConstruction = $"({string.Join(", ", tupleValues)})";
+
+				sb.AppendLine($"\t\tpublic void RecordCall({paramList}) => _calls.Add({tupleConstruction});");
+			}
+			else
+			{
+				sb.AppendLine($"\t\tpublic void RecordCall({paramList}) => CallCount++;");
+			}
+			delegateIndex++;
+		}
+		sb.AppendLine();
+
+		// 7. Reset method
+		sb.AppendLine("\t\t/// <summary>Resets all tracking state.</summary>");
+		sb.Append("\t\tpublic void Reset() { ");
+		if (combinedParams.Count > 0)
+		{
+			sb.Append("_calls.Clear(); ");
+		}
+		else
+		{
+			sb.Append("CallCount = 0; ");
+		}
+		delegateIndex = 0;
+		foreach (var _ in group.Overloads)
+		{
+			var fieldName = hasOverloads ? $"_onCall{delegateIndex}" : "_onCall";
+			sb.Append($"{fieldName} = null; ");
+			delegateIndex++;
+		}
+		sb.AppendLine("}");
+
+		sb.AppendLine("\t}");
+		sb.AppendLine();
+	}
+
+	/// <summary>
 	/// Makes a type nullable if it isn't already
 	/// </summary>
 	private static string MakeNullable(string type)
@@ -1021,19 +1320,29 @@ public class KnockOffGenerator : IIncrementalGenerator
 	private static void GenerateSpyClass(
 		System.Text.StringBuilder sb,
 		string className,
-		IEnumerable<InterfaceMemberInfo> members,
+		IEnumerable<InterfaceMemberInfo> properties,
+		IEnumerable<MethodGroupInfo> methodGroups,
 		IEnumerable<EventMemberInfo> events)
 	{
 		sb.AppendLine($"\t/// <summary>Spy for {className} - tracks invocations and configures behavior.</summary>");
 		sb.AppendLine($"\tpublic sealed class {className}Spy");
 		sb.AppendLine("\t{");
 
-		foreach (var member in members)
+		// Property handlers
+		foreach (var prop in properties)
 		{
-			sb.AppendLine($"\t\t/// <summary>Handler for {member.Name}.</summary>");
-			sb.AppendLine($"\t\tpublic {member.Name}Handler {member.Name} {{ get; }} = new();");
+			sb.AppendLine($"\t\t/// <summary>Handler for {prop.Name}.</summary>");
+			sb.AppendLine($"\t\tpublic {prop.Name}Handler {prop.Name} {{ get; }} = new();");
 		}
 
+		// Method handlers (delegate-based)
+		foreach (var group in methodGroups)
+		{
+			sb.AppendLine($"\t\t/// <summary>Handler for {group.Name}.</summary>");
+			sb.AppendLine($"\t\tpublic {group.Name}Handler {group.Name} {{ get; }} = new();");
+		}
+
+		// Event handlers
 		foreach (var evt in events)
 		{
 			sb.AppendLine($"\t\t/// <summary>Handler for {evt.Name} event.</summary>");
@@ -1194,11 +1503,15 @@ public class KnockOffGenerator : IIncrementalGenerator
 		sb.AppendLine();
 	}
 
+	/// <summary>
+	/// Generate method implementation (uses delegate-based handler)
+	/// </summary>
 	private static void GenerateMethod(
 		System.Text.StringBuilder sb,
 		string interfaceName,
 		InterfaceMemberInfo method,
-		KnockOffTypeInfo typeInfo)
+		KnockOffTypeInfo typeInfo,
+		MethodGroupInfo group)
 	{
 		var paramList = string.Join(", ", method.Parameters.Select(p => $"{p.Type} {p.Name}"));
 		var argList = string.Join(", ", method.Parameters.Select(p => p.Name));
@@ -1219,10 +1532,31 @@ public class KnockOffGenerator : IIncrementalGenerator
 		var isTaskOfT = method.ReturnType.StartsWith("global::System.Threading.Tasks.Task<");
 		var isValueTaskOfT = method.ReturnType.StartsWith("global::System.Threading.Tasks.ValueTask<");
 
+		// Find the overload index for this specific method signature
+		var overloadIndex = -1;
+		for (int i = 0; i < group.Overloads.Count; i++)
+		{
+			var overload = group.Overloads.GetArray()![i];
+			if (overload.Parameters.Count == method.Parameters.Count)
+			{
+				var matches = true;
+				for (int j = 0; j < overload.Parameters.Count && matches; j++)
+				{
+					if (overload.Parameters.GetArray()![j].Type != method.Parameters.GetArray()![j].Type)
+						matches = false;
+				}
+				if (matches)
+				{
+					overloadIndex = i;
+					break;
+				}
+			}
+		}
+
 		sb.AppendLine($"\t{method.ReturnType} {interfaceName}.{method.Name}({paramList})");
 		sb.AppendLine("\t{");
 
-		// Record the call (now strongly typed)
+		// Record the call
 		if (paramCount > 0)
 		{
 			sb.AppendLine($"\t\tSpy.{method.Name}.RecordCall({argList});");
@@ -1232,8 +1566,10 @@ public class KnockOffGenerator : IIncrementalGenerator
 			sb.AppendLine($"\t\tSpy.{method.Name}.RecordCall();");
 		}
 
-		// Check OnCall callback first
-		sb.AppendLine($"\t\tif (Spy.{method.Name}.OnCall is {{ }} onCallCallback)");
+		// Check for callback using the appropriate GetCallback method
+		var hasOverloads = group.Overloads.Count > 1;
+		var callbackMethodSuffix = hasOverloads ? overloadIndex.ToString() : "";
+		sb.AppendLine($"\t\tif (Spy.{method.Name}.GetCallback{callbackMethodSuffix}() is {{ }} onCallCallback)");
 		if (isVoid)
 		{
 			// Void: just invoke callback
@@ -1241,15 +1577,9 @@ public class KnockOffGenerator : IIncrementalGenerator
 			{
 				sb.AppendLine($"\t\t{{ onCallCallback(this); return; }}");
 			}
-			else if (paramCount == 1)
-			{
-				var param = method.Parameters.GetArray()![0];
-				sb.AppendLine($"\t\t{{ onCallCallback(this, {param.Name}); return; }}");
-			}
 			else
 			{
-				var tupleConstruction = GetTupleConstruction(method.Parameters);
-				sb.AppendLine($"\t\t{{ onCallCallback(this, {tupleConstruction}); return; }}");
+				sb.AppendLine($"\t\t{{ onCallCallback(this, {argList}); return; }}");
 			}
 		}
 		else
@@ -1259,15 +1589,9 @@ public class KnockOffGenerator : IIncrementalGenerator
 			{
 				sb.AppendLine($"\t\t\treturn onCallCallback(this);");
 			}
-			else if (paramCount == 1)
-			{
-				var param = method.Parameters.GetArray()![0];
-				sb.AppendLine($"\t\t\treturn onCallCallback(this, {param.Name});");
-			}
 			else
 			{
-				var tupleConstruction = GetTupleConstruction(method.Parameters);
-				sb.AppendLine($"\t\t\treturn onCallCallback(this, {tupleConstruction});");
+				sb.AppendLine($"\t\t\treturn onCallCallback(this, {argList});");
 			}
 		}
 
@@ -1406,5 +1730,31 @@ internal enum EventDelegateKind
 	Func,               // System.Func<..., TResult>
 	Custom              // Custom delegate type
 }
+
+/// <summary>
+/// Represents a group of method overloads with the same name
+/// </summary>
+internal sealed record MethodGroupInfo(
+	string Name,
+	string ReturnType,
+	bool IsVoid,
+	bool IsNullable,
+	EquatableArray<MethodOverloadInfo> Overloads,
+	EquatableArray<CombinedParameterInfo> CombinedParameters) : IEquatable<MethodGroupInfo>;
+
+/// <summary>
+/// Represents a single method overload's parameters
+/// </summary>
+internal sealed record MethodOverloadInfo(
+	EquatableArray<ParameterInfo> Parameters) : IEquatable<MethodOverloadInfo>;
+
+/// <summary>
+/// Represents a parameter in the combined tuple (nullable if not in all overloads)
+/// </summary>
+internal sealed record CombinedParameterInfo(
+	string Name,
+	string Type,
+	string NullableType,
+	bool IsNullable) : IEquatable<CombinedParameterInfo>;
 
 #endregion

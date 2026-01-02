@@ -5,33 +5,6 @@ namespace KnockOff.Tests;
 
 partial class SharedSignatureKnockOff
 {
-	/// <summary>Tracks and configures behavior for Log.</summary>
-	public sealed class LogHandler
-	{
-		private readonly global::System.Collections.Generic.List<string> _calls = new();
-
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
-
-		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
-
-		/// <summary>The 'message' argument from the most recent call.</summary>
-		public string? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : default;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<string> AllCalls => _calls;
-
-		/// <summary>Callback invoked when the method is called. If set (and returns non-null for Func), its result is used.</summary>
-		public global::System.Action<SharedSignatureKnockOff, string>? OnCall { get; set; }
-
-		/// <summary>Records a method call.</summary>
-		public void RecordCall(string message) => _calls.Add(message);
-
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
-	}
-
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameHandler
 	{
@@ -60,9 +33,48 @@ partial class SharedSignatureKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
+	/// <summary>Tracks and configures behavior for Log.</summary>
+	public sealed class LogHandler
+	{
+		/// <summary>Delegate for Log(string message).</summary>
+		public delegate void LogDelegate(SharedSignatureKnockOff ko, string message);
+
+		private LogDelegate? _onCall;
+
+		private readonly global::System.Collections.Generic.List<string> _calls = new();
+
+		/// <summary>Number of times this method was called.</summary>
+		public int CallCount => _calls.Count;
+
+		/// <summary>True if this method was called at least once.</summary>
+		public bool WasCalled => _calls.Count > 0;
+
+		/// <summary>The 'message' argument from the most recent call.</summary>
+		public string? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : default;
+
+		/// <summary>All recorded calls with their arguments.</summary>
+		public global::System.Collections.Generic.IReadOnlyList<string> AllCalls => _calls;
+
+		/// <summary>Sets callback for Log(message) overload.</summary>
+		public void OnCall(LogDelegate callback) => _onCall = callback;
+
+		internal LogDelegate? GetCallback() => _onCall;
+
+		/// <summary>Records a method call.</summary>
+		public void RecordCall(string message) => _calls.Add(message);
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { _calls.Clear(); _onCall = null; }
+	}
+
 	/// <summary>Tracks and configures behavior for Audit.</summary>
 	public sealed class AuditHandler
 	{
+		/// <summary>Delegate for Audit(string action, int userId).</summary>
+		public delegate void AuditDelegate(SharedSignatureKnockOff ko, string action, int userId);
+
+		private AuditDelegate? _onCall;
+
 		private readonly global::System.Collections.Generic.List<(string action, int userId)> _calls = new();
 
 		/// <summary>Number of times this method was called.</summary>
@@ -71,29 +83,31 @@ partial class SharedSignatureKnockOff
 		/// <summary>True if this method was called at least once.</summary>
 		public bool WasCalled => _calls.Count > 0;
 
-		/// <summary>The arguments from the most recent call.</summary>
+		/// <summary>Arguments from the most recent call (nullable for params not in all overloads).</summary>
 		public (string action, int userId)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
 
 		/// <summary>All recorded calls with their arguments.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<(string action, int userId)> AllCalls => _calls;
 
-		/// <summary>Callback invoked when the method is called. If set (and returns non-null for Func), its result is used.</summary>
-		public global::System.Action<SharedSignatureKnockOff, (string action, int userId)>? OnCall { get; set; }
+		/// <summary>Sets callback for Audit(action, userId) overload.</summary>
+		public void OnCall(AuditDelegate callback) => _onCall = callback;
+
+		internal AuditDelegate? GetCallback() => _onCall;
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall(string action, int userId) => _calls.Add((action, userId));
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { _calls.Clear(); _onCall = null; }
 	}
 
 	/// <summary>Spy for SharedSignatureKnockOff - tracks invocations and configures behavior.</summary>
 	public sealed class SharedSignatureKnockOffSpy
 	{
-		/// <summary>Handler for Log.</summary>
-		public LogHandler Log { get; } = new();
 		/// <summary>Handler for Name.</summary>
 		public NameHandler Name { get; } = new();
+		/// <summary>Handler for Log.</summary>
+		public LogHandler Log { get; } = new();
 		/// <summary>Handler for Audit.</summary>
 		public AuditHandler Audit { get; } = new();
 	}
@@ -113,7 +127,7 @@ partial class SharedSignatureKnockOff
 	void KnockOff.Tests.ILogger.Log(string message)
 	{
 		Spy.Log.RecordCall(message);
-		if (Spy.Log.OnCall is { } onCallCallback)
+		if (Spy.Log.GetCallback() is { } onCallCallback)
 		{ onCallCallback(this, message); return; }
 	}
 
@@ -139,15 +153,15 @@ partial class SharedSignatureKnockOff
 	void KnockOff.Tests.IAuditor.Log(string message)
 	{
 		Spy.Log.RecordCall(message);
-		if (Spy.Log.OnCall is { } onCallCallback)
+		if (Spy.Log.GetCallback() is { } onCallCallback)
 		{ onCallCallback(this, message); return; }
 	}
 
 	void KnockOff.Tests.IAuditor.Audit(string action, int userId)
 	{
 		Spy.Audit.RecordCall(action, userId);
-		if (Spy.Audit.OnCall is { } onCallCallback)
-		{ onCallCallback(this, (action, userId)); return; }
+		if (Spy.Audit.GetCallback() is { } onCallCallback)
+		{ onCallCallback(this, action, userId); return; }
 	}
 
 }

@@ -60,25 +60,25 @@ public partial class AsyncRepositoryKnockOff : IAsyncRepository
 
 ```csharp
 // Task (void equivalent)
-knockOff.Spy.InitializeAsync.OnCall = (ko) =>
+knockOff.Spy.InitializeAsync.OnCall((ko) =>
 {
     // Custom logic
     return Task.CompletedTask;
-};
+});
 
 // Task<T>
-knockOff.Spy.GetByIdAsync.OnCall = (ko, id) =>
-    Task.FromResult<User?>(new User { Id = id, Name = "Mocked" });
+knockOff.Spy.GetByIdAsync.OnCall((ko, id) =>
+    Task.FromResult<User?>(new User { Id = id, Name = "Mocked" }));
 ```
 
 ### ValueTask Methods
 
 ```csharp
 // ValueTask (void equivalent)
-knockOff.Spy.DoWorkAsync.OnCall = (ko) => default(ValueTask);
+knockOff.Spy.DoWorkAsync.OnCall((ko) => default(ValueTask));
 
 // ValueTask<T>
-knockOff.Spy.CountAsync.OnCall = (ko) => new ValueTask<int>(100);
+knockOff.Spy.CountAsync.OnCall((ko) => new ValueTask<int>(100));
 ```
 
 ## Tracking
@@ -101,11 +101,11 @@ var allIds = knockOff.Spy.GetByIdAsync.AllCalls;  // [1, 2, 3]
 ### Simulating Delays
 
 ```csharp
-knockOff.Spy.GetByIdAsync.OnCall = async (ko, id) =>
+knockOff.Spy.GetByIdAsync.OnCall(async (ko, id) =>
 {
     await Task.Delay(100);  // Simulate network latency
     return new User { Id = id };
-};
+});
 ```
 
 Note: This requires the callback to be `async`.
@@ -114,26 +114,26 @@ Note: This requires the callback to be `async`.
 
 ```csharp
 // Faulted task
-knockOff.Spy.SaveAsync.OnCall = (ko, entity) =>
-    Task.FromException<int>(new DbException("Connection lost"));
+knockOff.Spy.SaveAsync.OnCall((ko, entity) =>
+    Task.FromException<int>(new DbException("Connection lost")));
 
 // Or throw directly in callback
-knockOff.Spy.SaveAsync.OnCall = (ko, entity) =>
+knockOff.Spy.SaveAsync.OnCall((ko, entity) =>
 {
     throw new DbException("Connection lost");
-};
+});
 ```
 
 ### Conditional Async Behavior
 
 ```csharp
-knockOff.Spy.GetByIdAsync.OnCall = (ko, id) =>
+knockOff.Spy.GetByIdAsync.OnCall((ko, id) =>
 {
     if (id <= 0)
         return Task.FromException<User?>(new ArgumentException("Invalid ID"));
 
     return Task.FromResult<User?>(new User { Id = id });
-};
+});
 ```
 
 ### Cancellation Support
@@ -146,12 +146,11 @@ public interface IService
     Task<Data> FetchAsync(int id, CancellationToken ct);
 }
 
-knockOff.Spy.FetchAsync.OnCall = (ko, args) =>
+knockOff.Spy.FetchAsync.OnCall((ko, id, ct) =>
 {
-    var (id, ct) = args;
     ct.ThrowIfCancellationRequested();
     return Task.FromResult(new Data { Id = id });
-};
+});
 ```
 
 ### Sequential Async Returns
@@ -163,8 +162,8 @@ var results = new Queue<User?>([
     null  // Then not found
 ]);
 
-knockOff.Spy.GetByIdAsync.OnCall = (ko, id) =>
-    Task.FromResult(results.Dequeue());
+knockOff.Spy.GetByIdAsync.OnCall((ko, id) =>
+    Task.FromResult(results.Dequeue()));
 ```
 
 ### Verifying Async Call Order
@@ -172,17 +171,17 @@ knockOff.Spy.GetByIdAsync.OnCall = (ko, id) =>
 ```csharp
 var order = new List<string>();
 
-knockOff.Spy.StartAsync.OnCall = (ko) =>
+knockOff.Spy.StartAsync.OnCall((ko) =>
 {
     order.Add("Start");
     return Task.CompletedTask;
-};
+});
 
-knockOff.Spy.ProcessAsync.OnCall = (ko) =>
+knockOff.Spy.ProcessAsync.OnCall((ko) =>
 {
     order.Add("Process");
     return Task.CompletedTask;
-};
+});
 
 await service.StartAsync();
 await service.ProcessAsync();
@@ -196,12 +195,12 @@ Assert.Equal(["Start", "Process"], order);
 
 ```csharp
 // ValueTask<T> - synchronous completion
-knockOff.Spy.GetCachedAsync.OnCall = (ko, key) =>
-    new ValueTask<string?>(cache.GetOrDefault(key));
+knockOff.Spy.GetCachedAsync.OnCall((ko, key) =>
+    new ValueTask<string?>(cache.GetOrDefault(key)));
 
 // Task<T> - async completion
-knockOff.Spy.FetchRemoteAsync.OnCall = (ko, key) =>
-    Task.FromResult(remoteData[key]);
+knockOff.Spy.FetchRemoteAsync.OnCall((ko, key) =>
+    Task.FromResult(remoteData[key]));
 ```
 
 ## Reset

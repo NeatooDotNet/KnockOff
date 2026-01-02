@@ -54,22 +54,21 @@ For interface methods: `void M()`, `T M()`, `void M(args)`, `T M(args)`
 ```csharp
 // Void method, no params
 Assert.True(knockOff.Spy.Initialize.WasCalled);
-knockOff.Spy.Initialize.OnCall = (ko) => { /* custom */ };
+knockOff.Spy.Initialize.OnCall((ko) => { /* custom */ });
 
 // Return method, single param
 Assert.Equal(42, knockOff.Spy.GetById.LastCallArg);
-knockOff.Spy.GetById.OnCall = (ko, id) => new User { Id = id };
+knockOff.Spy.GetById.OnCall((ko, id) => new User { Id = id });
 
 // Void method, multiple params
 var args = knockOff.Spy.Log.LastCallArgs;
 Assert.Equal("error", args?.level);
 Assert.Equal("Failed", args?.message);
 
-knockOff.Spy.Log.OnCall = (ko, args) =>
+knockOff.Spy.Log.OnCall((ko, level, message) =>
 {
-    var (level, message) = args;
     Console.WriteLine($"[{level}] {message}");
-};
+});
 ```
 
 ## Property Handler
@@ -317,9 +316,9 @@ Async methods use the same handler structure as sync methods. The `OnCall` callb
 | `ValueTask<T>` | `ValueTask<T>` |
 
 ```csharp
-knockOff.Spy.GetByIdAsync.OnCall = (ko, id) =>
-    Task.FromResult<User?>(new User { Id = id });
+knockOff.Spy.GetByIdAsync.OnCall((ko, id) =>
+    Task.FromResult<User?>(new User { Id = id }));
 
-knockOff.Spy.SaveAsync.OnCall = (ko, entity) =>
-    Task.FromException<int>(new DbException("Failed"));
+knockOff.Spy.SaveAsync.OnCall((ko, entity) =>
+    Task.FromException<int>(new DbException("Failed")));
 ```

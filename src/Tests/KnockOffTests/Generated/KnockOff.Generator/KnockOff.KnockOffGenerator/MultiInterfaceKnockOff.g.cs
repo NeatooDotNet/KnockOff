@@ -5,33 +5,6 @@ namespace KnockOff.Tests;
 
 partial class MultiInterfaceKnockOff
 {
-	/// <summary>Tracks and configures behavior for Log.</summary>
-	public sealed class LogHandler
-	{
-		private readonly global::System.Collections.Generic.List<string> _calls = new();
-
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
-
-		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
-
-		/// <summary>The 'message' argument from the most recent call.</summary>
-		public string? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : default;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<string> AllCalls => _calls;
-
-		/// <summary>Callback invoked when the method is called. If set (and returns non-null for Func), its result is used.</summary>
-		public global::System.Action<MultiInterfaceKnockOff, string>? OnCall { get; set; }
-
-		/// <summary>Records a method call.</summary>
-		public void RecordCall(string message) => _calls.Add(message);
-
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
-	}
-
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameHandler
 	{
@@ -60,9 +33,48 @@ partial class MultiInterfaceKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
+	/// <summary>Tracks and configures behavior for Log.</summary>
+	public sealed class LogHandler
+	{
+		/// <summary>Delegate for Log(string message).</summary>
+		public delegate void LogDelegate(MultiInterfaceKnockOff ko, string message);
+
+		private LogDelegate? _onCall;
+
+		private readonly global::System.Collections.Generic.List<string> _calls = new();
+
+		/// <summary>Number of times this method was called.</summary>
+		public int CallCount => _calls.Count;
+
+		/// <summary>True if this method was called at least once.</summary>
+		public bool WasCalled => _calls.Count > 0;
+
+		/// <summary>The 'message' argument from the most recent call.</summary>
+		public string? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : default;
+
+		/// <summary>All recorded calls with their arguments.</summary>
+		public global::System.Collections.Generic.IReadOnlyList<string> AllCalls => _calls;
+
+		/// <summary>Sets callback for Log(message) overload.</summary>
+		public void OnCall(LogDelegate callback) => _onCall = callback;
+
+		internal LogDelegate? GetCallback() => _onCall;
+
+		/// <summary>Records a method call.</summary>
+		public void RecordCall(string message) => _calls.Add(message);
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { _calls.Clear(); _onCall = null; }
+	}
+
 	/// <summary>Tracks and configures behavior for Notify.</summary>
 	public sealed class NotifyHandler
 	{
+		/// <summary>Delegate for Notify(string recipient).</summary>
+		public delegate void NotifyDelegate(MultiInterfaceKnockOff ko, string recipient);
+
+		private NotifyDelegate? _onCall;
+
 		private readonly global::System.Collections.Generic.List<string> _calls = new();
 
 		/// <summary>Number of times this method was called.</summary>
@@ -77,23 +89,25 @@ partial class MultiInterfaceKnockOff
 		/// <summary>All recorded calls with their arguments.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<string> AllCalls => _calls;
 
-		/// <summary>Callback invoked when the method is called. If set (and returns non-null for Func), its result is used.</summary>
-		public global::System.Action<MultiInterfaceKnockOff, string>? OnCall { get; set; }
+		/// <summary>Sets callback for Notify(recipient) overload.</summary>
+		public void OnCall(NotifyDelegate callback) => _onCall = callback;
+
+		internal NotifyDelegate? GetCallback() => _onCall;
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall(string recipient) => _calls.Add(recipient);
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { _calls.Clear(); _onCall = null; }
 	}
 
 	/// <summary>Spy for MultiInterfaceKnockOff - tracks invocations and configures behavior.</summary>
 	public sealed class MultiInterfaceKnockOffSpy
 	{
-		/// <summary>Handler for Log.</summary>
-		public LogHandler Log { get; } = new();
 		/// <summary>Handler for Name.</summary>
 		public NameHandler Name { get; } = new();
+		/// <summary>Handler for Log.</summary>
+		public LogHandler Log { get; } = new();
 		/// <summary>Handler for Notify.</summary>
 		public NotifyHandler Notify { get; } = new();
 	}
@@ -113,7 +127,7 @@ partial class MultiInterfaceKnockOff
 	void KnockOff.Tests.ILogger.Log(string message)
 	{
 		Spy.Log.RecordCall(message);
-		if (Spy.Log.OnCall is { } onCallCallback)
+		if (Spy.Log.GetCallback() is { } onCallCallback)
 		{ onCallCallback(this, message); return; }
 	}
 
@@ -139,7 +153,7 @@ partial class MultiInterfaceKnockOff
 	void KnockOff.Tests.INotifier.Notify(string recipient)
 	{
 		Spy.Notify.RecordCall(recipient);
-		if (Spy.Notify.OnCall is { } onCallCallback)
+		if (Spy.Notify.GetCallback() is { } onCallCallback)
 		{ onCallCallback(this, recipient); return; }
 	}
 

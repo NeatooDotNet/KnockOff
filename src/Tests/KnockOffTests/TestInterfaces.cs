@@ -161,3 +161,28 @@ public partial class EventSourceKnockOff : IEventSource
 }
 
 #endregion
+
+#region Method Overload Test Types
+
+public interface IOverloadedService
+{
+	// Method overloads - same name, different signatures
+	Task<User?> GetByIdAsync(int id);
+	Task<User?> GetByIdAsync(int id, CancellationToken cancellationToken);
+
+	// More overloads
+	void Process(string data);
+	void Process(string data, int priority);
+	void Process(string data, int priority, bool async);
+
+	// Return type overloads with different params
+	int Calculate(int value);
+	int Calculate(int a, int b);
+}
+
+[KnockOff]
+public partial class OverloadedServiceKnockOff : IOverloadedService
+{
+}
+
+#endregion

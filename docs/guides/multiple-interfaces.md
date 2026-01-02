@@ -121,17 +121,16 @@ Set callbacks for any member regardless of which interface defines it:
 
 ```csharp
 // Shared member
-knockOff.Spy.Log.OnCall = (ko, message) =>
+knockOff.Spy.Log.OnCall((ko, message) =>
 {
     Console.WriteLine($"[Log] {message}");
-};
+});
 
 // IAuditor-specific member
-knockOff.Spy.Audit.OnCall = (ko, args) =>
+knockOff.Spy.Audit.OnCall((ko, action, userId) =>
 {
-    var (action, userId) = args;
     Console.WriteLine($"[Audit] {action} by user {userId}");
-};
+});
 ```
 
 ## Common Patterns
@@ -156,8 +155,8 @@ public partial class DataContextKnockOff : IRepository, IUnitOfWork { }
 // Usage
 var knockOff = new DataContextKnockOff();
 
-knockOff.Spy.SaveChangesAsync.OnCall = (ko, ct) =>
-    Task.FromResult(ko.Spy.Add.CallCount);  // Return count of adds
+knockOff.Spy.SaveChangesAsync.OnCall((ko, ct) =>
+    Task.FromResult(ko.Spy.Add.CallCount));  // Return count of adds
 
 IRepository repo = knockOff.AsRepository();
 IUnitOfWork uow = knockOff.AsUnitOfWork();
@@ -186,10 +185,10 @@ public interface IDisposable
 public partial class DisposableLoggerKnockOff : ILogger, IDisposable { }
 
 // Verify cleanup
-knockOff.Spy.Dispose.OnCall = (ko) =>
+knockOff.Spy.Dispose.OnCall((ko) =>
 {
     Assert.True(ko.Spy.Log.WasCalled, "Should log before disposing");
-};
+});
 ```
 
 ### Multiple Repositories
@@ -209,8 +208,8 @@ public interface IOrderRepository
 public partial class CompositeRepositoryKnockOff : IUserRepository, IOrderRepository { }
 
 // Configure each independently
-knockOff.Spy.GetUser.OnCall = (ko, id) => new User { Id = id };
-knockOff.Spy.GetOrder.OnCall = (ko, id) => new Order { Id = id };
+knockOff.Spy.GetUser.OnCall((ko, id) => new User { Id = id });
+knockOff.Spy.GetOrder.OnCall((ko, id) => new Order { Id = id });
 ```
 
 ## Conflicting Signatures
