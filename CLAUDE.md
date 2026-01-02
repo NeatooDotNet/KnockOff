@@ -55,6 +55,11 @@ dotnet build src/KnockOff.sln --configuration Release
 
 # Create NuGet package
 dotnet pack src/KnockOff/KnockOff.csproj --configuration Release --output ./artifacts
+
+# Publish to NuGet (via GitHub Actions)
+# Push a version tag to trigger automated NuGet publishing:
+git tag v10.1.0
+git push origin v10.1.0
 ```
 
 ## Source Generator Requirements
