@@ -401,3 +401,6 @@ FodyWeavers.xsd
 
 # Claude Code local settings
 /.claude/settings.local.json
+
+# Windows device file artifacts
+nul
