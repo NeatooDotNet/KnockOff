@@ -8,6 +8,7 @@ A Roslyn Source Generator for creating unit test stubs. Unlike Moq's fluent runt
 - [Customization Patterns](docs/concepts/customization-patterns.md) - The two ways to customize stub behavior
 - [KnockOff vs Moq Comparison](docs/knockoff-vs-moq.md) - Side-by-side comparison for supported scenarios
 - [Migration from Moq](docs/migration-from-moq.md) - Step-by-step migration guide
+- [Release Notes](docs/release-notes/index.md) - Version history
 
 ## Concept
 

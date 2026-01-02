@@ -222,6 +222,44 @@ var name = store["Name"];
 Assert.Equal("Name", knockOff.Spy.StringIndexer.LastGetKey);
 ```
 
+### Event Mocking
+
+**Moq**
+```csharp
+var mock = new Mock<IEventSource>();
+
+// Raise event
+mock.Raise(x => x.DataReceived += null, "test data");
+
+// Verify subscription (requires Callback setup)
+bool subscribed = false;
+mock.SetupAdd(x => x.DataReceived += It.IsAny<EventHandler<string>>())
+    .Callback(() => subscribed = true);
+```
+
+**KnockOff**
+```csharp
+// Define stub
+[KnockOff]
+public partial class EventSourceKnockOff : IEventSource { }
+
+// Use in test
+var knockOff = new EventSourceKnockOff();
+IEventSource source = knockOff;
+
+// Subscribe (tracked automatically)
+source.DataReceived += (sender, data) => Console.WriteLine(data);
+
+Assert.True(knockOff.Spy.DataReceived.HasSubscribers);
+Assert.Equal(1, knockOff.Spy.DataReceived.SubscribeCount);
+
+// Raise event
+knockOff.Spy.DataReceived.Raise("test data");
+
+Assert.True(knockOff.Spy.DataReceived.WasRaised);
+Assert.Equal("test data", knockOff.Spy.DataReceived.LastRaiseArgs?.e);
+```
+
 ### Verification Patterns
 
 **Moq**
@@ -323,7 +361,7 @@ When both a user method and callback are defined, the callback takes precedence:
 
 ### Consider Moq When
 
-- You need features KnockOff doesn't support (events, ref/out, strict mode)
+- You need features KnockOff doesn't support (ref/out, generic methods, strict mode)
 - Dynamic setup per-test is strongly preferred
 - `VerifyNoOtherCalls` is needed
 - Your team is already experienced with Moq

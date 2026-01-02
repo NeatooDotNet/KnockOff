@@ -240,3 +240,4 @@ IRepository repo = knockOff;
 - [Multiple Interfaces](guides/multiple-interfaces.md)
 - [Interface Inheritance](guides/interface-inheritance.md)
 - [Indexers](guides/indexers.md)
+- [Events](guides/events.md)
