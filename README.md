@@ -26,66 +26,78 @@ public interface IUserService
     User GetUser(int id);
 }
 
-// Define your KnockOff stub
-[KnockOff]
-public partial class UserServiceKnockOff : IUserService
-{
-    // Optional: Define default behavior (compile-time)
-    protected User GetUser(int id) => new User { Id = id, Name = "Default" };
-}
-
-// Use in tests
-[Fact]
-public void Test_UserService()
-{
-    var knockOff = new UserServiceKnockOff();
-    IUserService service = knockOff;
-
-    // Override behavior for this test (runtime)
-    knockOff.Spy.GetUser.OnCall = (ko, id) => new User { Id = id, Name = "Mocked" };
-
-    var user = service.GetUser(42);
-
-    Assert.Equal("Mocked", user.Name);
-    Assert.Equal(1, knockOff.Spy.GetUser.CallCount);
-    Assert.Equal(42, knockOff.Spy.GetUser.LastCallArg);
-}
-```
-
-## Two Ways to Customize Behavior
-
-KnockOff provides two complementary patterns for customizing stub behavior:
-
-### Pattern 1: User-Defined Methods (Compile-Time)
-
-Define protected methods in your stub class for consistent behavior across all tests:
-
-```csharp
+// Define your stub with behavior built-in
 [KnockOff]
 public partial class UserServiceKnockOff : IUserService
 {
     protected User GetUser(int id) => new User { Id = id, Name = "Test User" };
 }
+
+// Use in tests
+[Fact]
+public void Test_GetUser_ReturnsUserWithCorrectId()
+{
+    var knockOff = new UserServiceKnockOff();
+    IUserService service = knockOff;
+
+    var user = service.GetUser(42);
+
+    Assert.Equal(42, user.Id);
+    Assert.Equal("Test User", user.Name);
+    Assert.Equal(1, knockOff.Spy.GetUser.CallCount);
+    Assert.Equal(42, knockOff.Spy.GetUser.LastCallArg);
+}
 ```
 
-### Pattern 2: Callbacks (Runtime)
+The stub behavior is defined once in the partial class. Every test uses the same predictable behavior. Verification happens through `Spy`.
 
-Set callbacks for test-specific behavior:
+## Defining Stub Behavior
+
+Define protected methods in your stub class that match interface members:
 
 ```csharp
-knockOff.Spy.GetUser.OnCall = (ko, id) => new User { Id = id, Name = "Custom" };
+[KnockOff]
+public partial class RepositoryKnockOff : IRepository
+{
+    private readonly List<Entity> _entities = [];
+
+    // Return value methods
+    protected Entity? GetById(int id) => _entities.FirstOrDefault(e => e.Id == id);
+
+    // Void methods
+    protected void Save(Entity entity) => _entities.Add(entity);
+
+    // Async methods
+    protected Task<List<Entity>> GetAllAsync() => Task.FromResult(_entities.ToList());
+}
+```
+
+Properties use backing fields automatically. For custom property behavior, define get/set methods:
+
+```csharp
+[KnockOff]
+public partial class ConfigKnockOff : IConfig
+{
+    private int _callCount;
+
+    protected string GetConnectionString() => $"Called {++_callCount} times";
+}
+```
+
+## Runtime Callbacks (Optional)
+
+If you need per-test behavior without creating a new stub class, use callbacks:
+
+```csharp
+var knockOff = new UserServiceKnockOff();
+
+// Override the stub's built-in behavior for this specific test
+knockOff.Spy.GetUser.OnCall = (ko, id) => new User { Id = id, Name = "Override" };
 knockOff.Spy.Name.OnGet = (ko) => "FromCallback";
 knockOff.Spy.Name.OnSet = (ko, value) => { /* custom logic */ };
 ```
 
-### Priority Order
-
-When an interface member is invoked:
-1. **Callback** (if set) — takes precedence
-2. **User method** (if defined) — fallback for methods
-3. **Default** — backing field for properties, `default(T)` for methods
-
-Use `Reset()` to clear callbacks and return to user method behavior.
+Callbacks take precedence over user-defined methods. Use `Reset()` to clear callbacks and return to the stub's default behavior.
 
 ## Verification
 

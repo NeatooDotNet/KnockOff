@@ -89,6 +89,11 @@ mock.Verify(x => x.GetUser(42), Times.Once);
 
 **KnockOff**
 ```csharp
+// Define stub once (typically in a shared file)
+[KnockOff]
+public partial class UserServiceKnockOff : IUserService { }
+
+// Use in test
 var knockOff = new UserServiceKnockOff();
 knockOff.Spy.GetUser.OnCall = (ko, id) => new User { Id = id };
 
@@ -115,6 +120,11 @@ mock.VerifySet(x => x.CurrentUser = It.IsAny<User>(), Times.Once);
 
 **KnockOff**
 ```csharp
+// Define stub
+[KnockOff]
+public partial class UserServiceKnockOff : IUserService { }
+
+// Use in test
 var knockOff = new UserServiceKnockOff();
 knockOff.Spy.CurrentUser.OnGet = (ko) => new User { Name = "Test" };
 
@@ -140,6 +150,11 @@ var entity = await mock.Object.GetByIdAsync(42);
 
 **KnockOff**
 ```csharp
+// Define stub
+[KnockOff]
+public partial class RepositoryKnockOff : IRepository { }
+
+// Use in test
 var knockOff = new RepositoryKnockOff();
 knockOff.Spy.GetByIdAsync.OnCall = (ko, id) =>
     Task.FromResult<Entity?>(new Entity { Id = id });
@@ -163,6 +178,11 @@ Assert.Equal(1, captured?.Id);
 
 **KnockOff**
 ```csharp
+// Define stub
+[KnockOff]
+public partial class RepositoryKnockOff : IRepository { }
+
+// Use in test - no setup needed, arguments captured automatically
 var knockOff = new RepositoryKnockOff();
 IRepository repo = knockOff;
 
@@ -215,6 +235,11 @@ var name = mock.Object["Name"];
 
 **KnockOff**
 ```csharp
+// Define stub
+[KnockOff]
+public partial class PropertyStoreKnockOff : IPropertyStore { }
+
+// Use in test
 var knockOff = new PropertyStoreKnockOff();
 
 // Option 1: Pre-populate backing dictionary
@@ -247,6 +272,11 @@ mock.Verify(x => x.Update(It.IsAny<Entity>()), Times.Exactly(3));
 
 **KnockOff**
 ```csharp
+// Define stub
+[KnockOff]
+public partial class RepositoryKnockOff : IRepository { }
+
+// Verify in test
 Assert.Equal(1, knockOff.Spy.Save.CallCount);      // Times.Once
 Assert.Equal(0, knockOff.Spy.Delete.CallCount);    // Times.Never
 Assert.True(knockOff.Spy.GetAll.WasCalled);        // Times.AtLeastOnce
@@ -285,6 +315,12 @@ mock.SetupSequence(x => x.GetNext())
 
 **KnockOff**
 ```csharp
+// Define stub
+[KnockOff]
+public partial class SequenceKnockOff : ISequence { }
+
+// Use in test
+var knockOff = new SequenceKnockOff();
 var returnValues = new Queue<int>([1, 2, 3]);
 knockOff.Spy.GetNext.OnCall = (ko) => returnValues.Dequeue();
 ```
@@ -293,6 +329,14 @@ knockOff.Spy.GetNext.OnCall = (ko) => returnValues.Dequeue();
 
 **KnockOff** (no Moq equivalent - Moq requires new mock)
 ```csharp
+// Define stub
+[KnockOff]
+public partial class UserServiceKnockOff : IUserService { }
+
+// Use in test
+var knockOff = new UserServiceKnockOff();
+IUserService service = knockOff;
+
 knockOff.Spy.GetUser.OnCall = (ko, id) => new User { Name = "First" };
 var user1 = service.GetUser(1);
 
@@ -329,3 +373,32 @@ For teams migrating from Moq to KnockOff:
 2. **Add `OnCall` for returns** - Replace `.Setup().Returns()` with `OnCall` callbacks
 3. **Use partial class for stable stubs** - Move common setups to protected methods
 4. **Defer unsupported features** - Keep Moq for tests using events or ref/out
+
+## But Wait, I Just Want Moq-Style Per-Test Setup
+
+If you prefer Moq's per-test configuration style, KnockOff supports that too. Just define an empty stub and use callbacks:
+
+```csharp
+// Define once - no behavior, just the stub
+[KnockOff]
+public partial class UserServiceKnockOff : IUserService { }
+
+// Configure per-test, just like Moq
+[Fact]
+public void Test_WithMoqStyle()
+{
+    var knockOff = new UserServiceKnockOff();
+
+    // This feels like Moq's Setup().Returns()
+    knockOff.Spy.GetUser.OnCall = (ko, id) => new User { Id = id, Name = "Mocked" };
+    knockOff.Spy.Name.OnGet = (ko) => "Test Name";
+
+    IUserService service = knockOff;
+    var user = service.GetUser(42);
+
+    Assert.Equal("Mocked", user.Name);
+    Assert.Equal(1, knockOff.Spy.GetUser.CallCount);
+}
+```
+
+The difference from Moq: callbacks are simple delegate assignments, not expression trees. You get IntelliSense, compile-time checking, and easier debugging.
