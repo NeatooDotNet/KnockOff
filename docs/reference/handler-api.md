@@ -168,13 +168,15 @@ Each indexer has a backing dictionary:
 - `{KeyType}IndexerBacking` — e.g., `StringIndexerBacking`, `IntIndexerBacking`
 - Type: `Dictionary<TKey, TValue>`
 
-### Priority Order (Getter)
+### Getter Behavior
 
-1. `OnGet` callback (if set)
-2. Backing dictionary (if key exists)
-3. `default(TValue)`
+When **no `OnGet`** is set:
+- Backing dictionary checked first, then `default(TValue)`
 
-**Note**: When `OnGet` is set, backing dictionary is NOT automatically checked. Include it manually in your callback if needed.
+When **`OnGet` is set**:
+- Callback completely replaces getter logic
+- Backing dictionary NOT checked automatically
+- Include it manually in your callback if needed
 
 ### Behavior Notes
 

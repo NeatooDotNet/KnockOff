@@ -132,11 +132,9 @@ public partial class UserServiceKnockOff
         {
             Spy.Name.RecordSet(value);
             if (Spy.Name.OnSet is { } onSetCallback)
-            {
                 onSetCallback(this, value);
-                return;
-            }
-            NameBacking = value;
+            else
+                NameBacking = value;
         }
     }
 

@@ -154,30 +154,16 @@ Assert.False(knockOff.StringIndexerBacking.ContainsKey("Key"));  // Not in backi
 | Getter | `Func<TKnockOff, TKey, TValue>` |
 | Setter | `Action<TKnockOff, TKey, TValue>` |
 
-## Priority Order
+## Getter Behavior
 
-For indexer getters:
-1. **OnGet callback** (if set)
-2. **Backing dictionary** (if key exists)
-3. **Default** (`default(T)`)
+When **no `OnGet` callback** is set:
+1. Backing dictionary is checked (returns value if key exists)
+2. Returns `default(T)` if key not found
 
-```csharp
-// Pre-populate backing
-knockOff.StringIndexerBacking["Backed"] = new PropertyInfo { Value = "FromBacking" };
-
-// Set callback for specific keys
-knockOff.Spy.StringIndexer.OnGet = (ko, key) =>
-{
-    if (key == "Callback")
-        return new PropertyInfo { Value = "FromCallback" };
-    return null;  // Fall through
-};
-
-// But wait - if OnGet is set, backing is NOT checked
-// The callback completely replaces the getter logic
-```
-
-**Important**: Unlike properties/methods, when `OnGet` is set for indexers, you must handle all cases in the callback. The backing dictionary is NOT checked as a fallback.
+When **`OnGet` callback is set**:
+- The callback **completely replaces** the getter logic
+- Backing dictionary is NOT checked automatically
+- You must handle all cases in your callback
 
 To combine callback with backing:
 
