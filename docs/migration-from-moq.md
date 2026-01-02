@@ -258,7 +258,7 @@ knockOff.Spy.Log.OnCall = (ko, message) =>
 | Call counting | Verify(Times.X) | CallCount property |
 | Strict mode | Yes | No |
 | VerifyNoOtherCalls | Yes | No |
-| Events | Yes | Not yet |
+| Events | Yes | Yes |
 | ref/out | Yes | Not yet |
 | Generic methods | Yes | Not yet |
 
@@ -310,8 +310,8 @@ Assert.Equal("data", knockOff.Spy.Process.LastCallArg);
 
 Some features aren't in KnockOff yet. Keep using Moq for:
 
-- **Events** — Raising events on mocks
 - **ref/out parameters** — By-reference parameters
+- **Generic methods** — Methods with type parameters
 - **Strict mode** — Throwing on unconfigured calls
 - **VerifyNoOtherCalls** — Ensuring no unexpected calls
 

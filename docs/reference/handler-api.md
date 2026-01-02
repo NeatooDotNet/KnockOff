@@ -9,6 +9,7 @@ Every interface member gets a dedicated Handler class in the `Spy` property. Thi
 | Method | `{MethodName}Handler` | `Spy.MethodName` |
 | Property | `{PropertyName}Handler` | `Spy.PropertyName` |
 | Indexer | `{KeyType}IndexerHandler` | `Spy.StringIndexer`, `Spy.IntIndexer`, etc. |
+| Event | `{EventName}Handler` | `Spy.EventName` |
 
 ## Method Handler
 
@@ -213,6 +214,87 @@ knockOff.Spy.StringIndexer.OnSet = (ko, key, value) =>
 };
 ```
 
+## Event Handler
+
+For interface events: `event EventHandler E`, `event EventHandler<T> E`, `event Action<T> E`
+
+### Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `SubscribeCount` | `int` | Number of times handlers were added |
+| `UnsubscribeCount` | `int` | Number of times handlers were removed |
+| `HasSubscribers` | `bool` | `true` if at least one handler is attached |
+| `RaiseCount` | `int` | Number of times event was raised |
+| `WasRaised` | `bool` | `true` if `RaiseCount > 0` |
+| `LastRaiseArgs` | `T?` | Arguments from most recent raise |
+| `AllRaises` | `IReadOnlyList<T>` | All raise arguments in order |
+
+### Args Type by Delegate
+
+| Delegate Type | Args Tracking Type |
+|--------------|-------------------|
+| `EventHandler` | `(object? sender, EventArgs e)` |
+| `EventHandler<T>` | `(object? sender, T e)` |
+| `Action` | None (no args) |
+| `Action<T>` | `T` |
+| `Action<T1, T2>` | `(T1 arg1, T2 arg2)` |
+| `Action<T1, T2, T3>` | `(T1 arg1, T2 arg2, T3 arg3)` |
+
+### Methods
+
+| Method | Description |
+|--------|-------------|
+| `Raise(...)` | Raises the event and records arguments |
+| `Reset()` | Clears counts and `AllRaises`, keeps handlers attached |
+| `Clear()` | Clears counts, `AllRaises`, AND removes all handlers |
+
+### Raise Signatures
+
+| Delegate Type | Raise Overloads |
+|--------------|----------------|
+| `EventHandler` | `Raise()`, `Raise(sender, e)` |
+| `EventHandler<T>` | `Raise(e)`, `Raise(sender, e)` |
+| `Action` | `Raise()` |
+| `Action<T>` | `Raise(arg)` |
+| `Action<T1, T2>` | `Raise(arg1, arg2)` |
+
+### Behavior Notes
+
+- `Raise()` works even with no subscribers (no exception)
+- `Reset()` clears tracking but keeps handlers attached
+- `Clear()` clears both tracking and handlers
+- All raises are tracked in `AllRaises` regardless of subscriber count
+
+### Examples
+
+```csharp
+// Subscribe tracking
+source.DataReceived += handler;
+Assert.Equal(1, knockOff.Spy.DataReceived.SubscribeCount);
+Assert.True(knockOff.Spy.DataReceived.HasSubscribers);
+
+// Raise event
+knockOff.Spy.DataReceived.Raise("test data");
+Assert.True(knockOff.Spy.DataReceived.WasRaised);
+Assert.Equal("test data", knockOff.Spy.DataReceived.LastRaiseArgs?.e);
+
+// EventHandler (non-generic)
+knockOff.Spy.Completed.Raise(); // null sender, EventArgs.Empty
+
+// Action with params
+knockOff.Spy.ProgressChanged.Raise(75);
+knockOff.Spy.DataUpdated.Raise("key", 42);
+
+// All raises
+var allRaises = knockOff.Spy.DataReceived.AllRaises;
+Assert.Equal(3, allRaises.Count);
+
+// Reset vs Clear
+knockOff.Spy.DataReceived.Reset();  // Clears tracking, keeps handlers
+knockOff.Spy.DataReceived.Clear();  // Clears tracking AND handlers
+```
+
 ## Reset Behavior Summary
 
 | Handler Type | Reset Clears | Reset Does NOT Clear |
@@ -220,6 +302,7 @@ knockOff.Spy.StringIndexer.OnSet = (ko, key, value) =>
 | Method | `CallCount`, `AllCalls`, `OnCall` | — |
 | Property | `GetCount`, `SetCount`, `AllSetValues`, `OnGet`, `OnSet` | Backing field |
 | Indexer | `GetCount`, `SetCount`, `AllGetKeys`, `AllSetEntries`, `OnGet`, `OnSet` | Backing dictionary |
+| Event | `SubscribeCount`, `UnsubscribeCount`, `RaiseCount`, `AllRaises` | Handlers (use `Clear()` to remove) |
 
 ## Async Method Handlers
 

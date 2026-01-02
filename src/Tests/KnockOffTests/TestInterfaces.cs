@@ -1,0 +1,163 @@
+namespace KnockOff.Tests;
+
+#region Basic Test Types
+
+public interface ISampleService
+{
+	string Name { get; set; }
+	void DoSomething();
+	int GetValue(int input);
+	void Calculate(string name, int value, bool flag);
+	string? GetOptional();
+}
+
+[KnockOff]
+public partial class SampleKnockOff : ISampleService
+{
+	protected int GetValue(int input) => input * 2;
+}
+
+#endregion
+
+#region Multi-Interface Test Types
+
+public interface ILogger
+{
+	void Log(string message);
+	string Name { get; set; }
+}
+
+public interface IAuditor
+{
+	void Log(string message); // Same signature as ILogger.Log
+	void Audit(string action, int userId);
+}
+
+public interface INotifier
+{
+	void Notify(string recipient);
+	string Name { get; } // Same name but get-only (vs ILogger which is get/set)
+}
+
+[KnockOff]
+public partial class MultiInterfaceKnockOff : ILogger, INotifier
+{
+}
+
+[KnockOff]
+public partial class SharedSignatureKnockOff : ILogger, IAuditor
+{
+}
+
+#endregion
+
+#region Async Test Types
+
+public interface IAsyncService
+{
+	Task DoWorkAsync();
+	Task<int> GetValueAsync(int input);
+	Task<string?> GetOptionalAsync();
+	Task<string> GetRequiredAsync();
+	ValueTask DoWorkValueTaskAsync();
+	ValueTask<int> GetValueValueTaskAsync(int input);
+}
+
+[KnockOff]
+public partial class AsyncServiceKnockOff : IAsyncService
+{
+	protected Task<int> GetValueAsync(int input) => Task.FromResult(input * 3);
+	protected ValueTask<int> GetValueValueTaskAsync(int input) => new(input * 4);
+}
+
+#endregion
+
+#region Generic Interface Test Types
+
+public interface IRepository<T> where T : class
+{
+	T? GetById(int id);
+	void Save(T entity);
+	Task<T?> GetByIdAsync(int id);
+}
+
+[KnockOff]
+public partial class UserRepositoryKnockOff : IRepository<User>
+{
+}
+
+public class User
+{
+	public int Id { get; set; }
+	public string Name { get; set; } = "";
+}
+
+#endregion
+
+#region Interface Inheritance Test Types
+
+public interface IBaseEntity
+{
+	int Id { get; }
+	DateTime CreatedAt { get; }
+}
+
+public interface IAuditableEntity : IBaseEntity
+{
+	DateTime? ModifiedAt { get; set; }
+	string ModifiedBy { get; set; }
+}
+
+[KnockOff]
+public partial class AuditableEntityKnockOff : IAuditableEntity
+{
+}
+
+#endregion
+
+#region Indexer Test Types
+
+public class PropertyInfo
+{
+	public string Name { get; set; } = "";
+	public string Value { get; set; } = "";
+}
+
+public interface IPropertyStore
+{
+	PropertyInfo? this[string key] { get; }
+}
+
+public interface IReadWriteStore
+{
+	PropertyInfo? this[string key] { get; set; }
+}
+
+[KnockOff]
+public partial class PropertyStoreKnockOff : IPropertyStore
+{
+}
+
+[KnockOff]
+public partial class ReadWriteStoreKnockOff : IReadWriteStore
+{
+}
+
+#endregion
+
+#region Event Test Types
+
+public interface IEventSource
+{
+	event EventHandler<string> MessageReceived;
+	event EventHandler OnCompleted;
+	event Action<int> OnProgress;
+	event Action<string, int> OnData;
+}
+
+[KnockOff]
+public partial class EventSourceKnockOff : IEventSource
+{
+}
+
+#endregion

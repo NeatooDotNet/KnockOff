@@ -89,6 +89,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 		foreach (var iface in interfaces)
 		{
 			var members = new List<InterfaceMemberInfo>();
+			var events = new List<EventMemberInfo>();
 
 			foreach (var member in iface.GetMembers())
 			{
@@ -100,9 +101,13 @@ public class KnockOffGenerator : IIncrementalGenerator
 				{
 					members.Add(CreateMethodInfo(method));
 				}
+				else if (member is IEventSymbol eventSymbol)
+				{
+					events.Add(CreateEventInfo(eventSymbol));
+				}
 			}
 
-			if (members.Count > 0)
+			if (members.Count > 0 || events.Count > 0)
 			{
 				// Extract simple interface name for AsXYZ() generation
 				var simpleName = GetSimpleInterfaceName(iface.Name);
@@ -110,7 +115,8 @@ public class KnockOffGenerator : IIncrementalGenerator
 				interfaceInfos.Add(new InterfaceInfo(
 					iface.ToDisplayString(),
 					simpleName,
-					new EquatableArray<InterfaceMemberInfo>(members.ToArray())));
+					new EquatableArray<InterfaceMemberInfo>(members.ToArray()),
+					new EquatableArray<EventMemberInfo>(events.ToArray())));
 			}
 		}
 
@@ -234,6 +240,93 @@ public class KnockOffGenerator : IIncrementalGenerator
 	}
 
 	/// <summary>
+	/// Create event info from an IEventSymbol
+	/// </summary>
+	private static EventMemberInfo CreateEventInfo(IEventSymbol eventSymbol)
+	{
+		var delegateType = (INamedTypeSymbol)eventSymbol.Type;
+		var invokeMethod = delegateType.DelegateInvokeMethod;
+
+		if (invokeMethod is null)
+		{
+			// Fallback for malformed delegates
+			return new EventMemberInfo(
+				Name: eventSymbol.Name,
+				FullDelegateTypeName: delegateType.ToDisplayString(FullyQualifiedWithNullability),
+				DelegateKind: EventDelegateKind.Custom,
+				DelegateParameters: EquatableArray<ParameterInfo>.Empty,
+				ReturnTypeName: null,
+				IsAsync: false);
+		}
+
+		var delegateKind = ClassifyDelegateKind(delegateType);
+		var isAsync = IsAsyncDelegate(invokeMethod);
+
+		var parameters = invokeMethod.Parameters
+			.Select(p => new ParameterInfo(p.Name, p.Type.ToDisplayString(FullyQualifiedWithNullability)))
+			.ToArray();
+
+		var returnType = invokeMethod.ReturnsVoid ? null
+			: invokeMethod.ReturnType.ToDisplayString(FullyQualifiedWithNullability);
+
+		return new EventMemberInfo(
+			Name: eventSymbol.Name,
+			FullDelegateTypeName: delegateType.ToDisplayString(FullyQualifiedWithNullability),
+			DelegateKind: delegateKind,
+			DelegateParameters: new EquatableArray<ParameterInfo>(parameters),
+			ReturnTypeName: returnType,
+			IsAsync: isAsync);
+	}
+
+	/// <summary>
+	/// Classify the delegate type for code generation
+	/// </summary>
+	private static EventDelegateKind ClassifyDelegateKind(INamedTypeSymbol delegateType)
+	{
+		var ns = delegateType.ContainingNamespace?.ToDisplayString() ?? "";
+		var name = delegateType.Name;
+
+		// Check for System.EventHandler and System.EventHandler<T>
+		if (ns == "System")
+		{
+			if (name == "EventHandler")
+			{
+				return delegateType.IsGenericType
+					? EventDelegateKind.EventHandlerOfT
+					: EventDelegateKind.EventHandler;
+			}
+
+			if (name == "Action")
+				return EventDelegateKind.Action;
+
+			if (name == "Func")
+				return EventDelegateKind.Func;
+		}
+
+		return EventDelegateKind.Custom;
+	}
+
+	/// <summary>
+	/// Check if a delegate returns Task or ValueTask (async pattern)
+	/// </summary>
+	private static bool IsAsyncDelegate(IMethodSymbol invokeMethod)
+	{
+		if (invokeMethod.ReturnsVoid)
+			return false;
+
+		var returnType = invokeMethod.ReturnType;
+		var ns = returnType.ContainingNamespace?.ToDisplayString() ?? "";
+		var name = returnType.Name;
+
+		if (ns == "System.Threading.Tasks")
+		{
+			return name == "Task" || name == "ValueTask";
+		}
+
+		return false;
+	}
+
+	/// <summary>
 	/// Find user-defined protected methods that match interface method signatures
 	/// </summary>
 	private static EquatableArray<UserMethodInfo> GetUserDefinedMethods(
@@ -314,6 +407,8 @@ public class KnockOffGenerator : IIncrementalGenerator
 
 		// Collect unique members across all interfaces
 		var processedMembers = new Dictionary<string, InterfaceMemberInfo>();
+		var processedEvents = new Dictionary<string, EventMemberInfo>();
+
 		foreach (var iface in typeInfo.Interfaces)
 		{
 			foreach (var member in iface.Members)
@@ -327,6 +422,15 @@ public class KnockOffGenerator : IIncrementalGenerator
 					processedMembers[memberKey] = member;
 				}
 			}
+
+			foreach (var evt in iface.Events)
+			{
+				var eventKey = $"event:{evt.Name}";
+				if (!processedEvents.ContainsKey(eventKey))
+				{
+					processedEvents[eventKey] = evt;
+				}
+			}
 		}
 
 		// 1. Generate per-member Handler classes
@@ -335,8 +439,14 @@ public class KnockOffGenerator : IIncrementalGenerator
 			GenerateMemberHandlerClass(sb, kvp.Value, typeInfo.ClassName);
 		}
 
+		// 1b. Generate per-event Handler classes
+		foreach (var kvp in processedEvents)
+		{
+			GenerateEventHandlerClass(sb, kvp.Value, typeInfo.ClassName);
+		}
+
 		// 2. Generate Spy class
-		GenerateSpyClass(sb, typeInfo.ClassName, processedMembers.Values);
+		GenerateSpyClass(sb, typeInfo.ClassName, processedMembers.Values, processedEvents.Values);
 
 		// 3. Generate Spy property
 		sb.AppendLine("\t/// <summary>Tracks invocations and configures behavior for all interface members.</summary>");
@@ -393,6 +503,12 @@ public class KnockOffGenerator : IIncrementalGenerator
 				{
 					GenerateMethod(sb, iface.FullName, member, typeInfo);
 				}
+			}
+
+			// 6b. Generate explicit interface implementations for events
+			foreach (var evt in iface.Events)
+			{
+				GenerateEventImplementation(sb, iface.FullName, evt);
 			}
 		}
 
@@ -704,10 +820,209 @@ public class KnockOffGenerator : IIncrementalGenerator
 		return $"({string.Join(", ", elements)})";
 	}
 
+	/// <summary>
+	/// Generate handler class for an event
+	/// </summary>
+	private static void GenerateEventHandlerClass(System.Text.StringBuilder sb, EventMemberInfo evt, string className)
+	{
+		sb.AppendLine($"\t/// <summary>Tracks and raises {evt.Name}.</summary>");
+		sb.AppendLine($"\tpublic sealed class {evt.Name}Handler");
+		sb.AppendLine("\t{");
+
+		// Private handler field
+		sb.AppendLine($"\t\tprivate {evt.FullDelegateTypeName}? _handler;");
+
+		// Determine raise tracking type based on parameter count
+		var paramCount = evt.DelegateParameters.Count;
+		string raiseTrackingType;
+		string raiseTrackingConstruction;
+
+		if (paramCount == 0)
+		{
+			raiseTrackingType = ""; // No tracking for parameterless events
+			raiseTrackingConstruction = "";
+		}
+		else if (paramCount == 1)
+		{
+			// Single parameter - track directly (no tuple)
+			var param = evt.DelegateParameters.GetArray()![0];
+			raiseTrackingType = param.Type;
+			raiseTrackingConstruction = param.Name;
+		}
+		else
+		{
+			// Multiple parameters - use tuple
+			raiseTrackingType = GetTupleType(evt.DelegateParameters);
+			raiseTrackingConstruction = GetTupleConstruction(evt.DelegateParameters);
+		}
+
+		// Raise tracking list (if there are parameters to track)
+		if (paramCount > 0)
+		{
+			sb.AppendLine($"\t\tprivate readonly global::System.Collections.Generic.List<{raiseTrackingType}> _raises = new();");
+		}
+		sb.AppendLine();
+
+		// === Subscription Tracking ===
+		sb.AppendLine("\t\t/// <summary>Number of times handlers were added.</summary>");
+		sb.AppendLine("\t\tpublic int SubscribeCount { get; private set; }");
+		sb.AppendLine();
+		sb.AppendLine("\t\t/// <summary>Number of times handlers were removed.</summary>");
+		sb.AppendLine("\t\tpublic int UnsubscribeCount { get; private set; }");
+		sb.AppendLine();
+		sb.AppendLine("\t\t/// <summary>True if at least one handler is subscribed.</summary>");
+		sb.AppendLine("\t\tpublic bool HasSubscribers => _handler != null;");
+		sb.AppendLine();
+
+		// === Raise Tracking ===
+		if (paramCount == 0)
+		{
+			sb.AppendLine("\t\t/// <summary>Number of times the event was raised.</summary>");
+			sb.AppendLine("\t\tpublic int RaiseCount { get; private set; }");
+			sb.AppendLine();
+		}
+		else
+		{
+			sb.AppendLine("\t\t/// <summary>Number of times the event was raised.</summary>");
+			sb.AppendLine("\t\tpublic int RaiseCount => _raises.Count;");
+			sb.AppendLine();
+		}
+
+		sb.AppendLine("\t\t/// <summary>True if the event was raised at least once.</summary>");
+		sb.AppendLine("\t\tpublic bool WasRaised => RaiseCount > 0;");
+		sb.AppendLine();
+
+		if (paramCount == 1)
+		{
+			var param = evt.DelegateParameters.GetArray()![0];
+			var nullableType = MakeNullable(param.Type);
+			sb.AppendLine($"\t\t/// <summary>Arguments from the most recent raise.</summary>");
+			sb.AppendLine($"\t\tpublic {nullableType} LastRaiseArgs => _raises.Count > 0 ? _raises[_raises.Count - 1] : default;");
+			sb.AppendLine();
+			sb.AppendLine($"\t\t/// <summary>All recorded raise invocations.</summary>");
+			sb.AppendLine($"\t\tpublic global::System.Collections.Generic.IReadOnlyList<{param.Type}> AllRaises => _raises;");
+			sb.AppendLine();
+		}
+		else if (paramCount > 1)
+		{
+			sb.AppendLine($"\t\t/// <summary>Arguments from the most recent raise.</summary>");
+			sb.AppendLine($"\t\tpublic {raiseTrackingType}? LastRaiseArgs => _raises.Count > 0 ? _raises[_raises.Count - 1] : null;");
+			sb.AppendLine();
+			sb.AppendLine($"\t\t/// <summary>All recorded raise invocations.</summary>");
+			sb.AppendLine($"\t\tpublic global::System.Collections.Generic.IReadOnlyList<{raiseTrackingType}> AllRaises => _raises;");
+			sb.AppendLine();
+		}
+
+		// === Add/Remove methods ===
+		sb.AppendLine($"\t\tinternal void Add({evt.FullDelegateTypeName} handler)");
+		sb.AppendLine("\t\t{");
+		sb.AppendLine("\t\t\t_handler += handler;");
+		sb.AppendLine("\t\t\tSubscribeCount++;");
+		sb.AppendLine("\t\t}");
+		sb.AppendLine();
+
+		sb.AppendLine($"\t\tinternal void Remove({evt.FullDelegateTypeName} handler)");
+		sb.AppendLine("\t\t{");
+		sb.AppendLine("\t\t\t_handler -= handler;");
+		sb.AppendLine("\t\t\tUnsubscribeCount++;");
+		sb.AppendLine("\t\t}");
+		sb.AppendLine();
+
+		// === Raise method(s) ===
+		GenerateEventRaiseMethods(sb, evt, raiseTrackingConstruction);
+
+		// === Reset and Clear ===
+		sb.AppendLine("\t\t/// <summary>Resets all tracking counters.</summary>");
+		sb.Append("\t\tpublic void Reset() { SubscribeCount = 0; UnsubscribeCount = 0; ");
+		if (paramCount == 0)
+			sb.Append("RaiseCount = 0; ");
+		else
+			sb.Append("_raises.Clear(); ");
+		sb.AppendLine("}");
+		sb.AppendLine();
+
+		sb.AppendLine("\t\t/// <summary>Clears all handlers and resets tracking.</summary>");
+		sb.AppendLine("\t\tpublic void Clear() { _handler = null; Reset(); }");
+
+		sb.AppendLine("\t}");
+		sb.AppendLine();
+	}
+
+	/// <summary>
+	/// Generate Raise methods for an event handler
+	/// </summary>
+	private static void GenerateEventRaiseMethods(System.Text.StringBuilder sb, EventMemberInfo evt, string raiseTrackingConstruction)
+	{
+		var paramList = string.Join(", ", evt.DelegateParameters.Select(p => $"{p.Type} {p.Name}"));
+		var argList = string.Join(", ", evt.DelegateParameters.Select(p => p.Name));
+		var paramCount = evt.DelegateParameters.Count;
+
+		if (evt.IsAsync)
+		{
+			// Async: iterate through invocation list and await each
+			sb.AppendLine($"\t\t/// <summary>Raises the event and awaits all handlers sequentially.</summary>");
+			sb.AppendLine($"\t\tpublic async global::System.Threading.Tasks.Task RaiseAsync({paramList})");
+			sb.AppendLine("\t\t{");
+			if (paramCount > 0)
+				sb.AppendLine($"\t\t\t_raises.Add({raiseTrackingConstruction});");
+			else
+				sb.AppendLine("\t\t\tRaiseCount++;");
+			sb.AppendLine("\t\t\tif (_handler == null) return;");
+			sb.AppendLine("\t\t\tforeach (var h in _handler.GetInvocationList())");
+			sb.AppendLine($"\t\t\t\tawait (({evt.FullDelegateTypeName})h)({argList});");
+			sb.AppendLine("\t\t}");
+		}
+		else if (evt.ReturnTypeName != null)
+		{
+			// Func delegate: return result of invocation
+			sb.AppendLine($"\t\t/// <summary>Raises the event and returns the result.</summary>");
+			sb.AppendLine($"\t\tpublic {evt.ReturnTypeName} Raise({paramList})");
+			sb.AppendLine("\t\t{");
+			if (paramCount > 0)
+				sb.AppendLine($"\t\t\t_raises.Add({raiseTrackingConstruction});");
+			else
+				sb.AppendLine("\t\t\tRaiseCount++;");
+			sb.AppendLine($"\t\t\treturn _handler?.Invoke({argList}) ?? default!;");
+			sb.AppendLine("\t\t}");
+		}
+		else
+		{
+			// Void/Action: simple invocation
+			sb.AppendLine($"\t\t/// <summary>Raises the event.</summary>");
+			sb.AppendLine($"\t\tpublic void Raise({paramList})");
+			sb.AppendLine("\t\t{");
+			if (paramCount > 0)
+				sb.AppendLine($"\t\t\t_raises.Add({raiseTrackingConstruction});");
+			else
+				sb.AppendLine("\t\t\tRaiseCount++;");
+			sb.AppendLine($"\t\t\t_handler?.Invoke({argList});");
+			sb.AppendLine("\t\t}");
+		}
+		sb.AppendLine();
+
+		// Convenience overloads for EventHandler patterns
+		if (evt.DelegateKind == EventDelegateKind.EventHandler && paramCount == 2)
+		{
+			// EventHandler: Raise() with null sender and EventArgs.Empty
+			sb.AppendLine("\t\t/// <summary>Raises the event with null sender and empty args.</summary>");
+			sb.AppendLine("\t\tpublic void Raise() => Raise(null, global::System.EventArgs.Empty);");
+			sb.AppendLine();
+		}
+		else if (evt.DelegateKind == EventDelegateKind.EventHandlerOfT && paramCount == 2)
+		{
+			// EventHandler<T>: Raise(e) with null sender
+			var eventArgsParam = evt.DelegateParameters.GetArray()![1];
+			sb.AppendLine($"\t\t/// <summary>Raises the event with null sender.</summary>");
+			sb.AppendLine($"\t\tpublic void Raise({eventArgsParam.Type} e) => Raise(null, e);");
+			sb.AppendLine();
+		}
+	}
+
 	private static void GenerateSpyClass(
 		System.Text.StringBuilder sb,
 		string className,
-		IEnumerable<InterfaceMemberInfo> members)
+		IEnumerable<InterfaceMemberInfo> members,
+		IEnumerable<EventMemberInfo> events)
 	{
 		sb.AppendLine($"\t/// <summary>Spy for {className} - tracks invocations and configures behavior.</summary>");
 		sb.AppendLine($"\tpublic sealed class {className}Spy");
@@ -719,6 +1034,28 @@ public class KnockOffGenerator : IIncrementalGenerator
 			sb.AppendLine($"\t\tpublic {member.Name}Handler {member.Name} {{ get; }} = new();");
 		}
 
+		foreach (var evt in events)
+		{
+			sb.AppendLine($"\t\t/// <summary>Handler for {evt.Name} event.</summary>");
+			sb.AppendLine($"\t\tpublic {evt.Name}Handler {evt.Name} {{ get; }} = new();");
+		}
+
+		sb.AppendLine("\t}");
+		sb.AppendLine();
+	}
+
+	/// <summary>
+	/// Generate explicit interface implementation for an event
+	/// </summary>
+	private static void GenerateEventImplementation(
+		System.Text.StringBuilder sb,
+		string interfaceName,
+		EventMemberInfo evt)
+	{
+		sb.AppendLine($"\tevent {evt.FullDelegateTypeName} {interfaceName}.{evt.Name}");
+		sb.AppendLine("\t{");
+		sb.AppendLine($"\t\tadd => Spy.{evt.Name}.Add(value);");
+		sb.AppendLine($"\t\tremove => Spy.{evt.Name}.Remove(value);");
 		sb.AppendLine("\t}");
 		sb.AppendLine();
 	}
@@ -1030,7 +1367,8 @@ internal sealed record KnockOffTypeInfo(
 internal sealed record InterfaceInfo(
 	string FullName,
 	string SimpleName,
-	EquatableArray<InterfaceMemberInfo> Members) : IEquatable<InterfaceInfo>;
+	EquatableArray<InterfaceMemberInfo> Members,
+	EquatableArray<EventMemberInfo> Events) : IEquatable<InterfaceInfo>;
 
 internal sealed record InterfaceMemberInfo(
 	string Name,
@@ -1051,5 +1389,22 @@ internal sealed record UserMethodInfo(
 	string Name,
 	string ReturnType,
 	EquatableArray<ParameterInfo> Parameters) : IEquatable<UserMethodInfo>;
+
+internal sealed record EventMemberInfo(
+	string Name,
+	string FullDelegateTypeName,
+	EventDelegateKind DelegateKind,
+	EquatableArray<ParameterInfo> DelegateParameters,
+	string? ReturnTypeName,
+	bool IsAsync) : IEquatable<EventMemberInfo>;
+
+internal enum EventDelegateKind
+{
+	EventHandler,       // System.EventHandler
+	EventHandlerOfT,    // System.EventHandler<TEventArgs>
+	Action,             // System.Action or Action<T...>
+	Func,               // System.Func<..., TResult>
+	Custom              // Custom delegate type
+}
 
 #endregion
