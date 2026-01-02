@@ -73,34 +73,42 @@ The stub behavior is defined once in the partial class. Every test uses the same
 
 ## Defining Stub Behavior
 
-Define protected methods in your stub class that match interface members:
+**Properties** use generated backing fields automatically—no code needed.
+
+**Methods** need a protected method in your stub if you want custom behavior:
 
 ```csharp
-[KnockOff]
-public partial class RepositoryKnockOff : IRepository
+public interface ICalculator
 {
-    private readonly List<Entity> _entities = [];
+    int Add(int a, int b);
+    Task<int> AddAsync(int a, int b);
+    void Reset();
+}
 
-    // Return value methods
-    protected Entity? GetById(int id) => _entities.FirstOrDefault(e => e.Id == id);
-
-    // Void methods
-    protected void Save(Entity entity) => _entities.Add(entity);
-
-    // Async methods
-    protected Task<List<Entity>> GetAllAsync() => Task.FromResult(_entities.ToList());
+[KnockOff]
+public partial class CalculatorKnockOff : ICalculator
+{
+    protected int Add(int a, int b) => a + b;
+    protected Task<int> AddAsync(int a, int b) => Task.FromResult(a + b);
+    protected void Reset() { /* side effect logic */ }
 }
 ```
 
-Properties use backing fields automatically. For custom property behavior, define get/set methods:
+**Custom property getters/setters** use `Get`/`Set` prefix:
 
 ```csharp
-[KnockOff]
-public partial class ConfigKnockOff : IConfig
+public interface ICounter
 {
-    private int _callCount;
+    int Value { get; set; }
+}
 
-    protected string GetConnectionString() => $"Called {++_callCount} times";
+[KnockOff]
+public partial class CounterKnockOff : ICounter
+{
+    private int _calls;
+
+    protected int GetValue() => ++_calls;  // Custom getter
+    protected void SetValue(int value) { } // Custom setter
 }
 ```
 
@@ -109,10 +117,10 @@ public partial class ConfigKnockOff : IConfig
 If you need per-test behavior without creating a new stub class, use callbacks:
 
 ```csharp
-var knockOff = new UserServiceKnockOff();
+var knockOff = new DataServiceKnockOff();
 
-// Override the stub's built-in behavior for this specific test
-knockOff.Spy.GetUser.OnCall = (ko, id) => new User { Id = id, Name = "Override" };
+// Override for this specific test
+knockOff.Spy.GetCount.OnCall = (ko) => 999;
 knockOff.Spy.Name.OnGet = (ko) => "FromCallback";
 knockOff.Spy.Name.OnSet = (ko, value) => { /* custom logic */ };
 ```
@@ -122,17 +130,26 @@ Callbacks take precedence over user-defined methods. Use `Reset()` to clear call
 ## Verification
 
 ```csharp
+var knockOff = new DataServiceKnockOff();
+IDataService service = knockOff;
+
+service.GetDescription(1);
+service.GetDescription(2);
+service.GetDescription(42);
+
 // Check invocation
-Assert.True(knockOff.Spy.GetUser.WasCalled);
-Assert.Equal(3, knockOff.Spy.GetUser.CallCount);
+Assert.True(knockOff.Spy.GetDescription.WasCalled);
+Assert.Equal(3, knockOff.Spy.GetDescription.CallCount);
 
 // Check arguments
-Assert.Equal(42, knockOff.Spy.GetUser.LastCallArg);
-var allCalls = knockOff.Spy.GetUser.AllCalls; // [1, 2, 42]
+Assert.Equal(42, knockOff.Spy.GetDescription.LastCallArg);
+var allCalls = knockOff.Spy.GetDescription.AllCalls; // [1, 2, 42]
 
 // Check properties
+service.Name = "First";
+service.Name = "Second";
 Assert.Equal(2, knockOff.Spy.Name.SetCount);
-Assert.Equal("LastValue", knockOff.Spy.Name.LastSetValue);
+Assert.Equal("Second", knockOff.Spy.Name.LastSetValue);
 ```
 
 ## Features
