@@ -92,7 +92,7 @@ partial class UserServiceKnockOff
 		public bool WasCalled => _calls.Count > 0;
 
 		/// <summary>The 'name' argument from the most recent call.</summary>
-		public string? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : default;
+		public string? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
 
 		/// <summary>All recorded calls with their arguments.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<string> AllCalls => _calls;

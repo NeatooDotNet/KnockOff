@@ -48,7 +48,7 @@ partial class AsyncServiceKnockOff
 		public bool WasCalled => _calls.Count > 0;
 
 		/// <summary>The 'input' argument from the most recent call.</summary>
-		public int? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : default;
+		public int? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
 
 		/// <summary>All recorded calls with their arguments.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<int> AllCalls => _calls;
@@ -160,7 +160,7 @@ partial class AsyncServiceKnockOff
 		public bool WasCalled => _calls.Count > 0;
 
 		/// <summary>The 'input' argument from the most recent call.</summary>
-		public int? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : default;
+		public int? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
 
 		/// <summary>All recorded calls with their arguments.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<int> AllCalls => _calls;

@@ -16,6 +16,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Neatoo" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\..\KnockOff\KnockOff.csproj" />
 		<ProjectReference Include="..\..\Generator\Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 	</ItemGroup>

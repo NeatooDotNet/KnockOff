@@ -84,6 +84,9 @@ public class KnockOffGenerator : IIncrementalGenerator
 		if (interfaces.Length == 0)
 			return null;
 
+		// Get the KnockOff class's assembly for accessibility checks
+		var knockOffAssembly = classSymbol.ContainingAssembly;
+
 		var interfaceInfos = new List<InterfaceInfo>();
 
 		foreach (var iface in interfaces)
@@ -93,6 +96,10 @@ public class KnockOffGenerator : IIncrementalGenerator
 
 			foreach (var member in iface.GetMembers())
 			{
+				// Skip internal members from external assemblies
+				if (!IsMemberAccessible(member, knockOffAssembly))
+					continue;
+
 				if (member is IPropertySymbol property)
 				{
 					members.Add(CreatePropertyInfo(property));
@@ -145,6 +152,73 @@ public class KnockOffGenerator : IIncrementalGenerator
 		return interfaceName;
 	}
 
+	/// <summary>
+	/// Checks if a member is accessible from the KnockOff class.
+	/// Internal members are only accessible from the same assembly.
+	/// </summary>
+	private static bool IsMemberAccessible(ISymbol member, IAssemblySymbol knockOffAssembly)
+	{
+		// Internal or ProtectedAndInternal members are only accessible from the same assembly
+		if (member.DeclaredAccessibility == Accessibility.Internal ||
+			member.DeclaredAccessibility == Accessibility.ProtectedAndInternal)
+		{
+			var memberAssembly = member.ContainingAssembly;
+			return SymbolEqualityComparer.Default.Equals(memberAssembly, knockOffAssembly);
+		}
+
+		// Public and Protected members are accessible
+		return true;
+	}
+
+	/// <summary>
+	/// Gets the keyword prefix for a ref kind (out, ref, in, ref readonly).
+	/// </summary>
+	private static string GetRefKindPrefix(RefKind kind) => kind switch
+	{
+		RefKind.Out => "out ",
+		RefKind.Ref => "ref ",
+		RefKind.In => "in ",
+		RefKind.RefReadOnlyParameter => "ref readonly ",
+		_ => ""
+	};
+
+	/// <summary>
+	/// Formats a parameter for use in a method signature (e.g., "out string value").
+	/// </summary>
+	private static string FormatParameter(ParameterInfo p) =>
+		$"{GetRefKindPrefix(p.RefKind)}{p.Type} {p.Name}";
+
+	/// <summary>
+	/// Formats a parameter for use in a method call/argument (e.g., "out value").
+	/// </summary>
+	private static string FormatArgument(ParameterInfo p) =>
+		$"{GetRefKindPrefix(p.RefKind)}{p.Name}";
+
+	/// <summary>
+	/// Returns true if the parameter is an output-only parameter (out, not ref).
+	/// Out parameters are outputs from the method, not inputs to track.
+	/// </summary>
+	private static bool IsOutputParameter(RefKind refKind) =>
+		refKind == RefKind.Out;
+
+	/// <summary>
+	/// Filters parameters to only include input parameters (excludes out params).
+	/// </summary>
+	private static IEnumerable<ParameterInfo> GetInputParameters(EquatableArray<ParameterInfo> parameters) =>
+		parameters.Where(p => !IsOutputParameter(p.RefKind));
+
+	/// <summary>
+	/// Filters combined parameters to only include input parameters (excludes out params).
+	/// </summary>
+	private static IEnumerable<CombinedParameterInfo> GetInputCombinedParameters(EquatableArray<CombinedParameterInfo> parameters) =>
+		parameters.Where(p => !IsOutputParameter(p.RefKind));
+
+	/// <summary>
+	/// Formats a parameter for RecordCall (stores value, no ref/out keywords).
+	/// </summary>
+	private static string FormatRecordCallParameter(ParameterInfo p) =>
+		$"{p.Type} {p.Name}";
+
 	private static InterfaceMemberInfo CreatePropertyInfo(IPropertySymbol property)
 	{
 		var returnType = property.Type.ToDisplayString(FullyQualifiedWithNullability);
@@ -167,7 +241,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 
 			indexerParameters = new EquatableArray<ParameterInfo>(
 				property.Parameters
-					.Select(p => new ParameterInfo(p.Name, p.Type.ToDisplayString(FullyQualifiedWithNullability)))
+					.Select(p => new ParameterInfo(p.Name, p.Type.ToDisplayString(FullyQualifiedWithNullability), p.RefKind))
 					.ToArray());
 		}
 
@@ -224,7 +298,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 		}
 
 		var parameters = method.Parameters
-			.Select(p => new ParameterInfo(p.Name, p.Type.ToDisplayString(FullyQualifiedWithNullability)))
+			.Select(p => new ParameterInfo(p.Name, p.Type.ToDisplayString(FullyQualifiedWithNullability), p.RefKind))
 			.ToArray();
 
 		return new InterfaceMemberInfo(
@@ -263,7 +337,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 		var isAsync = IsAsyncDelegate(invokeMethod);
 
 		var parameters = invokeMethod.Parameters
-			.Select(p => new ParameterInfo(p.Name, p.Type.ToDisplayString(FullyQualifiedWithNullability)))
+			.Select(p => new ParameterInfo(p.Name, p.Type.ToDisplayString(FullyQualifiedWithNullability), p.RefKind))
 			.ToArray();
 
 		var returnType = invokeMethod.ReturnsVoid ? null
@@ -362,7 +436,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 		{
 			var returnType = method.ReturnType.ToDisplayString(FullyQualifiedWithNullability);
 			var parameters = method.Parameters
-				.Select(p => new ParameterInfo(p.Name, p.Type.ToDisplayString(FullyQualifiedWithNullability)))
+				.Select(p => new ParameterInfo(p.Name, p.Type.ToDisplayString(FullyQualifiedWithNullability), p.RefKind))
 				.ToArray();
 
 			var sig = GetMethodSignature(method.Name, returnType, new EquatableArray<ParameterInfo>(parameters));
@@ -412,7 +486,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 
 			// Build combined parameters: union of all params across overloads
 			// Params not in all overloads become nullable
-			var allParamNames = new Dictionary<string, (string Type, int Count)>();
+			var allParamNames = new Dictionary<string, (string Type, int Count, RefKind RefKind)>();
 			var totalOverloads = overloads.Count;
 
 			foreach (var overload in overloads)
@@ -422,11 +496,11 @@ public class KnockOffGenerator : IIncrementalGenerator
 					if (allParamNames.TryGetValue(param.Name, out var existing))
 					{
 						// Same name exists - increment count (param appears in multiple overloads)
-						allParamNames[param.Name] = (existing.Type, existing.Count + 1);
+						allParamNames[param.Name] = (existing.Type, existing.Count + 1, existing.RefKind);
 					}
 					else
 					{
-						allParamNames[param.Name] = (param.Type, 1);
+						allParamNames[param.Name] = (param.Type, 1, param.RefKind);
 					}
 				}
 			}
@@ -438,10 +512,11 @@ public class KnockOffGenerator : IIncrementalGenerator
 				var paramName = kvp2.Key;
 				var paramType = kvp2.Value.Type;
 				var count = kvp2.Value.Count;
+				var refKind = kvp2.Value.RefKind;
 				var isNullable = count < totalOverloads; // Not in all overloads = nullable
 				var nullableType = isNullable ? MakeNullable(paramType) : paramType;
 
-				combinedParams.Add(new CombinedParameterInfo(paramName, paramType, nullableType, isNullable));
+				combinedParams.Add(new CombinedParameterInfo(paramName, paramType, nullableType, isNullable, refKind));
 			}
 
 			// Create overload infos
@@ -698,7 +773,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 				sb.AppendLine("\t\tpublic bool WasCalled => _calls.Count > 0;");
 				sb.AppendLine();
 				sb.AppendLine($"\t\t/// <summary>The '{param.Name}' argument from the most recent call.</summary>");
-				sb.AppendLine($"\t\tpublic {nullableType} LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : default;");
+				sb.AppendLine($"\t\tpublic {nullableType} LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;");
 				sb.AppendLine();
 				sb.AppendLine("\t\t/// <summary>All recorded calls with their arguments.</summary>");
 				sb.AppendLine($"\t\tpublic global::System.Collections.Generic.IReadOnlyList<{param.Type}> AllCalls => _calls;");
@@ -756,7 +831,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 				sb.AppendLine();
 
 				// RecordCall with typed parameters
-				var paramList = string.Join(", ", member.Parameters.Select(p => $"{p.Type} {p.Name}"));
+				var paramList = string.Join(", ", member.Parameters.Select(p => FormatParameter(p)));
 				var tupleConstruction = GetTupleConstruction(member.Parameters);
 				sb.AppendLine("\t\t/// <summary>Records a method call.</summary>");
 				sb.AppendLine($"\t\tpublic void RecordCall({paramList}) => _calls.Add({tupleConstruction});");
@@ -900,7 +975,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 				? $"{group.Name}Delegate{delegateIndex}"
 				: $"{group.Name}Delegate";
 
-			var paramList = string.Join(", ", overload.Parameters.Select(p => $"{p.Type} {p.Name}"));
+			var paramList = string.Join(", ", overload.Parameters.Select(p => FormatParameter(p)));
 			var fullParamList = string.IsNullOrEmpty(paramList)
 				? $"{className} ko"
 				: $"{className} ko, {paramList}";
@@ -932,11 +1007,12 @@ public class KnockOffGenerator : IIncrementalGenerator
 		}
 		sb.AppendLine();
 
-		// 3. Combined tracking list
-		if (combinedParams.Count == 1)
+		// 3. Combined tracking list (only input parameters - exclude out params)
+		var inputParams = GetInputCombinedParameters(combinedParams).ToArray();
+		if (inputParams.Length == 1)
 		{
-			// Single parameter - store directly (tuples require 2+ elements)
-			var param = combinedParams.GetArray()![0];
+			// Single input parameter - store directly (tuples require 2+ elements)
+			var param = inputParams[0];
 
 			sb.AppendLine($"\t\tprivate readonly global::System.Collections.Generic.List<{param.Type}> _calls = new();");
 			sb.AppendLine();
@@ -951,17 +1027,17 @@ public class KnockOffGenerator : IIncrementalGenerator
 
 			var nullableType = MakeNullable(param.Type);
 			sb.AppendLine($"\t\t/// <summary>The '{param.Name}' argument from the most recent call.</summary>");
-			sb.AppendLine($"\t\tpublic {nullableType} LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : default;");
+			sb.AppendLine($"\t\tpublic {nullableType} LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;");
 			sb.AppendLine();
 
 			sb.AppendLine("\t\t/// <summary>All recorded calls with their arguments.</summary>");
 			sb.AppendLine($"\t\tpublic global::System.Collections.Generic.IReadOnlyList<{param.Type}> AllCalls => _calls;");
 			sb.AppendLine();
 		}
-		else if (combinedParams.Count > 1)
+		else if (inputParams.Length > 1)
 		{
-			// Multiple parameters - use tuple
-			var tupleElements = combinedParams.Select(p => $"{p.NullableType} {p.Name}");
+			// Multiple input parameters - use tuple
+			var tupleElements = inputParams.Select(p => $"{p.NullableType} {p.Name}");
 			var tupleType = $"({string.Join(", ", tupleElements)})";
 
 			sb.AppendLine($"\t\tprivate readonly global::System.Collections.Generic.List<{tupleType}> _calls = new();");
@@ -1028,28 +1104,30 @@ public class KnockOffGenerator : IIncrementalGenerator
 		}
 		sb.AppendLine();
 
-		// 6. RecordCall methods for each overload
+		// 6. RecordCall methods for each overload (only input params, no out/ref keywords)
 		delegateIndex = 0;
 		foreach (var overload in group.Overloads)
 		{
-			var paramList = string.Join(", ", overload.Parameters.Select(p => $"{p.Type} {p.Name}"));
+			// Only include input parameters in RecordCall (exclude out params, strip ref)
+			var inputOverloadParams = GetInputParameters(overload.Parameters).ToArray();
+			var paramList = string.Join(", ", inputOverloadParams.Select(p => FormatRecordCallParameter(p)));
 
 			sb.AppendLine($"\t\t/// <summary>Records a method call.</summary>");
-			if (combinedParams.Count == 1)
+			if (inputParams.Length == 1)
 			{
-				// Single parameter - add directly
-				var param = combinedParams.GetArray()![0];
-				var matchingParam = overload.Parameters.FirstOrDefault(p => p.Name == param.Name);
+				// Single input parameter - add directly
+				var param = inputParams[0];
+				var matchingParam = inputOverloadParams.FirstOrDefault(p => p.Name == param.Name);
 				var addValue = matchingParam != null ? matchingParam.Name : "default";
 				sb.AppendLine($"\t\tpublic void RecordCall({paramList}) => _calls.Add({addValue});");
 			}
-			else if (combinedParams.Count > 1)
+			else if (inputParams.Length > 1)
 			{
-				// Build tuple with nulls for missing params
+				// Build tuple with nulls for missing params (only input params)
 				var tupleValues = new List<string>();
-				foreach (var combinedParam in combinedParams)
+				foreach (var inputParam in inputParams)
 				{
-					var matchingParam = overload.Parameters.FirstOrDefault(p => p.Name == combinedParam.Name);
+					var matchingParam = inputOverloadParams.FirstOrDefault(p => p.Name == inputParam.Name);
 					tupleValues.Add(matchingParam != null ? matchingParam.Name : "default");
 				}
 				var tupleConstruction = $"({string.Join(", ", tupleValues)})";
@@ -1058,7 +1136,8 @@ public class KnockOffGenerator : IIncrementalGenerator
 			}
 			else
 			{
-				sb.AppendLine($"\t\tpublic void RecordCall({paramList}) => CallCount++;");
+				// No input parameters - just track count
+				sb.AppendLine($"\t\tpublic void RecordCall() => CallCount++;");
 			}
 			delegateIndex++;
 		}
@@ -1067,7 +1146,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 		// 7. Reset method
 		sb.AppendLine("\t\t/// <summary>Resets all tracking state.</summary>");
 		sb.Append("\t\tpublic void Reset() { ");
-		if (combinedParams.Count > 0)
+		if (inputParams.Length > 0)
 		{
 			sb.Append("_calls.Clear(); ");
 		}
@@ -1106,7 +1185,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 	/// </summary>
 	private static string GetTupleType(EquatableArray<ParameterInfo> parameters)
 	{
-		var elements = parameters.Select(p => $"{p.Type} {p.Name}");
+		var elements = parameters.Select(p => FormatParameter(p));
 		return $"({string.Join(", ", elements)})";
 	}
 
@@ -1252,7 +1331,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 	/// </summary>
 	private static void GenerateEventRaiseMethods(System.Text.StringBuilder sb, EventMemberInfo evt, string raiseTrackingConstruction)
 	{
-		var paramList = string.Join(", ", evt.DelegateParameters.Select(p => $"{p.Type} {p.Name}"));
+		var paramList = string.Join(", ", evt.DelegateParameters.Select(p => FormatParameter(p)));
 		var argList = string.Join(", ", evt.DelegateParameters.Select(p => p.Name));
 		var paramCount = evt.DelegateParameters.Count;
 
@@ -1513,9 +1592,17 @@ public class KnockOffGenerator : IIncrementalGenerator
 		KnockOffTypeInfo typeInfo,
 		MethodGroupInfo group)
 	{
-		var paramList = string.Join(", ", method.Parameters.Select(p => $"{p.Type} {p.Name}"));
-		var argList = string.Join(", ", method.Parameters.Select(p => p.Name));
+		var paramList = string.Join(", ", method.Parameters.Select(p => FormatParameter(p)));
+		var argList = string.Join(", ", method.Parameters.Select(p => FormatArgument(p)));
 		var paramCount = method.Parameters.Count;
+
+		// Separate input params for RecordCall (exclude out params)
+		var inputParams = GetInputParameters(method.Parameters).ToArray();
+		var inputArgList = string.Join(", ", inputParams.Select(p => p.Name));
+		var inputParamCount = inputParams.Length;
+
+		// Find out parameters that need initialization
+		var outParams = method.Parameters.Where(p => IsOutputParameter(p.RefKind)).ToArray();
 
 		// Check if user defined this method
 		var hasUserMethod = typeInfo.UserMethods.Any(um =>
@@ -1556,10 +1643,16 @@ public class KnockOffGenerator : IIncrementalGenerator
 		sb.AppendLine($"\t{method.ReturnType} {interfaceName}.{method.Name}({paramList})");
 		sb.AppendLine("\t{");
 
-		// Record the call
-		if (paramCount > 0)
+		// Initialize out parameters to default
+		foreach (var outParam in outParams)
 		{
-			sb.AppendLine($"\t\tSpy.{method.Name}.RecordCall({argList});");
+			sb.AppendLine($"\t\t{outParam.Name} = default!;");
+		}
+
+		// Record the call (only input params - out params are outputs, not inputs)
+		if (inputParamCount > 0)
+		{
+			sb.AppendLine($"\t\tSpy.{method.Name}.RecordCall({inputArgList});");
 		}
 		else
 		{
@@ -1707,7 +1800,8 @@ internal sealed record InterfaceMemberInfo(
 
 internal sealed record ParameterInfo(
 	string Name,
-	string Type) : IEquatable<ParameterInfo>;
+	string Type,
+	RefKind RefKind) : IEquatable<ParameterInfo>;
 
 internal sealed record UserMethodInfo(
 	string Name,
@@ -1755,6 +1849,7 @@ internal sealed record CombinedParameterInfo(
 	string Name,
 	string Type,
 	string NullableType,
-	bool IsNullable) : IEquatable<CombinedParameterInfo>;
+	bool IsNullable,
+	RefKind RefKind) : IEquatable<CombinedParameterInfo>;
 
 #endregion

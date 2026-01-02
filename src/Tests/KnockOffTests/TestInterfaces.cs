@@ -186,3 +186,34 @@ public partial class OverloadedServiceKnockOff : IOverloadedService
 }
 
 #endregion
+
+#region Out Parameter Test Types
+
+public interface IOutParameterService
+{
+	bool TryGetValue(string key, out string? value);
+	bool TryParse(string input, out int result);
+	void GetData(out string name, out int count);
+}
+
+[KnockOff]
+public partial class OutParameterServiceKnockOff : IOutParameterService
+{
+}
+
+#endregion
+
+#region Ref Parameter Test Types
+
+public interface IRefParameterService
+{
+	void Increment(ref int value);
+	bool TryUpdate(string key, ref string value);
+}
+
+[KnockOff]
+public partial class RefParameterServiceKnockOff : IRefParameterService
+{
+}
+
+#endregion
