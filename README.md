@@ -166,7 +166,24 @@ Assert.Equal("Second", knockOff.Spy.Name.LastSetValue);
 | Named tuple argument tracking | Supported |
 | Events | Supported |
 | Generic methods | Not yet |
-| ref/out parameters | Not yet |
+| ref/out parameters | Supported |
+
+## Limitation: Interfaces with Internal Members
+
+KnockOff **cannot stub interfaces with `internal` members from external assemblies**. This is a C# language constraint, not a tooling limitation.
+
+```csharp
+// In ExternalLibrary.dll
+public interface IEntity
+{
+    bool IsModified { get; }       // public - stubbable
+    internal void MarkModified();  // internal - impossible to implement externally
+}
+```
+
+Internal members are invisible to external assemblies. No C# syntax—implicit or explicit interface implementation—can reference an invisible member. The compiler errors are CS0122 ("inaccessible due to protection level") and CS9044 ("cannot implicitly implement inaccessible member").
+
+**KnockOff's behavior:** Internal members from external assemblies are filtered out. Public members are stubbed normally. If your tests require mocking internal members, use a runtime proxy library that the target assembly has declared as a friend via `[InternalsVisibleTo]`.
 
 ## Generated Code
 

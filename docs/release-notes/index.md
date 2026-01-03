@@ -14,6 +14,7 @@ Releases with notable changes.
 
 ## All Releases
 
+- [v10.4.1](v10.4.1.md) - 2026-01-02 - Bug fixes for nullable events and collection defaults
 - [v10.4.0](v10.4.0.md) - 2026-01-02 - Documentation updates
 - [v10.3.0](v10.3.0.md) - 2026-01-01 - Out/ref parameter support
 - [v10.2.0](v10.2.0.md) - 2026-01-01 - Method overloads & delegate-based callbacks

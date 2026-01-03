@@ -1207,8 +1207,9 @@ public class KnockOffGenerator : IIncrementalGenerator
 		sb.AppendLine($"\tpublic sealed class {evt.Name}Handler");
 		sb.AppendLine("\t{");
 
-		// Private handler field
-		sb.AppendLine($"\t\tprivate {evt.FullDelegateTypeName}? _handler;");
+		// Private handler field - strip trailing ? from delegate type since we add our own
+		var delegateTypeForField = evt.FullDelegateTypeName.TrimEnd('?');
+		sb.AppendLine($"\t\tprivate {delegateTypeForField}? _handler;");
 
 		// Determine raise tracking type based on parameter count
 		var paramCount = evt.DelegateParameters.Count;
@@ -1769,6 +1770,14 @@ public class KnockOffGenerator : IIncrementalGenerator
 		// Handle common value types that need explicit defaults
 		if (typeName == "global::System.String" || typeName == "string")
 			return "\"\"";
+
+		// Handle collection types - use Array.Empty<T>() for IEnumerable<T> and IReadOnlyCollection<T>
+		if (typeName.Contains("IEnumerable<") || typeName.Contains("IReadOnlyCollection<") || typeName.Contains("IReadOnlyList<"))
+		{
+			var elementType = ExtractGenericArg(typeName);
+			return $"global::System.Array.Empty<{elementType}>()";
+		}
+
 		return "";
 	}
 }
