@@ -289,6 +289,47 @@ IUnitOfWork uow = knockOff.AsUnitOfWork();
 IRepository repo = knockOff;
 ```
 
+### Nested Classes
+
+KnockOff stubs can be nested inside test classes, which is a common pattern for organizing test fixtures:
+
+```csharp
+public partial class UserServiceTests  // Must be partial!
+{
+    [KnockOff]
+    public partial class UserRepositoryKnockOff : IUserRepository
+    {
+    }
+
+    [Fact]
+    public void GetUser_ReturnsUser()
+    {
+        var knockOff = new UserRepositoryKnockOff();
+        // ... test code
+    }
+}
+```
+
+**Important:** When nesting a `[KnockOff]` class inside another class, all containing classes must also be marked `partial`. This is a C# requirement—the generator produces a partial class that must merge with your nested class declaration.
+
+```csharp
+// ❌ Won't compile - containing class not partial
+public class MyTests
+{
+    [KnockOff]
+    public partial class ServiceKnockOff : IService { }
+}
+
+// ✅ Correct - containing class is partial
+public partial class MyTests
+{
+    [KnockOff]
+    public partial class ServiceKnockOff : IService { }
+}
+```
+
+This works for any nesting depth—just ensure every class in the hierarchy is `partial`.
+
 ## Next Steps
 
 - [Customization Patterns](concepts/customization-patterns.md) — Deep dive into user methods vs callbacks

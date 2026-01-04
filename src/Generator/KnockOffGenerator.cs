@@ -79,6 +79,9 @@ public class KnockOffGenerator : IIncrementalGenerator
 		var ns = classSymbol.ContainingNamespace;
 		var namespaceName = ns.IsGlobalNamespace ? "" : ns.ToDisplayString();
 
+		// Get containing types chain (for nested class support)
+		var containingTypes = GetContainingTypes(classSymbol);
+
 		// Get all implemented interfaces
 		var interfaces = classSymbol.AllInterfaces;
 		if (interfaces.Length == 0)
@@ -133,8 +136,50 @@ public class KnockOffGenerator : IIncrementalGenerator
 		return new KnockOffTypeInfo(
 			Namespace: namespaceName,
 			ClassName: classSymbol.Name,
+			ContainingTypes: containingTypes,
 			Interfaces: new EquatableArray<InterfaceInfo>(interfaceInfos.ToArray()),
 			UserMethods: userMethods);
+	}
+
+	/// <summary>
+	/// Gets the chain of containing types for nested class support.
+	/// Returns types from outermost to innermost.
+	/// </summary>
+	private static EquatableArray<ContainingTypeInfo> GetContainingTypes(INamedTypeSymbol classSymbol)
+	{
+		var containingTypes = new List<ContainingTypeInfo>();
+		var current = classSymbol.ContainingType;
+
+		while (current != null)
+		{
+			var keyword = current.TypeKind switch
+			{
+				TypeKind.Class => current.IsRecord ? "record" : "class",
+				TypeKind.Struct => current.IsRecord ? "record struct" : "struct",
+				TypeKind.Interface => "interface",
+				_ => "class"
+			};
+
+			var accessibility = current.DeclaredAccessibility switch
+			{
+				Accessibility.Public => "public",
+				Accessibility.Internal => "internal",
+				Accessibility.Private => "private",
+				Accessibility.Protected => "protected",
+				Accessibility.ProtectedOrInternal => "protected internal",
+				Accessibility.ProtectedAndInternal => "private protected",
+				_ => ""
+			};
+
+			containingTypes.Insert(0, new ContainingTypeInfo(
+				current.Name,
+				keyword,
+				accessibility));
+
+			current = current.ContainingType;
+		}
+
+		return new EquatableArray<ContainingTypeInfo>(containingTypes.ToArray());
 	}
 
 	/// <summary>
@@ -661,6 +706,16 @@ public class KnockOffGenerator : IIncrementalGenerator
 			sb.AppendLine();
 		}
 
+		// Open containing type wrappers for nested classes
+		foreach (var containingType in typeInfo.ContainingTypes)
+		{
+			var accessMod = string.IsNullOrEmpty(containingType.AccessibilityModifier)
+				? ""
+				: containingType.AccessibilityModifier + " ";
+			sb.AppendLine($"{accessMod}partial {containingType.Keyword} {containingType.Name}");
+			sb.AppendLine("{");
+		}
+
 		sb.AppendLine($"partial class {typeInfo.ClassName}");
 		sb.AppendLine("{");
 
@@ -781,7 +836,18 @@ public class KnockOffGenerator : IIncrementalGenerator
 
 		sb.AppendLine("}");
 
-		context.AddSource($"{typeInfo.ClassName}.g.cs", sb.ToString());
+		// Close containing type wrappers for nested classes
+		for (int i = 0; i < typeInfo.ContainingTypes.Count; i++)
+		{
+			sb.AppendLine("}");
+		}
+
+		// Build hint name including containing types to ensure uniqueness
+		var hintName = typeInfo.ContainingTypes.Count > 0
+			? string.Join(".", typeInfo.ContainingTypes.Select(ct => ct.Name)) + "." + typeInfo.ClassName
+			: typeInfo.ClassName;
+
+		context.AddSource($"{hintName}.g.cs", sb.ToString());
 	}
 
 	/// <summary>
@@ -2800,8 +2866,17 @@ public class KnockOffGenerator : IIncrementalGenerator
 internal sealed record KnockOffTypeInfo(
 	string Namespace,
 	string ClassName,
+	EquatableArray<ContainingTypeInfo> ContainingTypes,
 	EquatableArray<InterfaceInfo> Interfaces,
 	EquatableArray<UserMethodInfo> UserMethods) : IEquatable<KnockOffTypeInfo>;
+
+/// <summary>
+/// Represents a containing type (for nested class support).
+/// </summary>
+internal sealed record ContainingTypeInfo(
+	string Name,
+	string Keyword,
+	string AccessibilityModifier) : IEquatable<ContainingTypeInfo>;
 
 internal sealed record InterfaceInfo(
 	string FullName,

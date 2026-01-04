@@ -12,8 +12,21 @@ public partial class EntityBaseStub : IEntityBase
 {
 }
 
-public class NeatooTests
+public interface IBuildingEdit : IEntityBase
 {
+
+}
+
+
+public partial class NeatooTests
+{
+    [KnockOff]
+    public partial class BuildingEditKnockOff : IBuildingEdit
+    {
+
+    }
+
+
     [Fact]
     public void IEntityBase_CanBeStubbed()
     {
