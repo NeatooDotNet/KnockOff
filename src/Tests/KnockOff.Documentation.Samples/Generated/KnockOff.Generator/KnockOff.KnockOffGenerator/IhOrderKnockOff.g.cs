@@ -151,7 +151,7 @@ partial class IhOrderKnockOff
 		IIhValidatable.GetErrors.RecordCall();
 		if (IIhValidatable.GetErrors.OnCall is { } onCallCallback)
 			return onCallCallback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'GetErrors' in your partial class, or set IIhValidatable.GetErrors.OnCall.");
+		return new global::System.Collections.Generic.List<string>();
 	}
 
 }

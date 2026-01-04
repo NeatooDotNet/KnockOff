@@ -238,7 +238,7 @@ partial class MigUserServiceKnockOff
 		IMigUserService.GetUser.RecordCall(id);
 		if (IMigUserService.GetUser.OnCall is { } onCallCallback)
 			return onCallCallback(this, id);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'GetUser' in your partial class, or set IMigUserService.GetUser.OnCall.");
+		return new global::KnockOff.Documentation.Samples.Comparison.MigUser();
 	}
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Comparison.MigUser?> KnockOff.Documentation.Samples.Comparison.IMigUserService.GetUserAsync(int id)
@@ -268,7 +268,7 @@ partial class MigUserServiceKnockOff
 		IMigUserService.GetAll.RecordCall();
 		if (IMigUserService.GetAll.OnCall is { } onCallCallback)
 			return onCallCallback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'GetAll' in your partial class, or set IMigUserService.GetAll.OnCall.");
+		return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Comparison.MigUser>();
 	}
 
 	void KnockOff.Documentation.Samples.Comparison.IMigUserService.Update(global::KnockOff.Documentation.Samples.Comparison.MigUser user)

@@ -45,7 +45,7 @@ partial class MigSequenceKnockOff
 		IMigSequence.GetNext.RecordCall();
 		if (IMigSequence.GetNext.OnCall is { } onCallCallback)
 			return onCallCallback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'GetNext' in your partial class, or set IMigSequence.GetNext.OnCall.");
+		return default!;
 	}
 
 }

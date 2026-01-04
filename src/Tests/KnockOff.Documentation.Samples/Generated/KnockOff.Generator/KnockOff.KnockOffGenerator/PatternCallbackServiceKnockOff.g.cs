@@ -116,7 +116,7 @@ partial class PatternCallbackServiceKnockOff
 		IPatternCallbackService.GetUser.RecordCall(id);
 		if (IPatternCallbackService.GetUser.OnCall is { } onCallCallback)
 			return onCallCallback(this, id);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'GetUser' in your partial class, or set IPatternCallbackService.GetUser.OnCall.");
+		return new global::KnockOff.Documentation.Samples.Concepts.PatternUser();
 	}
 
 	int KnockOff.Documentation.Samples.Concepts.IPatternCallbackService.Calculate(string name, int value, bool flag)
@@ -124,7 +124,7 @@ partial class PatternCallbackServiceKnockOff
 		IPatternCallbackService.Calculate.RecordCall(name, value, flag);
 		if (IPatternCallbackService.Calculate.OnCall is { } onCallCallback)
 			return onCallCallback(this, name, value, flag);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'Calculate' in your partial class, or set IPatternCallbackService.Calculate.OnCall.");
+		return default!;
 	}
 
 }

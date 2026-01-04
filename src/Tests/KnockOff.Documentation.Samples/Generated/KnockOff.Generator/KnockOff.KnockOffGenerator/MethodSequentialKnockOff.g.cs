@@ -45,7 +45,7 @@ partial class MethodSequentialKnockOff
 		IMethodSequential.GetNext.RecordCall();
 		if (IMethodSequential.GetNext.OnCall is { } onCallCallback)
 			return onCallCallback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'GetNext' in your partial class, or set IMethodSequential.GetNext.OnCall.");
+		return default!;
 	}
 
 }

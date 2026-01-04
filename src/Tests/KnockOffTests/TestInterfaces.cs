@@ -275,3 +275,57 @@ public partial class CollisionKnockOff : ICollision
 }
 
 #endregion
+
+#region Smart Defaults Test Types
+
+/// <summary>
+/// Simple class with parameterless constructor for testing NewInstance strategy.
+/// </summary>
+public class TestEntity
+{
+	public int Id { get; set; }
+	public string Name { get; set; } = "";
+}
+
+/// <summary>
+/// Interface testing smart default return values for various types.
+/// </summary>
+public interface ISmartDefaultsService
+{
+	// Value types - should return default (0, false, etc.)
+	int GetInt();
+	bool GetBool();
+	DateTime GetDateTime();
+
+	// Nullable reference types - should return default (null)
+	string? GetNullableString();
+	TestEntity? GetNullableEntity();
+
+	// Non-nullable with parameterless constructor - should return new T()
+	List<string> GetList();
+	Dictionary<string, int> GetDictionary();
+	TestEntity GetEntity();
+	IList<string> GetIList();
+
+	// Non-nullable without parameterless constructor - should throw
+	string GetString();
+
+	// Interface return type - should throw (can't instantiate)
+	IDisposable GetDisposable();
+
+	// Task<T> variants
+	Task<int> GetIntAsync();
+	Task<List<string>> GetListAsync();
+	Task<string> GetStringAsync();
+
+	// Properties with various types
+	int Count { get; }
+	List<string> Items { get; }
+}
+
+[KnockOff]
+public partial class SmartDefaultsKnockOff : ISmartDefaultsService
+{
+}
+
+#endregion

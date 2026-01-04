@@ -53,7 +53,7 @@ partial class AsyncSaveKnockOff
 		IAsyncSave.SaveAsync.RecordCall(entity);
 		if (IAsyncSave.SaveAsync.OnCall is { } onCallCallback)
 			return onCallCallback(this, entity);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'SaveAsync' in your partial class, or set IAsyncSave.SaveAsync.OnCall.");
+		return global::System.Threading.Tasks.Task.FromResult<int>(default!);
 	}
 
 }

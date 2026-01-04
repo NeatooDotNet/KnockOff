@@ -117,7 +117,7 @@ partial class GenAsyncUserRepositoryKnockOff
 		IGenAsyncRepository_KnockOff_Documentation_Samples_Guides_GenUser.GetAllAsync.RecordCall();
 		if (IGenAsyncRepository_KnockOff_Documentation_Samples_Guides_GenUser.GetAllAsync.OnCall is { } onCallCallback)
 			return onCallCallback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'GetAllAsync' in your partial class, or set IGenAsyncRepository_KnockOff_Documentation_Samples_Guides_GenUser.GetAllAsync.OnCall.");
+		return global::System.Threading.Tasks.Task.FromResult<global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Guides.GenUser>>(new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Guides.GenUser>());
 	}
 
 	global::System.Threading.Tasks.Task KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<KnockOff.Documentation.Samples.Guides.GenUser>.SaveAsync(global::KnockOff.Documentation.Samples.Guides.GenUser entity)

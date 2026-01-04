@@ -92,7 +92,7 @@ partial class RefParameterServiceKnockOff
 		IRefParameterService.TryUpdate.RecordCall(key, value);
 		if (IRefParameterService.TryUpdate.OnCall is { } onCallCallback)
 			return onCallCallback(this, key, ref value);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'TryUpdate' in your partial class, or set IRefParameterService.TryUpdate.OnCall.");
+		return default!;
 	}
 
 }

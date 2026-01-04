@@ -155,7 +155,7 @@ partial class VsVerificationRepositoryKnockOff
 		IVsVerificationRepository.GetAll.RecordCall();
 		if (IVsVerificationRepository.GetAll.OnCall is { } onCallCallback)
 			return onCallCallback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'GetAll' in your partial class, or set IVsVerificationRepository.GetAll.OnCall.");
+		return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Comparison.VsEntity>();
 	}
 
 	void KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository.Update(global::KnockOff.Documentation.Samples.Comparison.VsEntity entity)

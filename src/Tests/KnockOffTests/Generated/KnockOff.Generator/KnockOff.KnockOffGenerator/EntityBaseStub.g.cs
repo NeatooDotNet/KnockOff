@@ -793,7 +793,7 @@ partial class EntityBaseStub
 	public Neatoo.RemoteFactory.IFactorySaveMeta AsFactorySaveMeta() => this;
 
 	/// <summary>Backing field for IEntityBase.ModifiedProperties.</summary>
-	protected global::System.Collections.Generic.IEnumerable<string> IEntityBase_ModifiedPropertiesBacking { get; set; } = global::System.Array.Empty<string>();
+	protected global::System.Collections.Generic.IEnumerable<string> IEntityBase_ModifiedPropertiesBacking { get; set; } = new global::System.Collections.Generic.List<string>();
 
 	/// <summary>Backing dictionary for IEntityBase.StringIndexer. Pre-populate with values or use OnGet callback.</summary>
 	public global::System.Collections.Generic.Dictionary<string, global::Neatoo.IEntityProperty> IEntityBase_StringIndexerBacking { get; } = new();
@@ -814,7 +814,7 @@ partial class EntityBaseStub
 	protected bool IValidateMetaProperties_IsSelfValidBacking { get; set; }
 
 	/// <summary>Backing field for IValidateMetaProperties.PropertyMessages.</summary>
-	protected global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> IValidateMetaProperties_PropertyMessagesBacking { get; set; } = global::System.Array.Empty<global::Neatoo.IPropertyMessage>();
+	protected global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> IValidateMetaProperties_PropertyMessagesBacking { get; set; } = new global::System.Collections.Generic.List<global::Neatoo.IPropertyMessage>();
 
 	/// <summary>Backing field for IBaseMetaProperties.IsBusy.</summary>
 	protected bool IBaseMetaProperties_IsBusyBacking { get; set; }
@@ -900,7 +900,7 @@ partial class EntityBaseStub
 		IValidateBase.TryGetProperty.RecordCall(propertyName);
 		if (IValidateBase.TryGetProperty.OnCall is { } onCallCallback)
 			return onCallCallback(this, propertyName, out validateProperty);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'TryGetProperty' in your partial class, or set IValidateBase.TryGetProperty.OnCall.");
+		return default!;
 	}
 
 	bool Neatoo.IValidateBase.IsPaused

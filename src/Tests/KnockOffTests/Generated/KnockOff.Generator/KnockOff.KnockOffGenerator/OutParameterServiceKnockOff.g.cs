@@ -110,7 +110,7 @@ partial class OutParameterServiceKnockOff
 		IOutParameterService.TryGetValue.RecordCall(key);
 		if (IOutParameterService.TryGetValue.OnCall is { } onCallCallback)
 			return onCallCallback(this, key, out value);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'TryGetValue' in your partial class, or set IOutParameterService.TryGetValue.OnCall.");
+		return default!;
 	}
 
 	bool KnockOff.Tests.IOutParameterService.TryParse(string input, out int result)
@@ -119,7 +119,7 @@ partial class OutParameterServiceKnockOff
 		IOutParameterService.TryParse.RecordCall(input);
 		if (IOutParameterService.TryParse.OnCall is { } onCallCallback)
 			return onCallCallback(this, input, out result);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'TryParse' in your partial class, or set IOutParameterService.TryParse.OnCall.");
+		return default!;
 	}
 
 	void KnockOff.Tests.IOutParameterService.GetData(out string name, out int count)

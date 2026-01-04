@@ -77,7 +77,7 @@ partial class GenProductRepositoryKnockOff
 		IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProduct.GetAll.RecordCall();
 		if (IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProduct.GetAll.OnCall is { } onCallCallback)
 			return onCallCallback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'GetAll' in your partial class, or set IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProduct.GetAll.OnCall.");
+		return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Guides.GenProduct>();
 	}
 
 	global::KnockOff.Documentation.Samples.Guides.GenProduct? KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<KnockOff.Documentation.Samples.Guides.GenProduct>.FindFirst(global::System.Func<global::KnockOff.Documentation.Samples.Guides.GenProduct, bool> predicate)

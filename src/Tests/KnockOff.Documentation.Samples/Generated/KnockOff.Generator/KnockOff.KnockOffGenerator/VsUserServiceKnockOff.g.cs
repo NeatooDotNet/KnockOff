@@ -248,7 +248,7 @@ partial class VsUserServiceKnockOff
 		IVsUserService.GetAll.RecordCall();
 		if (IVsUserService.GetAll.OnCall is { } onCallCallback)
 			return onCallCallback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'GetAll' in your partial class, or set IVsUserService.GetAll.OnCall.");
+		return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Comparison.VsUser>();
 	}
 
 	void KnockOff.Documentation.Samples.Comparison.IVsUserService.Update(global::KnockOff.Documentation.Samples.Comparison.VsUser user)

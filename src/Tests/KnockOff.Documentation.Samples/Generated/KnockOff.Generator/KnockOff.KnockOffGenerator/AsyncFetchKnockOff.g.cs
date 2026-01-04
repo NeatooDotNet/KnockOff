@@ -53,7 +53,7 @@ partial class AsyncFetchKnockOff
 		IAsyncFetch.FetchAsync.RecordCall(id, ct);
 		if (IAsyncFetch.FetchAsync.OnCall is { } onCallCallback)
 			return onCallCallback(this, id, ct);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'FetchAsync' in your partial class, or set IAsyncFetch.FetchAsync.OnCall.");
+		return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Guides.AsyncData>(new global::KnockOff.Documentation.Samples.Guides.AsyncData());
 	}
 
 }

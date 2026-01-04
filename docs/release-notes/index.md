@@ -8,14 +8,14 @@ Releases with notable changes.
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| [v10.5.0](v10.5.0.md) | 2026-01-03 | **Breaking:** Interface spy architecture |
+| [v10.5.0](v10.5.0.md) | 2026-01-03 | **Breaking:** Interface spy architecture, smart defaults |
 | [v10.3.0](v10.3.0.md) | 2026-01-01 | Out/ref parameter support |
 | [v10.2.0](v10.2.0.md) | 2026-01-01 | Method overloads & delegate-based callbacks |
 | [v10.0.0](v10.0.0.md) | 2026-01-01 | Initial release |
 
 ## All Releases
 
-- [v10.5.0](v10.5.0.md) - 2026-01-03 - **Breaking:** Interface spy properties, separate overload handlers, property-based OnCall
+- [v10.5.0](v10.5.0.md) - 2026-01-03 - **Breaking:** Interface spy properties, separate overload handlers, property-based OnCall, smart default return values
 - [v10.4.1](v10.4.1.md) - 2026-01-02 - Bug fixes for nullable events and collection defaults
 - [v10.4.0](v10.4.0.md) - 2026-01-02 - Documentation updates
 - [v10.3.0](v10.3.0.md) - 2026-01-01 - Out/ref parameter support

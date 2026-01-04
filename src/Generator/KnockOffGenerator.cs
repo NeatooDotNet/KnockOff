@@ -224,6 +224,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 		var returnType = property.Type.ToDisplayString(FullyQualifiedWithNullability);
 		var isNullable = property.Type.NullableAnnotation == NullableAnnotation.Annotated
 			|| property.Type.IsReferenceType && property.Type.NullableAnnotation != NullableAnnotation.NotAnnotated;
+		var (defaultStrategy, concreteType) = GetDefaultValueStrategyWithConcreteType(property.Type);
 
 		// Handle indexers
 		var isIndexer = property.IsIndexer;
@@ -253,6 +254,8 @@ public class KnockOffGenerator : IIncrementalGenerator
 			HasGetter: property.GetMethod is not null,
 			HasSetter: property.SetMethod is not null,
 			IsNullable: isNullable,
+			DefaultStrategy: defaultStrategy,
+			ConcreteTypeForNew: concreteType,
 			Parameters: EquatableArray<ParameterInfo>.Empty,
 			IndexerParameters: indexerParameters);
 	}
@@ -269,11 +272,101 @@ public class KnockOffGenerator : IIncrementalGenerator
 		return char.ToUpperInvariant(name[0]) + name.Substring(1);
 	}
 
+	/// <summary>
+	/// Determines the default value strategy for a return type.
+	/// </summary>
+	private static DefaultValueStrategy GetDefaultValueStrategy(ITypeSymbol type) =>
+		GetDefaultValueStrategyWithConcreteType(type).Strategy;
+
+	/// <summary>
+	/// Determines the default value strategy and concrete type for a return type.
+	/// For collection interfaces, returns the concrete implementation type.
+	/// </summary>
+	private static (DefaultValueStrategy Strategy, string? ConcreteType) GetDefaultValueStrategyWithConcreteType(ITypeSymbol type)
+	{
+		// Value types: always use default (0, false, etc.)
+		if (type.IsValueType)
+			return (DefaultValueStrategy.Default, null);
+
+		// Nullable reference types: use default (null is valid)
+		if (type.NullableAnnotation == NullableAnnotation.Annotated)
+			return (DefaultValueStrategy.Default, null);
+
+		// Non-nullable reference: check for accessible parameterless constructor
+		if (type is INamedTypeSymbol named)
+		{
+			if (!named.IsAbstract && named.TypeKind == TypeKind.Class)
+			{
+				var hasParameterlessCtor = named.Constructors.Any(c =>
+					c.Parameters.Length == 0 &&
+					c.DeclaredAccessibility >= Accessibility.Public);
+
+				if (hasParameterlessCtor)
+					return (DefaultValueStrategy.NewInstance, null);
+			}
+
+			// Check for well-known collection interfaces
+			if (named.TypeKind == TypeKind.Interface)
+			{
+				var concreteType = GetCollectionInterfaceMapping(named);
+				if (concreteType is not null)
+					return (DefaultValueStrategy.NewInstance, concreteType);
+			}
+		}
+
+		// No safe default available (string, abstract class, interface, etc.)
+		return (DefaultValueStrategy.ThrowException, null);
+	}
+
+	/// <summary>
+	/// Maps well-known collection interfaces to concrete implementation types.
+	/// Returns null if no mapping exists.
+	/// </summary>
+	private static string? GetCollectionInterfaceMapping(INamedTypeSymbol interfaceType)
+	{
+		var ns = interfaceType.ContainingNamespace?.ToDisplayString();
+		if (ns != "System.Collections.Generic")
+			return null;
+
+		var name = interfaceType.Name;
+		var typeArgs = interfaceType.TypeArguments;
+
+		// Map collection interfaces to concrete types
+		return name switch
+		{
+			// List-based interfaces
+			"IEnumerable" when typeArgs.Length == 1 =>
+				$"global::System.Collections.Generic.List<{typeArgs[0].ToDisplayString(FullyQualifiedWithNullability)}>",
+			"ICollection" when typeArgs.Length == 1 =>
+				$"global::System.Collections.Generic.List<{typeArgs[0].ToDisplayString(FullyQualifiedWithNullability)}>",
+			"IList" when typeArgs.Length == 1 =>
+				$"global::System.Collections.Generic.List<{typeArgs[0].ToDisplayString(FullyQualifiedWithNullability)}>",
+			"IReadOnlyList" when typeArgs.Length == 1 =>
+				$"global::System.Collections.Generic.List<{typeArgs[0].ToDisplayString(FullyQualifiedWithNullability)}>",
+			"IReadOnlyCollection" when typeArgs.Length == 1 =>
+				$"global::System.Collections.Generic.List<{typeArgs[0].ToDisplayString(FullyQualifiedWithNullability)}>",
+
+			// Dictionary-based interfaces
+			"IDictionary" when typeArgs.Length == 2 =>
+				$"global::System.Collections.Generic.Dictionary<{typeArgs[0].ToDisplayString(FullyQualifiedWithNullability)}, {typeArgs[1].ToDisplayString(FullyQualifiedWithNullability)}>",
+			"IReadOnlyDictionary" when typeArgs.Length == 2 =>
+				$"global::System.Collections.Generic.Dictionary<{typeArgs[0].ToDisplayString(FullyQualifiedWithNullability)}, {typeArgs[1].ToDisplayString(FullyQualifiedWithNullability)}>",
+
+			// Set-based interfaces
+			"ISet" when typeArgs.Length == 1 =>
+				$"global::System.Collections.Generic.HashSet<{typeArgs[0].ToDisplayString(FullyQualifiedWithNullability)}>",
+
+			_ => null
+		};
+	}
+
 	private static InterfaceMemberInfo CreateMethodInfo(IMethodSymbol method)
 	{
 		var returnType = method.ReturnType.ToDisplayString(FullyQualifiedWithNullability);
 		var isNullable = method.ReturnType.NullableAnnotation == NullableAnnotation.Annotated
 			|| (method.ReturnType.IsReferenceType && method.ReturnType.NullableAnnotation != NullableAnnotation.NotAnnotated);
+		var defaultStrategy = DefaultValueStrategy.Default; // Default for void, Task, ValueTask
+		string? concreteType = null;
 
 		// For void methods, they're not "nullable" in the sense that matters
 		if (method.ReturnsVoid)
@@ -284,7 +377,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 		if (typeFullName == "System.Threading.Tasks.Task" || typeFullName == "System.Threading.Tasks.ValueTask")
 			isNullable = true; // async void-like, return completed task
 
-		// For Task<T> and ValueTask<T>, check the inner type for nullability
+		// For Task<T> and ValueTask<T>, check the inner type for nullability and default strategy
 		if (method.ReturnType is INamedTypeSymbol namedType && namedType.IsGenericType)
 		{
 			var containingNs = namedType.ContainingNamespace?.ToDisplayString() ?? "";
@@ -294,7 +387,20 @@ public class KnockOffGenerator : IIncrementalGenerator
 				var innerType = namedType.TypeArguments[0];
 				isNullable = innerType.NullableAnnotation == NullableAnnotation.Annotated
 					|| (innerType.IsReferenceType && innerType.NullableAnnotation != NullableAnnotation.NotAnnotated);
+				(defaultStrategy, concreteType) = GetDefaultValueStrategyWithConcreteType(innerType);
 			}
+			else
+			{
+				// Generic type that's not Task/ValueTask (e.g., List<T>) - check strategy directly
+				(defaultStrategy, concreteType) = GetDefaultValueStrategyWithConcreteType(method.ReturnType);
+			}
+		}
+		else if (!method.ReturnsVoid &&
+			typeFullName != "System.Threading.Tasks.Task" &&
+			typeFullName != "System.Threading.Tasks.ValueTask")
+		{
+			// Non-void, non-Task return type - check strategy directly
+			(defaultStrategy, concreteType) = GetDefaultValueStrategyWithConcreteType(method.ReturnType);
 		}
 
 		var parameters = method.Parameters
@@ -309,6 +415,8 @@ public class KnockOffGenerator : IIncrementalGenerator
 			HasGetter: false,
 			HasSetter: false,
 			IsNullable: isNullable,
+			DefaultStrategy: defaultStrategy,
+			ConcreteTypeForNew: concreteType,
 			Parameters: new EquatableArray<ParameterInfo>(parameters),
 			IndexerParameters: EquatableArray<ParameterInfo>.Empty);
 	}
@@ -1964,9 +2072,16 @@ public class KnockOffGenerator : IIncrementalGenerator
 	{
 		var backingName = $"{spyPropertyName}_{prop.Name}Backing";
 
-		// Always generate get; set; for backing - we need both for implementation
-		var defaultValue = prop.IsNullable ? "" : GetDefaultValue(prop.ReturnType);
-		var initializer = !string.IsNullOrEmpty(defaultValue) ? $" = {defaultValue};" : "";
+		// Initialize based on default strategy
+		// For backing properties, we must provide a value even if the type can't be new()'d
+		var typeToNew = prop.ConcreteTypeForNew ?? prop.ReturnType;
+		var initializer = prop.DefaultStrategy switch
+		{
+			DefaultValueStrategy.NewInstance => $" = new {typeToNew}();",
+			DefaultValueStrategy.Default => "", // Value types/nullable get default automatically
+			DefaultValueStrategy.ThrowException => GetBackingPropertyInitializer(prop.ReturnType),
+			_ => ""
+		};
 
 		sb.AppendLine($"\t/// <summary>Backing field for {spyPropertyName}.{prop.Name}.</summary>");
 		sb.AppendLine($"\tprotected {prop.ReturnType} {backingName} {{ get; set; }}{initializer}");
@@ -2061,13 +2176,13 @@ public class KnockOffGenerator : IIncrementalGenerator
 			sb.AppendLine($"\t\t\t\treturn onGetCallback(this, {keyParamName});");
 			sb.AppendLine($"\t\t\tif ({backingName}.TryGetValue({keyParamName}, out var value))");
 			sb.AppendLine($"\t\t\t\treturn value;");
-			if (indexer.IsNullable)
+			if (indexer.DefaultStrategy == DefaultValueStrategy.ThrowException)
 			{
-				sb.AppendLine($"\t\t\treturn default!;");
+				sb.AppendLine($"\t\t\tthrow new global::System.Collections.Generic.KeyNotFoundException($\"Key '{{{keyParamName}}}' not found. Set {spyPropertyName}.{indexer.Name}.OnGet or add to {backingName} dictionary.\");");
 			}
 			else
 			{
-				sb.AppendLine($"\t\t\tthrow new global::System.Collections.Generic.KeyNotFoundException($\"Key '{{{keyParamName}}}' not found. Set {spyPropertyName}.{indexer.Name}.OnGet or add to {backingName} dictionary.\");");
+				sb.AppendLine($"\t\t\t{GenerateDefaultReturn(indexer.ReturnType, indexer.DefaultStrategy, indexer.ConcreteTypeForNew)}");
 			}
 			sb.AppendLine("\t\t}");
 		}
@@ -2212,33 +2327,35 @@ public class KnockOffGenerator : IIncrementalGenerator
 		}
 		else if (isTaskOfT)
 		{
-			if (method.IsNullable)
+			var innerType = ExtractGenericArg(method.ReturnType);
+			if (method.DefaultStrategy == DefaultValueStrategy.ThrowException)
 			{
-				sb.AppendLine($"\t\treturn global::System.Threading.Tasks.Task.FromResult<{ExtractGenericArg(method.ReturnType)}>(default!);");
+				sb.AppendLine($"\t\tthrow new global::System.InvalidOperationException(\"No implementation provided for non-nullable return type. Define a protected method '{method.Name}' in your partial class, or set {spyPropertyName}.{handlerName}.OnCall.\");");
 			}
 			else
 			{
-				sb.AppendLine($"\t\tthrow new global::System.InvalidOperationException(\"No implementation provided for non-nullable return type. Define a protected method '{method.Name}' in your partial class, or set {spyPropertyName}.{handlerName}.OnCall.\");");
+				sb.AppendLine($"\t\t{GenerateTaskOfTReturn(innerType, method.DefaultStrategy, method.ConcreteTypeForNew)}");
 			}
 		}
 		else if (isValueTaskOfT)
 		{
-			if (method.IsNullable)
-			{
-				sb.AppendLine($"\t\treturn default;");
-			}
-			else
+			var innerType = ExtractGenericArg(method.ReturnType);
+			if (method.DefaultStrategy == DefaultValueStrategy.ThrowException)
 			{
 				sb.AppendLine($"\t\tthrow new global::System.InvalidOperationException(\"No implementation provided for non-nullable return type. Define a protected method '{method.Name}' in your partial class, or set {spyPropertyName}.{handlerName}.OnCall.\");");
 			}
+			else
+			{
+				sb.AppendLine($"\t\t{GenerateValueTaskOfTReturn(innerType, method.DefaultStrategy, method.ConcreteTypeForNew)}");
+			}
 		}
-		else if (method.IsNullable)
+		else if (method.DefaultStrategy == DefaultValueStrategy.ThrowException)
 		{
-			sb.AppendLine($"\t\treturn default!;");
+			sb.AppendLine($"\t\tthrow new global::System.InvalidOperationException(\"No implementation provided for non-nullable return type. Define a protected method '{method.Name}' in your partial class, or set {spyPropertyName}.{handlerName}.OnCall.\");");
 		}
 		else
 		{
-			sb.AppendLine($"\t\tthrow new global::System.InvalidOperationException(\"No implementation provided for non-nullable return type. Define a protected method '{method.Name}' in your partial class, or set {spyPropertyName}.{handlerName}.OnCall.\");");
+			sb.AppendLine($"\t\t{GenerateDefaultReturn(method.ReturnType, method.DefaultStrategy, method.ConcreteTypeForNew)}");
 		}
 
 		sb.AppendLine("\t}");
@@ -2275,8 +2392,16 @@ public class KnockOffGenerator : IIncrementalGenerator
 		else if (prop.HasSetter)
 			accessors = "set;";
 
-		var defaultValue = prop.IsNullable ? "" : GetDefaultValue(prop.ReturnType);
-		var initializer = !string.IsNullOrEmpty(defaultValue) ? $" = {defaultValue};" : "";
+		// Initialize based on default strategy
+		// For backing properties, we must provide a value even if the type can't be new()'d
+		var typeToNew = prop.ConcreteTypeForNew ?? prop.ReturnType;
+		var initializer = prop.DefaultStrategy switch
+		{
+			DefaultValueStrategy.NewInstance => $" = new {typeToNew}();",
+			DefaultValueStrategy.Default => "", // Value types/nullable get default automatically
+			DefaultValueStrategy.ThrowException => GetBackingPropertyInitializer(prop.ReturnType),
+			_ => ""
+		};
 
 		sb.AppendLine($"\t/// <summary>Backing field for {prop.Name}.</summary>");
 		sb.AppendLine($"\tprotected {prop.ReturnType} {prop.Name}Backing {{ {accessors} }}{initializer}");
@@ -2367,14 +2492,14 @@ public class KnockOffGenerator : IIncrementalGenerator
 			// Fall back to backing dictionary
 			sb.AppendLine($"\t\t\tif ({indexer.Name}Backing.TryGetValue({keyParamName}, out var value))");
 			sb.AppendLine($"\t\t\t\treturn value;");
-			// Return default for nullable, throw for non-nullable
-			if (indexer.IsNullable)
+			// Return default, new instance, or throw based on strategy
+			if (indexer.DefaultStrategy == DefaultValueStrategy.ThrowException)
 			{
-				sb.AppendLine($"\t\t\treturn default!;");
+				sb.AppendLine($"\t\t\tthrow new global::System.Collections.Generic.KeyNotFoundException($\"Key '{{{keyParamName}}}' not found. Set Spy.{indexer.Name}.OnGet or add to {indexer.Name}Backing dictionary.\");");
 			}
 			else
 			{
-				sb.AppendLine($"\t\t\tthrow new global::System.Collections.Generic.KeyNotFoundException($\"Key '{{{keyParamName}}}' not found. Set Spy.{indexer.Name}.OnGet or add to {indexer.Name}Backing dictionary.\");");
+				sb.AppendLine($"\t\t\t{GenerateDefaultReturn(indexer.ReturnType, indexer.DefaultStrategy, indexer.ConcreteTypeForNew)}");
 			}
 			sb.AppendLine("\t\t}");
 		}
@@ -2531,37 +2656,39 @@ public class KnockOffGenerator : IIncrementalGenerator
 		}
 		else if (isTaskOfT)
 		{
-			// Task<T> - return Task.FromResult with default value
-			if (method.IsNullable)
+			// Task<T> - return Task.FromResult with appropriate default value
+			var innerType = ExtractGenericArg(method.ReturnType);
+			if (method.DefaultStrategy == DefaultValueStrategy.ThrowException)
 			{
-				sb.AppendLine($"\t\treturn global::System.Threading.Tasks.Task.FromResult<{ExtractGenericArg(method.ReturnType)}>(default!);");
+				sb.AppendLine($"\t\tthrow new global::System.InvalidOperationException(\"No implementation provided for non-nullable return type. Define a protected method '{method.Name}' in your partial class, or set Spy.{method.Name}.OnCall.\");");
 			}
 			else
 			{
-				sb.AppendLine($"\t\tthrow new global::System.InvalidOperationException(\"No implementation provided for non-nullable return type. Define a protected method '{method.Name}' in your partial class, or set Spy.{method.Name}.OnCall.\");");
+				sb.AppendLine($"\t\t{GenerateTaskOfTReturn(innerType, method.DefaultStrategy, method.ConcreteTypeForNew)}");
 			}
 		}
 		else if (isValueTaskOfT)
 		{
-			// ValueTask<T> - return default (which wraps default value)
-			if (method.IsNullable)
-			{
-				sb.AppendLine($"\t\treturn default;");
-			}
-			else
+			// ValueTask<T> - return with appropriate default value
+			var innerType = ExtractGenericArg(method.ReturnType);
+			if (method.DefaultStrategy == DefaultValueStrategy.ThrowException)
 			{
 				sb.AppendLine($"\t\tthrow new global::System.InvalidOperationException(\"No implementation provided for non-nullable return type. Define a protected method '{method.Name}' in your partial class, or set Spy.{method.Name}.OnCall.\");");
 			}
+			else
+			{
+				sb.AppendLine($"\t\t{GenerateValueTaskOfTReturn(innerType, method.DefaultStrategy, method.ConcreteTypeForNew)}");
+			}
 		}
-		else if (method.IsNullable)
+		else if (method.DefaultStrategy == DefaultValueStrategy.ThrowException)
 		{
-			// Other nullable return type - return default
-			sb.AppendLine($"\t\treturn default!;");
+			// Non-nullable return type without parameterless constructor - throw
+			sb.AppendLine($"\t\tthrow new global::System.InvalidOperationException(\"No implementation provided for non-nullable return type. Define a protected method '{method.Name}' in your partial class, or set Spy.{method.Name}.OnCall.\");");
 		}
 		else
 		{
-			// Non-nullable return type - throw
-			sb.AppendLine($"\t\tthrow new global::System.InvalidOperationException(\"No implementation provided for non-nullable return type. Define a protected method '{method.Name}' in your partial class, or set Spy.{method.Name}.OnCall.\");");
+			// Return default or new instance based on strategy
+			sb.AppendLine($"\t\t{GenerateDefaultReturn(method.ReturnType, method.DefaultStrategy, method.ConcreteTypeForNew)}");
 		}
 
 		sb.AppendLine("\t}");
@@ -2576,6 +2703,79 @@ public class KnockOffGenerator : IIncrementalGenerator
 		var startIndex = genericType.IndexOf('<') + 1;
 		var endIndex = genericType.LastIndexOf('>');
 		return genericType.Substring(startIndex, endIndex - startIndex);
+	}
+
+	/// <summary>
+	/// Generates a return statement based on the DefaultValueStrategy.
+	/// </summary>
+	private static string GenerateDefaultReturn(string returnType, DefaultValueStrategy strategy, string? concreteType = null)
+	{
+		var typeToNew = concreteType ?? returnType;
+		return strategy switch
+		{
+			DefaultValueStrategy.Default => "return default!;",
+			DefaultValueStrategy.NewInstance => $"return new {typeToNew}();",
+			DefaultValueStrategy.ThrowException => throw new InvalidOperationException("ThrowException strategy should be handled separately"),
+			_ => "return default!;"
+		};
+	}
+
+	/// <summary>
+	/// Generates a return statement for Task&lt;T&gt; based on the DefaultValueStrategy.
+	/// </summary>
+	private static string GenerateTaskOfTReturn(string innerType, DefaultValueStrategy strategy, string? concreteType = null)
+	{
+		var typeToNew = concreteType ?? innerType;
+		return strategy switch
+		{
+			DefaultValueStrategy.Default => $"return global::System.Threading.Tasks.Task.FromResult<{innerType}>(default!);",
+			DefaultValueStrategy.NewInstance => $"return global::System.Threading.Tasks.Task.FromResult<{innerType}>(new {typeToNew}());",
+			DefaultValueStrategy.ThrowException => throw new InvalidOperationException("ThrowException strategy should be handled separately"),
+			_ => $"return global::System.Threading.Tasks.Task.FromResult<{innerType}>(default!);"
+		};
+	}
+
+	/// <summary>
+	/// Generates a return statement for ValueTask&lt;T&gt; based on the DefaultValueStrategy.
+	/// </summary>
+	private static string GenerateValueTaskOfTReturn(string innerType, DefaultValueStrategy strategy, string? concreteType = null)
+	{
+		var typeToNew = concreteType ?? innerType;
+		return strategy switch
+		{
+			DefaultValueStrategy.Default => "return default;",
+			DefaultValueStrategy.NewInstance => $"return new global::System.Threading.Tasks.ValueTask<{innerType}>(new {typeToNew}());",
+			DefaultValueStrategy.ThrowException => throw new InvalidOperationException("ThrowException strategy should be handled separately"),
+			_ => "return default;"
+		};
+	}
+
+	/// <summary>
+	/// Gets an initializer for backing properties when the type can't be new()'d.
+	/// Backing properties MUST have a value, so we provide sensible defaults.
+	/// </summary>
+	private static string GetBackingPropertyInitializer(string typeName)
+	{
+		// Handle string - use empty string
+		if (typeName == "global::System.String" || typeName == "string")
+			return " = \"\";";
+
+		// Handle arrays - use Array.Empty<T>() or empty array
+		if (typeName.EndsWith("[]"))
+		{
+			var elementType = typeName.Substring(0, typeName.Length - 2);
+			return $" = global::System.Array.Empty<{elementType}>();";
+		}
+
+		// Handle collection interfaces - use Array.Empty<T>()
+		if (typeName.Contains("IEnumerable<") || typeName.Contains("IReadOnlyCollection<") || typeName.Contains("IReadOnlyList<"))
+		{
+			var elementType = ExtractGenericArg(typeName);
+			return $" = global::System.Array.Empty<{elementType}>();";
+		}
+
+		// Fallback: suppress nullable warning (property exists but user must set it)
+		return " = default!;";
 	}
 
 	private static string GetDefaultValue(string typeName)
@@ -2617,6 +2817,8 @@ internal sealed record InterfaceMemberInfo(
 	bool HasGetter,
 	bool HasSetter,
 	bool IsNullable,
+	DefaultValueStrategy DefaultStrategy,
+	string? ConcreteTypeForNew,
 	EquatableArray<ParameterInfo> Parameters,
 	EquatableArray<ParameterInfo> IndexerParameters) : IEquatable<InterfaceMemberInfo>;
 
@@ -2645,6 +2847,19 @@ internal enum EventDelegateKind
 	Action,             // System.Action or Action<T...>
 	Func,               // System.Func<..., TResult>
 	Custom              // Custom delegate type
+}
+
+/// <summary>
+/// Strategy for generating default return values when no callback/user method is provided.
+/// </summary>
+internal enum DefaultValueStrategy
+{
+	/// <summary>Use default/default! - for value types and nullable reference types.</summary>
+	Default,
+	/// <summary>Use new T() - for non-nullable reference types with parameterless constructor.</summary>
+	NewInstance,
+	/// <summary>Throw exception - no safe default available.</summary>
+	ThrowException
 }
 
 /// <summary>

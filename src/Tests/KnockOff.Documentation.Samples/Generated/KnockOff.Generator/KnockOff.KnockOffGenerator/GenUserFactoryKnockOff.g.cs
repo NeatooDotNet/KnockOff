@@ -45,7 +45,7 @@ partial class GenUserFactoryKnockOff
 		IGenFactory_KnockOff_Documentation_Samples_Guides_GenUser.Create.RecordCall();
 		if (IGenFactory_KnockOff_Documentation_Samples_Guides_GenUser.Create.OnCall is { } onCallCallback)
 			return onCallCallback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'Create' in your partial class, or set IGenFactory_KnockOff_Documentation_Samples_Guides_GenUser.Create.OnCall.");
+		return new global::KnockOff.Documentation.Samples.Guides.GenUser();
 	}
 
 }

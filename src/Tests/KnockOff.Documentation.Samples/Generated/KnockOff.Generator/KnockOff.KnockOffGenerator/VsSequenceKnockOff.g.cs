@@ -45,7 +45,7 @@ partial class VsSequenceKnockOff
 		IVsSequence.GetNext.RecordCall();
 		if (IVsSequence.GetNext.OnCall is { } onCallCallback)
 			return onCallCallback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'GetNext' in your partial class, or set IVsSequence.GetNext.OnCall.");
+		return default!;
 	}
 
 }

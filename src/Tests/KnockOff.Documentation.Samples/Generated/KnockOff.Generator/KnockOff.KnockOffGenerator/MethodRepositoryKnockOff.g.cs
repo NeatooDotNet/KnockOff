@@ -85,7 +85,7 @@ partial class MethodRepositoryKnockOff
 		IMethodRepository.Count.RecordCall();
 		if (IMethodRepository.Count.OnCall is { } onCallCallback)
 			return onCallCallback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'Count' in your partial class, or set IMethodRepository.Count.OnCall.");
+		return default!;
 	}
 
 }

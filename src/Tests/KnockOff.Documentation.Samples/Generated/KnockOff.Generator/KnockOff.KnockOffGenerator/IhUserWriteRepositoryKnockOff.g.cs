@@ -174,7 +174,7 @@ partial class IhUserWriteRepositoryKnockOff
 		IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUser.GetAll.RecordCall();
 		if (IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUser.GetAll.OnCall is { } onCallCallback)
 			return onCallCallback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'GetAll' in your partial class, or set IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUser.GetAll.OnCall.");
+		return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Guides.IhUser>();
 	}
 
 }

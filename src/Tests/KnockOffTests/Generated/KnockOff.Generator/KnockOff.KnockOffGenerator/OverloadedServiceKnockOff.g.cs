@@ -282,7 +282,7 @@ partial class OverloadedServiceKnockOff
 		IOverloadedService.Calculate1.RecordCall(value);
 		if (IOverloadedService.Calculate1.OnCall is { } onCallCallback)
 			return onCallCallback(this, value);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'Calculate' in your partial class, or set IOverloadedService.Calculate1.OnCall.");
+		return default!;
 	}
 
 	int KnockOff.Tests.IOverloadedService.Calculate(int a, int b)
@@ -290,7 +290,7 @@ partial class OverloadedServiceKnockOff
 		IOverloadedService.Calculate2.RecordCall(a, b);
 		if (IOverloadedService.Calculate2.OnCall is { } onCallCallback)
 			return onCallCallback(this, a, b);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'Calculate' in your partial class, or set IOverloadedService.Calculate2.OnCall.");
+		return default!;
 	}
 
 }

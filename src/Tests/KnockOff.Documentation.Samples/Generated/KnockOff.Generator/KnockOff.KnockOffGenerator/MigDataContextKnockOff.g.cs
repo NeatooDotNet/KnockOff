@@ -104,7 +104,7 @@ partial class MigDataContextKnockOff
 		IMigUnitOfWork.SaveChangesAsync.RecordCall(cancellationToken);
 		if (IMigUnitOfWork.SaveChangesAsync.OnCall is { } onCallCallback)
 			return onCallCallback(this, cancellationToken);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'SaveChangesAsync' in your partial class, or set IMigUnitOfWork.SaveChangesAsync.OnCall.");
+		return global::System.Threading.Tasks.Task.FromResult<int>(default!);
 	}
 
 }

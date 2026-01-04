@@ -117,7 +117,7 @@ partial class AsyncRepositoryKnockOff
 		IAsyncRepository.CountAsync.RecordCall();
 		if (IAsyncRepository.CountAsync.OnCall is { } onCallCallback)
 			return onCallCallback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'CountAsync' in your partial class, or set IAsyncRepository.CountAsync.OnCall.");
+		return default;
 	}
 
 }
