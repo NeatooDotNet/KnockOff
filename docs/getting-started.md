@@ -114,15 +114,17 @@ Assert.Equal("NewValue", knockOff.IUserService.Name.LastSetValue);
 
 Define protected methods in your stub class for consistent behavior:
 
+<!-- snippet: docs:getting-started:user-method -->
 ```csharp
 [KnockOff]
-public partial class EmailServiceKnockOff : IEmailService
+public partial class EmailServiceWithValidation : IEmailServiceWithValidation
 {
     // This method is called when IEmailService.IsValidAddress is invoked
     protected bool IsValidAddress(string email) =>
         email.Contains("@") && email.Contains(".");
 }
 ```
+<!-- /snippet -->
 
 ### Option 2: Callbacks (Runtime)
 
@@ -179,13 +181,23 @@ Generated files appear in `Generated/KnockOff.Generator/KnockOff.KnockOffGenerat
 
 ### Returning Values from Methods
 
+Via callback:
 ```csharp
-// Via callback
 knockOff.IUserService.GetUser.OnCall = (ko, id) => new User { Id = id, Name = "Test" };
-
-// Via user method (in stub class)
-protected User GetUser(int id) => new User { Id = id, Name = "Default" };
 ```
+
+Via user method (in stub class):
+
+<!-- snippet: docs:getting-started:returning-values -->
+```csharp
+[KnockOff]
+public partial class UserServiceKnockOff : IUserServiceSimple
+{
+    // Via user method (in stub class)
+    protected User GetUser(int id) => new User { Id = id, Name = "Default" };
+}
+```
+<!-- /snippet -->
 
 ### Simulating Failures
 
@@ -255,12 +267,16 @@ knockOff.IEmailService.SendEmail.CallCount;  // Single method - no suffix
 
 Each interface gets its own spy property with separate tracking:
 
+<!-- snippet: docs:getting-started:multiple-interfaces -->
 ```csharp
 [KnockOff]
 public partial class DataContextKnockOff : IRepository, IUnitOfWork
 {
 }
+```
+<!-- /snippet -->
 
+```csharp
 // Access via interface spy properties
 Assert.True(knockOff.IRepository.Save.WasCalled);
 Assert.True(knockOff.IUnitOfWork.Commit.WasCalled);

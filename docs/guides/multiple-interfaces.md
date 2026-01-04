@@ -4,22 +4,24 @@ KnockOff supports implementing multiple interfaces in a single stub class. Each 
 
 ## Basic Usage
 
+<!-- snippet: docs:multiple-interfaces:basic-usage -->
 ```csharp
-public interface ILogger
+public interface IMiLogger
 {
     void Log(string message);
     string Name { get; set; }
 }
 
-public interface INotifier
+public interface IMiNotifier
 {
     void Notify(string recipient);
-    string Name { get; }  // Same name as ILogger
+    string Name { get; }  // Same name, different accessor
 }
 
 [KnockOff]
-public partial class LoggerNotifierKnockOff : ILogger, INotifier { }
+public partial class MiLoggerNotifierKnockOff : IMiLogger, IMiNotifier { }
 ```
+<!-- /snippet -->
 
 ## Interface Spy Classes
 
@@ -56,21 +58,23 @@ INotifier notifier2 = knockOff;
 
 Each interface's members are tracked independently, even for same-named members:
 
+<!-- snippet: docs:multiple-interfaces:shared-method -->
 ```csharp
-public interface ILogger
+public interface IMiLoggerSame
 {
     void Log(string message);
 }
 
-public interface IAuditor
+public interface IMiAuditor
 {
-    void Log(string message);  // Same name and signature
+    void Log(string message);  // Same signature
     void Audit(string action, int userId);
 }
 
 [KnockOff]
-public partial class LoggerAuditorKnockOff : ILogger, IAuditor { }
+public partial class MiLoggerAuditorKnockOff : IMiLoggerSame, IMiAuditor { }
 ```
+<!-- /snippet -->
 
 Usage:
 
@@ -141,23 +145,27 @@ knockOff.IAuditor.Audit.OnCall = (ko, action, userId) =>
 
 ### Repository + Unit of Work
 
+<!-- snippet: docs:multiple-interfaces:repo-uow -->
 ```csharp
-public interface IRepository
+public interface IMiRepository
 {
-    User? GetById(int id);
-    void Add(User user);
+    MiUser? GetById(int id);
+    void Add(MiUser user);
 }
 
-public interface IUnitOfWork
+public interface IMiUnitOfWork
 {
     Task<int> SaveChangesAsync(CancellationToken ct = default);
 }
 
 [KnockOff]
-public partial class DataContextKnockOff : IRepository, IUnitOfWork { }
+public partial class MiDataContextKnockOff : IMiRepository, IMiUnitOfWork { }
+```
+<!-- /snippet -->
 
+```csharp
 // Usage
-var knockOff = new DataContextKnockOff();
+var knockOff = new MiDataContextKnockOff();
 
 knockOff.IUnitOfWork.SaveChangesAsync.OnCall = (ko, ct) =>
     Task.FromResult(ko.IRepository.Add.CallCount);  // Return count of adds
@@ -197,23 +205,17 @@ knockOff.IDisposable.Dispose.OnCall = (ko) =>
 
 ### Multiple Repositories
 
+<!-- snippet: docs:multiple-interfaces:multiple-repos -->
 ```csharp
-public interface IUserRepository
-{
-    User? GetUser(int id);
-}
-
-public interface IOrderRepository
-{
-    Order? GetOrder(int id);
-}
-
 [KnockOff]
-public partial class CompositeRepositoryKnockOff : IUserRepository, IOrderRepository { }
+public partial class MiCompositeRepositoryKnockOff : IMiUserRepository, IMiOrderRepository { }
+```
+<!-- /snippet -->
 
+```csharp
 // Configure each interface independently
-knockOff.IUserRepository.GetUser.OnCall = (ko, id) => new User { Id = id };
-knockOff.IOrderRepository.GetOrder.OnCall = (ko, id) => new Order { Id = id };
+knockOff.IMiUserRepository.GetUser.OnCall = (ko, id) => new MiUser { Id = id };
+knockOff.IMiOrderRepository.GetOrder.OnCall = (ko, id) => new MiOrder { Id = id };
 ```
 
 ## Same-Named Members

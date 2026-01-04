@@ -129,6 +129,38 @@ See README.md "Open Questions" section:
 - Callback support in ExecutionDetails
 - Default return values for non-overridden methods
 
+## Documentation Snippets
+
+Code examples in documentation must come from the `KnockOff.Documentation.Samples` project:
+
+```
+src/Tests/KnockOff.Documentation.Samples/     # Compiled samples with #region markers
+src/Tests/KnockOff.Documentation.Samples.Tests/ # Tests for samples
+docs/                                          # Markdown with <!-- snippet: --> markers
+scripts/extract-snippets.ps1                   # Sync script
+```
+
+### Commands
+
+```powershell
+# Verify docs are in sync (for CI)
+.\scripts\extract-snippets.ps1 -Verify
+
+# Update docs from samples
+.\scripts\extract-snippets.ps1 -Update
+
+# List all snippets
+.\scripts\extract-snippets.ps1
+```
+
+### Adding Code to Docs
+
+1. Add `#region docs:{doc-file}:{snippet-id}` in `Documentation.Samples`
+2. Add `<!-- snippet: docs:{doc-file}:{snippet-id} -->` marker in markdown
+3. Run `-Update` to sync
+
+See `/docs-snippets` skill for full documentation.
+
 ## Implementation Phases
 
 See README.md for detailed checklist. Key phases:

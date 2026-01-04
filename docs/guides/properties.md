@@ -6,15 +6,17 @@ KnockOff supports all property types: get/set, get-only, and set-only.
 
 ### Get/Set Properties
 
+<!-- snippet: docs:properties:get-set-property -->
 ```csharp
-public interface IUserService
+public interface IPropUserService
 {
     string Name { get; set; }
 }
 
 [KnockOff]
-public partial class UserServiceKnockOff : IUserService { }
+public partial class PropUserServiceKnockOff : IPropUserService { }
 ```
+<!-- /snippet -->
 
 Generated:
 - `IUserService_NameBacking` — protected backing field (interface-prefixed)
@@ -26,12 +28,17 @@ Generated:
 
 ### Get-Only Properties
 
+<!-- snippet: docs:properties:get-only-property -->
 ```csharp
-public interface IConfig
+public interface IPropConfig
 {
     string ConnectionString { get; }
 }
+
+[KnockOff]
+public partial class PropConfigKnockOff : IPropConfig { }
 ```
+<!-- /snippet -->
 
 For get-only properties:
 - Backing field is still generated
@@ -39,11 +46,11 @@ For get-only properties:
 - Set the backing field directly for default values
 
 ```csharp
-var knockOff = new ConfigKnockOff();
-knockOff.IConfig_ConnectionStringBacking = "Server=localhost";
+var knockOff = new PropConfigKnockOff();
+knockOff.IPropConfig_ConnectionStringBacking = "Server=localhost";
 
 // Or use callback
-knockOff.IConfig.ConnectionString.OnGet = (ko) => "Server=test";
+knockOff.IPropConfig.ConnectionString.OnGet = (ko) => "Server=test";
 ```
 
 ### Set-Only Properties
@@ -141,11 +148,24 @@ Assert.Equal("Test", captured);
 
 ### Conditional Logic
 
+<!-- snippet: docs:properties:conditional-logic -->
 ```csharp
-knockOff.IConnection.IsConnected.OnGet = (ko) =>
+public interface IPropConnection
+{
+    bool IsConnected { get; }
+    void Connect();
+}
+
+[KnockOff]
+public partial class PropConnectionKnockOff : IPropConnection { }
+```
+<!-- /snippet -->
+
+```csharp
+knockOff.IPropConnection.IsConnected.OnGet = (ko) =>
 {
     // Check other handler state
-    return ko.IConnection.Connect.WasCalled;
+    return ko.IPropConnection.Connect.WasCalled;
 };
 ```
 
@@ -180,25 +200,63 @@ Assert.Equal("Server=localhost;Database=test", config.ConnectionString);
 
 ### Simulating Read-Only Computed Properties
 
+<!-- snippet: docs:properties:computed-property -->
 ```csharp
-knockOff.IUser.FullName.OnGet = (ko) =>
-    $"{ko.IUser_FirstNameBacking} {ko.IUser_LastNameBacking}";
+public interface IPropPerson
+{
+    string FirstName { get; set; }
+    string LastName { get; set; }
+    string FullName { get; }
+}
+
+[KnockOff]
+public partial class PropPersonKnockOff : IPropPerson { }
+```
+<!-- /snippet -->
+
+```csharp
+knockOff.IPropPerson.FullName.OnGet = (ko) =>
+    $"{ko.IPropPerson_FirstNameBacking} {ko.IPropPerson_LastNameBacking}";
 ```
 
 ### Tracking Property Changes
 
+<!-- snippet: docs:properties:tracking-changes -->
+```csharp
+public interface IPropStatus
+{
+    string Status { get; set; }
+}
+
+[KnockOff]
+public partial class PropStatusKnockOff : IPropStatus { }
+```
+<!-- /snippet -->
+
 ```csharp
 var changes = new List<string>();
-knockOff.IService.Status.OnSet = (ko, value) =>
+knockOff.IPropStatus.Status.OnSet = (ko, value) =>
 {
     changes.Add(value);
-    ko.IService_StatusBacking = value;  // Still store it
+    ko.IPropStatus_StatusBacking = value;  // Still store it
 };
 ```
 
 ### Throwing on Access
 
+<!-- snippet: docs:properties:throwing-on-access -->
 ```csharp
-knockOff.ISecrets.SecretKey.OnGet = (ko) =>
+public interface IPropSecure
+{
+    string SecretKey { get; }
+}
+
+[KnockOff]
+public partial class PropSecureKnockOff : IPropSecure { }
+```
+<!-- /snippet -->
+
+```csharp
+knockOff.IPropSecure.SecretKey.OnGet = (ko) =>
     throw new UnauthorizedAccessException("Access denied");
 ```

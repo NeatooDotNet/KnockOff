@@ -4,23 +4,25 @@ KnockOff supports indexer properties, both get-only and get/set.
 
 ## Basic Usage
 
+<!-- snippet: docs:indexers:basic-interface -->
 ```csharp
-public interface IPropertyStore
+public interface IIdxPropertyStore
 {
-    PropertyInfo? this[string key] { get; }
+    IdxPropertyInfo? this[string key] { get; }
 }
 
-public interface IReadWriteStore
+public interface IIdxReadWriteStore
 {
-    PropertyInfo? this[string key] { get; set; }
+    IdxPropertyInfo? this[string key] { get; set; }
 }
 
 [KnockOff]
-public partial class PropertyStoreKnockOff : IPropertyStore { }
+public partial class IdxPropertyStoreKnockOff : IIdxPropertyStore { }
 
 [KnockOff]
-public partial class ReadWriteStoreKnockOff : IReadWriteStore { }
+public partial class IdxReadWriteStoreKnockOff : IIdxReadWriteStore { }
 ```
+<!-- /snippet -->
 
 ## Naming Convention
 
@@ -215,24 +217,28 @@ Assert.True(knockOff.IPropertyStore_StringIndexerBacking.ContainsKey("Key3"));
 
 ### Entity Property Access (IEntityBase Pattern)
 
+<!-- snippet: docs:indexers:entity-property -->
 ```csharp
-public interface IEntityBase
+public interface IIdxEntityBase
 {
-    IEntityProperty? this[string propertyName] { get; }
+    IIdxEntityProperty? this[string propertyName] { get; }
     bool IsNew { get; }
 }
 
 [KnockOff]
-public partial class EntityBaseKnockOff : IEntityBase { }
+public partial class IdxEntityBaseKnockOff : IIdxEntityBase { }
+```
+<!-- /snippet -->
 
+```csharp
 // Configure property access
-knockOff.IEntityBase.StringIndexer.OnGet = (ko, propertyName) =>
+knockOff.IIdxEntityBase.StringIndexer.OnGet = (ko, propertyName) =>
 {
     return propertyName switch
     {
-        "FirstName" => new EntityProperty { IsModified = true },
-        "LastName" => new EntityProperty { IsModified = false },
-        "Id" => new EntityProperty { IsModified = ko.IEntityBase.IsNew.OnGet?.Invoke(ko) ?? false },
+        "FirstName" => new IdxEntityProperty { IsModified = true },
+        "LastName" => new IdxEntityProperty { IsModified = false },
+        "Id" => new IdxEntityProperty { IsModified = ko.IIdxEntityBase.IsNew.OnGet?.Invoke(ko) ?? false },
         _ => null
     };
 };
@@ -240,12 +246,19 @@ knockOff.IEntityBase.StringIndexer.OnGet = (ko, propertyName) =>
 
 ### Dictionary-Like Behavior
 
+<!-- snippet: docs:indexers:dictionary-like -->
+```csharp
+[KnockOff]
+public partial class IdxConfigStoreKnockOff : IIdxConfigStore { }
+```
+<!-- /snippet -->
+
 ```csharp
 // Pre-populate like a dictionary
-knockOff.IConfigStore_StringIndexerBacking["config:timeout"] = new ConfigValue { Value = "30" };
-knockOff.IConfigStore_StringIndexerBacking["config:retries"] = new ConfigValue { Value = "3" };
+knockOff.IIdxConfigStore_StringIndexerBacking["config:timeout"] = new IdxConfigValue { Value = "30" };
+knockOff.IIdxConfigStore_StringIndexerBacking["config:retries"] = new IdxConfigValue { Value = "3" };
 
-IConfigStore config = knockOff;
+IIdxConfigStore config = knockOff;
 var timeout = config["config:timeout"];
 ```
 
@@ -267,20 +280,24 @@ knockOff.IPropertyStore.StringIndexer.OnGet = (ko, key) =>
 
 ### Integer Indexers
 
+<!-- snippet: docs:indexers:integer-indexer -->
 ```csharp
-public interface IList
+public interface IIdxList
 {
     object? this[int index] { get; set; }
 }
 
 [KnockOff]
-public partial class ListKnockOff : IList { }
+public partial class IdxListKnockOff : IIdxList { }
+```
+<!-- /snippet -->
 
-// IList_IntIndexerBacking is Dictionary<int, object?>
-knockOff.IList_IntIndexerBacking[0] = "First";
-knockOff.IList_IntIndexerBacking[1] = "Second";
+```csharp
+// IIdxList_IntIndexerBacking is Dictionary<int, object?>
+knockOff.IIdxList_IntIndexerBacking[0] = "First";
+knockOff.IIdxList_IntIndexerBacking[1] = "Second";
 
-IList list = knockOff;
+IIdxList list = knockOff;
 Assert.Equal("First", list[0]);
-Assert.Equal(0, knockOff.IList.IntIndexer.LastGetKey);
+Assert.Equal(0, knockOff.IIdxList.IntIndexer.LastGetKey);
 ```

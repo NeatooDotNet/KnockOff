@@ -4,22 +4,24 @@ KnockOff supports interface inheritance, automatically implementing members from
 
 ## Basic Usage
 
+<!-- snippet: docs:interface-inheritance:basic-usage -->
 ```csharp
-public interface IBaseEntity
+public interface IIhBaseEntity
 {
     int Id { get; }
     DateTime CreatedAt { get; }
 }
 
-public interface IAuditableEntity : IBaseEntity
+public interface IIhAuditableEntity : IIhBaseEntity
 {
     DateTime? ModifiedAt { get; set; }
     string ModifiedBy { get; set; }
 }
 
 [KnockOff]
-public partial class AuditableEntityKnockOff : IAuditableEntity { }
+public partial class IhAuditableEntityKnockOff : IIhAuditableEntity { }
 ```
+<!-- /snippet -->
 
 The generator implements:
 - `Id` and `CreatedAt` from `IBaseEntity`
@@ -105,26 +107,28 @@ knockOff.IAuditableEntity.ModifiedAt.OnSet = (ko, value) =>
 
 KnockOff handles multiple levels of inheritance:
 
+<!-- snippet: docs:interface-inheritance:deep-inheritance -->
 ```csharp
-public interface IEntity
+public interface IIhEntity
 {
     int Id { get; }
 }
 
-public interface ITimestampedEntity : IEntity
+public interface IIhTimestampedEntity : IIhEntity
 {
     DateTime CreatedAt { get; }
 }
 
-public interface IAuditableEntity : ITimestampedEntity
+public interface IIhFullAuditableEntity : IIhTimestampedEntity
 {
     string CreatedBy { get; }
     string? ModifiedBy { get; set; }
 }
 
 [KnockOff]
-public partial class FullEntityKnockOff : IAuditableEntity { }
+public partial class IhFullEntityKnockOff : IIhFullAuditableEntity { }
 ```
+<!-- /snippet -->
 
 All members from all levels are generated:
 - `Id` from `IEntity`
@@ -135,73 +139,85 @@ All members from all levels are generated:
 
 ### Entity Base Pattern
 
+<!-- snippet: docs:interface-inheritance:entity-base -->
 ```csharp
-public interface IEntity
+public interface IIhEntityBase
 {
     int Id { get; }
 }
 
-public interface IEmployee : IEntity
+public interface IIhEmployee : IIhEntityBase
 {
     string Name { get; set; }
     string Department { get; set; }
 }
 
 [KnockOff]
-public partial class EmployeeKnockOff : IEmployee { }
+public partial class IhEmployeeKnockOff : IIhEmployee { }
+```
+<!-- /snippet -->
 
+```csharp
 // Pre-populate properties using interface-prefixed backing fields
-knockOff.IEntity_IdBacking = 1;
-knockOff.IEmployee_NameBacking = "Test Employee";
+knockOff.IIhEntityBase_IdBacking = 1;
+knockOff.IIhEmployee_NameBacking = "Test Employee";
 ```
 
 ### Validation Pattern
 
+<!-- snippet: docs:interface-inheritance:validation-pattern -->
 ```csharp
-public interface IValidatable
+public interface IIhValidatable
 {
     bool IsValid { get; }
     IEnumerable<string> GetErrors();
 }
 
-public interface IOrder : IValidatable
+public interface IIhOrder : IIhValidatable
 {
     decimal Total { get; }
     void Submit();
 }
 
 [KnockOff]
-public partial class OrderKnockOff : IOrder { }
+public partial class IhOrderKnockOff : IIhOrder { }
+```
+<!-- /snippet -->
 
+```csharp
 // Configure validation (using interface spy classes)
-knockOff.IValidatable.IsValid.OnGet = (ko) => ko.IOrder.Total.GetCount > 0;
-knockOff.IValidatable.GetErrors.OnCall = (ko) =>
-    ko.IValidatable.IsValid.OnGet!(ko) ? [] : ["No total calculated"];
+knockOff.IIhValidatable.IsValid.OnGet = (ko) => ko.IIhOrder.Total.GetCount > 0;
+knockOff.IIhValidatable.GetErrors.OnCall = (ko) =>
+    ko.IIhValidatable.IsValid.OnGet!(ko) ? [] : ["No total calculated"];
 ```
 
 ### Repository Hierarchy
 
+<!-- snippet: docs:interface-inheritance:repository-hierarchy -->
 ```csharp
-public interface IReadRepository<T>
+public interface IIhReadRepository<T>
 {
     T? GetById(int id);
     IEnumerable<T> GetAll();
 }
 
-public interface IWriteRepository<T> : IReadRepository<T>
+public interface IIhWriteRepository<T> : IIhReadRepository<T>
 {
     void Add(T entity);
     void Delete(int id);
 }
 
 [KnockOff]
-public partial class UserWriteRepositoryKnockOff : IWriteRepository<User> { }
+public partial class IhUserWriteRepositoryKnockOff : IIhWriteRepository<IhUser> { }
+```
+<!-- /snippet -->
 
-// Base interface members via IReadRepository_User
-knockOff.IReadRepository_User.GetById.OnCall = (ko, id) => users.FirstOrDefault(u => u.Id == id);
-knockOff.IReadRepository_User.GetAll.OnCall = (ko) => users;
+```csharp
+// Base interface members via IIhReadRepository_IhUser
+knockOff.IIhReadRepository_IhUser.GetById.OnCall = (ko, id) => users.FirstOrDefault(u => u.Id == id);
+knockOff.IIhReadRepository_IhUser.GetAll.OnCall = (ko) => users;
 
-// Derived interface members via IWriteRepository_User
-knockOff.IWriteRepository_User.Add.OnCall = (ko, user) => users.Add(user);
-knockOff.IWriteRepository_User.Delete.OnCall = (ko, id) => users.RemoveAll(u => u.Id == id);
+// Derived interface members via IIhWriteRepository_IhUser
+knockOff.IIhWriteRepository_IhUser.Add.OnCall = (ko, user) => users.Add(user);
+knockOff.IIhWriteRepository_IhUser.Delete.OnCall = (ko, id) => users.RemoveAll(u => u.Id == id);
 ```

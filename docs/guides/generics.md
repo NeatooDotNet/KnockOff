@@ -6,22 +6,24 @@ KnockOff supports generic interfaces with concrete type parameters.
 
 For generic interfaces, create a KnockOff class with concrete type arguments:
 
+<!-- snippet: docs:generics:basic-interface -->
 ```csharp
-public interface IRepository<T> where T : class
+public interface IGenRepository<T> where T : class
 {
     T? GetById(int id);
     void Save(T entity);
     Task<T?> GetByIdAsync(int id);
 }
 
-// Concrete KnockOff for User entities
+// Concrete KnockOff for GenUser entities
 [KnockOff]
-public partial class UserRepositoryKnockOff : IRepository<User> { }
+public partial class GenUserRepositoryKnockOff : IGenRepository<GenUser> { }
 
-// Concrete KnockOff for Order entities
+// Concrete KnockOff for GenOrder entities
 [KnockOff]
-public partial class OrderRepositoryKnockOff : IRepository<Order> { }
+public partial class GenOrderRepositoryKnockOff : IGenRepository<GenOrder> { }
 ```
+<!-- /snippet -->
 
 ## Tracking
 
@@ -57,16 +59,18 @@ knockOff.IRepository_User.Save.OnCall = (ko, user) =>
 
 ## Multiple Generic Parameters
 
+<!-- snippet: docs:generics:multiple-params -->
 ```csharp
-public interface ICache<TKey, TValue>
+public interface IGenCache<TKey, TValue>
 {
     TValue? Get(TKey key);
     void Set(TKey key, TValue value);
 }
 
 [KnockOff]
-public partial class StringCacheKnockOff : ICache<string, User> { }
+public partial class GenStringCacheKnockOff : IGenCache<string, GenUser> { }
 ```
+<!-- /snippet -->
 
 Usage:
 
@@ -91,63 +95,74 @@ knockOff.ICache_string_User.Set.OnCall = (ko, key, value) =>
 
 KnockOff works with constrained generic interfaces:
 
+<!-- snippet: docs:generics:constrained -->
 ```csharp
-public interface IEntityRepository<T> where T : class, IEntity
+public interface IGenEntityRepository<T> where T : class, IGenEntity
 {
     T? FindById(int id);
 }
 
-// Employee must implement IEntity
+// GenEmployee must implement IGenEntity
 [KnockOff]
-public partial class EmployeeRepositoryKnockOff : IEntityRepository<Employee> { }
+public partial class GenEmployeeRepositoryKnockOff : IGenEntityRepository<GenEmployee> { }
 ```
+<!-- /snippet -->
 
 ## Common Patterns
 
 ### Factory Pattern
 
+<!-- snippet: docs:generics:factory-pattern -->
 ```csharp
-public interface IFactory<T> where T : new()
+public interface IGenFactory<T> where T : new()
 {
     T Create();
 }
 
 [KnockOff]
-public partial class UserFactoryKnockOff : IFactory<User> { }
+public partial class GenUserFactoryKnockOff : IGenFactory<GenUser> { }
+```
+<!-- /snippet -->
 
+```csharp
 // Usage
-knockOff.IFactory_User.Create.OnCall = (ko) => new User { Name = "Created" };
+knockOff.IGenFactory_GenUser.Create.OnCall = (ko) => new GenUser { Name = "Created" };
 ```
 
 ### Collection Repositories
 
+<!-- snippet: docs:generics:collection-repo -->
 ```csharp
-public interface IReadOnlyRepository<T>
+public interface IGenReadOnlyRepository<T>
 {
     IEnumerable<T> GetAll();
     T? FindFirst(Func<T, bool> predicate);
 }
 
 [KnockOff]
-public partial class ProductRepositoryKnockOff : IReadOnlyRepository<Product> { }
+public partial class GenProductRepositoryKnockOff : IGenReadOnlyRepository<GenProduct> { }
+```
+<!-- /snippet -->
 
+```csharp
 // Usage
-var products = new List<Product>
+var products = new List<GenProduct>
 {
-    new Product { Id = 1, Name = "Widget" },
-    new Product { Id = 2, Name = "Gadget" }
+    new GenProduct { Id = 1, Name = "Widget" },
+    new GenProduct { Id = 2, Name = "Gadget" }
 };
 
-knockOff.IReadOnlyRepository_Product.GetAll.OnCall = (ko) => products;
+knockOff.IGenReadOnlyRepository_GenProduct.GetAll.OnCall = (ko) => products;
 
-knockOff.IReadOnlyRepository_Product.FindFirst.OnCall = (ko, predicate) =>
+knockOff.IGenReadOnlyRepository_GenProduct.FindFirst.OnCall = (ko, predicate) =>
     products.FirstOrDefault(predicate);
 ```
 
 ### Async Generic Repositories
 
+<!-- snippet: docs:generics:async-generic -->
 ```csharp
-public interface IAsyncRepository<T> where T : class
+public interface IGenAsyncRepository<T> where T : class
 {
     Task<T?> GetByIdAsync(int id);
     Task<IEnumerable<T>> GetAllAsync();
@@ -155,14 +170,17 @@ public interface IAsyncRepository<T> where T : class
 }
 
 [KnockOff]
-public partial class AsyncUserRepositoryKnockOff : IAsyncRepository<User> { }
+public partial class GenAsyncUserRepositoryKnockOff : IGenAsyncRepository<GenUser> { }
+```
+<!-- /snippet -->
 
+```csharp
 // Usage
-knockOff.IAsyncRepository_User.GetByIdAsync.OnCall = (ko, id) =>
-    Task.FromResult<User?>(new User { Id = id });
+knockOff.IGenAsyncRepository_GenUser.GetByIdAsync.OnCall = (ko, id) =>
+    Task.FromResult<GenUser?>(new GenUser { Id = id });
 
-knockOff.IAsyncRepository_User.GetAllAsync.OnCall = (ko) =>
-    Task.FromResult<IEnumerable<User>>(users);
+knockOff.IGenAsyncRepository_GenUser.GetAllAsync.OnCall = (ko) =>
+    Task.FromResult<IEnumerable<GenUser>>(users);
 ```
 
 ## Limitations

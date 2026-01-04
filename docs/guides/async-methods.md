@@ -13,17 +13,19 @@ KnockOff supports all async return types: `Task`, `Task<T>`, `ValueTask`, and `V
 
 ## Basic Usage
 
+<!-- snippet: docs:async-methods:basic-interface -->
 ```csharp
 public interface IAsyncRepository
 {
     Task InitializeAsync();
-    Task<User?> GetByIdAsync(int id);
+    Task<AsyncUser?> GetByIdAsync(int id);
     ValueTask<int> CountAsync();
 }
 
 [KnockOff]
 public partial class AsyncRepositoryKnockOff : IAsyncRepository { }
 ```
+<!-- /snippet -->
 
 ### Default Behavior
 
@@ -42,17 +44,19 @@ var count = await repo.CountAsync();  // Returns 0 (default)
 
 Define protected async methods for default behavior:
 
+<!-- snippet: docs:async-methods:user-defined -->
 ```csharp
 [KnockOff]
-public partial class AsyncRepositoryKnockOff : IAsyncRepository
+public partial class AsyncUserDefinedKnockOff : IAsyncUserDefined
 {
-    protected Task<User?> GetByIdAsync(int id) =>
-        Task.FromResult<User?>(new User { Id = id, Name = "Default" });
+    protected Task<AsyncUser?> GetByIdAsync(int id) =>
+        Task.FromResult<AsyncUser?>(new AsyncUser { Id = id, Name = "Default" });
 
     protected ValueTask<int> CountAsync() =>
         new ValueTask<int>(42);
 }
 ```
+<!-- /snippet -->
 
 ## Callbacks
 
@@ -112,13 +116,20 @@ Note: This requires the callback to be `async`.
 
 ### Simulating Failures
 
+<!-- snippet: docs:async-methods:simulating-failures -->
+```csharp
+[KnockOff]
+public partial class AsyncSaveKnockOff : IAsyncSave { }
+```
+<!-- /snippet -->
+
 ```csharp
 // Faulted task
-knockOff.IAsyncRepository.SaveAsync.OnCall = (ko, entity) =>
+knockOff.IAsyncSave.SaveAsync.OnCall = (ko, entity) =>
     Task.FromException<int>(new DbException("Connection lost"));
 
 // Or throw directly in callback
-knockOff.IAsyncRepository.SaveAsync.OnCall = (ko, entity) =>
+knockOff.IAsyncSave.SaveAsync.OnCall = (ko, entity) =>
 {
     throw new DbException("Connection lost");
 };
@@ -140,16 +151,23 @@ knockOff.IAsyncRepository.GetByIdAsync.OnCall = (ko, id) =>
 
 For methods with `CancellationToken`:
 
+<!-- snippet: docs:async-methods:cancellation -->
 ```csharp
-public interface IService
+public interface IAsyncFetch
 {
-    Task<Data> FetchAsync(int id, CancellationToken ct);
+    Task<AsyncData> FetchAsync(int id, CancellationToken ct);
 }
 
-knockOff.IService.FetchAsync.OnCall = (ko, id, ct) =>
+[KnockOff]
+public partial class AsyncFetchKnockOff : IAsyncFetch { }
+```
+<!-- /snippet -->
+
+```csharp
+knockOff.IAsyncFetch.FetchAsync.OnCall = (ko, id, ct) =>
 {
     ct.ThrowIfCancellationRequested();
-    return Task.FromResult(new Data { Id = id });
+    return Task.FromResult(new AsyncData { Id = id });
 };
 ```
 
@@ -168,16 +186,23 @@ knockOff.IAsyncRepository.GetByIdAsync.OnCall = (ko, id) =>
 
 ### Verifying Async Call Order
 
+<!-- snippet: docs:async-methods:call-order -->
+```csharp
+[KnockOff]
+public partial class AsyncCallOrderKnockOff : IAsyncCallOrder { }
+```
+<!-- /snippet -->
+
 ```csharp
 var order = new List<string>();
 
-knockOff.IAsyncService.StartAsync.OnCall = (ko) =>
+knockOff.IAsyncCallOrder.StartAsync.OnCall = (ko) =>
 {
     order.Add("Start");
     return Task.CompletedTask;
 };
 
-knockOff.IAsyncService.ProcessAsync.OnCall = (ko) =>
+knockOff.IAsyncCallOrder.ProcessAsync.OnCall = (ko) =>
 {
     order.Add("Process");
     return Task.CompletedTask;

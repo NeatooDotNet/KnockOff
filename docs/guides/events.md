@@ -4,18 +4,20 @@ KnockOff supports interface events with full subscription tracking and programma
 
 ## Basic Usage
 
+<!-- snippet: docs:events:basic-interface -->
 ```csharp
-public interface IEventSource
+public interface IGuideEventSource
 {
-    event EventHandler<string> MessageReceived;
-    event EventHandler OnCompleted;
-    event Action<int> OnProgress;
-    event Action<string, int> OnData;
+    event EventHandler<string>? MessageReceived;
+    event EventHandler? OnCompleted;
+    event Action<int>? OnProgress;
+    event Action<string, int>? OnData;
 }
 
 [KnockOff]
-public partial class EventSourceKnockOff : IEventSource { }
+public partial class GuideEventSourceKnockOff : IGuideEventSource { }
 ```
+<!-- /snippet -->
 
 ## Supported Delegate Types
 
@@ -216,26 +218,33 @@ Assert.Equal(1, knockOff.IEventSource.MessageReceived.RaiseCount);
 
 ### Testing Event Handlers
 
+<!-- snippet: docs:events:testing-viewmodel -->
+```csharp
+[KnockOff]
+public partial class GuideDataServiceKnockOff : IGuideDataService { }
+```
+<!-- /snippet -->
+
 ```csharp
 [Fact]
 public void ViewModel_SubscribesToDataService_Events()
 {
-    var knockOff = new DataServiceKnockOff();
-    var viewModel = new MyViewModel(knockOff.AsDataService());
+    var knockOff = new GuideDataServiceKnockOff();
+    var viewModel = new MyViewModel(knockOff.AsGuideDataService());
 
     // ViewModel should have subscribed
-    Assert.True(knockOff.IDataService.DataChanged.HasSubscribers);
-    Assert.Equal(1, knockOff.IDataService.DataChanged.SubscribeCount);
+    Assert.True(knockOff.IGuideDataService.DataChanged.HasSubscribers);
+    Assert.Equal(1, knockOff.IGuideDataService.DataChanged.SubscribeCount);
 }
 
 [Fact]
 public void ViewModel_UpdatesOnDataChanged()
 {
-    var knockOff = new DataServiceKnockOff();
-    var viewModel = new MyViewModel(knockOff.AsDataService());
+    var knockOff = new GuideDataServiceKnockOff();
+    var viewModel = new MyViewModel(knockOff.AsGuideDataService());
 
     // Simulate data change
-    knockOff.IDataService.DataChanged.Raise(new DataChangedEventArgs { NewValue = 42 });
+    knockOff.IGuideDataService.DataChanged.Raise(new DataChangedEventArgs { NewValue = 42 });
 
     Assert.Equal(42, viewModel.CurrentValue);
 }
@@ -260,24 +269,31 @@ public void ViewModel_Dispose_UnsubscribesFromEvents()
 
 ### Progress Reporting
 
+<!-- snippet: docs:events:progress-reporting -->
+```csharp
+[KnockOff]
+public partial class GuideDownloaderKnockOff : IGuideDownloader { }
+```
+<!-- /snippet -->
+
 ```csharp
 [Fact]
 public async Task Downloader_ReportsProgress()
 {
-    var knockOff = new DownloaderKnockOff();
+    var knockOff = new GuideDownloaderKnockOff();
     var progressValues = new List<int>();
 
-    knockOff.AsDownloader().ProgressChanged += (p) => progressValues.Add(p);
+    knockOff.AsGuideDownloader().ProgressChanged += (p) => progressValues.Add(p);
 
     // Simulate download progress
-    knockOff.IDownloader.ProgressChanged.Raise(0);
-    knockOff.IDownloader.ProgressChanged.Raise(25);
-    knockOff.IDownloader.ProgressChanged.Raise(50);
-    knockOff.IDownloader.ProgressChanged.Raise(75);
-    knockOff.IDownloader.ProgressChanged.Raise(100);
+    knockOff.IGuideDownloader.ProgressChanged.Raise(0);
+    knockOff.IGuideDownloader.ProgressChanged.Raise(25);
+    knockOff.IGuideDownloader.ProgressChanged.Raise(50);
+    knockOff.IGuideDownloader.ProgressChanged.Raise(75);
+    knockOff.IGuideDownloader.ProgressChanged.Raise(100);
 
     Assert.Equal([0, 25, 50, 75, 100], progressValues);
-    Assert.Equal(5, knockOff.IDownloader.ProgressChanged.RaiseCount);
+    Assert.Equal(5, knockOff.IGuideDownloader.ProgressChanged.RaiseCount);
 }
 ```
 

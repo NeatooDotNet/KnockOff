@@ -15,23 +15,25 @@ Define protected methods in your stub class that match interface method signatur
 
 ### Basic Example
 
+<!-- snippet: docs:customization-patterns:user-method-basic -->
 ```csharp
-public interface IUserService
+public interface IPatternUserService
 {
-    User GetUser(int id);
+    PatternUser GetUser(int id);
     int CalculateScore(string name, int baseScore);
 }
 
 [KnockOff]
-public partial class UserServiceKnockOff : IUserService
+public partial class PatternUserServiceKnockOff : IPatternUserService
 {
-    // Generator detects this and calls it for IUserService.GetUser
-    protected User GetUser(int id) => new User { Id = id, Name = "Default User" };
+    // Generator detects this and calls it for IPatternUserService.GetUser
+    protected PatternUser GetUser(int id) => new PatternUser { Id = id, Name = "Default User" };
 
     // Multi-parameter methods work the same way
     protected int CalculateScore(string name, int baseScore) => baseScore * 2;
 }
 ```
+<!-- /snippet -->
 
 ### Rules for User Methods
 
@@ -43,23 +45,25 @@ public partial class UserServiceKnockOff : IUserService
 
 User methods work with async return types:
 
+<!-- snippet: docs:customization-patterns:user-method-async -->
 ```csharp
-public interface IRepository
+public interface IPatternRepository
 {
-    Task<User?> GetByIdAsync(int id);
+    Task<PatternUser?> GetByIdAsync(int id);
     ValueTask<int> CountAsync();
 }
 
 [KnockOff]
-public partial class RepositoryKnockOff : IRepository
+public partial class PatternRepositoryKnockOff : IPatternRepository
 {
-    protected Task<User?> GetByIdAsync(int id) =>
-        Task.FromResult<User?>(new User { Id = id });
+    protected Task<PatternUser?> GetByIdAsync(int id) =>
+        Task.FromResult<PatternUser?>(new PatternUser { Id = id });
 
     protected ValueTask<int> CountAsync() =>
         new ValueTask<int>(42);
 }
 ```
+<!-- /snippet -->
 
 ### When to Use User Methods
 
@@ -190,13 +194,21 @@ When an interface member is invoked, KnockOff checks in this order:
 
 ### Example: Priority in Action
 
+<!-- snippet: docs:customization-patterns:priority-example -->
 ```csharp
+public interface IPatternService
+{
+    int Calculate(int input);
+}
+
 [KnockOff]
-public partial class ServiceKnockOff : IService
+public partial class PatternServiceKnockOff : IPatternService
 {
     // User method returns input * 2
     protected int Calculate(int input) => input * 2;
 }
+```
+<!-- /snippet -->
 
 // Test
 var knockOff = new ServiceKnockOff();
@@ -246,13 +258,21 @@ var user = service.GetUser(3);
 
 The patterns work together for layered customization:
 
+<!-- snippet: docs:customization-patterns:combining-patterns -->
 ```csharp
+public interface IPatternCombinedRepository
+{
+    PatternUser? GetById(int id);
+}
+
 [KnockOff]
-public partial class RepositoryKnockOff : IRepository
+public partial class PatternCombinedRepositoryKnockOff : IPatternCombinedRepository
 {
     // Default: return null (not found)
-    protected User? GetById(int id) => null;
+    protected PatternUser? GetById(int id) => null;
 }
+```
+<!-- /snippet -->
 
 // Test 1: Uses default (null)
 var knockOff = new RepositoryKnockOff();
