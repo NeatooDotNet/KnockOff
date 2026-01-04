@@ -5,8 +5,8 @@ namespace KnockOff.Tests;
 
 partial class AuditableEntityKnockOff
 {
-	/// <summary>Tracks and configures behavior for ModifiedAt.</summary>
-	public sealed class ModifiedAtHandler
+	/// <summary>Tracks and configures behavior for IAuditableEntity.ModifiedAt.</summary>
+	public sealed class IAuditableEntity_ModifiedAtHandler
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -33,8 +33,8 @@ partial class AuditableEntityKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ModifiedBy.</summary>
-	public sealed class ModifiedByHandler
+	/// <summary>Tracks and configures behavior for IAuditableEntity.ModifiedBy.</summary>
+	public sealed class IAuditableEntity_ModifiedByHandler
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -61,8 +61,17 @@ partial class AuditableEntityKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for Id.</summary>
-	public sealed class IdHandler
+	/// <summary>Spy for KnockOff.Tests.IAuditableEntity - tracks invocations and configures behavior.</summary>
+	public sealed class IAuditableEntitySpy
+	{
+		/// <summary>Handler for ModifiedAt.</summary>
+		public IAuditableEntity_ModifiedAtHandler ModifiedAt { get; } = new();
+		/// <summary>Handler for ModifiedBy.</summary>
+		public IAuditableEntity_ModifiedByHandler ModifiedBy { get; } = new();
+	}
+
+	/// <summary>Tracks and configures behavior for IBaseEntity.Id.</summary>
+	public sealed class IBaseEntity_IdHandler
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -77,8 +86,8 @@ partial class AuditableEntityKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for CreatedAt.</summary>
-	public sealed class CreatedAtHandler
+	/// <summary>Tracks and configures behavior for IBaseEntity.CreatedAt.</summary>
+	public sealed class IBaseEntity_CreatedAtHandler
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -93,21 +102,20 @@ partial class AuditableEntityKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Spy for AuditableEntityKnockOff - tracks invocations and configures behavior.</summary>
-	public sealed class AuditableEntityKnockOffSpy
+	/// <summary>Spy for KnockOff.Tests.IBaseEntity - tracks invocations and configures behavior.</summary>
+	public sealed class IBaseEntitySpy
 	{
-		/// <summary>Handler for ModifiedAt.</summary>
-		public ModifiedAtHandler ModifiedAt { get; } = new();
-		/// <summary>Handler for ModifiedBy.</summary>
-		public ModifiedByHandler ModifiedBy { get; } = new();
 		/// <summary>Handler for Id.</summary>
-		public IdHandler Id { get; } = new();
+		public IBaseEntity_IdHandler Id { get; } = new();
 		/// <summary>Handler for CreatedAt.</summary>
-		public CreatedAtHandler CreatedAt { get; } = new();
+		public IBaseEntity_CreatedAtHandler CreatedAt { get; } = new();
 	}
 
-	/// <summary>Tracks invocations and configures behavior for all interface members.</summary>
-	public AuditableEntityKnockOffSpy Spy { get; } = new();
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IAuditableEntity.</summary>
+	public IAuditableEntitySpy IAuditableEntity { get; } = new();
+
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IBaseEntity.</summary>
+	public IBaseEntitySpy IBaseEntity { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IAuditableEntity.</summary>
 	public KnockOff.Tests.IAuditableEntity AsAuditableEntity() => this;
@@ -115,34 +123,34 @@ partial class AuditableEntityKnockOff
 	/// <summary>Returns this instance as KnockOff.Tests.IBaseEntity.</summary>
 	public KnockOff.Tests.IBaseEntity AsBaseEntity() => this;
 
-	/// <summary>Backing field for ModifiedAt.</summary>
-	protected global::System.DateTime? ModifiedAtBacking { get; set; }
+	/// <summary>Backing field for IAuditableEntity.ModifiedAt.</summary>
+	protected global::System.DateTime? IAuditableEntity_ModifiedAtBacking { get; set; }
 
-	/// <summary>Backing field for ModifiedBy.</summary>
-	protected string ModifiedByBacking { get; set; } = "";
+	/// <summary>Backing field for IAuditableEntity.ModifiedBy.</summary>
+	protected string IAuditableEntity_ModifiedByBacking { get; set; } = "";
 
-	/// <summary>Backing field for Id.</summary>
-	protected int IdBacking { get; }
+	/// <summary>Backing field for IBaseEntity.Id.</summary>
+	protected int IBaseEntity_IdBacking { get; set; }
 
-	/// <summary>Backing field for CreatedAt.</summary>
-	protected global::System.DateTime CreatedAtBacking { get; }
+	/// <summary>Backing field for IBaseEntity.CreatedAt.</summary>
+	protected global::System.DateTime IBaseEntity_CreatedAtBacking { get; set; }
 
 	global::System.DateTime? KnockOff.Tests.IAuditableEntity.ModifiedAt
 	{
 		get
 		{
-			Spy.ModifiedAt.RecordGet();
-			if (Spy.ModifiedAt.OnGet is { } onGetCallback)
+			IAuditableEntity.ModifiedAt.RecordGet();
+			if (IAuditableEntity.ModifiedAt.OnGet is { } onGetCallback)
 				return onGetCallback(this);
-			return ModifiedAtBacking;
+			return IAuditableEntity_ModifiedAtBacking;
 		}
 		set
 		{
-			Spy.ModifiedAt.RecordSet(value);
-			if (Spy.ModifiedAt.OnSet is { } onSetCallback)
+			IAuditableEntity.ModifiedAt.RecordSet(value);
+			if (IAuditableEntity.ModifiedAt.OnSet is { } onSetCallback)
 				onSetCallback(this, value);
 			else
-				ModifiedAtBacking = value;
+				IAuditableEntity_ModifiedAtBacking = value;
 		}
 	}
 
@@ -150,18 +158,18 @@ partial class AuditableEntityKnockOff
 	{
 		get
 		{
-			Spy.ModifiedBy.RecordGet();
-			if (Spy.ModifiedBy.OnGet is { } onGetCallback)
+			IAuditableEntity.ModifiedBy.RecordGet();
+			if (IAuditableEntity.ModifiedBy.OnGet is { } onGetCallback)
 				return onGetCallback(this);
-			return ModifiedByBacking;
+			return IAuditableEntity_ModifiedByBacking;
 		}
 		set
 		{
-			Spy.ModifiedBy.RecordSet(value);
-			if (Spy.ModifiedBy.OnSet is { } onSetCallback)
+			IAuditableEntity.ModifiedBy.RecordSet(value);
+			if (IAuditableEntity.ModifiedBy.OnSet is { } onSetCallback)
 				onSetCallback(this, value);
 			else
-				ModifiedByBacking = value;
+				IAuditableEntity_ModifiedByBacking = value;
 		}
 	}
 
@@ -169,10 +177,10 @@ partial class AuditableEntityKnockOff
 	{
 		get
 		{
-			Spy.Id.RecordGet();
-			if (Spy.Id.OnGet is { } onGetCallback)
+			IBaseEntity.Id.RecordGet();
+			if (IBaseEntity.Id.OnGet is { } onGetCallback)
 				return onGetCallback(this);
-			return IdBacking;
+			return IBaseEntity_IdBacking;
 		}
 	}
 
@@ -180,10 +188,10 @@ partial class AuditableEntityKnockOff
 	{
 		get
 		{
-			Spy.CreatedAt.RecordGet();
-			if (Spy.CreatedAt.OnGet is { } onGetCallback)
+			IBaseEntity.CreatedAt.RecordGet();
+			if (IBaseEntity.CreatedAt.OnGet is { } onGetCallback)
 				return onGetCallback(this);
-			return CreatedAtBacking;
+			return IBaseEntity_CreatedAtBacking;
 		}
 	}
 

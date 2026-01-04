@@ -5,8 +5,8 @@ namespace KnockOff.Sandbox;
 
 partial class UserServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for Name.</summary>
-	public sealed class NameHandler
+	/// <summary>Tracks and configures behavior for IUserService.Name.</summary>
+	public sealed class IUserService_NameHandler
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -33,8 +33,8 @@ partial class UserServiceKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for Count.</summary>
-	public sealed class CountHandler
+	/// <summary>Tracks and configures behavior for IUserService.Count.</summary>
+	public sealed class IUserService_CountHandler
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -49,13 +49,11 @@ partial class UserServiceKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for DoWork.</summary>
-	public sealed class DoWorkHandler
+	/// <summary>Tracks and configures behavior for IUserService.DoWork.</summary>
+	public sealed class IUserService_DoWorkHandler
 	{
 		/// <summary>Delegate for DoWork().</summary>
 		public delegate void DoWorkDelegate(UserServiceKnockOff ko);
-
-		private DoWorkDelegate? _onCall;
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
@@ -63,25 +61,21 @@ partial class UserServiceKnockOff
 		/// <summary>True if this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Sets callback for DoWork(parameterless) overload.</summary>
-		public void OnCall(DoWorkDelegate callback) => _onCall = callback;
-
-		internal DoWorkDelegate? GetCallback() => _onCall;
+		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		public DoWorkDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; _onCall = null; }
+		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for GetGreeting.</summary>
-	public sealed class GetGreetingHandler
+	/// <summary>Tracks and configures behavior for IUserService.GetGreeting.</summary>
+	public sealed class IUserService_GetGreetingHandler
 	{
 		/// <summary>Delegate for GetGreeting(string name).</summary>
 		public delegate string GetGreetingDelegate(UserServiceKnockOff ko, string name);
-
-		private GetGreetingDelegate? _onCall;
 
 		private readonly global::System.Collections.Generic.List<string> _calls = new();
 
@@ -97,25 +91,21 @@ partial class UserServiceKnockOff
 		/// <summary>All recorded calls with their arguments.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<string> AllCalls => _calls;
 
-		/// <summary>Sets callback for GetGreeting(name) overload.</summary>
-		public void OnCall(GetGreetingDelegate callback) => _onCall = callback;
-
-		internal GetGreetingDelegate? GetCallback() => _onCall;
+		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		public GetGreetingDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall(string name) => _calls.Add(name);
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); _onCall = null; }
+		public void Reset() { _calls.Clear(); OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for Process.</summary>
-	public sealed class ProcessHandler
+	/// <summary>Tracks and configures behavior for IUserService.Process.</summary>
+	public sealed class IUserService_ProcessHandler
 	{
 		/// <summary>Delegate for Process(string id, int count, bool urgent).</summary>
 		public delegate void ProcessDelegate(UserServiceKnockOff ko, string id, int count, bool urgent);
-
-		private ProcessDelegate? _onCall;
 
 		private readonly global::System.Collections.Generic.List<(string id, int count, bool urgent)> _calls = new();
 
@@ -125,67 +115,65 @@ partial class UserServiceKnockOff
 		/// <summary>True if this method was called at least once.</summary>
 		public bool WasCalled => _calls.Count > 0;
 
-		/// <summary>Arguments from the most recent call (nullable for params not in all overloads).</summary>
+		/// <summary>Arguments from the most recent call.</summary>
 		public (string id, int count, bool urgent)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
 
 		/// <summary>All recorded calls with their arguments.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<(string id, int count, bool urgent)> AllCalls => _calls;
 
-		/// <summary>Sets callback for Process(id, count, urgent) overload.</summary>
-		public void OnCall(ProcessDelegate callback) => _onCall = callback;
-
-		internal ProcessDelegate? GetCallback() => _onCall;
+		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		public ProcessDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall(string id, int count, bool urgent) => _calls.Add((id, count, urgent));
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); _onCall = null; }
+		public void Reset() { _calls.Clear(); OnCall = null; }
 	}
 
-	/// <summary>Spy for UserServiceKnockOff - tracks invocations and configures behavior.</summary>
-	public sealed class UserServiceKnockOffSpy
+	/// <summary>Spy for KnockOff.Sandbox.IUserService - tracks invocations and configures behavior.</summary>
+	public sealed class IUserServiceSpy
 	{
 		/// <summary>Handler for Name.</summary>
-		public NameHandler Name { get; } = new();
+		public IUserService_NameHandler Name { get; } = new();
 		/// <summary>Handler for Count.</summary>
-		public CountHandler Count { get; } = new();
+		public IUserService_CountHandler Count { get; } = new();
 		/// <summary>Handler for DoWork.</summary>
-		public DoWorkHandler DoWork { get; } = new();
+		public IUserService_DoWorkHandler DoWork { get; } = new();
 		/// <summary>Handler for GetGreeting.</summary>
-		public GetGreetingHandler GetGreeting { get; } = new();
+		public IUserService_GetGreetingHandler GetGreeting { get; } = new();
 		/// <summary>Handler for Process.</summary>
-		public ProcessHandler Process { get; } = new();
+		public IUserService_ProcessHandler Process { get; } = new();
 	}
 
-	/// <summary>Tracks invocations and configures behavior for all interface members.</summary>
-	public UserServiceKnockOffSpy Spy { get; } = new();
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Sandbox.IUserService.</summary>
+	public IUserServiceSpy IUserService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Sandbox.IUserService.</summary>
 	public KnockOff.Sandbox.IUserService AsUserService() => this;
 
-	/// <summary>Backing field for Name.</summary>
-	protected string NameBacking { get; set; } = "";
+	/// <summary>Backing field for IUserService.Name.</summary>
+	protected string IUserService_NameBacking { get; set; } = "";
 
-	/// <summary>Backing field for Count.</summary>
-	protected int CountBacking { get; }
+	/// <summary>Backing field for IUserService.Count.</summary>
+	protected int IUserService_CountBacking { get; set; }
 
 	string KnockOff.Sandbox.IUserService.Name
 	{
 		get
 		{
-			Spy.Name.RecordGet();
-			if (Spy.Name.OnGet is { } onGetCallback)
+			IUserService.Name.RecordGet();
+			if (IUserService.Name.OnGet is { } onGetCallback)
 				return onGetCallback(this);
-			return NameBacking;
+			return IUserService_NameBacking;
 		}
 		set
 		{
-			Spy.Name.RecordSet(value);
-			if (Spy.Name.OnSet is { } onSetCallback)
+			IUserService.Name.RecordSet(value);
+			if (IUserService.Name.OnSet is { } onSetCallback)
 				onSetCallback(this, value);
 			else
-				NameBacking = value;
+				IUserService_NameBacking = value;
 		}
 	}
 
@@ -193,32 +181,32 @@ partial class UserServiceKnockOff
 	{
 		get
 		{
-			Spy.Count.RecordGet();
-			if (Spy.Count.OnGet is { } onGetCallback)
+			IUserService.Count.RecordGet();
+			if (IUserService.Count.OnGet is { } onGetCallback)
 				return onGetCallback(this);
-			return CountBacking;
+			return IUserService_CountBacking;
 		}
 	}
 
 	void KnockOff.Sandbox.IUserService.DoWork()
 	{
-		Spy.DoWork.RecordCall();
-		if (Spy.DoWork.GetCallback() is { } onCallCallback)
+		IUserService.DoWork.RecordCall();
+		if (IUserService.DoWork.OnCall is { } onCallCallback)
 		{ onCallCallback(this); return; }
 	}
 
 	string KnockOff.Sandbox.IUserService.GetGreeting(string name)
 	{
-		Spy.GetGreeting.RecordCall(name);
-		if (Spy.GetGreeting.GetCallback() is { } onCallCallback)
+		IUserService.GetGreeting.RecordCall(name);
+		if (IUserService.GetGreeting.OnCall is { } onCallCallback)
 			return onCallCallback(this, name);
 		return GetGreeting(name);
 	}
 
 	void KnockOff.Sandbox.IUserService.Process(string id, int count, bool urgent)
 	{
-		Spy.Process.RecordCall(id, count, urgent);
-		if (Spy.Process.GetCallback() is { } onCallCallback)
+		IUserService.Process.RecordCall(id, count, urgent);
+		if (IUserService.Process.OnCall is { } onCallCallback)
 		{ onCallCallback(this, id, count, urgent); return; }
 	}
 

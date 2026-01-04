@@ -60,25 +60,25 @@ public partial class AsyncRepositoryKnockOff : IAsyncRepository
 
 ```csharp
 // Task (void equivalent)
-knockOff.Spy.InitializeAsync.OnCall((ko) =>
+knockOff.IAsyncRepository.InitializeAsync.OnCall = (ko) =>
 {
     // Custom logic
     return Task.CompletedTask;
-});
+};
 
 // Task<T>
-knockOff.Spy.GetByIdAsync.OnCall((ko, id) =>
-    Task.FromResult<User?>(new User { Id = id, Name = "Mocked" }));
+knockOff.IAsyncRepository.GetByIdAsync.OnCall = (ko, id) =>
+    Task.FromResult<User?>(new User { Id = id, Name = "Mocked" });
 ```
 
 ### ValueTask Methods
 
 ```csharp
 // ValueTask (void equivalent)
-knockOff.Spy.DoWorkAsync.OnCall((ko) => default(ValueTask));
+knockOff.IAsyncService.DoWorkAsync.OnCall = (ko) => default(ValueTask);
 
 // ValueTask<T>
-knockOff.Spy.CountAsync.OnCall((ko) => new ValueTask<int>(100));
+knockOff.IAsyncRepository.CountAsync.OnCall = (ko) => new ValueTask<int>(100);
 ```
 
 ## Tracking
@@ -90,10 +90,10 @@ await repo.GetByIdAsync(1);
 await repo.GetByIdAsync(2);
 await repo.GetByIdAsync(3);
 
-Assert.Equal(3, knockOff.Spy.GetByIdAsync.CallCount);
-Assert.Equal(3, knockOff.Spy.GetByIdAsync.LastCallArg);
+Assert.Equal(3, knockOff.IAsyncRepository.GetByIdAsync.CallCount);
+Assert.Equal(3, knockOff.IAsyncRepository.GetByIdAsync.LastCallArg);
 
-var allIds = knockOff.Spy.GetByIdAsync.AllCalls;  // [1, 2, 3]
+var allIds = knockOff.IAsyncRepository.GetByIdAsync.AllCalls;  // [1, 2, 3]
 ```
 
 ## Common Patterns
@@ -101,11 +101,11 @@ var allIds = knockOff.Spy.GetByIdAsync.AllCalls;  // [1, 2, 3]
 ### Simulating Delays
 
 ```csharp
-knockOff.Spy.GetByIdAsync.OnCall(async (ko, id) =>
+knockOff.IAsyncRepository.GetByIdAsync.OnCall = async (ko, id) =>
 {
     await Task.Delay(100);  // Simulate network latency
     return new User { Id = id };
-});
+};
 ```
 
 Note: This requires the callback to be `async`.
@@ -114,26 +114,26 @@ Note: This requires the callback to be `async`.
 
 ```csharp
 // Faulted task
-knockOff.Spy.SaveAsync.OnCall((ko, entity) =>
-    Task.FromException<int>(new DbException("Connection lost")));
+knockOff.IAsyncRepository.SaveAsync.OnCall = (ko, entity) =>
+    Task.FromException<int>(new DbException("Connection lost"));
 
 // Or throw directly in callback
-knockOff.Spy.SaveAsync.OnCall((ko, entity) =>
+knockOff.IAsyncRepository.SaveAsync.OnCall = (ko, entity) =>
 {
     throw new DbException("Connection lost");
-});
+};
 ```
 
 ### Conditional Async Behavior
 
 ```csharp
-knockOff.Spy.GetByIdAsync.OnCall((ko, id) =>
+knockOff.IAsyncRepository.GetByIdAsync.OnCall = (ko, id) =>
 {
     if (id <= 0)
         return Task.FromException<User?>(new ArgumentException("Invalid ID"));
 
     return Task.FromResult<User?>(new User { Id = id });
-});
+};
 ```
 
 ### Cancellation Support
@@ -146,11 +146,11 @@ public interface IService
     Task<Data> FetchAsync(int id, CancellationToken ct);
 }
 
-knockOff.Spy.FetchAsync.OnCall((ko, id, ct) =>
+knockOff.IService.FetchAsync.OnCall = (ko, id, ct) =>
 {
     ct.ThrowIfCancellationRequested();
     return Task.FromResult(new Data { Id = id });
-});
+};
 ```
 
 ### Sequential Async Returns
@@ -162,8 +162,8 @@ var results = new Queue<User?>([
     null  // Then not found
 ]);
 
-knockOff.Spy.GetByIdAsync.OnCall((ko, id) =>
-    Task.FromResult(results.Dequeue()));
+knockOff.IAsyncRepository.GetByIdAsync.OnCall = (ko, id) =>
+    Task.FromResult(results.Dequeue());
 ```
 
 ### Verifying Async Call Order
@@ -171,17 +171,17 @@ knockOff.Spy.GetByIdAsync.OnCall((ko, id) =>
 ```csharp
 var order = new List<string>();
 
-knockOff.Spy.StartAsync.OnCall((ko) =>
+knockOff.IAsyncService.StartAsync.OnCall = (ko) =>
 {
     order.Add("Start");
     return Task.CompletedTask;
-});
+};
 
-knockOff.Spy.ProcessAsync.OnCall((ko) =>
+knockOff.IAsyncService.ProcessAsync.OnCall = (ko) =>
 {
     order.Add("Process");
     return Task.CompletedTask;
-});
+};
 
 await service.StartAsync();
 await service.ProcessAsync();
@@ -195,12 +195,12 @@ Assert.Equal(["Start", "Process"], order);
 
 ```csharp
 // ValueTask<T> - synchronous completion
-knockOff.Spy.GetCachedAsync.OnCall((ko, key) =>
-    new ValueTask<string?>(cache.GetOrDefault(key)));
+knockOff.ICache.GetCachedAsync.OnCall = (ko, key) =>
+    new ValueTask<string?>(cache.GetOrDefault(key));
 
 // Task<T> - async completion
-knockOff.Spy.FetchRemoteAsync.OnCall((ko, key) =>
-    Task.FromResult(remoteData[key]));
+knockOff.IRemoteService.FetchRemoteAsync.OnCall = (ko, key) =>
+    Task.FromResult(remoteData[key]);
 ```
 
 ## Reset
@@ -209,8 +209,8 @@ Reset works the same for async methods:
 
 ```csharp
 await repo.GetByIdAsync(1);
-knockOff.Spy.GetByIdAsync.Reset();
+knockOff.IAsyncRepository.GetByIdAsync.Reset();
 
-Assert.Equal(0, knockOff.Spy.GetByIdAsync.CallCount);
-Assert.Null(knockOff.Spy.GetByIdAsync.OnCall);
+Assert.Equal(0, knockOff.IAsyncRepository.GetByIdAsync.CallCount);
+Assert.Null(knockOff.IAsyncRepository.GetByIdAsync.OnCall);
 ```

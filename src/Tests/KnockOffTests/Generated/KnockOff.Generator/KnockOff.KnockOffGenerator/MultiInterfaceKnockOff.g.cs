@@ -5,8 +5,8 @@ namespace KnockOff.Tests;
 
 partial class MultiInterfaceKnockOff
 {
-	/// <summary>Tracks and configures behavior for Name.</summary>
-	public sealed class NameHandler
+	/// <summary>Tracks and configures behavior for ILogger.Name.</summary>
+	public sealed class ILogger_NameHandler
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -33,13 +33,11 @@ partial class MultiInterfaceKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for Log.</summary>
-	public sealed class LogHandler
+	/// <summary>Tracks and configures behavior for ILogger.Log.</summary>
+	public sealed class ILogger_LogHandler
 	{
 		/// <summary>Delegate for Log(string message).</summary>
 		public delegate void LogDelegate(MultiInterfaceKnockOff ko, string message);
-
-		private LogDelegate? _onCall;
 
 		private readonly global::System.Collections.Generic.List<string> _calls = new();
 
@@ -55,25 +53,46 @@ partial class MultiInterfaceKnockOff
 		/// <summary>All recorded calls with their arguments.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<string> AllCalls => _calls;
 
-		/// <summary>Sets callback for Log(message) overload.</summary>
-		public void OnCall(LogDelegate callback) => _onCall = callback;
-
-		internal LogDelegate? GetCallback() => _onCall;
+		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		public LogDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall(string message) => _calls.Add(message);
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); _onCall = null; }
+		public void Reset() { _calls.Clear(); OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for Notify.</summary>
-	public sealed class NotifyHandler
+	/// <summary>Spy for KnockOff.Tests.ILogger - tracks invocations and configures behavior.</summary>
+	public sealed class ILoggerSpy
+	{
+		/// <summary>Handler for Name.</summary>
+		public ILogger_NameHandler Name { get; } = new();
+		/// <summary>Handler for Log.</summary>
+		public ILogger_LogHandler Log { get; } = new();
+	}
+
+	/// <summary>Tracks and configures behavior for INotifier.Name.</summary>
+	public sealed class INotifier_NameHandler
+	{
+		/// <summary>Number of times the getter was accessed.</summary>
+		public int GetCount { get; private set; }
+
+		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
+		public global::System.Func<MultiInterfaceKnockOff, string>? OnGet { get; set; }
+
+		/// <summary>Records a getter access.</summary>
+		public void RecordGet() => GetCount++;
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { GetCount = 0; OnGet = null; }
+	}
+
+	/// <summary>Tracks and configures behavior for INotifier.Notify.</summary>
+	public sealed class INotifier_NotifyHandler
 	{
 		/// <summary>Delegate for Notify(string recipient).</summary>
 		public delegate void NotifyDelegate(MultiInterfaceKnockOff ko, string recipient);
-
-		private NotifyDelegate? _onCall;
 
 		private readonly global::System.Collections.Generic.List<string> _calls = new();
 
@@ -89,31 +108,30 @@ partial class MultiInterfaceKnockOff
 		/// <summary>All recorded calls with their arguments.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<string> AllCalls => _calls;
 
-		/// <summary>Sets callback for Notify(recipient) overload.</summary>
-		public void OnCall(NotifyDelegate callback) => _onCall = callback;
-
-		internal NotifyDelegate? GetCallback() => _onCall;
+		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		public NotifyDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall(string recipient) => _calls.Add(recipient);
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); _onCall = null; }
+		public void Reset() { _calls.Clear(); OnCall = null; }
 	}
 
-	/// <summary>Spy for MultiInterfaceKnockOff - tracks invocations and configures behavior.</summary>
-	public sealed class MultiInterfaceKnockOffSpy
+	/// <summary>Spy for KnockOff.Tests.INotifier - tracks invocations and configures behavior.</summary>
+	public sealed class INotifierSpy
 	{
 		/// <summary>Handler for Name.</summary>
-		public NameHandler Name { get; } = new();
-		/// <summary>Handler for Log.</summary>
-		public LogHandler Log { get; } = new();
+		public INotifier_NameHandler Name { get; } = new();
 		/// <summary>Handler for Notify.</summary>
-		public NotifyHandler Notify { get; } = new();
+		public INotifier_NotifyHandler Notify { get; } = new();
 	}
 
-	/// <summary>Tracks invocations and configures behavior for all interface members.</summary>
-	public MultiInterfaceKnockOffSpy Spy { get; } = new();
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.ILogger.</summary>
+	public ILoggerSpy ILogger { get; } = new();
+
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.INotifier.</summary>
+	public INotifierSpy INotifier { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.ILogger.</summary>
 	public KnockOff.Tests.ILogger AsLogger() => this;
@@ -121,13 +139,16 @@ partial class MultiInterfaceKnockOff
 	/// <summary>Returns this instance as KnockOff.Tests.INotifier.</summary>
 	public KnockOff.Tests.INotifier AsNotifier() => this;
 
-	/// <summary>Backing field for Name.</summary>
-	protected string NameBacking { get; set; } = "";
+	/// <summary>Backing field for ILogger.Name.</summary>
+	protected string ILogger_NameBacking { get; set; } = "";
+
+	/// <summary>Backing field for INotifier.Name.</summary>
+	protected string INotifier_NameBacking { get; set; } = "";
 
 	void KnockOff.Tests.ILogger.Log(string message)
 	{
-		Spy.Log.RecordCall(message);
-		if (Spy.Log.GetCallback() is { } onCallCallback)
+		ILogger.Log.RecordCall(message);
+		if (ILogger.Log.OnCall is { } onCallCallback)
 		{ onCallCallback(this, message); return; }
 	}
 
@@ -135,25 +156,25 @@ partial class MultiInterfaceKnockOff
 	{
 		get
 		{
-			Spy.Name.RecordGet();
-			if (Spy.Name.OnGet is { } onGetCallback)
+			ILogger.Name.RecordGet();
+			if (ILogger.Name.OnGet is { } onGetCallback)
 				return onGetCallback(this);
-			return NameBacking;
+			return ILogger_NameBacking;
 		}
 		set
 		{
-			Spy.Name.RecordSet(value);
-			if (Spy.Name.OnSet is { } onSetCallback)
+			ILogger.Name.RecordSet(value);
+			if (ILogger.Name.OnSet is { } onSetCallback)
 				onSetCallback(this, value);
 			else
-				NameBacking = value;
+				ILogger_NameBacking = value;
 		}
 	}
 
 	void KnockOff.Tests.INotifier.Notify(string recipient)
 	{
-		Spy.Notify.RecordCall(recipient);
-		if (Spy.Notify.GetCallback() is { } onCallCallback)
+		INotifier.Notify.RecordCall(recipient);
+		if (INotifier.Notify.OnCall is { } onCallCallback)
 		{ onCallCallback(this, recipient); return; }
 	}
 
@@ -161,10 +182,10 @@ partial class MultiInterfaceKnockOff
 	{
 		get
 		{
-			Spy.Name.RecordGet();
-			if (Spy.Name.OnGet is { } onGetCallback)
+			INotifier.Name.RecordGet();
+			if (INotifier.Name.OnGet is { } onGetCallback)
 				return onGetCallback(this);
-			return NameBacking;
+			return INotifier_NameBacking;
 		}
 	}
 

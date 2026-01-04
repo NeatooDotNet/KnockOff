@@ -5,13 +5,11 @@ namespace KnockOff.Tests;
 
 partial class UserRepositoryKnockOff
 {
-	/// <summary>Tracks and configures behavior for GetById.</summary>
-	public sealed class GetByIdHandler
+	/// <summary>Tracks and configures behavior for IRepository_KnockOff_Tests_User.GetById.</summary>
+	public sealed class IRepository_KnockOff_Tests_User_GetByIdHandler
 	{
 		/// <summary>Delegate for GetById(int id).</summary>
 		public delegate global::KnockOff.Tests.User? GetByIdDelegate(UserRepositoryKnockOff ko, int id);
-
-		private GetByIdDelegate? _onCall;
 
 		private readonly global::System.Collections.Generic.List<int> _calls = new();
 
@@ -27,25 +25,21 @@ partial class UserRepositoryKnockOff
 		/// <summary>All recorded calls with their arguments.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<int> AllCalls => _calls;
 
-		/// <summary>Sets callback for GetById(id) overload.</summary>
-		public void OnCall(GetByIdDelegate callback) => _onCall = callback;
-
-		internal GetByIdDelegate? GetCallback() => _onCall;
+		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		public GetByIdDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall(int id) => _calls.Add(id);
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); _onCall = null; }
+		public void Reset() { _calls.Clear(); OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for Save.</summary>
-	public sealed class SaveHandler
+	/// <summary>Tracks and configures behavior for IRepository_KnockOff_Tests_User.Save.</summary>
+	public sealed class IRepository_KnockOff_Tests_User_SaveHandler
 	{
 		/// <summary>Delegate for Save(global::KnockOff.Tests.User entity).</summary>
 		public delegate void SaveDelegate(UserRepositoryKnockOff ko, global::KnockOff.Tests.User entity);
-
-		private SaveDelegate? _onCall;
 
 		private readonly global::System.Collections.Generic.List<global::KnockOff.Tests.User> _calls = new();
 
@@ -61,25 +55,21 @@ partial class UserRepositoryKnockOff
 		/// <summary>All recorded calls with their arguments.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<global::KnockOff.Tests.User> AllCalls => _calls;
 
-		/// <summary>Sets callback for Save(entity) overload.</summary>
-		public void OnCall(SaveDelegate callback) => _onCall = callback;
-
-		internal SaveDelegate? GetCallback() => _onCall;
+		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		public SaveDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall(global::KnockOff.Tests.User entity) => _calls.Add(entity);
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); _onCall = null; }
+		public void Reset() { _calls.Clear(); OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for GetByIdAsync.</summary>
-	public sealed class GetByIdAsyncHandler
+	/// <summary>Tracks and configures behavior for IRepository_KnockOff_Tests_User.GetByIdAsync.</summary>
+	public sealed class IRepository_KnockOff_Tests_User_GetByIdAsyncHandler
 	{
 		/// <summary>Delegate for GetByIdAsync(int id).</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> GetByIdAsyncDelegate(UserRepositoryKnockOff ko, int id);
-
-		private GetByIdAsyncDelegate? _onCall;
 
 		private readonly global::System.Collections.Generic.List<int> _calls = new();
 
@@ -95,54 +85,52 @@ partial class UserRepositoryKnockOff
 		/// <summary>All recorded calls with their arguments.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<int> AllCalls => _calls;
 
-		/// <summary>Sets callback for GetByIdAsync(id) overload.</summary>
-		public void OnCall(GetByIdAsyncDelegate callback) => _onCall = callback;
-
-		internal GetByIdAsyncDelegate? GetCallback() => _onCall;
+		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		public GetByIdAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall(int id) => _calls.Add(id);
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); _onCall = null; }
+		public void Reset() { _calls.Clear(); OnCall = null; }
 	}
 
-	/// <summary>Spy for UserRepositoryKnockOff - tracks invocations and configures behavior.</summary>
-	public sealed class UserRepositoryKnockOffSpy
+	/// <summary>Spy for KnockOff.Tests.IRepository<KnockOff.Tests.User> - tracks invocations and configures behavior.</summary>
+	public sealed class IRepository_KnockOff_Tests_UserSpy
 	{
 		/// <summary>Handler for GetById.</summary>
-		public GetByIdHandler GetById { get; } = new();
+		public IRepository_KnockOff_Tests_User_GetByIdHandler GetById { get; } = new();
 		/// <summary>Handler for Save.</summary>
-		public SaveHandler Save { get; } = new();
+		public IRepository_KnockOff_Tests_User_SaveHandler Save { get; } = new();
 		/// <summary>Handler for GetByIdAsync.</summary>
-		public GetByIdAsyncHandler GetByIdAsync { get; } = new();
+		public IRepository_KnockOff_Tests_User_GetByIdAsyncHandler GetByIdAsync { get; } = new();
 	}
 
-	/// <summary>Tracks invocations and configures behavior for all interface members.</summary>
-	public UserRepositoryKnockOffSpy Spy { get; } = new();
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IRepository<KnockOff.Tests.User>.</summary>
+	public IRepository_KnockOff_Tests_UserSpy IRepository_KnockOff_Tests_User { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IRepository<KnockOff.Tests.User>.</summary>
 	public KnockOff.Tests.IRepository<KnockOff.Tests.User> AsRepository() => this;
 
 	global::KnockOff.Tests.User? KnockOff.Tests.IRepository<KnockOff.Tests.User>.GetById(int id)
 	{
-		Spy.GetById.RecordCall(id);
-		if (Spy.GetById.GetCallback() is { } onCallCallback)
+		IRepository_KnockOff_Tests_User.GetById.RecordCall(id);
+		if (IRepository_KnockOff_Tests_User.GetById.OnCall is { } onCallCallback)
 			return onCallCallback(this, id);
 		return default!;
 	}
 
 	void KnockOff.Tests.IRepository<KnockOff.Tests.User>.Save(global::KnockOff.Tests.User entity)
 	{
-		Spy.Save.RecordCall(entity);
-		if (Spy.Save.GetCallback() is { } onCallCallback)
+		IRepository_KnockOff_Tests_User.Save.RecordCall(entity);
+		if (IRepository_KnockOff_Tests_User.Save.OnCall is { } onCallCallback)
 		{ onCallCallback(this, entity); return; }
 	}
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> KnockOff.Tests.IRepository<KnockOff.Tests.User>.GetByIdAsync(int id)
 	{
-		Spy.GetByIdAsync.RecordCall(id);
-		if (Spy.GetByIdAsync.GetCallback() is { } onCallCallback)
+		IRepository_KnockOff_Tests_User.GetByIdAsync.RecordCall(id);
+		if (IRepository_KnockOff_Tests_User.GetByIdAsync.OnCall is { } onCallCallback)
 			return onCallCallback(this, id);
 		return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.User?>(default!);
 	}

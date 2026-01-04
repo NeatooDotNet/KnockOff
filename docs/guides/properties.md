@@ -17,12 +17,12 @@ public partial class UserServiceKnockOff : IUserService { }
 ```
 
 Generated:
-- `NameBacking` — protected backing field
-- `Spy.Name.GetCount` — number of getter calls
-- `Spy.Name.SetCount` — number of setter calls
-- `Spy.Name.LastSetValue` — last value set
-- `Spy.Name.OnGet` — getter callback
-- `Spy.Name.OnSet` — setter callback
+- `IUserService_NameBacking` — protected backing field (interface-prefixed)
+- `IUserService.Name.GetCount` — number of getter calls
+- `IUserService.Name.SetCount` — number of setter calls
+- `IUserService.Name.LastSetValue` — last value set
+- `IUserService.Name.OnGet` — getter callback
+- `IUserService.Name.OnSet` — setter callback
 
 ### Get-Only Properties
 
@@ -40,10 +40,10 @@ For get-only properties:
 
 ```csharp
 var knockOff = new ConfigKnockOff();
-knockOff.ConnectionStringBacking = "Server=localhost";
+knockOff.IConfig_ConnectionStringBacking = "Server=localhost";
 
 // Or use callback
-knockOff.Spy.ConnectionString.OnGet = (ko) => "Server=test";
+knockOff.IConfig.ConnectionString.OnGet = (ko) => "Server=test";
 ```
 
 ### Set-Only Properties
@@ -70,7 +70,7 @@ _ = service.Name;
 _ = service.Name;
 _ = service.Name;
 
-Assert.Equal(3, knockOff.Spy.Name.GetCount);
+Assert.Equal(3, knockOff.IUserService.Name.GetCount);
 ```
 
 ### Set Tracking
@@ -80,8 +80,8 @@ service.Name = "First";
 service.Name = "Second";
 service.Name = "Third";
 
-Assert.Equal(3, knockOff.Spy.Name.SetCount);
-Assert.Equal("Third", knockOff.Spy.Name.LastSetValue);
+Assert.Equal(3, knockOff.IUserService.Name.SetCount);
+Assert.Equal("Third", knockOff.IUserService.Name.LastSetValue);
 ```
 
 ## Customization
@@ -105,7 +105,7 @@ Assert.Equal("Test", value);  // Read from backing
 Override getter behavior:
 
 ```csharp
-knockOff.Spy.Name.OnGet = (ko) => "Always This Value";
+knockOff.IUserService.Name.OnGet = (ko) => "Always This Value";
 
 var value = service.Name;
 Assert.Equal("Always This Value", value);
@@ -115,7 +115,7 @@ Dynamic values:
 
 ```csharp
 var counter = 0;
-knockOff.Spy.Name.OnGet = (ko) => $"Call-{++counter}";
+knockOff.IUserService.Name.OnGet = (ko) => $"Call-{++counter}";
 
 Assert.Equal("Call-1", service.Name);
 Assert.Equal("Call-2", service.Name);
@@ -127,7 +127,7 @@ Override setter behavior:
 
 ```csharp
 string? captured = null;
-knockOff.Spy.Name.OnSet = (ko, value) =>
+knockOff.IUserService.Name.OnSet = (ko, value) =>
 {
     captured = value;
     // Value does NOT go to backing field when OnSet is set
@@ -142,10 +142,10 @@ Assert.Equal("Test", captured);
 ### Conditional Logic
 
 ```csharp
-knockOff.Spy.IsConnected.OnGet = (ko) =>
+knockOff.IConnection.IsConnected.OnGet = (ko) =>
 {
-    // Check other Spy state
-    return ko.Spy.Connect.WasCalled;
+    // Check other handler state
+    return ko.IConnection.Connect.WasCalled;
 };
 ```
 
@@ -155,15 +155,15 @@ knockOff.Spy.IsConnected.OnGet = (ko) =>
 service.Name = "Value";
 _ = service.Name;
 
-knockOff.Spy.Name.Reset();
+knockOff.IUserService.Name.Reset();
 
-Assert.Equal(0, knockOff.Spy.Name.GetCount);
-Assert.Equal(0, knockOff.Spy.Name.SetCount);
-Assert.Null(knockOff.Spy.Name.OnGet);
-Assert.Null(knockOff.Spy.Name.OnSet);
+Assert.Equal(0, knockOff.IUserService.Name.GetCount);
+Assert.Equal(0, knockOff.IUserService.Name.SetCount);
+Assert.Null(knockOff.IUserService.Name.OnGet);
+Assert.Null(knockOff.IUserService.Name.OnSet);
 
 // Backing field is NOT cleared by Reset
-Assert.Equal("Value", knockOff.NameBacking);
+Assert.Equal("Value", knockOff.IUserService_NameBacking);
 ```
 
 ## Common Patterns
@@ -172,7 +172,7 @@ Assert.Equal("Value", knockOff.NameBacking);
 
 ```csharp
 var knockOff = new ConfigKnockOff();
-knockOff.ConnectionStringBacking = "Server=localhost;Database=test";
+knockOff.IConfig_ConnectionStringBacking = "Server=localhost;Database=test";
 
 IConfig config = knockOff;
 Assert.Equal("Server=localhost;Database=test", config.ConnectionString);
@@ -181,24 +181,24 @@ Assert.Equal("Server=localhost;Database=test", config.ConnectionString);
 ### Simulating Read-Only Computed Properties
 
 ```csharp
-knockOff.Spy.FullName.OnGet = (ko) =>
-    $"{ko.FirstNameBacking} {ko.LastNameBacking}";
+knockOff.IUser.FullName.OnGet = (ko) =>
+    $"{ko.IUser_FirstNameBacking} {ko.IUser_LastNameBacking}";
 ```
 
 ### Tracking Property Changes
 
 ```csharp
 var changes = new List<string>();
-knockOff.Spy.Status.OnSet = (ko, value) =>
+knockOff.IService.Status.OnSet = (ko, value) =>
 {
     changes.Add(value);
-    ko.StatusBacking = value;  // Still store it
+    ko.IService_StatusBacking = value;  // Still store it
 };
 ```
 
 ### Throwing on Access
 
 ```csharp
-knockOff.Spy.SecretKey.OnGet = (ko) =>
+knockOff.ISecrets.SecretKey.OnGet = (ko) =>
     throw new UnauthorizedAccessException("Access denied");
 ```

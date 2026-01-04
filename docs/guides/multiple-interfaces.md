@@ -1,6 +1,6 @@
 # Multiple Interfaces
 
-KnockOff supports implementing multiple interfaces in a single stub class.
+KnockOff supports implementing multiple interfaces in a single stub class. Each interface gets its own spy class with separate handlers.
 
 ## Basic Usage
 
@@ -14,11 +14,26 @@ public interface ILogger
 public interface INotifier
 {
     void Notify(string recipient);
-    string Name { get; }  // Same name, different accessor
+    string Name { get; }  // Same name as ILogger
 }
 
 [KnockOff]
 public partial class LoggerNotifierKnockOff : ILogger, INotifier { }
+```
+
+## Interface Spy Classes
+
+Each interface gets its own spy class and property:
+
+```csharp
+var knockOff = new LoggerNotifierKnockOff();
+
+// Each interface has its own spy class
+knockOff.ILogger.Log.CallCount;
+knockOff.ILogger.Name.GetCount;
+
+knockOff.INotifier.Notify.CallCount;
+knockOff.INotifier.Name.GetCount;
 ```
 
 ## AsXYZ() Helper Methods
@@ -37,31 +52,9 @@ ILogger logger2 = knockOff;
 INotifier notifier2 = knockOff;
 ```
 
-## Shared Members
+## Separate Tracking
 
-### Same Property Name
-
-When multiple interfaces have properties with the same name, they share a backing field:
-
-```csharp
-ILogger logger = knockOff;
-INotifier notifier = knockOff;
-
-// Set via ILogger (which has setter)
-logger.Name = "SharedValue";
-
-// Both interfaces see the same value
-Assert.Equal("SharedValue", logger.Name);
-Assert.Equal("SharedValue", notifier.Name);
-
-// Tracking accumulates from all interfaces
-Assert.Equal(2, knockOff.Spy.Name.GetCount);  // One get from each
-Assert.Equal(1, knockOff.Spy.Name.SetCount);
-```
-
-### Same Method Signature
-
-When multiple interfaces have methods with identical signatures, they share tracking:
+Each interface's members are tracked independently, even for same-named members:
 
 ```csharp
 public interface ILogger
@@ -71,7 +64,7 @@ public interface ILogger
 
 public interface IAuditor
 {
-    void Log(string message);  // Same signature
+    void Log(string message);  // Same name and signature
     void Audit(string action, int userId);
 }
 
@@ -89,48 +82,59 @@ IAuditor auditor = knockOff;
 logger.Log("from logger");
 auditor.Log("from auditor");
 
-// Shared handler tracks both calls
-Assert.Equal(2, knockOff.Spy.Log.CallCount);
-Assert.Equal("from auditor", knockOff.Spy.Log.LastCallArg);
+// Each interface tracks its own calls
+Assert.Equal(1, knockOff.ILogger.Log.CallCount);
+Assert.Equal("from logger", knockOff.ILogger.Log.LastCallArg);
 
-// AllCalls contains both
-Assert.Equal(2, knockOff.Spy.Log.AllCalls.Count);
-Assert.Equal("from logger", knockOff.Spy.Log.AllCalls[0]);
-Assert.Equal("from auditor", knockOff.Spy.Log.AllCalls[1]);
+Assert.Equal(1, knockOff.IAuditor.Log.CallCount);
+Assert.Equal("from auditor", knockOff.IAuditor.Log.LastCallArg);
+
+// Audit is only on IAuditor
+Assert.Equal(0, knockOff.IAuditor.Audit.CallCount);
 ```
 
-## Distinct Members
+## Separate Backing Fields
 
-Unique members from each interface get their own handlers:
+Each interface gets its own backing fields:
 
 ```csharp
-logger.Log("message");
-auditor.Audit("delete", 42);
+ILogger logger = knockOff;
+INotifier notifier = knockOff;
 
-Assert.True(knockOff.Spy.Log.WasCalled);
-Assert.True(knockOff.Spy.Audit.WasCalled);
+// Each interface has its own backing
+logger.Name = "LoggerValue";
 
-var auditArgs = knockOff.Spy.Audit.LastCallArgs;
-Assert.Equal("delete", auditArgs?.action);
-Assert.Equal(42, auditArgs?.userId);
+// INotifier.Name has a separate backing
+Assert.Equal("LoggerValue", knockOff.ILogger_NameBacking);
+Assert.Equal("", knockOff.INotifier_NameBacking);  // Still default
+
+// Access via interface uses its own backing
+Assert.Equal("LoggerValue", logger.Name);
+Assert.Equal("", notifier.Name);  // Different value!
 ```
 
 ## Callbacks
 
-Set callbacks for any member regardless of which interface defines it:
+Set callbacks using the interface spy class:
 
 ```csharp
-// Shared member
-knockOff.Spy.Log.OnCall((ko, message) =>
+// ILogger.Log callback
+knockOff.ILogger.Log.OnCall = (ko, message) =>
 {
-    Console.WriteLine($"[Log] {message}");
-});
+    Console.WriteLine($"[Logger] {message}");
+};
 
-// IAuditor-specific member
-knockOff.Spy.Audit.OnCall((ko, action, userId) =>
+// IAuditor.Log callback (separate from ILogger.Log)
+knockOff.IAuditor.Log.OnCall = (ko, message) =>
+{
+    Console.WriteLine($"[Auditor] {message}");
+};
+
+// IAuditor.Audit callback
+knockOff.IAuditor.Audit.OnCall = (ko, action, userId) =>
 {
     Console.WriteLine($"[Audit] {action} by user {userId}");
-});
+};
 ```
 
 ## Common Patterns
@@ -155,8 +159,8 @@ public partial class DataContextKnockOff : IRepository, IUnitOfWork { }
 // Usage
 var knockOff = new DataContextKnockOff();
 
-knockOff.Spy.SaveChangesAsync.OnCall((ko, ct) =>
-    Task.FromResult(ko.Spy.Add.CallCount));  // Return count of adds
+knockOff.IUnitOfWork.SaveChangesAsync.OnCall = (ko, ct) =>
+    Task.FromResult(ko.IRepository.Add.CallCount);  // Return count of adds
 
 IRepository repo = knockOff.AsRepository();
 IUnitOfWork uow = knockOff.AsUnitOfWork();
@@ -185,10 +189,10 @@ public interface IDisposable
 public partial class DisposableLoggerKnockOff : ILogger, IDisposable { }
 
 // Verify cleanup
-knockOff.Spy.Dispose.OnCall((ko) =>
+knockOff.IDisposable.Dispose.OnCall = (ko) =>
 {
-    Assert.True(ko.Spy.Log.WasCalled, "Should log before disposing");
-});
+    Assert.True(ko.ILogger.Log.WasCalled, "Should log before disposing");
+};
 ```
 
 ### Multiple Repositories
@@ -207,14 +211,14 @@ public interface IOrderRepository
 [KnockOff]
 public partial class CompositeRepositoryKnockOff : IUserRepository, IOrderRepository { }
 
-// Configure each independently
-knockOff.Spy.GetUser.OnCall((ko, id) => new User { Id = id });
-knockOff.Spy.GetOrder.OnCall((ko, id) => new Order { Id = id });
+// Configure each interface independently
+knockOff.IUserRepository.GetUser.OnCall = (ko, id) => new User { Id = id };
+knockOff.IOrderRepository.GetOrder.OnCall = (ko, id) => new Order { Id = id };
 ```
 
-## Conflicting Signatures
+## Same-Named Members
 
-If interfaces have members with the same name but **different** signatures, both are tracked separately:
+When interfaces have members with the same name (even with identical signatures), each interface gets its own handler:
 
 ```csharp
 public interface IStringProcessor
@@ -224,11 +228,23 @@ public interface IStringProcessor
 
 public interface IIntProcessor
 {
-    void Process(int input);
+    void Process(int input);  // Different parameter type
 }
 
 [KnockOff]
 public partial class DualProcessorKnockOff : IStringProcessor, IIntProcessor { }
 ```
 
-Each gets its own handler because the signatures differ.
+Each interface has its own handler accessed via its spy class:
+
+```csharp
+knockOff.IStringProcessor.Process.OnCall = (ko, input) =>
+    Console.WriteLine($"String: {input}");
+
+knockOff.IIntProcessor.Process.OnCall = (ko, input) =>
+    Console.WriteLine($"Int: {input}");
+
+// Track separately
+Assert.Equal(1, knockOff.IStringProcessor.Process.CallCount);
+Assert.Equal(1, knockOff.IIntProcessor.Process.CallCount);
+```

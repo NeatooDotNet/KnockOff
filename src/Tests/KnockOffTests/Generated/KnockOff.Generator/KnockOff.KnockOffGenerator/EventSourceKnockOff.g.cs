@@ -5,8 +5,8 @@ namespace KnockOff.Tests;
 
 partial class EventSourceKnockOff
 {
-	/// <summary>Tracks and raises MessageReceived.</summary>
-	public sealed class MessageReceivedHandler
+	/// <summary>Tracks and raises IEventSource.MessageReceived.</summary>
+	public sealed class IEventSource_MessageReceivedHandler
 	{
 		private global::System.EventHandler<string>? _handler;
 		private readonly global::System.Collections.Generic.List<(object? sender, string e)> _raises = new();
@@ -61,8 +61,8 @@ partial class EventSourceKnockOff
 		public void Clear() { _handler = null; Reset(); }
 	}
 
-	/// <summary>Tracks and raises OnCompleted.</summary>
-	public sealed class OnCompletedHandler
+	/// <summary>Tracks and raises IEventSource.OnCompleted.</summary>
+	public sealed class IEventSource_OnCompletedHandler
 	{
 		private global::System.EventHandler? _handler;
 		private readonly global::System.Collections.Generic.List<(object? sender, global::System.EventArgs e)> _raises = new();
@@ -117,8 +117,8 @@ partial class EventSourceKnockOff
 		public void Clear() { _handler = null; Reset(); }
 	}
 
-	/// <summary>Tracks and raises OnProgress.</summary>
-	public sealed class OnProgressHandler
+	/// <summary>Tracks and raises IEventSource.OnProgress.</summary>
+	public sealed class IEventSource_OnProgressHandler
 	{
 		private global::System.Action<int>? _handler;
 		private readonly global::System.Collections.Generic.List<int> _raises = new();
@@ -170,8 +170,8 @@ partial class EventSourceKnockOff
 		public void Clear() { _handler = null; Reset(); }
 	}
 
-	/// <summary>Tracks and raises OnData.</summary>
-	public sealed class OnDataHandler
+	/// <summary>Tracks and raises IEventSource.OnData.</summary>
+	public sealed class IEventSource_OnDataHandler
 	{
 		private global::System.Action<string, int>? _handler;
 		private readonly global::System.Collections.Generic.List<(string arg1, int arg2)> _raises = new();
@@ -223,47 +223,47 @@ partial class EventSourceKnockOff
 		public void Clear() { _handler = null; Reset(); }
 	}
 
-	/// <summary>Spy for EventSourceKnockOff - tracks invocations and configures behavior.</summary>
-	public sealed class EventSourceKnockOffSpy
+	/// <summary>Spy for KnockOff.Tests.IEventSource - tracks invocations and configures behavior.</summary>
+	public sealed class IEventSourceSpy
 	{
 		/// <summary>Handler for MessageReceived event.</summary>
-		public MessageReceivedHandler MessageReceived { get; } = new();
+		public IEventSource_MessageReceivedHandler MessageReceived { get; } = new();
 		/// <summary>Handler for OnCompleted event.</summary>
-		public OnCompletedHandler OnCompleted { get; } = new();
+		public IEventSource_OnCompletedHandler OnCompleted { get; } = new();
 		/// <summary>Handler for OnProgress event.</summary>
-		public OnProgressHandler OnProgress { get; } = new();
+		public IEventSource_OnProgressHandler OnProgress { get; } = new();
 		/// <summary>Handler for OnData event.</summary>
-		public OnDataHandler OnData { get; } = new();
+		public IEventSource_OnDataHandler OnData { get; } = new();
 	}
 
-	/// <summary>Tracks invocations and configures behavior for all interface members.</summary>
-	public EventSourceKnockOffSpy Spy { get; } = new();
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IEventSource.</summary>
+	public IEventSourceSpy IEventSource { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IEventSource.</summary>
 	public KnockOff.Tests.IEventSource AsEventSource() => this;
 
 	event global::System.EventHandler<string> KnockOff.Tests.IEventSource.MessageReceived
 	{
-		add => Spy.MessageReceived.Add(value);
-		remove => Spy.MessageReceived.Remove(value);
+		add => IEventSource.MessageReceived.Add(value);
+		remove => IEventSource.MessageReceived.Remove(value);
 	}
 
 	event global::System.EventHandler KnockOff.Tests.IEventSource.OnCompleted
 	{
-		add => Spy.OnCompleted.Add(value);
-		remove => Spy.OnCompleted.Remove(value);
+		add => IEventSource.OnCompleted.Add(value);
+		remove => IEventSource.OnCompleted.Remove(value);
 	}
 
 	event global::System.Action<int> KnockOff.Tests.IEventSource.OnProgress
 	{
-		add => Spy.OnProgress.Add(value);
-		remove => Spy.OnProgress.Remove(value);
+		add => IEventSource.OnProgress.Add(value);
+		remove => IEventSource.OnProgress.Remove(value);
 	}
 
 	event global::System.Action<string, int> KnockOff.Tests.IEventSource.OnData
 	{
-		add => Spy.OnData.Add(value);
-		remove => Spy.OnData.Remove(value);
+		add => IEventSource.OnData.Add(value);
+		remove => IEventSource.OnData.Remove(value);
 	}
 
 }

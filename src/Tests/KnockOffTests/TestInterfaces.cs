@@ -217,3 +217,61 @@ public partial class RefParameterServiceKnockOff : IRefParameterService
 }
 
 #endregion
+
+#region Conflicting Signature Test Types
+
+/// <summary>
+/// Interface with GetData returning string based on int id.
+/// </summary>
+public interface IDataProvider
+{
+	string GetData(int id);
+	int Count { get; }
+}
+
+/// <summary>
+/// Interface with GetData returning int based on string key.
+/// Different signature and return type than IDataProvider.GetData.
+/// </summary>
+public interface IKeyLookup
+{
+	int GetData(string key);
+	int Count { get; set; }
+}
+
+/// <summary>
+/// Tests the original bug: conflicting method signatures across interfaces.
+/// Before the fix, this would fail because GetData couldn't have two different
+/// handler types in a single Spy class.
+/// </summary>
+[KnockOff]
+public partial class ConflictingSignatureKnockOff : IDataProvider, IKeyLookup
+{
+	protected string GetData(int id) => $"Data-{id}";
+	protected int GetData(string key) => key.Length;
+}
+
+#endregion
+
+#region Spy Property Collision Test Types
+
+/// <summary>
+/// Interface with a property named the same as the interface.
+/// Tests spy property naming collision detection.
+/// </summary>
+public interface ICollision
+{
+	string ICollision { get; set; }
+	void DoWork();
+}
+
+/// <summary>
+/// The generated spy property "ICollision" would collide with the member "ICollision".
+/// Generator should detect this and use a different name (e.g., "ICollision_").
+/// </summary>
+[KnockOff]
+public partial class CollisionKnockOff : ICollision
+{
+}
+
+#endregion

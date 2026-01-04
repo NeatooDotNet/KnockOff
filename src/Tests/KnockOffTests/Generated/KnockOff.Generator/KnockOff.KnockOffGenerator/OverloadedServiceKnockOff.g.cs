@@ -5,19 +5,13 @@ namespace KnockOff.Tests;
 
 partial class OverloadedServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for GetByIdAsync.</summary>
-	public sealed class GetByIdAsyncHandler
+	/// <summary>Tracks and configures behavior for IOverloadedService.GetByIdAsync1.</summary>
+	public sealed class IOverloadedService_GetByIdAsync1Handler
 	{
 		/// <summary>Delegate for GetByIdAsync(int id).</summary>
-		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> GetByIdAsyncDelegate0(OverloadedServiceKnockOff ko, int id);
+		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> GetByIdAsyncDelegate(OverloadedServiceKnockOff ko, int id);
 
-		/// <summary>Delegate for GetByIdAsync(int id, global::System.Threading.CancellationToken cancellationToken).</summary>
-		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> GetByIdAsyncDelegate1(OverloadedServiceKnockOff ko, int id, global::System.Threading.CancellationToken cancellationToken);
-
-		private GetByIdAsyncDelegate0? _onCall0;
-		private GetByIdAsyncDelegate1? _onCall1;
-
-		private readonly global::System.Collections.Generic.List<(int id, global::System.Threading.CancellationToken? cancellationToken)> _calls = new();
+		private readonly global::System.Collections.Generic.List<int> _calls = new();
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount => _calls.Count;
@@ -25,47 +19,59 @@ partial class OverloadedServiceKnockOff
 		/// <summary>True if this method was called at least once.</summary>
 		public bool WasCalled => _calls.Count > 0;
 
-		/// <summary>Arguments from the most recent call (nullable for params not in all overloads).</summary>
-		public (int id, global::System.Threading.CancellationToken? cancellationToken)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
+		/// <summary>The 'id' argument from the most recent call.</summary>
+		public int? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
 
 		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(int id, global::System.Threading.CancellationToken? cancellationToken)> AllCalls => _calls;
+		public global::System.Collections.Generic.IReadOnlyList<int> AllCalls => _calls;
 
-		/// <summary>Sets callback for GetByIdAsync(id) overload.</summary>
-		public void OnCall(GetByIdAsyncDelegate0 callback) => _onCall0 = callback;
-
-		/// <summary>Sets callback for GetByIdAsync(id, cancellationToken) overload.</summary>
-		public void OnCall(GetByIdAsyncDelegate1 callback) => _onCall1 = callback;
-
-		internal GetByIdAsyncDelegate0? GetCallback0() => _onCall0;
-		internal GetByIdAsyncDelegate1? GetCallback1() => _onCall1;
+		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		public GetByIdAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) => _calls.Add((id, default));
+		public void RecordCall(int id) => _calls.Add(id);
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { _calls.Clear(); OnCall = null; }
+	}
+
+	/// <summary>Tracks and configures behavior for IOverloadedService.GetByIdAsync2.</summary>
+	public sealed class IOverloadedService_GetByIdAsync2Handler
+	{
+		/// <summary>Delegate for GetByIdAsync(int id, global::System.Threading.CancellationToken cancellationToken).</summary>
+		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> GetByIdAsyncDelegate(OverloadedServiceKnockOff ko, int id, global::System.Threading.CancellationToken cancellationToken);
+
+		private readonly global::System.Collections.Generic.List<(int id, global::System.Threading.CancellationToken cancellationToken)> _calls = new();
+
+		/// <summary>Number of times this method was called.</summary>
+		public int CallCount => _calls.Count;
+
+		/// <summary>True if this method was called at least once.</summary>
+		public bool WasCalled => _calls.Count > 0;
+
+		/// <summary>Arguments from the most recent call.</summary>
+		public (int id, global::System.Threading.CancellationToken cancellationToken)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
+
+		/// <summary>All recorded calls with their arguments.</summary>
+		public global::System.Collections.Generic.IReadOnlyList<(int id, global::System.Threading.CancellationToken cancellationToken)> AllCalls => _calls;
+
+		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		public GetByIdAsyncDelegate? OnCall { get; set; }
+
 		/// <summary>Records a method call.</summary>
 		public void RecordCall(int id, global::System.Threading.CancellationToken cancellationToken) => _calls.Add((id, cancellationToken));
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); _onCall0 = null; _onCall1 = null; }
+		public void Reset() { _calls.Clear(); OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for Process.</summary>
-	public sealed class ProcessHandler
+	/// <summary>Tracks and configures behavior for IOverloadedService.Process1.</summary>
+	public sealed class IOverloadedService_Process1Handler
 	{
 		/// <summary>Delegate for Process(string data).</summary>
-		public delegate void ProcessDelegate0(OverloadedServiceKnockOff ko, string data);
+		public delegate void ProcessDelegate(OverloadedServiceKnockOff ko, string data);
 
-		/// <summary>Delegate for Process(string data, int priority).</summary>
-		public delegate void ProcessDelegate1(OverloadedServiceKnockOff ko, string data, int priority);
-
-		/// <summary>Delegate for Process(string data, int priority, bool async).</summary>
-		public delegate void ProcessDelegate2(OverloadedServiceKnockOff ko, string data, int priority, bool async);
-
-		private ProcessDelegate0? _onCall0;
-		private ProcessDelegate1? _onCall1;
-		private ProcessDelegate2? _onCall2;
-
-		private readonly global::System.Collections.Generic.List<(string data, int? priority, bool? async)> _calls = new();
+		private readonly global::System.Collections.Generic.List<string> _calls = new();
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount => _calls.Count;
@@ -73,49 +79,89 @@ partial class OverloadedServiceKnockOff
 		/// <summary>True if this method was called at least once.</summary>
 		public bool WasCalled => _calls.Count > 0;
 
-		/// <summary>Arguments from the most recent call (nullable for params not in all overloads).</summary>
-		public (string data, int? priority, bool? async)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
+		/// <summary>The 'data' argument from the most recent call.</summary>
+		public string? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
 
 		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(string data, int? priority, bool? async)> AllCalls => _calls;
+		public global::System.Collections.Generic.IReadOnlyList<string> AllCalls => _calls;
 
-		/// <summary>Sets callback for Process(data) overload.</summary>
-		public void OnCall(ProcessDelegate0 callback) => _onCall0 = callback;
-
-		/// <summary>Sets callback for Process(data, priority) overload.</summary>
-		public void OnCall(ProcessDelegate1 callback) => _onCall1 = callback;
-
-		/// <summary>Sets callback for Process(data, priority, async) overload.</summary>
-		public void OnCall(ProcessDelegate2 callback) => _onCall2 = callback;
-
-		internal ProcessDelegate0? GetCallback0() => _onCall0;
-		internal ProcessDelegate1? GetCallback1() => _onCall1;
-		internal ProcessDelegate2? GetCallback2() => _onCall2;
+		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		public ProcessDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string data) => _calls.Add((data, default, default));
+		public void RecordCall(string data) => _calls.Add(data);
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { _calls.Clear(); OnCall = null; }
+	}
+
+	/// <summary>Tracks and configures behavior for IOverloadedService.Process2.</summary>
+	public sealed class IOverloadedService_Process2Handler
+	{
+		/// <summary>Delegate for Process(string data, int priority).</summary>
+		public delegate void ProcessDelegate(OverloadedServiceKnockOff ko, string data, int priority);
+
+		private readonly global::System.Collections.Generic.List<(string data, int priority)> _calls = new();
+
+		/// <summary>Number of times this method was called.</summary>
+		public int CallCount => _calls.Count;
+
+		/// <summary>True if this method was called at least once.</summary>
+		public bool WasCalled => _calls.Count > 0;
+
+		/// <summary>Arguments from the most recent call.</summary>
+		public (string data, int priority)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
+
+		/// <summary>All recorded calls with their arguments.</summary>
+		public global::System.Collections.Generic.IReadOnlyList<(string data, int priority)> AllCalls => _calls;
+
+		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		public ProcessDelegate? OnCall { get; set; }
+
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string data, int priority) => _calls.Add((data, priority, default));
+		public void RecordCall(string data, int priority) => _calls.Add((data, priority));
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { _calls.Clear(); OnCall = null; }
+	}
+
+	/// <summary>Tracks and configures behavior for IOverloadedService.Process3.</summary>
+	public sealed class IOverloadedService_Process3Handler
+	{
+		/// <summary>Delegate for Process(string data, int priority, bool async).</summary>
+		public delegate void ProcessDelegate(OverloadedServiceKnockOff ko, string data, int priority, bool async);
+
+		private readonly global::System.Collections.Generic.List<(string data, int priority, bool async)> _calls = new();
+
+		/// <summary>Number of times this method was called.</summary>
+		public int CallCount => _calls.Count;
+
+		/// <summary>True if this method was called at least once.</summary>
+		public bool WasCalled => _calls.Count > 0;
+
+		/// <summary>Arguments from the most recent call.</summary>
+		public (string data, int priority, bool async)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
+
+		/// <summary>All recorded calls with their arguments.</summary>
+		public global::System.Collections.Generic.IReadOnlyList<(string data, int priority, bool async)> AllCalls => _calls;
+
+		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		public ProcessDelegate? OnCall { get; set; }
+
 		/// <summary>Records a method call.</summary>
 		public void RecordCall(string data, int priority, bool async) => _calls.Add((data, priority, async));
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); _onCall0 = null; _onCall1 = null; _onCall2 = null; }
+		public void Reset() { _calls.Clear(); OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for Calculate.</summary>
-	public sealed class CalculateHandler
+	/// <summary>Tracks and configures behavior for IOverloadedService.Calculate1.</summary>
+	public sealed class IOverloadedService_Calculate1Handler
 	{
 		/// <summary>Delegate for Calculate(int value).</summary>
-		public delegate int CalculateDelegate0(OverloadedServiceKnockOff ko, int value);
+		public delegate int CalculateDelegate(OverloadedServiceKnockOff ko, int value);
 
-		/// <summary>Delegate for Calculate(int a, int b).</summary>
-		public delegate int CalculateDelegate1(OverloadedServiceKnockOff ko, int a, int b);
-
-		private CalculateDelegate0? _onCall0;
-		private CalculateDelegate1? _onCall1;
-
-		private readonly global::System.Collections.Generic.List<(int? value, int? a, int? b)> _calls = new();
+		private readonly global::System.Collections.Generic.List<int> _calls = new();
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount => _calls.Count;
@@ -123,98 +169,128 @@ partial class OverloadedServiceKnockOff
 		/// <summary>True if this method was called at least once.</summary>
 		public bool WasCalled => _calls.Count > 0;
 
-		/// <summary>Arguments from the most recent call (nullable for params not in all overloads).</summary>
-		public (int? value, int? a, int? b)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
+		/// <summary>The 'value' argument from the most recent call.</summary>
+		public int? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
 
 		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(int? value, int? a, int? b)> AllCalls => _calls;
+		public global::System.Collections.Generic.IReadOnlyList<int> AllCalls => _calls;
 
-		/// <summary>Sets callback for Calculate(value) overload.</summary>
-		public void OnCall(CalculateDelegate0 callback) => _onCall0 = callback;
-
-		/// <summary>Sets callback for Calculate(a, b) overload.</summary>
-		public void OnCall(CalculateDelegate1 callback) => _onCall1 = callback;
-
-		internal CalculateDelegate0? GetCallback0() => _onCall0;
-		internal CalculateDelegate1? GetCallback1() => _onCall1;
+		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		public CalculateDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int value) => _calls.Add((value, default, default));
-		/// <summary>Records a method call.</summary>
-		public void RecordCall(int a, int b) => _calls.Add((default, a, b));
+		public void RecordCall(int value) => _calls.Add(value);
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); _onCall0 = null; _onCall1 = null; }
+		public void Reset() { _calls.Clear(); OnCall = null; }
 	}
 
-	/// <summary>Spy for OverloadedServiceKnockOff - tracks invocations and configures behavior.</summary>
-	public sealed class OverloadedServiceKnockOffSpy
+	/// <summary>Tracks and configures behavior for IOverloadedService.Calculate2.</summary>
+	public sealed class IOverloadedService_Calculate2Handler
 	{
-		/// <summary>Handler for GetByIdAsync.</summary>
-		public GetByIdAsyncHandler GetByIdAsync { get; } = new();
-		/// <summary>Handler for Process.</summary>
-		public ProcessHandler Process { get; } = new();
-		/// <summary>Handler for Calculate.</summary>
-		public CalculateHandler Calculate { get; } = new();
+		/// <summary>Delegate for Calculate(int a, int b).</summary>
+		public delegate int CalculateDelegate(OverloadedServiceKnockOff ko, int a, int b);
+
+		private readonly global::System.Collections.Generic.List<(int a, int b)> _calls = new();
+
+		/// <summary>Number of times this method was called.</summary>
+		public int CallCount => _calls.Count;
+
+		/// <summary>True if this method was called at least once.</summary>
+		public bool WasCalled => _calls.Count > 0;
+
+		/// <summary>Arguments from the most recent call.</summary>
+		public (int a, int b)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
+
+		/// <summary>All recorded calls with their arguments.</summary>
+		public global::System.Collections.Generic.IReadOnlyList<(int a, int b)> AllCalls => _calls;
+
+		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		public CalculateDelegate? OnCall { get; set; }
+
+		/// <summary>Records a method call.</summary>
+		public void RecordCall(int a, int b) => _calls.Add((a, b));
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { _calls.Clear(); OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for all interface members.</summary>
-	public OverloadedServiceKnockOffSpy Spy { get; } = new();
+	/// <summary>Spy for KnockOff.Tests.IOverloadedService - tracks invocations and configures behavior.</summary>
+	public sealed class IOverloadedServiceSpy
+	{
+		/// <summary>Handler for GetByIdAsync overload 1.</summary>
+		public IOverloadedService_GetByIdAsync1Handler GetByIdAsync1 { get; } = new();
+		/// <summary>Handler for GetByIdAsync overload 2.</summary>
+		public IOverloadedService_GetByIdAsync2Handler GetByIdAsync2 { get; } = new();
+		/// <summary>Handler for Process overload 1.</summary>
+		public IOverloadedService_Process1Handler Process1 { get; } = new();
+		/// <summary>Handler for Process overload 2.</summary>
+		public IOverloadedService_Process2Handler Process2 { get; } = new();
+		/// <summary>Handler for Process overload 3.</summary>
+		public IOverloadedService_Process3Handler Process3 { get; } = new();
+		/// <summary>Handler for Calculate overload 1.</summary>
+		public IOverloadedService_Calculate1Handler Calculate1 { get; } = new();
+		/// <summary>Handler for Calculate overload 2.</summary>
+		public IOverloadedService_Calculate2Handler Calculate2 { get; } = new();
+	}
+
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IOverloadedService.</summary>
+	public IOverloadedServiceSpy IOverloadedService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IOverloadedService.</summary>
 	public KnockOff.Tests.IOverloadedService AsOverloadedService() => this;
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> KnockOff.Tests.IOverloadedService.GetByIdAsync(int id)
 	{
-		Spy.GetByIdAsync.RecordCall(id);
-		if (Spy.GetByIdAsync.GetCallback0() is { } onCallCallback)
+		IOverloadedService.GetByIdAsync1.RecordCall(id);
+		if (IOverloadedService.GetByIdAsync1.OnCall is { } onCallCallback)
 			return onCallCallback(this, id);
 		return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.User?>(default!);
 	}
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> KnockOff.Tests.IOverloadedService.GetByIdAsync(int id, global::System.Threading.CancellationToken cancellationToken)
 	{
-		Spy.GetByIdAsync.RecordCall(id, cancellationToken);
-		if (Spy.GetByIdAsync.GetCallback1() is { } onCallCallback)
+		IOverloadedService.GetByIdAsync2.RecordCall(id, cancellationToken);
+		if (IOverloadedService.GetByIdAsync2.OnCall is { } onCallCallback)
 			return onCallCallback(this, id, cancellationToken);
 		return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.User?>(default!);
 	}
 
 	void KnockOff.Tests.IOverloadedService.Process(string data)
 	{
-		Spy.Process.RecordCall(data);
-		if (Spy.Process.GetCallback0() is { } onCallCallback)
+		IOverloadedService.Process1.RecordCall(data);
+		if (IOverloadedService.Process1.OnCall is { } onCallCallback)
 		{ onCallCallback(this, data); return; }
 	}
 
 	void KnockOff.Tests.IOverloadedService.Process(string data, int priority)
 	{
-		Spy.Process.RecordCall(data, priority);
-		if (Spy.Process.GetCallback1() is { } onCallCallback)
+		IOverloadedService.Process2.RecordCall(data, priority);
+		if (IOverloadedService.Process2.OnCall is { } onCallCallback)
 		{ onCallCallback(this, data, priority); return; }
 	}
 
 	void KnockOff.Tests.IOverloadedService.Process(string data, int priority, bool async)
 	{
-		Spy.Process.RecordCall(data, priority, async);
-		if (Spy.Process.GetCallback2() is { } onCallCallback)
+		IOverloadedService.Process3.RecordCall(data, priority, async);
+		if (IOverloadedService.Process3.OnCall is { } onCallCallback)
 		{ onCallCallback(this, data, priority, async); return; }
 	}
 
 	int KnockOff.Tests.IOverloadedService.Calculate(int value)
 	{
-		Spy.Calculate.RecordCall(value);
-		if (Spy.Calculate.GetCallback0() is { } onCallCallback)
+		IOverloadedService.Calculate1.RecordCall(value);
+		if (IOverloadedService.Calculate1.OnCall is { } onCallCallback)
 			return onCallCallback(this, value);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'Calculate' in your partial class, or set Spy.Calculate.OnCall.");
+		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'Calculate' in your partial class, or set IOverloadedService.Calculate1.OnCall.");
 	}
 
 	int KnockOff.Tests.IOverloadedService.Calculate(int a, int b)
 	{
-		Spy.Calculate.RecordCall(a, b);
-		if (Spy.Calculate.GetCallback1() is { } onCallCallback)
+		IOverloadedService.Calculate2.RecordCall(a, b);
+		if (IOverloadedService.Calculate2.OnCall is { } onCallCallback)
 			return onCallCallback(this, a, b);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'Calculate' in your partial class, or set Spy.Calculate.OnCall.");
+		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'Calculate' in your partial class, or set IOverloadedService.Calculate2.OnCall.");
 	}
 
 }

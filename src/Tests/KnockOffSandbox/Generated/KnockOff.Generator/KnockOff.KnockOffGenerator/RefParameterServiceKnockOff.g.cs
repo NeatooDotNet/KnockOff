@@ -5,13 +5,11 @@ namespace KnockOff.Sandbox;
 
 partial class RefParameterServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for Increment.</summary>
-	public sealed class IncrementHandler
+	/// <summary>Tracks and configures behavior for IRefParameterService.Increment.</summary>
+	public sealed class IRefParameterService_IncrementHandler
 	{
 		/// <summary>Delegate for Increment(ref int value).</summary>
 		public delegate void IncrementDelegate(RefParameterServiceKnockOff ko, ref int value);
-
-		private IncrementDelegate? _onCall;
 
 		private readonly global::System.Collections.Generic.List<int> _calls = new();
 
@@ -27,25 +25,21 @@ partial class RefParameterServiceKnockOff
 		/// <summary>All recorded calls with their arguments.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<int> AllCalls => _calls;
 
-		/// <summary>Sets callback for Increment(value) overload.</summary>
-		public void OnCall(IncrementDelegate callback) => _onCall = callback;
-
-		internal IncrementDelegate? GetCallback() => _onCall;
+		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		public IncrementDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall(int value) => _calls.Add(value);
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); _onCall = null; }
+		public void Reset() { _calls.Clear(); OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for TryUpdate.</summary>
-	public sealed class TryUpdateHandler
+	/// <summary>Tracks and configures behavior for IRefParameterService.TryUpdate.</summary>
+	public sealed class IRefParameterService_TryUpdateHandler
 	{
 		/// <summary>Delegate for TryUpdate(string key, ref string value).</summary>
 		public delegate bool TryUpdateDelegate(RefParameterServiceKnockOff ko, string key, ref string value);
-
-		private TryUpdateDelegate? _onCall;
 
 		private readonly global::System.Collections.Generic.List<(string key, string value)> _calls = new();
 
@@ -55,52 +49,50 @@ partial class RefParameterServiceKnockOff
 		/// <summary>True if this method was called at least once.</summary>
 		public bool WasCalled => _calls.Count > 0;
 
-		/// <summary>Arguments from the most recent call (nullable for params not in all overloads).</summary>
+		/// <summary>Arguments from the most recent call.</summary>
 		public (string key, string value)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
 
 		/// <summary>All recorded calls with their arguments.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<(string key, string value)> AllCalls => _calls;
 
-		/// <summary>Sets callback for TryUpdate(key, value) overload.</summary>
-		public void OnCall(TryUpdateDelegate callback) => _onCall = callback;
-
-		internal TryUpdateDelegate? GetCallback() => _onCall;
+		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		public TryUpdateDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall(string key, string value) => _calls.Add((key, value));
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); _onCall = null; }
+		public void Reset() { _calls.Clear(); OnCall = null; }
 	}
 
-	/// <summary>Spy for RefParameterServiceKnockOff - tracks invocations and configures behavior.</summary>
-	public sealed class RefParameterServiceKnockOffSpy
+	/// <summary>Spy for KnockOff.Sandbox.IRefParameterService - tracks invocations and configures behavior.</summary>
+	public sealed class IRefParameterServiceSpy
 	{
 		/// <summary>Handler for Increment.</summary>
-		public IncrementHandler Increment { get; } = new();
+		public IRefParameterService_IncrementHandler Increment { get; } = new();
 		/// <summary>Handler for TryUpdate.</summary>
-		public TryUpdateHandler TryUpdate { get; } = new();
+		public IRefParameterService_TryUpdateHandler TryUpdate { get; } = new();
 	}
 
-	/// <summary>Tracks invocations and configures behavior for all interface members.</summary>
-	public RefParameterServiceKnockOffSpy Spy { get; } = new();
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Sandbox.IRefParameterService.</summary>
+	public IRefParameterServiceSpy IRefParameterService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Sandbox.IRefParameterService.</summary>
 	public KnockOff.Sandbox.IRefParameterService AsRefParameterService() => this;
 
 	void KnockOff.Sandbox.IRefParameterService.Increment(ref int value)
 	{
-		Spy.Increment.RecordCall(value);
-		if (Spy.Increment.GetCallback() is { } onCallCallback)
+		IRefParameterService.Increment.RecordCall(value);
+		if (IRefParameterService.Increment.OnCall is { } onCallCallback)
 		{ onCallCallback(this, ref value); return; }
 	}
 
 	bool KnockOff.Sandbox.IRefParameterService.TryUpdate(string key, ref string value)
 	{
-		Spy.TryUpdate.RecordCall(key, value);
-		if (Spy.TryUpdate.GetCallback() is { } onCallCallback)
+		IRefParameterService.TryUpdate.RecordCall(key, value);
+		if (IRefParameterService.TryUpdate.OnCall is { } onCallCallback)
 			return onCallCallback(this, key, ref value);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'TryUpdate' in your partial class, or set Spy.TryUpdate.OnCall.");
+		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'TryUpdate' in your partial class, or set IRefParameterService.TryUpdate.OnCall.");
 	}
 
 }

@@ -21,7 +21,7 @@ public class NeatooTests
         IEntityBase entity = stub;
 
         Assert.NotNull(entity);
-        Assert.NotNull(stub.Spy);
+        Assert.NotNull(stub.IEntityBase);
     }
 
     [Fact]
@@ -31,10 +31,10 @@ public class NeatooTests
         IEntityBase entity = stub;
 
         // Configure via OnGet callback
-        stub.Spy.IsNew.OnGet = (ko) => true;
+        stub.IFactorySaveMeta.IsNew.OnGet = (ko) => true;
 
         Assert.True(entity.IsNew);
-        Assert.Equal(1, stub.Spy.IsNew.GetCount);
+        Assert.Equal(1, stub.IFactorySaveMeta.IsNew.GetCount);
     }
 
     [Fact]
@@ -43,7 +43,7 @@ public class NeatooTests
         var stub = new EntityBaseStub();
         IEntityBase entity = stub;
 
-        stub.Spy.IsModified.OnGet = (ko) => true;
+        stub.IEntityMetaProperties.IsModified.OnGet = (ko) => true;
 
         Assert.True(entity.IsModified);
     }
@@ -55,7 +55,7 @@ public class NeatooTests
         IEntityBase entity = stub;
 
         // Configure indexer to return a mock property
-        stub.Spy.StringIndexer.OnGet = (ko, propertyName) =>
+        stub.IEntityBase.StringIndexer.OnGet = (ko, propertyName) =>
         {
             // Return null for now - would need IEntityProperty stub
             return null!;
@@ -64,8 +64,8 @@ public class NeatooTests
         // Access triggers tracking
         var prop = entity["FirstName"];
 
-        Assert.Equal(1, stub.Spy.StringIndexer.GetCount);
-        Assert.Equal("FirstName", stub.Spy.StringIndexer.LastGetKey);
+        Assert.Equal(1, stub.IEntityBase.StringIndexer.GetCount);
+        Assert.Equal("FirstName", stub.IEntityBase.StringIndexer.LastGetKey);
     }
 
     [Fact]
@@ -76,8 +76,8 @@ public class NeatooTests
 
         entity.Delete();
 
-        Assert.True(stub.Spy.Delete.WasCalled);
-        Assert.Equal(1, stub.Spy.Delete.CallCount);
+        Assert.True(stub.IEntityBase.Delete.WasCalled);
+        Assert.Equal(1, stub.IEntityBase.Delete.CallCount);
     }
 
     [Fact]
@@ -87,11 +87,11 @@ public class NeatooTests
         IEntityBase entity = stub;
 
         // Configure Save to return the stub itself
-        stub.Spy.Save.OnCall((ko) => Task.FromResult<IEntityBase>(ko));
+        stub.IEntityBase.Save.OnCall = (ko) => Task.FromResult<IEntityBase>(ko);
 
         var result = await entity.Save();
 
         Assert.Same(entity, result);
-        Assert.True(stub.Spy.Save.WasCalled);
+        Assert.True(stub.IEntityBase.Save.WasCalled);
     }
 }

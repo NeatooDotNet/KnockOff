@@ -5,8 +5,8 @@ namespace KnockOff.Tests;
 
 partial class SharedSignatureKnockOff
 {
-	/// <summary>Tracks and configures behavior for Name.</summary>
-	public sealed class NameHandler
+	/// <summary>Tracks and configures behavior for ILogger.Name.</summary>
+	public sealed class ILogger_NameHandler
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -33,13 +33,11 @@ partial class SharedSignatureKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for Log.</summary>
-	public sealed class LogHandler
+	/// <summary>Tracks and configures behavior for ILogger.Log.</summary>
+	public sealed class ILogger_LogHandler
 	{
 		/// <summary>Delegate for Log(string message).</summary>
 		public delegate void LogDelegate(SharedSignatureKnockOff ko, string message);
-
-		private LogDelegate? _onCall;
 
 		private readonly global::System.Collections.Generic.List<string> _calls = new();
 
@@ -55,25 +53,60 @@ partial class SharedSignatureKnockOff
 		/// <summary>All recorded calls with their arguments.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<string> AllCalls => _calls;
 
-		/// <summary>Sets callback for Log(message) overload.</summary>
-		public void OnCall(LogDelegate callback) => _onCall = callback;
-
-		internal LogDelegate? GetCallback() => _onCall;
+		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		public LogDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall(string message) => _calls.Add(message);
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); _onCall = null; }
+		public void Reset() { _calls.Clear(); OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for Audit.</summary>
-	public sealed class AuditHandler
+	/// <summary>Spy for KnockOff.Tests.ILogger - tracks invocations and configures behavior.</summary>
+	public sealed class ILoggerSpy
+	{
+		/// <summary>Handler for Name.</summary>
+		public ILogger_NameHandler Name { get; } = new();
+		/// <summary>Handler for Log.</summary>
+		public ILogger_LogHandler Log { get; } = new();
+	}
+
+	/// <summary>Tracks and configures behavior for IAuditor.Log.</summary>
+	public sealed class IAuditor_LogHandler
+	{
+		/// <summary>Delegate for Log(string message).</summary>
+		public delegate void LogDelegate(SharedSignatureKnockOff ko, string message);
+
+		private readonly global::System.Collections.Generic.List<string> _calls = new();
+
+		/// <summary>Number of times this method was called.</summary>
+		public int CallCount => _calls.Count;
+
+		/// <summary>True if this method was called at least once.</summary>
+		public bool WasCalled => _calls.Count > 0;
+
+		/// <summary>The 'message' argument from the most recent call.</summary>
+		public string? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
+
+		/// <summary>All recorded calls with their arguments.</summary>
+		public global::System.Collections.Generic.IReadOnlyList<string> AllCalls => _calls;
+
+		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		public LogDelegate? OnCall { get; set; }
+
+		/// <summary>Records a method call.</summary>
+		public void RecordCall(string message) => _calls.Add(message);
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { _calls.Clear(); OnCall = null; }
+	}
+
+	/// <summary>Tracks and configures behavior for IAuditor.Audit.</summary>
+	public sealed class IAuditor_AuditHandler
 	{
 		/// <summary>Delegate for Audit(string action, int userId).</summary>
 		public delegate void AuditDelegate(SharedSignatureKnockOff ko, string action, int userId);
-
-		private AuditDelegate? _onCall;
 
 		private readonly global::System.Collections.Generic.List<(string action, int userId)> _calls = new();
 
@@ -83,37 +116,36 @@ partial class SharedSignatureKnockOff
 		/// <summary>True if this method was called at least once.</summary>
 		public bool WasCalled => _calls.Count > 0;
 
-		/// <summary>Arguments from the most recent call (nullable for params not in all overloads).</summary>
+		/// <summary>Arguments from the most recent call.</summary>
 		public (string action, int userId)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
 
 		/// <summary>All recorded calls with their arguments.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<(string action, int userId)> AllCalls => _calls;
 
-		/// <summary>Sets callback for Audit(action, userId) overload.</summary>
-		public void OnCall(AuditDelegate callback) => _onCall = callback;
-
-		internal AuditDelegate? GetCallback() => _onCall;
+		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		public AuditDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall(string action, int userId) => _calls.Add((action, userId));
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); _onCall = null; }
+		public void Reset() { _calls.Clear(); OnCall = null; }
 	}
 
-	/// <summary>Spy for SharedSignatureKnockOff - tracks invocations and configures behavior.</summary>
-	public sealed class SharedSignatureKnockOffSpy
+	/// <summary>Spy for KnockOff.Tests.IAuditor - tracks invocations and configures behavior.</summary>
+	public sealed class IAuditorSpy
 	{
-		/// <summary>Handler for Name.</summary>
-		public NameHandler Name { get; } = new();
 		/// <summary>Handler for Log.</summary>
-		public LogHandler Log { get; } = new();
+		public IAuditor_LogHandler Log { get; } = new();
 		/// <summary>Handler for Audit.</summary>
-		public AuditHandler Audit { get; } = new();
+		public IAuditor_AuditHandler Audit { get; } = new();
 	}
 
-	/// <summary>Tracks invocations and configures behavior for all interface members.</summary>
-	public SharedSignatureKnockOffSpy Spy { get; } = new();
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.ILogger.</summary>
+	public ILoggerSpy ILogger { get; } = new();
+
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IAuditor.</summary>
+	public IAuditorSpy IAuditor { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.ILogger.</summary>
 	public KnockOff.Tests.ILogger AsLogger() => this;
@@ -121,13 +153,13 @@ partial class SharedSignatureKnockOff
 	/// <summary>Returns this instance as KnockOff.Tests.IAuditor.</summary>
 	public KnockOff.Tests.IAuditor AsAuditor() => this;
 
-	/// <summary>Backing field for Name.</summary>
-	protected string NameBacking { get; set; } = "";
+	/// <summary>Backing field for ILogger.Name.</summary>
+	protected string ILogger_NameBacking { get; set; } = "";
 
 	void KnockOff.Tests.ILogger.Log(string message)
 	{
-		Spy.Log.RecordCall(message);
-		if (Spy.Log.GetCallback() is { } onCallCallback)
+		ILogger.Log.RecordCall(message);
+		if (ILogger.Log.OnCall is { } onCallCallback)
 		{ onCallCallback(this, message); return; }
 	}
 
@@ -135,32 +167,32 @@ partial class SharedSignatureKnockOff
 	{
 		get
 		{
-			Spy.Name.RecordGet();
-			if (Spy.Name.OnGet is { } onGetCallback)
+			ILogger.Name.RecordGet();
+			if (ILogger.Name.OnGet is { } onGetCallback)
 				return onGetCallback(this);
-			return NameBacking;
+			return ILogger_NameBacking;
 		}
 		set
 		{
-			Spy.Name.RecordSet(value);
-			if (Spy.Name.OnSet is { } onSetCallback)
+			ILogger.Name.RecordSet(value);
+			if (ILogger.Name.OnSet is { } onSetCallback)
 				onSetCallback(this, value);
 			else
-				NameBacking = value;
+				ILogger_NameBacking = value;
 		}
 	}
 
 	void KnockOff.Tests.IAuditor.Log(string message)
 	{
-		Spy.Log.RecordCall(message);
-		if (Spy.Log.GetCallback() is { } onCallCallback)
+		IAuditor.Log.RecordCall(message);
+		if (IAuditor.Log.OnCall is { } onCallCallback)
 		{ onCallCallback(this, message); return; }
 	}
 
 	void KnockOff.Tests.IAuditor.Audit(string action, int userId)
 	{
-		Spy.Audit.RecordCall(action, userId);
-		if (Spy.Audit.GetCallback() is { } onCallCallback)
+		IAuditor.Audit.RecordCall(action, userId);
+		if (IAuditor.Audit.OnCall is { } onCallCallback)
 		{ onCallCallback(this, action, userId); return; }
 	}
 

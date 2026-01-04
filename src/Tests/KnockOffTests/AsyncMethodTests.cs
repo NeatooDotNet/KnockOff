@@ -13,8 +13,8 @@ public class AsyncMethodTests
 
 		await service.DoWorkAsync();
 
-		Assert.True(knockOff.Spy.DoWorkAsync.WasCalled);
-		Assert.Equal(1, knockOff.Spy.DoWorkAsync.CallCount);
+		Assert.True(knockOff.IAsyncService.DoWorkAsync.WasCalled);
+		Assert.Equal(1, knockOff.IAsyncService.DoWorkAsync.CallCount);
 	}
 
 	[Fact]
@@ -26,7 +26,7 @@ public class AsyncMethodTests
 		var result = await service.GetValueAsync(10);
 
 		Assert.Equal(30, result); // User method multiplies by 3
-		Assert.Equal(10, knockOff.Spy.GetValueAsync.LastCallArg);
+		Assert.Equal(10, knockOff.IAsyncService.GetValueAsync.LastCallArg);
 	}
 
 	[Fact]
@@ -38,7 +38,7 @@ public class AsyncMethodTests
 		var result = await service.GetOptionalAsync();
 
 		Assert.Null(result);
-		Assert.True(knockOff.Spy.GetOptionalAsync.WasCalled);
+		Assert.True(knockOff.IAsyncService.GetOptionalAsync.WasCalled);
 	}
 
 	[Fact]
@@ -49,7 +49,7 @@ public class AsyncMethodTests
 
 		await service.DoWorkValueTaskAsync();
 
-		Assert.True(knockOff.Spy.DoWorkValueTaskAsync.WasCalled);
+		Assert.True(knockOff.IAsyncService.DoWorkValueTaskAsync.WasCalled);
 	}
 
 	[Fact]
@@ -61,6 +61,6 @@ public class AsyncMethodTests
 		var result = await service.GetValueValueTaskAsync(5);
 
 		Assert.Equal(20, result); // User method multiplies by 4
-		Assert.Equal(5, knockOff.Spy.GetValueValueTaskAsync.LastCallArg);
+		Assert.Equal(5, knockOff.IAsyncService.GetValueValueTaskAsync.LastCallArg);
 	}
 }

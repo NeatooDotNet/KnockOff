@@ -2,109 +2,131 @@ namespace KnockOff.Tests;
 
 /// <summary>
 /// Tests for method overload support in KnockOff.
+/// With the new design, each overload gets its own handler: Process1, Process2, Process3, etc. (1-based).
+/// This allows clear tracking of which specific overload was called.
 /// </summary>
 public class OverloadedMethodTests
 {
 	[Fact]
-	public void OverloadedMethod_TracksAllCalls_InSingleList()
+	public void OverloadedMethod_EachOverload_HasOwnCallCount()
 	{
 		var knockOff = new OverloadedServiceKnockOff();
 		IOverloadedService service = knockOff;
 
-		service.Process("data1");
-		service.Process("data2", 5);
-		service.Process("data3", 10, true);
+		service.Process("data1");           // Process1 - Process(string)
+		service.Process("data2", 5);         // Process2 - Process(string, int)
+		service.Process("data3", 10, true);  // Process3 - Process(string, int, bool)
 
-		Assert.Equal(3, knockOff.Spy.Process.CallCount);
-		Assert.True(knockOff.Spy.Process.WasCalled);
+		// Each overload has its own separate tracking (1-based numbering)
+		Assert.Equal(1, knockOff.IOverloadedService.Process1.CallCount);
+		Assert.Equal(1, knockOff.IOverloadedService.Process2.CallCount);
+		Assert.Equal(1, knockOff.IOverloadedService.Process3.CallCount);
 	}
 
 	[Fact]
-	public void OverloadedMethod_LastCallArgs_TracksNullableParams()
+	public void OverloadedMethod_Process1_TracksLastCallArg()
 	{
 		var knockOff = new OverloadedServiceKnockOff();
 		IOverloadedService service = knockOff;
 
-		// Call simplest overload - priority and async should be null
 		service.Process("first");
-		var lastArgs = knockOff.Spy.Process.LastCallArgs;
-		Assert.NotNull(lastArgs);
-		Assert.Equal("first", lastArgs.Value.data);
-		Assert.Null(lastArgs.Value.priority);
-		Assert.Null(lastArgs.Value.async);
+		service.Process("second");
 
-		// Call middle overload - async should be null
-		service.Process("second", 5);
-		lastArgs = knockOff.Spy.Process.LastCallArgs;
-		Assert.NotNull(lastArgs);
-		Assert.Equal("second", lastArgs.Value.data);
-		Assert.Equal(5, lastArgs.Value.priority);
-		Assert.Null(lastArgs.Value.async);
+		// Process1 takes single param - uses LastCallArg (not LastCallArgs)
+		Assert.Equal("second", knockOff.IOverloadedService.Process1.LastCallArg);
+		Assert.Equal(2, knockOff.IOverloadedService.Process1.CallCount);
+	}
 
-		// Call full overload - all params present
-		service.Process("third", 10, true);
-		lastArgs = knockOff.Spy.Process.LastCallArgs;
+	[Fact]
+	public void OverloadedMethod_Process2_TracksLastCallArgs_WithProperTypes()
+	{
+		var knockOff = new OverloadedServiceKnockOff();
+		IOverloadedService service = knockOff;
+
+		service.Process("test", 42);
+
+		// Process2 takes two params - uses LastCallArgs tuple with proper (non-nullable) types
+		var lastArgs = knockOff.IOverloadedService.Process2.LastCallArgs;
 		Assert.NotNull(lastArgs);
-		Assert.Equal("third", lastArgs.Value.data);
-		Assert.Equal(10, lastArgs.Value.priority);
+		Assert.Equal("test", lastArgs.Value.data);
+		Assert.Equal(42, lastArgs.Value.priority); // int, not int?
+	}
+
+	[Fact]
+	public void OverloadedMethod_Process3_TracksLastCallArgs_AllParams()
+	{
+		var knockOff = new OverloadedServiceKnockOff();
+		IOverloadedService service = knockOff;
+
+		service.Process("full", 100, true);
+
+		var lastArgs = knockOff.IOverloadedService.Process3.LastCallArgs;
+		Assert.NotNull(lastArgs);
+		Assert.Equal("full", lastArgs.Value.data);
+		Assert.Equal(100, lastArgs.Value.priority);
 		Assert.True(lastArgs.Value.async);
 	}
 
 	[Fact]
-	public void OverloadedMethod_AllCalls_TracksAllOverloads()
+	public void OverloadedMethod_AllCalls_TracksPerOverload()
 	{
 		var knockOff = new OverloadedServiceKnockOff();
 		IOverloadedService service = knockOff;
 
 		service.Process("a");
-		service.Process("b", 1);
-		service.Process("c", 2, false);
+		service.Process("b");
+		service.Process("c", 1);
+		service.Process("d", 2, false);
 
-		var allCalls = knockOff.Spy.Process.AllCalls;
-		Assert.Equal(3, allCalls.Count);
+		// Process1.AllCalls contains only Process(string) calls
+		var process1Calls = knockOff.IOverloadedService.Process1.AllCalls;
+		Assert.Equal(2, process1Calls.Count);
+		Assert.Equal("a", process1Calls[0]);
+		Assert.Equal("b", process1Calls[1]);
 
-		Assert.Equal("a", allCalls[0].data);
-		Assert.Null(allCalls[0].priority);
+		// Process2.AllCalls contains only Process(string, int) calls
+		var process2Calls = knockOff.IOverloadedService.Process2.AllCalls;
+		Assert.Single(process2Calls);
+		Assert.Equal(("c", 1), process2Calls[0]);
 
-		Assert.Equal("b", allCalls[1].data);
-		Assert.Equal(1, allCalls[1].priority);
-
-		Assert.Equal("c", allCalls[2].data);
-		Assert.Equal(2, allCalls[2].priority);
-		Assert.False(allCalls[2].async);
+		// Process3.AllCalls contains only Process(string, int, bool) calls
+		var process3Calls = knockOff.IOverloadedService.Process3.AllCalls;
+		Assert.Single(process3Calls);
+		Assert.Equal(("d", 2, false), process3Calls[0]);
 	}
 
 	[Fact]
-	public void OverloadedMethod_OnCall_SetsCallbackForSpecificOverload()
+	public void OverloadedMethod_OnCall_SimpleCallback_NoDelegateCasting()
 	{
 		var knockOff = new OverloadedServiceKnockOff();
 		IOverloadedService service = knockOff;
 
-		var overload0Called = false;
 		var overload1Called = false;
 		var overload2Called = false;
+		var overload3Called = false;
 
-		knockOff.Spy.Process.OnCall((OverloadedServiceKnockOff.ProcessHandler.ProcessDelegate0)((ko, data) =>
-		{
-			overload0Called = true;
-		}));
-
-		knockOff.Spy.Process.OnCall((OverloadedServiceKnockOff.ProcessHandler.ProcessDelegate1)((ko, data, priority) =>
+		// Simple property assignment - no delegate casting needed!
+		knockOff.IOverloadedService.Process1.OnCall = (ko, data) =>
 		{
 			overload1Called = true;
-		}));
+		};
 
-		knockOff.Spy.Process.OnCall((OverloadedServiceKnockOff.ProcessHandler.ProcessDelegate2)((ko, data, priority, async) =>
+		knockOff.IOverloadedService.Process2.OnCall = (ko, data, priority) =>
 		{
 			overload2Called = true;
-		}));
+		};
+
+		knockOff.IOverloadedService.Process3.OnCall = (ko, data, priority, async) =>
+		{
+			overload3Called = true;
+		};
 
 		// Call only the first overload
 		service.Process("test");
 
-		Assert.True(overload0Called);
-		Assert.False(overload1Called);
+		Assert.True(overload1Called);
 		Assert.False(overload2Called);
+		Assert.False(overload3Called);
 	}
 
 	[Fact]
@@ -113,11 +135,11 @@ public class OverloadedMethodTests
 		var knockOff = new OverloadedServiceKnockOff();
 		IOverloadedService service = knockOff;
 
-		// Set callback for Calculate(int value)
-		knockOff.Spy.Calculate.OnCall((OverloadedServiceKnockOff.CalculateHandler.CalculateDelegate0)((ko, value) => value * 2));
+		// Set callback for Calculate(int value) - overload 1
+		knockOff.IOverloadedService.Calculate1.OnCall = (ko, value) => value * 2;
 
-		// Set callback for Calculate(int a, int b)
-		knockOff.Spy.Calculate.OnCall((OverloadedServiceKnockOff.CalculateHandler.CalculateDelegate1)((ko, a, b) => a + b));
+		// Set callback for Calculate(int a, int b) - overload 2
+		knockOff.IOverloadedService.Calculate2.OnCall = (ko, a, b) => a + b;
 
 		Assert.Equal(10, service.Calculate(5));      // 5 * 2 = 10
 		Assert.Equal(8, service.Calculate(3, 5));    // 3 + 5 = 8
@@ -132,12 +154,13 @@ public class OverloadedMethodTests
 
 		var user = new User { Id = 42, Name = "Test" };
 
-		// Set callback for both overloads
-		knockOff.Spy.GetByIdAsync.OnCall((OverloadedServiceKnockOff.GetByIdAsyncHandler.GetByIdAsyncDelegate0)(
-			(ko, id) => Task.FromResult<User?>(user)));
+		// Set callback for GetByIdAsync(int id) - overload 1
+		knockOff.IOverloadedService.GetByIdAsync1.OnCall = (ko, id) =>
+			Task.FromResult<User?>(user);
 
-		knockOff.Spy.GetByIdAsync.OnCall((OverloadedServiceKnockOff.GetByIdAsyncHandler.GetByIdAsyncDelegate1)(
-			(ko, id, ct) => Task.FromResult<User?>(new User { Id = id, Name = "FromCt" })));
+		// Set callback for GetByIdAsync(int id, CancellationToken) - overload 2
+		knockOff.IOverloadedService.GetByIdAsync2.OnCall = (ko, id, ct) =>
+			Task.FromResult<User?>(new User { Id = id, Name = "FromCt" });
 
 		// Call first overload
 		var result1 = await service.GetByIdAsync(1);
@@ -149,58 +172,82 @@ public class OverloadedMethodTests
 		Assert.Equal(99, result2?.Id);
 		Assert.Equal("FromCt", result2?.Name);
 
-		// Verify tracking
-		Assert.Equal(2, knockOff.Spy.GetByIdAsync.CallCount);
-		var lastArgs = knockOff.Spy.GetByIdAsync.LastCallArgs;
+		// Verify tracking - each overload tracked separately
+		Assert.Equal(1, knockOff.IOverloadedService.GetByIdAsync1.CallCount);
+		Assert.Equal(1, knockOff.IOverloadedService.GetByIdAsync2.CallCount);
+
+		// LastCallArg for GetByIdAsync1 (single param)
+		Assert.Equal(1, knockOff.IOverloadedService.GetByIdAsync1.LastCallArg);
+
+		// LastCallArgs for GetByIdAsync2 (two params)
+		var lastArgs = knockOff.IOverloadedService.GetByIdAsync2.LastCallArgs;
 		Assert.NotNull(lastArgs);
 		Assert.Equal(99, lastArgs.Value.id);
-		Assert.NotNull(lastArgs.Value.cancellationToken); // Was provided
 	}
 #pragma warning restore xUnit1051
 
 	[Fact]
-	public void OverloadedMethod_Reset_ClearsAllState()
+	public void OverloadedMethod_Reset_ClearsOnlyThatOverload()
 	{
 		var knockOff = new OverloadedServiceKnockOff();
 		IOverloadedService service = knockOff;
 
-		knockOff.Spy.Process.OnCall((OverloadedServiceKnockOff.ProcessHandler.ProcessDelegate0)((ko, data) => { }));
+		knockOff.IOverloadedService.Process1.OnCall = (ko, data) => { };
 		service.Process("test");
 		service.Process("test2", 1);
 
-		Assert.Equal(2, knockOff.Spy.Process.CallCount);
+		Assert.Equal(1, knockOff.IOverloadedService.Process1.CallCount);
+		Assert.Equal(1, knockOff.IOverloadedService.Process2.CallCount);
 
-		knockOff.Spy.Process.Reset();
+		// Reset only Process1
+		knockOff.IOverloadedService.Process1.Reset();
 
-		Assert.Equal(0, knockOff.Spy.Process.CallCount);
-		Assert.False(knockOff.Spy.Process.WasCalled);
-		Assert.Null(knockOff.Spy.Process.LastCallArgs);
+		Assert.Equal(0, knockOff.IOverloadedService.Process1.CallCount);
+		Assert.False(knockOff.IOverloadedService.Process1.WasCalled);
+		Assert.Null(knockOff.IOverloadedService.Process1.LastCallArg);
+
+		// Process2 is NOT affected
+		Assert.Equal(1, knockOff.IOverloadedService.Process2.CallCount);
+		Assert.True(knockOff.IOverloadedService.Process2.WasCalled);
 	}
 
 	[Fact]
-	public void OverloadedMethod_DifferentParamNames_TracksCorrectly()
+	public void OverloadedMethod_DifferentParamNames_EachOverloadHasProperTypes()
 	{
 		var knockOff = new OverloadedServiceKnockOff();
 		IOverloadedService service = knockOff;
 
-		// Calculate has (int value) and (int a, int b) - different param names
-		knockOff.Spy.Calculate.OnCall((OverloadedServiceKnockOff.CalculateHandler.CalculateDelegate0)((ko, v) => v));
-		knockOff.Spy.Calculate.OnCall((OverloadedServiceKnockOff.CalculateHandler.CalculateDelegate1)((ko, a, b) => a));
+		// Calculate has (int value) and (int a, int b) - completely separate handlers now
+		knockOff.IOverloadedService.Calculate1.OnCall = (ko, value) => value;
+		knockOff.IOverloadedService.Calculate2.OnCall = (ko, a, b) => a;
 
 		service.Calculate(5);
 		service.Calculate(3, 7);
 
-		var allCalls = knockOff.Spy.Calculate.AllCalls;
-		Assert.Equal(2, allCalls.Count);
+		// Calculate1.AllCalls - just the value
+		var calc1Calls = knockOff.IOverloadedService.Calculate1.AllCalls;
+		Assert.Single(calc1Calls);
+		Assert.Equal(5, calc1Calls[0]);
 
-		// First call: value=5, a=null, b=null
-		Assert.Equal(5, allCalls[0].value);
-		Assert.Null(allCalls[0].a);
-		Assert.Null(allCalls[0].b);
+		// Calculate2.AllCalls - tuple of (a, b)
+		var calc2Calls = knockOff.IOverloadedService.Calculate2.AllCalls;
+		Assert.Single(calc2Calls);
+		Assert.Equal((3, 7), calc2Calls[0]);
+	}
 
-		// Second call: value=null, a=3, b=7
-		Assert.Null(allCalls[1].value);
-		Assert.Equal(3, allCalls[1].a);
-		Assert.Equal(7, allCalls[1].b);
+	[Fact]
+	public void CanIdentifyWhichOverloadWasCalled()
+	{
+		// This test demonstrates the key benefit of the new design:
+		// You can now tell exactly which overload was called!
+		var knockOff = new OverloadedServiceKnockOff();
+		IOverloadedService service = knockOff;
+
+		service.Process("data", 42);  // This is Process2 (string, int)
+
+		// Clear identification of which overload was called
+		Assert.False(knockOff.IOverloadedService.Process1.WasCalled);  // Process(string) - NOT called
+		Assert.True(knockOff.IOverloadedService.Process2.WasCalled);   // Process(string, int) - CALLED!
+		Assert.False(knockOff.IOverloadedService.Process3.WasCalled);  // Process(string, int, bool) - NOT called
 	}
 }

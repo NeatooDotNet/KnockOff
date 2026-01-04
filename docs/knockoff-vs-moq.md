@@ -64,8 +64,8 @@ IUserService service = knockOff;
 
 var user = service.GetUser(42);
 
-Assert.Equal(1, knockOff.Spy.GetUser.CallCount);
-Assert.Equal(42, knockOff.Spy.GetUser.LastCallArg);
+Assert.Equal(1, knockOff.IUserService.GetUser.CallCount);
+Assert.Equal(42, knockOff.IUserService.GetUser.LastCallArg);
 ```
 
 ### Property Mocking
@@ -93,14 +93,14 @@ var knockOff = new UserServiceKnockOff();
 IUserService service = knockOff;
 
 // Optional: customize getter behavior
-knockOff.Spy.CurrentUser.OnGet = (ko) => new User { Name = "Test" };
+knockOff.IUserService.CurrentUser.OnGet = (ko) => new User { Name = "Test" };
 
 var user = service.CurrentUser;
 service.CurrentUser = new User { Name = "New" };
 
-Assert.Equal(1, knockOff.Spy.CurrentUser.GetCount);
-Assert.Equal(1, knockOff.Spy.CurrentUser.SetCount);
-Assert.Equal("New", knockOff.Spy.CurrentUser.LastSetValue?.Name);
+Assert.Equal(1, knockOff.IUserService.CurrentUser.GetCount);
+Assert.Equal(1, knockOff.IUserService.CurrentUser.SetCount);
+Assert.Equal("New", knockOff.IUserService.CurrentUser.LastSetValue?.Name);
 ```
 
 ### Async Methods
@@ -158,11 +158,11 @@ IRepository repo = knockOff;
 
 repo.Save(new Entity { Id = 1 });
 
-var captured = knockOff.Spy.Save.LastCallArg;
+var captured = knockOff.IRepository.Save.LastCallArg;
 Assert.Equal(1, captured?.Id);
 
 // All calls are available
-var allSaved = knockOff.Spy.Save.AllCalls;
+var allSaved = knockOff.IRepository.Save.AllCalls;
 ```
 
 ### Multiple Interface Implementation
@@ -212,13 +212,13 @@ public partial class PropertyStoreKnockOff : IPropertyStore { }
 
 // Use in test - pre-populate backing dictionary
 var knockOff = new PropertyStoreKnockOff();
-knockOff.StringIndexerBacking["Name"] = new PropertyInfo { Value = "Test" };
-knockOff.StringIndexerBacking["Age"] = new PropertyInfo { Value = "25" };
+knockOff.IPropertyStore_StringIndexerBacking["Name"] = new PropertyInfo { Value = "Test" };
+knockOff.IPropertyStore_StringIndexerBacking["Age"] = new PropertyInfo { Value = "25" };
 
 IPropertyStore store = knockOff;
 var name = store["Name"];
 
-Assert.Equal("Name", knockOff.Spy.StringIndexer.LastGetKey);
+Assert.Equal("Name", knockOff.IPropertyStore.StringIndexer.LastGetKey);
 ```
 
 ### Event Mocking
@@ -249,14 +249,14 @@ IEventSource source = knockOff;
 // Subscribe (tracked automatically)
 source.DataReceived += (sender, data) => Console.WriteLine(data);
 
-Assert.True(knockOff.Spy.DataReceived.HasSubscribers);
-Assert.Equal(1, knockOff.Spy.DataReceived.SubscribeCount);
+Assert.True(knockOff.IEventSource.DataReceived.HasSubscribers);
+Assert.Equal(1, knockOff.IEventSource.DataReceived.SubscribeCount);
 
 // Raise event
-knockOff.Spy.DataReceived.Raise("test data");
+knockOff.IEventSource.DataReceived.Raise("test data");
 
-Assert.True(knockOff.Spy.DataReceived.WasRaised);
-Assert.Equal("test data", knockOff.Spy.DataReceived.LastRaiseArgs?.e);
+Assert.True(knockOff.IEventSource.DataReceived.WasRaised);
+Assert.Equal("test data", knockOff.IEventSource.DataReceived.LastRaiseArgs?.e);
 ```
 
 ### Verification Patterns
@@ -276,10 +276,10 @@ mock.Verify(x => x.Update(It.IsAny<Entity>()), Times.Exactly(3));
 public partial class RepositoryKnockOff : IRepository { }
 
 // Verify in test
-Assert.Equal(1, knockOff.Spy.Save.CallCount);      // Times.Once
-Assert.Equal(0, knockOff.Spy.Delete.CallCount);    // Times.Never
-Assert.True(knockOff.Spy.GetAll.WasCalled);        // Times.AtLeastOnce
-Assert.Equal(3, knockOff.Spy.Update.CallCount);    // Times.Exactly(3)
+Assert.Equal(1, knockOff.IRepository.Save.CallCount);      // Times.Once
+Assert.Equal(0, knockOff.IRepository.Delete.CallCount);    // Times.Never
+Assert.True(knockOff.IRepository.GetAll.WasCalled);        // Times.AtLeastOnce
+Assert.Equal(3, knockOff.IRepository.Update.CallCount);    // Times.Exactly(3)
 ```
 
 ## Dynamic Behavior with Callbacks
@@ -303,7 +303,7 @@ public partial class SequenceKnockOff : ISequence { }
 
 var knockOff = new SequenceKnockOff();
 var returnValues = new Queue<int>([1, 2, 3]);
-knockOff.Spy.GetNext.OnCall((ko) => returnValues.Dequeue());
+knockOff.ISequence.GetNext.OnCall = (ko) => returnValues.Dequeue();
 ```
 
 ### Per-Test Overrides
@@ -324,7 +324,7 @@ public void Test_WithSpecialCase()
     var knockOff = new UserServiceKnockOff();
 
     // Override just for this test
-    knockOff.Spy.GetUser.OnCall((ko, id) => new User { Id = id, Name = "Special" });
+    knockOff.IUserService.GetUser.OnCall = (ko, id) => new User { Id = id, Name = "Special" };
 
     var user = knockOff.AsUserService().GetUser(42);
     Assert.Equal("Special", user.Name);
@@ -338,14 +338,14 @@ public void Test_WithSpecialCase()
 var knockOff = new UserServiceKnockOff();
 IUserService service = knockOff;
 
-knockOff.Spy.GetUser.OnCall((ko, id) => new User { Name = "First" });
+knockOff.IUserService.GetUser.OnCall = (ko, id) => new User { Name = "First" };
 var user1 = service.GetUser(1);
 
-knockOff.Spy.GetUser.Reset(); // Clears callback and tracking
+knockOff.IUserService.GetUser.Reset(); // Clears callback and tracking
 
 // Now falls back to user method or default
 var user2 = service.GetUser(2);
-Assert.Equal(0, knockOff.Spy.GetUser.CallCount); // Reset cleared count
+Assert.Equal(0, knockOff.IUserService.GetUser.CallCount); // Reset cleared count
 ```
 
 ## Callback Priority

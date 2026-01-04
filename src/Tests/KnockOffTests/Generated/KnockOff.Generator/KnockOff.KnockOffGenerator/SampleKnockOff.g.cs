@@ -5,8 +5,8 @@ namespace KnockOff.Tests;
 
 partial class SampleKnockOff
 {
-	/// <summary>Tracks and configures behavior for Name.</summary>
-	public sealed class NameHandler
+	/// <summary>Tracks and configures behavior for ISampleService.Name.</summary>
+	public sealed class ISampleService_NameHandler
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -33,13 +33,11 @@ partial class SampleKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for DoSomething.</summary>
-	public sealed class DoSomethingHandler
+	/// <summary>Tracks and configures behavior for ISampleService.DoSomething.</summary>
+	public sealed class ISampleService_DoSomethingHandler
 	{
 		/// <summary>Delegate for DoSomething().</summary>
 		public delegate void DoSomethingDelegate(SampleKnockOff ko);
-
-		private DoSomethingDelegate? _onCall;
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
@@ -47,25 +45,21 @@ partial class SampleKnockOff
 		/// <summary>True if this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Sets callback for DoSomething(parameterless) overload.</summary>
-		public void OnCall(DoSomethingDelegate callback) => _onCall = callback;
-
-		internal DoSomethingDelegate? GetCallback() => _onCall;
+		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		public DoSomethingDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; _onCall = null; }
+		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for GetValue.</summary>
-	public sealed class GetValueHandler
+	/// <summary>Tracks and configures behavior for ISampleService.GetValue.</summary>
+	public sealed class ISampleService_GetValueHandler
 	{
 		/// <summary>Delegate for GetValue(int input).</summary>
 		public delegate int GetValueDelegate(SampleKnockOff ko, int input);
-
-		private GetValueDelegate? _onCall;
 
 		private readonly global::System.Collections.Generic.List<int> _calls = new();
 
@@ -81,25 +75,21 @@ partial class SampleKnockOff
 		/// <summary>All recorded calls with their arguments.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<int> AllCalls => _calls;
 
-		/// <summary>Sets callback for GetValue(input) overload.</summary>
-		public void OnCall(GetValueDelegate callback) => _onCall = callback;
-
-		internal GetValueDelegate? GetCallback() => _onCall;
+		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		public GetValueDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall(int input) => _calls.Add(input);
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); _onCall = null; }
+		public void Reset() { _calls.Clear(); OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for Calculate.</summary>
-	public sealed class CalculateHandler
+	/// <summary>Tracks and configures behavior for ISampleService.Calculate.</summary>
+	public sealed class ISampleService_CalculateHandler
 	{
 		/// <summary>Delegate for Calculate(string name, int value, bool flag).</summary>
 		public delegate void CalculateDelegate(SampleKnockOff ko, string name, int value, bool flag);
-
-		private CalculateDelegate? _onCall;
 
 		private readonly global::System.Collections.Generic.List<(string name, int value, bool flag)> _calls = new();
 
@@ -109,31 +99,27 @@ partial class SampleKnockOff
 		/// <summary>True if this method was called at least once.</summary>
 		public bool WasCalled => _calls.Count > 0;
 
-		/// <summary>Arguments from the most recent call (nullable for params not in all overloads).</summary>
+		/// <summary>Arguments from the most recent call.</summary>
 		public (string name, int value, bool flag)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
 
 		/// <summary>All recorded calls with their arguments.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<(string name, int value, bool flag)> AllCalls => _calls;
 
-		/// <summary>Sets callback for Calculate(name, value, flag) overload.</summary>
-		public void OnCall(CalculateDelegate callback) => _onCall = callback;
-
-		internal CalculateDelegate? GetCallback() => _onCall;
+		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		public CalculateDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall(string name, int value, bool flag) => _calls.Add((name, value, flag));
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); _onCall = null; }
+		public void Reset() { _calls.Clear(); OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for GetOptional.</summary>
-	public sealed class GetOptionalHandler
+	/// <summary>Tracks and configures behavior for ISampleService.GetOptional.</summary>
+	public sealed class ISampleService_GetOptionalHandler
 	{
 		/// <summary>Delegate for GetOptional().</summary>
 		public delegate string? GetOptionalDelegate(SampleKnockOff ko);
-
-		private GetOptionalDelegate? _onCall;
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
@@ -141,87 +127,85 @@ partial class SampleKnockOff
 		/// <summary>True if this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Sets callback for GetOptional(parameterless) overload.</summary>
-		public void OnCall(GetOptionalDelegate callback) => _onCall = callback;
-
-		internal GetOptionalDelegate? GetCallback() => _onCall;
+		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		public GetOptionalDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; _onCall = null; }
+		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for SampleKnockOff - tracks invocations and configures behavior.</summary>
-	public sealed class SampleKnockOffSpy
+	/// <summary>Spy for KnockOff.Tests.ISampleService - tracks invocations and configures behavior.</summary>
+	public sealed class ISampleServiceSpy
 	{
 		/// <summary>Handler for Name.</summary>
-		public NameHandler Name { get; } = new();
+		public ISampleService_NameHandler Name { get; } = new();
 		/// <summary>Handler for DoSomething.</summary>
-		public DoSomethingHandler DoSomething { get; } = new();
+		public ISampleService_DoSomethingHandler DoSomething { get; } = new();
 		/// <summary>Handler for GetValue.</summary>
-		public GetValueHandler GetValue { get; } = new();
+		public ISampleService_GetValueHandler GetValue { get; } = new();
 		/// <summary>Handler for Calculate.</summary>
-		public CalculateHandler Calculate { get; } = new();
+		public ISampleService_CalculateHandler Calculate { get; } = new();
 		/// <summary>Handler for GetOptional.</summary>
-		public GetOptionalHandler GetOptional { get; } = new();
+		public ISampleService_GetOptionalHandler GetOptional { get; } = new();
 	}
 
-	/// <summary>Tracks invocations and configures behavior for all interface members.</summary>
-	public SampleKnockOffSpy Spy { get; } = new();
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.ISampleService.</summary>
+	public ISampleServiceSpy ISampleService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.ISampleService.</summary>
 	public KnockOff.Tests.ISampleService AsSampleService() => this;
 
-	/// <summary>Backing field for Name.</summary>
-	protected string NameBacking { get; set; } = "";
+	/// <summary>Backing field for ISampleService.Name.</summary>
+	protected string ISampleService_NameBacking { get; set; } = "";
 
 	string KnockOff.Tests.ISampleService.Name
 	{
 		get
 		{
-			Spy.Name.RecordGet();
-			if (Spy.Name.OnGet is { } onGetCallback)
+			ISampleService.Name.RecordGet();
+			if (ISampleService.Name.OnGet is { } onGetCallback)
 				return onGetCallback(this);
-			return NameBacking;
+			return ISampleService_NameBacking;
 		}
 		set
 		{
-			Spy.Name.RecordSet(value);
-			if (Spy.Name.OnSet is { } onSetCallback)
+			ISampleService.Name.RecordSet(value);
+			if (ISampleService.Name.OnSet is { } onSetCallback)
 				onSetCallback(this, value);
 			else
-				NameBacking = value;
+				ISampleService_NameBacking = value;
 		}
 	}
 
 	void KnockOff.Tests.ISampleService.DoSomething()
 	{
-		Spy.DoSomething.RecordCall();
-		if (Spy.DoSomething.GetCallback() is { } onCallCallback)
+		ISampleService.DoSomething.RecordCall();
+		if (ISampleService.DoSomething.OnCall is { } onCallCallback)
 		{ onCallCallback(this); return; }
 	}
 
 	int KnockOff.Tests.ISampleService.GetValue(int input)
 	{
-		Spy.GetValue.RecordCall(input);
-		if (Spy.GetValue.GetCallback() is { } onCallCallback)
+		ISampleService.GetValue.RecordCall(input);
+		if (ISampleService.GetValue.OnCall is { } onCallCallback)
 			return onCallCallback(this, input);
 		return GetValue(input);
 	}
 
 	void KnockOff.Tests.ISampleService.Calculate(string name, int value, bool flag)
 	{
-		Spy.Calculate.RecordCall(name, value, flag);
-		if (Spy.Calculate.GetCallback() is { } onCallCallback)
+		ISampleService.Calculate.RecordCall(name, value, flag);
+		if (ISampleService.Calculate.OnCall is { } onCallCallback)
 		{ onCallCallback(this, name, value, flag); return; }
 	}
 
 	string? KnockOff.Tests.ISampleService.GetOptional()
 	{
-		Spy.GetOptional.RecordCall();
-		if (Spy.GetOptional.GetCallback() is { } onCallCallback)
+		ISampleService.GetOptional.RecordCall();
+		if (ISampleService.GetOptional.OnCall is { } onCallCallback)
 			return onCallCallback(this);
 		return default!;
 	}

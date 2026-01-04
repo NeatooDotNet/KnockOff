@@ -5,8 +5,8 @@ namespace KnockOff.Tests;
 
 partial class ReadWriteStoreKnockOff
 {
-	/// <summary>Tracks and configures behavior for StringIndexer.</summary>
-	public sealed class StringIndexerHandler
+	/// <summary>Tracks and configures behavior for IReadWriteStore.StringIndexer.</summary>
+	public sealed class IReadWriteStore_StringIndexerHandler
 	{
 		private readonly global::System.Collections.Generic.List<string> _getKeys = new();
 
@@ -46,40 +46,40 @@ partial class ReadWriteStoreKnockOff
 		public void Reset() { _getKeys.Clear(); OnGet = null; _setEntries.Clear(); OnSet = null; }
 	}
 
-	/// <summary>Spy for ReadWriteStoreKnockOff - tracks invocations and configures behavior.</summary>
-	public sealed class ReadWriteStoreKnockOffSpy
+	/// <summary>Spy for KnockOff.Tests.IReadWriteStore - tracks invocations and configures behavior.</summary>
+	public sealed class IReadWriteStoreSpy
 	{
 		/// <summary>Handler for StringIndexer.</summary>
-		public StringIndexerHandler StringIndexer { get; } = new();
+		public IReadWriteStore_StringIndexerHandler StringIndexer { get; } = new();
 	}
 
-	/// <summary>Tracks invocations and configures behavior for all interface members.</summary>
-	public ReadWriteStoreKnockOffSpy Spy { get; } = new();
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IReadWriteStore.</summary>
+	public IReadWriteStoreSpy IReadWriteStore { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IReadWriteStore.</summary>
 	public KnockOff.Tests.IReadWriteStore AsReadWriteStore() => this;
 
-	/// <summary>Backing dictionary for StringIndexer. Pre-populate with values or use OnGet callback.</summary>
-	public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Tests.PropertyInfo?> StringIndexerBacking { get; } = new();
+	/// <summary>Backing dictionary for IReadWriteStore.StringIndexer. Pre-populate with values or use OnGet callback.</summary>
+	public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Tests.PropertyInfo?> IReadWriteStore_StringIndexerBacking { get; } = new();
 
 	global::KnockOff.Tests.PropertyInfo? KnockOff.Tests.IReadWriteStore.this[string key]
 	{
 		get
 		{
-			Spy.StringIndexer.RecordGet(key);
-			if (Spy.StringIndexer.OnGet is { } onGetCallback)
+			IReadWriteStore.StringIndexer.RecordGet(key);
+			if (IReadWriteStore.StringIndexer.OnGet is { } onGetCallback)
 				return onGetCallback(this, key);
-			if (StringIndexerBacking.TryGetValue(key, out var value))
+			if (IReadWriteStore_StringIndexerBacking.TryGetValue(key, out var value))
 				return value;
 			return default!;
 		}
 		set
 		{
-			Spy.StringIndexer.RecordSet(key, value);
-			if (Spy.StringIndexer.OnSet is { } onSetCallback)
+			IReadWriteStore.StringIndexer.RecordSet(key, value);
+			if (IReadWriteStore.StringIndexer.OnSet is { } onSetCallback)
 				onSetCallback(this, key, value);
 			else
-				StringIndexerBacking[key] = value;
+				IReadWriteStore_StringIndexerBacking[key] = value;
 		}
 	}
 

@@ -1,15 +1,15 @@
 # Handler API Reference
 
-Every interface member gets a dedicated Handler class in the `Spy` property. This reference covers the complete API for each handler type.
+Every interface member gets a dedicated Handler class in its interface spy property. This reference covers the complete API for each handler type.
 
 ## Handler Types
 
 | Interface Member | Handler Type | Access Pattern |
 |------------------|--------------|----------------|
-| Method | `{MethodName}Handler` | `Spy.MethodName` |
-| Property | `{PropertyName}Handler` | `Spy.PropertyName` |
-| Indexer | `{KeyType}IndexerHandler` | `Spy.StringIndexer`, `Spy.IntIndexer`, etc. |
-| Event | `{EventName}Handler` | `Spy.EventName` |
+| Method | `{InterfaceName}_{MethodName}Handler` | `IInterface.MethodName` |
+| Property | `{InterfaceName}_{PropertyName}Handler` | `IInterface.PropertyName` |
+| Indexer | `{InterfaceName}_{KeyType}IndexerHandler` | `IInterface.StringIndexer`, `IInterface.IntIndexer`, etc. |
+| Event | `{InterfaceName}_{EventName}Handler` | `IInterface.EventName` |
 
 ## Method Handler
 
@@ -53,22 +53,22 @@ For interface methods: `void M()`, `T M()`, `void M(args)`, `T M(args)`
 
 ```csharp
 // Void method, no params
-Assert.True(knockOff.Spy.Initialize.WasCalled);
-knockOff.Spy.Initialize.OnCall((ko) => { /* custom */ });
+Assert.True(knockOff.IService.Initialize.WasCalled);
+knockOff.IService.Initialize.OnCall = (ko) => { /* custom */ };
 
 // Return method, single param
-Assert.Equal(42, knockOff.Spy.GetById.LastCallArg);
-knockOff.Spy.GetById.OnCall((ko, id) => new User { Id = id });
+Assert.Equal(42, knockOff.IService.GetById.LastCallArg);
+knockOff.IService.GetById.OnCall = (ko, id) => new User { Id = id };
 
 // Void method, multiple params
-var args = knockOff.Spy.Log.LastCallArgs;
+var args = knockOff.IService.Log.LastCallArgs;
 Assert.Equal("error", args?.level);
 Assert.Equal("Failed", args?.message);
 
-knockOff.Spy.Log.OnCall((ko, level, message) =>
+knockOff.IService.Log.OnCall = (ko, level, message) =>
 {
     Console.WriteLine($"[{level}] {message}");
-});
+};
 ```
 
 ## Property Handler
@@ -108,23 +108,23 @@ For interface properties: `T Prop { get; }`, `T Prop { set; }`, `T Prop { get; s
 
 ```csharp
 // Track property access
-Assert.Equal(3, knockOff.Spy.Name.GetCount);
-Assert.Equal(2, knockOff.Spy.Name.SetCount);
-Assert.Equal("LastValue", knockOff.Spy.Name.LastSetValue);
+Assert.Equal(3, knockOff.IService.Name.GetCount);
+Assert.Equal(2, knockOff.IService.Name.SetCount);
+Assert.Equal("LastValue", knockOff.IService.Name.LastSetValue);
 
 // Override getter
-knockOff.Spy.Name.OnGet = (ko) => "Always this";
+knockOff.IService.Name.OnGet = (ko) => "Always this";
 
 // Override setter (capture without storing)
-knockOff.Spy.Name.OnSet = (ko, value) =>
+knockOff.IService.Name.OnSet = (ko, value) =>
 {
     capturedValues.Add(value);
     // Value does NOT go to backing field
 };
 
 // Reset
-knockOff.Spy.Name.Reset();
-Assert.Equal(0, knockOff.Spy.Name.GetCount);
+knockOff.IService.Name.Reset();
+Assert.Equal(0, knockOff.IService.Name.GetCount);
 ```
 
 ## Indexer Handler
@@ -164,7 +164,7 @@ Handler naming: `{KeyTypeName}IndexerHandler`
 ### Backing Dictionary
 
 Each indexer has a backing dictionary:
-- `{KeyType}IndexerBacking` — e.g., `StringIndexerBacking`, `IntIndexerBacking`
+- `{InterfaceName}_{KeyType}IndexerBacking` — e.g., `IPropertyStore_StringIndexerBacking`, `IList_IntIndexerBacking`
 - Type: `Dictionary<TKey, TValue>`
 
 ### Getter Behavior
@@ -186,28 +186,28 @@ When **`OnGet` is set**:
 
 ```csharp
 // Pre-populate backing
-knockOff.StringIndexerBacking["Key1"] = value1;
-knockOff.StringIndexerBacking["Key2"] = value2;
+knockOff.IPropertyStore_StringIndexerBacking["Key1"] = value1;
+knockOff.IPropertyStore_StringIndexerBacking["Key2"] = value2;
 
 // Track access
 _ = store["Key1"];
 _ = store["Key2"];
-Assert.Equal(2, knockOff.Spy.StringIndexer.GetCount);
-Assert.Equal("Key2", knockOff.Spy.StringIndexer.LastGetKey);
+Assert.Equal(2, knockOff.IPropertyStore.StringIndexer.GetCount);
+Assert.Equal("Key2", knockOff.IPropertyStore.StringIndexer.LastGetKey);
 
 // Dynamic getter
-knockOff.Spy.StringIndexer.OnGet = (ko, key) =>
+knockOff.IPropertyStore.StringIndexer.OnGet = (ko, key) =>
 {
     if (key == "special") return specialValue;
-    return ko.StringIndexerBacking.GetValueOrDefault(key);
+    return ko.IPropertyStore_StringIndexerBacking.GetValueOrDefault(key);
 };
 
 // Track setter
 store["NewKey"] = newValue;
-Assert.Equal("NewKey", knockOff.Spy.StringIndexer.LastSetEntry?.key);
+Assert.Equal("NewKey", knockOff.IPropertyStore.StringIndexer.LastSetEntry?.key);
 
 // Intercept setter
-knockOff.Spy.StringIndexer.OnSet = (ko, key, value) =>
+knockOff.IPropertyStore.StringIndexer.OnSet = (ko, key, value) =>
 {
     // Custom logic
     // Value does NOT go to backing dictionary
@@ -271,28 +271,28 @@ For interface events: `event EventHandler E`, `event EventHandler<T> E`, `event 
 ```csharp
 // Subscribe tracking
 source.DataReceived += handler;
-Assert.Equal(1, knockOff.Spy.DataReceived.SubscribeCount);
-Assert.True(knockOff.Spy.DataReceived.HasSubscribers);
+Assert.Equal(1, knockOff.IEventSource.DataReceived.SubscribeCount);
+Assert.True(knockOff.IEventSource.DataReceived.HasSubscribers);
 
 // Raise event
-knockOff.Spy.DataReceived.Raise("test data");
-Assert.True(knockOff.Spy.DataReceived.WasRaised);
-Assert.Equal("test data", knockOff.Spy.DataReceived.LastRaiseArgs?.e);
+knockOff.IEventSource.DataReceived.Raise("test data");
+Assert.True(knockOff.IEventSource.DataReceived.WasRaised);
+Assert.Equal("test data", knockOff.IEventSource.DataReceived.LastRaiseArgs?.e);
 
 // EventHandler (non-generic)
-knockOff.Spy.Completed.Raise(); // null sender, EventArgs.Empty
+knockOff.IEventSource.Completed.Raise(); // null sender, EventArgs.Empty
 
 // Action with params
-knockOff.Spy.ProgressChanged.Raise(75);
-knockOff.Spy.DataUpdated.Raise("key", 42);
+knockOff.IEventSource.ProgressChanged.Raise(75);
+knockOff.IEventSource.DataUpdated.Raise("key", 42);
 
 // All raises
-var allRaises = knockOff.Spy.DataReceived.AllRaises;
+var allRaises = knockOff.IEventSource.DataReceived.AllRaises;
 Assert.Equal(3, allRaises.Count);
 
 // Reset vs Clear
-knockOff.Spy.DataReceived.Reset();  // Clears tracking, keeps handlers
-knockOff.Spy.DataReceived.Clear();  // Clears tracking AND handlers
+knockOff.IEventSource.DataReceived.Reset();  // Clears tracking, keeps handlers
+knockOff.IEventSource.DataReceived.Clear();  // Clears tracking AND handlers
 ```
 
 ## Reset Behavior Summary
@@ -316,9 +316,9 @@ Async methods use the same handler structure as sync methods. The `OnCall` callb
 | `ValueTask<T>` | `ValueTask<T>` |
 
 ```csharp
-knockOff.Spy.GetByIdAsync.OnCall((ko, id) =>
-    Task.FromResult<User?>(new User { Id = id }));
+knockOff.IRepository.GetByIdAsync.OnCall = (ko, id) =>
+    Task.FromResult<User?>(new User { Id = id });
 
-knockOff.Spy.SaveAsync.OnCall((ko, entity) =>
-    Task.FromException<int>(new DbException("Failed")));
+knockOff.IRepository.SaveAsync.OnCall = (ko, entity) =>
+    Task.FromException<int>(new DbException("Failed"));
 ```

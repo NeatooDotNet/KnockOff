@@ -8,11 +8,11 @@ This guide helps you migrate from Moq to KnockOff for interface stubbing.
 |-----|----------|
 | `new Mock<IService>()` | `new ServiceKnockOff()` |
 | `mock.Object` | Cast to interface or `knockOff.AsService()` |
-| `.Setup(x => x.Method())` | `Spy.Method.OnCall(...)` |
-| `.Returns(value)` | `OnCall((ko) => value)` |
-| `.ReturnsAsync(value)` | `OnCall((ko) => Task.FromResult(value))` |
+| `.Setup(x => x.Method())` | `IInterface.Method.OnCall = ...` |
+| `.Returns(value)` | `OnCall = (ko) => value` |
+| `.ReturnsAsync(value)` | `OnCall = (ko) => Task.FromResult(value)` |
 | `.Callback(action)` | Logic inside `OnCall` |
-| `.Verify(Times.Once)` | `Assert.Equal(1, Spy.Method.CallCount)` |
+| `.Verify(Times.Once)` | `Assert.Equal(1, IInterface.Method.CallCount)` |
 | `It.IsAny<T>()` | Implicit (callback receives all args) |
 | `It.Is<T>(predicate)` | Check in callback body |
 
@@ -60,8 +60,8 @@ mock.Setup(x => x.GetUser(It.IsAny<int>()))
 
 **After (KnockOff):**
 ```csharp
-knockOff.Spy.GetUser.OnCall((ko, id) =>
-    new User { Id = id, Name = "Test" });
+knockOff.IUserService.GetUser.OnCall = (ko, id) =>
+    new User { Id = id, Name = "Test" };
 ```
 
 ### Step 4: Convert Async Returns
@@ -74,8 +74,8 @@ mock.Setup(x => x.GetUserAsync(It.IsAny<int>()))
 
 **After (KnockOff):**
 ```csharp
-knockOff.Spy.GetUserAsync.OnCall((ko, id) =>
-    Task.FromResult<User?>(new User { Id = id }));
+knockOff.IUserService.GetUserAsync.OnCall = (ko, id) =>
+    Task.FromResult<User?>(new User { Id = id });
 ```
 
 ### Step 5: Convert Verification
@@ -90,10 +90,10 @@ mock.Verify(x => x.Update(It.IsAny<User>()), Times.Exactly(3));
 
 **After (KnockOff):**
 ```csharp
-Assert.Equal(1, knockOff.Spy.Save.CallCount);
-Assert.Equal(0, knockOff.Spy.Delete.CallCount);
-Assert.True(knockOff.Spy.GetAll.WasCalled);
-Assert.Equal(3, knockOff.Spy.Update.CallCount);
+Assert.Equal(1, knockOff.IUserService.Save.CallCount);
+Assert.Equal(0, knockOff.IUserService.Delete.CallCount);
+Assert.True(knockOff.IUserService.GetAll.WasCalled);
+Assert.Equal(3, knockOff.IUserService.Update.CallCount);
 ```
 
 ### Step 6: Convert Callback
@@ -108,13 +108,13 @@ mock.Setup(x => x.Save(It.IsAny<User>()))
 **After (KnockOff):**
 ```csharp
 // Arguments are captured automatically
-var captured = knockOff.Spy.Save.LastCallArg;
+var captured = knockOff.IUserService.Save.LastCallArg;
 
 // Or use callback for custom logic
-knockOff.Spy.Save.OnCall((ko, user) =>
+knockOff.IUserService.Save.OnCall = (ko, user) =>
 {
     customList.Add(user);
-});
+};
 ```
 
 ### Step 7: Convert Property Setup
@@ -127,11 +127,11 @@ mock.SetupSet(x => x.Name = It.IsAny<string>()).Verifiable();
 
 **After (KnockOff):**
 ```csharp
-knockOff.Spy.Name.OnGet = (ko) => "Test";
+knockOff.IUserService.Name.OnGet = (ko) => "Test";
 
 // Setter tracking is automatic
 service.Name = "Value";
-Assert.Equal("Value", knockOff.Spy.Name.LastSetValue);
+Assert.Equal("Value", knockOff.IUserService.Name.LastSetValue);
 ```
 
 ## Common Patterns
@@ -154,7 +154,7 @@ public partial class ConfigServiceKnockOff : IConfigService
 
 **KnockOff Option 2 - Callback (runtime):**
 ```csharp
-knockOff.Spy.GetConfig.OnCall((ko) => new Config { Timeout = 30 });
+knockOff.IConfigService.GetConfig.OnCall = (ko) => new Config { Timeout = 30 };
 ```
 
 ### Conditional Returns
@@ -168,12 +168,12 @@ mock.Setup(x => x.GetUser(It.IsAny<int>())).Returns((User?)null);
 
 **KnockOff:**
 ```csharp
-knockOff.Spy.GetUser.OnCall((ko, id) => id switch
+knockOff.IUserService.GetUser.OnCall = (ko, id) => id switch
 {
     1 => new User { Name = "Admin" },
     2 => new User { Name = "Guest" },
     _ => null
-});
+};
 ```
 
 ### Throwing Exceptions
@@ -185,8 +185,8 @@ mock.Setup(x => x.Connect()).Throws(new TimeoutException());
 
 **KnockOff:**
 ```csharp
-knockOff.Spy.Connect.OnCall((ko) =>
-    throw new TimeoutException());
+knockOff.IConnection.Connect.OnCall = (ko) =>
+    throw new TimeoutException();
 ```
 
 ### Sequential Returns
@@ -202,7 +202,7 @@ mock.SetupSequence(x => x.GetNext())
 **KnockOff:**
 ```csharp
 var values = new Queue<int>([1, 2, 3]);
-knockOff.Spy.GetNext.OnCall((ko) => values.Dequeue());
+knockOff.ISequence.GetNext.OnCall = (ko) => values.Dequeue();
 ```
 
 ### Multiple Interfaces
@@ -224,7 +224,7 @@ var uow = mock.As<IUnitOfWork>().Object;
 public partial class DataContextKnockOff : IRepository, IUnitOfWork { }
 
 var knockOff = new DataContextKnockOff();
-knockOff.Spy.SaveChangesAsync.OnCall((ko, ct) => Task.FromResult(1));
+knockOff.IUnitOfWork.SaveChangesAsync.OnCall = (ko, ct) => Task.FromResult(1);
 
 IRepository repo = knockOff.AsRepository();
 IUnitOfWork uow = knockOff.AsUnitOfWork();
@@ -240,11 +240,11 @@ mock.Setup(x => x.Log(It.Is<string>(s => s.Contains("error"))))
 
 **KnockOff:**
 ```csharp
-knockOff.Spy.Log.OnCall((ko, message) =>
+knockOff.ILogger.Log.OnCall = (ko, message) =>
 {
     if (message.Contains("error"))
         errors.Add(message);
-});
+};
 ```
 
 ## Feature Comparison
@@ -269,8 +269,8 @@ knockOff.Spy.Log.OnCall((ko, message) =>
 Begin with tests that only verify calls:
 ```csharp
 // These translate directly
-Assert.True(knockOff.Spy.Method.WasCalled);
-Assert.Equal(expectedCount, knockOff.Spy.Method.CallCount);
+Assert.True(knockOff.IService.Method.WasCalled);
+Assert.Equal(expectedCount, knockOff.IService.Method.CallCount);
 ```
 
 ### Use User Methods for Shared Stubs
@@ -288,11 +288,11 @@ public partial class RepositoryKnockOff : IRepository
 
 For test-specific behavior, use callbacks:
 ```csharp
-knockOff.Spy.Save.OnCall((ko, entity) =>
+knockOff.ISaveService.Save.OnCall = (ko, entity) =>
 {
     entity.Id = nextId++;
     savedEntities.Add(entity);
-});
+};
 ```
 
 ### Leverage Automatic Tracking
@@ -303,7 +303,7 @@ Unlike Moq where you need Callback to capture args, KnockOff tracks automaticall
 service.Process("data");
 
 // Args are captured
-Assert.Equal("data", knockOff.Spy.Process.LastCallArg);
+Assert.Equal("data", knockOff.IProcessor.Process.LastCallArg);
 ```
 
 ## What to Keep in Moq

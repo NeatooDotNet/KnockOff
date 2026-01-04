@@ -17,9 +17,9 @@ public partial class ServiceKnockOff : IService { }
 ```
 
 Tracking:
-- `Spy.Initialize.WasCalled`
-- `Spy.Initialize.CallCount`
-- `Spy.Initialize.OnCall` — `Action<ServiceKnockOff>`
+- `IService.Initialize.WasCalled`
+- `IService.Initialize.CallCount`
+- `IService.Initialize.OnCall` — `Action<ServiceKnockOff>`
 
 ### Void Methods (With Parameters)
 
@@ -32,12 +32,12 @@ public interface ILogger
 ```
 
 Single parameter:
-- `Spy.Log.LastCallArg` — the argument value (not a tuple)
-- `Spy.Log.AllCalls` — `List<string>`
+- `ILogger.Log.LastCallArg` — the argument value (not a tuple)
+- `ILogger.Log.AllCalls` — `List<string>`
 
 Multiple parameters:
-- `Spy.LogError.LastCallArgs` — named tuple `(string message, Exception ex)`
-- `Spy.LogError.AllCalls` — `List<(string message, Exception ex)>`
+- `ILogger.LogError.LastCallArgs` — named tuple `(string message, Exception ex)`
+- `ILogger.LogError.AllCalls` — `List<(string message, Exception ex)>`
 
 ### Methods with Return Values
 
@@ -68,8 +68,8 @@ public interface IService
 service.GetUser(42);
 
 // Tracking
-int? lastId = knockOff.Spy.GetUser.LastCallArg;  // 42, not (42,)
-List<int> allIds = knockOff.Spy.GetUser.AllCalls; // [42]
+int? lastId = knockOff.IService.GetUser.LastCallArg;  // 42, not (42,)
+List<int> allIds = knockOff.IService.GetUser.AllCalls; // [42]
 ```
 
 ### Multiple Parameters
@@ -86,19 +86,19 @@ public interface IService
 service.Process("test", 42, true);
 
 // Tracking - named tuple with original parameter names
-var args = knockOff.Spy.Process.LastCallArgs;
+var args = knockOff.IService.Process.LastCallArgs;
 Assert.Equal("test", args?.name);
 Assert.Equal(42, args?.value);
 Assert.True(args?.flag);
 
 // Tuple destructuring
-if (knockOff.Spy.Process.LastCallArgs is var (name, value, flag))
+if (knockOff.IService.Process.LastCallArgs is var (name, value, flag))
 {
     Assert.Equal("test", name);
 }
 
 // All calls
-var allCalls = knockOff.Spy.Process.AllCalls;
+var allCalls = knockOff.IService.Process.AllCalls;
 Assert.Equal("test", allCalls[0].name);
 ```
 
@@ -127,52 +127,52 @@ Rules:
 
 ```csharp
 // No parameters
-knockOff.Spy.Initialize.OnCall((ko) =>
+knockOff.IService.Initialize.OnCall = (ko) =>
 {
     // Custom initialization logic
-});
+};
 
 // Single parameter
-knockOff.Spy.Log.OnCall((ko, message) =>
+knockOff.ILogger.Log.OnCall = (ko, message) =>
 {
     Console.WriteLine($"Logged: {message}");
-});
+};
 
 // Multiple parameters (individual params)
-knockOff.Spy.LogError.OnCall((ko, message, ex) =>
+knockOff.ILogger.LogError.OnCall = (ko, message, ex) =>
 {
     Console.WriteLine($"Error: {message} - {ex.Message}");
-});
+};
 ```
 
 ### Return Method Callbacks
 
 ```csharp
 // No parameters
-knockOff.Spy.Count.OnCall((ko) => 42);
+knockOff.IRepository.Count.OnCall = (ko) => 42;
 
 // Single parameter
-knockOff.Spy.GetById.OnCall((ko, id) => new User { Id = id });
+knockOff.IRepository.GetById.OnCall = (ko, id) => new User { Id = id };
 
 // Multiple parameters
-knockOff.Spy.Find.OnCall((ko, name, includeInactive) =>
+knockOff.IRepository.Find.OnCall = (ko, name, includeInactive) =>
 {
     return users.Where(u => u.Name == name).ToList();
-});
+};
 ```
 
 ### Callback Signatures
 
-Each method gets a generated delegate type with individual parameters:
+Each method gets an `OnCall` property with a delegate or Func/Action type:
 
-| Method Signature | OnCall Delegate |
-|------------------|-----------------|
-| `void M()` | `MDelegate(TKnockOff ko)` |
-| `void M(T1 a)` | `MDelegate(TKnockOff ko, T1 a)` |
-| `void M(T1 a, T2 b)` | `MDelegate(TKnockOff ko, T1 a, T2 b)` |
-| `R M()` | `MDelegate(TKnockOff ko) → R` |
-| `R M(T1 a)` | `MDelegate(TKnockOff ko, T1 a) → R` |
-| `R M(T1 a, T2 b)` | `MDelegate(TKnockOff ko, T1 a, T2 b) → R` |
+| Method Signature | OnCall Type |
+|------------------|-------------|
+| `void M()` | `Action<TKnockOff>?` |
+| `void M(T1 a)` | `Action<TKnockOff, T1>?` |
+| `void M(T1 a, T2 b)` | `Action<TKnockOff, T1, T2>?` |
+| `R M()` | `Func<TKnockOff, R>?` |
+| `R M(T1 a)` | `Func<TKnockOff, T1, R>?` |
+| `R M(T1 a, T2 b)` | `Func<TKnockOff, T1, T2, R>?` |
 
 ## Priority Order
 
@@ -194,11 +194,11 @@ IService service = knockOff;
 Assert.Equal(10, service.Calculate(5));  // 5 * 2
 
 // Callback → overrides user method
-knockOff.Spy.Calculate.OnCall((ko, x) => x * 100);
+knockOff.IService.Calculate.OnCall = (ko, x) => x * 100;
 Assert.Equal(500, service.Calculate(5));  // callback
 
 // Reset → back to user method
-knockOff.Spy.Calculate.Reset();
+knockOff.IService.Calculate.Reset();
 Assert.Equal(10, service.Calculate(5));  // user method again
 ```
 
@@ -207,32 +207,32 @@ Assert.Equal(10, service.Calculate(5));  // user method again
 ### Simulating Failures
 
 ```csharp
-knockOff.Spy.Save.OnCall((ko, entity) =>
+knockOff.IRepository.Save.OnCall = (ko, entity) =>
 {
     throw new DbException("Connection failed");
-});
+};
 ```
 
 ### Conditional Returns
 
 ```csharp
-knockOff.Spy.GetById.OnCall((ko, id) => id switch
+knockOff.IRepository.GetById.OnCall = (ko, id) => id switch
 {
     1 => new User { Id = 1, Name = "Admin" },
     2 => new User { Id = 2, Name = "Guest" },
     _ => null
-});
+};
 ```
 
 ### Capturing Arguments
 
 ```csharp
 var capturedIds = new List<int>();
-knockOff.Spy.GetById.OnCall((ko, id) =>
+knockOff.IRepository.GetById.OnCall = (ko, id) =>
 {
     capturedIds.Add(id);
     return new User { Id = id };
-});
+};
 ```
 
 ### Verifying Call Order
@@ -240,9 +240,9 @@ knockOff.Spy.GetById.OnCall((ko, id) =>
 ```csharp
 var callOrder = new List<string>();
 
-knockOff.Spy.Initialize.OnCall((ko) => callOrder.Add("Initialize"));
-knockOff.Spy.Process.OnCall((ko) => callOrder.Add("Process"));
-knockOff.Spy.Cleanup.OnCall((ko) => callOrder.Add("Cleanup"));
+knockOff.IService.Initialize.OnCall = (ko) => callOrder.Add("Initialize");
+knockOff.IService.Process.OnCall = (ko) => callOrder.Add("Process");
+knockOff.IService.Cleanup.OnCall = (ko) => callOrder.Add("Cleanup");
 
 // ... run code under test ...
 
@@ -253,7 +253,7 @@ Assert.Equal(["Initialize", "Process", "Cleanup"], callOrder);
 
 ```csharp
 var results = new Queue<int>([1, 2, 3]);
-knockOff.Spy.GetNext.OnCall((ko) => results.Dequeue());
+knockOff.ISequence.GetNext.OnCall = (ko) => results.Dequeue();
 
 Assert.Equal(1, service.GetNext());
 Assert.Equal(2, service.GetNext());
@@ -263,9 +263,9 @@ Assert.Equal(3, service.GetNext());
 ### Accessing Other Spy State
 
 ```csharp
-knockOff.Spy.Process.OnCall((ko) =>
+knockOff.IService.Process.OnCall = (ko) =>
 {
-    if (!ko.Spy.Initialize.WasCalled)
+    if (!ko.IService.Initialize.WasCalled)
         throw new InvalidOperationException("Not initialized");
-});
+};
 ```

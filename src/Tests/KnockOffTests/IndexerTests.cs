@@ -11,12 +11,12 @@ public class IndexerTests
 		var knockOff = new PropertyStoreKnockOff();
 		IPropertyStore store = knockOff;
 
-		knockOff.StringIndexerBacking["Name"] = new PropertyInfo { Name = "Name", Value = "Test" };
+		knockOff.IPropertyStore_StringIndexerBacking["Name"] = new PropertyInfo { Name = "Name", Value = "Test" };
 
 		var result = store["Name"];
 
-		Assert.Equal(1, knockOff.Spy.StringIndexer.GetCount);
-		Assert.Equal("Name", knockOff.Spy.StringIndexer.LastGetKey);
+		Assert.Equal(1, knockOff.IPropertyStore.StringIndexer.GetCount);
+		Assert.Equal("Name", knockOff.IPropertyStore.StringIndexer.LastGetKey);
 		Assert.NotNull(result);
 		Assert.Equal("Name", result.Name);
 	}
@@ -27,19 +27,19 @@ public class IndexerTests
 		var knockOff = new PropertyStoreKnockOff();
 		IPropertyStore store = knockOff;
 
-		knockOff.StringIndexerBacking["First"] = new PropertyInfo { Name = "First", Value = "1" };
-		knockOff.StringIndexerBacking["Second"] = new PropertyInfo { Name = "Second", Value = "2" };
-		knockOff.StringIndexerBacking["Third"] = new PropertyInfo { Name = "Third", Value = "3" };
+		knockOff.IPropertyStore_StringIndexerBacking["First"] = new PropertyInfo { Name = "First", Value = "1" };
+		knockOff.IPropertyStore_StringIndexerBacking["Second"] = new PropertyInfo { Name = "Second", Value = "2" };
+		knockOff.IPropertyStore_StringIndexerBacking["Third"] = new PropertyInfo { Name = "Third", Value = "3" };
 
 		_ = store["First"];
 		_ = store["Second"];
 		_ = store["Third"];
 
-		Assert.Equal(3, knockOff.Spy.StringIndexer.GetCount);
-		Assert.Equal(3, knockOff.Spy.StringIndexer.AllGetKeys.Count);
-		Assert.Equal("First", knockOff.Spy.StringIndexer.AllGetKeys[0]);
-		Assert.Equal("Second", knockOff.Spy.StringIndexer.AllGetKeys[1]);
-		Assert.Equal("Third", knockOff.Spy.StringIndexer.AllGetKeys[2]);
+		Assert.Equal(3, knockOff.IPropertyStore.StringIndexer.GetCount);
+		Assert.Equal(3, knockOff.IPropertyStore.StringIndexer.AllGetKeys.Count);
+		Assert.Equal("First", knockOff.IPropertyStore.StringIndexer.AllGetKeys[0]);
+		Assert.Equal("Second", knockOff.IPropertyStore.StringIndexer.AllGetKeys[1]);
+		Assert.Equal("Third", knockOff.IPropertyStore.StringIndexer.AllGetKeys[2]);
 	}
 
 	[Fact]
@@ -49,7 +49,7 @@ public class IndexerTests
 		IPropertyStore store = knockOff;
 
 		var mockProperty = new PropertyInfo { Name = "FromCallback", Value = "Mocked" };
-		knockOff.Spy.StringIndexer.OnGet = (ko, key) =>
+		knockOff.IPropertyStore.StringIndexer.OnGet = (ko, key) =>
 		{
 			if (key == "Special") return mockProperty;
 			return null;
@@ -58,7 +58,7 @@ public class IndexerTests
 		var result = store["Special"];
 
 		Assert.Same(mockProperty, result);
-		Assert.Equal("Special", knockOff.Spy.StringIndexer.LastGetKey);
+		Assert.Equal("Special", knockOff.IPropertyStore.StringIndexer.LastGetKey);
 	}
 
 	[Fact]
@@ -67,10 +67,10 @@ public class IndexerTests
 		var knockOff = new PropertyStoreKnockOff();
 		IPropertyStore store = knockOff;
 
-		knockOff.Spy.StringIndexer.OnGet = (ko, key) =>
+		knockOff.IPropertyStore.StringIndexer.OnGet = (ko, key) =>
 		{
 			Assert.Same(knockOff, ko);
-			return new PropertyInfo { Name = key, Value = $"Accessed {ko.Spy.StringIndexer.GetCount} times" };
+			return new PropertyInfo { Name = key, Value = $"Accessed {ko.IPropertyStore.StringIndexer.GetCount} times" };
 		};
 
 		_ = store["First"];
@@ -89,10 +89,10 @@ public class IndexerTests
 		var prop = new PropertyInfo { Name = "Test", Value = "Value" };
 		store["Test"] = prop;
 
-		Assert.Equal(1, knockOff.Spy.StringIndexer.SetCount);
-		Assert.NotNull(knockOff.Spy.StringIndexer.LastSetEntry);
-		Assert.Equal("Test", knockOff.Spy.StringIndexer.LastSetEntry.Value.key);
-		Assert.Same(prop, knockOff.Spy.StringIndexer.LastSetEntry.Value.value);
+		Assert.Equal(1, knockOff.IReadWriteStore.StringIndexer.SetCount);
+		Assert.NotNull(knockOff.IReadWriteStore.StringIndexer.LastSetEntry);
+		Assert.Equal("Test", knockOff.IReadWriteStore.StringIndexer.LastSetEntry.Value.key);
+		Assert.Same(prop, knockOff.IReadWriteStore.StringIndexer.LastSetEntry.Value.value);
 	}
 
 	[Fact]
@@ -104,8 +104,8 @@ public class IndexerTests
 		var prop = new PropertyInfo { Name = "Stored", Value = "InBacking" };
 		store["Stored"] = prop;
 
-		Assert.True(knockOff.StringIndexerBacking.ContainsKey("Stored"));
-		Assert.Same(prop, knockOff.StringIndexerBacking["Stored"]);
+		Assert.True(knockOff.IReadWriteStore_StringIndexerBacking.ContainsKey("Stored"));
+		Assert.Same(prop, knockOff.IReadWriteStore_StringIndexerBacking["Stored"]);
 
 		var retrieved = store["Stored"];
 		Assert.Same(prop, retrieved);
@@ -118,7 +118,7 @@ public class IndexerTests
 		IReadWriteStore store = knockOff;
 
 		(string key, PropertyInfo? value)? capturedEntry = null;
-		knockOff.Spy.StringIndexer.OnSet = (ko, key, value) =>
+		knockOff.IReadWriteStore.StringIndexer.OnSet = (ko, key, value) =>
 		{
 			capturedEntry = (key, value);
 		};
@@ -131,7 +131,7 @@ public class IndexerTests
 		Assert.Same(prop, capturedEntry.Value.value);
 
 		// Since OnSet was used, backing was NOT updated
-		Assert.False(knockOff.StringIndexerBacking.ContainsKey("MyKey"));
+		Assert.False(knockOff.IReadWriteStore_StringIndexerBacking.ContainsKey("MyKey"));
 	}
 
 	[Fact]
@@ -141,28 +141,28 @@ public class IndexerTests
 		IReadWriteStore store = knockOff;
 
 		var prop = new PropertyInfo { Name = "Test", Value = "Value" };
-		knockOff.StringIndexerBacking["Existing"] = prop;
-		knockOff.Spy.StringIndexer.OnGet = (ko, key) => prop;
+		knockOff.IReadWriteStore_StringIndexerBacking["Existing"] = prop;
+		knockOff.IReadWriteStore.StringIndexer.OnGet = (ko, key) => prop;
 
 		_ = store["Key1"];
 		_ = store["Key2"];
 		store["Key3"] = prop;
 
-		Assert.Equal(2, knockOff.Spy.StringIndexer.GetCount);
-		Assert.Equal(1, knockOff.Spy.StringIndexer.SetCount);
-		Assert.NotNull(knockOff.Spy.StringIndexer.OnGet);
+		Assert.Equal(2, knockOff.IReadWriteStore.StringIndexer.GetCount);
+		Assert.Equal(1, knockOff.IReadWriteStore.StringIndexer.SetCount);
+		Assert.NotNull(knockOff.IReadWriteStore.StringIndexer.OnGet);
 
-		knockOff.Spy.StringIndexer.Reset();
+		knockOff.IReadWriteStore.StringIndexer.Reset();
 
-		Assert.Equal(0, knockOff.Spy.StringIndexer.GetCount);
-		Assert.Empty(knockOff.Spy.StringIndexer.AllGetKeys);
-		Assert.Equal(0, knockOff.Spy.StringIndexer.SetCount);
-		Assert.Empty(knockOff.Spy.StringIndexer.AllSetEntries);
-		Assert.Null(knockOff.Spy.StringIndexer.OnGet);
-		Assert.Null(knockOff.Spy.StringIndexer.OnSet);
+		Assert.Equal(0, knockOff.IReadWriteStore.StringIndexer.GetCount);
+		Assert.Empty(knockOff.IReadWriteStore.StringIndexer.AllGetKeys);
+		Assert.Equal(0, knockOff.IReadWriteStore.StringIndexer.SetCount);
+		Assert.Empty(knockOff.IReadWriteStore.StringIndexer.AllSetEntries);
+		Assert.Null(knockOff.IReadWriteStore.StringIndexer.OnGet);
+		Assert.Null(knockOff.IReadWriteStore.StringIndexer.OnSet);
 
 		// Backing dictionary is NOT cleared by Reset
-		Assert.True(knockOff.StringIndexerBacking.ContainsKey("Existing"));
+		Assert.True(knockOff.IReadWriteStore_StringIndexerBacking.ContainsKey("Existing"));
 	}
 
 	[Fact]
@@ -174,6 +174,6 @@ public class IndexerTests
 		var result = store["NonExistent"];
 
 		Assert.Null(result);
-		Assert.Equal(1, knockOff.Spy.StringIndexer.GetCount);
+		Assert.Equal(1, knockOff.IPropertyStore.StringIndexer.GetCount);
 	}
 }

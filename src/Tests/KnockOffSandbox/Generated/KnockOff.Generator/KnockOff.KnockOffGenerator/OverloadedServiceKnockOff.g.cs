@@ -5,23 +5,13 @@ namespace KnockOff.Sandbox;
 
 partial class OverloadedServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for Format.</summary>
-	public sealed class FormatHandler
+	/// <summary>Tracks and configures behavior for IOverloadedService.Format1.</summary>
+	public sealed class IOverloadedService_Format1Handler
 	{
 		/// <summary>Delegate for Format(string input).</summary>
-		public delegate string FormatDelegate0(OverloadedServiceKnockOff ko, string input);
+		public delegate string FormatDelegate(OverloadedServiceKnockOff ko, string input);
 
-		/// <summary>Delegate for Format(string input, bool uppercase).</summary>
-		public delegate string FormatDelegate1(OverloadedServiceKnockOff ko, string input, bool uppercase);
-
-		/// <summary>Delegate for Format(string input, int maxLength).</summary>
-		public delegate string FormatDelegate2(OverloadedServiceKnockOff ko, string input, int maxLength);
-
-		private FormatDelegate0? _onCall0;
-		private FormatDelegate1? _onCall1;
-		private FormatDelegate2? _onCall2;
-
-		private readonly global::System.Collections.Generic.List<(string input, bool? uppercase, int? maxLength)> _calls = new();
+		private readonly global::System.Collections.Generic.List<string> _calls = new();
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount => _calls.Count;
@@ -29,71 +19,121 @@ partial class OverloadedServiceKnockOff
 		/// <summary>True if this method was called at least once.</summary>
 		public bool WasCalled => _calls.Count > 0;
 
-		/// <summary>Arguments from the most recent call (nullable for params not in all overloads).</summary>
-		public (string input, bool? uppercase, int? maxLength)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
+		/// <summary>The 'input' argument from the most recent call.</summary>
+		public string? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
 
 		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(string input, bool? uppercase, int? maxLength)> AllCalls => _calls;
+		public global::System.Collections.Generic.IReadOnlyList<string> AllCalls => _calls;
 
-		/// <summary>Sets callback for Format(input) overload.</summary>
-		public void OnCall(FormatDelegate0 callback) => _onCall0 = callback;
-
-		/// <summary>Sets callback for Format(input, uppercase) overload.</summary>
-		public void OnCall(FormatDelegate1 callback) => _onCall1 = callback;
-
-		/// <summary>Sets callback for Format(input, maxLength) overload.</summary>
-		public void OnCall(FormatDelegate2 callback) => _onCall2 = callback;
-
-		internal FormatDelegate0? GetCallback0() => _onCall0;
-		internal FormatDelegate1? GetCallback1() => _onCall1;
-		internal FormatDelegate2? GetCallback2() => _onCall2;
+		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		public FormatDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string input) => _calls.Add((input, default, default));
-		/// <summary>Records a method call.</summary>
-		public void RecordCall(string input, bool uppercase) => _calls.Add((input, uppercase, default));
-		/// <summary>Records a method call.</summary>
-		public void RecordCall(string input, int maxLength) => _calls.Add((input, default, maxLength));
+		public void RecordCall(string input) => _calls.Add(input);
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); _onCall0 = null; _onCall1 = null; _onCall2 = null; }
+		public void Reset() { _calls.Clear(); OnCall = null; }
 	}
 
-	/// <summary>Spy for OverloadedServiceKnockOff - tracks invocations and configures behavior.</summary>
-	public sealed class OverloadedServiceKnockOffSpy
+	/// <summary>Tracks and configures behavior for IOverloadedService.Format2.</summary>
+	public sealed class IOverloadedService_Format2Handler
 	{
-		/// <summary>Handler for Format.</summary>
-		public FormatHandler Format { get; } = new();
+		/// <summary>Delegate for Format(string input, bool uppercase).</summary>
+		public delegate string FormatDelegate(OverloadedServiceKnockOff ko, string input, bool uppercase);
+
+		private readonly global::System.Collections.Generic.List<(string input, bool uppercase)> _calls = new();
+
+		/// <summary>Number of times this method was called.</summary>
+		public int CallCount => _calls.Count;
+
+		/// <summary>True if this method was called at least once.</summary>
+		public bool WasCalled => _calls.Count > 0;
+
+		/// <summary>Arguments from the most recent call.</summary>
+		public (string input, bool uppercase)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
+
+		/// <summary>All recorded calls with their arguments.</summary>
+		public global::System.Collections.Generic.IReadOnlyList<(string input, bool uppercase)> AllCalls => _calls;
+
+		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		public FormatDelegate? OnCall { get; set; }
+
+		/// <summary>Records a method call.</summary>
+		public void RecordCall(string input, bool uppercase) => _calls.Add((input, uppercase));
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { _calls.Clear(); OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for all interface members.</summary>
-	public OverloadedServiceKnockOffSpy Spy { get; } = new();
+	/// <summary>Tracks and configures behavior for IOverloadedService.Format3.</summary>
+	public sealed class IOverloadedService_Format3Handler
+	{
+		/// <summary>Delegate for Format(string input, int maxLength).</summary>
+		public delegate string FormatDelegate(OverloadedServiceKnockOff ko, string input, int maxLength);
+
+		private readonly global::System.Collections.Generic.List<(string input, int maxLength)> _calls = new();
+
+		/// <summary>Number of times this method was called.</summary>
+		public int CallCount => _calls.Count;
+
+		/// <summary>True if this method was called at least once.</summary>
+		public bool WasCalled => _calls.Count > 0;
+
+		/// <summary>Arguments from the most recent call.</summary>
+		public (string input, int maxLength)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
+
+		/// <summary>All recorded calls with their arguments.</summary>
+		public global::System.Collections.Generic.IReadOnlyList<(string input, int maxLength)> AllCalls => _calls;
+
+		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		public FormatDelegate? OnCall { get; set; }
+
+		/// <summary>Records a method call.</summary>
+		public void RecordCall(string input, int maxLength) => _calls.Add((input, maxLength));
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { _calls.Clear(); OnCall = null; }
+	}
+
+	/// <summary>Spy for KnockOff.Sandbox.IOverloadedService - tracks invocations and configures behavior.</summary>
+	public sealed class IOverloadedServiceSpy
+	{
+		/// <summary>Handler for Format overload 1.</summary>
+		public IOverloadedService_Format1Handler Format1 { get; } = new();
+		/// <summary>Handler for Format overload 2.</summary>
+		public IOverloadedService_Format2Handler Format2 { get; } = new();
+		/// <summary>Handler for Format overload 3.</summary>
+		public IOverloadedService_Format3Handler Format3 { get; } = new();
+	}
+
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Sandbox.IOverloadedService.</summary>
+	public IOverloadedServiceSpy IOverloadedService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Sandbox.IOverloadedService.</summary>
 	public KnockOff.Sandbox.IOverloadedService AsOverloadedService() => this;
 
 	string KnockOff.Sandbox.IOverloadedService.Format(string input)
 	{
-		Spy.Format.RecordCall(input);
-		if (Spy.Format.GetCallback0() is { } onCallCallback)
+		IOverloadedService.Format1.RecordCall(input);
+		if (IOverloadedService.Format1.OnCall is { } onCallCallback)
 			return onCallCallback(this, input);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'Format' in your partial class, or set Spy.Format.OnCall.");
+		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'Format' in your partial class, or set IOverloadedService.Format1.OnCall.");
 	}
 
 	string KnockOff.Sandbox.IOverloadedService.Format(string input, bool uppercase)
 	{
-		Spy.Format.RecordCall(input, uppercase);
-		if (Spy.Format.GetCallback1() is { } onCallCallback)
+		IOverloadedService.Format2.RecordCall(input, uppercase);
+		if (IOverloadedService.Format2.OnCall is { } onCallCallback)
 			return onCallCallback(this, input, uppercase);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'Format' in your partial class, or set Spy.Format.OnCall.");
+		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'Format' in your partial class, or set IOverloadedService.Format2.OnCall.");
 	}
 
 	string KnockOff.Sandbox.IOverloadedService.Format(string input, int maxLength)
 	{
-		Spy.Format.RecordCall(input, maxLength);
-		if (Spy.Format.GetCallback2() is { } onCallCallback)
+		IOverloadedService.Format3.RecordCall(input, maxLength);
+		if (IOverloadedService.Format3.OnCall is { } onCallCallback)
 			return onCallCallback(this, input, maxLength);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'Format' in your partial class, or set Spy.Format.OnCall.");
+		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'Format' in your partial class, or set IOverloadedService.Format3.OnCall.");
 	}
 
 }

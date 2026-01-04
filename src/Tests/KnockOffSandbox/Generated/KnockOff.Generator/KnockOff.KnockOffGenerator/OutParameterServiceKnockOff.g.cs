@@ -5,13 +5,11 @@ namespace KnockOff.Sandbox;
 
 partial class OutParameterServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for TryGetValue.</summary>
-	public sealed class TryGetValueHandler
+	/// <summary>Tracks and configures behavior for IOutParameterService.TryGetValue.</summary>
+	public sealed class IOutParameterService_TryGetValueHandler
 	{
 		/// <summary>Delegate for TryGetValue(string key, out string? value).</summary>
 		public delegate bool TryGetValueDelegate(OutParameterServiceKnockOff ko, string key, out string? value);
-
-		private TryGetValueDelegate? _onCall;
 
 		private readonly global::System.Collections.Generic.List<string> _calls = new();
 
@@ -27,25 +25,21 @@ partial class OutParameterServiceKnockOff
 		/// <summary>All recorded calls with their arguments.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<string> AllCalls => _calls;
 
-		/// <summary>Sets callback for TryGetValue(key, value) overload.</summary>
-		public void OnCall(TryGetValueDelegate callback) => _onCall = callback;
-
-		internal TryGetValueDelegate? GetCallback() => _onCall;
+		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		public TryGetValueDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall(string key) => _calls.Add(key);
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); _onCall = null; }
+		public void Reset() { _calls.Clear(); OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for TryParse.</summary>
-	public sealed class TryParseHandler
+	/// <summary>Tracks and configures behavior for IOutParameterService.TryParse.</summary>
+	public sealed class IOutParameterService_TryParseHandler
 	{
 		/// <summary>Delegate for TryParse(string input, out int result).</summary>
 		public delegate bool TryParseDelegate(OutParameterServiceKnockOff ko, string input, out int result);
-
-		private TryParseDelegate? _onCall;
 
 		private readonly global::System.Collections.Generic.List<string> _calls = new();
 
@@ -61,25 +55,21 @@ partial class OutParameterServiceKnockOff
 		/// <summary>All recorded calls with their arguments.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<string> AllCalls => _calls;
 
-		/// <summary>Sets callback for TryParse(input, result) overload.</summary>
-		public void OnCall(TryParseDelegate callback) => _onCall = callback;
-
-		internal TryParseDelegate? GetCallback() => _onCall;
+		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		public TryParseDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall(string input) => _calls.Add(input);
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); _onCall = null; }
+		public void Reset() { _calls.Clear(); OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for GetData.</summary>
-	public sealed class GetDataHandler
+	/// <summary>Tracks and configures behavior for IOutParameterService.GetData.</summary>
+	public sealed class IOutParameterService_GetDataHandler
 	{
 		/// <summary>Delegate for GetData(out string name, out int count).</summary>
 		public delegate void GetDataDelegate(OutParameterServiceKnockOff ko, out string name, out int count);
-
-		private GetDataDelegate? _onCall;
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
@@ -87,31 +77,29 @@ partial class OutParameterServiceKnockOff
 		/// <summary>True if this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Sets callback for GetData(name, count) overload.</summary>
-		public void OnCall(GetDataDelegate callback) => _onCall = callback;
-
-		internal GetDataDelegate? GetCallback() => _onCall;
+		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		public GetDataDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; _onCall = null; }
+		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for OutParameterServiceKnockOff - tracks invocations and configures behavior.</summary>
-	public sealed class OutParameterServiceKnockOffSpy
+	/// <summary>Spy for KnockOff.Sandbox.IOutParameterService - tracks invocations and configures behavior.</summary>
+	public sealed class IOutParameterServiceSpy
 	{
 		/// <summary>Handler for TryGetValue.</summary>
-		public TryGetValueHandler TryGetValue { get; } = new();
+		public IOutParameterService_TryGetValueHandler TryGetValue { get; } = new();
 		/// <summary>Handler for TryParse.</summary>
-		public TryParseHandler TryParse { get; } = new();
+		public IOutParameterService_TryParseHandler TryParse { get; } = new();
 		/// <summary>Handler for GetData.</summary>
-		public GetDataHandler GetData { get; } = new();
+		public IOutParameterService_GetDataHandler GetData { get; } = new();
 	}
 
-	/// <summary>Tracks invocations and configures behavior for all interface members.</summary>
-	public OutParameterServiceKnockOffSpy Spy { get; } = new();
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Sandbox.IOutParameterService.</summary>
+	public IOutParameterServiceSpy IOutParameterService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Sandbox.IOutParameterService.</summary>
 	public KnockOff.Sandbox.IOutParameterService AsOutParameterService() => this;
@@ -119,27 +107,27 @@ partial class OutParameterServiceKnockOff
 	bool KnockOff.Sandbox.IOutParameterService.TryGetValue(string key, out string? value)
 	{
 		value = default!;
-		Spy.TryGetValue.RecordCall(key);
-		if (Spy.TryGetValue.GetCallback() is { } onCallCallback)
+		IOutParameterService.TryGetValue.RecordCall(key);
+		if (IOutParameterService.TryGetValue.OnCall is { } onCallCallback)
 			return onCallCallback(this, key, out value);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'TryGetValue' in your partial class, or set Spy.TryGetValue.OnCall.");
+		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'TryGetValue' in your partial class, or set IOutParameterService.TryGetValue.OnCall.");
 	}
 
 	bool KnockOff.Sandbox.IOutParameterService.TryParse(string input, out int result)
 	{
 		result = default!;
-		Spy.TryParse.RecordCall(input);
-		if (Spy.TryParse.GetCallback() is { } onCallCallback)
+		IOutParameterService.TryParse.RecordCall(input);
+		if (IOutParameterService.TryParse.OnCall is { } onCallCallback)
 			return onCallCallback(this, input, out result);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'TryParse' in your partial class, or set Spy.TryParse.OnCall.");
+		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'TryParse' in your partial class, or set IOutParameterService.TryParse.OnCall.");
 	}
 
 	void KnockOff.Sandbox.IOutParameterService.GetData(out string name, out int count)
 	{
 		name = default!;
 		count = default!;
-		Spy.GetData.RecordCall();
-		if (Spy.GetData.GetCallback() is { } onCallCallback)
+		IOutParameterService.GetData.RecordCall();
+		if (IOutParameterService.GetData.OnCall is { } onCallCallback)
 		{ onCallCallback(this, out name, out count); return; }
 	}
 

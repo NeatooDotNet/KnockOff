@@ -20,6 +20,7 @@ Or add directly to your `.csproj`:
 
 ### Step 1: Define an Interface
 
+<!-- snippet: docs:getting-started:interface-definition -->
 ```csharp
 public interface IEmailService
 {
@@ -27,26 +28,27 @@ public interface IEmailService
     bool IsConnected { get; }
 }
 ```
+<!-- /snippet -->
 
 ### Step 2: Create a KnockOff Stub
 
 Create a partial class marked with `[KnockOff]` that implements your interface:
 
+<!-- snippet: docs:getting-started:stub-class -->
 ```csharp
-using KnockOff;
-
 [KnockOff]
 public partial class EmailServiceKnockOff : IEmailService
 {
     // That's it! The generator creates the implementation.
 }
 ```
+<!-- /snippet -->
 
 The source generator automatically creates:
 - Explicit interface implementations
-- A `Spy` property with handlers for each member
-- Backing fields for properties
-- An `AsEmailService()` helper method
+- Interface spy properties (e.g., `IEmailService`) with handlers for each member
+- Backing fields for properties (prefixed with interface name)
+- An `AsEmailService()` helper method for explicit casting
 
 ### Step 3: Use in Tests
 
@@ -64,46 +66,46 @@ public void NotificationService_SendsEmail_WhenUserRegisters()
     notificationService.NotifyRegistration("user@example.com");
 
     // Assert
-    Assert.True(emailKnockOff.Spy.SendEmail.WasCalled);
-    Assert.Equal("user@example.com", emailKnockOff.Spy.SendEmail.LastCallArgs?.to);
+    Assert.True(emailKnockOff.IEmailService.SendEmail.WasCalled);
+    Assert.Equal("user@example.com", emailKnockOff.IEmailService.SendEmail.LastCallArgs?.to);
 }
 ```
 
 ## Verification Basics
 
-Every interface member gets a handler in the `Spy` class with tracking properties:
+Every interface member gets a handler in its interface spy class with tracking properties. Access handlers via the interface spy property (e.g., `knockOff.IEmailService`).
 
 ### For Methods
 
 ```csharp
 // Check if called
-Assert.True(knockOff.Spy.SendEmail.WasCalled);
+Assert.True(knockOff.IEmailService.SendEmail.WasCalled);
 
 // Check call count
-Assert.Equal(3, knockOff.Spy.SendEmail.CallCount);
+Assert.Equal(3, knockOff.IEmailService.SendEmail.CallCount);
 
 // Check last argument (single parameter)
-Assert.Equal(42, knockOff.Spy.GetById.LastCallArg);
+Assert.Equal(42, knockOff.IUserService.GetById.LastCallArg);
 
 // Check last arguments (multiple parameters - named tuple)
-var args = knockOff.Spy.SendEmail.LastCallArgs;
+var args = knockOff.IEmailService.SendEmail.LastCallArgs;
 Assert.Equal("user@example.com", args?.to);
 Assert.Equal("Welcome", args?.subject);
 
 // Check all calls
-Assert.Equal(3, knockOff.Spy.SendEmail.AllCalls.Count);
-Assert.Equal("first@example.com", knockOff.Spy.SendEmail.AllCalls[0].to);
+Assert.Equal(3, knockOff.IEmailService.SendEmail.AllCalls.Count);
+Assert.Equal("first@example.com", knockOff.IEmailService.SendEmail.AllCalls[0].to);
 ```
 
 ### For Properties
 
 ```csharp
 // Check getter calls
-Assert.Equal(2, knockOff.Spy.IsConnected.GetCount);
+Assert.Equal(2, knockOff.IEmailService.IsConnected.GetCount);
 
 // Check setter calls
-Assert.Equal(1, knockOff.Spy.Name.SetCount);
-Assert.Equal("NewValue", knockOff.Spy.Name.LastSetValue);
+Assert.Equal(1, knockOff.IUserService.Name.SetCount);
+Assert.Equal("NewValue", knockOff.IUserService.Name.LastSetValue);
 ```
 
 ## Adding Custom Behavior
@@ -133,13 +135,13 @@ public void RejectsEmail_WhenNotConnected()
     var knockOff = new EmailServiceKnockOff();
 
     // Configure property to return false
-    knockOff.Spy.IsConnected.OnGet = (ko) => false;
+    knockOff.IEmailService.IsConnected.OnGet = (ko) => false;
 
     // Configure method to throw
-    knockOff.Spy.SendEmail.OnCall((ko, to, subject, body) =>
+    knockOff.IEmailService.SendEmail.OnCall = (ko, to, subject, body) =>
     {
         throw new InvalidOperationException("Not connected");
-    });
+    };
 
     // ... test code
 }
@@ -153,11 +155,11 @@ Clear tracking and callbacks between tests or test phases:
 
 ```csharp
 // Reset specific handler
-knockOff.Spy.SendEmail.Reset();
+knockOff.IEmailService.SendEmail.Reset();
 
 // After reset:
-Assert.Equal(0, knockOff.Spy.SendEmail.CallCount);
-Assert.Null(knockOff.Spy.SendEmail.OnCall);
+Assert.Equal(0, knockOff.IEmailService.SendEmail.CallCount);
+// Callbacks are also cleared
 ```
 
 ## Viewing Generated Code
@@ -179,7 +181,7 @@ Generated files appear in `Generated/KnockOff.Generator/KnockOff.KnockOffGenerat
 
 ```csharp
 // Via callback
-knockOff.Spy.GetUser.OnCall((ko, id) => new User { Id = id, Name = "Test" });
+knockOff.IUserService.GetUser.OnCall = (ko, id) => new User { Id = id, Name = "Test" };
 
 // Via user method (in stub class)
 protected User GetUser(int id) => new User { Id = id, Name = "Default" };
@@ -188,8 +190,8 @@ protected User GetUser(int id) => new User { Id = id, Name = "Default" };
 ### Simulating Failures
 
 ```csharp
-knockOff.Spy.SaveAsync.OnCall((ko, entity) =>
-    Task.FromException<int>(new DbException("Connection lost")));
+knockOff.IRepository.SaveAsync.OnCall = (ko, entity) =>
+    Task.FromException<int>(new DbException("Connection lost"));
 ```
 
 ### Capturing Arguments for Later Assertions
@@ -197,10 +199,10 @@ knockOff.Spy.SaveAsync.OnCall((ko, entity) =>
 ```csharp
 List<string> sentEmails = new();
 
-knockOff.Spy.SendEmail.OnCall((ko, to, subject, body) =>
+knockOff.IEmailService.SendEmail.OnCall = (ko, to, subject, body) =>
 {
     sentEmails.Add(to);
-});
+};
 
 // ... run test ...
 
@@ -208,7 +210,50 @@ Assert.Equal(3, sentEmails.Count);
 Assert.Contains("admin@example.com", sentEmails);
 ```
 
+### Method Overloads
+
+When an interface has method overloads, each overload gets its own handler with a numeric suffix:
+
+```csharp
+public interface IProcessService
+{
+    void Process(string data);                           // Overload 1
+    void Process(string data, int priority);             // Overload 2
+    void Process(string data, int priority, bool async); // Overload 3
+}
+
+[KnockOff]
+public partial class ProcessServiceKnockOff : IProcessService { }
+
+// Each overload has its own handler (1-based numbering)
+knockOff.IProcessService.Process1.CallCount;  // Calls to Process(string)
+knockOff.IProcessService.Process2.CallCount;  // Calls to Process(string, int)
+knockOff.IProcessService.Process3.CallCount;  // Calls to Process(string, int, bool)
+
+// Identify exactly which overload was called
+Assert.True(knockOff.IProcessService.Process2.WasCalled);
+Assert.False(knockOff.IProcessService.Process1.WasCalled);
+
+// Simple callbacks - no delegate casting needed
+knockOff.IProcessService.Process1.OnCall = (ko, data) => { };
+knockOff.IProcessService.Process2.OnCall = (ko, data, priority) => { };
+knockOff.IProcessService.Process3.OnCall = (ko, data, priority, async) => { };
+
+// Proper types - no nullable wrappers
+var args = knockOff.IProcessService.Process3.LastCallArgs;
+Assert.Equal("test", args.Value.data);
+Assert.Equal(5, args.Value.priority);  // int, not int?
+Assert.True(args.Value.async);
+```
+
+Methods without overloads don't get a suffix:
+```csharp
+knockOff.IEmailService.SendEmail.CallCount;  // Single method - no suffix
+```
+
 ### Multiple Interfaces
+
+Each interface gets its own spy property with separate tracking:
 
 ```csharp
 [KnockOff]
@@ -216,7 +261,11 @@ public partial class DataContextKnockOff : IRepository, IUnitOfWork
 {
 }
 
-// Use either interface
+// Access via interface spy properties
+Assert.True(knockOff.IRepository.Save.WasCalled);
+Assert.True(knockOff.IUnitOfWork.Commit.WasCalled);
+
+// Use AsXxx() for explicit casting
 IRepository repo = knockOff.AsRepository();
 IUnitOfWork uow = knockOff.AsUnitOfWork();
 
@@ -235,6 +284,7 @@ IRepository repo = knockOff;
 
 - [Properties](guides/properties.md)
 - [Methods](guides/methods.md)
+- [Method Overloads](guides/method-overloads.md)
 - [Async Methods](guides/async-methods.md)
 - [Generic Interfaces](guides/generics.md)
 - [Multiple Interfaces](guides/multiple-interfaces.md)

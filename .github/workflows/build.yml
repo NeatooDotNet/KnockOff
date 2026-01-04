@@ -4,8 +4,9 @@ on:
   push:
     branches: [ main ]
     paths-ignore:
-      - '**.md'
-      - 'docs/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - 'docs/release-notes/**'
   pull_request:
     branches: [ main ]
 
@@ -51,6 +52,10 @@ jobs:
 
     - name: Test
       run: dotnet test src/KnockOff.sln --configuration Release --no-build --verbosity normal --logger trx --results-directory TestResults
+
+    - name: Verify documentation snippets
+      shell: pwsh
+      run: ./scripts/extract-snippets.ps1 -Verify
 
     - name: Upload test results
       uses: actions/upload-artifact@v4

@@ -2,6 +2,7 @@ namespace KnockOff.Tests;
 
 /// <summary>
 /// Tests for multiple interface implementation scenarios.
+/// With interface-scoped spy handlers, each interface has its own tracking.
 /// </summary>
 public class MultiInterfaceTests
 {
@@ -16,12 +17,13 @@ public class MultiInterfaceTests
 		logger.Name = "Logger1";
 		notifier.Notify("user@example.com");
 
-		Assert.True(knockOff.Spy.Log.WasCalled);
-		Assert.Equal("test message", knockOff.Spy.Log.LastCallArg);
-		Assert.Equal(1, knockOff.Spy.Name.SetCount);
-		Assert.Equal("Logger1", knockOff.Spy.Name.LastSetValue);
-		Assert.True(knockOff.Spy.Notify.WasCalled);
-		Assert.Equal("user@example.com", knockOff.Spy.Notify.LastCallArg);
+		// Each interface has its own spy handlers
+		Assert.True(knockOff.ILogger.Log.WasCalled);
+		Assert.Equal("test message", knockOff.ILogger.Log.LastCallArg);
+		Assert.Equal(1, knockOff.ILogger.Name.SetCount);
+		Assert.Equal("Logger1", knockOff.ILogger.Name.LastSetValue);
+		Assert.True(knockOff.INotifier.Notify.WasCalled);
+		Assert.Equal("user@example.com", knockOff.INotifier.Notify.LastCallArg);
 	}
 
 	[Fact]
@@ -35,31 +37,36 @@ public class MultiInterfaceTests
 		logger.Log("via logger");
 		notifier.Notify("via notifier");
 
-		Assert.True(knockOff.Spy.Log.WasCalled);
-		Assert.True(knockOff.Spy.Notify.WasCalled);
+		Assert.True(knockOff.ILogger.Log.WasCalled);
+		Assert.True(knockOff.INotifier.Notify.WasCalled);
 	}
 
 	[Fact]
-	public void MultiInterface_SharedProperty_UsesSharedBacking()
+	public void MultiInterface_SameNameProperty_SeparateBacking()
 	{
+		// ILogger.Name is get/set, INotifier.Name is get-only
+		// Each interface has its own backing field now
 		var knockOff = new MultiInterfaceKnockOff();
 		ILogger logger = knockOff;
 		INotifier notifier = knockOff;
 
-		logger.Name = "SharedValue";
+		logger.Name = "LoggerValue";
 
 		var loggerName = logger.Name;
 		var notifierName = notifier.Name;
 
-		Assert.Equal("SharedValue", loggerName);
-		Assert.Equal("SharedValue", notifierName);
-		Assert.Equal(1, knockOff.Spy.Name.SetCount);
-		Assert.Equal(2, knockOff.Spy.Name.GetCount);
+		Assert.Equal("LoggerValue", loggerName);
+		Assert.Equal("", notifierName); // Separate backing, default value
+		Assert.Equal(1, knockOff.ILogger.Name.SetCount);
+		Assert.Equal(1, knockOff.ILogger.Name.GetCount);
+		Assert.Equal(1, knockOff.INotifier.Name.GetCount);
 	}
 
 	[Fact]
-	public void SharedSignature_SameMethodSignature_SharesTracking()
+	public void SharedSignature_SameMethodSignature_SeparateTracking()
 	{
+		// With interface-scoped handlers, ILogger.Log and IAuditor.Log
+		// have separate tracking even with the same signature
 		var knockOff = new SharedSignatureKnockOff();
 		ILogger logger = knockOff;
 		IAuditor auditor = knockOff;
@@ -67,11 +74,12 @@ public class MultiInterfaceTests
 		logger.Log("logger message");
 		auditor.Log("auditor message");
 
-		Assert.Equal(2, knockOff.Spy.Log.CallCount);
-		Assert.Equal("auditor message", knockOff.Spy.Log.LastCallArg);
-		Assert.Equal(2, knockOff.Spy.Log.AllCalls.Count);
-		Assert.Equal("logger message", knockOff.Spy.Log.AllCalls[0]);
-		Assert.Equal("auditor message", knockOff.Spy.Log.AllCalls[1]);
+		// Each interface tracks separately
+		Assert.Equal(1, knockOff.ILogger.Log.CallCount);
+		Assert.Equal("logger message", knockOff.ILogger.Log.LastCallArg);
+
+		Assert.Equal(1, knockOff.IAuditor.Log.CallCount);
+		Assert.Equal("auditor message", knockOff.IAuditor.Log.LastCallArg);
 	}
 
 	[Fact]
@@ -83,11 +91,11 @@ public class MultiInterfaceTests
 
 		auditor.Audit("delete", 42);
 
-		Assert.True(knockOff.Spy.Audit.WasCalled);
-		var args = knockOff.Spy.Audit.LastCallArgs;
+		Assert.True(knockOff.IAuditor.Audit.WasCalled);
+		var args = knockOff.IAuditor.Audit.LastCallArgs;
 		Assert.NotNull(args);
 		Assert.Equal("delete", args.Value.action);
 		Assert.Equal(42, args.Value.userId);
-		Assert.False(knockOff.Spy.Log.WasCalled);
+		Assert.False(knockOff.ILogger.Log.WasCalled);
 	}
 }

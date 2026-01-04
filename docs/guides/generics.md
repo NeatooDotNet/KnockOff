@@ -25,7 +25,7 @@ public partial class OrderRepositoryKnockOff : IRepository<Order> { }
 
 ## Tracking
 
-Tracking uses the concrete types:
+Tracking uses the concrete types. For generic interfaces, the spy property includes the type arguments in the name:
 
 ```csharp
 var knockOff = new UserRepositoryKnockOff();
@@ -34,8 +34,9 @@ IRepository<User> repo = knockOff;
 var user = new User { Id = 1, Name = "Test" };
 repo.Save(user);
 
+// Spy property is IRepository_User (interface name + type arg)
 // LastCallArg is strongly typed as User
-User? savedUser = knockOff.Spy.Save.LastCallArg;
+User? savedUser = knockOff.IRepository_User.Save.LastCallArg;
 Assert.Same(user, savedUser);
 ```
 
@@ -44,14 +45,14 @@ Assert.Same(user, savedUser);
 Callbacks also use concrete types:
 
 ```csharp
-knockOff.Spy.GetById.OnCall((ko, id) =>
-    new User { Id = id, Name = $"User-{id}" });
+knockOff.IRepository_User.GetById.OnCall = (ko, id) =>
+    new User { Id = id, Name = $"User-{id}" };
 
-knockOff.Spy.Save.OnCall((ko, user) =>
+knockOff.IRepository_User.Save.OnCall = (ko, user) =>
 {
     // user is typed as User, not T
     Assert.NotNull(user.Name);
-});
+};
 ```
 
 ## Multiple Generic Parameters
@@ -72,17 +73,18 @@ Usage:
 ```csharp
 var knockOff = new StringCacheKnockOff();
 
-knockOff.Spy.Get.OnCall((ko, key) => key switch
+// Spy property: ICache_string_User (interface + type args)
+knockOff.ICache_string_User.Get.OnCall = (ko, key) => key switch
 {
     "admin" => new User { Name = "Admin" },
     _ => null
-});
+};
 
-knockOff.Spy.Set.OnCall((ko, key, value) =>
+knockOff.ICache_string_User.Set.OnCall = (ko, key, value) =>
 {
     // string key, User value
     Console.WriteLine($"Cached {key}: {value.Name}");
-});
+};
 ```
 
 ## Constrained Generics
@@ -114,7 +116,7 @@ public interface IFactory<T> where T : new()
 public partial class UserFactoryKnockOff : IFactory<User> { }
 
 // Usage
-knockOff.Spy.Create.OnCall((ko) => new User { Name = "Created" });
+knockOff.IFactory_User.Create.OnCall = (ko) => new User { Name = "Created" };
 ```
 
 ### Collection Repositories
@@ -136,10 +138,10 @@ var products = new List<Product>
     new Product { Id = 2, Name = "Gadget" }
 };
 
-knockOff.Spy.GetAll.OnCall((ko) => products);
+knockOff.IReadOnlyRepository_Product.GetAll.OnCall = (ko) => products;
 
-knockOff.Spy.FindFirst.OnCall((ko, predicate) =>
-    products.FirstOrDefault(predicate));
+knockOff.IReadOnlyRepository_Product.FindFirst.OnCall = (ko, predicate) =>
+    products.FirstOrDefault(predicate);
 ```
 
 ### Async Generic Repositories
@@ -156,11 +158,11 @@ public interface IAsyncRepository<T> where T : class
 public partial class AsyncUserRepositoryKnockOff : IAsyncRepository<User> { }
 
 // Usage
-knockOff.Spy.GetByIdAsync.OnCall((ko, id) =>
-    Task.FromResult<User?>(new User { Id = id }));
+knockOff.IAsyncRepository_User.GetByIdAsync.OnCall = (ko, id) =>
+    Task.FromResult<User?>(new User { Id = id });
 
-knockOff.Spy.GetAllAsync.OnCall((ko) =>
-    Task.FromResult<IEnumerable<User>>(users));
+knockOff.IAsyncRepository_User.GetAllAsync.OnCall = (ko) =>
+    Task.FromResult<IEnumerable<User>>(users);
 ```
 
 ## Limitations

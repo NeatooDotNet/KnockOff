@@ -6,11 +6,11 @@ This document explains what KnockOff generates and the conventions used.
 
 For each `[KnockOff]` class, the generator creates:
 
-1. **Spy class** — Nested class containing handlers for each member
-2. **Spy property** — `public {ClassName}Spy Spy { get; } = new();`
+1. **Interface spy classes** — One per implemented interface, containing handlers for that interface's members
+2. **Interface spy properties** — `public {InterfaceName}Spy {InterfaceName} { get; } = new();`
 3. **Handler classes** — One per interface member
-4. **Backing fields** — For properties
-5. **Backing dictionaries** — For indexers
+4. **Backing fields** — For properties (prefixed with interface name)
+5. **Backing dictionaries** — For indexers (prefixed with interface name)
 6. **Explicit interface implementations** — Recording + delegation
 7. **AsXYZ() methods** — For typed interface access
 
@@ -57,68 +57,64 @@ KnockOff generates:
 ```csharp
 public partial class UserServiceKnockOff
 {
-    // Spy property
-    public UserServiceKnockOffSpy Spy { get; } = new();
+    // Interface spy property
+    public IUserServiceSpy IUserService { get; } = new();
 
-    // Backing field for property
-    protected string NameBacking { get; set; } = "";
+    // Backing field for property (interface-prefixed)
+    protected string IUserService_NameBacking { get; set; } = "";
 
-    // Spy class
-    public sealed class UserServiceKnockOffSpy
+    // Interface spy class
+    public sealed class IUserServiceSpy
     {
-        public NameHandler Name { get; } = new();
-        public GetUserHandler GetUser { get; } = new();
+        public IUserService_NameHandler Name { get; } = new();
+        public IUserService_GetUserHandler GetUser { get; } = new();
+    }
 
-        // Handler for Name property
-        public sealed class NameHandler
+    // Handler for Name property
+    public sealed class IUserService_NameHandler
+    {
+        public int GetCount { get; private set; }
+        public int SetCount { get; private set; }
+        public string? LastSetValue { get; private set; }
+
+        public Func<UserServiceKnockOff, string>? OnGet { get; set; }
+        public Action<UserServiceKnockOff, string>? OnSet { get; set; }
+
+        public void RecordGet() => GetCount++;
+        public void RecordSet(string value)
         {
-            public int GetCount { get; private set; }
-            public int SetCount { get; private set; }
-            public string? LastSetValue { get; private set; }
-
-            public Func<UserServiceKnockOff, string>? OnGet { get; set; }
-            public Action<UserServiceKnockOff, string>? OnSet { get; set; }
-
-            public void RecordGet() => GetCount++;
-            public void RecordSet(string value)
-            {
-                SetCount++;
-                LastSetValue = value;
-            }
-
-            public void Reset()
-            {
-                GetCount = 0;
-                SetCount = 0;
-                LastSetValue = default;
-                OnGet = null;
-                OnSet = null;
-            }
+            SetCount++;
+            LastSetValue = value;
         }
 
-        // Handler for GetUser method
-        public sealed class GetUserHandler
+        public void Reset()
         {
-            public delegate User? GetUserDelegate(UserServiceKnockOff ko, int id);
+            GetCount = 0;
+            SetCount = 0;
+            LastSetValue = default;
+            OnGet = null;
+            OnSet = null;
+        }
+    }
 
-            private GetUserDelegate? _onCall;
-            private readonly List<int> _calls = new();
+    // Handler for GetUser method
+    public sealed class IUserService_GetUserHandler
+    {
+        private readonly List<int> _calls = new();
 
-            public int CallCount => _calls.Count;
-            public bool WasCalled => _calls.Count > 0;
-            public int? LastCallArg => _calls.Count > 0 ? _calls[^1] : null;
-            public IReadOnlyList<int> AllCalls => _calls;
+        public int CallCount => _calls.Count;
+        public bool WasCalled => _calls.Count > 0;
+        public int? LastCallArg => _calls.Count > 0 ? _calls[^1] : null;
+        public IReadOnlyList<int> AllCalls => _calls;
 
-            public void OnCall(GetUserDelegate callback) => _onCall = callback;
-            internal GetUserDelegate? GetCallback() => _onCall;
+        public Func<UserServiceKnockOff, int, User?>? OnCall { get; set; }
 
-            public void RecordCall(int id) => _calls.Add(id);
+        public void RecordCall(int id) => _calls.Add(id);
 
-            public void Reset()
-            {
-                _calls.Clear();
-                _onCall = null;
-            }
+        public void Reset()
+        {
+            _calls.Clear();
+            OnCall = null;
         }
     }
 
@@ -127,26 +123,26 @@ public partial class UserServiceKnockOff
     {
         get
         {
-            Spy.Name.RecordGet();
-            if (Spy.Name.OnGet is { } onGetCallback)
+            IUserService.Name.RecordGet();
+            if (IUserService.Name.OnGet is { } onGetCallback)
                 return onGetCallback(this);
-            return NameBacking;
+            return IUserService_NameBacking;
         }
         set
         {
-            Spy.Name.RecordSet(value);
-            if (Spy.Name.OnSet is { } onSetCallback)
+            IUserService.Name.RecordSet(value);
+            if (IUserService.Name.OnSet is { } onSetCallback)
                 onSetCallback(this, value);
             else
-                NameBacking = value;
+                IUserService_NameBacking = value;
         }
     }
 
     // Explicit interface implementation - method
     User? IUserService.GetUser(int id)
     {
-        Spy.GetUser.RecordCall(id);
-        if (Spy.GetUser.GetCallback() is { } onCallCallback)
+        IUserService.GetUser.RecordCall(id);
+        if (IUserService.GetUser.OnCall is { } onCallCallback)
             return onCallCallback(this, id);
         return GetUser(id);  // Calls user-defined method
     }
@@ -158,18 +154,22 @@ public partial class UserServiceKnockOff
 
 ## Naming Conventions
 
-### Spy Class
-- Name: `{ClassName}Spy`
-- Example: `UserServiceKnockOff` → `UserServiceKnockOffSpy`
+### Interface Spy Class
+- Name: `{InterfaceName}Spy`
+- Example: `IUserService` → `IUserServiceSpy`
+
+### Interface Spy Property
+- Name: `{InterfaceName}` (same as interface name)
+- Example: `public IUserServiceSpy IUserService { get; }`
 
 ### Handlers
-- Properties: `{PropertyName}Handler`
-- Methods: `{MethodName}Handler`
-- Indexers: `{KeyTypeName}IndexerHandler`
+- Properties: `{InterfaceName}_{PropertyName}Handler`
+- Methods: `{InterfaceName}_{MethodName}Handler`
+- Indexers: `{InterfaceName}_{KeyTypeName}IndexerHandler`
 
 ### Backing Storage
-- Properties: `{PropertyName}Backing`
-- Indexers: `{KeyTypeName}IndexerBacking`
+- Properties: `{InterfaceName}_{PropertyName}Backing`
+- Indexers: `{InterfaceName}_{KeyTypeName}IndexerBacking`
 
 ### Helper Methods
 - Interface access: `As{InterfaceName}()`
@@ -201,15 +201,15 @@ Rules:
 
 ## Indexer Naming
 
-Indexer handlers use the key type name:
+Indexer handlers use the key type name with interface prefix:
 
-| Indexer | Handler Name | Backing Name |
-|---------|--------------|--------------|
-| `this[string key]` | `StringIndexer` | `StringIndexerBacking` |
-| `this[int index]` | `IntIndexer` | `IntIndexerBacking` |
-| `this[Guid id]` | `GuidIndexer` | `GuidIndexerBacking` |
+| Interface | Indexer | Handler Access | Backing Name |
+|-----------|---------|----------------|--------------|
+| `IPropertyStore` | `this[string key]` | `IPropertyStore.StringIndexer` | `IPropertyStore_StringIndexerBacking` |
+| `IList` | `this[int index]` | `IList.IntIndexer` | `IList_IntIndexerBacking` |
+| `ICache` | `this[Guid id]` | `ICache.GuidIndexer` | `ICache_GuidIndexerBacking` |
 
-## Multiple Parameters (Tuples)
+## Multiple Parameters
 
 For methods with 2+ parameters, tracking uses named tuples:
 
@@ -220,13 +220,19 @@ For methods with 2+ parameters, tracking uses named tuples:
 public (string level, string message, int code)? LastCallArgs { get; }
 public IReadOnlyList<(string level, string message, int code)> AllCalls { get; }
 
-// Generated callback signature
-public Action<ServiceKnockOff, (string level, string message, int code)>? OnCall { get; set; }
+// Generated callback signature - individual parameters
+public Action<ServiceKnockOff, string, string, int>? OnCall { get; set; }
+
+// Usage
+knockOff.ILogger.Log.OnCall = (ko, level, message, code) =>
+{
+    Console.WriteLine($"[{level}] {message} ({code})");
+};
 ```
 
-## Shared Members (Multiple Interfaces)
+## Multiple Interfaces
 
-When interfaces share members with identical signatures:
+When a KnockOff class implements multiple interfaces, each interface gets its own spy class with separate handlers:
 
 ```csharp
 interface ILogger { void Log(string msg); }
@@ -236,15 +242,41 @@ interface IAuditor { void Log(string msg); }
 public partial class LoggerKnockOff : ILogger, IAuditor { }
 ```
 
-One handler is generated, used by both interface implementations:
+Separate handlers are generated for each interface:
 
 ```csharp
-// Single handler
-public sealed class LogHandler { ... }
+// Interface spy classes
+public sealed class ILoggerSpy
+{
+    public ILogger_LogHandler Log { get; } = new();
+}
 
-// Both implementations use it
-void ILogger.Log(string msg) { Spy.Log.RecordCall(msg); ... }
-void IAuditor.Log(string msg) { Spy.Log.RecordCall(msg); ... }
+public sealed class IAuditorSpy
+{
+    public IAuditor_LogHandler Log { get; } = new();
+}
+
+// Interface spy properties
+public ILoggerSpy ILogger { get; } = new();
+public IAuditorSpy IAuditor { get; } = new();
+
+// Each implementation uses its own handler
+void ILogger.Log(string msg) { ILogger.Log.RecordCall(msg); ... }
+void IAuditor.Log(string msg) { IAuditor.Log.RecordCall(msg); ... }
+```
+
+This allows tracking calls separately:
+
+```csharp
+var knockOff = new LoggerKnockOff();
+ILogger logger = knockOff;
+IAuditor auditor = knockOff;
+
+logger.Log("hello");
+auditor.Log("world");
+
+Assert.Equal(1, knockOff.ILogger.Log.CallCount);   // Only ILogger call
+Assert.Equal(1, knockOff.IAuditor.Log.CallCount);  // Only IAuditor call
 ```
 
 ## Null Handling

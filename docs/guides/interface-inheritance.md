@@ -27,7 +27,7 @@ The generator implements:
 
 ## Tracking
 
-All members from all inherited interfaces are tracked:
+All members from all inherited interfaces are tracked. Each interface gets its own spy class with handlers for the members it defines:
 
 ```csharp
 var knockOff = new AuditableEntityKnockOff();
@@ -41,11 +41,13 @@ var created = entity.CreatedAt;
 entity.ModifiedAt = DateTime.Now;
 entity.ModifiedBy = "TestUser";
 
-// All tracked in Spy
-Assert.Equal(1, knockOff.Spy.Id.GetCount);
-Assert.Equal(1, knockOff.Spy.CreatedAt.GetCount);
-Assert.Equal(1, knockOff.Spy.ModifiedAt.SetCount);
-Assert.Equal(1, knockOff.Spy.ModifiedBy.SetCount);
+// Base interface members tracked in IBaseEntity spy
+Assert.Equal(1, knockOff.IBaseEntity.Id.GetCount);
+Assert.Equal(1, knockOff.IBaseEntity.CreatedAt.GetCount);
+
+// Derived interface members tracked in IAuditableEntity spy
+Assert.Equal(1, knockOff.IAuditableEntity.ModifiedAt.SetCount);
+Assert.Equal(1, knockOff.IAuditableEntity.ModifiedBy.SetCount);
 ```
 
 ## AsXYZ() Methods
@@ -77,21 +79,22 @@ IAuditableEntity entity = knockOff;
 var id = entity.Id;
 var createdAt = entity.CreatedAt;
 
-Assert.Equal(1, knockOff.Spy.Id.GetCount);
-Assert.Equal(1, knockOff.Spy.CreatedAt.GetCount);
+// Tracked in the base interface's spy class
+Assert.Equal(1, knockOff.IBaseEntity.Id.GetCount);
+Assert.Equal(1, knockOff.IBaseEntity.CreatedAt.GetCount);
 ```
 
 ## Callbacks
 
-Set callbacks for any member, regardless of which interface level defines it:
+Set callbacks for any member using its defining interface's spy class:
 
 ```csharp
-// Base interface member
-knockOff.Spy.Id.OnGet = (ko) => 42;
+// Base interface member (via IBaseEntity spy)
+knockOff.IBaseEntity.Id.OnGet = (ko) => 42;
 
-// Derived interface member
-knockOff.Spy.ModifiedBy.OnGet = (ko) => "System";
-knockOff.Spy.ModifiedAt.OnSet = (ko, value) =>
+// Derived interface member (via IAuditableEntity spy)
+knockOff.IAuditableEntity.ModifiedBy.OnGet = (ko) => "System";
+knockOff.IAuditableEntity.ModifiedAt.OnSet = (ko, value) =>
 {
     // Track modification timestamps
     Console.WriteLine($"Modified at {value}");
@@ -147,9 +150,9 @@ public interface IEmployee : IEntity
 [KnockOff]
 public partial class EmployeeKnockOff : IEmployee { }
 
-// Pre-populate base properties
-knockOff.IdBacking = 1;
-knockOff.NameBacking = "Test Employee";
+// Pre-populate properties using interface-prefixed backing fields
+knockOff.IEntity_IdBacking = 1;
+knockOff.IEmployee_NameBacking = "Test Employee";
 ```
 
 ### Validation Pattern
@@ -170,10 +173,10 @@ public interface IOrder : IValidatable
 [KnockOff]
 public partial class OrderKnockOff : IOrder { }
 
-// Configure validation
-knockOff.Spy.IsValid.OnGet = (ko) => ko.Spy.Total.GetCount > 0;
-knockOff.Spy.GetErrors.OnCall((ko) =>
-    ko.Spy.IsValid.OnGet!(ko) ? [] : ["No total calculated"]);
+// Configure validation (using interface spy classes)
+knockOff.IValidatable.IsValid.OnGet = (ko) => ko.IOrder.Total.GetCount > 0;
+knockOff.IValidatable.GetErrors.OnCall = (ko) =>
+    ko.IValidatable.IsValid.OnGet!(ko) ? [] : ["No total calculated"];
 ```
 
 ### Repository Hierarchy
@@ -194,9 +197,11 @@ public interface IWriteRepository<T> : IReadRepository<T>
 [KnockOff]
 public partial class UserWriteRepositoryKnockOff : IWriteRepository<User> { }
 
-// All methods available
-knockOff.Spy.GetById.OnCall((ko, id) => users.FirstOrDefault(u => u.Id == id));
-knockOff.Spy.GetAll.OnCall((ko) => users);
-knockOff.Spy.Add.OnCall((ko, user) => users.Add(user));
-knockOff.Spy.Delete.OnCall((ko, id) => users.RemoveAll(u => u.Id == id));
+// Base interface members via IReadRepository_User
+knockOff.IReadRepository_User.GetById.OnCall = (ko, id) => users.FirstOrDefault(u => u.Id == id);
+knockOff.IReadRepository_User.GetAll.OnCall = (ko) => users;
+
+// Derived interface members via IWriteRepository_User
+knockOff.IWriteRepository_User.Add.OnCall = (ko, user) => users.Add(user);
+knockOff.IWriteRepository_User.Delete.OnCall = (ko, id) => users.RemoveAll(u => u.Id == id);
 ```

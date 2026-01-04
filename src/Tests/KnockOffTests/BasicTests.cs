@@ -17,7 +17,7 @@ public class BasicTests
 	{
 		var knockOff = new SampleKnockOff();
 		Assert.NotNull(knockOff);
-		Assert.NotNull(knockOff.Spy);
+		Assert.NotNull(knockOff.ISampleService);
 	}
 
 	[Fact]
@@ -28,8 +28,8 @@ public class BasicTests
 
 		service.Name = "Test";
 
-		Assert.Equal(1, knockOff.Spy.Name.SetCount);
-		string? lastValue = knockOff.Spy.Name.LastSetValue;
+		Assert.Equal(1, knockOff.ISampleService.Name.SetCount);
+		string? lastValue = knockOff.ISampleService.Name.LastSetValue;
 		Assert.Equal("Test", lastValue);
 	}
 
@@ -42,7 +42,7 @@ public class BasicTests
 		service.Name = "Test";
 		var _ = service.Name;
 
-		Assert.Equal(1, knockOff.Spy.Name.GetCount);
+		Assert.Equal(1, knockOff.ISampleService.Name.GetCount);
 	}
 
 	[Fact]
@@ -53,8 +53,8 @@ public class BasicTests
 
 		service.DoSomething();
 
-		Assert.True(knockOff.Spy.DoSomething.WasCalled);
-		Assert.Equal(1, knockOff.Spy.DoSomething.CallCount);
+		Assert.True(knockOff.ISampleService.DoSomething.WasCalled);
+		Assert.Equal(1, knockOff.ISampleService.DoSomething.CallCount);
 	}
 
 	[Fact]
@@ -66,9 +66,9 @@ public class BasicTests
 		var result = service.GetValue(42);
 
 		Assert.Equal(84, result);
-		Assert.Equal(1, knockOff.Spy.GetValue.CallCount);
+		Assert.Equal(1, knockOff.ISampleService.GetValue.CallCount);
 
-		int? lastArg = knockOff.Spy.GetValue.LastCallArg;
+		int? lastArg = knockOff.ISampleService.GetValue.LastCallArg;
 		Assert.Equal(42, lastArg);
 	}
 
@@ -80,7 +80,7 @@ public class BasicTests
 
 		service.Calculate("test", 100, true);
 
-		var args = knockOff.Spy.Calculate.LastCallArgs;
+		var args = knockOff.ISampleService.Calculate.LastCallArgs;
 		Assert.NotNull(args);
 		Assert.Equal("test", args.Value.name);
 		Assert.Equal(100, args.Value.value);
@@ -97,11 +97,11 @@ public class BasicTests
 		service.GetValue(2);
 		service.GetValue(3);
 
-		Assert.Equal(3, knockOff.Spy.GetValue.CallCount);
-		Assert.Equal(3, knockOff.Spy.GetValue.AllCalls.Count);
-		Assert.Equal(1, knockOff.Spy.GetValue.AllCalls[0]);
-		Assert.Equal(2, knockOff.Spy.GetValue.AllCalls[1]);
-		Assert.Equal(3, knockOff.Spy.GetValue.AllCalls[2]);
+		Assert.Equal(3, knockOff.ISampleService.GetValue.CallCount);
+		Assert.Equal(3, knockOff.ISampleService.GetValue.AllCalls.Count);
+		Assert.Equal(1, knockOff.ISampleService.GetValue.AllCalls[0]);
+		Assert.Equal(2, knockOff.ISampleService.GetValue.AllCalls[1]);
+		Assert.Equal(3, knockOff.ISampleService.GetValue.AllCalls[2]);
 	}
 
 	[Fact]
@@ -113,7 +113,7 @@ public class BasicTests
 		var result = service.GetOptional();
 
 		Assert.Null(result);
-		Assert.True(knockOff.Spy.GetOptional.WasCalled);
+		Assert.True(knockOff.ISampleService.GetOptional.WasCalled);
 	}
 
 	[Fact]
@@ -124,7 +124,7 @@ public class BasicTests
 		ISampleService service = knockOff.AsSampleService();
 
 		service.Name = "Test";
-		Assert.Equal(1, knockOff.Spy.Name.SetCount);
+		Assert.Equal(1, knockOff.ISampleService.Name.SetCount);
 	}
 
 	[Fact]
@@ -137,14 +137,14 @@ public class BasicTests
 		service.GetValue(42);
 		service.DoSomething();
 
-		knockOff.Spy.Name.Reset();
-		knockOff.Spy.GetValue.Reset();
-		knockOff.Spy.DoSomething.Reset();
+		knockOff.ISampleService.Name.Reset();
+		knockOff.ISampleService.GetValue.Reset();
+		knockOff.ISampleService.DoSomething.Reset();
 
-		Assert.Equal(0, knockOff.Spy.Name.SetCount);
-		Assert.Equal(0, knockOff.Spy.GetValue.CallCount);
-		Assert.Equal(0, knockOff.Spy.DoSomething.CallCount);
-		Assert.False(knockOff.Spy.DoSomething.WasCalled);
+		Assert.Equal(0, knockOff.ISampleService.Name.SetCount);
+		Assert.Equal(0, knockOff.ISampleService.GetValue.CallCount);
+		Assert.Equal(0, knockOff.ISampleService.DoSomething.CallCount);
+		Assert.False(knockOff.ISampleService.DoSomething.WasCalled);
 	}
 
 	[Fact]
@@ -155,7 +155,7 @@ public class BasicTests
 
 		service.Calculate("test", 42, true);
 
-		if (knockOff.Spy.Calculate.LastCallArgs is var (name, value, flag))
+		if (knockOff.ISampleService.Calculate.LastCallArgs is var (name, value, flag))
 		{
 			Assert.Equal("test", name);
 			Assert.Equal(42, value);
