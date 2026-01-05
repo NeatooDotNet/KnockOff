@@ -183,10 +183,102 @@ knockOff.IGenAsyncRepository_GenUser.GetAllAsync.OnCall = (ko) =>
     Task.FromResult<IEnumerable<GenUser>>(users);
 ```
 
+## Generic Methods
+
+KnockOff supports generic methods using the `.Of<T>()` pattern. This allows type-specific behavior configuration and call tracking.
+
+### Basic Usage
+
+```csharp
+public interface ISerializer
+{
+    T Deserialize<T>(string json);
+    void Process<T>(T value);
+}
+
+[KnockOff]
+public partial class SerializerKnockOff : ISerializer { }
+```
+
+Configure behavior per type argument:
+
+```csharp
+var knockOff = new SerializerKnockOff();
+
+// Configure for specific type using Of<T>()
+knockOff.ISerializer.Deserialize.Of<User>().OnCall = (ko, json) =>
+    JsonSerializer.Deserialize<User>(json)!;
+
+knockOff.ISerializer.Deserialize.Of<Order>().OnCall = (ko, json) =>
+    new Order { Id = 123 };
+```
+
+### Per-Type Call Tracking
+
+```csharp
+ISerializer service = knockOff;
+
+service.Deserialize<User>("{...}");
+service.Deserialize<User>("{...}");
+service.Deserialize<Order>("{...}");
+
+// Per-type tracking
+Assert.Equal(2, knockOff.ISerializer.Deserialize.Of<User>().CallCount);
+Assert.Equal(1, knockOff.ISerializer.Deserialize.Of<Order>().CallCount);
+
+// Aggregate tracking across all type arguments
+Assert.Equal(3, knockOff.ISerializer.Deserialize.TotalCallCount);
+Assert.True(knockOff.ISerializer.Deserialize.WasCalled);
+
+// See which types were used
+var types = knockOff.ISerializer.Deserialize.CalledTypeArguments;
+// Returns: [typeof(User), typeof(Order)]
+```
+
+### Multiple Type Parameters
+
+```csharp
+public interface IConverter
+{
+    TOut Convert<TIn, TOut>(TIn input);
+}
+
+[KnockOff]
+public partial class ConverterKnockOff : IConverter { }
+```
+
+```csharp
+knockOff.IConverter.Convert.Of<string, int>().OnCall = (ko, s) => s.Length;
+knockOff.IConverter.Convert.Of<int, string>().OnCall = (ko, i) => i.ToString();
+```
+
+### Constrained Generic Methods
+
+Type constraints are preserved on the `.Of<T>()` method:
+
+```csharp
+public interface IEntityFactory
+{
+    T Create<T>() where T : class, IEntity, new();
+}
+```
+
+```csharp
+// Constraints enforced at compile time
+knockOff.IEntityFactory.Create.Of<Employee>().OnCall = (ko) => new Employee();
+```
+
+### Smart Defaults
+
+Unconfigured generic methods use smart defaults at runtime:
+- **Value types**: Return `default(T)`
+- **Types with parameterless constructor**: Return `new T()`
+- **Nullable return types**: Return `null`
+- **Other types**: Throw `InvalidOperationException`
+
 ## Limitations
 
-- **Generic methods** within interfaces are not yet supported
-- The KnockOff class must specify **concrete type arguments**
+- The KnockOff class must specify **concrete type arguments** for generic interfaces
 
 ```csharp
 // NOT supported - generic KnockOff class

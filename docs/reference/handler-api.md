@@ -10,6 +10,7 @@ Every interface member gets a dedicated Handler class in its interface spy prope
 | Property | `{InterfaceName}_{PropertyName}Handler` | `IInterface.PropertyName` |
 | Indexer | `{InterfaceName}_{KeyType}IndexerHandler` | `IInterface.StringIndexer`, `IInterface.IntIndexer`, etc. |
 | Event | `{InterfaceName}_{EventName}Handler` | `IInterface.EventName` |
+| Generic Method | `{InterfaceName}_{MethodName}Handler` | `IInterface.MethodName.Of<T>()` |
 
 ## Method Handler
 
@@ -303,6 +304,8 @@ knockOff.IEventSource.DataReceived.Clear();  // Clears tracking AND handlers
 | Property | `GetCount`, `SetCount`, `LastSetValue`, `OnGet`, `OnSet` | Backing field |
 | Indexer | `GetCount`, `SetCount`, `AllGetKeys`, `AllSetEntries`, `OnGet`, `OnSet` | Backing dictionary |
 | Event | `SubscribeCount`, `UnsubscribeCount`, `RaiseCount`, `AllRaises` | Handlers (use `Clear()` to remove) |
+| Generic Method | All typed handlers, `CalledTypeArguments` | — |
+| Generic Method `.Of<T>()` | `CallCount`, `AllCalls`, `OnCall` | — |
 
 ## Async Method Handlers
 
@@ -322,3 +325,94 @@ knockOff.IRepository.GetByIdAsync.OnCall = (ko, id) =>
 knockOff.IRepository.SaveAsync.OnCall = (ko, entity) =>
     Task.FromException<int>(new DbException("Failed"));
 ```
+
+## Generic Method Handlers
+
+Generic methods use a two-tier handler structure with the `.Of<T>()` pattern.
+
+### Base Handler Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `TotalCallCount` | `int` | Total calls across all type arguments |
+| `WasCalled` | `bool` | `true` if called with any type argument |
+| `CalledTypeArguments` | `IReadOnlyList<Type>` | All type arguments that were used |
+
+### Base Handler Methods
+
+| Method | Description |
+|--------|-------------|
+| `Of<T>()` | Get typed handler for specific type argument(s) |
+| `Reset()` | Clear all typed handlers |
+
+For multiple type parameters, use `Of<T1, T2>()` or `Of<T1, T2, T3>()`.
+
+### Typed Handler Properties
+
+Accessed via `.Of<T>()`:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `CallCount` | `int` | Calls with this type argument |
+| `WasCalled` | `bool` | `true` if `CallCount > 0` |
+| `LastCallArg` | `T?` | Last non-generic argument (if method has params) |
+| `AllCalls` | `IReadOnlyList<T>` | All non-generic arguments (if method has params) |
+| `OnCall` | Delegate | Callback for this type argument |
+
+### Typed Handler Methods
+
+| Method | Description |
+|--------|-------------|
+| `Reset()` | Clear this typed handler's tracking and callback |
+| `RecordCall(...)` | Internal - records invocation |
+
+### OnCall Signatures
+
+| Method Signature | OnCall Type |
+|------------------|-------------|
+| `void M<T>()` | `Action<TKnockOff>?` |
+| `void M<T>(T value)` | `Action<TKnockOff, T>?` |
+| `void M<T>(string s)` | `Action<TKnockOff, string>?` |
+| `T M<T>()` | `Func<TKnockOff, T>?` |
+| `T M<T>(string json)` | `Func<TKnockOff, string, T>?` |
+| `TOut M<TIn, TOut>(TIn input)` | `Func<TKnockOff, TIn, TOut>?` |
+
+### Examples
+
+```csharp
+// Configure per type
+knockOff.ISerializer.Deserialize.Of<User>().OnCall = (ko, json) =>
+    JsonSerializer.Deserialize<User>(json)!;
+
+// Per-type tracking
+Assert.Equal(2, knockOff.ISerializer.Deserialize.Of<User>().CallCount);
+Assert.Equal("{...}", knockOff.ISerializer.Deserialize.Of<User>().LastCallArg);
+
+// Aggregate tracking
+Assert.Equal(5, knockOff.ISerializer.Deserialize.TotalCallCount);
+Assert.True(knockOff.ISerializer.Deserialize.WasCalled);
+
+// See which types were called
+var types = knockOff.ISerializer.Deserialize.CalledTypeArguments;
+// [typeof(User), typeof(Order)]
+
+// Multiple type parameters
+knockOff.IConverter.Convert.Of<string, int>().OnCall = (ko, s) => s.Length;
+
+// Reset single type
+knockOff.ISerializer.Deserialize.Of<User>().Reset();
+
+// Reset all types
+knockOff.ISerializer.Deserialize.Reset();
+```
+
+### Smart Defaults
+
+When `OnCall` is not set, generic methods use runtime defaults:
+
+| Return Type | Default Behavior |
+|-------------|------------------|
+| Value type (`int`, `bool`, etc.) | `default(T)` |
+| Type with parameterless ctor | `new T()` |
+| Nullable reference type (`T?`) | `null` |
+| Other (no ctor) | Throws `InvalidOperationException` |

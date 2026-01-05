@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net9.0</TargetFramework>
+		<IsPackable>false</IsPackable>
+		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+		<CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
+		<!-- Disable noisy code analysis rules for benchmark project -->
+		<NoWarn>$(NoWarn);CA1515;CA2227;CA1002;CA1724;CA1707</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="BenchmarkDotNet" />
+		<PackageReference Include="Moq" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\KnockOff\KnockOff.csproj" />
+		<ProjectReference Include="..\..\Generator\Generator.csproj"
+						  OutputItemType="Analyzer"
+						  ReferenceOutputAssembly="false" />
+	</ItemGroup>
+
+	<!-- Exclude generated files from compile (they're included via source generator) -->
+	<ItemGroup>
+		<Compile Remove="Generated\**" />
+	</ItemGroup>
+
+</Project>

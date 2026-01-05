@@ -329,3 +329,67 @@ public partial class SmartDefaultsKnockOff : ISmartDefaultsService
 }
 
 #endregion
+
+#region Generic Method Test Types
+
+/// <summary>
+/// Interface with generic methods for testing Of&lt;T&gt;() pattern.
+/// </summary>
+public interface IGenericMethodService
+{
+	// Basic generic return type
+	T Create<T>() where T : new();
+
+	// Generic parameter
+	void Process<T>(T value);
+
+	// Generic return with non-generic parameter
+	T Deserialize<T>(string json);
+
+	// Multiple type parameters
+	TOut Convert<TIn, TOut>(TIn input);
+
+	// Generic with nullable return
+	T? Find<T>(int id) where T : class;
+
+	// Void with multiple generic params
+	void Transfer<TSource, TDest>(TSource source, TDest destination);
+}
+
+/// <summary>
+/// Entity interface for constraint testing.
+/// </summary>
+public interface IEntity
+{
+	int Id { get; set; }
+}
+
+/// <summary>
+/// Test entity that implements IEntity and has parameterless constructor.
+/// </summary>
+public class TestEntityWithInterface : IEntity
+{
+	public int Id { get; set; }
+	public string Name { get; set; } = "";
+}
+
+/// <summary>
+/// Interface with constrained generic methods.
+/// </summary>
+public interface IConstrainedGenericService
+{
+	T CreateEntity<T>() where T : class, IEntity, new();
+	void SaveEntity<T>(T entity) where T : IEntity;
+}
+
+[KnockOff]
+public partial class GenericMethodServiceKnockOff : IGenericMethodService
+{
+}
+
+[KnockOff]
+public partial class ConstrainedGenericServiceKnockOff : IConstrainedGenericService
+{
+}
+
+#endregion

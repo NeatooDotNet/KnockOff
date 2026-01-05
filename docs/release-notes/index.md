@@ -8,6 +8,7 @@ Releases with notable changes.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| [v10.6.0](v10.6.0.md) | 2026-01-04 | Generic methods support with `.Of<T>()` pattern |
 | [v10.5.0](v10.5.0.md) | 2026-01-03 | **Breaking:** Interface spy architecture, smart defaults |
 | [v10.3.0](v10.3.0.md) | 2026-01-01 | Out/ref parameter support |
 | [v10.2.0](v10.2.0.md) | 2026-01-01 | Method overloads & delegate-based callbacks |
@@ -15,6 +16,7 @@ Releases with notable changes.
 
 ## All Releases
 
+- [v10.6.0](v10.6.0.md) - 2026-01-04 - Generic methods support with `.Of<T>()` pattern
 - [v10.5.2](v10.5.2.md) - 2026-01-04 - Nested class support for test organization
 - [v10.5.1](v10.5.0.md) - 2026-01-03 - Fix mismatched version
 - [v10.5.0](v10.5.0.md) - 2026-01-03 - **Breaking:** Interface spy properties, separate overload handlers, property-based OnCall, smart default return values
