@@ -1,17 +1,17 @@
 <#
 .SYNOPSIS
-    Extracts code snippets from KnockOff.Documentation.Samples and updates documentation.
+    Extracts code snippets from KnockOff.Documentation.Samples and updates documentation and skills.
 
 .DESCRIPTION
-    This script scans the Documentation.Samples project for #region docs:* markers,
+    This script scans the Documentation.Samples project for #region docs:* and #region skill:* markers,
     extracts the code snippets, and can optionally update the corresponding markdown
-    documentation files.
+    documentation files and Claude skill files.
 
 .PARAMETER Verify
     Only verify that snippets exist and report status. Does not modify any files.
 
 .PARAMETER Update
-    Update the markdown documentation files with extracted snippets.
+    Update the markdown documentation and skill files with extracted snippets.
 
 .PARAMETER SamplesPath
     Path to the samples project. Defaults to src/Tests/KnockOff.Documentation.Samples
@@ -19,20 +19,24 @@
 .PARAMETER DocsPath
     Path to the docs directory. Defaults to docs/
 
+.PARAMETER SkillsPath
+    Path to the Claude skills directory. Defaults to $env:USERPROFILE\.claude\skills\knockoff
+
 .EXAMPLE
     .\extract-snippets.ps1 -Verify
     Verifies all snippet markers are valid without modifying files.
 
 .EXAMPLE
     .\extract-snippets.ps1 -Update
-    Extracts snippets and updates documentation files.
+    Extracts snippets and updates documentation and skill files.
 #>
 
 param(
     [switch]$Verify,
     [switch]$Update,
     [string]$SamplesPath = "src/Tests/KnockOff.Documentation.Samples",
-    [string]$DocsPath = "docs"
+    [string]$DocsPath = "docs",
+    [string]$SkillsPath = "$env:USERPROFILE\.claude\skills\knockoff"
 )
 
 $ErrorActionPreference = "Stop"
@@ -41,64 +45,104 @@ $ErrorActionPreference = "Stop"
 $RepoRoot = Split-Path -Parent $PSScriptRoot
 $SamplesFullPath = Join-Path $RepoRoot $SamplesPath
 $DocsFullPath = Join-Path $RepoRoot $DocsPath
+$SkillsFullPath = $SkillsPath
 
-Write-Host "KnockOff Documentation Snippet Extractor" -ForegroundColor Cyan
-Write-Host "=========================================" -ForegroundColor Cyan
+Write-Host "KnockOff Documentation & Skill Snippet Extractor" -ForegroundColor Cyan
+Write-Host "=================================================" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Samples Path: $SamplesFullPath"
 Write-Host "Docs Path: $DocsFullPath"
+Write-Host "Skills Path: $SkillsFullPath"
 Write-Host ""
 
-# Pattern to match region markers: #region docs:{doc-file}:{snippet-id}
-$regionPattern = '#region\s+docs:([^:\s]+):([^\s]+)'
+# Patterns to match region markers
+# #region docs:{doc-file}:{snippet-id} - for documentation
+# #region skill:{skill-file}:{snippet-id} - for Claude skills
+$docsRegionPattern = '#region\s+docs:([^:\s]+):([^\s]+)'
+$skillRegionPattern = '#region\s+skill:([^:\s]+):([^\s]+)'
 
 # Find all C# files in samples (excluding obj, bin, Generated)
 $sourceFiles = Get-ChildItem -Path $SamplesFullPath -Recurse -Include "*.cs" |
     Where-Object { $_.FullName -notmatch '[\\/](obj|bin|Generated)[\\/]' }
 
-$snippets = @{}
+$docsSnippets = @{}
+$skillSnippets = @{}
 $errors = @()
+
+# Helper function to extract snippet content
+function Extract-SnippetContent {
+    param(
+        [string]$Content,
+        [System.Text.RegularExpressions.Match]$Match,
+        [string]$FileName
+    )
+
+    $afterRegion = $Content.Substring($Match.Index + $Match.Length)
+    $endRegionMatch = [regex]::Match($afterRegion, '#endregion')
+
+    if (-not $endRegionMatch.Success) {
+        return $null
+    }
+
+    $snippetContent = $afterRegion.Substring(0, $endRegionMatch.Index).Trim()
+    $snippetContent = $snippetContent -replace '^\s*\r?\n', ''
+    $snippetContent = $snippetContent -replace '\r?\n\s*$', ''
+
+    return $snippetContent
+}
 
 Write-Host "Scanning source files..." -ForegroundColor Yellow
 
 foreach ($file in $sourceFiles) {
     $content = Get-Content $file.FullName -Raw
-    $lines = Get-Content $file.FullName
 
-    # Find all region markers
-    $matches = [regex]::Matches($content, $regionPattern)
-
-    foreach ($match in $matches) {
+    # Find all docs region markers
+    $docsMatches = [regex]::Matches($content, $docsRegionPattern)
+    foreach ($match in $docsMatches) {
         $docFile = $match.Groups[1].Value
         $snippetId = $match.Groups[2].Value
         $key = "${docFile}:${snippetId}"
 
-        # Find the line number of the region start
-        $regionStartIndex = $content.Substring(0, $match.Index).Split("`n").Count - 1
+        $snippetContent = Extract-SnippetContent -Content $content -Match $match -FileName $file.Name
 
-        # Find the matching #endregion
-        $afterRegion = $content.Substring($match.Index + $match.Length)
-        $endRegionMatch = [regex]::Match($afterRegion, '#endregion')
-
-        if (-not $endRegionMatch.Success) {
-            $errors += "Missing #endregion for '$key' in $($file.Name)"
+        if ($null -eq $snippetContent) {
+            $errors += "Missing #endregion for docs:'$key' in $($file.Name)"
             continue
         }
 
-        # Extract content between region and endregion
-        $snippetContent = $afterRegion.Substring(0, $endRegionMatch.Index).Trim()
-
-        # Remove leading/trailing blank lines
-        $snippetContent = $snippetContent -replace '^\s*\r?\n', ''
-        $snippetContent = $snippetContent -replace '\r?\n\s*$', ''
-
-        if ($snippets.ContainsKey($key)) {
-            $errors += "Duplicate snippet key '$key' found in $($file.Name)"
+        if ($docsSnippets.ContainsKey($key)) {
+            $errors += "Duplicate docs snippet key '$key' found in $($file.Name)"
         } else {
-            $snippets[$key] = @{
+            $docsSnippets[$key] = @{
                 Content = $snippetContent
                 SourceFile = $file.Name
-                DocFile = $docFile
+                TargetFile = $docFile
+                SnippetId = $snippetId
+            }
+        }
+    }
+
+    # Find all skill region markers
+    $skillMatches = [regex]::Matches($content, $skillRegionPattern)
+    foreach ($match in $skillMatches) {
+        $skillFile = $match.Groups[1].Value
+        $snippetId = $match.Groups[2].Value
+        $key = "${skillFile}:${snippetId}"
+
+        $snippetContent = Extract-SnippetContent -Content $content -Match $match -FileName $file.Name
+
+        if ($null -eq $snippetContent) {
+            $errors += "Missing #endregion for skill:'$key' in $($file.Name)"
+            continue
+        }
+
+        if ($skillSnippets.ContainsKey($key)) {
+            $errors += "Duplicate skill snippet key '$key' found in $($file.Name)"
+        } else {
+            $skillSnippets[$key] = @{
+                Content = $snippetContent
+                SourceFile = $file.Name
+                TargetFile = $skillFile
                 SnippetId = $snippetId
             }
         }
@@ -106,16 +150,36 @@ foreach ($file in $sourceFiles) {
 }
 
 Write-Host ""
-Write-Host "Found $($snippets.Count) snippets:" -ForegroundColor Green
 
-# Group by doc file
-$byDocFile = $snippets.GetEnumerator() | Group-Object { $_.Value.DocFile }
+# Group docs snippets by target file
+$byDocsFile = $docsSnippets.GetEnumerator() | Group-Object { $_.Value.TargetFile }
 
-foreach ($group in $byDocFile | Sort-Object Name) {
-    Write-Host "  $($group.Name).md:" -ForegroundColor White
-    foreach ($snippet in $group.Group | Sort-Object { $_.Value.SnippetId }) {
-        Write-Host "    - $($snippet.Value.SnippetId) ($($snippet.Value.SourceFile))" -ForegroundColor Gray
+if ($docsSnippets.Count -gt 0) {
+    Write-Host "Found $($docsSnippets.Count) docs snippets:" -ForegroundColor Green
+    foreach ($group in $byDocsFile | Sort-Object Name) {
+        Write-Host "  $($group.Name).md:" -ForegroundColor White
+        foreach ($snippet in $group.Group | Sort-Object { $_.Value.SnippetId }) {
+            Write-Host "    - $($snippet.Value.SnippetId) ($($snippet.Value.SourceFile))" -ForegroundColor Gray
+        }
     }
+}
+
+# Group skill snippets by target file
+$bySkillFile = $skillSnippets.GetEnumerator() | Group-Object { $_.Value.TargetFile }
+
+if ($skillSnippets.Count -gt 0) {
+    Write-Host ""
+    Write-Host "Found $($skillSnippets.Count) skill snippets:" -ForegroundColor Green
+    foreach ($group in $bySkillFile | Sort-Object Name) {
+        Write-Host "  $($group.Name).md:" -ForegroundColor White
+        foreach ($snippet in $group.Group | Sort-Object { $_.Value.SnippetId }) {
+            Write-Host "    - $($snippet.Value.SnippetId) ($($snippet.Value.SourceFile))" -ForegroundColor Gray
+        }
+    }
+}
+
+if ($docsSnippets.Count -eq 0 -and $skillSnippets.Count -eq 0) {
+    Write-Host "No snippets found." -ForegroundColor Yellow
 }
 
 if ($errors.Count -gt 0) {
@@ -127,35 +191,43 @@ if ($errors.Count -gt 0) {
     exit 1
 }
 
-if ($Verify) {
-    Write-Host ""
-    Write-Host "Verifying documentation is in sync with samples..." -ForegroundColor Yellow
+# Helper function to verify snippets in a target directory
+function Verify-Snippets {
+    param(
+        [hashtable]$Snippets,
+        [string]$TargetPath,
+        [string]$MarkerPrefix,
+        [string]$Label
+    )
 
-    $outOfSync = @()
-    $orphanSnippets = @()
-    $verifiedCount = 0
+    $result = @{
+        OutOfSync = @()
+        Orphans = @()
+        Verified = 0
+    }
 
-    foreach ($group in $byDocFile) {
-        $docFileName = "$($group.Name).md"
+    $byFile = $Snippets.GetEnumerator() | Group-Object { $_.Value.TargetFile }
 
-        # Try to find the doc file (may be in subdirectory)
-        $docFilePath = Get-ChildItem -Path $DocsFullPath -Recurse -Filter $docFileName | Select-Object -First 1
+    foreach ($group in $byFile) {
+        $fileName = "$($group.Name).md"
+        $filePath = Get-ChildItem -Path $TargetPath -Recurse -Filter $fileName -ErrorAction SilentlyContinue | Select-Object -First 1
 
-        if (-not $docFilePath) {
-            Write-Host "  Warning: Doc file not found: $docFileName" -ForegroundColor Yellow
+        if (-not $filePath) {
+            Write-Host "  Warning: $Label file not found: $fileName" -ForegroundColor Yellow
             continue
         }
 
-        $docContent = Get-Content $docFilePath.FullName -Raw
+        $fileContent = Get-Content $filePath.FullName -Raw
 
         foreach ($snippet in $group.Group) {
             $snippetId = $snippet.Value.SnippetId
             $expectedContent = $snippet.Value.Content
+            $targetFile = $group.Name
 
-            # Pattern to extract current content from docs
-            $markerPattern = "<!--\s*snippet:\s*docs:$($group.Name):$snippetId\s*-->\s*\r?\n``````(?:csharp|razor)?\r?\n([\s\S]*?)``````\s*\r?\n<!--\s*/snippet\s*-->"
+            # Pattern to extract current content
+            $markerPattern = "<!--\s*snippet:\s*${MarkerPrefix}:${targetFile}:${snippetId}\s*-->\s*\r?\n``````(?:csharp|razor)?\r?\n([\s\S]*?)``````\s*\r?\n<!--\s*/snippet\s*-->"
 
-            if ($docContent -match $markerPattern) {
+            if ($fileContent -match $markerPattern) {
                 $currentContent = $Matches[1].Trim()
                 $expectedTrimmed = $expectedContent.Trim()
 
@@ -164,98 +236,184 @@ if ($Verify) {
                 $expectedNormalized = $expectedTrimmed -replace '\r\n', "`n"
 
                 if ($currentNormalized -ne $expectedNormalized) {
-                    $outOfSync += "  - ${docFileName}: ${snippetId}"
+                    $result.OutOfSync += "  - ${fileName}: ${snippetId}"
                 } else {
-                    $verifiedCount++
+                    $result.Verified++
                 }
             } else {
-                # Snippet exists in samples but no marker in docs - track as orphan (warning only)
-                $orphanSnippets += "  - ${docFileName}: ${snippetId}"
+                # Snippet exists in samples but no marker in target - track as orphan
+                $result.Orphans += "  - ${fileName}: ${snippetId}"
             }
         }
     }
 
-    if ($orphanSnippets.Count -gt 0) {
-        Write-Host ""
-        Write-Host "Orphan snippets (in samples but not in docs):" -ForegroundColor Yellow
-        foreach ($item in $orphanSnippets) {
-            Write-Host $item -ForegroundColor Yellow
-        }
-    }
-
-    if ($outOfSync.Count -gt 0) {
-        Write-Host ""
-        Write-Host "Documentation out of sync with samples:" -ForegroundColor Red
-        foreach ($item in $outOfSync) {
-            Write-Host $item -ForegroundColor Red
-        }
-        Write-Host ""
-        Write-Host "Run '.\scripts\extract-snippets.ps1 -Update' to sync documentation." -ForegroundColor Yellow
-        exit 1
-    }
-
-    Write-Host ""
-    Write-Host "Verification complete. $verifiedCount snippets verified, $($orphanSnippets.Count) orphan snippets." -ForegroundColor Green
-    exit 0
+    return $result
 }
 
-if ($Update) {
-    Write-Host ""
-    Write-Host "Updating documentation files..." -ForegroundColor Yellow
+# Helper function to update snippets in a target directory
+function Update-Snippets {
+    param(
+        [hashtable]$Snippets,
+        [string]$TargetPath,
+        [string]$MarkerPrefix,
+        [string]$Label
+    )
 
-    $updatedFiles = 0
-    $snippetsUpdated = 0
+    $result = @{
+        UpdatedFiles = 0
+        UpdatedSnippets = 0
+    }
 
-    foreach ($group in $byDocFile) {
-        $docFileName = "$($group.Name).md"
+    $byFile = $Snippets.GetEnumerator() | Group-Object { $_.Value.TargetFile }
 
-        # Try to find the doc file (may be in subdirectory)
-        $docFilePath = Get-ChildItem -Path $DocsFullPath -Recurse -Filter $docFileName | Select-Object -First 1
+    foreach ($group in $byFile) {
+        $fileName = "$($group.Name).md"
+        $filePath = Get-ChildItem -Path $TargetPath -Recurse -Filter $fileName -ErrorAction SilentlyContinue | Select-Object -First 1
 
-        if (-not $docFilePath) {
-            Write-Host "  Warning: Doc file not found: $docFileName" -ForegroundColor Yellow
+        if (-not $filePath) {
+            Write-Host "  Warning: $Label file not found: $fileName" -ForegroundColor Yellow
             continue
         }
 
-        $docContent = Get-Content $docFilePath.FullName -Raw
-        $originalContent = $docContent
+        $fileContent = Get-Content $filePath.FullName -Raw
+        $originalContent = $fileContent
         $fileUpdated = $false
 
         foreach ($snippet in $group.Group) {
             $snippetId = $snippet.Value.SnippetId
             $snippetContent = $snippet.Value.Content
+            $targetFile = $group.Name
 
-            # Pattern to match snippet markers in markdown:
-            # <!-- snippet: docs:doc-file:snippet-id -->
-            # ```csharp
-            # ... content ...
-            # ```
-            # <!-- /snippet -->
+            # Pattern to match snippet markers
+            $markerPattern = "<!--\s*snippet:\s*${MarkerPrefix}:${targetFile}:${snippetId}\s*-->\s*\r?\n``````(?:csharp|razor)?\r?\n([\s\S]*?)``````\s*\r?\n<!--\s*/snippet\s*-->"
 
-            $markerPattern = "<!--\s*snippet:\s*docs:$($group.Name):$snippetId\s*-->\s*\r?\n``````(?:csharp|razor)?\r?\n([\s\S]*?)``````\s*\r?\n<!--\s*/snippet\s*-->"
-
-            if ($docContent -match $markerPattern) {
-                $replacement = "<!-- snippet: docs:$($group.Name):$snippetId -->`n``````csharp`n$snippetContent`n```````n<!-- /snippet -->"
-                $docContent = $docContent -replace $markerPattern, $replacement
-                $snippetsUpdated++
+            if ($fileContent -match $markerPattern) {
+                $replacement = "<!-- snippet: ${MarkerPrefix}:${targetFile}:${snippetId} -->`n``````csharp`n$snippetContent`n```````n<!-- /snippet -->"
+                $fileContent = $fileContent -replace $markerPattern, $replacement
+                $result.UpdatedSnippets++
                 $fileUpdated = $true
             }
         }
 
-        if ($fileUpdated -and $docContent -ne $originalContent) {
-            Set-Content -Path $docFilePath.FullName -Value $docContent -NoNewline
-            $updatedFiles++
-            Write-Host "  Updated: $docFileName" -ForegroundColor Green
+        if ($fileUpdated -and $fileContent -ne $originalContent) {
+            Set-Content -Path $filePath.FullName -Value $fileContent -NoNewline
+            $result.UpdatedFiles++
+            Write-Host "  Updated: $fileName" -ForegroundColor Green
+        }
+    }
+
+    return $result
+}
+
+if ($Verify) {
+    Write-Host ""
+    $totalVerified = 0
+    $totalOrphans = 0
+    $hasOutOfSync = $false
+
+    # Verify docs snippets
+    if ($docsSnippets.Count -gt 0) {
+        Write-Host "Verifying documentation snippets..." -ForegroundColor Yellow
+        $docsResult = Verify-Snippets -Snippets $docsSnippets -TargetPath $DocsFullPath -MarkerPrefix "docs" -Label "Docs"
+
+        if ($docsResult.Orphans.Count -gt 0) {
+            Write-Host ""
+            Write-Host "Orphan docs snippets (in samples but not in docs):" -ForegroundColor Yellow
+            foreach ($item in $docsResult.Orphans) {
+                Write-Host $item -ForegroundColor Yellow
+            }
+        }
+
+        if ($docsResult.OutOfSync.Count -gt 0) {
+            Write-Host ""
+            Write-Host "Documentation out of sync with samples:" -ForegroundColor Red
+            foreach ($item in $docsResult.OutOfSync) {
+                Write-Host $item -ForegroundColor Red
+            }
+            $hasOutOfSync = $true
+        }
+
+        $totalVerified += $docsResult.Verified
+        $totalOrphans += $docsResult.Orphans.Count
+    }
+
+    # Verify skill snippets
+    if ($skillSnippets.Count -gt 0) {
+        Write-Host ""
+        Write-Host "Verifying skill snippets..." -ForegroundColor Yellow
+
+        if (-not (Test-Path $SkillsFullPath)) {
+            Write-Host "  Warning: Skills directory not found: $SkillsFullPath" -ForegroundColor Yellow
+        } else {
+            $skillResult = Verify-Snippets -Snippets $skillSnippets -TargetPath $SkillsFullPath -MarkerPrefix "skill" -Label "Skill"
+
+            if ($skillResult.Orphans.Count -gt 0) {
+                Write-Host ""
+                Write-Host "Orphan skill snippets (in samples but not in skills):" -ForegroundColor Yellow
+                foreach ($item in $skillResult.Orphans) {
+                    Write-Host $item -ForegroundColor Yellow
+                }
+            }
+
+            if ($skillResult.OutOfSync.Count -gt 0) {
+                Write-Host ""
+                Write-Host "Skills out of sync with samples:" -ForegroundColor Red
+                foreach ($item in $skillResult.OutOfSync) {
+                    Write-Host $item -ForegroundColor Red
+                }
+                $hasOutOfSync = $true
+            }
+
+            $totalVerified += $skillResult.Verified
+            $totalOrphans += $skillResult.Orphans.Count
+        }
+    }
+
+    if ($hasOutOfSync) {
+        Write-Host ""
+        Write-Host "Run '.\scripts\extract-snippets.ps1 -Update' to sync." -ForegroundColor Yellow
+        exit 1
+    }
+
+    Write-Host ""
+    Write-Host "Verification complete. $totalVerified snippets verified, $totalOrphans orphan snippets." -ForegroundColor Green
+    exit 0
+}
+
+if ($Update) {
+    Write-Host ""
+    $totalUpdatedFiles = 0
+    $totalUpdatedSnippets = 0
+
+    # Update docs snippets
+    if ($docsSnippets.Count -gt 0) {
+        Write-Host "Updating documentation files..." -ForegroundColor Yellow
+        $docsResult = Update-Snippets -Snippets $docsSnippets -TargetPath $DocsFullPath -MarkerPrefix "docs" -Label "Docs"
+        $totalUpdatedFiles += $docsResult.UpdatedFiles
+        $totalUpdatedSnippets += $docsResult.UpdatedSnippets
+    }
+
+    # Update skill snippets
+    if ($skillSnippets.Count -gt 0) {
+        Write-Host ""
+        Write-Host "Updating skill files..." -ForegroundColor Yellow
+
+        if (-not (Test-Path $SkillsFullPath)) {
+            Write-Host "  Warning: Skills directory not found: $SkillsFullPath" -ForegroundColor Yellow
+        } else {
+            $skillResult = Update-Snippets -Snippets $skillSnippets -TargetPath $SkillsFullPath -MarkerPrefix "skill" -Label "Skill"
+            $totalUpdatedFiles += $skillResult.UpdatedFiles
+            $totalUpdatedSnippets += $skillResult.UpdatedSnippets
         }
     }
 
     Write-Host ""
-    Write-Host "Update complete. $updatedFiles files updated, $snippetsUpdated snippets processed." -ForegroundColor Green
+    Write-Host "Update complete. $totalUpdatedFiles files updated, $totalUpdatedSnippets snippets processed." -ForegroundColor Green
 }
 
 if (-not $Verify -and -not $Update) {
     Write-Host ""
     Write-Host "Usage:" -ForegroundColor Cyan
     Write-Host "  .\extract-snippets.ps1 -Verify    # Verify snippets without updating"
-    Write-Host "  .\extract-snippets.ps1 -Update    # Update documentation files"
+    Write-Host "  .\extract-snippets.ps1 -Update    # Update documentation and skill files"
 }
