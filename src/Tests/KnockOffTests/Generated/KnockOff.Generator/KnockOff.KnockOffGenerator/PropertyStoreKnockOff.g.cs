@@ -8,25 +8,20 @@ partial class PropertyStoreKnockOff
 	/// <summary>Tracks and configures behavior for IPropertyStore.StringIndexer.</summary>
 	public sealed class IPropertyStore_StringIndexerHandler
 	{
-		private readonly global::System.Collections.Generic.List<string> _getKeys = new();
-
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount => _getKeys.Count;
+		public int GetCount { get; private set; }
 
 		/// <summary>The key from the most recent getter access.</summary>
-		public string? LastGetKey => _getKeys.Count > 0 ? _getKeys[_getKeys.Count - 1] : default;
-
-		/// <summary>All keys accessed via the getter.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<string> AllGetKeys => _getKeys;
+		public string? LastGetKey { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<PropertyStoreKnockOff, string, global::KnockOff.Tests.PropertyInfo?>? OnGet { get; set; }
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet(string key) => _getKeys.Add(key);
+		public void RecordGet(string key) { GetCount++; LastGetKey = key; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _getKeys.Clear(); OnGet = null; }
+		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
 	}
 
 	/// <summary>Spy for KnockOff.Tests.IPropertyStore - tracks invocations and configures behavior.</summary>

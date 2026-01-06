@@ -81,8 +81,8 @@ public class VerificationBenchmarks
     [Benchmark]
     public void KnockOff_VerifyWithArgs()
     {
-        var args = _knockOffCalculator.ICalculator.Add.AllCalls[0];
-        _ = args.a == 1 && args.b == 2;
+        var args = _knockOffCalculator.ICalculator.Add.LastCallArgs;
+        _ = args?.a == 1 && args?.b == 2;
     }
 
     // Multiple verifications

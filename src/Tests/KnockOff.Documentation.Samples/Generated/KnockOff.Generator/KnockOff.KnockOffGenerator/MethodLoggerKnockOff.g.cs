@@ -11,28 +11,23 @@ partial class MethodLoggerKnockOff
 		/// <summary>Delegate for Log(string message).</summary>
 		public delegate void LogDelegate(MethodLoggerKnockOff ko, string message);
 
-		private readonly global::System.Collections.Generic.List<string> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'message' argument from the most recent call.</summary>
-		public string? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<string> AllCalls => _calls;
+		public string? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public LogDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string message) => _calls.Add(message);
+		public void RecordCall(string message) { CallCount++; LastCallArg = message; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IMethodLogger.LogError.</summary>
@@ -41,28 +36,23 @@ partial class MethodLoggerKnockOff
 		/// <summary>Delegate for LogError(string message, global::System.Exception ex).</summary>
 		public delegate void LogErrorDelegate(MethodLoggerKnockOff ko, string message, global::System.Exception ex);
 
-		private readonly global::System.Collections.Generic.List<(string message, global::System.Exception ex)> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>Arguments from the most recent call.</summary>
-		public (string message, global::System.Exception ex)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(string message, global::System.Exception ex)> AllCalls => _calls;
+		public (string message, global::System.Exception ex)? LastCallArgs { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public LogErrorDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string message, global::System.Exception ex) => _calls.Add((message, ex));
+		public void RecordCall(string message, global::System.Exception ex) { CallCount++; LastCallArgs = (message, ex); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
 	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IMethodLogger - tracks invocations and configures behavior.</summary>

@@ -33,28 +33,23 @@ partial class MediumServiceStub
 		/// <summary>Delegate for Method2(int param).</summary>
 		public delegate void Method2Delegate(MediumServiceStub ko, int param);
 
-		private readonly global::System.Collections.Generic.List<int> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'param' argument from the most recent call.</summary>
-		public int? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<int> AllCalls => _calls;
+		public int? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public Method2Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int param) => _calls.Add(param);
+		public void RecordCall(int param) { CallCount++; LastCallArg = param; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IMediumService.Method3.</summary>
@@ -63,28 +58,23 @@ partial class MediumServiceStub
 		/// <summary>Delegate for Method3(string param).</summary>
 		public delegate void Method3Delegate(MediumServiceStub ko, string param);
 
-		private readonly global::System.Collections.Generic.List<string> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'param' argument from the most recent call.</summary>
-		public string? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<string> AllCalls => _calls;
+		public string? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public Method3Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string param) => _calls.Add(param);
+		public void RecordCall(string param) { CallCount++; LastCallArg = param; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IMediumService.Method4.</summary>
@@ -93,28 +83,23 @@ partial class MediumServiceStub
 		/// <summary>Delegate for Method4(int a, string b).</summary>
 		public delegate void Method4Delegate(MediumServiceStub ko, int a, string b);
 
-		private readonly global::System.Collections.Generic.List<(int a, string b)> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>Arguments from the most recent call.</summary>
-		public (int a, string b)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(int a, string b)> AllCalls => _calls;
+		public (int a, string b)? LastCallArgs { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public Method4Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int a, string b) => _calls.Add((a, b));
+		public void RecordCall(int a, string b) { CallCount++; LastCallArgs = (a, b); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IMediumService.Method5.</summary>
@@ -123,28 +108,23 @@ partial class MediumServiceStub
 		/// <summary>Delegate for Method5(int a, int b, int c).</summary>
 		public delegate void Method5Delegate(MediumServiceStub ko, int a, int b, int c);
 
-		private readonly global::System.Collections.Generic.List<(int a, int b, int c)> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>Arguments from the most recent call.</summary>
-		public (int a, int b, int c)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(int a, int b, int c)> AllCalls => _calls;
+		public (int a, int b, int c)? LastCallArgs { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public Method5Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int a, int b, int c) => _calls.Add((a, b, c));
+		public void RecordCall(int a, int b, int c) { CallCount++; LastCallArgs = (a, b, c); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IMediumService.Method6.</summary>
@@ -197,28 +177,23 @@ partial class MediumServiceStub
 		/// <summary>Delegate for Method8(int param).</summary>
 		public delegate int Method8Delegate(MediumServiceStub ko, int param);
 
-		private readonly global::System.Collections.Generic.List<int> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'param' argument from the most recent call.</summary>
-		public int? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<int> AllCalls => _calls;
+		public int? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public Method8Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int param) => _calls.Add(param);
+		public void RecordCall(int param) { CallCount++; LastCallArg = param; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IMediumService.Method9.</summary>
@@ -227,28 +202,23 @@ partial class MediumServiceStub
 		/// <summary>Delegate for Method9(string param).</summary>
 		public delegate string Method9Delegate(MediumServiceStub ko, string param);
 
-		private readonly global::System.Collections.Generic.List<string> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'param' argument from the most recent call.</summary>
-		public string? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<string> AllCalls => _calls;
+		public string? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public Method9Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string param) => _calls.Add(param);
+		public void RecordCall(string param) { CallCount++; LastCallArg = param; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IMediumService.Method10.</summary>
@@ -257,28 +227,23 @@ partial class MediumServiceStub
 		/// <summary>Delegate for Method10(int a, string b).</summary>
 		public delegate bool Method10Delegate(MediumServiceStub ko, int a, string b);
 
-		private readonly global::System.Collections.Generic.List<(int a, string b)> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>Arguments from the most recent call.</summary>
-		public (int a, string b)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(int a, string b)> AllCalls => _calls;
+		public (int a, string b)? LastCallArgs { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public Method10Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int a, string b) => _calls.Add((a, b));
+		public void RecordCall(int a, string b) { CallCount++; LastCallArgs = (a, b); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
 	/// <summary>Spy for KnockOff.Benchmarks.Interfaces.IMediumService - tracks invocations and configures behavior.</summary>

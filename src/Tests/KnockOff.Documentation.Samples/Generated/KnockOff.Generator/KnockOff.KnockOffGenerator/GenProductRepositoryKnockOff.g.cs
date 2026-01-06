@@ -33,28 +33,23 @@ partial class GenProductRepositoryKnockOff
 		/// <summary>Delegate for FindFirst(global::System.Func<global::KnockOff.Documentation.Samples.Guides.GenProduct, bool> predicate).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Guides.GenProduct? FindFirstDelegate(GenProductRepositoryKnockOff ko, global::System.Func<global::KnockOff.Documentation.Samples.Guides.GenProduct, bool> predicate);
 
-		private readonly global::System.Collections.Generic.List<global::System.Func<global::KnockOff.Documentation.Samples.Guides.GenProduct, bool>> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'predicate' argument from the most recent call.</summary>
-		public global::System.Func<global::KnockOff.Documentation.Samples.Guides.GenProduct, bool>? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<global::System.Func<global::KnockOff.Documentation.Samples.Guides.GenProduct, bool>> AllCalls => _calls;
+		public global::System.Func<global::KnockOff.Documentation.Samples.Guides.GenProduct, bool>? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public FindFirstDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::System.Func<global::KnockOff.Documentation.Samples.Guides.GenProduct, bool> predicate) => _calls.Add(predicate);
+		public void RecordCall(global::System.Func<global::KnockOff.Documentation.Samples.Guides.GenProduct, bool> predicate) { CallCount++; LastCallArg = predicate; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<KnockOff.Documentation.Samples.Guides.GenProduct> - tracks invocations and configures behavior.</summary>

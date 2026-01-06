@@ -11,28 +11,23 @@ partial class CpCalculatorKnockOff
 		/// <summary>Delegate for Add(int a, int b).</summary>
 		public delegate int AddDelegate(CpCalculatorKnockOff ko, int a, int b);
 
-		private readonly global::System.Collections.Generic.List<(int a, int b)> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>Arguments from the most recent call.</summary>
-		public (int a, int b)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(int a, int b)> AllCalls => _calls;
+		public (int a, int b)? LastCallArgs { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public AddDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int a, int b) => _calls.Add((a, b));
+		public void RecordCall(int a, int b) { CallCount++; LastCallArgs = (a, b); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for ICpCalculator.Divide.</summary>
@@ -41,28 +36,23 @@ partial class CpCalculatorKnockOff
 		/// <summary>Delegate for Divide(int numerator, int denominator).</summary>
 		public delegate double DivideDelegate(CpCalculatorKnockOff ko, int numerator, int denominator);
 
-		private readonly global::System.Collections.Generic.List<(int numerator, int denominator)> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>Arguments from the most recent call.</summary>
-		public (int numerator, int denominator)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(int numerator, int denominator)> AllCalls => _calls;
+		public (int numerator, int denominator)? LastCallArgs { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public DivideDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int numerator, int denominator) => _calls.Add((numerator, denominator));
+		public void RecordCall(int numerator, int denominator) { CallCount++; LastCallArgs = (numerator, denominator); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
 	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ICpCalculator - tracks invocations and configures behavior.</summary>

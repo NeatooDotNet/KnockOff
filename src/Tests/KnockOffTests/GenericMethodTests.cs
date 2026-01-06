@@ -183,11 +183,8 @@ public class GenericMethodTests
 		service.Find<User>(2);
 		service.Find<User>(3);
 
-		var allCalls = knockOff.IGenericMethodService.Find.Of<User>().AllCalls;
-		Assert.Equal(3, allCalls.Count);
-		Assert.Equal(1, allCalls[0]);
-		Assert.Equal(2, allCalls[1]);
-		Assert.Equal(3, allCalls[2]);
+		Assert.Equal(3, knockOff.IGenericMethodService.Find.Of<User>().CallCount);
+		Assert.Equal(3, knockOff.IGenericMethodService.Find.Of<User>().LastCallArg); // Last call was Find<User>(3)
 	}
 
 	#endregion
@@ -444,7 +441,7 @@ public class GenericMethodTests
 
 		knockOff.IGenericMethodService.Deserialize.Of<TestEntity>().Reset();
 
-		Assert.Empty(knockOff.IGenericMethodService.Deserialize.Of<TestEntity>().AllCalls);
+		Assert.Equal(0, knockOff.IGenericMethodService.Deserialize.Of<TestEntity>().CallCount);
 		Assert.Null(knockOff.IGenericMethodService.Deserialize.Of<TestEntity>().LastCallArg);
 	}
 

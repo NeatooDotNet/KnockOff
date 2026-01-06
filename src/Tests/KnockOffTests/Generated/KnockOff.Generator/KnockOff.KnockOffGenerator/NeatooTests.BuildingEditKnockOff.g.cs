@@ -26,25 +26,20 @@ partial class BuildingEditKnockOff
 	/// <summary>Tracks and configures behavior for IEntityBase.StringIndexer.</summary>
 	public sealed class IEntityBase_StringIndexerHandler
 	{
-		private readonly global::System.Collections.Generic.List<string> _getKeys = new();
-
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount => _getKeys.Count;
+		public int GetCount { get; private set; }
 
 		/// <summary>The key from the most recent getter access.</summary>
-		public string? LastGetKey => _getKeys.Count > 0 ? _getKeys[_getKeys.Count - 1] : default;
-
-		/// <summary>All keys accessed via the getter.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<string> AllGetKeys => _getKeys;
+		public string? LastGetKey { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<BuildingEditKnockOff, string, global::Neatoo.IEntityProperty>? OnGet { get; set; }
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet(string propertyName) => _getKeys.Add(propertyName);
+		public void RecordGet(string propertyName) { GetCount++; LastGetKey = propertyName; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _getKeys.Clear(); OnGet = null; }
+		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IEntityBase.Delete.</summary>
@@ -147,25 +142,20 @@ partial class BuildingEditKnockOff
 	/// <summary>Tracks and configures behavior for IValidateBase.StringIndexer.</summary>
 	public sealed class IValidateBase_StringIndexerHandler
 	{
-		private readonly global::System.Collections.Generic.List<string> _getKeys = new();
-
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount => _getKeys.Count;
+		public int GetCount { get; private set; }
 
 		/// <summary>The key from the most recent getter access.</summary>
-		public string? LastGetKey => _getKeys.Count > 0 ? _getKeys[_getKeys.Count - 1] : default;
-
-		/// <summary>All keys accessed via the getter.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<string> AllGetKeys => _getKeys;
+		public string? LastGetKey { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<BuildingEditKnockOff, string, global::Neatoo.IValidateProperty>? OnGet { get; set; }
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet(string propertyName) => _getKeys.Add(propertyName);
+		public void RecordGet(string propertyName) { GetCount++; LastGetKey = propertyName; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _getKeys.Clear(); OnGet = null; }
+		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IValidateBase.GetProperty.</summary>
@@ -174,28 +164,23 @@ partial class BuildingEditKnockOff
 		/// <summary>Delegate for GetProperty(string propertyName).</summary>
 		public delegate global::Neatoo.IValidateProperty GetPropertyDelegate(BuildingEditKnockOff ko, string propertyName);
 
-		private readonly global::System.Collections.Generic.List<string> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'propertyName' argument from the most recent call.</summary>
-		public string? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<string> AllCalls => _calls;
+		public string? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public GetPropertyDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string propertyName) => _calls.Add(propertyName);
+		public void RecordCall(string propertyName) { CallCount++; LastCallArg = propertyName; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IValidateBase.TryGetProperty.</summary>
@@ -204,28 +189,23 @@ partial class BuildingEditKnockOff
 		/// <summary>Delegate for TryGetProperty(string propertyName, out global::Neatoo.IValidateProperty validateProperty).</summary>
 		public delegate bool TryGetPropertyDelegate(BuildingEditKnockOff ko, string propertyName, out global::Neatoo.IValidateProperty validateProperty);
 
-		private readonly global::System.Collections.Generic.List<string> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'propertyName' argument from the most recent call.</summary>
-		public string? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<string> AllCalls => _calls;
+		public string? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public TryGetPropertyDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string propertyName) => _calls.Add(propertyName);
+		public void RecordCall(string propertyName) { CallCount++; LastCallArg = propertyName; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Spy for Neatoo.IValidateBase - tracks invocations and configures behavior.</summary>
@@ -440,28 +420,23 @@ partial class BuildingEditKnockOff
 		/// <summary>Delegate for RunRules(string propertyName, global::System.Threading.CancellationToken? token).</summary>
 		public delegate global::System.Threading.Tasks.Task RunRulesDelegate(BuildingEditKnockOff ko, string propertyName, global::System.Threading.CancellationToken? token);
 
-		private readonly global::System.Collections.Generic.List<(string propertyName, global::System.Threading.CancellationToken? token)> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>Arguments from the most recent call.</summary>
-		public (string propertyName, global::System.Threading.CancellationToken? token)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(string propertyName, global::System.Threading.CancellationToken? token)> AllCalls => _calls;
+		public (string propertyName, global::System.Threading.CancellationToken? token)? LastCallArgs { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public RunRulesDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string propertyName, global::System.Threading.CancellationToken? token) => _calls.Add((propertyName, token));
+		public void RecordCall(string propertyName, global::System.Threading.CancellationToken? token) { CallCount++; LastCallArgs = (propertyName, token); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IValidateMetaProperties.RunRules2.</summary>
@@ -470,28 +445,23 @@ partial class BuildingEditKnockOff
 		/// <summary>Delegate for RunRules(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token).</summary>
 		public delegate global::System.Threading.Tasks.Task RunRulesDelegate(BuildingEditKnockOff ko, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token);
 
-		private readonly global::System.Collections.Generic.List<(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>Arguments from the most recent call.</summary>
-		public (global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)> AllCalls => _calls;
+		public (global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)? LastCallArgs { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public RunRulesDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token) => _calls.Add((runRules, token));
+		public void RecordCall(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token) { CallCount++; LastCallArgs = (runRules, token); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IValidateMetaProperties.ClearAllMessages.</summary>

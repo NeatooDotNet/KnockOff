@@ -101,16 +101,11 @@ public class ConflictingSignatureTests
 		lookup.GetData("bb");
 
 		// IDataProvider.GetData tracks int arguments
-		var providerCalls = knockOff.IDataProvider.GetData.AllCalls;
-		Assert.Equal(3, providerCalls.Count);
-		Assert.Equal(1, providerCalls[0]);
-		Assert.Equal(2, providerCalls[1]);
-		Assert.Equal(3, providerCalls[2]);
+		Assert.Equal(3, knockOff.IDataProvider.GetData.CallCount);
+		Assert.Equal(3, knockOff.IDataProvider.GetData.LastCallArg); // Last call was GetData(3)
 
 		// IKeyLookup.GetData tracks string arguments
-		var lookupCalls = knockOff.IKeyLookup.GetData.AllCalls;
-		Assert.Equal(2, lookupCalls.Count);
-		Assert.Equal("a", lookupCalls[0]);
-		Assert.Equal("bb", lookupCalls[1]);
+		Assert.Equal(2, knockOff.IKeyLookup.GetData.CallCount);
+		Assert.Equal("bb", knockOff.IKeyLookup.GetData.LastCallArg); // Last call was GetData("bb")
 	}
 }

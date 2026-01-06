@@ -45,12 +45,8 @@ service.Process("item1", 100, true);
 service.Process("item2", 200, false);
 
 var processArgs = knockOff.IUserService.Process.LastCallArgs;
+Console.WriteLine($"  Call count: {knockOff.IUserService.Process.CallCount}");
 Console.WriteLine($"  Last call: ({processArgs?.id}, {processArgs?.count}, {processArgs?.urgent})");
-Console.WriteLine($"  All calls:");
-foreach (var call in knockOff.IUserService.Process.AllCalls)
-{
-	Console.WriteLine($"    ({call.id}, {call.count}, {call.urgent})");
-}
 Console.WriteLine();
 
 // Test AsInterface() method

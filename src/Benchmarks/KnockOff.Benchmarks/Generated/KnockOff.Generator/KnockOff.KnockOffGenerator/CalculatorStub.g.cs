@@ -11,28 +11,23 @@ partial class CalculatorStub
 		/// <summary>Delegate for Add(int a, int b).</summary>
 		public delegate int AddDelegate(CalculatorStub ko, int a, int b);
 
-		private readonly global::System.Collections.Generic.List<(int a, int b)> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>Arguments from the most recent call.</summary>
-		public (int a, int b)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(int a, int b)> AllCalls => _calls;
+		public (int a, int b)? LastCallArgs { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public AddDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int a, int b) => _calls.Add((a, b));
+		public void RecordCall(int a, int b) { CallCount++; LastCallArgs = (a, b); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for ICalculator.Subtract.</summary>
@@ -41,28 +36,23 @@ partial class CalculatorStub
 		/// <summary>Delegate for Subtract(int a, int b).</summary>
 		public delegate int SubtractDelegate(CalculatorStub ko, int a, int b);
 
-		private readonly global::System.Collections.Generic.List<(int a, int b)> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>Arguments from the most recent call.</summary>
-		public (int a, int b)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(int a, int b)> AllCalls => _calls;
+		public (int a, int b)? LastCallArgs { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public SubtractDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int a, int b) => _calls.Add((a, b));
+		public void RecordCall(int a, int b) { CallCount++; LastCallArgs = (a, b); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for ICalculator.Multiply.</summary>
@@ -71,28 +61,23 @@ partial class CalculatorStub
 		/// <summary>Delegate for Multiply(int a, int b).</summary>
 		public delegate int MultiplyDelegate(CalculatorStub ko, int a, int b);
 
-		private readonly global::System.Collections.Generic.List<(int a, int b)> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>Arguments from the most recent call.</summary>
-		public (int a, int b)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(int a, int b)> AllCalls => _calls;
+		public (int a, int b)? LastCallArgs { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public MultiplyDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int a, int b) => _calls.Add((a, b));
+		public void RecordCall(int a, int b) { CallCount++; LastCallArgs = (a, b); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for ICalculator.Divide.</summary>
@@ -101,28 +86,23 @@ partial class CalculatorStub
 		/// <summary>Delegate for Divide(double a, double b).</summary>
 		public delegate double DivideDelegate(CalculatorStub ko, double a, double b);
 
-		private readonly global::System.Collections.Generic.List<(double a, double b)> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>Arguments from the most recent call.</summary>
-		public (double a, double b)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(double a, double b)> AllCalls => _calls;
+		public (double a, double b)? LastCallArgs { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public DivideDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(double a, double b) => _calls.Add((a, b));
+		public void RecordCall(double a, double b) { CallCount++; LastCallArgs = (a, b); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for ICalculator.Square.</summary>
@@ -131,28 +111,23 @@ partial class CalculatorStub
 		/// <summary>Delegate for Square(int x).</summary>
 		public delegate int SquareDelegate(CalculatorStub ko, int x);
 
-		private readonly global::System.Collections.Generic.List<int> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'x' argument from the most recent call.</summary>
-		public int? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<int> AllCalls => _calls;
+		public int? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public SquareDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int x) => _calls.Add(x);
+		public void RecordCall(int x) { CallCount++; LastCallArg = x; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Spy for KnockOff.Benchmarks.Interfaces.ICalculator - tracks invocations and configures behavior.</summary>

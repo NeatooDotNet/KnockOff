@@ -78,21 +78,17 @@ public class OverloadedMethodTests
 		service.Process("c", 1);
 		service.Process("d", 2, false);
 
-		// Process1.AllCalls contains only Process(string) calls
-		var process1Calls = knockOff.IOverloadedService.Process1.AllCalls;
-		Assert.Equal(2, process1Calls.Count);
-		Assert.Equal("a", process1Calls[0]);
-		Assert.Equal("b", process1Calls[1]);
+		// Process1 - tracks Process(string) calls
+		Assert.Equal(2, knockOff.IOverloadedService.Process1.CallCount);
+		Assert.Equal("b", knockOff.IOverloadedService.Process1.LastCallArg); // Last call to this overload
 
-		// Process2.AllCalls contains only Process(string, int) calls
-		var process2Calls = knockOff.IOverloadedService.Process2.AllCalls;
-		Assert.Single(process2Calls);
-		Assert.Equal(("c", 1), process2Calls[0]);
+		// Process2 - tracks Process(string, int) calls
+		Assert.Equal(1, knockOff.IOverloadedService.Process2.CallCount);
+		Assert.Equal(("c", 1), knockOff.IOverloadedService.Process2.LastCallArgs);
 
-		// Process3.AllCalls contains only Process(string, int, bool) calls
-		var process3Calls = knockOff.IOverloadedService.Process3.AllCalls;
-		Assert.Single(process3Calls);
-		Assert.Equal(("d", 2, false), process3Calls[0]);
+		// Process3 - tracks Process(string, int, bool) calls
+		Assert.Equal(1, knockOff.IOverloadedService.Process3.CallCount);
+		Assert.Equal(("d", 2, false), knockOff.IOverloadedService.Process3.LastCallArgs);
 	}
 
 	[Fact]
@@ -224,15 +220,13 @@ public class OverloadedMethodTests
 		service.Calculate(5);
 		service.Calculate(3, 7);
 
-		// Calculate1.AllCalls - just the value
-		var calc1Calls = knockOff.IOverloadedService.Calculate1.AllCalls;
-		Assert.Single(calc1Calls);
-		Assert.Equal(5, calc1Calls[0]);
+		// Calculate1 - single param overload
+		Assert.Equal(1, knockOff.IOverloadedService.Calculate1.CallCount);
+		Assert.Equal(5, knockOff.IOverloadedService.Calculate1.LastCallArg);
 
-		// Calculate2.AllCalls - tuple of (a, b)
-		var calc2Calls = knockOff.IOverloadedService.Calculate2.AllCalls;
-		Assert.Single(calc2Calls);
-		Assert.Equal((3, 7), calc2Calls[0]);
+		// Calculate2 - two param overload
+		Assert.Equal(1, knockOff.IOverloadedService.Calculate2.CallCount);
+		Assert.Equal((3, 7), knockOff.IOverloadedService.Calculate2.LastCallArgs);
 	}
 
 	[Fact]

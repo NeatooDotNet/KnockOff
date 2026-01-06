@@ -39,28 +39,23 @@ partial class SkVerificationKnockOff
 		/// <summary>Delegate for GetUser(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.SkUser GetUserDelegate(SkVerificationKnockOff ko, int id);
 
-		private readonly global::System.Collections.Generic.List<int> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'id' argument from the most recent call.</summary>
-		public int? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<int> AllCalls => _calls;
+		public int? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public GetUserDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) => _calls.Add(id);
+		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for ISkVerificationService.Create.</summary>
@@ -69,28 +64,23 @@ partial class SkVerificationKnockOff
 		/// <summary>Delegate for Create(string name, int value).</summary>
 		public delegate void CreateDelegate(SkVerificationKnockOff ko, string name, int value);
 
-		private readonly global::System.Collections.Generic.List<(string name, int value)> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>Arguments from the most recent call.</summary>
-		public (string name, int value)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(string name, int value)> AllCalls => _calls;
+		public (string name, int value)? LastCallArgs { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public CreateDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string name, int value) => _calls.Add((name, value));
+		public void RecordCall(string name, int value) { CallCount++; LastCallArgs = (name, value); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
 	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ISkVerificationService - tracks invocations and configures behavior.</summary>

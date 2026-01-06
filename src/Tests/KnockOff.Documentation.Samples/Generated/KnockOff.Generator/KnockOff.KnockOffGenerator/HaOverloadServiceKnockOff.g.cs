@@ -11,28 +11,23 @@ partial class HaOverloadServiceKnockOff
 		/// <summary>Delegate for Process(string data).</summary>
 		public delegate void ProcessDelegate(HaOverloadServiceKnockOff ko, string data);
 
-		private readonly global::System.Collections.Generic.List<string> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'data' argument from the most recent call.</summary>
-		public string? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<string> AllCalls => _calls;
+		public string? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public ProcessDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string data) => _calls.Add(data);
+		public void RecordCall(string data) { CallCount++; LastCallArg = data; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IHaOverloadService.Process2.</summary>
@@ -41,28 +36,23 @@ partial class HaOverloadServiceKnockOff
 		/// <summary>Delegate for Process(string data, int priority).</summary>
 		public delegate void ProcessDelegate(HaOverloadServiceKnockOff ko, string data, int priority);
 
-		private readonly global::System.Collections.Generic.List<(string data, int priority)> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>Arguments from the most recent call.</summary>
-		public (string data, int priority)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(string data, int priority)> AllCalls => _calls;
+		public (string data, int priority)? LastCallArgs { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public ProcessDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string data, int priority) => _calls.Add((data, priority));
+		public void RecordCall(string data, int priority) { CallCount++; LastCallArgs = (data, priority); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IHaOverloadService.Calculate1.</summary>
@@ -71,28 +61,23 @@ partial class HaOverloadServiceKnockOff
 		/// <summary>Delegate for Calculate(int value).</summary>
 		public delegate int CalculateDelegate(HaOverloadServiceKnockOff ko, int value);
 
-		private readonly global::System.Collections.Generic.List<int> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'value' argument from the most recent call.</summary>
-		public int? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<int> AllCalls => _calls;
+		public int? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public CalculateDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int value) => _calls.Add(value);
+		public void RecordCall(int value) { CallCount++; LastCallArg = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IHaOverloadService.Calculate2.</summary>
@@ -101,28 +86,23 @@ partial class HaOverloadServiceKnockOff
 		/// <summary>Delegate for Calculate(int a, int b).</summary>
 		public delegate int CalculateDelegate(HaOverloadServiceKnockOff ko, int a, int b);
 
-		private readonly global::System.Collections.Generic.List<(int a, int b)> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>Arguments from the most recent call.</summary>
-		public (int a, int b)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(int a, int b)> AllCalls => _calls;
+		public (int a, int b)? LastCallArgs { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public CalculateDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int a, int b) => _calls.Add((a, b));
+		public void RecordCall(int a, int b) { CallCount++; LastCallArgs = (a, b); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
 	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.IHaOverloadService - tracks invocations and configures behavior.</summary>

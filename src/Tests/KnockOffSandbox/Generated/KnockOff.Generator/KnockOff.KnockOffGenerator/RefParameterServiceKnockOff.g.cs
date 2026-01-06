@@ -11,28 +11,23 @@ partial class RefParameterServiceKnockOff
 		/// <summary>Delegate for Increment(ref int value).</summary>
 		public delegate void IncrementDelegate(RefParameterServiceKnockOff ko, ref int value);
 
-		private readonly global::System.Collections.Generic.List<int> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'value' argument from the most recent call.</summary>
-		public int? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<int> AllCalls => _calls;
+		public int? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public IncrementDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int value) => _calls.Add(value);
+		public void RecordCall(int value) { CallCount++; LastCallArg = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IRefParameterService.TryUpdate.</summary>
@@ -41,28 +36,23 @@ partial class RefParameterServiceKnockOff
 		/// <summary>Delegate for TryUpdate(string key, ref string value).</summary>
 		public delegate bool TryUpdateDelegate(RefParameterServiceKnockOff ko, string key, ref string value);
 
-		private readonly global::System.Collections.Generic.List<(string key, string value)> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>Arguments from the most recent call.</summary>
-		public (string key, string value)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(string key, string value)> AllCalls => _calls;
+		public (string key, string value)? LastCallArgs { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public TryUpdateDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string key, string value) => _calls.Add((key, value));
+		public void RecordCall(string key, string value) { CallCount++; LastCallArgs = (key, value); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
 	/// <summary>Spy for KnockOff.Sandbox.IRefParameterService - tracks invocations and configures behavior.</summary>

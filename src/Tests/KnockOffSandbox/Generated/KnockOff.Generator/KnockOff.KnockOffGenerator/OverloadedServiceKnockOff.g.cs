@@ -11,28 +11,23 @@ partial class OverloadedServiceKnockOff
 		/// <summary>Delegate for Format(string input).</summary>
 		public delegate string FormatDelegate(OverloadedServiceKnockOff ko, string input);
 
-		private readonly global::System.Collections.Generic.List<string> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'input' argument from the most recent call.</summary>
-		public string? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<string> AllCalls => _calls;
+		public string? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public FormatDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string input) => _calls.Add(input);
+		public void RecordCall(string input) { CallCount++; LastCallArg = input; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IOverloadedService.Format2.</summary>
@@ -41,28 +36,23 @@ partial class OverloadedServiceKnockOff
 		/// <summary>Delegate for Format(string input, bool uppercase).</summary>
 		public delegate string FormatDelegate(OverloadedServiceKnockOff ko, string input, bool uppercase);
 
-		private readonly global::System.Collections.Generic.List<(string input, bool uppercase)> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>Arguments from the most recent call.</summary>
-		public (string input, bool uppercase)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(string input, bool uppercase)> AllCalls => _calls;
+		public (string input, bool uppercase)? LastCallArgs { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public FormatDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string input, bool uppercase) => _calls.Add((input, uppercase));
+		public void RecordCall(string input, bool uppercase) { CallCount++; LastCallArgs = (input, uppercase); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IOverloadedService.Format3.</summary>
@@ -71,28 +61,23 @@ partial class OverloadedServiceKnockOff
 		/// <summary>Delegate for Format(string input, int maxLength).</summary>
 		public delegate string FormatDelegate(OverloadedServiceKnockOff ko, string input, int maxLength);
 
-		private readonly global::System.Collections.Generic.List<(string input, int maxLength)> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>Arguments from the most recent call.</summary>
-		public (string input, int maxLength)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(string input, int maxLength)> AllCalls => _calls;
+		public (string input, int maxLength)? LastCallArgs { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public FormatDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string input, int maxLength) => _calls.Add((input, maxLength));
+		public void RecordCall(string input, int maxLength) { CallCount++; LastCallArgs = (input, maxLength); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
 	/// <summary>Spy for KnockOff.Sandbox.IOverloadedService - tracks invocations and configures behavior.</summary>

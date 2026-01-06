@@ -100,11 +100,8 @@ public class RefParameterTests
 		service.Increment(ref v2);
 		service.Increment(ref v3);
 
-		var allCalls = knockOff.IRefParameterService.Increment.AllCalls;
-		Assert.Equal(3, allCalls.Count);
-		Assert.Equal(1, allCalls[0]); // Original values
-		Assert.Equal(2, allCalls[1]);
-		Assert.Equal(3, allCalls[2]);
+		Assert.Equal(3, knockOff.IRefParameterService.Increment.CallCount);
+		Assert.Equal(3, knockOff.IRefParameterService.Increment.LastCallArg); // Last original value passed
 
 		// And the values were modified
 		Assert.Equal(2, v1);
@@ -148,7 +145,6 @@ public class RefParameterTests
 		Assert.Equal(0, knockOff.IRefParameterService.Increment.CallCount);
 		Assert.False(knockOff.IRefParameterService.Increment.WasCalled);
 		Assert.Null(knockOff.IRefParameterService.Increment.LastCallArg);
-		Assert.Empty(knockOff.IRefParameterService.Increment.AllCalls);
 	}
 
 	[Fact]

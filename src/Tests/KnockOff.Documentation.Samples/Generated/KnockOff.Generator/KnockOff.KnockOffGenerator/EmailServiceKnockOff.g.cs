@@ -27,28 +27,23 @@ partial class EmailServiceKnockOff
 		/// <summary>Delegate for SendEmail(string to, string subject, string body).</summary>
 		public delegate void SendEmailDelegate(EmailServiceKnockOff ko, string to, string subject, string body);
 
-		private readonly global::System.Collections.Generic.List<(string to, string subject, string body)> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>Arguments from the most recent call.</summary>
-		public (string to, string subject, string body)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(string to, string subject, string body)> AllCalls => _calls;
+		public (string to, string subject, string body)? LastCallArgs { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public SendEmailDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string to, string subject, string body) => _calls.Add((to, subject, body));
+		public void RecordCall(string to, string subject, string body) { CallCount++; LastCallArgs = (to, subject, body); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
 	/// <summary>Spy for KnockOff.Documentation.Samples.GettingStarted.IEmailService - tracks invocations and configures behavior.</summary>

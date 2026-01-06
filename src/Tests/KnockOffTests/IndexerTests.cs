@@ -36,10 +36,7 @@ public class IndexerTests
 		_ = store["Third"];
 
 		Assert.Equal(3, knockOff.IPropertyStore.StringIndexer.GetCount);
-		Assert.Equal(3, knockOff.IPropertyStore.StringIndexer.AllGetKeys.Count);
-		Assert.Equal("First", knockOff.IPropertyStore.StringIndexer.AllGetKeys[0]);
-		Assert.Equal("Second", knockOff.IPropertyStore.StringIndexer.AllGetKeys[1]);
-		Assert.Equal("Third", knockOff.IPropertyStore.StringIndexer.AllGetKeys[2]);
+		Assert.Equal("Third", knockOff.IPropertyStore.StringIndexer.LastGetKey); // Last key accessed
 	}
 
 	[Fact]
@@ -155,9 +152,9 @@ public class IndexerTests
 		knockOff.IReadWriteStore.StringIndexer.Reset();
 
 		Assert.Equal(0, knockOff.IReadWriteStore.StringIndexer.GetCount);
-		Assert.Empty(knockOff.IReadWriteStore.StringIndexer.AllGetKeys);
+		Assert.Null(knockOff.IReadWriteStore.StringIndexer.LastGetKey);
 		Assert.Equal(0, knockOff.IReadWriteStore.StringIndexer.SetCount);
-		Assert.Empty(knockOff.IReadWriteStore.StringIndexer.AllSetEntries);
+		Assert.Null(knockOff.IReadWriteStore.StringIndexer.LastSetEntry);
 		Assert.Null(knockOff.IReadWriteStore.StringIndexer.OnGet);
 		Assert.Null(knockOff.IReadWriteStore.StringIndexer.OnSet);
 

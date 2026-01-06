@@ -33,28 +33,23 @@ partial class SkOnCallKnockOff
 		/// <summary>Delegate for GetById(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.SkUser GetByIdDelegate(SkOnCallKnockOff ko, int id);
 
-		private readonly global::System.Collections.Generic.List<int> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'id' argument from the most recent call.</summary>
-		public int? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<int> AllCalls => _calls;
+		public int? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public GetByIdDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) => _calls.Add(id);
+		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for ISkOnCallService.Find.</summary>
@@ -63,28 +58,23 @@ partial class SkOnCallKnockOff
 		/// <summary>Delegate for Find(string name, bool active).</summary>
 		public delegate global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser> FindDelegate(SkOnCallKnockOff ko, string name, bool active);
 
-		private readonly global::System.Collections.Generic.List<(string name, bool active)> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>Arguments from the most recent call.</summary>
-		public (string name, bool active)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(string name, bool active)> AllCalls => _calls;
+		public (string name, bool active)? LastCallArgs { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public FindDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string name, bool active) => _calls.Add((name, active));
+		public void RecordCall(string name, bool active) { CallCount++; LastCallArgs = (name, active); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for ISkOnCallService.Save.</summary>
@@ -93,28 +83,23 @@ partial class SkOnCallKnockOff
 		/// <summary>Delegate for Save(object entity).</summary>
 		public delegate void SaveDelegate(SkOnCallKnockOff ko, object entity);
 
-		private readonly global::System.Collections.Generic.List<object> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'entity' argument from the most recent call.</summary>
-		public object? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<object> AllCalls => _calls;
+		public object? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public SaveDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(object entity) => _calls.Add(entity);
+		public void RecordCall(object entity) { CallCount++; LastCallArg = entity; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ISkOnCallService - tracks invocations and configures behavior.</summary>

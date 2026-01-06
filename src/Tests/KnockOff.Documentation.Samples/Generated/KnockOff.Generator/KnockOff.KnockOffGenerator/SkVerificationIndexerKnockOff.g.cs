@@ -8,42 +8,32 @@ partial class SkVerificationIndexerKnockOff
 	/// <summary>Tracks and configures behavior for ISkVerificationPropertyStore.StringIndexer.</summary>
 	public sealed class ISkVerificationPropertyStore_StringIndexerHandler
 	{
-		private readonly global::System.Collections.Generic.List<string> _getKeys = new();
-
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount => _getKeys.Count;
+		public int GetCount { get; private set; }
 
 		/// <summary>The key from the most recent getter access.</summary>
-		public string? LastGetKey => _getKeys.Count > 0 ? _getKeys[_getKeys.Count - 1] : default;
-
-		/// <summary>All keys accessed via the getter.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<string> AllGetKeys => _getKeys;
+		public string? LastGetKey { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<SkVerificationIndexerKnockOff, string, object?>? OnGet { get; set; }
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet(string key) => _getKeys.Add(key);
-
-		private readonly global::System.Collections.Generic.List<(string key, object? value)> _setEntries = new();
+		public void RecordGet(string key) { GetCount++; LastGetKey = key; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
-		public int SetCount => _setEntries.Count;
+		public int SetCount { get; private set; }
 
 		/// <summary>The key-value pair from the most recent setter access.</summary>
-		public (string key, object? value)? LastSetEntry => _setEntries.Count > 0 ? _setEntries[_setEntries.Count - 1] : null;
-
-		/// <summary>All key-value pairs set via the setter.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(string key, object? value)> AllSetEntries => _setEntries;
+		public (string key, object? value)? LastSetEntry { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
 		public global::System.Action<SkVerificationIndexerKnockOff, string, object?>? OnSet { get; set; }
 
 		/// <summary>Records a setter access.</summary>
-		public void RecordSet(string key, object? value) => _setEntries.Add((key, value));
+		public void RecordSet(string key, object? value) { SetCount++; LastSetEntry = (key, value); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _getKeys.Clear(); OnGet = null; _setEntries.Clear(); OnSet = null; }
+		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
 	}
 
 	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ISkVerificationPropertyStore - tracks invocations and configures behavior.</summary>

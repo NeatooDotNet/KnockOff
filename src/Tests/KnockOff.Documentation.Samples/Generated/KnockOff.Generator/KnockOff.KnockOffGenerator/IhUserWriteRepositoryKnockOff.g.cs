@@ -11,28 +11,23 @@ partial class IhUserWriteRepositoryKnockOff
 		/// <summary>Delegate for Add(global::KnockOff.Documentation.Samples.Guides.IhUser entity).</summary>
 		public delegate void AddDelegate(IhUserWriteRepositoryKnockOff ko, global::KnockOff.Documentation.Samples.Guides.IhUser entity);
 
-		private readonly global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Guides.IhUser> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'entity' argument from the most recent call.</summary>
-		public global::KnockOff.Documentation.Samples.Guides.IhUser? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<global::KnockOff.Documentation.Samples.Guides.IhUser> AllCalls => _calls;
+		public global::KnockOff.Documentation.Samples.Guides.IhUser? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public AddDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::KnockOff.Documentation.Samples.Guides.IhUser entity) => _calls.Add(entity);
+		public void RecordCall(global::KnockOff.Documentation.Samples.Guides.IhUser entity) { CallCount++; LastCallArg = entity; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUser.Delete.</summary>
@@ -41,28 +36,23 @@ partial class IhUserWriteRepositoryKnockOff
 		/// <summary>Delegate for Delete(int id).</summary>
 		public delegate void DeleteDelegate(IhUserWriteRepositoryKnockOff ko, int id);
 
-		private readonly global::System.Collections.Generic.List<int> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'id' argument from the most recent call.</summary>
-		public int? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<int> AllCalls => _calls;
+		public int? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public DeleteDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) => _calls.Add(id);
+		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IIhWriteRepository<KnockOff.Documentation.Samples.Guides.IhUser> - tracks invocations and configures behavior.</summary>
@@ -80,28 +70,23 @@ partial class IhUserWriteRepositoryKnockOff
 		/// <summary>Delegate for GetById(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Guides.IhUser? GetByIdDelegate(IhUserWriteRepositoryKnockOff ko, int id);
 
-		private readonly global::System.Collections.Generic.List<int> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'id' argument from the most recent call.</summary>
-		public int? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<int> AllCalls => _calls;
+		public int? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public GetByIdDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) => _calls.Add(id);
+		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUser.GetAll.</summary>

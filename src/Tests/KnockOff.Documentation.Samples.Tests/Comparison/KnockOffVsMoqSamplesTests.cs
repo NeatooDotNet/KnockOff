@@ -109,11 +109,8 @@ public class KnockOffVsMoqSamplesTests : SamplesTestBase
         repo.Save(new VsEntity { Id = 2 });
         repo.Save(new VsEntity { Id = 3 });
 
-        var allSaved = knockOff.IVsRepository.Save.AllCalls;
-        Assert.Equal(3, allSaved.Count);
-        Assert.Equal(1, allSaved[0]?.Id);
-        Assert.Equal(2, allSaved[1]?.Id);
-        Assert.Equal(3, allSaved[2]?.Id);
+        Assert.Equal(3, knockOff.IVsRepository.Save.CallCount);
+        Assert.Equal(3, knockOff.IVsRepository.Save.LastCallArg?.Id);
     }
 
     // ========================================================================

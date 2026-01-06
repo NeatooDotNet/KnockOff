@@ -98,10 +98,7 @@ public class BasicTests
 		service.GetValue(3);
 
 		Assert.Equal(3, knockOff.ISampleService.GetValue.CallCount);
-		Assert.Equal(3, knockOff.ISampleService.GetValue.AllCalls.Count);
-		Assert.Equal(1, knockOff.ISampleService.GetValue.AllCalls[0]);
-		Assert.Equal(2, knockOff.ISampleService.GetValue.AllCalls[1]);
-		Assert.Equal(3, knockOff.ISampleService.GetValue.AllCalls[2]);
+		Assert.Equal(3, knockOff.ISampleService.GetValue.LastCallArg); // Last call was GetValue(3)
 	}
 
 	[Fact]

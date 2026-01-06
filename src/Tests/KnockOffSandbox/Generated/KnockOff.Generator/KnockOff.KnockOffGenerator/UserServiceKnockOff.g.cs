@@ -77,28 +77,23 @@ partial class UserServiceKnockOff
 		/// <summary>Delegate for GetGreeting(string name).</summary>
 		public delegate string GetGreetingDelegate(UserServiceKnockOff ko, string name);
 
-		private readonly global::System.Collections.Generic.List<string> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'name' argument from the most recent call.</summary>
-		public string? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<string> AllCalls => _calls;
+		public string? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public GetGreetingDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string name) => _calls.Add(name);
+		public void RecordCall(string name) { CallCount++; LastCallArg = name; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IUserService.Process.</summary>
@@ -107,28 +102,23 @@ partial class UserServiceKnockOff
 		/// <summary>Delegate for Process(string id, int count, bool urgent).</summary>
 		public delegate void ProcessDelegate(UserServiceKnockOff ko, string id, int count, bool urgent);
 
-		private readonly global::System.Collections.Generic.List<(string id, int count, bool urgent)> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>Arguments from the most recent call.</summary>
-		public (string id, int count, bool urgent)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(string id, int count, bool urgent)> AllCalls => _calls;
+		public (string id, int count, bool urgent)? LastCallArgs { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public ProcessDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string id, int count, bool urgent) => _calls.Add((id, count, urgent));
+		public void RecordCall(string id, int count, bool urgent) { CallCount++; LastCallArgs = (id, count, urgent); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
 	/// <summary>Spy for KnockOff.Sandbox.IUserService - tracks invocations and configures behavior.</summary>

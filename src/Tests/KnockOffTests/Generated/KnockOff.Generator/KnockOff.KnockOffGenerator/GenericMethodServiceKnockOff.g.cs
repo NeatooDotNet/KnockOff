@@ -189,16 +189,11 @@ partial class GenericMethodServiceKnockOff
 			/// <summary>Delegate for Deserialize.</summary>
 			public delegate T DeserializeDelegate(GenericMethodServiceKnockOff ko, string json);
 
-			private readonly global::System.Collections.Generic.List<string> _calls = new();
-
 			/// <summary>Number of times this method was called with these type arguments.</summary>
-			public int CallCount => _calls.Count;
+			public int CallCount { get; private set; }
 
 			/// <summary>The 'json' argument from the most recent call.</summary>
-			public string? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-			/// <summary>All recorded calls with their arguments.</summary>
-			public global::System.Collections.Generic.IReadOnlyList<string> AllCalls => _calls;
+			public string? LastCallArg { get; private set; }
 
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -207,10 +202,10 @@ partial class GenericMethodServiceKnockOff
 			public DeserializeDelegate? OnCall { get; set; }
 
 			/// <summary>Records a method call.</summary>
-			public void RecordCall(string json) => _calls.Add(json);
+			public void RecordCall(string json) { CallCount++; LastCallArg = json; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { _calls.Clear(); OnCall = null; }
+			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 	}
 
@@ -311,16 +306,11 @@ partial class GenericMethodServiceKnockOff
 			/// <summary>Delegate for Find.</summary>
 			public delegate T? FindDelegate(GenericMethodServiceKnockOff ko, int id);
 
-			private readonly global::System.Collections.Generic.List<int> _calls = new();
-
 			/// <summary>Number of times this method was called with these type arguments.</summary>
-			public int CallCount => _calls.Count;
+			public int CallCount { get; private set; }
 
 			/// <summary>The 'id' argument from the most recent call.</summary>
-			public int? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-			/// <summary>All recorded calls with their arguments.</summary>
-			public global::System.Collections.Generic.IReadOnlyList<int> AllCalls => _calls;
+			public int? LastCallArg { get; private set; }
 
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -329,10 +319,10 @@ partial class GenericMethodServiceKnockOff
 			public FindDelegate? OnCall { get; set; }
 
 			/// <summary>Records a method call.</summary>
-			public void RecordCall(int id) => _calls.Add(id);
+			public void RecordCall(int id) { CallCount++; LastCallArg = id; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { _calls.Clear(); OnCall = null; }
+			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 	}
 

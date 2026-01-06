@@ -11,28 +11,23 @@ partial class OrderServiceStub
 		/// <summary>Delegate for GetOrder(int orderId).</summary>
 		public delegate global::KnockOff.Benchmarks.Interfaces.Order? GetOrderDelegate(OrderServiceStub ko, int orderId);
 
-		private readonly global::System.Collections.Generic.List<int> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'orderId' argument from the most recent call.</summary>
-		public int? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<int> AllCalls => _calls;
+		public int? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public GetOrderDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int orderId) => _calls.Add(orderId);
+		public void RecordCall(int orderId) { CallCount++; LastCallArg = orderId; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IOrderService.GetOrdersByCustomer.</summary>
@@ -41,28 +36,23 @@ partial class OrderServiceStub
 		/// <summary>Delegate for GetOrdersByCustomer(int customerId).</summary>
 		public delegate global::System.Collections.Generic.IEnumerable<global::KnockOff.Benchmarks.Interfaces.Order> GetOrdersByCustomerDelegate(OrderServiceStub ko, int customerId);
 
-		private readonly global::System.Collections.Generic.List<int> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'customerId' argument from the most recent call.</summary>
-		public int? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<int> AllCalls => _calls;
+		public int? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public GetOrdersByCustomerDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int customerId) => _calls.Add(customerId);
+		public void RecordCall(int customerId) { CallCount++; LastCallArg = customerId; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IOrderService.SaveOrder.</summary>
@@ -71,28 +61,23 @@ partial class OrderServiceStub
 		/// <summary>Delegate for SaveOrder(global::KnockOff.Benchmarks.Interfaces.Order order).</summary>
 		public delegate void SaveOrderDelegate(OrderServiceStub ko, global::KnockOff.Benchmarks.Interfaces.Order order);
 
-		private readonly global::System.Collections.Generic.List<global::KnockOff.Benchmarks.Interfaces.Order> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'order' argument from the most recent call.</summary>
-		public global::KnockOff.Benchmarks.Interfaces.Order? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<global::KnockOff.Benchmarks.Interfaces.Order> AllCalls => _calls;
+		public global::KnockOff.Benchmarks.Interfaces.Order? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public SaveOrderDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::KnockOff.Benchmarks.Interfaces.Order order) => _calls.Add(order);
+		public void RecordCall(global::KnockOff.Benchmarks.Interfaces.Order order) { CallCount++; LastCallArg = order; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IOrderService.DeleteOrder.</summary>
@@ -101,28 +86,23 @@ partial class OrderServiceStub
 		/// <summary>Delegate for DeleteOrder(int orderId).</summary>
 		public delegate void DeleteOrderDelegate(OrderServiceStub ko, int orderId);
 
-		private readonly global::System.Collections.Generic.List<int> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'orderId' argument from the most recent call.</summary>
-		public int? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<int> AllCalls => _calls;
+		public int? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public DeleteOrderDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int orderId) => _calls.Add(orderId);
+		public void RecordCall(int orderId) { CallCount++; LastCallArg = orderId; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IOrderService.ValidateOrder.</summary>
@@ -131,28 +111,23 @@ partial class OrderServiceStub
 		/// <summary>Delegate for ValidateOrder(global::KnockOff.Benchmarks.Interfaces.Order order).</summary>
 		public delegate bool ValidateOrderDelegate(OrderServiceStub ko, global::KnockOff.Benchmarks.Interfaces.Order order);
 
-		private readonly global::System.Collections.Generic.List<global::KnockOff.Benchmarks.Interfaces.Order> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'order' argument from the most recent call.</summary>
-		public global::KnockOff.Benchmarks.Interfaces.Order? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<global::KnockOff.Benchmarks.Interfaces.Order> AllCalls => _calls;
+		public global::KnockOff.Benchmarks.Interfaces.Order? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public ValidateOrderDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::KnockOff.Benchmarks.Interfaces.Order order) => _calls.Add(order);
+		public void RecordCall(global::KnockOff.Benchmarks.Interfaces.Order order) { CallCount++; LastCallArg = order; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IOrderService.CalculateTotal.</summary>
@@ -161,28 +136,23 @@ partial class OrderServiceStub
 		/// <summary>Delegate for CalculateTotal(global::KnockOff.Benchmarks.Interfaces.Order order).</summary>
 		public delegate decimal CalculateTotalDelegate(OrderServiceStub ko, global::KnockOff.Benchmarks.Interfaces.Order order);
 
-		private readonly global::System.Collections.Generic.List<global::KnockOff.Benchmarks.Interfaces.Order> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'order' argument from the most recent call.</summary>
-		public global::KnockOff.Benchmarks.Interfaces.Order? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<global::KnockOff.Benchmarks.Interfaces.Order> AllCalls => _calls;
+		public global::KnockOff.Benchmarks.Interfaces.Order? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public CalculateTotalDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::KnockOff.Benchmarks.Interfaces.Order order) => _calls.Add(order);
+		public void RecordCall(global::KnockOff.Benchmarks.Interfaces.Order order) { CallCount++; LastCallArg = order; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Spy for KnockOff.Benchmarks.Interfaces.IOrderService - tracks invocations and configures behavior.</summary>

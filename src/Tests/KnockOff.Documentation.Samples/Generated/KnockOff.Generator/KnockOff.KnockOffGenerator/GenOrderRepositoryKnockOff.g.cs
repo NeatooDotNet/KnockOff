@@ -11,28 +11,23 @@ partial class GenOrderRepositoryKnockOff
 		/// <summary>Delegate for GetById(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Guides.GenOrder? GetByIdDelegate(GenOrderRepositoryKnockOff ko, int id);
 
-		private readonly global::System.Collections.Generic.List<int> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'id' argument from the most recent call.</summary>
-		public int? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<int> AllCalls => _calls;
+		public int? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public GetByIdDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) => _calls.Add(id);
+		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder.Save.</summary>
@@ -41,28 +36,23 @@ partial class GenOrderRepositoryKnockOff
 		/// <summary>Delegate for Save(global::KnockOff.Documentation.Samples.Guides.GenOrder entity).</summary>
 		public delegate void SaveDelegate(GenOrderRepositoryKnockOff ko, global::KnockOff.Documentation.Samples.Guides.GenOrder entity);
 
-		private readonly global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Guides.GenOrder> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'entity' argument from the most recent call.</summary>
-		public global::KnockOff.Documentation.Samples.Guides.GenOrder? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<global::KnockOff.Documentation.Samples.Guides.GenOrder> AllCalls => _calls;
+		public global::KnockOff.Documentation.Samples.Guides.GenOrder? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public SaveDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::KnockOff.Documentation.Samples.Guides.GenOrder entity) => _calls.Add(entity);
+		public void RecordCall(global::KnockOff.Documentation.Samples.Guides.GenOrder entity) { CallCount++; LastCallArg = entity; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder.GetByIdAsync.</summary>
@@ -71,28 +61,23 @@ partial class GenOrderRepositoryKnockOff
 		/// <summary>Delegate for GetByIdAsync(int id).</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.GenOrder?> GetByIdAsyncDelegate(GenOrderRepositoryKnockOff ko, int id);
 
-		private readonly global::System.Collections.Generic.List<int> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'id' argument from the most recent call.</summary>
-		public int? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<int> AllCalls => _calls;
+		public int? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public GetByIdAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) => _calls.Add(id);
+		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IGenRepository<KnockOff.Documentation.Samples.Guides.GenOrder> - tracks invocations and configures behavior.</summary>

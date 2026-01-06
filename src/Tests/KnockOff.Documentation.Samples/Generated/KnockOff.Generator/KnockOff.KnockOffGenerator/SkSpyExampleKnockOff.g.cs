@@ -11,28 +11,23 @@ partial class SkSpyExampleKnockOff
 		/// <summary>Delegate for GetUser(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.SkUser GetUserDelegate(SkSpyExampleKnockOff ko, int id);
 
-		private readonly global::System.Collections.Generic.List<int> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'id' argument from the most recent call.</summary>
-		public int? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<int> AllCalls => _calls;
+		public int? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public GetUserDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) => _calls.Add(id);
+		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ISkUserService - tracks invocations and configures behavior.</summary>
@@ -45,42 +40,32 @@ partial class SkSpyExampleKnockOff
 	/// <summary>Tracks and configures behavior for ISkPropertyStore.StringIndexer.</summary>
 	public sealed class ISkPropertyStore_StringIndexerHandler
 	{
-		private readonly global::System.Collections.Generic.List<string> _getKeys = new();
-
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount => _getKeys.Count;
+		public int GetCount { get; private set; }
 
 		/// <summary>The key from the most recent getter access.</summary>
-		public string? LastGetKey => _getKeys.Count > 0 ? _getKeys[_getKeys.Count - 1] : default;
-
-		/// <summary>All keys accessed via the getter.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<string> AllGetKeys => _getKeys;
+		public string? LastGetKey { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<SkSpyExampleKnockOff, string, global::KnockOff.Documentation.Samples.Skills.SkUser?>? OnGet { get; set; }
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet(string key) => _getKeys.Add(key);
-
-		private readonly global::System.Collections.Generic.List<(string key, global::KnockOff.Documentation.Samples.Skills.SkUser? value)> _setEntries = new();
+		public void RecordGet(string key) { GetCount++; LastGetKey = key; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
-		public int SetCount => _setEntries.Count;
+		public int SetCount { get; private set; }
 
 		/// <summary>The key-value pair from the most recent setter access.</summary>
-		public (string key, global::KnockOff.Documentation.Samples.Skills.SkUser? value)? LastSetEntry => _setEntries.Count > 0 ? _setEntries[_setEntries.Count - 1] : null;
-
-		/// <summary>All key-value pairs set via the setter.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(string key, global::KnockOff.Documentation.Samples.Skills.SkUser? value)> AllSetEntries => _setEntries;
+		public (string key, global::KnockOff.Documentation.Samples.Skills.SkUser? value)? LastSetEntry { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
 		public global::System.Action<SkSpyExampleKnockOff, string, global::KnockOff.Documentation.Samples.Skills.SkUser?>? OnSet { get; set; }
 
 		/// <summary>Records a setter access.</summary>
-		public void RecordSet(string key, global::KnockOff.Documentation.Samples.Skills.SkUser? value) => _setEntries.Add((key, value));
+		public void RecordSet(string key, global::KnockOff.Documentation.Samples.Skills.SkUser? value) { SetCount++; LastSetEntry = (key, value); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _getKeys.Clear(); OnGet = null; _setEntries.Clear(); OnSet = null; }
+		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
 	}
 
 	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ISkPropertyStore - tracks invocations and configures behavior.</summary>

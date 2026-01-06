@@ -1012,29 +1012,24 @@ public class KnockOffGenerator : IIncrementalGenerator
 				return;
 			}
 
-			// Method tracking: CallCount, WasCalled, LastCallArgs, AllCalls, OnCall
+			// Method tracking: CallCount, WasCalled, LastCallArg/LastCallArgs (if params), OnCall
 			var paramCount = member.Parameters.Count;
 			var isVoid = member.ReturnType == "void";
 
 			if (paramCount == 1)
 			{
-				// Single parameter - store directly (tuples require 2+ elements)
+				// Single parameter - track last call only (no List for performance)
 				var param = member.Parameters.GetArray()![0];
 				var nullableType = MakeNullable(param.Type);
 
-				sb.AppendLine($"\t\tprivate readonly global::System.Collections.Generic.List<{param.Type}> _calls = new();");
-				sb.AppendLine();
 				sb.AppendLine("\t\t/// <summary>Number of times this method was called.</summary>");
-				sb.AppendLine("\t\tpublic int CallCount => _calls.Count;");
+				sb.AppendLine("\t\tpublic int CallCount { get; private set; }");
 				sb.AppendLine();
 				sb.AppendLine("\t\t/// <summary>True if this method was called at least once.</summary>");
-				sb.AppendLine("\t\tpublic bool WasCalled => _calls.Count > 0;");
+				sb.AppendLine("\t\tpublic bool WasCalled => CallCount > 0;");
 				sb.AppendLine();
 				sb.AppendLine($"\t\t/// <summary>The '{param.Name}' argument from the most recent call.</summary>");
-				sb.AppendLine($"\t\tpublic {nullableType} LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;");
-				sb.AppendLine();
-				sb.AppendLine("\t\t/// <summary>All recorded calls with their arguments.</summary>");
-				sb.AppendLine($"\t\tpublic global::System.Collections.Generic.IReadOnlyList<{param.Type}> AllCalls => _calls;");
+				sb.AppendLine($"\t\tpublic {nullableType} LastCallArg {{ get; private set; }}");
 				sb.AppendLine();
 
 				// OnCall callback: Func<TKnockOff, TArg, TReturn>? or Action<TKnockOff, TArg>?
@@ -1050,30 +1045,27 @@ public class KnockOffGenerator : IIncrementalGenerator
 				sb.AppendLine();
 
 				sb.AppendLine("\t\t/// <summary>Records a method call.</summary>");
-				sb.AppendLine($"\t\tpublic void RecordCall({param.Type} {param.Name}) => _calls.Add({param.Name});");
+				sb.AppendLine($"\t\tpublic void RecordCall({param.Type} {param.Name}) {{ CallCount++; LastCallArg = {param.Name}; }}");
 				sb.AppendLine();
 
 				sb.AppendLine("\t\t/// <summary>Resets all tracking state.</summary>");
-				sb.AppendLine("\t\tpublic void Reset() { _calls.Clear(); OnCall = null; }");
+				sb.AppendLine("\t\tpublic void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }");
 			}
 			else if (paramCount > 1)
 			{
-				// Multiple parameters - use tuple
+				// Multiple parameters - track last call only (no List for performance)
 				var tupleType = GetTupleType(member.Parameters);
+				var paramList = string.Join(", ", member.Parameters.Select(p => FormatParameter(p)));
+				var tupleConstruction = GetTupleConstruction(member.Parameters);
 
-				sb.AppendLine($"\t\tprivate readonly global::System.Collections.Generic.List<{tupleType}> _calls = new();");
-				sb.AppendLine();
 				sb.AppendLine("\t\t/// <summary>Number of times this method was called.</summary>");
-				sb.AppendLine("\t\tpublic int CallCount => _calls.Count;");
+				sb.AppendLine("\t\tpublic int CallCount { get; private set; }");
 				sb.AppendLine();
 				sb.AppendLine("\t\t/// <summary>True if this method was called at least once.</summary>");
-				sb.AppendLine("\t\tpublic bool WasCalled => _calls.Count > 0;");
+				sb.AppendLine("\t\tpublic bool WasCalled => CallCount > 0;");
 				sb.AppendLine();
 				sb.AppendLine("\t\t/// <summary>The arguments from the most recent call.</summary>");
-				sb.AppendLine($"\t\tpublic {tupleType}? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;");
-				sb.AppendLine();
-				sb.AppendLine("\t\t/// <summary>All recorded calls with their arguments.</summary>");
-				sb.AppendLine($"\t\tpublic global::System.Collections.Generic.IReadOnlyList<{tupleType}> AllCalls => _calls;");
+				sb.AppendLine($"\t\tpublic {tupleType}? LastCallArgs {{ get; private set; }}");
 				sb.AppendLine();
 
 				// OnCall callback with tuple parameter: Func<TKnockOff, (T1, T2), TReturn>? or Action<TKnockOff, (T1, T2)>?
@@ -1088,15 +1080,12 @@ public class KnockOffGenerator : IIncrementalGenerator
 				}
 				sb.AppendLine();
 
-				// RecordCall with typed parameters
-				var paramList = string.Join(", ", member.Parameters.Select(p => FormatParameter(p)));
-				var tupleConstruction = GetTupleConstruction(member.Parameters);
 				sb.AppendLine("\t\t/// <summary>Records a method call.</summary>");
-				sb.AppendLine($"\t\tpublic void RecordCall({paramList}) => _calls.Add({tupleConstruction});");
+				sb.AppendLine($"\t\tpublic void RecordCall({paramList}) {{ CallCount++; LastCallArgs = {tupleConstruction}; }}");
 				sb.AppendLine();
 
 				sb.AppendLine("\t\t/// <summary>Resets all tracking state.</summary>");
-				sb.AppendLine("\t\tpublic void Reset() { _calls.Clear(); OnCall = null; }");
+				sb.AppendLine("\t\tpublic void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }");
 			}
 			else
 			{
@@ -1227,42 +1216,26 @@ public class KnockOffGenerator : IIncrementalGenerator
 		}
 		sb.AppendLine();
 
-		// Tracking storage - based on non-generic parameter count
-		if (nonGenericParams.Length == 0)
-		{
-			sb.AppendLine("\t\t\t/// <summary>Number of times this method was called with these type arguments.</summary>");
-			sb.AppendLine("\t\t\tpublic int CallCount { get; private set; }");
-		}
-		else if (nonGenericParams.Length == 1)
+		// Tracking storage - based on non-generic parameter count (no List for performance)
+		sb.AppendLine("\t\t\t/// <summary>Number of times this method was called with these type arguments.</summary>");
+		sb.AppendLine("\t\t\tpublic int CallCount { get; private set; }");
+		sb.AppendLine();
+
+		if (nonGenericParams.Length == 1)
 		{
 			var param = nonGenericParams[0];
-			sb.AppendLine($"\t\t\tprivate readonly global::System.Collections.Generic.List<{param.Type}> _calls = new();");
-			sb.AppendLine();
-			sb.AppendLine("\t\t\t/// <summary>Number of times this method was called with these type arguments.</summary>");
-			sb.AppendLine("\t\t\tpublic int CallCount => _calls.Count;");
-			sb.AppendLine();
-			sb.AppendLine($"\t\t\t/// <summary>The '{param.Name}' argument from the most recent call.</summary>");
 			var nullableType = MakeNullable(param.Type);
-			sb.AppendLine($"\t\t\tpublic {nullableType} LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;");
+			sb.AppendLine($"\t\t\t/// <summary>The '{param.Name}' argument from the most recent call.</summary>");
+			sb.AppendLine($"\t\t\tpublic {nullableType} LastCallArg {{ get; private set; }}");
 			sb.AppendLine();
-			sb.AppendLine("\t\t\t/// <summary>All recorded calls with their arguments.</summary>");
-			sb.AppendLine($"\t\t\tpublic global::System.Collections.Generic.IReadOnlyList<{param.Type}> AllCalls => _calls;");
 		}
-		else
+		else if (nonGenericParams.Length > 1)
 		{
 			var tupleType = "(" + string.Join(", ", nonGenericParams.Select(p => $"{p.Type} {p.Name}")) + ")";
-			sb.AppendLine($"\t\t\tprivate readonly global::System.Collections.Generic.List<{tupleType}> _calls = new();");
-			sb.AppendLine();
-			sb.AppendLine("\t\t\t/// <summary>Number of times this method was called with these type arguments.</summary>");
-			sb.AppendLine("\t\t\tpublic int CallCount => _calls.Count;");
-			sb.AppendLine();
 			sb.AppendLine("\t\t\t/// <summary>The arguments from the most recent call.</summary>");
-			sb.AppendLine($"\t\t\tpublic {tupleType}? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;");
+			sb.AppendLine($"\t\t\tpublic {tupleType}? LastCallArgs {{ get; private set; }}");
 			sb.AppendLine();
-			sb.AppendLine("\t\t\t/// <summary>All recorded calls with their arguments.</summary>");
-			sb.AppendLine($"\t\t\tpublic global::System.Collections.Generic.IReadOnlyList<{tupleType}> AllCalls => _calls;");
 		}
-		sb.AppendLine();
 
 		sb.AppendLine("\t\t\t/// <summary>True if this method was called at least once with these type arguments.</summary>");
 		sb.AppendLine("\t\t\tpublic bool WasCalled => CallCount > 0;");
@@ -1281,13 +1254,13 @@ public class KnockOffGenerator : IIncrementalGenerator
 		else if (nonGenericParams.Length == 1)
 		{
 			var param = nonGenericParams[0];
-			sb.AppendLine($"\t\t\tpublic void RecordCall({param.Type} {param.Name}) => _calls.Add({param.Name});");
+			sb.AppendLine($"\t\t\tpublic void RecordCall({param.Type} {param.Name}) {{ CallCount++; LastCallArg = {param.Name}; }}");
 		}
 		else
 		{
 			var paramList = string.Join(", ", nonGenericParams.Select(p => $"{p.Type} {p.Name}"));
 			var tupleConstruction = "(" + string.Join(", ", nonGenericParams.Select(p => p.Name)) + ")";
-			sb.AppendLine($"\t\t\tpublic void RecordCall({paramList}) => _calls.Add({tupleConstruction});");
+			sb.AppendLine($"\t\t\tpublic void RecordCall({paramList}) {{ CallCount++; LastCallArgs = {tupleConstruction}; }}");
 		}
 		sb.AppendLine();
 
@@ -1297,9 +1270,13 @@ public class KnockOffGenerator : IIncrementalGenerator
 		{
 			sb.AppendLine("\t\t\tpublic void Reset() { CallCount = 0; OnCall = null; }");
 		}
+		else if (nonGenericParams.Length == 1)
+		{
+			sb.AppendLine("\t\t\tpublic void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }");
+		}
 		else
 		{
-			sb.AppendLine("\t\t\tpublic void Reset() { _calls.Clear(); OnCall = null; }");
+			sb.AppendLine("\t\t\tpublic void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }");
 		}
 
 		sb.AppendLine("\t\t}");
@@ -1360,21 +1337,14 @@ public class KnockOffGenerator : IIncrementalGenerator
 
 		if (member.HasGetter)
 		{
-			// Track keys accessed
-			sb.AppendLine($"\t\tprivate readonly global::System.Collections.Generic.List<{keyType}> _getKeys = new();");
-			sb.AppendLine();
+			var nullableKeyType = MakeNullable(keyType);
 
 			sb.AppendLine("\t\t/// <summary>Number of times the getter was accessed.</summary>");
-			sb.AppendLine("\t\tpublic int GetCount => _getKeys.Count;");
+			sb.AppendLine("\t\tpublic int GetCount { get; private set; }");
 			sb.AppendLine();
 
-			var nullableKeyType = MakeNullable(keyType);
 			sb.AppendLine("\t\t/// <summary>The key from the most recent getter access.</summary>");
-			sb.AppendLine($"\t\tpublic {nullableKeyType} LastGetKey => _getKeys.Count > 0 ? _getKeys[_getKeys.Count - 1] : default;");
-			sb.AppendLine();
-
-			sb.AppendLine("\t\t/// <summary>All keys accessed via the getter.</summary>");
-			sb.AppendLine($"\t\tpublic global::System.Collections.Generic.IReadOnlyList<{keyType}> AllGetKeys => _getKeys;");
+			sb.AppendLine($"\t\tpublic {nullableKeyType} LastGetKey {{ get; private set; }}");
 			sb.AppendLine();
 
 			// OnGet callback: Func<TKnockOff, TKey, TReturn>?
@@ -1383,28 +1353,20 @@ public class KnockOffGenerator : IIncrementalGenerator
 			sb.AppendLine();
 
 			sb.AppendLine("\t\t/// <summary>Records a getter access.</summary>");
-			sb.AppendLine($"\t\tpublic void RecordGet({keyType} {keyParamName}) => _getKeys.Add({keyParamName});");
+			sb.AppendLine($"\t\tpublic void RecordGet({keyType} {keyParamName}) {{ GetCount++; LastGetKey = {keyParamName}; }}");
 			sb.AppendLine();
 		}
 
 		if (member.HasSetter)
 		{
-			// Track key-value pairs set
 			var tupleType = $"({keyType} {keyParamName}, {member.ReturnType} value)";
 
-			sb.AppendLine($"\t\tprivate readonly global::System.Collections.Generic.List<{tupleType}> _setEntries = new();");
-			sb.AppendLine();
-
 			sb.AppendLine("\t\t/// <summary>Number of times the setter was accessed.</summary>");
-			sb.AppendLine("\t\tpublic int SetCount => _setEntries.Count;");
+			sb.AppendLine("\t\tpublic int SetCount { get; private set; }");
 			sb.AppendLine();
 
 			sb.AppendLine("\t\t/// <summary>The key-value pair from the most recent setter access.</summary>");
-			sb.AppendLine($"\t\tpublic {tupleType}? LastSetEntry => _setEntries.Count > 0 ? _setEntries[_setEntries.Count - 1] : null;");
-			sb.AppendLine();
-
-			sb.AppendLine("\t\t/// <summary>All key-value pairs set via the setter.</summary>");
-			sb.AppendLine($"\t\tpublic global::System.Collections.Generic.IReadOnlyList<{tupleType}> AllSetEntries => _setEntries;");
+			sb.AppendLine($"\t\tpublic {tupleType}? LastSetEntry {{ get; private set; }}");
 			sb.AppendLine();
 
 			// OnSet callback: Action<TKnockOff, TKey, TValue>?
@@ -1413,15 +1375,15 @@ public class KnockOffGenerator : IIncrementalGenerator
 			sb.AppendLine();
 
 			sb.AppendLine("\t\t/// <summary>Records a setter access.</summary>");
-			sb.AppendLine($"\t\tpublic void RecordSet({keyType} {keyParamName}, {member.ReturnType} value) => _setEntries.Add(({keyParamName}, value));");
+			sb.AppendLine($"\t\tpublic void RecordSet({keyType} {keyParamName}, {member.ReturnType} value) {{ SetCount++; LastSetEntry = ({keyParamName}, value); }}");
 			sb.AppendLine();
 		}
 
 		// Reset method
 		sb.AppendLine("\t\t/// <summary>Resets all tracking state.</summary>");
 		sb.Append("\t\tpublic void Reset() { ");
-		if (member.HasGetter) sb.Append("_getKeys.Clear(); OnGet = null; ");
-		if (member.HasSetter) sb.Append("_setEntries.Clear(); OnSet = null; ");
+		if (member.HasGetter) sb.Append("GetCount = 0; LastGetKey = default; OnGet = null; ");
+		if (member.HasSetter) sb.Append("SetCount = 0; LastSetEntry = default; OnSet = null; ");
 		sb.AppendLine("}");
 	}
 
@@ -1478,67 +1440,30 @@ public class KnockOffGenerator : IIncrementalGenerator
 		}
 		sb.AppendLine();
 
-		// 3. Combined tracking list (only input parameters - exclude out params)
+		// 3. Call tracking - no List for performance, just track last call
 		var inputParams = GetInputCombinedParameters(combinedParams).ToArray();
+		sb.AppendLine("\t\t/// <summary>Number of times this method was called.</summary>");
+		sb.AppendLine("\t\tpublic int CallCount { get; private set; }");
+		sb.AppendLine();
+
+		sb.AppendLine("\t\t/// <summary>True if this method was called at least once.</summary>");
+		sb.AppendLine("\t\tpublic bool WasCalled => CallCount > 0;");
+		sb.AppendLine();
+
 		if (inputParams.Length == 1)
 		{
-			// Single input parameter - store directly (tuples require 2+ elements)
 			var param = inputParams[0];
-
-			sb.AppendLine($"\t\tprivate readonly global::System.Collections.Generic.List<{param.Type}> _calls = new();");
-			sb.AppendLine();
-
-			sb.AppendLine("\t\t/// <summary>Number of times this method was called.</summary>");
-			sb.AppendLine("\t\tpublic int CallCount => _calls.Count;");
-			sb.AppendLine();
-
-			sb.AppendLine("\t\t/// <summary>True if this method was called at least once.</summary>");
-			sb.AppendLine("\t\tpublic bool WasCalled => _calls.Count > 0;");
-			sb.AppendLine();
-
 			var nullableType = MakeNullable(param.Type);
 			sb.AppendLine($"\t\t/// <summary>The '{param.Name}' argument from the most recent call.</summary>");
-			sb.AppendLine($"\t\tpublic {nullableType} LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;");
-			sb.AppendLine();
-
-			sb.AppendLine("\t\t/// <summary>All recorded calls with their arguments.</summary>");
-			sb.AppendLine($"\t\tpublic global::System.Collections.Generic.IReadOnlyList<{param.Type}> AllCalls => _calls;");
+			sb.AppendLine($"\t\tpublic {nullableType} LastCallArg {{ get; private set; }}");
 			sb.AppendLine();
 		}
 		else if (inputParams.Length > 1)
 		{
-			// Multiple input parameters - use tuple
 			var tupleElements = inputParams.Select(p => $"{p.NullableType} {p.Name}");
 			var tupleType = $"({string.Join(", ", tupleElements)})";
-
-			sb.AppendLine($"\t\tprivate readonly global::System.Collections.Generic.List<{tupleType}> _calls = new();");
-			sb.AppendLine();
-
-			sb.AppendLine("\t\t/// <summary>Number of times this method was called.</summary>");
-			sb.AppendLine("\t\tpublic int CallCount => _calls.Count;");
-			sb.AppendLine();
-
-			sb.AppendLine("\t\t/// <summary>True if this method was called at least once.</summary>");
-			sb.AppendLine("\t\tpublic bool WasCalled => _calls.Count > 0;");
-			sb.AppendLine();
-
 			sb.AppendLine("\t\t/// <summary>Arguments from the most recent call (nullable for params not in all overloads).</summary>");
-			sb.AppendLine($"\t\tpublic {tupleType}? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;");
-			sb.AppendLine();
-
-			sb.AppendLine("\t\t/// <summary>All recorded calls with their arguments.</summary>");
-			sb.AppendLine($"\t\tpublic global::System.Collections.Generic.IReadOnlyList<{tupleType}> AllCalls => _calls;");
-			sb.AppendLine();
-		}
-		else
-		{
-			// No parameters - just track count
-			sb.AppendLine("\t\t/// <summary>Number of times this method was called.</summary>");
-			sb.AppendLine("\t\tpublic int CallCount { get; private set; }");
-			sb.AppendLine();
-
-			sb.AppendLine("\t\t/// <summary>True if this method was called at least once.</summary>");
-			sb.AppendLine("\t\tpublic bool WasCalled => CallCount > 0;");
+			sb.AppendLine($"\t\tpublic {tupleType}? LastCallArgs {{ get; private set; }}");
 			sb.AppendLine();
 		}
 
@@ -1586,11 +1511,11 @@ public class KnockOffGenerator : IIncrementalGenerator
 			sb.AppendLine($"\t\t/// <summary>Records a method call.</summary>");
 			if (inputParams.Length == 1)
 			{
-				// Single input parameter - add directly
+				// Single input parameter - store directly
 				var param = inputParams[0];
 				var matchingParam = inputOverloadParams.FirstOrDefault(p => p.Name == param.Name);
-				var addValue = matchingParam != null ? matchingParam.Name : "default";
-				sb.AppendLine($"\t\tpublic void RecordCall({paramList}) => _calls.Add({addValue});");
+				var assignValue = matchingParam != null ? matchingParam.Name : "default";
+				sb.AppendLine($"\t\tpublic void RecordCall({paramList}) {{ CallCount++; LastCallArg = {assignValue}; }}");
 			}
 			else if (inputParams.Length > 1)
 			{
@@ -1603,7 +1528,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 				}
 				var tupleConstruction = $"({string.Join(", ", tupleValues)})";
 
-				sb.AppendLine($"\t\tpublic void RecordCall({paramList}) => _calls.Add({tupleConstruction});");
+				sb.AppendLine($"\t\tpublic void RecordCall({paramList}) {{ CallCount++; LastCallArgs = {tupleConstruction}; }}");
 			}
 			else
 			{
@@ -1616,14 +1541,14 @@ public class KnockOffGenerator : IIncrementalGenerator
 
 		// 7. Reset method
 		sb.AppendLine("\t\t/// <summary>Resets all tracking state.</summary>");
-		sb.Append("\t\tpublic void Reset() { ");
-		if (inputParams.Length > 0)
+		sb.Append("\t\tpublic void Reset() { CallCount = 0; ");
+		if (inputParams.Length == 1)
 		{
-			sb.Append("_calls.Clear(); ");
+			sb.Append("LastCallArg = default; ");
 		}
-		else
+		else if (inputParams.Length > 1)
 		{
-			sb.Append("CallCount = 0; ");
+			sb.Append("LastCallArgs = default; ");
 		}
 		delegateIndex = 0;
 		foreach (var _ in group.Overloads)
@@ -2060,20 +1985,14 @@ public class KnockOffGenerator : IIncrementalGenerator
 
 		if (member.HasGetter)
 		{
-			sb.AppendLine($"\t\tprivate readonly global::System.Collections.Generic.List<{keyType}> _getKeys = new();");
-			sb.AppendLine();
+			var nullableKeyType = MakeNullable(keyType);
 
 			sb.AppendLine("\t\t/// <summary>Number of times the getter was accessed.</summary>");
-			sb.AppendLine("\t\tpublic int GetCount => _getKeys.Count;");
+			sb.AppendLine("\t\tpublic int GetCount { get; private set; }");
 			sb.AppendLine();
 
-			var nullableKeyType = MakeNullable(keyType);
 			sb.AppendLine("\t\t/// <summary>The key from the most recent getter access.</summary>");
-			sb.AppendLine($"\t\tpublic {nullableKeyType} LastGetKey => _getKeys.Count > 0 ? _getKeys[_getKeys.Count - 1] : default;");
-			sb.AppendLine();
-
-			sb.AppendLine("\t\t/// <summary>All keys accessed via the getter.</summary>");
-			sb.AppendLine($"\t\tpublic global::System.Collections.Generic.IReadOnlyList<{keyType}> AllGetKeys => _getKeys;");
+			sb.AppendLine($"\t\tpublic {nullableKeyType} LastGetKey {{ get; private set; }}");
 			sb.AppendLine();
 
 			sb.AppendLine("\t\t/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>");
@@ -2081,7 +2000,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 			sb.AppendLine();
 
 			sb.AppendLine("\t\t/// <summary>Records a getter access.</summary>");
-			sb.AppendLine($"\t\tpublic void RecordGet({keyType} {keyParamName}) => _getKeys.Add({keyParamName});");
+			sb.AppendLine($"\t\tpublic void RecordGet({keyType} {keyParamName}) {{ GetCount++; LastGetKey = {keyParamName}; }}");
 			sb.AppendLine();
 		}
 
@@ -2089,19 +2008,12 @@ public class KnockOffGenerator : IIncrementalGenerator
 		{
 			var tupleType = $"({keyType} {keyParamName}, {member.ReturnType} value)";
 
-			sb.AppendLine($"\t\tprivate readonly global::System.Collections.Generic.List<{tupleType}> _setEntries = new();");
-			sb.AppendLine();
-
 			sb.AppendLine("\t\t/// <summary>Number of times the setter was accessed.</summary>");
-			sb.AppendLine("\t\tpublic int SetCount => _setEntries.Count;");
+			sb.AppendLine("\t\tpublic int SetCount { get; private set; }");
 			sb.AppendLine();
 
 			sb.AppendLine("\t\t/// <summary>The key-value pair from the most recent setter access.</summary>");
-			sb.AppendLine($"\t\tpublic {tupleType}? LastSetEntry => _setEntries.Count > 0 ? _setEntries[_setEntries.Count - 1] : null;");
-			sb.AppendLine();
-
-			sb.AppendLine("\t\t/// <summary>All key-value pairs set via the setter.</summary>");
-			sb.AppendLine($"\t\tpublic global::System.Collections.Generic.IReadOnlyList<{tupleType}> AllSetEntries => _setEntries;");
+			sb.AppendLine($"\t\tpublic {tupleType}? LastSetEntry {{ get; private set; }}");
 			sb.AppendLine();
 
 			sb.AppendLine("\t\t/// <summary>Callback invoked when the setter is accessed.</summary>");
@@ -2109,14 +2021,14 @@ public class KnockOffGenerator : IIncrementalGenerator
 			sb.AppendLine();
 
 			sb.AppendLine("\t\t/// <summary>Records a setter access.</summary>");
-			sb.AppendLine($"\t\tpublic void RecordSet({keyType} {keyParamName}, {member.ReturnType} value) => _setEntries.Add(({keyParamName}, value));");
+			sb.AppendLine($"\t\tpublic void RecordSet({keyType} {keyParamName}, {member.ReturnType} value) {{ SetCount++; LastSetEntry = ({keyParamName}, value); }}");
 			sb.AppendLine();
 		}
 
 		sb.AppendLine("\t\t/// <summary>Resets all tracking state.</summary>");
 		sb.Append("\t\tpublic void Reset() { ");
-		if (member.HasGetter) sb.Append("_getKeys.Clear(); OnGet = null; ");
-		if (member.HasSetter) sb.Append("_setEntries.Clear(); OnSet = null; ");
+		if (member.HasGetter) sb.Append("GetCount = 0; LastGetKey = default; OnGet = null; ");
+		if (member.HasSetter) sb.Append("SetCount = 0; LastSetEntry = default; OnSet = null; ");
 		sb.AppendLine("}");
 	}
 
@@ -2198,28 +2110,22 @@ public class KnockOffGenerator : IIncrementalGenerator
 		}
 		sb.AppendLine();
 
-		// 2. Tracking list - uses exact types from this overload (no nullable wrappers)
+		// 2. Tracking - uses exact types from this overload (no nullable wrappers)
 		if (inputParams.Length == 1)
 		{
 			var param = inputParams[0];
-			sb.AppendLine($"\t\tprivate readonly global::System.Collections.Generic.List<{param.Type}> _calls = new();");
-			sb.AppendLine();
+			var nullableType = MakeNullable(param.Type);
 
 			sb.AppendLine("\t\t/// <summary>Number of times this method was called.</summary>");
-			sb.AppendLine("\t\tpublic int CallCount => _calls.Count;");
+			sb.AppendLine("\t\tpublic int CallCount { get; private set; }");
 			sb.AppendLine();
 
 			sb.AppendLine("\t\t/// <summary>True if this method was called at least once.</summary>");
-			sb.AppendLine("\t\tpublic bool WasCalled => _calls.Count > 0;");
+			sb.AppendLine("\t\tpublic bool WasCalled => CallCount > 0;");
 			sb.AppendLine();
 
-			var nullableType = MakeNullable(param.Type);
 			sb.AppendLine($"\t\t/// <summary>The '{param.Name}' argument from the most recent call.</summary>");
-			sb.AppendLine($"\t\tpublic {nullableType} LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;");
-			sb.AppendLine();
-
-			sb.AppendLine("\t\t/// <summary>All recorded calls with their arguments.</summary>");
-			sb.AppendLine($"\t\tpublic global::System.Collections.Generic.IReadOnlyList<{param.Type}> AllCalls => _calls;");
+			sb.AppendLine($"\t\tpublic {nullableType} LastCallArg {{ get; private set; }}");
 			sb.AppendLine();
 		}
 		else if (inputParams.Length > 1)
@@ -2228,23 +2134,16 @@ public class KnockOffGenerator : IIncrementalGenerator
 			var tupleElements = inputParams.Select(p => $"{p.Type} {p.Name}");
 			var tupleType = $"({string.Join(", ", tupleElements)})";
 
-			sb.AppendLine($"\t\tprivate readonly global::System.Collections.Generic.List<{tupleType}> _calls = new();");
-			sb.AppendLine();
-
 			sb.AppendLine("\t\t/// <summary>Number of times this method was called.</summary>");
-			sb.AppendLine("\t\tpublic int CallCount => _calls.Count;");
+			sb.AppendLine("\t\tpublic int CallCount { get; private set; }");
 			sb.AppendLine();
 
 			sb.AppendLine("\t\t/// <summary>True if this method was called at least once.</summary>");
-			sb.AppendLine("\t\tpublic bool WasCalled => _calls.Count > 0;");
+			sb.AppendLine("\t\tpublic bool WasCalled => CallCount > 0;");
 			sb.AppendLine();
 
 			sb.AppendLine("\t\t/// <summary>Arguments from the most recent call.</summary>");
-			sb.AppendLine($"\t\tpublic {tupleType}? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;");
-			sb.AppendLine();
-
-			sb.AppendLine("\t\t/// <summary>All recorded calls with their arguments.</summary>");
-			sb.AppendLine($"\t\tpublic global::System.Collections.Generic.IReadOnlyList<{tupleType}> AllCalls => _calls;");
+			sb.AppendLine($"\t\tpublic {tupleType}? LastCallArgs {{ get; private set; }}");
 			sb.AppendLine();
 		}
 		else
@@ -2269,12 +2168,12 @@ public class KnockOffGenerator : IIncrementalGenerator
 		sb.AppendLine($"\t\t/// <summary>Records a method call.</summary>");
 		if (inputParams.Length == 1)
 		{
-			sb.AppendLine($"\t\tpublic void RecordCall({recordCallParamList}) => _calls.Add({inputParams[0].Name});");
+			sb.AppendLine($"\t\tpublic void RecordCall({recordCallParamList}) {{ CallCount++; LastCallArg = {inputParams[0].Name}; }}");
 		}
 		else if (inputParams.Length > 1)
 		{
 			var tupleConstruction = $"({string.Join(", ", inputParams.Select(p => p.Name))})";
-			sb.AppendLine($"\t\tpublic void RecordCall({recordCallParamList}) => _calls.Add({tupleConstruction});");
+			sb.AppendLine($"\t\tpublic void RecordCall({recordCallParamList}) {{ CallCount++; LastCallArgs = {tupleConstruction}; }}");
 		}
 		else
 		{
@@ -2284,9 +2183,13 @@ public class KnockOffGenerator : IIncrementalGenerator
 
 		// 6. Reset method
 		sb.AppendLine("\t\t/// <summary>Resets all tracking state.</summary>");
-		if (inputParams.Length > 0)
+		if (inputParams.Length == 1)
 		{
-			sb.AppendLine("\t\tpublic void Reset() { _calls.Clear(); OnCall = null; }");
+			sb.AppendLine("\t\tpublic void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }");
+		}
+		else if (inputParams.Length > 1)
+		{
+			sb.AppendLine("\t\tpublic void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }");
 		}
 		else
 		{
@@ -2414,32 +2317,22 @@ public class KnockOffGenerator : IIncrementalGenerator
 		else if (inputParams.Length == 1)
 		{
 			var param = inputParams[0];
-			sb.AppendLine($"\t\t\tprivate readonly global::System.Collections.Generic.List<{param.Type}> _calls = new();");
-			sb.AppendLine();
-			sb.AppendLine("\t\t\t/// <summary>Number of times this method was called with these type arguments.</summary>");
-			sb.AppendLine("\t\t\tpublic int CallCount => _calls.Count;");
-			sb.AppendLine();
 			var nullableType = MakeNullable(param.Type);
-			sb.AppendLine($"\t\t\t/// <summary>The '{param.Name}' argument from the most recent call.</summary>");
-			sb.AppendLine($"\t\t\tpublic {nullableType} LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;");
+			sb.AppendLine("\t\t\t/// <summary>Number of times this method was called with these type arguments.</summary>");
+			sb.AppendLine("\t\t\tpublic int CallCount { get; private set; }");
 			sb.AppendLine();
-			sb.AppendLine("\t\t\t/// <summary>All recorded calls with their arguments.</summary>");
-			sb.AppendLine($"\t\t\tpublic global::System.Collections.Generic.IReadOnlyList<{param.Type}> AllCalls => _calls;");
+			sb.AppendLine($"\t\t\t/// <summary>The '{param.Name}' argument from the most recent call.</summary>");
+			sb.AppendLine($"\t\t\tpublic {nullableType} LastCallArg {{ get; private set; }}");
 		}
 		else
 		{
 			var tupleElements = inputParams.Select(p => $"{p.Type} {p.Name}");
 			var tupleType = $"({string.Join(", ", tupleElements)})";
-			sb.AppendLine($"\t\t\tprivate readonly global::System.Collections.Generic.List<{tupleType}> _calls = new();");
-			sb.AppendLine();
 			sb.AppendLine("\t\t\t/// <summary>Number of times this method was called with these type arguments.</summary>");
-			sb.AppendLine("\t\t\tpublic int CallCount => _calls.Count;");
+			sb.AppendLine("\t\t\tpublic int CallCount { get; private set; }");
 			sb.AppendLine();
 			sb.AppendLine("\t\t\t/// <summary>The arguments from the most recent call.</summary>");
-			sb.AppendLine($"\t\t\tpublic {tupleType}? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;");
-			sb.AppendLine();
-			sb.AppendLine("\t\t\t/// <summary>All recorded calls with their arguments.</summary>");
-			sb.AppendLine($"\t\t\tpublic global::System.Collections.Generic.IReadOnlyList<{tupleType}> AllCalls => _calls;");
+			sb.AppendLine($"\t\t\tpublic {tupleType}? LastCallArgs {{ get; private set; }}");
 		}
 		sb.AppendLine();
 
@@ -2460,25 +2353,29 @@ public class KnockOffGenerator : IIncrementalGenerator
 		else if (inputParams.Length == 1)
 		{
 			var param = inputParams[0];
-			sb.AppendLine($"\t\t\tpublic void RecordCall({param.Type} {param.Name}) => _calls.Add({param.Name});");
+			sb.AppendLine($"\t\t\tpublic void RecordCall({param.Type} {param.Name}) {{ CallCount++; LastCallArg = {param.Name}; }}");
 		}
 		else
 		{
 			var recordCallParams = string.Join(", ", inputParams.Select(p => $"{p.Type} {p.Name}"));
 			var tupleConstruction = $"({string.Join(", ", inputParams.Select(p => p.Name))})";
-			sb.AppendLine($"\t\t\tpublic void RecordCall({recordCallParams}) => _calls.Add({tupleConstruction});");
+			sb.AppendLine($"\t\t\tpublic void RecordCall({recordCallParams}) {{ CallCount++; LastCallArgs = {tupleConstruction}; }}");
 		}
 		sb.AppendLine();
 
 		// Reset method for typed handler
 		sb.AppendLine("\t\t\t/// <summary>Resets all tracking state.</summary>");
-		if (inputParams.Length > 0)
+		if (inputParams.Length == 0)
 		{
-			sb.AppendLine("\t\t\tpublic void Reset() { _calls.Clear(); OnCall = null; }");
+			sb.AppendLine("\t\t\tpublic void Reset() { CallCount = 0; OnCall = null; }");
+		}
+		else if (inputParams.Length == 1)
+		{
+			sb.AppendLine("\t\t\tpublic void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }");
 		}
 		else
 		{
-			sb.AppendLine("\t\t\tpublic void Reset() { CallCount = 0; OnCall = null; }");
+			sb.AppendLine("\t\t\tpublic void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }");
 		}
 
 		sb.AppendLine("\t\t}"); // Close typed handler class

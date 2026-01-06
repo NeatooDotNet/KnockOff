@@ -8,42 +8,32 @@ partial class IdxListKnockOff
 	/// <summary>Tracks and configures behavior for IIdxList.Int32Indexer.</summary>
 	public sealed class IIdxList_Int32IndexerHandler
 	{
-		private readonly global::System.Collections.Generic.List<int> _getKeys = new();
-
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount => _getKeys.Count;
+		public int GetCount { get; private set; }
 
 		/// <summary>The key from the most recent getter access.</summary>
-		public int? LastGetKey => _getKeys.Count > 0 ? _getKeys[_getKeys.Count - 1] : default;
-
-		/// <summary>All keys accessed via the getter.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<int> AllGetKeys => _getKeys;
+		public int? LastGetKey { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<IdxListKnockOff, int, object?>? OnGet { get; set; }
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet(int index) => _getKeys.Add(index);
-
-		private readonly global::System.Collections.Generic.List<(int index, object? value)> _setEntries = new();
+		public void RecordGet(int index) { GetCount++; LastGetKey = index; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
-		public int SetCount => _setEntries.Count;
+		public int SetCount { get; private set; }
 
 		/// <summary>The key-value pair from the most recent setter access.</summary>
-		public (int index, object? value)? LastSetEntry => _setEntries.Count > 0 ? _setEntries[_setEntries.Count - 1] : null;
-
-		/// <summary>All key-value pairs set via the setter.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(int index, object? value)> AllSetEntries => _setEntries;
+		public (int index, object? value)? LastSetEntry { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
 		public global::System.Action<IdxListKnockOff, int, object?>? OnSet { get; set; }
 
 		/// <summary>Records a setter access.</summary>
-		public void RecordSet(int index, object? value) => _setEntries.Add((index, value));
+		public void RecordSet(int index, object? value) { SetCount++; LastSetEntry = (index, value); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _getKeys.Clear(); OnGet = null; _setEntries.Clear(); OnSet = null; }
+		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
 	}
 
 	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IIdxList - tracks invocations and configures behavior.</summary>

@@ -8,25 +8,20 @@ partial class IdxEntityBaseKnockOff
 	/// <summary>Tracks and configures behavior for IIdxEntityBase.StringIndexer.</summary>
 	public sealed class IIdxEntityBase_StringIndexerHandler
 	{
-		private readonly global::System.Collections.Generic.List<string> _getKeys = new();
-
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount => _getKeys.Count;
+		public int GetCount { get; private set; }
 
 		/// <summary>The key from the most recent getter access.</summary>
-		public string? LastGetKey => _getKeys.Count > 0 ? _getKeys[_getKeys.Count - 1] : default;
-
-		/// <summary>All keys accessed via the getter.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<string> AllGetKeys => _getKeys;
+		public string? LastGetKey { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<IdxEntityBaseKnockOff, string, global::KnockOff.Documentation.Samples.Guides.IIdxEntityProperty?>? OnGet { get; set; }
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet(string propertyName) => _getKeys.Add(propertyName);
+		public void RecordGet(string propertyName) { GetCount++; LastGetKey = propertyName; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _getKeys.Clear(); OnGet = null; }
+		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IIdxEntityBase.IsNew.</summary>

@@ -11,28 +11,23 @@ partial class MmDataContextKnockOff
 		/// <summary>Delegate for Save(object entity).</summary>
 		public delegate void SaveDelegate(MmDataContextKnockOff ko, object entity);
 
-		private readonly global::System.Collections.Generic.List<object> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'entity' argument from the most recent call.</summary>
-		public object? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<object> AllCalls => _calls;
+		public object? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public SaveDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(object entity) => _calls.Add(entity);
+		public void RecordCall(object entity) { CallCount++; LastCallArg = entity; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.IMmRepository - tracks invocations and configures behavior.</summary>
@@ -48,28 +43,23 @@ partial class MmDataContextKnockOff
 		/// <summary>Delegate for SaveChangesAsync(global::System.Threading.CancellationToken ct).</summary>
 		public delegate global::System.Threading.Tasks.Task<int> SaveChangesAsyncDelegate(MmDataContextKnockOff ko, global::System.Threading.CancellationToken ct);
 
-		private readonly global::System.Collections.Generic.List<global::System.Threading.CancellationToken> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'ct' argument from the most recent call.</summary>
-		public global::System.Threading.CancellationToken? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<global::System.Threading.CancellationToken> AllCalls => _calls;
+		public global::System.Threading.CancellationToken? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public SaveChangesAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::System.Threading.CancellationToken ct) => _calls.Add(ct);
+		public void RecordCall(global::System.Threading.CancellationToken ct) { CallCount++; LastCallArg = ct; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.IMmUnitOfWork - tracks invocations and configures behavior.</summary>

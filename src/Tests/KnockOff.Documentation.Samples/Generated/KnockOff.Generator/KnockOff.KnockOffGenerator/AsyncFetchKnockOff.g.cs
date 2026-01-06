@@ -11,28 +11,23 @@ partial class AsyncFetchKnockOff
 		/// <summary>Delegate for FetchAsync(int id, global::System.Threading.CancellationToken ct).</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.AsyncData> FetchAsyncDelegate(AsyncFetchKnockOff ko, int id, global::System.Threading.CancellationToken ct);
 
-		private readonly global::System.Collections.Generic.List<(int id, global::System.Threading.CancellationToken ct)> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>Arguments from the most recent call.</summary>
-		public (int id, global::System.Threading.CancellationToken ct)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(int id, global::System.Threading.CancellationToken ct)> AllCalls => _calls;
+		public (int id, global::System.Threading.CancellationToken ct)? LastCallArgs { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public FetchAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id, global::System.Threading.CancellationToken ct) => _calls.Add((id, ct));
+		public void RecordCall(int id, global::System.Threading.CancellationToken ct) { CallCount++; LastCallArgs = (id, ct); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
 	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IAsyncFetch - tracks invocations and configures behavior.</summary>

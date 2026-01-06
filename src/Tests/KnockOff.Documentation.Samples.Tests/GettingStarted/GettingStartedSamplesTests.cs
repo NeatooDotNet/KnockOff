@@ -76,9 +76,9 @@ public class GettingStartedSamplesTests : SamplesTestBase
         emailService.SendEmail("second@example.com", "S2", "B2");
         emailService.SendEmail("third@example.com", "S3", "B3");
 
-        // Check all calls
-        Assert.Equal(3, knockOff.IEmailService.SendEmail.AllCalls.Count);
-        Assert.Equal("first@example.com", knockOff.IEmailService.SendEmail.AllCalls[0].to);
+        // Check call count and last call
+        Assert.Equal(3, knockOff.IEmailService.SendEmail.CallCount);
+        Assert.Equal("third@example.com", knockOff.IEmailService.SendEmail.LastCallArgs?.to);
     }
 
     // ========================================================================

@@ -41,8 +41,6 @@ public class OutParameterTests
 		// Tracking should only show the input parameter 'key', not the out param 'value'
 		Assert.Equal(1, knockOff.IOutParameterService.TryGetValue.CallCount);
 		Assert.Equal("myKey", knockOff.IOutParameterService.TryGetValue.LastCallArg);
-		Assert.Single(knockOff.IOutParameterService.TryGetValue.AllCalls);
-		Assert.Equal("myKey", knockOff.IOutParameterService.TryGetValue.AllCalls[0]);
 	}
 
 	[Fact]
@@ -172,11 +170,10 @@ public class OutParameterTests
 		Assert.Equal(0, knockOff.IOutParameterService.TryGetValue.CallCount);
 		Assert.False(knockOff.IOutParameterService.TryGetValue.WasCalled);
 		Assert.Null(knockOff.IOutParameterService.TryGetValue.LastCallArg);
-		Assert.Empty(knockOff.IOutParameterService.TryGetValue.AllCalls);
 	}
 
 	[Fact]
-	public void OutParameter_AllCalls_TracksInputParamsOnly()
+	public void OutParameter_LastCallArg_TracksInputParamsOnly()
 	{
 		var knockOff = new OutParameterServiceKnockOff();
 		IOutParameterService service = knockOff;
@@ -187,10 +184,7 @@ public class OutParameterTests
 		service.TryParse("second", out _);
 		service.TryParse("third", out _);
 
-		var allCalls = knockOff.IOutParameterService.TryParse.AllCalls;
-		Assert.Equal(3, allCalls.Count);
-		Assert.Equal("first", allCalls[0]);
-		Assert.Equal("second", allCalls[1]);
-		Assert.Equal("third", allCalls[2]);
+		Assert.Equal(3, knockOff.IOutParameterService.TryParse.CallCount);
+		Assert.Equal("third", knockOff.IOutParameterService.TryParse.LastCallArg); // Last call
 	}
 }

@@ -11,28 +11,23 @@ partial class AsyncSaveKnockOff
 		/// <summary>Delegate for SaveAsync(global::KnockOff.Documentation.Samples.Guides.AsyncData entity).</summary>
 		public delegate global::System.Threading.Tasks.Task<int> SaveAsyncDelegate(AsyncSaveKnockOff ko, global::KnockOff.Documentation.Samples.Guides.AsyncData entity);
 
-		private readonly global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Guides.AsyncData> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'entity' argument from the most recent call.</summary>
-		public global::KnockOff.Documentation.Samples.Guides.AsyncData? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<global::KnockOff.Documentation.Samples.Guides.AsyncData> AllCalls => _calls;
+		public global::KnockOff.Documentation.Samples.Guides.AsyncData? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public SaveAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::KnockOff.Documentation.Samples.Guides.AsyncData entity) => _calls.Add(entity);
+		public void RecordCall(global::KnockOff.Documentation.Samples.Guides.AsyncData entity) { CallCount++; LastCallArg = entity; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IAsyncSave - tracks invocations and configures behavior.</summary>

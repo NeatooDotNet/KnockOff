@@ -39,28 +39,23 @@ partial class MigUserServiceKnockOff
 		/// <summary>Delegate for GetUser(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Comparison.MigUser GetUserDelegate(MigUserServiceKnockOff ko, int id);
 
-		private readonly global::System.Collections.Generic.List<int> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'id' argument from the most recent call.</summary>
-		public int? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<int> AllCalls => _calls;
+		public int? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public GetUserDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) => _calls.Add(id);
+		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IMigUserService.GetUserAsync.</summary>
@@ -69,28 +64,23 @@ partial class MigUserServiceKnockOff
 		/// <summary>Delegate for GetUserAsync(int id).</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Comparison.MigUser?> GetUserAsyncDelegate(MigUserServiceKnockOff ko, int id);
 
-		private readonly global::System.Collections.Generic.List<int> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'id' argument from the most recent call.</summary>
-		public int? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<int> AllCalls => _calls;
+		public int? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public GetUserAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) => _calls.Add(id);
+		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IMigUserService.Save.</summary>
@@ -99,28 +89,23 @@ partial class MigUserServiceKnockOff
 		/// <summary>Delegate for Save(global::KnockOff.Documentation.Samples.Comparison.MigUser user).</summary>
 		public delegate void SaveDelegate(MigUserServiceKnockOff ko, global::KnockOff.Documentation.Samples.Comparison.MigUser user);
 
-		private readonly global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Comparison.MigUser> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'user' argument from the most recent call.</summary>
-		public global::KnockOff.Documentation.Samples.Comparison.MigUser? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<global::KnockOff.Documentation.Samples.Comparison.MigUser> AllCalls => _calls;
+		public global::KnockOff.Documentation.Samples.Comparison.MigUser? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public SaveDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::KnockOff.Documentation.Samples.Comparison.MigUser user) => _calls.Add(user);
+		public void RecordCall(global::KnockOff.Documentation.Samples.Comparison.MigUser user) { CallCount++; LastCallArg = user; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IMigUserService.Delete.</summary>
@@ -129,28 +114,23 @@ partial class MigUserServiceKnockOff
 		/// <summary>Delegate for Delete(int id).</summary>
 		public delegate void DeleteDelegate(MigUserServiceKnockOff ko, int id);
 
-		private readonly global::System.Collections.Generic.List<int> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'id' argument from the most recent call.</summary>
-		public int? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<int> AllCalls => _calls;
+		public int? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public DeleteDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) => _calls.Add(id);
+		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IMigUserService.GetAll.</summary>
@@ -181,28 +161,23 @@ partial class MigUserServiceKnockOff
 		/// <summary>Delegate for Update(global::KnockOff.Documentation.Samples.Comparison.MigUser user).</summary>
 		public delegate void UpdateDelegate(MigUserServiceKnockOff ko, global::KnockOff.Documentation.Samples.Comparison.MigUser user);
 
-		private readonly global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Comparison.MigUser> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'user' argument from the most recent call.</summary>
-		public global::KnockOff.Documentation.Samples.Comparison.MigUser? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<global::KnockOff.Documentation.Samples.Comparison.MigUser> AllCalls => _calls;
+		public global::KnockOff.Documentation.Samples.Comparison.MigUser? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public UpdateDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::KnockOff.Documentation.Samples.Comparison.MigUser user) => _calls.Add(user);
+		public void RecordCall(global::KnockOff.Documentation.Samples.Comparison.MigUser user) { CallCount++; LastCallArg = user; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Spy for KnockOff.Documentation.Samples.Comparison.IMigUserService - tracks invocations and configures behavior.</summary>

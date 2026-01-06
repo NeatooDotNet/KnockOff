@@ -385,7 +385,6 @@ public partial class SkVerificationKnockOff : ISkVerificationService { }
 
 // Arguments (single param)
 // Assert.Equal(42, knockOff.ISkVerificationService.GetUser.LastCallArg);
-// Assert.Equal([1, 2, 42], knockOff.ISkVerificationService.GetUser.AllCalls);
 
 // Arguments (multiple params - named tuple)
 // var args = knockOff.ISkVerificationService.Create.LastCallArgs;
@@ -410,7 +409,6 @@ public partial class SkVerificationKnockOff : ISkVerificationService { }
 public partial class SkVerificationIndexerKnockOff : ISkVerificationPropertyStore { }
 
 // Assert.Equal("key1", knockOff.ISkVerificationPropertyStore.StringIndexer.LastGetKey);
-// Assert.Equal(["key1", "key2"], knockOff.ISkVerificationPropertyStore.StringIndexer.AllGetKeys);
 
 // var setEntry = knockOff.ISkVerificationPropertyStore.StringIndexer.LastSetEntry;
 // Assert.Equal("key", setEntry?.key);

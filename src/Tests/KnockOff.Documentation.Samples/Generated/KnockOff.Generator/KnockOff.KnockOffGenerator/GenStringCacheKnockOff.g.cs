@@ -11,28 +11,23 @@ partial class GenStringCacheKnockOff
 		/// <summary>Delegate for Get(string key).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Guides.GenUser? GetDelegate(GenStringCacheKnockOff ko, string key);
 
-		private readonly global::System.Collections.Generic.List<string> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The 'key' argument from the most recent call.</summary>
-		public string? LastCallArg => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<string> AllCalls => _calls;
+		public string? LastCallArg { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public GetDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string key) => _calls.Add(key);
+		public void RecordCall(string key) { CallCount++; LastCallArg = key; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUser.Set.</summary>
@@ -41,28 +36,23 @@ partial class GenStringCacheKnockOff
 		/// <summary>Delegate for Set(string key, global::KnockOff.Documentation.Samples.Guides.GenUser value).</summary>
 		public delegate void SetDelegate(GenStringCacheKnockOff ko, string key, global::KnockOff.Documentation.Samples.Guides.GenUser value);
 
-		private readonly global::System.Collections.Generic.List<(string key, global::KnockOff.Documentation.Samples.Guides.GenUser value)> _calls = new();
-
 		/// <summary>Number of times this method was called.</summary>
-		public int CallCount => _calls.Count;
+		public int CallCount { get; private set; }
 
 		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => _calls.Count > 0;
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>Arguments from the most recent call.</summary>
-		public (string key, global::KnockOff.Documentation.Samples.Guides.GenUser value)? LastCallArgs => _calls.Count > 0 ? _calls[_calls.Count - 1] : null;
-
-		/// <summary>All recorded calls with their arguments.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(string key, global::KnockOff.Documentation.Samples.Guides.GenUser value)> AllCalls => _calls;
+		public (string key, global::KnockOff.Documentation.Samples.Guides.GenUser value)? LastCallArgs { get; private set; }
 
 		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
 		public SetDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string key, global::KnockOff.Documentation.Samples.Guides.GenUser value) => _calls.Add((key, value));
+		public void RecordCall(string key, global::KnockOff.Documentation.Samples.Guides.GenUser value) { CallCount++; LastCallArgs = (key, value); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { _calls.Clear(); OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
 	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IGenCache<string, KnockOff.Documentation.Samples.Guides.GenUser> - tracks invocations and configures behavior.</summary>
