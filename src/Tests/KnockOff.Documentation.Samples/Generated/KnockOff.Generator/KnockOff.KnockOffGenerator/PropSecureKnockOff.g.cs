@@ -21,15 +21,15 @@ partial class PropSecureKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IPropSecure - tracks invocations and configures behavior.</summary>
-	public sealed class IPropSecureSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropSecure.</summary>
+	public sealed class IPropSecureKO
 	{
 		/// <summary>Handler for SecretKey.</summary>
 		public IPropSecure_SecretKeyHandler SecretKey { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropSecure.</summary>
-	public IPropSecureSpy IPropSecure { get; } = new();
+	public IPropSecureKO IPropSecure { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IPropSecure.</summary>
 	public KnockOff.Documentation.Samples.Guides.IPropSecure AsPropSecure() => this;

@@ -30,15 +30,15 @@ partial class CpCombinedRepoKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ICpCombinedRepository - tracks invocations and configures behavior.</summary>
-	public sealed class ICpCombinedRepositorySpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpCombinedRepository.</summary>
+	public sealed class ICpCombinedRepositoryKO
 	{
 		/// <summary>Handler for GetById.</summary>
 		public ICpCombinedRepository_GetByIdHandler GetById { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpCombinedRepository.</summary>
-	public ICpCombinedRepositorySpy ICpCombinedRepository { get; } = new();
+	public ICpCombinedRepositoryKO ICpCombinedRepository { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpCombinedRepository.</summary>
 	public KnockOff.Documentation.Samples.Skills.ICpCombinedRepository AsCpCombinedRepository() => this;

@@ -30,8 +30,8 @@ partial class MiLoggerAuditorKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IMiLoggerSame - tracks invocations and configures behavior.</summary>
-	public sealed class IMiLoggerSameSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiLoggerSame.</summary>
+	public sealed class IMiLoggerSameKO
 	{
 		/// <summary>Handler for Log.</summary>
 		public IMiLoggerSame_LogHandler Log { get; } = new();
@@ -87,8 +87,8 @@ partial class MiLoggerAuditorKnockOff
 		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IMiAuditor - tracks invocations and configures behavior.</summary>
-	public sealed class IMiAuditorSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiAuditor.</summary>
+	public sealed class IMiAuditorKO
 	{
 		/// <summary>Handler for Log.</summary>
 		public IMiAuditor_LogHandler Log { get; } = new();
@@ -97,10 +97,10 @@ partial class MiLoggerAuditorKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiLoggerSame.</summary>
-	public IMiLoggerSameSpy IMiLoggerSame { get; } = new();
+	public IMiLoggerSameKO IMiLoggerSame { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiAuditor.</summary>
-	public IMiAuditorSpy IMiAuditor { get; } = new();
+	public IMiAuditorKO IMiAuditor { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMiLoggerSame.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMiLoggerSame AsMiLoggerSame() => this;

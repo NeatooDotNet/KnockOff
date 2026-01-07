@@ -52,8 +52,8 @@ partial class GenProductRepositoryKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<KnockOff.Documentation.Samples.Guides.GenProduct> - tracks invocations and configures behavior.</summary>
-	public sealed class IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProductSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<KnockOff.Documentation.Samples.Guides.GenProduct>.</summary>
+	public sealed class IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProductKO
 	{
 		/// <summary>Handler for GetAll.</summary>
 		public IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProduct_GetAllHandler GetAll { get; } = new();
@@ -62,7 +62,7 @@ partial class GenProductRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<KnockOff.Documentation.Samples.Guides.GenProduct>.</summary>
-	public IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProductSpy IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProduct { get; } = new();
+	public IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProductKO IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProduct { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<KnockOff.Documentation.Samples.Guides.GenProduct>.</summary>
 	public KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<KnockOff.Documentation.Samples.Guides.GenProduct> AsGenReadOnlyRepository() => this;

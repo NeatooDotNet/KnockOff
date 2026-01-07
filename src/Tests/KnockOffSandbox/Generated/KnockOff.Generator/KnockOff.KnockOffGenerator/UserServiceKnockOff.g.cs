@@ -121,8 +121,8 @@ partial class UserServiceKnockOff
 		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Sandbox.IUserService - tracks invocations and configures behavior.</summary>
-	public sealed class IUserServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Sandbox.IUserService.</summary>
+	public sealed class IUserServiceKO
 	{
 		/// <summary>Handler for Name.</summary>
 		public IUserService_NameHandler Name { get; } = new();
@@ -137,7 +137,7 @@ partial class UserServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Sandbox.IUserService.</summary>
-	public IUserServiceSpy IUserService { get; } = new();
+	public IUserServiceKO IUserService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Sandbox.IUserService.</summary>
 	public KnockOff.Sandbox.IUserService AsUserService() => this;

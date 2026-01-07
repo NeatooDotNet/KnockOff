@@ -43,8 +43,8 @@ partial class IhOrderKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IIhOrder - tracks invocations and configures behavior.</summary>
-	public sealed class IIhOrderSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhOrder.</summary>
+	public sealed class IIhOrderKO
 	{
 		/// <summary>Handler for Total.</summary>
 		public IIhOrder_TotalHandler Total { get; } = new();
@@ -90,8 +90,8 @@ partial class IhOrderKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IIhValidatable - tracks invocations and configures behavior.</summary>
-	public sealed class IIhValidatableSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhValidatable.</summary>
+	public sealed class IIhValidatableKO
 	{
 		/// <summary>Handler for IsValid.</summary>
 		public IIhValidatable_IsValidHandler IsValid { get; } = new();
@@ -100,10 +100,10 @@ partial class IhOrderKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhOrder.</summary>
-	public IIhOrderSpy IIhOrder { get; } = new();
+	public IIhOrderKO IIhOrder { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhValidatable.</summary>
-	public IIhValidatableSpy IIhValidatable { get; } = new();
+	public IIhValidatableKO IIhValidatable { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIhOrder.</summary>
 	public KnockOff.Documentation.Samples.Guides.IIhOrder AsIhOrder() => this;

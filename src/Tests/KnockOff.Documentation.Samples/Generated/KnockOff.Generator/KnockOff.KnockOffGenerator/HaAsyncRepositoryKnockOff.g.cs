@@ -55,8 +55,8 @@ partial class HaAsyncRepositoryKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.IHaAsyncRepository - tracks invocations and configures behavior.</summary>
-	public sealed class IHaAsyncRepositorySpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaAsyncRepository.</summary>
+	public sealed class IHaAsyncRepositoryKO
 	{
 		/// <summary>Handler for GetByIdAsync.</summary>
 		public IHaAsyncRepository_GetByIdAsyncHandler GetByIdAsync { get; } = new();
@@ -65,7 +65,7 @@ partial class HaAsyncRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaAsyncRepository.</summary>
-	public IHaAsyncRepositorySpy IHaAsyncRepository { get; } = new();
+	public IHaAsyncRepositoryKO IHaAsyncRepository { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IHaAsyncRepository.</summary>
 	public KnockOff.Documentation.Samples.Skills.IHaAsyncRepository AsHaAsyncRepository() => this;

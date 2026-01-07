@@ -49,8 +49,8 @@ partial class AsyncCallOrderKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IAsyncCallOrder - tracks invocations and configures behavior.</summary>
-	public sealed class IAsyncCallOrderSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IAsyncCallOrder.</summary>
+	public sealed class IAsyncCallOrderKO
 	{
 		/// <summary>Handler for StartAsync.</summary>
 		public IAsyncCallOrder_StartAsyncHandler StartAsync { get; } = new();
@@ -59,7 +59,7 @@ partial class AsyncCallOrderKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IAsyncCallOrder.</summary>
-	public IAsyncCallOrderSpy IAsyncCallOrder { get; } = new();
+	public IAsyncCallOrderKO IAsyncCallOrder { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IAsyncCallOrder.</summary>
 	public KnockOff.Documentation.Samples.Guides.IAsyncCallOrder AsAsyncCallOrder() => this;

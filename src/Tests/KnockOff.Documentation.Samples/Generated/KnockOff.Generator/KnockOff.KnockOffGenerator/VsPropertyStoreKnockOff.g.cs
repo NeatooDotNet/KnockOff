@@ -36,15 +36,15 @@ partial class VsPropertyStoreKnockOff
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Comparison.IVsPropertyStore - tracks invocations and configures behavior.</summary>
-	public sealed class IVsPropertyStoreSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsPropertyStore.</summary>
+	public sealed class IVsPropertyStoreKO
 	{
 		/// <summary>Handler for StringIndexer.</summary>
 		public IVsPropertyStore_StringIndexerHandler StringIndexer { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsPropertyStore.</summary>
-	public IVsPropertyStoreSpy IVsPropertyStore { get; } = new();
+	public IVsPropertyStoreKO IVsPropertyStore { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IVsPropertyStore.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IVsPropertyStore AsVsPropertyStore() => this;

@@ -61,15 +61,15 @@ partial class VsEventSourceKnockOff
 		public void Clear() { _handler = null; Reset(); }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Comparison.IVsEventSource - tracks invocations and configures behavior.</summary>
-	public sealed class IVsEventSourceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsEventSource.</summary>
+	public sealed class IVsEventSourceKO
 	{
 		/// <summary>Handler for DataReceived event.</summary>
 		public IVsEventSource_DataReceivedHandler DataReceived { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsEventSource.</summary>
-	public IVsEventSourceSpy IVsEventSource { get; } = new();
+	public IVsEventSourceKO IVsEventSource { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IVsEventSource.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IVsEventSource AsVsEventSource() => this;

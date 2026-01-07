@@ -55,8 +55,8 @@ partial class MethodLoggerKnockOff
 		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IMethodLogger - tracks invocations and configures behavior.</summary>
-	public sealed class IMethodLoggerSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodLogger.</summary>
+	public sealed class IMethodLoggerKO
 	{
 		/// <summary>Handler for Log.</summary>
 		public IMethodLogger_LogHandler Log { get; } = new();
@@ -65,7 +65,7 @@ partial class MethodLoggerKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodLogger.</summary>
-	public IMethodLoggerSpy IMethodLogger { get; } = new();
+	public IMethodLoggerKO IMethodLogger { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodLogger.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMethodLogger AsMethodLogger() => this;

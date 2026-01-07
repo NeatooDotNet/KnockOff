@@ -80,8 +80,8 @@ partial class SkOverloadedServiceKnockOff
 		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ISkOverloadedService - tracks invocations and configures behavior.</summary>
-	public sealed class ISkOverloadedServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkOverloadedService.</summary>
+	public sealed class ISkOverloadedServiceKO
 	{
 		/// <summary>Handler for Process overload 1.</summary>
 		public ISkOverloadedService_Process1Handler Process1 { get; } = new();
@@ -92,7 +92,7 @@ partial class SkOverloadedServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkOverloadedService.</summary>
-	public ISkOverloadedServiceSpy ISkOverloadedService { get; } = new();
+	public ISkOverloadedServiceKO ISkOverloadedService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkOverloadedService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkOverloadedService AsSkOverloadedService() => this;

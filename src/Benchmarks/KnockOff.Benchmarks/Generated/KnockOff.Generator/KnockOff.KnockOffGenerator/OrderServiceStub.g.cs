@@ -155,8 +155,8 @@ partial class OrderServiceStub
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Benchmarks.Interfaces.IOrderService - tracks invocations and configures behavior.</summary>
-	public sealed class IOrderServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Benchmarks.Interfaces.IOrderService.</summary>
+	public sealed class IOrderServiceKO
 	{
 		/// <summary>Handler for GetOrder.</summary>
 		public IOrderService_GetOrderHandler GetOrder { get; } = new();
@@ -173,7 +173,7 @@ partial class OrderServiceStub
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Benchmarks.Interfaces.IOrderService.</summary>
-	public IOrderServiceSpy IOrderService { get; } = new();
+	public IOrderServiceKO IOrderService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Benchmarks.Interfaces.IOrderService.</summary>
 	public KnockOff.Benchmarks.Interfaces.IOrderService AsOrderService() => this;

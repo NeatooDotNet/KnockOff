@@ -290,7 +290,7 @@ knockOff.IMigLogger.Log.OnCall = (ko, message) =>
 | Runtime configuration | Yes | Yes (callbacks) |
 | Compile-time configuration | No | Yes (user methods) |
 | Type-safe setup | Expression-based | Strongly-typed handlers |
-| Argument capture | Via Callback | Automatic (AllCalls) |
+| Argument capture | Via Callback | Automatic (LastCallArg/LastCallArgs) |
 | Call counting | Verify(Times.X) | CallCount property |
 | Strict mode | Yes | No |
 | VerifyNoOtherCalls | Yes | No |

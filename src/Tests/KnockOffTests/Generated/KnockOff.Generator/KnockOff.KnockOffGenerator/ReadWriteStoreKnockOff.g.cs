@@ -36,15 +36,15 @@ partial class ReadWriteStoreKnockOff
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Tests.IReadWriteStore - tracks invocations and configures behavior.</summary>
-	public sealed class IReadWriteStoreSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IReadWriteStore.</summary>
+	public sealed class IReadWriteStoreKO
 	{
 		/// <summary>Handler for StringIndexer.</summary>
 		public IReadWriteStore_StringIndexerHandler StringIndexer { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IReadWriteStore.</summary>
-	public IReadWriteStoreSpy IReadWriteStore { get; } = new();
+	public IReadWriteStoreKO IReadWriteStore { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IReadWriteStore.</summary>
 	public KnockOff.Tests.IReadWriteStore AsReadWriteStore() => this;

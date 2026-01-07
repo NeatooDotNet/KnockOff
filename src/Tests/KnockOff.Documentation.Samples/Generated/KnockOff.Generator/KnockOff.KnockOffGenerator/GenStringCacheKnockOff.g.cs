@@ -55,8 +55,8 @@ partial class GenStringCacheKnockOff
 		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IGenCache<string, KnockOff.Documentation.Samples.Guides.GenUser> - tracks invocations and configures behavior.</summary>
-	public sealed class IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUserSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenCache<string, KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
+	public sealed class IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUserKO
 	{
 		/// <summary>Handler for Get.</summary>
 		public IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUser_GetHandler Get { get; } = new();
@@ -65,7 +65,7 @@ partial class GenStringCacheKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenCache<string, KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
-	public IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUserSpy IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUser { get; } = new();
+	public IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUserKO IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUser { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IGenCache<string, KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
 	public KnockOff.Documentation.Samples.Guides.IGenCache<string, KnockOff.Documentation.Samples.Guides.GenUser> AsGenCache() => this;

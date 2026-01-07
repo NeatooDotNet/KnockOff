@@ -26,7 +26,7 @@ public partial class IdxReadWriteStoreKnockOff : IIdxReadWriteStore { }
 
 ## Naming Convention
 
-Indexer handlers are named based on the key type and accessed via the interface spy:
+Indexer handlers are named based on the key type and accessed via the interface KO property:
 - `string` key → `StringIndexer`
 - `int` key → `IntIndexer`
 - Custom type → `{TypeName}Indexer`

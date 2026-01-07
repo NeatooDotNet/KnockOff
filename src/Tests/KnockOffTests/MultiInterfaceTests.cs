@@ -2,7 +2,7 @@ namespace KnockOff.Tests;
 
 /// <summary>
 /// Tests for multiple interface implementation scenarios.
-/// With interface-scoped spy handlers, each interface has its own tracking.
+/// With interface-scoped handlers, each interface has its own tracking.
 /// </summary>
 public class MultiInterfaceTests
 {
@@ -17,7 +17,7 @@ public class MultiInterfaceTests
 		logger.Name = "Logger1";
 		notifier.Notify("user@example.com");
 
-		// Each interface has its own spy handlers
+		// Each interface has its own handlers
 		Assert.True(knockOff.ILogger.Log.WasCalled);
 		Assert.Equal("test message", knockOff.ILogger.Log.LastCallArg);
 		Assert.Equal(1, knockOff.ILogger.Name.SetCount);

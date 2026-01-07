@@ -27,15 +27,15 @@ partial class MmConfigServiceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.IMmConfigService - tracks invocations and configures behavior.</summary>
-	public sealed class IMmConfigServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmConfigService.</summary>
+	public sealed class IMmConfigServiceKO
 	{
 		/// <summary>Handler for GetConfig.</summary>
 		public IMmConfigService_GetConfigHandler GetConfig { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmConfigService.</summary>
-	public IMmConfigServiceSpy IMmConfigService { get; } = new();
+	public IMmConfigServiceKO IMmConfigService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmConfigService.</summary>
 	public KnockOff.Documentation.Samples.Skills.IMmConfigService AsMmConfigService() => this;

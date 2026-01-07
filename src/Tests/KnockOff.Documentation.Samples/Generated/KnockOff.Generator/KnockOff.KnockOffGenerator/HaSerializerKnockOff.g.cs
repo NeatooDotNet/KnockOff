@@ -152,8 +152,8 @@ partial class HaSerializerKnockOff
 		}
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.IHaSerializer - tracks invocations and configures behavior.</summary>
-	public sealed class IHaSerializerSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaSerializer.</summary>
+	public sealed class IHaSerializerKO
 	{
 		/// <summary>Handler for Deserialize.</summary>
 		public IHaSerializer_DeserializeHandler Deserialize { get; } = new();
@@ -162,7 +162,7 @@ partial class HaSerializerKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaSerializer.</summary>
-	public IHaSerializerSpy IHaSerializer { get; } = new();
+	public IHaSerializerKO IHaSerializer { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IHaSerializer.</summary>
 	public KnockOff.Documentation.Samples.Skills.IHaSerializer AsHaSerializer() => this;

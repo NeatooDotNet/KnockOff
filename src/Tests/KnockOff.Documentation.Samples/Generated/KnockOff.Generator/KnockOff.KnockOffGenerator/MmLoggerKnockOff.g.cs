@@ -30,15 +30,15 @@ partial class MmLoggerKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.IMmLogger - tracks invocations and configures behavior.</summary>
-	public sealed class IMmLoggerSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmLogger.</summary>
+	public sealed class IMmLoggerKO
 	{
 		/// <summary>Handler for Log.</summary>
 		public IMmLogger_LogHandler Log { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmLogger.</summary>
-	public IMmLoggerSpy IMmLogger { get; } = new();
+	public IMmLoggerKO IMmLogger { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmLogger.</summary>
 	public KnockOff.Documentation.Samples.Skills.IMmLogger AsMmLogger() => this;

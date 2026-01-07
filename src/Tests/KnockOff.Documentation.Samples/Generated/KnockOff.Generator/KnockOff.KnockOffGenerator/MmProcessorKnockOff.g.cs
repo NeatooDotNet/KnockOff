@@ -105,8 +105,8 @@ partial class MmProcessorKnockOff
 		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.IMmProcessorService - tracks invocations and configures behavior.</summary>
-	public sealed class IMmProcessorServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmProcessorService.</summary>
+	public sealed class IMmProcessorServiceKO
 	{
 		/// <summary>Handler for Process overload 1.</summary>
 		public IMmProcessorService_Process1Handler Process1 { get; } = new();
@@ -119,7 +119,7 @@ partial class MmProcessorKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmProcessorService.</summary>
-	public IMmProcessorServiceSpy IMmProcessorService { get; } = new();
+	public IMmProcessorServiceKO IMmProcessorService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmProcessorService.</summary>
 	public KnockOff.Documentation.Samples.Skills.IMmProcessorService AsMmProcessorService() => this;

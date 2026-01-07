@@ -29,7 +29,7 @@ The generator implements:
 
 ## Tracking
 
-All members from all inherited interfaces are tracked. Each interface gets its own spy class with handlers for the members it defines:
+All members from all inherited interfaces are tracked. Each interface gets its own KO class with handlers for the members it defines:
 
 ```csharp
 var knockOff = new AuditableEntityKnockOff();
@@ -43,11 +43,11 @@ var created = entity.CreatedAt;
 entity.ModifiedAt = DateTime.Now;
 entity.ModifiedBy = "TestUser";
 
-// Base interface members tracked in IBaseEntity spy
+// Base interface members tracked in IBaseEntity KO class
 Assert.Equal(1, knockOff.IBaseEntity.Id.GetCount);
 Assert.Equal(1, knockOff.IBaseEntity.CreatedAt.GetCount);
 
-// Derived interface members tracked in IAuditableEntity spy
+// Derived interface members tracked in IAuditableEntity KO class
 Assert.Equal(1, knockOff.IAuditableEntity.ModifiedAt.SetCount);
 Assert.Equal(1, knockOff.IAuditableEntity.ModifiedBy.SetCount);
 ```
@@ -81,20 +81,20 @@ IAuditableEntity entity = knockOff;
 var id = entity.Id;
 var createdAt = entity.CreatedAt;
 
-// Tracked in the base interface's spy class
+// Tracked in the base interface's KO class
 Assert.Equal(1, knockOff.IBaseEntity.Id.GetCount);
 Assert.Equal(1, knockOff.IBaseEntity.CreatedAt.GetCount);
 ```
 
 ## Callbacks
 
-Set callbacks for any member using its defining interface's spy class:
+Set callbacks for any member using its defining interface's KO class:
 
 ```csharp
-// Base interface member (via IBaseEntity spy)
+// Base interface member (via IBaseEntity KO class)
 knockOff.IBaseEntity.Id.OnGet = (ko) => 42;
 
-// Derived interface member (via IAuditableEntity spy)
+// Derived interface member (via IAuditableEntity KO class)
 knockOff.IAuditableEntity.ModifiedBy.OnGet = (ko) => "System";
 knockOff.IAuditableEntity.ModifiedAt.OnSet = (ko, value) =>
 {
@@ -185,7 +185,7 @@ public partial class IhOrderKnockOff : IIhOrder { }
 <!-- /snippet -->
 
 ```csharp
-// Configure validation (using interface spy classes)
+// Configure validation (using interface KO classes)
 knockOff.IIhValidatable.IsValid.OnGet = (ko) => ko.IIhOrder.Total.GetCount > 0;
 knockOff.IIhValidatable.GetErrors.OnCall = (ko) =>
     ko.IIhValidatable.IsValid.OnGet!(ko) ? [] : ["No total calculated"];

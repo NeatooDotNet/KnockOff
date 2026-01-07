@@ -77,8 +77,8 @@ partial class OutParameterServiceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Sandbox.IOutParameterService - tracks invocations and configures behavior.</summary>
-	public sealed class IOutParameterServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Sandbox.IOutParameterService.</summary>
+	public sealed class IOutParameterServiceKO
 	{
 		/// <summary>Handler for TryGetValue.</summary>
 		public IOutParameterService_TryGetValueHandler TryGetValue { get; } = new();
@@ -89,7 +89,7 @@ partial class OutParameterServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Sandbox.IOutParameterService.</summary>
-	public IOutParameterServiceSpy IOutParameterService { get; } = new();
+	public IOutParameterServiceKO IOutParameterService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Sandbox.IOutParameterService.</summary>
 	public KnockOff.Sandbox.IOutParameterService AsOutParameterService() => this;

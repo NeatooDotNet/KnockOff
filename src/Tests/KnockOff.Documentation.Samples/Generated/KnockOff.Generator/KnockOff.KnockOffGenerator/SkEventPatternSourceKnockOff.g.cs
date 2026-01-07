@@ -114,8 +114,8 @@ partial class SkEventPatternSourceKnockOff
 		public void Clear() { _handler = null; Reset(); }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ISkEventPatternSource - tracks invocations and configures behavior.</summary>
-	public sealed class ISkEventPatternSourceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkEventPatternSource.</summary>
+	public sealed class ISkEventPatternSourceKO
 	{
 		/// <summary>Handler for DataReceived event.</summary>
 		public ISkEventPatternSource_DataReceivedHandler DataReceived { get; } = new();
@@ -124,7 +124,7 @@ partial class SkEventPatternSourceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkEventPatternSource.</summary>
-	public ISkEventPatternSourceSpy ISkEventPatternSource { get; } = new();
+	public ISkEventPatternSourceKO ISkEventPatternSource { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkEventPatternSource.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkEventPatternSource AsSkEventPatternSource() => this;

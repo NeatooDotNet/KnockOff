@@ -30,15 +30,15 @@ partial class MigSharedRepositoryKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Comparison.IMigSharedRepository - tracks invocations and configures behavior.</summary>
-	public sealed class IMigSharedRepositorySpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigSharedRepository.</summary>
+	public sealed class IMigSharedRepositoryKO
 	{
 		/// <summary>Handler for GetById.</summary>
 		public IMigSharedRepository_GetByIdHandler GetById { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigSharedRepository.</summary>
-	public IMigSharedRepositorySpy IMigSharedRepository { get; } = new();
+	public IMigSharedRepositoryKO IMigSharedRepository { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IMigSharedRepository.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IMigSharedRepository AsMigSharedRepository() => this;

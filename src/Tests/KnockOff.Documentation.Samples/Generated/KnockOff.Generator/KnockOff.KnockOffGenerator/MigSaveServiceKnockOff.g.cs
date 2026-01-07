@@ -30,15 +30,15 @@ partial class MigSaveServiceKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Comparison.IMigSaveService - tracks invocations and configures behavior.</summary>
-	public sealed class IMigSaveServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigSaveService.</summary>
+	public sealed class IMigSaveServiceKO
 	{
 		/// <summary>Handler for Save.</summary>
 		public IMigSaveService_SaveHandler Save { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigSaveService.</summary>
-	public IMigSaveServiceSpy IMigSaveService { get; } = new();
+	public IMigSaveServiceKO IMigSaveService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IMigSaveService.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IMigSaveService AsMigSaveService() => this;

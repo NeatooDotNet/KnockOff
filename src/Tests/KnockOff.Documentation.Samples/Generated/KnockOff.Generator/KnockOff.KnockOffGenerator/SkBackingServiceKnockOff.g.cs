@@ -33,15 +33,15 @@ partial class SkBackingServiceKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ISkBackingService - tracks invocations and configures behavior.</summary>
-	public sealed class ISkBackingServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkBackingService.</summary>
+	public sealed class ISkBackingServiceKO
 	{
 		/// <summary>Handler for Name.</summary>
 		public ISkBackingService_NameHandler Name { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkBackingService.</summary>
-	public ISkBackingServiceSpy ISkBackingService { get; } = new();
+	public ISkBackingServiceKO ISkBackingService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkBackingService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkBackingService AsSkBackingService() => this;

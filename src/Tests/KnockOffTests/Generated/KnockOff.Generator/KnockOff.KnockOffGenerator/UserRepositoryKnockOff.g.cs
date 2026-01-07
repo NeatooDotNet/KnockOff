@@ -80,8 +80,8 @@ partial class UserRepositoryKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Tests.IRepository<KnockOff.Tests.User> - tracks invocations and configures behavior.</summary>
-	public sealed class IRepository_KnockOff_Tests_UserSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IRepository<KnockOff.Tests.User>.</summary>
+	public sealed class IRepository_KnockOff_Tests_UserKO
 	{
 		/// <summary>Handler for GetById.</summary>
 		public IRepository_KnockOff_Tests_User_GetByIdHandler GetById { get; } = new();
@@ -92,7 +92,7 @@ partial class UserRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IRepository<KnockOff.Tests.User>.</summary>
-	public IRepository_KnockOff_Tests_UserSpy IRepository_KnockOff_Tests_User { get; } = new();
+	public IRepository_KnockOff_Tests_UserKO IRepository_KnockOff_Tests_User { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IRepository<KnockOff.Tests.User>.</summary>
 	public KnockOff.Tests.IRepository<KnockOff.Tests.User> AsRepository() => this;

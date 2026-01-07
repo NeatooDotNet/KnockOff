@@ -55,8 +55,8 @@ partial class VsRepositoryKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Comparison.IVsRepository - tracks invocations and configures behavior.</summary>
-	public sealed class IVsRepositorySpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsRepository.</summary>
+	public sealed class IVsRepositoryKO
 	{
 		/// <summary>Handler for GetByIdAsync.</summary>
 		public IVsRepository_GetByIdAsyncHandler GetByIdAsync { get; } = new();
@@ -65,7 +65,7 @@ partial class VsRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsRepository.</summary>
-	public IVsRepositorySpy IVsRepository { get; } = new();
+	public IVsRepositoryKO IVsRepository { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IVsRepository.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IVsRepository AsVsRepository() => this;

@@ -115,8 +115,8 @@ partial class SkSmartDefaultKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService - tracks invocations and configures behavior.</summary>
-	public sealed class ISkSmartDefaultServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.</summary>
+	public sealed class ISkSmartDefaultServiceKO
 	{
 		/// <summary>Handler for GetCount.</summary>
 		public ISkSmartDefaultService_GetCountHandler GetCount { get; } = new();
@@ -131,7 +131,7 @@ partial class SkSmartDefaultKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.</summary>
-	public ISkSmartDefaultServiceSpy ISkSmartDefaultService { get; } = new();
+	public ISkSmartDefaultServiceKO ISkSmartDefaultService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService AsSkSmartDefaultService() => this;

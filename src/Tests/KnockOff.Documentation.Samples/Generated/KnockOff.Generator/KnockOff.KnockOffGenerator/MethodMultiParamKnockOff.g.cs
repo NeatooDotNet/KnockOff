@@ -30,15 +30,15 @@ partial class MethodMultiParamKnockOff
 		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IMethodMultiParam - tracks invocations and configures behavior.</summary>
-	public sealed class IMethodMultiParamSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodMultiParam.</summary>
+	public sealed class IMethodMultiParamKO
 	{
 		/// <summary>Handler for Process.</summary>
 		public IMethodMultiParam_ProcessHandler Process { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodMultiParam.</summary>
-	public IMethodMultiParamSpy IMethodMultiParam { get; } = new();
+	public IMethodMultiParamKO IMethodMultiParam { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodMultiParam.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMethodMultiParam AsMethodMultiParam() => this;

@@ -49,8 +49,8 @@ partial class IhFullEntityKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IIhFullAuditableEntity - tracks invocations and configures behavior.</summary>
-	public sealed class IIhFullAuditableEntitySpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhFullAuditableEntity.</summary>
+	public sealed class IIhFullAuditableEntityKO
 	{
 		/// <summary>Handler for CreatedBy.</summary>
 		public IIhFullAuditableEntity_CreatedByHandler CreatedBy { get; } = new();
@@ -74,8 +74,8 @@ partial class IhFullEntityKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IIhTimestampedEntity - tracks invocations and configures behavior.</summary>
-	public sealed class IIhTimestampedEntitySpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhTimestampedEntity.</summary>
+	public sealed class IIhTimestampedEntityKO
 	{
 		/// <summary>Handler for CreatedAt.</summary>
 		public IIhTimestampedEntity_CreatedAtHandler CreatedAt { get; } = new();
@@ -97,21 +97,21 @@ partial class IhFullEntityKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IIhEntity - tracks invocations and configures behavior.</summary>
-	public sealed class IIhEntitySpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhEntity.</summary>
+	public sealed class IIhEntityKO
 	{
 		/// <summary>Handler for Id.</summary>
 		public IIhEntity_IdHandler Id { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhFullAuditableEntity.</summary>
-	public IIhFullAuditableEntitySpy IIhFullAuditableEntity { get; } = new();
+	public IIhFullAuditableEntityKO IIhFullAuditableEntity { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhTimestampedEntity.</summary>
-	public IIhTimestampedEntitySpy IIhTimestampedEntity { get; } = new();
+	public IIhTimestampedEntityKO IIhTimestampedEntity { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhEntity.</summary>
-	public IIhEntitySpy IIhEntity { get; } = new();
+	public IIhEntityKO IIhEntity { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIhFullAuditableEntity.</summary>
 	public KnockOff.Documentation.Samples.Guides.IIhFullAuditableEntity AsIhFullAuditableEntity() => this;

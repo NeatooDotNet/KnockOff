@@ -52,8 +52,8 @@ partial class CpRepoKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ICpRepository - tracks invocations and configures behavior.</summary>
-	public sealed class ICpRepositorySpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpRepository.</summary>
+	public sealed class ICpRepositoryKO
 	{
 		/// <summary>Handler for GetByIdAsync.</summary>
 		public ICpRepository_GetByIdAsyncHandler GetByIdAsync { get; } = new();
@@ -62,7 +62,7 @@ partial class CpRepoKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpRepository.</summary>
-	public ICpRepositorySpy ICpRepository { get; } = new();
+	public ICpRepositoryKO ICpRepository { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpRepository.</summary>
 	public KnockOff.Documentation.Samples.Skills.ICpRepository AsCpRepository() => this;

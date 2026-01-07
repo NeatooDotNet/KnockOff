@@ -30,15 +30,15 @@ partial class CpPriorityServiceKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ICpPriorityService - tracks invocations and configures behavior.</summary>
-	public sealed class ICpPriorityServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpPriorityService.</summary>
+	public sealed class ICpPriorityServiceKO
 	{
 		/// <summary>Handler for Calculate.</summary>
 		public ICpPriorityService_CalculateHandler Calculate { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpPriorityService.</summary>
-	public ICpPriorityServiceSpy ICpPriorityService { get; } = new();
+	public ICpPriorityServiceKO ICpPriorityService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpPriorityService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ICpPriorityService AsCpPriorityService() => this;

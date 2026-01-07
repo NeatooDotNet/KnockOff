@@ -61,8 +61,8 @@ partial class IhEmployeeKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IIhEmployee - tracks invocations and configures behavior.</summary>
-	public sealed class IIhEmployeeSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhEmployee.</summary>
+	public sealed class IIhEmployeeKO
 	{
 		/// <summary>Handler for Name.</summary>
 		public IIhEmployee_NameHandler Name { get; } = new();
@@ -86,18 +86,18 @@ partial class IhEmployeeKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IIhEntityBase - tracks invocations and configures behavior.</summary>
-	public sealed class IIhEntityBaseSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhEntityBase.</summary>
+	public sealed class IIhEntityBaseKO
 	{
 		/// <summary>Handler for Id.</summary>
 		public IIhEntityBase_IdHandler Id { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhEmployee.</summary>
-	public IIhEmployeeSpy IIhEmployee { get; } = new();
+	public IIhEmployeeKO IIhEmployee { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhEntityBase.</summary>
-	public IIhEntityBaseSpy IIhEntityBase { get; } = new();
+	public IIhEntityBaseKO IIhEntityBase { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIhEmployee.</summary>
 	public KnockOff.Documentation.Samples.Guides.IIhEmployee AsIhEmployee() => this;

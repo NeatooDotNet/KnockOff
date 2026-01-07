@@ -36,15 +36,15 @@ partial class IdxListKnockOff
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IIdxList - tracks invocations and configures behavior.</summary>
-	public sealed class IIdxListSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIdxList.</summary>
+	public sealed class IIdxListKO
 	{
 		/// <summary>Handler for Int32Indexer.</summary>
 		public IIdxList_Int32IndexerHandler Int32Indexer { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIdxList.</summary>
-	public IIdxListSpy IIdxList { get; } = new();
+	public IIdxListKO IIdxList { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIdxList.</summary>
 	public KnockOff.Documentation.Samples.Guides.IIdxList AsIdxList() => this;

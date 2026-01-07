@@ -27,15 +27,15 @@ partial class MigSequenceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Comparison.IMigSequence - tracks invocations and configures behavior.</summary>
-	public sealed class IMigSequenceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigSequence.</summary>
+	public sealed class IMigSequenceKO
 	{
 		/// <summary>Handler for GetNext.</summary>
 		public IMigSequence_GetNextHandler GetNext { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigSequence.</summary>
-	public IMigSequenceSpy IMigSequence { get; } = new();
+	public IMigSequenceKO IMigSequence { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IMigSequence.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IMigSequence AsMigSequence() => this;

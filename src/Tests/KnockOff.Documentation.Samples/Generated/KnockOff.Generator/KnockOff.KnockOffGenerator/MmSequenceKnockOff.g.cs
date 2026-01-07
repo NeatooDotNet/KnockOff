@@ -27,15 +27,15 @@ partial class MmSequenceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.IMmSequenceService - tracks invocations and configures behavior.</summary>
-	public sealed class IMmSequenceServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmSequenceService.</summary>
+	public sealed class IMmSequenceServiceKO
 	{
 		/// <summary>Handler for GetNext.</summary>
 		public IMmSequenceService_GetNextHandler GetNext { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmSequenceService.</summary>
-	public IMmSequenceServiceSpy IMmSequenceService { get; } = new();
+	public IMmSequenceServiceKO IMmSequenceService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmSequenceService.</summary>
 	public KnockOff.Documentation.Samples.Skills.IMmSequenceService AsMmSequenceService() => this;

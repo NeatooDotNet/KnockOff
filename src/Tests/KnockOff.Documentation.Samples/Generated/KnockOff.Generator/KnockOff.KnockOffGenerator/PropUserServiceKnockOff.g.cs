@@ -33,15 +33,15 @@ partial class PropUserServiceKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IPropUserService - tracks invocations and configures behavior.</summary>
-	public sealed class IPropUserServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropUserService.</summary>
+	public sealed class IPropUserServiceKO
 	{
 		/// <summary>Handler for Name.</summary>
 		public IPropUserService_NameHandler Name { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropUserService.</summary>
-	public IPropUserServiceSpy IPropUserService { get; } = new();
+	public IPropUserServiceKO IPropUserService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IPropUserService.</summary>
 	public KnockOff.Documentation.Samples.Guides.IPropUserService AsPropUserService() => this;

@@ -27,7 +27,7 @@ public partial class GenOrderRepositoryKnockOff : IGenRepository<GenOrder> { }
 
 ## Tracking
 
-Tracking uses the concrete types. For generic interfaces, the spy property includes the type arguments in the name:
+Tracking uses the concrete types. For generic interfaces, the KO property includes the type arguments in the name:
 
 ```csharp
 var knockOff = new UserRepositoryKnockOff();
@@ -36,7 +36,7 @@ IRepository<User> repo = knockOff;
 var user = new User { Id = 1, Name = "Test" };
 repo.Save(user);
 
-// Spy property is IRepository_User (interface name + type arg)
+// KO property is IRepository_User (interface name + type arg)
 // LastCallArg is strongly typed as User
 User? savedUser = knockOff.IRepository_User.Save.LastCallArg;
 Assert.Same(user, savedUser);
@@ -77,7 +77,7 @@ Usage:
 ```csharp
 var knockOff = new StringCacheKnockOff();
 
-// Spy property: ICache_string_User (interface + type args)
+// KO property: ICache_string_User (interface + type args)
 knockOff.ICache_string_User.Get.OnCall = (ko, key) => key switch
 {
     "admin" => new User { Name = "Admin" },

@@ -30,8 +30,8 @@ partial class MigDataContextKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Comparison.IMigRepository - tracks invocations and configures behavior.</summary>
-	public sealed class IMigRepositorySpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigRepository.</summary>
+	public sealed class IMigRepositoryKO
 	{
 		/// <summary>Handler for GetById.</summary>
 		public IMigRepository_GetByIdHandler GetById { get; } = new();
@@ -62,18 +62,18 @@ partial class MigDataContextKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Comparison.IMigUnitOfWork - tracks invocations and configures behavior.</summary>
-	public sealed class IMigUnitOfWorkSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigUnitOfWork.</summary>
+	public sealed class IMigUnitOfWorkKO
 	{
 		/// <summary>Handler for SaveChangesAsync.</summary>
 		public IMigUnitOfWork_SaveChangesAsyncHandler SaveChangesAsync { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigRepository.</summary>
-	public IMigRepositorySpy IMigRepository { get; } = new();
+	public IMigRepositoryKO IMigRepository { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigUnitOfWork.</summary>
-	public IMigUnitOfWorkSpy IMigUnitOfWork { get; } = new();
+	public IMigUnitOfWorkKO IMigUnitOfWork { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IMigRepository.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IMigRepository AsMigRepository() => this;

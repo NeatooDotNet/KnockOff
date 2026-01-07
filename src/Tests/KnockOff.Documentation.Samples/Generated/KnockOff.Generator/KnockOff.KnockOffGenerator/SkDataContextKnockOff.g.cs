@@ -30,8 +30,8 @@ partial class SkDataContextKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ISkRepository - tracks invocations and configures behavior.</summary>
-	public sealed class ISkRepositorySpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkRepository.</summary>
+	public sealed class ISkRepositoryKO
 	{
 		/// <summary>Handler for Save.</summary>
 		public ISkRepository_SaveHandler Save { get; } = new();
@@ -59,18 +59,18 @@ partial class SkDataContextKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ISkUnitOfWork - tracks invocations and configures behavior.</summary>
-	public sealed class ISkUnitOfWorkSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkUnitOfWork.</summary>
+	public sealed class ISkUnitOfWorkKO
 	{
 		/// <summary>Handler for Commit.</summary>
 		public ISkUnitOfWork_CommitHandler Commit { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkRepository.</summary>
-	public ISkRepositorySpy ISkRepository { get; } = new();
+	public ISkRepositoryKO ISkRepository { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkUnitOfWork.</summary>
-	public ISkUnitOfWorkSpy ISkUnitOfWork { get; } = new();
+	public ISkUnitOfWorkKO ISkUnitOfWork { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkRepository.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkRepository AsSkRepository() => this;

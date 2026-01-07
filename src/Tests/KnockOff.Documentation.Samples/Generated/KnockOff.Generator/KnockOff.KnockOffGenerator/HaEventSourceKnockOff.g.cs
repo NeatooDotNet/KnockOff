@@ -223,8 +223,8 @@ partial class HaEventSourceKnockOff
 		public void Clear() { _handler = null; Reset(); }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.IHaEventSource - tracks invocations and configures behavior.</summary>
-	public sealed class IHaEventSourceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaEventSource.</summary>
+	public sealed class IHaEventSourceKO
 	{
 		/// <summary>Handler for DataReceived event.</summary>
 		public IHaEventSource_DataReceivedHandler DataReceived { get; } = new();
@@ -237,7 +237,7 @@ partial class HaEventSourceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaEventSource.</summary>
-	public IHaEventSourceSpy IHaEventSource { get; } = new();
+	public IHaEventSourceKO IHaEventSource { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IHaEventSource.</summary>
 	public KnockOff.Documentation.Samples.Skills.IHaEventSource AsHaEventSource() => this;

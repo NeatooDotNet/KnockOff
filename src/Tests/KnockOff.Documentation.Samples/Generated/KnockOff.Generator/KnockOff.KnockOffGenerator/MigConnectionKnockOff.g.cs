@@ -27,15 +27,15 @@ partial class MigConnectionKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Comparison.IMigConnection - tracks invocations and configures behavior.</summary>
-	public sealed class IMigConnectionSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigConnection.</summary>
+	public sealed class IMigConnectionKO
 	{
 		/// <summary>Handler for Connect.</summary>
 		public IMigConnection_ConnectHandler Connect { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigConnection.</summary>
-	public IMigConnectionSpy IMigConnection { get; } = new();
+	public IMigConnectionKO IMigConnection { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IMigConnection.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IMigConnection AsMigConnection() => this;

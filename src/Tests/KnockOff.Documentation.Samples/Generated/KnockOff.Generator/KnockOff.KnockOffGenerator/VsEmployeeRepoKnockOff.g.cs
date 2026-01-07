@@ -30,8 +30,8 @@ partial class VsEmployeeRepoKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Comparison.IVsEmployeeRepository - tracks invocations and configures behavior.</summary>
-	public sealed class IVsEmployeeRepositorySpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsEmployeeRepository.</summary>
+	public sealed class IVsEmployeeRepositoryKO
 	{
 		/// <summary>Handler for GetEmployee.</summary>
 		public IVsEmployeeRepository_GetEmployeeHandler GetEmployee { get; } = new();
@@ -62,18 +62,18 @@ partial class VsEmployeeRepoKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Comparison.IVsUnitOfWork - tracks invocations and configures behavior.</summary>
-	public sealed class IVsUnitOfWorkSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsUnitOfWork.</summary>
+	public sealed class IVsUnitOfWorkKO
 	{
 		/// <summary>Handler for SaveChangesAsync.</summary>
 		public IVsUnitOfWork_SaveChangesAsyncHandler SaveChangesAsync { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsEmployeeRepository.</summary>
-	public IVsEmployeeRepositorySpy IVsEmployeeRepository { get; } = new();
+	public IVsEmployeeRepositoryKO IVsEmployeeRepository { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsUnitOfWork.</summary>
-	public IVsUnitOfWorkSpy IVsUnitOfWork { get; } = new();
+	public IVsUnitOfWorkKO IVsUnitOfWork { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IVsEmployeeRepository.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IVsEmployeeRepository AsVsEmployeeRepository() => this;

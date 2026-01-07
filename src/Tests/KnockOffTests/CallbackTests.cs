@@ -63,7 +63,7 @@ public class CallbackTests
 	}
 
 	[Fact]
-	public void OnCall_CanAccessOtherSpy()
+	public void OnCall_CanAccessOtherHandler()
 	{
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;

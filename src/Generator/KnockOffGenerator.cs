@@ -800,17 +800,17 @@ public class KnockOffGenerator : IIncrementalGenerator
 			sb.AppendLine();
 		}
 
-		// Build spy property names for each interface (with collision detection)
-		var interfaceSpyNames = new Dictionary<InterfaceInfo, string>();
+		// Build KO property names for each interface (with collision detection)
+		var interfaceKONames = new Dictionary<InterfaceInfo, string>();
 		foreach (var iface in typeInfo.Interfaces)
 		{
-			interfaceSpyNames[iface] = GetSpyPropertyName(iface);
+			interfaceKONames[iface] = GetKOPropertyName(iface);
 		}
 
-		// For each interface, generate handlers and spy class
+		// For each interface, generate handlers and KO class
 		foreach (var iface in typeInfo.Interfaces)
 		{
-			var spyPropertyName = interfaceSpyNames[iface];
+			var koPropertyName = interfaceKONames[iface];
 
 			// Group methods by name for this interface only
 			var interfaceMethods = iface.Members.Where(m => !m.IsProperty && !m.IsIndexer);
@@ -821,32 +821,32 @@ public class KnockOffGenerator : IIncrementalGenerator
 			{
 				if (member.IsProperty || member.IsIndexer)
 				{
-					GenerateInterfaceMemberHandlerClass(sb, member, typeInfo.ClassName, spyPropertyName);
+					GenerateInterfaceMemberHandlerClass(sb, member, typeInfo.ClassName, koPropertyName);
 				}
 			}
 
 			// 1b. Generate method group handlers for this interface
 			foreach (var group in methodGroups.Values)
 			{
-				GenerateInterfaceMethodGroupHandlerClass(sb, group, typeInfo.ClassName, spyPropertyName);
+				GenerateInterfaceMethodGroupHandlerClass(sb, group, typeInfo.ClassName, koPropertyName);
 			}
 
 			// 1c. Generate event handlers for this interface
 			foreach (var evt in iface.Events)
 			{
-				GenerateInterfaceEventHandlerClass(sb, evt, typeInfo.ClassName, spyPropertyName);
+				GenerateInterfaceEventHandlerClass(sb, evt, typeInfo.ClassName, koPropertyName);
 			}
 
-			// 2. Generate spy class for this interface
-			GenerateInterfaceSpyClass(sb, typeInfo.ClassName, iface, spyPropertyName, methodGroups);
+			// 2. Generate KO class for this interface
+			GenerateInterfaceKOClass(sb, typeInfo.ClassName, iface, koPropertyName, methodGroups);
 		}
 
-		// 3. Generate interface spy properties (no more Spy property)
+		// 3. Generate interface KO properties
 		foreach (var iface in typeInfo.Interfaces)
 		{
-			var spyPropertyName = interfaceSpyNames[iface];
+			var koPropertyName = interfaceKONames[iface];
 			sb.AppendLine($"\t/// <summary>Tracks invocations and configures behavior for {iface.FullName}.</summary>");
-			sb.AppendLine($"\tpublic {spyPropertyName}Spy {spyPropertyName} {{ get; }} = new();");
+			sb.AppendLine($"\tpublic {koPropertyName}KO {koPropertyName} {{ get; }} = new();");
 			sb.AppendLine();
 		}
 
@@ -867,16 +867,16 @@ public class KnockOffGenerator : IIncrementalGenerator
 		// 5. Generate backing properties/dictionaries PER INTERFACE (separate backing per interface)
 		foreach (var iface in typeInfo.Interfaces)
 		{
-			var spyPropertyName = interfaceSpyNames[iface];
+			var koPropertyName = interfaceKONames[iface];
 			foreach (var member in iface.Members)
 			{
 				if (member.IsIndexer)
 				{
-					GenerateInterfaceIndexerBackingDictionary(sb, member, spyPropertyName);
+					GenerateInterfaceIndexerBackingDictionary(sb, member, koPropertyName);
 				}
 				else if (member.IsProperty)
 				{
-					GenerateInterfaceBackingProperty(sb, member, spyPropertyName);
+					GenerateInterfaceBackingProperty(sb, member, koPropertyName);
 				}
 			}
 		}
@@ -884,7 +884,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 		// 6. Generate explicit interface implementations for EACH interface member
 		foreach (var iface in typeInfo.Interfaces)
 		{
-			var spyPropertyName = interfaceSpyNames[iface];
+			var koPropertyName = interfaceKONames[iface];
 
 			// Build method groups for this interface for callback lookup
 			var interfaceMethods = iface.Members.Where(m => !m.IsProperty && !m.IsIndexer);
@@ -894,24 +894,24 @@ public class KnockOffGenerator : IIncrementalGenerator
 			{
 				if (member.IsIndexer)
 				{
-					GenerateInterfaceIndexerImplementation(sb, iface.FullName, member, spyPropertyName);
+					GenerateInterfaceIndexerImplementation(sb, iface.FullName, member, koPropertyName);
 				}
 				else if (member.IsProperty)
 				{
-					GenerateInterfacePropertyImplementation(sb, iface.FullName, member, spyPropertyName);
+					GenerateInterfacePropertyImplementation(sb, iface.FullName, member, koPropertyName);
 				}
 				else
 				{
 					// All methods use delegate-based handler
 					var group = methodGroups[member.Name];
-					GenerateInterfaceMethod(sb, iface.FullName, member, typeInfo, group, spyPropertyName);
+					GenerateInterfaceMethod(sb, iface.FullName, member, typeInfo, group, koPropertyName);
 				}
 			}
 
 			// 6b. Generate explicit interface implementations for events
 			foreach (var evt in iface.Events)
 			{
-				GenerateInterfaceEventImplementation(sb, iface.FullName, evt, spyPropertyName);
+				GenerateInterfaceEventImplementation(sb, iface.FullName, evt, koPropertyName);
 			}
 		}
 
@@ -1794,29 +1794,29 @@ public class KnockOffGenerator : IIncrementalGenerator
 	}
 
 	/// <summary>
-	/// Computes the spy property name for an interface, handling collisions with member names.
+	/// Computes the KO property name for an interface, handling collisions with member names.
 	/// If the interface name collides with a member name, adds underscore suffix.
 	/// </summary>
-	private static string GetSpyPropertyName(InterfaceInfo iface)
+	private static string GetKOPropertyName(InterfaceInfo iface)
 	{
 		// Extract interface name from FullName (keeps the 'I' prefix unlike SimpleName)
 		// e.g., "Namespace.IFoo" -> "IFoo", "Namespace.IRepository<User>" -> "IRepository_User"
-		var spyPropertyName = iface.FullName;
+		var koPropertyName = iface.FullName;
 
 		// Remove namespace prefix - find last dot that's not inside angle brackets
 		var depth = 0;
 		var lastNonGenericDot = -1;
-		for (int i = 0; i < spyPropertyName.Length; i++)
+		for (int i = 0; i < koPropertyName.Length; i++)
 		{
-			if (spyPropertyName[i] == '<') depth++;
-			else if (spyPropertyName[i] == '>') depth--;
-			else if (spyPropertyName[i] == '.' && depth == 0) lastNonGenericDot = i;
+			if (koPropertyName[i] == '<') depth++;
+			else if (koPropertyName[i] == '>') depth--;
+			else if (koPropertyName[i] == '.' && depth == 0) lastNonGenericDot = i;
 		}
 		if (lastNonGenericDot >= 0)
-			spyPropertyName = spyPropertyName.Substring(lastNonGenericDot + 1);
+			koPropertyName = koPropertyName.Substring(lastNonGenericDot + 1);
 
 		// Sanitize for C# identifiers: replace < > , with valid characters
-		spyPropertyName = spyPropertyName
+		koPropertyName = koPropertyName
 			.Replace("<", "_")
 			.Replace(">", "")
 			.Replace(",", "_")
@@ -1830,24 +1830,24 @@ public class KnockOffGenerator : IIncrementalGenerator
 		foreach (var evt in iface.Events)
 			memberNames.Add(evt.Name);
 
-		if (memberNames.Contains(spyPropertyName))
-			spyPropertyName += "_";
+		if (memberNames.Contains(koPropertyName))
+			koPropertyName += "_";
 
-		return spyPropertyName;
+		return koPropertyName;
 	}
 
 	/// <summary>
-	/// Generate an interface spy class with handlers for all members of that interface
+	/// Generate an interface KO class with handlers for all members of that interface
 	/// </summary>
-	private static void GenerateInterfaceSpyClass(
+	private static void GenerateInterfaceKOClass(
 		System.Text.StringBuilder sb,
 		string knockOffClassName,
 		InterfaceInfo iface,
-		string spyPropertyName,
+		string koPropertyName,
 		Dictionary<string, MethodGroupInfo> methodGroups)
 	{
-		sb.AppendLine($"\t/// <summary>Spy for {iface.FullName} - tracks invocations and configures behavior.</summary>");
-		sb.AppendLine($"\tpublic sealed class {spyPropertyName}Spy");
+		sb.AppendLine($"\t/// <summary>Tracks invocations and configures behavior for {iface.FullName}.</summary>");
+		sb.AppendLine($"\tpublic sealed class {koPropertyName}KO");
 		sb.AppendLine("\t{");
 
 		// Property/indexer handlers
@@ -1856,7 +1856,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 			if (member.IsProperty || member.IsIndexer)
 			{
 				sb.AppendLine($"\t\t/// <summary>Handler for {member.Name}.</summary>");
-				sb.AppendLine($"\t\tpublic {spyPropertyName}_{member.Name}Handler {member.Name} {{ get; }} = new();");
+				sb.AppendLine($"\t\tpublic {koPropertyName}_{member.Name}Handler {member.Name} {{ get; }} = new();");
 			}
 		}
 
@@ -1871,14 +1871,14 @@ public class KnockOffGenerator : IIncrementalGenerator
 				{
 					var overloadNumber = i + 1; // 1-based numbering
 					sb.AppendLine($"\t\t/// <summary>Handler for {group.Name} overload {overloadNumber}.</summary>");
-					sb.AppendLine($"\t\tpublic {spyPropertyName}_{group.Name}{overloadNumber}Handler {group.Name}{overloadNumber} {{ get; }} = new();");
+					sb.AppendLine($"\t\tpublic {koPropertyName}_{group.Name}{overloadNumber}Handler {group.Name}{overloadNumber} {{ get; }} = new();");
 				}
 			}
 			else
 			{
 				// Single method (no overloads) - generate single property without suffix
 				sb.AppendLine($"\t\t/// <summary>Handler for {group.Name}.</summary>");
-				sb.AppendLine($"\t\tpublic {spyPropertyName}_{group.Name}Handler {group.Name} {{ get; }} = new();");
+				sb.AppendLine($"\t\tpublic {koPropertyName}_{group.Name}Handler {group.Name} {{ get; }} = new();");
 			}
 		}
 
@@ -1886,7 +1886,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 		foreach (var evt in iface.Events)
 		{
 			sb.AppendLine($"\t\t/// <summary>Handler for {evt.Name} event.</summary>");
-			sb.AppendLine($"\t\tpublic {spyPropertyName}_{evt.Name}Handler {evt.Name} {{ get; }} = new();");
+			sb.AppendLine($"\t\tpublic {koPropertyName}_{evt.Name}Handler {evt.Name} {{ get; }} = new();");
 		}
 
 		sb.AppendLine("\t}");
@@ -1900,11 +1900,11 @@ public class KnockOffGenerator : IIncrementalGenerator
 		System.Text.StringBuilder sb,
 		InterfaceMemberInfo member,
 		string knockOffClassName,
-		string spyPropertyName)
+		string koPropertyName)
 	{
-		var handlerClassName = $"{spyPropertyName}_{member.Name}Handler";
+		var handlerClassName = $"{koPropertyName}_{member.Name}Handler";
 
-		sb.AppendLine($"\t/// <summary>Tracks and configures behavior for {spyPropertyName}.{member.Name}.</summary>");
+		sb.AppendLine($"\t/// <summary>Tracks and configures behavior for {koPropertyName}.{member.Name}.</summary>");
 		sb.AppendLine($"\tpublic sealed class {handlerClassName}");
 		sb.AppendLine("\t{");
 
@@ -2041,7 +2041,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 		System.Text.StringBuilder sb,
 		MethodGroupInfo group,
 		string knockOffClassName,
-		string spyPropertyName)
+		string koPropertyName)
 	{
 		var hasOverloads = group.Overloads.Count > 1;
 
@@ -2051,14 +2051,14 @@ public class KnockOffGenerator : IIncrementalGenerator
 			for (int i = 0; i < group.Overloads.Count; i++)
 			{
 				var overload = group.Overloads.GetArray()![i];
-				GenerateSingleOverloadHandlerClass(sb, group.Name, overload, group.ReturnType, group.IsVoid, knockOffClassName, spyPropertyName, i + 1);
+				GenerateSingleOverloadHandlerClass(sb, group.Name, overload, group.ReturnType, group.IsVoid, knockOffClassName, koPropertyName, i + 1);
 			}
 		}
 		else
 		{
 			// Single method (no overloads) - generate single handler without numeric suffix
 			var overload = group.Overloads.GetArray()![0];
-			GenerateSingleOverloadHandlerClass(sb, group.Name, overload, group.ReturnType, group.IsVoid, knockOffClassName, spyPropertyName, null);
+			GenerateSingleOverloadHandlerClass(sb, group.Name, overload, group.ReturnType, group.IsVoid, knockOffClassName, koPropertyName, null);
 		}
 	}
 
@@ -2073,18 +2073,18 @@ public class KnockOffGenerator : IIncrementalGenerator
 		string returnType,
 		bool isVoid,
 		string knockOffClassName,
-		string spyPropertyName,
+		string koPropertyName,
 		int? overloadIndex)
 	{
 		// Generic methods need special handling with Of<T>() pattern
 		if (overload.IsGenericMethod)
 		{
-			GenerateGenericMethodHandlerForInterface(sb, methodName, overload, returnType, isVoid, knockOffClassName, spyPropertyName, overloadIndex);
+			GenerateGenericMethodHandlerForInterface(sb, methodName, overload, returnType, isVoid, knockOffClassName, koPropertyName, overloadIndex);
 			return;
 		}
 
 		var handlerSuffix = overloadIndex.HasValue ? overloadIndex.Value.ToString() : "";
-		var handlerClassName = $"{spyPropertyName}_{methodName}{handlerSuffix}Handler";
+		var handlerClassName = $"{koPropertyName}_{methodName}{handlerSuffix}Handler";
 		var delegateName = $"{methodName}Delegate";
 
 		// Get input parameters for this specific overload
@@ -2094,7 +2094,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 			? $"{knockOffClassName} ko"
 			: $"{knockOffClassName} ko, {paramList}";
 
-		sb.AppendLine($"\t/// <summary>Tracks and configures behavior for {spyPropertyName}.{methodName}{handlerSuffix}.</summary>");
+		sb.AppendLine($"\t/// <summary>Tracks and configures behavior for {koPropertyName}.{methodName}{handlerSuffix}.</summary>");
 		sb.AppendLine($"\tpublic sealed class {handlerClassName}");
 		sb.AppendLine("\t{");
 
@@ -2211,11 +2211,11 @@ public class KnockOffGenerator : IIncrementalGenerator
 		string returnType,
 		bool isVoid,
 		string knockOffClassName,
-		string spyPropertyName,
+		string koPropertyName,
 		int? overloadIndex)
 	{
 		var handlerSuffix = overloadIndex.HasValue ? overloadIndex.Value.ToString() : "";
-		var handlerClassName = $"{spyPropertyName}_{methodName}{handlerSuffix}Handler";
+		var handlerClassName = $"{koPropertyName}_{methodName}{handlerSuffix}Handler";
 		var typeParams = overload.TypeParameters.GetArray()!;
 		var typeParamNames = string.Join(", ", typeParams.Select(tp => tp.Name));
 		var typeParamCount = typeParams.Length;
@@ -2239,7 +2239,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 			: $"({string.Join(", ", typeParams.Select(tp => $"typeof({tp.Name})"))})";
 
 		// Start base handler class
-		sb.AppendLine($"\t/// <summary>Tracks and configures behavior for {spyPropertyName}.{methodName}{handlerSuffix}.</summary>");
+		sb.AppendLine($"\t/// <summary>Tracks and configures behavior for {koPropertyName}.{methodName}{handlerSuffix}.</summary>");
 		sb.AppendLine($"\tpublic sealed class {handlerClassName}");
 		sb.AppendLine("\t{");
 
@@ -2408,11 +2408,11 @@ public class KnockOffGenerator : IIncrementalGenerator
 		System.Text.StringBuilder sb,
 		EventMemberInfo evt,
 		string knockOffClassName,
-		string spyPropertyName)
+		string koPropertyName)
 	{
-		var handlerClassName = $"{spyPropertyName}_{evt.Name}Handler";
+		var handlerClassName = $"{koPropertyName}_{evt.Name}Handler";
 
-		sb.AppendLine($"\t/// <summary>Tracks and raises {spyPropertyName}.{evt.Name}.</summary>");
+		sb.AppendLine($"\t/// <summary>Tracks and raises {koPropertyName}.{evt.Name}.</summary>");
 		sb.AppendLine($"\tpublic sealed class {handlerClassName}");
 		sb.AppendLine("\t{");
 
@@ -2525,32 +2525,15 @@ public class KnockOffGenerator : IIncrementalGenerator
 		sb.AppendLine("\t}");
 		sb.AppendLine();
 	}
-
-	/// <summary>
-	/// Generate explicit interface implementation for an event (LEGACY - kept for reference)
-	/// </summary>
-	private static void GenerateEventImplementation(
-		System.Text.StringBuilder sb,
-		string interfaceName,
-		EventMemberInfo evt)
-	{
-		sb.AppendLine($"\tevent {evt.FullDelegateTypeName} {interfaceName}.{evt.Name}");
-		sb.AppendLine("\t{");
-		sb.AppendLine($"\t\tadd => Spy.{evt.Name}.Add(value);");
-		sb.AppendLine($"\t\tremove => Spy.{evt.Name}.Remove(value);");
-		sb.AppendLine("\t}");
-		sb.AppendLine();
-	}
-
 	/// <summary>
 	/// Generate backing property for an interface property (interface-scoped version)
 	/// </summary>
 	private static void GenerateInterfaceBackingProperty(
 		System.Text.StringBuilder sb,
 		InterfaceMemberInfo prop,
-		string spyPropertyName)
+		string koPropertyName)
 	{
-		var backingName = $"{spyPropertyName}_{prop.Name}Backing";
+		var backingName = $"{koPropertyName}_{prop.Name}Backing";
 
 		// Initialize based on default strategy
 		// For backing properties, we must provide a value even if the type can't be new()'d
@@ -2563,7 +2546,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 			_ => ""
 		};
 
-		sb.AppendLine($"\t/// <summary>Backing field for {spyPropertyName}.{prop.Name}.</summary>");
+		sb.AppendLine($"\t/// <summary>Backing field for {koPropertyName}.{prop.Name}.</summary>");
 		sb.AppendLine($"\tprotected {prop.ReturnType} {backingName} {{ get; set; }}{initializer}");
 		sb.AppendLine();
 	}
@@ -2574,14 +2557,14 @@ public class KnockOffGenerator : IIncrementalGenerator
 	private static void GenerateInterfaceIndexerBackingDictionary(
 		System.Text.StringBuilder sb,
 		InterfaceMemberInfo indexer,
-		string spyPropertyName)
+		string koPropertyName)
 	{
-		var backingName = $"{spyPropertyName}_{indexer.Name}Backing";
+		var backingName = $"{koPropertyName}_{indexer.Name}Backing";
 		var keyType = indexer.IndexerParameters.Count > 0
 			? indexer.IndexerParameters.GetArray()![0].Type
 			: "object";
 
-		sb.AppendLine($"\t/// <summary>Backing dictionary for {spyPropertyName}.{indexer.Name}. Pre-populate with values or use OnGet callback.</summary>");
+		sb.AppendLine($"\t/// <summary>Backing dictionary for {koPropertyName}.{indexer.Name}. Pre-populate with values or use OnGet callback.</summary>");
 		sb.AppendLine($"\tpublic global::System.Collections.Generic.Dictionary<{keyType}, {indexer.ReturnType}> {backingName} {{ get; }} = new();");
 		sb.AppendLine();
 	}
@@ -2593,9 +2576,9 @@ public class KnockOffGenerator : IIncrementalGenerator
 		System.Text.StringBuilder sb,
 		string interfaceName,
 		InterfaceMemberInfo prop,
-		string spyPropertyName)
+		string koPropertyName)
 	{
-		var backingName = $"{spyPropertyName}_{prop.Name}Backing";
+		var backingName = $"{koPropertyName}_{prop.Name}Backing";
 
 		sb.AppendLine($"\t{prop.ReturnType} {interfaceName}.{prop.Name}");
 		sb.AppendLine("\t{");
@@ -2604,8 +2587,8 @@ public class KnockOffGenerator : IIncrementalGenerator
 		{
 			sb.AppendLine("\t\tget");
 			sb.AppendLine("\t\t{");
-			sb.AppendLine($"\t\t\t{spyPropertyName}.{prop.Name}.RecordGet();");
-			sb.AppendLine($"\t\t\tif ({spyPropertyName}.{prop.Name}.OnGet is {{ }} onGetCallback)");
+			sb.AppendLine($"\t\t\t{koPropertyName}.{prop.Name}.RecordGet();");
+			sb.AppendLine($"\t\t\tif ({koPropertyName}.{prop.Name}.OnGet is {{ }} onGetCallback)");
 			sb.AppendLine($"\t\t\t\treturn onGetCallback(this);");
 			sb.AppendLine($"\t\t\treturn {backingName};");
 			sb.AppendLine("\t\t}");
@@ -2615,8 +2598,8 @@ public class KnockOffGenerator : IIncrementalGenerator
 		{
 			sb.AppendLine("\t\tset");
 			sb.AppendLine("\t\t{");
-			sb.AppendLine($"\t\t\t{spyPropertyName}.{prop.Name}.RecordSet(value);");
-			sb.AppendLine($"\t\t\tif ({spyPropertyName}.{prop.Name}.OnSet is {{ }} onSetCallback)");
+			sb.AppendLine($"\t\t\t{koPropertyName}.{prop.Name}.RecordSet(value);");
+			sb.AppendLine($"\t\t\tif ({koPropertyName}.{prop.Name}.OnSet is {{ }} onSetCallback)");
 			sb.AppendLine($"\t\t\t\tonSetCallback(this, value);");
 			sb.AppendLine($"\t\t\telse");
 			sb.AppendLine($"\t\t\t\t{backingName} = value;");
@@ -2634,9 +2617,9 @@ public class KnockOffGenerator : IIncrementalGenerator
 		System.Text.StringBuilder sb,
 		string interfaceName,
 		InterfaceMemberInfo indexer,
-		string spyPropertyName)
+		string koPropertyName)
 	{
-		var backingName = $"{spyPropertyName}_{indexer.Name}Backing";
+		var backingName = $"{koPropertyName}_{indexer.Name}Backing";
 		var keyType = indexer.IndexerParameters.Count > 0
 			? indexer.IndexerParameters.GetArray()![0].Type
 			: "object";
@@ -2651,14 +2634,14 @@ public class KnockOffGenerator : IIncrementalGenerator
 		{
 			sb.AppendLine("\t\tget");
 			sb.AppendLine("\t\t{");
-			sb.AppendLine($"\t\t\t{spyPropertyName}.{indexer.Name}.RecordGet({keyParamName});");
-			sb.AppendLine($"\t\t\tif ({spyPropertyName}.{indexer.Name}.OnGet is {{ }} onGetCallback)");
+			sb.AppendLine($"\t\t\t{koPropertyName}.{indexer.Name}.RecordGet({keyParamName});");
+			sb.AppendLine($"\t\t\tif ({koPropertyName}.{indexer.Name}.OnGet is {{ }} onGetCallback)");
 			sb.AppendLine($"\t\t\t\treturn onGetCallback(this, {keyParamName});");
 			sb.AppendLine($"\t\t\tif ({backingName}.TryGetValue({keyParamName}, out var value))");
 			sb.AppendLine($"\t\t\t\treturn value;");
 			if (indexer.DefaultStrategy == DefaultValueStrategy.ThrowException)
 			{
-				sb.AppendLine($"\t\t\tthrow new global::System.Collections.Generic.KeyNotFoundException($\"Key '{{{keyParamName}}}' not found. Set {spyPropertyName}.{indexer.Name}.OnGet or add to {backingName} dictionary.\");");
+				sb.AppendLine($"\t\t\tthrow new global::System.Collections.Generic.KeyNotFoundException($\"Key '{{{keyParamName}}}' not found. Set {koPropertyName}.{indexer.Name}.OnGet or add to {backingName} dictionary.\");");
 			}
 			else
 			{
@@ -2671,8 +2654,8 @@ public class KnockOffGenerator : IIncrementalGenerator
 		{
 			sb.AppendLine("\t\tset");
 			sb.AppendLine("\t\t{");
-			sb.AppendLine($"\t\t\t{spyPropertyName}.{indexer.Name}.RecordSet({keyParamName}, value);");
-			sb.AppendLine($"\t\t\tif ({spyPropertyName}.{indexer.Name}.OnSet is {{ }} onSetCallback)");
+			sb.AppendLine($"\t\t\t{koPropertyName}.{indexer.Name}.RecordSet({keyParamName}, value);");
+			sb.AppendLine($"\t\t\tif ({koPropertyName}.{indexer.Name}.OnSet is {{ }} onSetCallback)");
 			sb.AppendLine($"\t\t\t\tonSetCallback(this, {keyParamName}, value);");
 			sb.AppendLine($"\t\t\telse");
 			sb.AppendLine($"\t\t\t\t{backingName}[{keyParamName}] = value;");
@@ -2692,12 +2675,12 @@ public class KnockOffGenerator : IIncrementalGenerator
 		InterfaceMemberInfo method,
 		KnockOffTypeInfo typeInfo,
 		MethodGroupInfo group,
-		string spyPropertyName)
+		string koPropertyName)
 	{
 		// Generic methods need special handling with Of<T>() pattern
 		if (method.IsGenericMethod)
 		{
-			GenerateGenericInterfaceMethod(sb, interfaceName, method, typeInfo, group, spyPropertyName);
+			GenerateGenericInterfaceMethod(sb, interfaceName, method, typeInfo, group, koPropertyName);
 			return;
 		}
 
@@ -2758,14 +2741,14 @@ public class KnockOffGenerator : IIncrementalGenerator
 
 		if (inputParamCount > 0)
 		{
-			sb.AppendLine($"\t\t{spyPropertyName}.{handlerName}.RecordCall({inputArgList});");
+			sb.AppendLine($"\t\t{koPropertyName}.{handlerName}.RecordCall({inputArgList});");
 		}
 		else
 		{
-			sb.AppendLine($"\t\t{spyPropertyName}.{handlerName}.RecordCall();");
+			sb.AppendLine($"\t\t{koPropertyName}.{handlerName}.RecordCall();");
 		}
 
-		sb.AppendLine($"\t\tif ({spyPropertyName}.{handlerName}.OnCall is {{ }} onCallCallback)");
+		sb.AppendLine($"\t\tif ({koPropertyName}.{handlerName}.OnCall is {{ }} onCallCallback)");
 		if (isVoid)
 		{
 			if (paramCount == 0)
@@ -2817,7 +2800,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 			var innerType = ExtractGenericArg(method.ReturnType);
 			if (method.DefaultStrategy == DefaultValueStrategy.ThrowException)
 			{
-				sb.AppendLine($"\t\tthrow new global::System.InvalidOperationException(\"No implementation provided for non-nullable return type. Define a protected method '{method.Name}' in your partial class, or set {spyPropertyName}.{handlerName}.OnCall.\");");
+				sb.AppendLine($"\t\tthrow new global::System.InvalidOperationException(\"No implementation provided for non-nullable return type. Define a protected method '{method.Name}' in your partial class, or set {koPropertyName}.{handlerName}.OnCall.\");");
 			}
 			else
 			{
@@ -2829,7 +2812,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 			var innerType = ExtractGenericArg(method.ReturnType);
 			if (method.DefaultStrategy == DefaultValueStrategy.ThrowException)
 			{
-				sb.AppendLine($"\t\tthrow new global::System.InvalidOperationException(\"No implementation provided for non-nullable return type. Define a protected method '{method.Name}' in your partial class, or set {spyPropertyName}.{handlerName}.OnCall.\");");
+				sb.AppendLine($"\t\tthrow new global::System.InvalidOperationException(\"No implementation provided for non-nullable return type. Define a protected method '{method.Name}' in your partial class, or set {koPropertyName}.{handlerName}.OnCall.\");");
 			}
 			else
 			{
@@ -2838,7 +2821,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 		}
 		else if (method.DefaultStrategy == DefaultValueStrategy.ThrowException)
 		{
-			sb.AppendLine($"\t\tthrow new global::System.InvalidOperationException(\"No implementation provided for non-nullable return type. Define a protected method '{method.Name}' in your partial class, or set {spyPropertyName}.{handlerName}.OnCall.\");");
+			sb.AppendLine($"\t\tthrow new global::System.InvalidOperationException(\"No implementation provided for non-nullable return type. Define a protected method '{method.Name}' in your partial class, or set {koPropertyName}.{handlerName}.OnCall.\");");
 		}
 		else
 		{
@@ -2859,7 +2842,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 		InterfaceMemberInfo method,
 		KnockOffTypeInfo typeInfo,
 		MethodGroupInfo group,
-		string spyPropertyName)
+		string koPropertyName)
 	{
 		var typeParams = method.TypeParameters.GetArray()!;
 		var typeParamNames = string.Join(", ", typeParams.Select(tp => tp.Name));
@@ -2908,7 +2891,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 		sb.AppendLine("\t{");
 
 		// Get the typed handler via Of<T>()
-		sb.AppendLine($"\t\tvar typedHandler = {spyPropertyName}.{handlerName}.Of<{typeParamNames}>();");
+		sb.AppendLine($"\t\tvar typedHandler = {koPropertyName}.{handlerName}.Of<{typeParamNames}>();");
 
 		// Record the call
 		if (nonGenericParams.Length > 0)
@@ -2979,328 +2962,12 @@ public class KnockOffGenerator : IIncrementalGenerator
 		System.Text.StringBuilder sb,
 		string interfaceName,
 		EventMemberInfo evt,
-		string spyPropertyName)
+		string koPropertyName)
 	{
 		sb.AppendLine($"\tevent {evt.FullDelegateTypeName} {interfaceName}.{evt.Name}");
 		sb.AppendLine("\t{");
-		sb.AppendLine($"\t\tadd => {spyPropertyName}.{evt.Name}.Add(value);");
-		sb.AppendLine($"\t\tremove => {spyPropertyName}.{evt.Name}.Remove(value);");
-		sb.AppendLine("\t}");
-		sb.AppendLine();
-	}
-
-	/// <summary>
-	/// Generate the backing property for an interface property (called once per unique property name)
-	/// </summary>
-	private static void GenerateBackingProperty(System.Text.StringBuilder sb, InterfaceMemberInfo prop)
-	{
-		var accessors = "";
-		if (prop.HasGetter && prop.HasSetter)
-			accessors = "get; set;";
-		else if (prop.HasGetter)
-			accessors = "get;";
-		else if (prop.HasSetter)
-			accessors = "set;";
-
-		// Initialize based on default strategy
-		// For backing properties, we must provide a value even if the type can't be new()'d
-		var typeToNew = prop.ConcreteTypeForNew ?? prop.ReturnType;
-		var initializer = prop.DefaultStrategy switch
-		{
-			DefaultValueStrategy.NewInstance => $" = new {typeToNew}();",
-			DefaultValueStrategy.Default => "", // Value types/nullable get default automatically
-			DefaultValueStrategy.ThrowException => GetBackingPropertyInitializer(prop.ReturnType),
-			_ => ""
-		};
-
-		sb.AppendLine($"\t/// <summary>Backing field for {prop.Name}.</summary>");
-		sb.AppendLine($"\tprotected {prop.ReturnType} {prop.Name}Backing {{ {accessors} }}{initializer}");
-		sb.AppendLine();
-	}
-
-	/// <summary>
-	/// Generate backing dictionary for an indexer property
-	/// </summary>
-	private static void GenerateIndexerBackingDictionary(System.Text.StringBuilder sb, InterfaceMemberInfo indexer)
-	{
-		var keyType = indexer.IndexerParameters.Count > 0
-			? indexer.IndexerParameters.GetArray()![0].Type
-			: "object";
-
-		sb.AppendLine($"\t/// <summary>Backing dictionary for {indexer.Name}. Pre-populate with values or use OnGet callback.</summary>");
-		sb.AppendLine($"\tpublic global::System.Collections.Generic.Dictionary<{keyType}, {indexer.ReturnType}> {indexer.Name}Backing {{ get; }} = new();");
-		sb.AppendLine();
-	}
-
-	/// <summary>
-	/// Generate explicit interface implementation for a property (called for each interface)
-	/// </summary>
-	private static void GeneratePropertyImplementation(
-		System.Text.StringBuilder sb,
-		string interfaceName,
-		InterfaceMemberInfo prop)
-	{
-		sb.AppendLine($"\t{prop.ReturnType} {interfaceName}.{prop.Name}");
-		sb.AppendLine("\t{");
-
-		if (prop.HasGetter)
-		{
-			sb.AppendLine("\t\tget");
-			sb.AppendLine("\t\t{");
-			sb.AppendLine($"\t\t\tSpy.{prop.Name}.RecordGet();");
-			// Check OnGet callback first
-			sb.AppendLine($"\t\t\tif (Spy.{prop.Name}.OnGet is {{ }} onGetCallback)");
-			sb.AppendLine($"\t\t\t\treturn onGetCallback(this);");
-			sb.AppendLine($"\t\t\treturn {prop.Name}Backing;");
-			sb.AppendLine("\t\t}");
-		}
-
-		if (prop.HasSetter)
-		{
-			sb.AppendLine("\t\tset");
-			sb.AppendLine("\t\t{");
-			sb.AppendLine($"\t\t\tSpy.{prop.Name}.RecordSet(value);");
-			// Check OnSet callback first, else store in backing
-			sb.AppendLine($"\t\t\tif (Spy.{prop.Name}.OnSet is {{ }} onSetCallback)");
-			sb.AppendLine($"\t\t\t\tonSetCallback(this, value);");
-			sb.AppendLine($"\t\t\telse");
-			sb.AppendLine($"\t\t\t\t{prop.Name}Backing = value;");
-			sb.AppendLine("\t\t}");
-		}
-
-		sb.AppendLine("\t}");
-		sb.AppendLine();
-	}
-
-	/// <summary>
-	/// Generate explicit interface implementation for an indexer
-	/// </summary>
-	private static void GenerateIndexerImplementation(
-		System.Text.StringBuilder sb,
-		string interfaceName,
-		InterfaceMemberInfo indexer)
-	{
-		var keyType = indexer.IndexerParameters.Count > 0
-			? indexer.IndexerParameters.GetArray()![0].Type
-			: "object";
-		var keyParamName = indexer.IndexerParameters.Count > 0
-			? indexer.IndexerParameters.GetArray()![0].Name
-			: "key";
-
-		// Explicit indexer implementation syntax: ReturnType IInterface.this[KeyType key]
-		sb.AppendLine($"\t{indexer.ReturnType} {interfaceName}.this[{keyType} {keyParamName}]");
-		sb.AppendLine("\t{");
-
-		if (indexer.HasGetter)
-		{
-			sb.AppendLine("\t\tget");
-			sb.AppendLine("\t\t{");
-			sb.AppendLine($"\t\t\tSpy.{indexer.Name}.RecordGet({keyParamName});");
-			// Check OnGet callback first (with key parameter)
-			sb.AppendLine($"\t\t\tif (Spy.{indexer.Name}.OnGet is {{ }} onGetCallback)");
-			sb.AppendLine($"\t\t\t\treturn onGetCallback(this, {keyParamName});");
-			// Fall back to backing dictionary
-			sb.AppendLine($"\t\t\tif ({indexer.Name}Backing.TryGetValue({keyParamName}, out var value))");
-			sb.AppendLine($"\t\t\t\treturn value;");
-			// Return default, new instance, or throw based on strategy
-			if (indexer.DefaultStrategy == DefaultValueStrategy.ThrowException)
-			{
-				sb.AppendLine($"\t\t\tthrow new global::System.Collections.Generic.KeyNotFoundException($\"Key '{{{keyParamName}}}' not found. Set Spy.{indexer.Name}.OnGet or add to {indexer.Name}Backing dictionary.\");");
-			}
-			else
-			{
-				sb.AppendLine($"\t\t\t{GenerateDefaultReturn(indexer.ReturnType, indexer.DefaultStrategy, indexer.ConcreteTypeForNew)}");
-			}
-			sb.AppendLine("\t\t}");
-		}
-
-		if (indexer.HasSetter)
-		{
-			sb.AppendLine("\t\tset");
-			sb.AppendLine("\t\t{");
-			sb.AppendLine($"\t\t\tSpy.{indexer.Name}.RecordSet({keyParamName}, value);");
-			// Check OnSet callback first
-			sb.AppendLine($"\t\t\tif (Spy.{indexer.Name}.OnSet is {{ }} onSetCallback)");
-			sb.AppendLine($"\t\t\t\tonSetCallback(this, {keyParamName}, value);");
-			sb.AppendLine($"\t\t\telse");
-			sb.AppendLine($"\t\t\t\t{indexer.Name}Backing[{keyParamName}] = value;");
-			sb.AppendLine("\t\t}");
-		}
-
-		sb.AppendLine("\t}");
-		sb.AppendLine();
-	}
-
-	/// <summary>
-	/// Generate method implementation (uses delegate-based handler)
-	/// </summary>
-	private static void GenerateMethod(
-		System.Text.StringBuilder sb,
-		string interfaceName,
-		InterfaceMemberInfo method,
-		KnockOffTypeInfo typeInfo,
-		MethodGroupInfo group)
-	{
-		var paramList = string.Join(", ", method.Parameters.Select(p => FormatParameter(p)));
-		var argList = string.Join(", ", method.Parameters.Select(p => FormatArgument(p)));
-		var paramCount = method.Parameters.Count;
-
-		// Separate input params for RecordCall (exclude out params)
-		var inputParams = GetInputParameters(method.Parameters).ToArray();
-		var inputArgList = string.Join(", ", inputParams.Select(p => p.Name));
-		var inputParamCount = inputParams.Length;
-
-		// Find out parameters that need initialization
-		var outParams = method.Parameters.Where(p => IsOutputParameter(p.RefKind)).ToArray();
-
-		// Check if user defined this method
-		var hasUserMethod = typeInfo.UserMethods.Any(um =>
-			um.Name == method.Name &&
-			um.ReturnType == method.ReturnType &&
-			um.Parameters.Count == method.Parameters.Count &&
-			um.Parameters.Zip(method.Parameters, (a, b) => a.Type == b.Type).All(x => x));
-
-		var isVoid = method.ReturnType == "void";
-
-		// Detect async patterns
-		var isTask = method.ReturnType == "global::System.Threading.Tasks.Task";
-		var isValueTask = method.ReturnType == "global::System.Threading.Tasks.ValueTask";
-		var isTaskOfT = method.ReturnType.StartsWith("global::System.Threading.Tasks.Task<");
-		var isValueTaskOfT = method.ReturnType.StartsWith("global::System.Threading.Tasks.ValueTask<");
-
-		// Find the overload index for this specific method signature
-		var overloadIndex = -1;
-		for (int i = 0; i < group.Overloads.Count; i++)
-		{
-			var overload = group.Overloads.GetArray()![i];
-			if (overload.Parameters.Count == method.Parameters.Count)
-			{
-				var matches = true;
-				for (int j = 0; j < overload.Parameters.Count && matches; j++)
-				{
-					if (overload.Parameters.GetArray()![j].Type != method.Parameters.GetArray()![j].Type)
-						matches = false;
-				}
-				if (matches)
-				{
-					overloadIndex = i;
-					break;
-				}
-			}
-		}
-
-		sb.AppendLine($"\t{method.ReturnType} {interfaceName}.{method.Name}({paramList})");
-		sb.AppendLine("\t{");
-
-		// Initialize out parameters to default
-		foreach (var outParam in outParams)
-		{
-			sb.AppendLine($"\t\t{outParam.Name} = default!;");
-		}
-
-		// Record the call (only input params - out params are outputs, not inputs)
-		if (inputParamCount > 0)
-		{
-			sb.AppendLine($"\t\tSpy.{method.Name}.RecordCall({inputArgList});");
-		}
-		else
-		{
-			sb.AppendLine($"\t\tSpy.{method.Name}.RecordCall();");
-		}
-
-		// Check for callback using the appropriate GetCallback method
-		var hasOverloads = group.Overloads.Count > 1;
-		var callbackMethodSuffix = hasOverloads ? overloadIndex.ToString() : "";
-		sb.AppendLine($"\t\tif (Spy.{method.Name}.GetCallback{callbackMethodSuffix}() is {{ }} onCallCallback)");
-		if (isVoid)
-		{
-			// Void: just invoke callback
-			if (paramCount == 0)
-			{
-				sb.AppendLine($"\t\t{{ onCallCallback(this); return; }}");
-			}
-			else
-			{
-				sb.AppendLine($"\t\t{{ onCallCallback(this, {argList}); return; }}");
-			}
-		}
-		else
-		{
-			// Return type: invoke callback and return result
-			if (paramCount == 0)
-			{
-				sb.AppendLine($"\t\t\treturn onCallCallback(this);");
-			}
-			else
-			{
-				sb.AppendLine($"\t\t\treturn onCallCallback(this, {argList});");
-			}
-		}
-
-		// Fall back to user method or default behavior
-		if (hasUserMethod)
-		{
-			// Call user-defined method
-			if (isVoid)
-			{
-				sb.AppendLine($"\t\t{method.Name}({argList});");
-			}
-			else
-			{
-				sb.AppendLine($"\t\treturn {method.Name}({argList});");
-			}
-		}
-		else if (isVoid)
-		{
-			// void - no return needed
-		}
-		else if (isTask)
-		{
-			// Task (non-generic) - return completed task
-			sb.AppendLine($"\t\treturn global::System.Threading.Tasks.Task.CompletedTask;");
-		}
-		else if (isValueTask)
-		{
-			// ValueTask (non-generic) - return default (completed)
-			sb.AppendLine($"\t\treturn default;");
-		}
-		else if (isTaskOfT)
-		{
-			// Task<T> - return Task.FromResult with appropriate default value
-			var innerType = ExtractGenericArg(method.ReturnType);
-			if (method.DefaultStrategy == DefaultValueStrategy.ThrowException)
-			{
-				sb.AppendLine($"\t\tthrow new global::System.InvalidOperationException(\"No implementation provided for non-nullable return type. Define a protected method '{method.Name}' in your partial class, or set Spy.{method.Name}.OnCall.\");");
-			}
-			else
-			{
-				sb.AppendLine($"\t\t{GenerateTaskOfTReturn(innerType, method.DefaultStrategy, method.ConcreteTypeForNew)}");
-			}
-		}
-		else if (isValueTaskOfT)
-		{
-			// ValueTask<T> - return with appropriate default value
-			var innerType = ExtractGenericArg(method.ReturnType);
-			if (method.DefaultStrategy == DefaultValueStrategy.ThrowException)
-			{
-				sb.AppendLine($"\t\tthrow new global::System.InvalidOperationException(\"No implementation provided for non-nullable return type. Define a protected method '{method.Name}' in your partial class, or set Spy.{method.Name}.OnCall.\");");
-			}
-			else
-			{
-				sb.AppendLine($"\t\t{GenerateValueTaskOfTReturn(innerType, method.DefaultStrategy, method.ConcreteTypeForNew)}");
-			}
-		}
-		else if (method.DefaultStrategy == DefaultValueStrategy.ThrowException)
-		{
-			// Non-nullable return type without parameterless constructor - throw
-			sb.AppendLine($"\t\tthrow new global::System.InvalidOperationException(\"No implementation provided for non-nullable return type. Define a protected method '{method.Name}' in your partial class, or set Spy.{method.Name}.OnCall.\");");
-		}
-		else
-		{
-			// Return default or new instance based on strategy
-			sb.AppendLine($"\t\t{GenerateDefaultReturn(method.ReturnType, method.DefaultStrategy, method.ConcreteTypeForNew)}");
-		}
-
+		sb.AppendLine($"\t\tadd => {koPropertyName}.{evt.Name}.Add(value);");
+		sb.AppendLine($"\t\tremove => {koPropertyName}.{evt.Name}.Remove(value);");
 		sb.AppendLine("\t}");
 		sb.AppendLine();
 	}

@@ -80,8 +80,8 @@ partial class GenUserRepositoryKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IGenRepository<KnockOff.Documentation.Samples.Guides.GenUser> - tracks invocations and configures behavior.</summary>
-	public sealed class IGenRepository_KnockOff_Documentation_Samples_Guides_GenUserSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenRepository<KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
+	public sealed class IGenRepository_KnockOff_Documentation_Samples_Guides_GenUserKO
 	{
 		/// <summary>Handler for GetById.</summary>
 		public IGenRepository_KnockOff_Documentation_Samples_Guides_GenUser_GetByIdHandler GetById { get; } = new();
@@ -92,7 +92,7 @@ partial class GenUserRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenRepository<KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
-	public IGenRepository_KnockOff_Documentation_Samples_Guides_GenUserSpy IGenRepository_KnockOff_Documentation_Samples_Guides_GenUser { get; } = new();
+	public IGenRepository_KnockOff_Documentation_Samples_Guides_GenUserKO IGenRepository_KnockOff_Documentation_Samples_Guides_GenUser { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IGenRepository<KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
 	public KnockOff.Documentation.Samples.Guides.IGenRepository<KnockOff.Documentation.Samples.Guides.GenUser> AsGenRepository() => this;

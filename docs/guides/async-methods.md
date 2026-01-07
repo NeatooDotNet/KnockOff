@@ -96,8 +96,6 @@ await repo.GetByIdAsync(3);
 
 Assert.Equal(3, knockOff.IAsyncRepository.GetByIdAsync.CallCount);
 Assert.Equal(3, knockOff.IAsyncRepository.GetByIdAsync.LastCallArg);
-
-var allIds = knockOff.IAsyncRepository.GetByIdAsync.AllCalls;  // [1, 2, 3]
 ```
 
 ## Common Patterns

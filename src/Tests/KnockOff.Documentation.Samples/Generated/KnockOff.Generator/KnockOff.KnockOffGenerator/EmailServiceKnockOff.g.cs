@@ -46,8 +46,8 @@ partial class EmailServiceKnockOff
 		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.GettingStarted.IEmailService - tracks invocations and configures behavior.</summary>
-	public sealed class IEmailServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.GettingStarted.IEmailService.</summary>
+	public sealed class IEmailServiceKO
 	{
 		/// <summary>Handler for IsConnected.</summary>
 		public IEmailService_IsConnectedHandler IsConnected { get; } = new();
@@ -56,7 +56,7 @@ partial class EmailServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.GettingStarted.IEmailService.</summary>
-	public IEmailServiceSpy IEmailService { get; } = new();
+	public IEmailServiceKO IEmailService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.GettingStarted.IEmailService.</summary>
 	public KnockOff.Documentation.Samples.GettingStarted.IEmailService AsEmailService() => this;

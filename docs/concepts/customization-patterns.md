@@ -74,7 +74,7 @@ public partial class PatternRepositoryKnockOff : IPatternRepository
 
 ## Pattern 2: Callbacks
 
-Set delegates on the interface spy handlers at runtime. Callbacks provide per-test customization and take precedence over user methods.
+Set delegates on the interface handlers at runtime. Callbacks provide per-test customization and take precedence over user methods.
 
 ### Method Callbacks (`OnCall`)
 
@@ -166,7 +166,7 @@ knockOff.IUserService.GetUser.OnCall = (ko, id) =>
 - **Per-test behavior** — Different return values for different tests
 - **Dynamic returns** — Return value depends on arguments
 - **Side effects** — Need to capture or validate during the call
-- **Access to Spy state** — Check if other methods were called
+- **Access to handler state** — Check if other methods were called
 - **Override user method** — Temporarily change behavior for one test
 
 ## Priority Order
@@ -229,7 +229,7 @@ var result3 = service.Calculate(5);  // Returns 10 (user method)
 ## Reset Behavior
 
 The `Reset()` method clears:
-- Call tracking (`CallCount`, `AllCalls`, etc.)
+- Call tracking (`CallCount`, `LastCallArg`/`LastCallArgs`)
 - Callbacks (`OnCall`, `OnGet`, `OnSet`)
 
 It does **NOT** clear:

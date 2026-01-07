@@ -55,8 +55,8 @@ partial class PatternUserServiceKnockOff
 		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Concepts.IPatternUserService - tracks invocations and configures behavior.</summary>
-	public sealed class IPatternUserServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternUserService.</summary>
+	public sealed class IPatternUserServiceKO
 	{
 		/// <summary>Handler for GetUser.</summary>
 		public IPatternUserService_GetUserHandler GetUser { get; } = new();
@@ -65,7 +65,7 @@ partial class PatternUserServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternUserService.</summary>
-	public IPatternUserServiceSpy IPatternUserService { get; } = new();
+	public IPatternUserServiceKO IPatternUserService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Concepts.IPatternUserService.</summary>
 	public KnockOff.Documentation.Samples.Concepts.IPatternUserService AsPatternUserService() => this;

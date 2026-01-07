@@ -246,8 +246,8 @@ partial class MediumServiceStub
 		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Benchmarks.Interfaces.IMediumService - tracks invocations and configures behavior.</summary>
-	public sealed class IMediumServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Benchmarks.Interfaces.IMediumService.</summary>
+	public sealed class IMediumServiceKO
 	{
 		/// <summary>Handler for Method1.</summary>
 		public IMediumService_Method1Handler Method1 { get; } = new();
@@ -272,7 +272,7 @@ partial class MediumServiceStub
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Benchmarks.Interfaces.IMediumService.</summary>
-	public IMediumServiceSpy IMediumService { get; } = new();
+	public IMediumServiceKO IMediumService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Benchmarks.Interfaces.IMediumService.</summary>
 	public KnockOff.Benchmarks.Interfaces.IMediumService AsMediumService() => this;

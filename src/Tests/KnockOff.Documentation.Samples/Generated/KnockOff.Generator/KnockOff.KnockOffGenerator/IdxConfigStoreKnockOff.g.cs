@@ -24,15 +24,15 @@ partial class IdxConfigStoreKnockOff
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IIdxConfigStore - tracks invocations and configures behavior.</summary>
-	public sealed class IIdxConfigStoreSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIdxConfigStore.</summary>
+	public sealed class IIdxConfigStoreKO
 	{
 		/// <summary>Handler for StringIndexer.</summary>
 		public IIdxConfigStore_StringIndexerHandler StringIndexer { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIdxConfigStore.</summary>
-	public IIdxConfigStoreSpy IIdxConfigStore { get; } = new();
+	public IIdxConfigStoreKO IIdxConfigStore { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIdxConfigStore.</summary>
 	public KnockOff.Documentation.Samples.Guides.IIdxConfigStore AsIdxConfigStore() => this;

@@ -52,8 +52,8 @@ partial class MethodRepositoryKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IMethodRepository - tracks invocations and configures behavior.</summary>
-	public sealed class IMethodRepositorySpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodRepository.</summary>
+	public sealed class IMethodRepositoryKO
 	{
 		/// <summary>Handler for GetById.</summary>
 		public IMethodRepository_GetByIdHandler GetById { get; } = new();
@@ -62,7 +62,7 @@ partial class MethodRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodRepository.</summary>
-	public IMethodRepositorySpy IMethodRepository { get; } = new();
+	public IMethodRepositoryKO IMethodRepository { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodRepository.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMethodRepository AsMethodRepository() => this;

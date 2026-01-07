@@ -52,8 +52,8 @@ partial class MethodUserDefinedKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IMethodUserDefined - tracks invocations and configures behavior.</summary>
-	public sealed class IMethodUserDefinedSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodUserDefined.</summary>
+	public sealed class IMethodUserDefinedKO
 	{
 		/// <summary>Handler for GetById.</summary>
 		public IMethodUserDefined_GetByIdHandler GetById { get; } = new();
@@ -62,7 +62,7 @@ partial class MethodUserDefinedKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodUserDefined.</summary>
-	public IMethodUserDefinedSpy IMethodUserDefined { get; } = new();
+	public IMethodUserDefinedKO IMethodUserDefined { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodUserDefined.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMethodUserDefined AsMethodUserDefined() => this;

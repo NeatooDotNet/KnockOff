@@ -58,8 +58,8 @@ partial class MiLoggerNotifierKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IMiLogger - tracks invocations and configures behavior.</summary>
-	public sealed class IMiLoggerSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiLogger.</summary>
+	public sealed class IMiLoggerKO
 	{
 		/// <summary>Handler for Name.</summary>
 		public IMiLogger_NameHandler Name { get; } = new();
@@ -108,8 +108,8 @@ partial class MiLoggerNotifierKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IMiNotifier - tracks invocations and configures behavior.</summary>
-	public sealed class IMiNotifierSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiNotifier.</summary>
+	public sealed class IMiNotifierKO
 	{
 		/// <summary>Handler for Name.</summary>
 		public IMiNotifier_NameHandler Name { get; } = new();
@@ -118,10 +118,10 @@ partial class MiLoggerNotifierKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiLogger.</summary>
-	public IMiLoggerSpy IMiLogger { get; } = new();
+	public IMiLoggerKO IMiLogger { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiNotifier.</summary>
-	public IMiNotifierSpy IMiNotifier { get; } = new();
+	public IMiNotifierKO IMiNotifier { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMiLogger.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMiLogger AsMiLogger() => this;

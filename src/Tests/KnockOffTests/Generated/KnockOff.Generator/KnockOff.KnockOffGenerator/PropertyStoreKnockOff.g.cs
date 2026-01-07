@@ -24,15 +24,15 @@ partial class PropertyStoreKnockOff
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Tests.IPropertyStore - tracks invocations and configures behavior.</summary>
-	public sealed class IPropertyStoreSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IPropertyStore.</summary>
+	public sealed class IPropertyStoreKO
 	{
 		/// <summary>Handler for StringIndexer.</summary>
 		public IPropertyStore_StringIndexerHandler StringIndexer { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IPropertyStore.</summary>
-	public IPropertyStoreSpy IPropertyStore { get; } = new();
+	public IPropertyStoreKO IPropertyStore { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IPropertyStore.</summary>
 	public KnockOff.Tests.IPropertyStore AsPropertyStore() => this;

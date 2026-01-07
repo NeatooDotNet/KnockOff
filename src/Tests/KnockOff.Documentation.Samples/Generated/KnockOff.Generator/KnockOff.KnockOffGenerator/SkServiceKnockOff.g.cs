@@ -30,15 +30,15 @@ partial class SkServiceKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ISkService - tracks invocations and configures behavior.</summary>
-	public sealed class ISkServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkService.</summary>
+	public sealed class ISkServiceKO
 	{
 		/// <summary>Handler for GetValue.</summary>
 		public ISkService_GetValueHandler GetValue { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkService.</summary>
-	public ISkServiceSpy ISkService { get; } = new();
+	public ISkServiceKO ISkService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkService AsSkService() => this;

@@ -1,13 +1,13 @@
 namespace KnockOff.Tests;
 
 /// <summary>
-/// Tests for spy property naming collision detection.
+/// Tests for KO property naming collision detection.
 ///
 /// When an interface has a member with the same name as the interface itself
 /// (e.g., ICollision interface with a property named ICollision), the generator
-/// must detect this and rename the spy accessor to avoid a compile error.
+/// must detect this and rename the KO accessor to avoid a compile error.
 /// </summary>
-public class SpyPropertyCollisionTests
+public class KOPropertyCollisionTests
 {
 	[Fact]
 	public void Collision_KnockOffCompiles()
@@ -18,11 +18,11 @@ public class SpyPropertyCollisionTests
 	}
 
 	[Fact]
-	public void Collision_SpyAccessorWorks()
+	public void Collision_KOAccessorWorks()
 	{
 		var knockOff = new CollisionKnockOff();
 
-		// The spy accessor is renamed to ICollision_ due to collision
+		// The KO accessor is renamed to ICollision_ due to collision
 		Assert.NotNull(knockOff.ICollision_);
 		Assert.NotNull(knockOff.ICollision_.ICollision);
 		Assert.NotNull(knockOff.ICollision_.DoWork);

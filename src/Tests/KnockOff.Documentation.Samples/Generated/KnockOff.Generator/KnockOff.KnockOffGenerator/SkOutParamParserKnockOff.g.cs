@@ -52,8 +52,8 @@ partial class SkOutParamParserKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ISkOutParamParser - tracks invocations and configures behavior.</summary>
-	public sealed class ISkOutParamParserSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkOutParamParser.</summary>
+	public sealed class ISkOutParamParserKO
 	{
 		/// <summary>Handler for TryParse.</summary>
 		public ISkOutParamParser_TryParseHandler TryParse { get; } = new();
@@ -62,7 +62,7 @@ partial class SkOutParamParserKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkOutParamParser.</summary>
-	public ISkOutParamParserSpy ISkOutParamParser { get; } = new();
+	public ISkOutParamParserKO ISkOutParamParser { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkOutParamParser.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkOutParamParser AsSkOutParamParser() => this;

@@ -80,8 +80,8 @@ partial class SkDataServiceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ISkDataService - tracks invocations and configures behavior.</summary>
-	public sealed class ISkDataServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkDataService.</summary>
+	public sealed class ISkDataServiceKO
 	{
 		/// <summary>Handler for Name.</summary>
 		public ISkDataService_NameHandler Name { get; } = new();
@@ -92,7 +92,7 @@ partial class SkDataServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkDataService.</summary>
-	public ISkDataServiceSpy ISkDataService { get; } = new();
+	public ISkDataServiceKO ISkDataService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkDataService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkDataService AsSkDataService() => this;

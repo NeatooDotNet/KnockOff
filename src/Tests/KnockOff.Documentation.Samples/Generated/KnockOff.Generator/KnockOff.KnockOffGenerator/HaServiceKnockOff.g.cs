@@ -77,8 +77,8 @@ partial class HaServiceKnockOff
 		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.IHaService - tracks invocations and configures behavior.</summary>
-	public sealed class IHaServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaService.</summary>
+	public sealed class IHaServiceKO
 	{
 		/// <summary>Handler for Initialize.</summary>
 		public IHaService_InitializeHandler Initialize { get; } = new();
@@ -89,7 +89,7 @@ partial class HaServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaService.</summary>
-	public IHaServiceSpy IHaService { get; } = new();
+	public IHaServiceKO IHaService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IHaService.</summary>
 	public KnockOff.Documentation.Samples.Skills.IHaService AsHaService() => this;

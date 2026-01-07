@@ -30,15 +30,15 @@ partial class PatternServiceKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Concepts.IPatternService - tracks invocations and configures behavior.</summary>
-	public sealed class IPatternServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternService.</summary>
+	public sealed class IPatternServiceKO
 	{
 		/// <summary>Handler for Calculate.</summary>
 		public IPatternService_CalculateHandler Calculate { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternService.</summary>
-	public IPatternServiceSpy IPatternService { get; } = new();
+	public IPatternServiceKO IPatternService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Concepts.IPatternService.</summary>
 	public KnockOff.Documentation.Samples.Concepts.IPatternService AsPatternService() => this;

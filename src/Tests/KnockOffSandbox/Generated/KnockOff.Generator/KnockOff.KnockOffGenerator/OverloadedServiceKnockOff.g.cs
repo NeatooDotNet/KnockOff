@@ -80,8 +80,8 @@ partial class OverloadedServiceKnockOff
 		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Sandbox.IOverloadedService - tracks invocations and configures behavior.</summary>
-	public sealed class IOverloadedServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Sandbox.IOverloadedService.</summary>
+	public sealed class IOverloadedServiceKO
 	{
 		/// <summary>Handler for Format overload 1.</summary>
 		public IOverloadedService_Format1Handler Format1 { get; } = new();
@@ -92,7 +92,7 @@ partial class OverloadedServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Sandbox.IOverloadedService.</summary>
-	public IOverloadedServiceSpy IOverloadedService { get; } = new();
+	public IOverloadedServiceKO IOverloadedService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Sandbox.IOverloadedService.</summary>
 	public KnockOff.Sandbox.IOverloadedService AsOverloadedService() => this;

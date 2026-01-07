@@ -52,8 +52,8 @@ partial class CpParserKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ICpParser - tracks invocations and configures behavior.</summary>
-	public sealed class ICpParserSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpParser.</summary>
+	public sealed class ICpParserKO
 	{
 		/// <summary>Handler for TryParse.</summary>
 		public ICpParser_TryParseHandler TryParse { get; } = new();
@@ -62,7 +62,7 @@ partial class CpParserKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpParser.</summary>
-	public ICpParserSpy ICpParser { get; } = new();
+	public ICpParserKO ICpParser { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpParser.</summary>
 	public KnockOff.Documentation.Samples.Skills.ICpParser AsCpParser() => this;

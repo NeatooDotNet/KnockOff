@@ -30,15 +30,15 @@ partial class MigLoggerKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Comparison.IMigLogger - tracks invocations and configures behavior.</summary>
-	public sealed class IMigLoggerSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigLogger.</summary>
+	public sealed class IMigLoggerKO
 	{
 		/// <summary>Handler for Log.</summary>
 		public IMigLogger_LogHandler Log { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigLogger.</summary>
-	public IMigLoggerSpy IMigLogger { get; } = new();
+	public IMigLoggerKO IMigLogger { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IMigLogger.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IMigLogger AsMigLogger() => this;

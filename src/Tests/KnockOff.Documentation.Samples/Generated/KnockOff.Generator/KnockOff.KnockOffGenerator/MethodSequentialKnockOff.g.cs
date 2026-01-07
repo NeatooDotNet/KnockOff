@@ -27,15 +27,15 @@ partial class MethodSequentialKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IMethodSequential - tracks invocations and configures behavior.</summary>
-	public sealed class IMethodSequentialSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodSequential.</summary>
+	public sealed class IMethodSequentialKO
 	{
 		/// <summary>Handler for GetNext.</summary>
 		public IMethodSequential_GetNextHandler GetNext { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodSequential.</summary>
-	public IMethodSequentialSpy IMethodSequential { get; } = new();
+	public IMethodSequentialKO IMethodSequential { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodSequential.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMethodSequential AsMethodSequential() => this;

@@ -143,8 +143,8 @@ partial class AsyncServiceKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Tests.IAsyncService - tracks invocations and configures behavior.</summary>
-	public sealed class IAsyncServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IAsyncService.</summary>
+	public sealed class IAsyncServiceKO
 	{
 		/// <summary>Handler for DoWorkAsync.</summary>
 		public IAsyncService_DoWorkAsyncHandler DoWorkAsync { get; } = new();
@@ -161,7 +161,7 @@ partial class AsyncServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IAsyncService.</summary>
-	public IAsyncServiceSpy IAsyncService { get; } = new();
+	public IAsyncServiceKO IAsyncService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IAsyncService.</summary>
 	public KnockOff.Tests.IAsyncService AsAsyncService() => this;

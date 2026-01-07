@@ -27,15 +27,15 @@ partial class MethodServiceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IMethodService - tracks invocations and configures behavior.</summary>
-	public sealed class IMethodServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodService.</summary>
+	public sealed class IMethodServiceKO
 	{
 		/// <summary>Handler for Initialize.</summary>
 		public IMethodService_InitializeHandler Initialize { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodService.</summary>
-	public IMethodServiceSpy IMethodService { get; } = new();
+	public IMethodServiceKO IMethodService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodService.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMethodService AsMethodService() => this;

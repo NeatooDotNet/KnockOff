@@ -61,8 +61,8 @@ partial class IhAuditableEntityKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IIhAuditableEntity - tracks invocations and configures behavior.</summary>
-	public sealed class IIhAuditableEntitySpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhAuditableEntity.</summary>
+	public sealed class IIhAuditableEntityKO
 	{
 		/// <summary>Handler for ModifiedAt.</summary>
 		public IIhAuditableEntity_ModifiedAtHandler ModifiedAt { get; } = new();
@@ -102,8 +102,8 @@ partial class IhAuditableEntityKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IIhBaseEntity - tracks invocations and configures behavior.</summary>
-	public sealed class IIhBaseEntitySpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhBaseEntity.</summary>
+	public sealed class IIhBaseEntityKO
 	{
 		/// <summary>Handler for Id.</summary>
 		public IIhBaseEntity_IdHandler Id { get; } = new();
@@ -112,10 +112,10 @@ partial class IhAuditableEntityKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhAuditableEntity.</summary>
-	public IIhAuditableEntitySpy IIhAuditableEntity { get; } = new();
+	public IIhAuditableEntityKO IIhAuditableEntity { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhBaseEntity.</summary>
-	public IIhBaseEntitySpy IIhBaseEntity { get; } = new();
+	public IIhBaseEntityKO IIhBaseEntity { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIhAuditableEntity.</summary>
 	public KnockOff.Documentation.Samples.Guides.IIhAuditableEntity AsIhAuditableEntity() => this;

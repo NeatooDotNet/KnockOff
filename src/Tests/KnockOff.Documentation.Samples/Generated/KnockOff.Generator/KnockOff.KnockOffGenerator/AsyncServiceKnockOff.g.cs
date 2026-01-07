@@ -30,15 +30,15 @@ partial class AsyncServiceKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.GettingStarted.IAsyncSaveService - tracks invocations and configures behavior.</summary>
-	public sealed class IAsyncSaveServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.GettingStarted.IAsyncSaveService.</summary>
+	public sealed class IAsyncSaveServiceKO
 	{
 		/// <summary>Handler for SaveAsync.</summary>
 		public IAsyncSaveService_SaveAsyncHandler SaveAsync { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.GettingStarted.IAsyncSaveService.</summary>
-	public IAsyncSaveServiceSpy IAsyncSaveService { get; } = new();
+	public IAsyncSaveServiceKO IAsyncSaveService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.GettingStarted.IAsyncSaveService.</summary>
 	public KnockOff.Documentation.Samples.GettingStarted.IAsyncSaveService AsAsyncSaveService() => this;

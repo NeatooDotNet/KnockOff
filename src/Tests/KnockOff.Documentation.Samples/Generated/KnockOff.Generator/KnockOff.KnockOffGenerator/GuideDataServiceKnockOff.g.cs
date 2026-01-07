@@ -61,15 +61,15 @@ partial class GuideDataServiceKnockOff
 		public void Clear() { _handler = null; Reset(); }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IGuideDataService - tracks invocations and configures behavior.</summary>
-	public sealed class IGuideDataServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGuideDataService.</summary>
+	public sealed class IGuideDataServiceKO
 	{
 		/// <summary>Handler for DataChanged event.</summary>
 		public IGuideDataService_DataChangedHandler DataChanged { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGuideDataService.</summary>
-	public IGuideDataServiceSpy IGuideDataService { get; } = new();
+	public IGuideDataServiceKO IGuideDataService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IGuideDataService.</summary>
 	public KnockOff.Documentation.Samples.Guides.IGuideDataService AsGuideDataService() => this;

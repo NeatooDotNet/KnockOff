@@ -149,8 +149,8 @@ partial class ConstrainedGenericServiceKnockOff
 		}
 	}
 
-	/// <summary>Spy for KnockOff.Tests.IConstrainedGenericService - tracks invocations and configures behavior.</summary>
-	public sealed class IConstrainedGenericServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IConstrainedGenericService.</summary>
+	public sealed class IConstrainedGenericServiceKO
 	{
 		/// <summary>Handler for CreateEntity.</summary>
 		public IConstrainedGenericService_CreateEntityHandler CreateEntity { get; } = new();
@@ -159,7 +159,7 @@ partial class ConstrainedGenericServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IConstrainedGenericService.</summary>
-	public IConstrainedGenericServiceSpy IConstrainedGenericService { get; } = new();
+	public IConstrainedGenericServiceKO IConstrainedGenericService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IConstrainedGenericService.</summary>
 	public KnockOff.Tests.IConstrainedGenericService AsConstrainedGenericService() => this;

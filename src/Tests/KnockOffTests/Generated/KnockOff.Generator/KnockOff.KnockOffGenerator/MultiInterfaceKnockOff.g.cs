@@ -58,8 +58,8 @@ partial class MultiInterfaceKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Tests.ILogger - tracks invocations and configures behavior.</summary>
-	public sealed class ILoggerSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.ILogger.</summary>
+	public sealed class ILoggerKO
 	{
 		/// <summary>Handler for Name.</summary>
 		public ILogger_NameHandler Name { get; } = new();
@@ -108,8 +108,8 @@ partial class MultiInterfaceKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Tests.INotifier - tracks invocations and configures behavior.</summary>
-	public sealed class INotifierSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.INotifier.</summary>
+	public sealed class INotifierKO
 	{
 		/// <summary>Handler for Name.</summary>
 		public INotifier_NameHandler Name { get; } = new();
@@ -118,10 +118,10 @@ partial class MultiInterfaceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.ILogger.</summary>
-	public ILoggerSpy ILogger { get; } = new();
+	public ILoggerKO ILogger { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.INotifier.</summary>
-	public INotifierSpy INotifier { get; } = new();
+	public INotifierKO INotifier { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.ILogger.</summary>
 	public KnockOff.Tests.ILogger AsLogger() => this;

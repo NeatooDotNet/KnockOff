@@ -46,7 +46,7 @@ public partial class EmailServiceKnockOff : IEmailService
 
 The source generator automatically creates:
 - Explicit interface implementations
-- Interface spy properties (e.g., `IEmailService`) with handlers for each member
+- Interface-named properties (e.g., `IEmailService`) with handlers for each member
 - Backing fields for properties (prefixed with interface name)
 - An `AsEmailService()` helper method for explicit casting
 
@@ -73,7 +73,7 @@ public void NotificationService_SendsEmail_WhenUserRegisters()
 
 ## Verification Basics
 
-Every interface member gets a handler in its interface spy class with tracking properties. Access handlers via the interface spy property (e.g., `knockOff.IEmailService`).
+Every interface member gets a handler with tracking properties. Access handlers via the interface-named property (e.g., `knockOff.IEmailService`).
 
 ### For Methods
 
@@ -91,10 +91,6 @@ Assert.Equal(42, knockOff.IUserService.GetById.LastCallArg);
 var args = knockOff.IEmailService.SendEmail.LastCallArgs;
 Assert.Equal("user@example.com", args?.to);
 Assert.Equal("Welcome", args?.subject);
-
-// Check all calls
-Assert.Equal(3, knockOff.IEmailService.SendEmail.AllCalls.Count);
-Assert.Equal("first@example.com", knockOff.IEmailService.SendEmail.AllCalls[0].to);
 ```
 
 ### For Properties
@@ -265,7 +261,7 @@ knockOff.IEmailService.SendEmail.CallCount;  // Single method - no suffix
 
 ### Multiple Interfaces
 
-Each interface gets its own spy property with separate tracking:
+Each interface gets its own property with separate tracking:
 
 <!-- snippet: docs:getting-started:multiple-interfaces -->
 ```csharp
@@ -277,7 +273,7 @@ public partial class DataContextKnockOff : IRepository, IUnitOfWork
 <!-- /snippet -->
 
 ```csharp
-// Access via interface spy properties
+// Access via interface-named properties
 Assert.True(knockOff.IRepository.Save.WasCalled);
 Assert.True(knockOff.IUnitOfWork.Commit.WasCalled);
 

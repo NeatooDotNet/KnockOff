@@ -105,8 +105,8 @@ partial class CpOverloadServiceKnockOff
 		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ICpOverloadService - tracks invocations and configures behavior.</summary>
-	public sealed class ICpOverloadServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpOverloadService.</summary>
+	public sealed class ICpOverloadServiceKO
 	{
 		/// <summary>Handler for Process overload 1.</summary>
 		public ICpOverloadService_Process1Handler Process1 { get; } = new();
@@ -119,7 +119,7 @@ partial class CpOverloadServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpOverloadService.</summary>
-	public ICpOverloadServiceSpy ICpOverloadService { get; } = new();
+	public ICpOverloadServiceKO ICpOverloadService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpOverloadService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ICpOverloadService AsCpOverloadService() => this;

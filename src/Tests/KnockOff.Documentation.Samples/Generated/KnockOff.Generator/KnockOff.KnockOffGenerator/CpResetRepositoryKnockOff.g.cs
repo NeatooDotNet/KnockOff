@@ -30,15 +30,15 @@ partial class CpResetRepositoryKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ICpResetRepository - tracks invocations and configures behavior.</summary>
-	public sealed class ICpResetRepositorySpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpResetRepository.</summary>
+	public sealed class ICpResetRepositoryKO
 	{
 		/// <summary>Handler for GetUser.</summary>
 		public ICpResetRepository_GetUserHandler GetUser { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpResetRepository.</summary>
-	public ICpResetRepositorySpy ICpResetRepository { get; } = new();
+	public ICpResetRepositoryKO ICpResetRepository { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpResetRepository.</summary>
 	public KnockOff.Documentation.Samples.Skills.ICpResetRepository AsCpResetRepository() => this;

@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Key concept: A class marked with `[KnockOff]` that implements an interface will have:
 1. Explicit interface implementations generated for all members
-2. `Spy` property for test verification (call counts, args, callbacks)
+2. Interface-named properties for test verification (call counts, args, callbacks)
 3. User-defined methods detected and called from generated intercepts
 
 ## Project Status
@@ -112,9 +112,9 @@ Central configuration via `Directory.Build.props` and `Directory.Packages.props`
 
 For a `[KnockOff]` class implementing an interface:
 
-1. **Spy property** - Contains Handler classes for each interface member
+1. **Interface-named property** (e.g., `IUserService`) - Contains Handler classes for that interface's members
 2. **Handler types**:
-   - Method handlers (CallCount, WasCalled, LastCallArg(s), AllCalls, OnCall)
+   - Method handlers (CallCount, WasCalled, LastCallArg/LastCallArgs, OnCall, Reset)
    - Property handlers (GetCount, SetCount, LastSetValue, OnGet, OnSet)
    - Indexer handlers (GetCount, SetCount, LastGetKey, LastSetEntry, OnGet, OnSet)
 3. **Protected backing members** - Properties get backing field, allows override
@@ -160,6 +160,15 @@ scripts/extract-snippets.ps1                   # Sync script
 3. Run `-Update` to sync
 
 See `/docs-snippets` skill for full documentation.
+
+### Before Committing
+
+**ALWAYS run `/docs-snippets` skill before creating any commit.** This loads the commit checklist:
+
+1. `dotnet build` - Code compiles
+2. `dotnet test` - Tests pass
+3. `.\scripts\extract-snippets.ps1 -Verify` - Docs in sync
+4. If release: version updated, release notes created
 
 ## Implementation Phases
 

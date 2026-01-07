@@ -58,15 +58,15 @@ partial class GuideDownloaderKnockOff
 		public void Clear() { _handler = null; Reset(); }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IGuideDownloader - tracks invocations and configures behavior.</summary>
-	public sealed class IGuideDownloaderSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGuideDownloader.</summary>
+	public sealed class IGuideDownloaderKO
 	{
 		/// <summary>Handler for ProgressChanged event.</summary>
 		public IGuideDownloader_ProgressChangedHandler ProgressChanged { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGuideDownloader.</summary>
-	public IGuideDownloaderSpy IGuideDownloader { get; } = new();
+	public IGuideDownloaderKO IGuideDownloader { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IGuideDownloader.</summary>
 	public KnockOff.Documentation.Samples.Guides.IGuideDownloader AsGuideDownloader() => this;

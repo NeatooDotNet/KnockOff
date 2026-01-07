@@ -36,15 +36,15 @@ partial class PatternIndexerServiceKnockOff
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Concepts.IPatternIndexerService - tracks invocations and configures behavior.</summary>
-	public sealed class IPatternIndexerServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternIndexerService.</summary>
+	public sealed class IPatternIndexerServiceKO
 	{
 		/// <summary>Handler for StringIndexer.</summary>
 		public IPatternIndexerService_StringIndexerHandler StringIndexer { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternIndexerService.</summary>
-	public IPatternIndexerServiceSpy IPatternIndexerService { get; } = new();
+	public IPatternIndexerServiceKO IPatternIndexerService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Concepts.IPatternIndexerService.</summary>
 	public KnockOff.Documentation.Samples.Concepts.IPatternIndexerService AsPatternIndexerService() => this;

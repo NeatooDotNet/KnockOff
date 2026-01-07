@@ -36,15 +36,15 @@ partial class SkCallbackIndexerKnockOff
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ISkCallbackPropertyStore - tracks invocations and configures behavior.</summary>
-	public sealed class ISkCallbackPropertyStoreSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkCallbackPropertyStore.</summary>
+	public sealed class ISkCallbackPropertyStoreKO
 	{
 		/// <summary>Handler for StringIndexer.</summary>
 		public ISkCallbackPropertyStore_StringIndexerHandler StringIndexer { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkCallbackPropertyStore.</summary>
-	public ISkCallbackPropertyStoreSpy ISkCallbackPropertyStore { get; } = new();
+	public ISkCallbackPropertyStoreKO ISkCallbackPropertyStore { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkCallbackPropertyStore.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkCallbackPropertyStore AsSkCallbackPropertyStore() => this;

@@ -52,8 +52,8 @@ partial class PatternRepositoryKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Concepts.IPatternRepository - tracks invocations and configures behavior.</summary>
-	public sealed class IPatternRepositorySpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternRepository.</summary>
+	public sealed class IPatternRepositoryKO
 	{
 		/// <summary>Handler for GetByIdAsync.</summary>
 		public IPatternRepository_GetByIdAsyncHandler GetByIdAsync { get; } = new();
@@ -62,7 +62,7 @@ partial class PatternRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternRepository.</summary>
-	public IPatternRepositorySpy IPatternRepository { get; } = new();
+	public IPatternRepositoryKO IPatternRepository { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Concepts.IPatternRepository.</summary>
 	public KnockOff.Documentation.Samples.Concepts.IPatternRepository AsPatternRepository() => this;

@@ -30,15 +30,15 @@ partial class MmParserKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.IMmParser - tracks invocations and configures behavior.</summary>
-	public sealed class IMmParserSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmParser.</summary>
+	public sealed class IMmParserKO
 	{
 		/// <summary>Handler for TryParse.</summary>
 		public IMmParser_TryParseHandler TryParse { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmParser.</summary>
-	public IMmParserSpy IMmParser { get; } = new();
+	public IMmParserKO IMmParser { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmParser.</summary>
 	public KnockOff.Documentation.Samples.Skills.IMmParser AsMmParser() => this;

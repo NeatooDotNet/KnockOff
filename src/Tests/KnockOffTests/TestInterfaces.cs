@@ -242,7 +242,7 @@ public interface IKeyLookup
 /// <summary>
 /// Tests the original bug: conflicting method signatures across interfaces.
 /// Before the fix, this would fail because GetData couldn't have two different
-/// handler types in a single Spy class.
+/// handler types in a single KO class.
 /// </summary>
 [KnockOff]
 public partial class ConflictingSignatureKnockOff : IDataProvider, IKeyLookup
@@ -253,11 +253,11 @@ public partial class ConflictingSignatureKnockOff : IDataProvider, IKeyLookup
 
 #endregion
 
-#region Spy Property Collision Test Types
+#region KO Property Collision Test Types
 
 /// <summary>
 /// Interface with a property named the same as the interface.
-/// Tests spy property naming collision detection.
+/// Tests KO property naming collision detection.
 /// </summary>
 public interface ICollision
 {
@@ -266,7 +266,7 @@ public interface ICollision
 }
 
 /// <summary>
-/// The generated spy property "ICollision" would collide with the member "ICollision".
+/// The generated KO property "ICollision" would collide with the member "ICollision".
 /// Generator should detect this and use a different name (e.g., "ICollision_").
 /// </summary>
 [KnockOff]

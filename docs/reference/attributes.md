@@ -111,9 +111,9 @@ The following options are under consideration for future versions:
 
 ```csharp
 // Hypothetical - NOT YET IMPLEMENTED
-[KnockOff(SpyPropertyName = "Mock")]
+[KnockOff(KOPropertyName = "Mock")]
 public partial class ServiceKnockOff : IService { }
-// Would generate: public ServiceKnockOffSpy Mock { get; }
+// Would generate: public ServiceKnockOffKO Mock { get; }
 ```
 
 ### Strict Mode

@@ -55,8 +55,8 @@ partial class RefParameterServiceKnockOff
 		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Sandbox.IRefParameterService - tracks invocations and configures behavior.</summary>
-	public sealed class IRefParameterServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Sandbox.IRefParameterService.</summary>
+	public sealed class IRefParameterServiceKO
 	{
 		/// <summary>Handler for Increment.</summary>
 		public IRefParameterService_IncrementHandler Increment { get; } = new();
@@ -65,7 +65,7 @@ partial class RefParameterServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Sandbox.IRefParameterService.</summary>
-	public IRefParameterServiceSpy IRefParameterService { get; } = new();
+	public IRefParameterServiceKO IRefParameterService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Sandbox.IRefParameterService.</summary>
 	public KnockOff.Sandbox.IRefParameterService AsRefParameterService() => this;

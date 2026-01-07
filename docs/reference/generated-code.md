@@ -6,8 +6,8 @@ This document explains what KnockOff generates and the conventions used.
 
 For each `[KnockOff]` class, the generator creates:
 
-1. **Interface spy classes** — One per implemented interface, containing handlers for that interface's members
-2. **Interface spy properties** — `public {InterfaceName}Spy {InterfaceName} { get; } = new();`
+1. **Interface KO classes** — One per implemented interface, containing handlers for that interface's members
+2. **Interface KO properties** — `public {InterfaceName}KO {InterfaceName} { get; } = new();`
 3. **Handler classes** — One per interface member
 4. **Backing fields** — For properties (prefixed with interface name)
 5. **Backing dictionaries** — For indexers (prefixed with interface name)
@@ -57,14 +57,14 @@ KnockOff generates:
 ```csharp
 public partial class UserServiceKnockOff
 {
-    // Interface spy property
-    public IUserServiceSpy IUserService { get; } = new();
+    // Interface KO property
+    public IUserServiceKO IUserService { get; } = new();
 
     // Backing field for property (interface-prefixed)
     protected string IUserService_NameBacking { get; set; } = "";
 
-    // Interface spy class
-    public sealed class IUserServiceSpy
+    // Interface KO class
+    public sealed class IUserServiceKO
     {
         public IUserService_NameHandler Name { get; } = new();
         public IUserService_GetUserHandler GetUser { get; } = new();
@@ -100,20 +100,22 @@ public partial class UserServiceKnockOff
     // Handler for GetUser method
     public sealed class IUserService_GetUserHandler
     {
-        private readonly List<int> _calls = new();
-
-        public int CallCount => _calls.Count;
-        public bool WasCalled => _calls.Count > 0;
-        public int? LastCallArg => _calls.Count > 0 ? _calls[^1] : null;
-        public IReadOnlyList<int> AllCalls => _calls;
+        public int CallCount { get; private set; }
+        public bool WasCalled => CallCount > 0;
+        public int? LastCallArg { get; private set; }
 
         public Func<UserServiceKnockOff, int, User?>? OnCall { get; set; }
 
-        public void RecordCall(int id) => _calls.Add(id);
+        public void RecordCall(int id)
+        {
+            CallCount++;
+            LastCallArg = id;
+        }
 
         public void Reset()
         {
-            _calls.Clear();
+            CallCount = 0;
+            LastCallArg = default;
             OnCall = null;
         }
     }
@@ -154,13 +156,13 @@ public partial class UserServiceKnockOff
 
 ## Naming Conventions
 
-### Interface Spy Class
-- Name: `{InterfaceName}Spy`
-- Example: `IUserService` → `IUserServiceSpy`
+### Interface KO Class
+- Name: `{InterfaceName}KO`
+- Example: `IUserService` → `IUserServiceKO`
 
-### Interface Spy Property
+### Interface KO Property
 - Name: `{InterfaceName}` (same as interface name)
-- Example: `public IUserServiceSpy IUserService { get; }`
+- Example: `public IUserServiceKO IUserService { get; }`
 
 ### Handlers
 - Properties: `{InterfaceName}_{PropertyName}Handler`
@@ -217,8 +219,9 @@ For methods with 2+ parameters, tracking uses named tuples:
 // Interface: void Log(string level, string message, int code)
 
 // Generated tracking
-public (string level, string message, int code)? LastCallArgs { get; }
-public IReadOnlyList<(string level, string message, int code)> AllCalls { get; }
+public int CallCount { get; private set; }
+public bool WasCalled => CallCount > 0;
+public (string level, string message, int code)? LastCallArgs { get; private set; }
 
 // Generated callback signature - individual parameters
 public Action<ServiceKnockOff, string, string, int>? OnCall { get; set; }
@@ -232,7 +235,7 @@ knockOff.ILogger.Log.OnCall = (ko, level, message, code) =>
 
 ## Multiple Interfaces
 
-When a KnockOff class implements multiple interfaces, each interface gets its own spy class with separate handlers:
+When a KnockOff class implements multiple interfaces, each interface gets its own KO class with separate handlers:
 
 ```csharp
 interface ILogger { void Log(string msg); }
@@ -245,20 +248,20 @@ public partial class LoggerKnockOff : ILogger, IAuditor { }
 Separate handlers are generated for each interface:
 
 ```csharp
-// Interface spy classes
-public sealed class ILoggerSpy
+// Interface KO classes
+public sealed class ILoggerKO
 {
     public ILogger_LogHandler Log { get; } = new();
 }
 
-public sealed class IAuditorSpy
+public sealed class IAuditorKO
 {
     public IAuditor_LogHandler Log { get; } = new();
 }
 
-// Interface spy properties
-public ILoggerSpy ILogger { get; } = new();
-public IAuditorSpy IAuditor { get; } = new();
+// Interface KO properties
+public ILoggerKO ILogger { get; } = new();
+public IAuditorKO IAuditor { get; } = new();
 
 // Each implementation uses its own handler
 void ILogger.Log(string msg) { ILogger.Log.RecordCall(msg); ... }

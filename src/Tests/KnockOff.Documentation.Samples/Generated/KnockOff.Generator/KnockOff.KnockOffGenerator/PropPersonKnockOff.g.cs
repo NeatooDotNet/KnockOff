@@ -77,8 +77,8 @@ partial class PropPersonKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IPropPerson - tracks invocations and configures behavior.</summary>
-	public sealed class IPropPersonSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropPerson.</summary>
+	public sealed class IPropPersonKO
 	{
 		/// <summary>Handler for FirstName.</summary>
 		public IPropPerson_FirstNameHandler FirstName { get; } = new();
@@ -89,7 +89,7 @@ partial class PropPersonKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropPerson.</summary>
-	public IPropPersonSpy IPropPerson { get; } = new();
+	public IPropPersonKO IPropPerson { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IPropPerson.</summary>
 	public KnockOff.Documentation.Samples.Guides.IPropPerson AsPropPerson() => this;

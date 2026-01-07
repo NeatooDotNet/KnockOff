@@ -133,8 +133,8 @@ partial class SkCallbackMethodKnockOff
 		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ISkCallbackService - tracks invocations and configures behavior.</summary>
-	public sealed class ISkCallbackServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkCallbackService.</summary>
+	public sealed class ISkCallbackServiceKO
 	{
 		/// <summary>Handler for Name.</summary>
 		public ISkCallbackService_NameHandler Name { get; } = new();
@@ -149,7 +149,7 @@ partial class SkCallbackMethodKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkCallbackService.</summary>
-	public ISkCallbackServiceSpy ISkCallbackService { get; } = new();
+	public ISkCallbackServiceKO ISkCallbackService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkCallbackService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkCallbackService AsSkCallbackService() => this;

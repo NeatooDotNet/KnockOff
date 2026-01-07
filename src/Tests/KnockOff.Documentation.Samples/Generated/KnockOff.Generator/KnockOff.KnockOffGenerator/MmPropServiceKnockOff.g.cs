@@ -33,15 +33,15 @@ partial class MmPropServiceKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.IMmPropService - tracks invocations and configures behavior.</summary>
-	public sealed class IMmPropServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmPropService.</summary>
+	public sealed class IMmPropServiceKO
 	{
 		/// <summary>Handler for Name.</summary>
 		public IMmPropService_NameHandler Name { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmPropService.</summary>
-	public IMmPropServiceSpy IMmPropService { get; } = new();
+	public IMmPropServiceKO IMmPropService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmPropService.</summary>
 	public KnockOff.Documentation.Samples.Skills.IMmPropService AsMmPropService() => this;

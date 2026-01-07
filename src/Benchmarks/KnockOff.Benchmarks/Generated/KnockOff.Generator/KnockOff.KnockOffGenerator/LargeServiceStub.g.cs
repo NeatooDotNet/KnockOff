@@ -1165,8 +1165,8 @@ partial class LargeServiceStub
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Benchmarks.Interfaces.ILargeService - tracks invocations and configures behavior.</summary>
-	public sealed class ILargeServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Benchmarks.Interfaces.ILargeService.</summary>
+	public sealed class ILargeServiceKO
 	{
 		/// <summary>Handler for VoidMethod01.</summary>
 		public ILargeService_VoidMethod01Handler VoidMethod01 { get; } = new();
@@ -1271,7 +1271,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Benchmarks.Interfaces.ILargeService.</summary>
-	public ILargeServiceSpy ILargeService { get; } = new();
+	public ILargeServiceKO ILargeService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Benchmarks.Interfaces.ILargeService.</summary>
 	public KnockOff.Benchmarks.Interfaces.ILargeService AsLargeService() => this;

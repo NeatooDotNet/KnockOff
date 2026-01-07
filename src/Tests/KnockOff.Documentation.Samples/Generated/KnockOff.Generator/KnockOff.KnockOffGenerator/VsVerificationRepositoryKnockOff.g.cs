@@ -102,8 +102,8 @@ partial class VsVerificationRepositoryKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository - tracks invocations and configures behavior.</summary>
-	public sealed class IVsVerificationRepositorySpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository.</summary>
+	public sealed class IVsVerificationRepositoryKO
 	{
 		/// <summary>Handler for Save.</summary>
 		public IVsVerificationRepository_SaveHandler Save { get; } = new();
@@ -116,7 +116,7 @@ partial class VsVerificationRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository.</summary>
-	public IVsVerificationRepositorySpy IVsVerificationRepository { get; } = new();
+	public IVsVerificationRepositoryKO IVsVerificationRepository { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository AsVsVerificationRepository() => this;

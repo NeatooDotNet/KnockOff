@@ -61,8 +61,8 @@ partial class AuditableEntityKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Tests.IAuditableEntity - tracks invocations and configures behavior.</summary>
-	public sealed class IAuditableEntitySpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IAuditableEntity.</summary>
+	public sealed class IAuditableEntityKO
 	{
 		/// <summary>Handler for ModifiedAt.</summary>
 		public IAuditableEntity_ModifiedAtHandler ModifiedAt { get; } = new();
@@ -102,8 +102,8 @@ partial class AuditableEntityKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Tests.IBaseEntity - tracks invocations and configures behavior.</summary>
-	public sealed class IBaseEntitySpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IBaseEntity.</summary>
+	public sealed class IBaseEntityKO
 	{
 		/// <summary>Handler for Id.</summary>
 		public IBaseEntity_IdHandler Id { get; } = new();
@@ -112,10 +112,10 @@ partial class AuditableEntityKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IAuditableEntity.</summary>
-	public IAuditableEntitySpy IAuditableEntity { get; } = new();
+	public IAuditableEntityKO IAuditableEntity { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IBaseEntity.</summary>
-	public IBaseEntitySpy IBaseEntity { get; } = new();
+	public IBaseEntityKO IBaseEntity { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IAuditableEntity.</summary>
 	public KnockOff.Tests.IAuditableEntity AsAuditableEntity() => this;

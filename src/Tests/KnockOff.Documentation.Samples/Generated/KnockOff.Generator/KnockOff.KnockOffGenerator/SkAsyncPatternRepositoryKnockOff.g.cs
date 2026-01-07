@@ -55,8 +55,8 @@ partial class SkAsyncPatternRepositoryKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ISkAsyncPatternRepository - tracks invocations and configures behavior.</summary>
-	public sealed class ISkAsyncPatternRepositorySpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkAsyncPatternRepository.</summary>
+	public sealed class ISkAsyncPatternRepositoryKO
 	{
 		/// <summary>Handler for GetUserAsync.</summary>
 		public ISkAsyncPatternRepository_GetUserAsyncHandler GetUserAsync { get; } = new();
@@ -65,7 +65,7 @@ partial class SkAsyncPatternRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkAsyncPatternRepository.</summary>
-	public ISkAsyncPatternRepositorySpy ISkAsyncPatternRepository { get; } = new();
+	public ISkAsyncPatternRepositoryKO ISkAsyncPatternRepository { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkAsyncPatternRepository.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkAsyncPatternRepository AsSkAsyncPatternRepository() => this;

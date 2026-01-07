@@ -5,7 +5,7 @@ namespace KnockOff.Tests;
 /// Before the fix, having two interfaces with methods of the same name but different
 /// signatures would fail because the handler types would conflict.
 ///
-/// The fix: Interface-scoped spy handlers. Each interface gets its own spy class
+/// The fix: Interface-scoped handlers. Each interface gets its own KO class
 /// with its own handlers, so IDataProvider.GetData and IKeyLookup.GetData can have
 /// completely different signatures.
 /// </summary>

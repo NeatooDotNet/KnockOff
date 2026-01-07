@@ -1,6 +1,6 @@
 # Multiple Interfaces
 
-KnockOff supports implementing multiple interfaces in a single stub class. Each interface gets its own spy class with separate handlers.
+KnockOff supports implementing multiple interfaces in a single stub class. Each interface gets its own KO class with separate handlers.
 
 ## Basic Usage
 
@@ -23,14 +23,14 @@ public partial class MiLoggerNotifierKnockOff : IMiLogger, IMiNotifier { }
 ```
 <!-- /snippet -->
 
-## Interface Spy Classes
+## Interface KO Classes
 
-Each interface gets its own spy class and property:
+Each interface gets its own KO class and property:
 
 ```csharp
 var knockOff = new LoggerNotifierKnockOff();
 
-// Each interface has its own spy class
+// Each interface has its own KO class
 knockOff.ILogger.Log.CallCount;
 knockOff.ILogger.Name.GetCount;
 
@@ -119,7 +119,7 @@ Assert.Equal("", notifier.Name);  // Different value!
 
 ## Callbacks
 
-Set callbacks using the interface spy class:
+Set callbacks using the interface KO class:
 
 ```csharp
 // ILogger.Log callback
@@ -237,7 +237,7 @@ public interface IIntProcessor
 public partial class DualProcessorKnockOff : IStringProcessor, IIntProcessor { }
 ```
 
-Each interface has its own handler accessed via its spy class:
+Each interface has its own handler accessed via its KO class:
 
 ```csharp
 knockOff.IStringProcessor.Process.OnCall = (ko, input) =>

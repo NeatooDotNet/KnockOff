@@ -152,8 +152,8 @@ partial class MmUserServiceKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.IMmUserService - tracks invocations and configures behavior.</summary>
-	public sealed class IMmUserServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmUserService.</summary>
+	public sealed class IMmUserServiceKO
 	{
 		/// <summary>Handler for GetUser.</summary>
 		public IMmUserService_GetUserHandler GetUser { get; } = new();
@@ -170,7 +170,7 @@ partial class MmUserServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmUserService.</summary>
-	public IMmUserServiceSpy IMmUserService { get; } = new();
+	public IMmUserServiceKO IMmUserService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmUserService.</summary>
 	public KnockOff.Documentation.Samples.Skills.IMmUserService AsMmUserService() => this;

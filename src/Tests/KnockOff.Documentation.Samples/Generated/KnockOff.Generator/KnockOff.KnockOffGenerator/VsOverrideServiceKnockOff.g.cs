@@ -30,15 +30,15 @@ partial class VsOverrideServiceKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Comparison.IVsOverrideService - tracks invocations and configures behavior.</summary>
-	public sealed class IVsOverrideServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsOverrideService.</summary>
+	public sealed class IVsOverrideServiceKO
 	{
 		/// <summary>Handler for GetUser.</summary>
 		public IVsOverrideService_GetUserHandler GetUser { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsOverrideService.</summary>
-	public IVsOverrideServiceSpy IVsOverrideService { get; } = new();
+	public IVsOverrideServiceKO IVsOverrideService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IVsOverrideService.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IVsOverrideService AsVsOverrideService() => this;

@@ -130,8 +130,8 @@ partial class CalculatorStub
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Benchmarks.Interfaces.ICalculator - tracks invocations and configures behavior.</summary>
-	public sealed class ICalculatorSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Benchmarks.Interfaces.ICalculator.</summary>
+	public sealed class ICalculatorKO
 	{
 		/// <summary>Handler for Add.</summary>
 		public ICalculator_AddHandler Add { get; } = new();
@@ -146,7 +146,7 @@ partial class CalculatorStub
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Benchmarks.Interfaces.ICalculator.</summary>
-	public ICalculatorSpy ICalculator { get; } = new();
+	public ICalculatorKO ICalculator { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Benchmarks.Interfaces.ICalculator.</summary>
 	public KnockOff.Benchmarks.Interfaces.ICalculator AsCalculator() => this;

@@ -6,7 +6,7 @@
 /// - skill:SKILL:quick-start-interface
 /// - skill:SKILL:quick-start-stub
 /// - skill:SKILL:quick-start-test
-/// - skill:SKILL:interface-spy-access
+/// - skill:SKILL:interface-access
 /// - skill:SKILL:multiple-interfaces
 /// - skill:SKILL:oncall-patterns
 /// - skill:SKILL:oncall-out-ref
@@ -110,7 +110,7 @@ public partial class SkDataServiceKnockOff : ISkDataService
 // Test usage is demonstrated in test file
 
 // ============================================================================
-// Interface Spy Access
+// Interface Access
 // ============================================================================
 
 public interface ISkUserService
@@ -128,9 +128,9 @@ public interface ISkEventSource
     event EventHandler<string> DataReceived;
 }
 
-#region skill:SKILL:interface-spy-access
+#region skill:SKILL:interface-access
 [KnockOff]
-public partial class SkSpyExampleKnockOff : ISkUserService, ISkPropertyStore, ISkEventSource { }
+public partial class SkExampleKnockOff : ISkUserService, ISkPropertyStore, ISkEventSource { }
 
 // Access patterns:
 // knockOff.ISkUserService.GetUser       // Method handler
@@ -156,7 +156,7 @@ public interface ISkUnitOfWork
 [KnockOff]
 public partial class SkDataContextKnockOff : ISkRepository, ISkUnitOfWork { }
 
-// Access via interface spy properties:
+// Access via interface properties:
 // knockOff.ISkRepository.Save.WasCalled
 // knockOff.ISkUnitOfWork.Commit.WasCalled
 

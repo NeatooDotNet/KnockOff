@@ -40,11 +40,9 @@ public partial class MethodLoggerKnockOff : IMethodLogger { }
 
 Single parameter:
 - `ILogger.Log.LastCallArg` — the argument value (not a tuple)
-- `ILogger.Log.AllCalls` — `List<string>`
 
 Multiple parameters:
 - `ILogger.LogError.LastCallArgs` — named tuple `(string message, Exception ex)`
-- `ILogger.LogError.AllCalls` — `List<(string message, Exception ex)>`
 
 ### Methods with Return Values
 
@@ -81,7 +79,6 @@ service.GetUser(42);
 
 // Tracking
 int? lastId = knockOff.IService.GetUser.LastCallArg;  // 42, not (42,)
-List<int> allIds = knockOff.IService.GetUser.AllCalls; // [42]
 ```
 
 ### Multiple Parameters
@@ -108,10 +105,6 @@ if (knockOff.IService.Process.LastCallArgs is var (name, value, flag))
 {
     Assert.Equal("test", name);
 }
-
-// All calls
-var allCalls = knockOff.IService.Process.AllCalls;
-Assert.Equal("test", allCalls[0].name);
 ```
 
 ## User-Defined Methods
@@ -299,19 +292,19 @@ Assert.Equal(2, service.GetNext());
 Assert.Equal(3, service.GetNext());
 ```
 
-### Accessing Other Spy State
+### Accessing Other Handler State
 
-<!-- snippet: docs:methods:accessing-spy-state -->
+<!-- snippet: docs:methods:accessing-handler-state -->
 ```csharp
 [KnockOff]
-public partial class MethodSpyStateKnockOff : IMethodSpyState { }
+public partial class MethodHandlerStateKnockOff : IMethodHandlerState { }
 ```
 <!-- /snippet -->
 
 ```csharp
-knockOff.IMethodSpyState.Process.OnCall = (ko) =>
+knockOff.IMethodHandlerState.Process.OnCall = (ko) =>
 {
-    if (!ko.IMethodSpyState.Initialize.WasCalled)
+    if (!ko.IMethodHandlerState.Initialize.WasCalled)
         throw new InvalidOperationException("Not initialized");
 };
 ```

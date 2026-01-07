@@ -30,15 +30,15 @@ partial class AsyncFetchKnockOff
 		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IAsyncFetch - tracks invocations and configures behavior.</summary>
-	public sealed class IAsyncFetchSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IAsyncFetch.</summary>
+	public sealed class IAsyncFetchKO
 	{
 		/// <summary>Handler for FetchAsync.</summary>
 		public IAsyncFetch_FetchAsyncHandler FetchAsync { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IAsyncFetch.</summary>
-	public IAsyncFetchSpy IAsyncFetch { get; } = new();
+	public IAsyncFetchKO IAsyncFetch { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IAsyncFetch.</summary>
 	public KnockOff.Documentation.Samples.Guides.IAsyncFetch AsAsyncFetch() => this;

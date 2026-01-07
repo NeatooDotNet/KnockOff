@@ -36,15 +36,15 @@ partial class CpPropertyStoreKnockOff
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ICpPropertyStore - tracks invocations and configures behavior.</summary>
-	public sealed class ICpPropertyStoreSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpPropertyStore.</summary>
+	public sealed class ICpPropertyStoreKO
 	{
 		/// <summary>Handler for StringIndexer.</summary>
 		public ICpPropertyStore_StringIndexerHandler StringIndexer { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpPropertyStore.</summary>
-	public ICpPropertyStoreSpy ICpPropertyStore { get; } = new();
+	public ICpPropertyStoreKO ICpPropertyStore { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpPropertyStore.</summary>
 	public KnockOff.Documentation.Samples.Skills.ICpPropertyStore AsCpPropertyStore() => this;

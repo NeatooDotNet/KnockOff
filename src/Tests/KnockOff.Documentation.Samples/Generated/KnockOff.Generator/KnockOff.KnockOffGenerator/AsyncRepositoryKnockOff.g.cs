@@ -74,8 +74,8 @@ partial class AsyncRepositoryKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IAsyncRepository - tracks invocations and configures behavior.</summary>
-	public sealed class IAsyncRepositorySpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IAsyncRepository.</summary>
+	public sealed class IAsyncRepositoryKO
 	{
 		/// <summary>Handler for InitializeAsync.</summary>
 		public IAsyncRepository_InitializeAsyncHandler InitializeAsync { get; } = new();
@@ -86,7 +86,7 @@ partial class AsyncRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IAsyncRepository.</summary>
-	public IAsyncRepositorySpy IAsyncRepository { get; } = new();
+	public IAsyncRepositoryKO IAsyncRepository { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IAsyncRepository.</summary>
 	public KnockOff.Documentation.Samples.Guides.IAsyncRepository AsAsyncRepository() => this;

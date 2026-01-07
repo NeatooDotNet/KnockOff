@@ -33,15 +33,15 @@ partial class HaPropertyServiceKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.IHaPropertyService - tracks invocations and configures behavior.</summary>
-	public sealed class IHaPropertyServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaPropertyService.</summary>
+	public sealed class IHaPropertyServiceKO
 	{
 		/// <summary>Handler for Name.</summary>
 		public IHaPropertyService_NameHandler Name { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaPropertyService.</summary>
-	public IHaPropertyServiceSpy IHaPropertyService { get; } = new();
+	public IHaPropertyServiceKO IHaPropertyService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IHaPropertyService.</summary>
 	public KnockOff.Documentation.Samples.Skills.IHaPropertyService AsHaPropertyService() => this;

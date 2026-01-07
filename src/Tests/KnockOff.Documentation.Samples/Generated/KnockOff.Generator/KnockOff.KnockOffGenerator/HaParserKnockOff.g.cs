@@ -52,8 +52,8 @@ partial class HaParserKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.IHaParser - tracks invocations and configures behavior.</summary>
-	public sealed class IHaParserSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaParser.</summary>
+	public sealed class IHaParserKO
 	{
 		/// <summary>Handler for TryParse.</summary>
 		public IHaParser_TryParseHandler TryParse { get; } = new();
@@ -62,7 +62,7 @@ partial class HaParserKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaParser.</summary>
-	public IHaParserSpy IHaParser { get; } = new();
+	public IHaParserKO IHaParser { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IHaParser.</summary>
 	public KnockOff.Documentation.Samples.Skills.IHaParser AsHaParser() => this;

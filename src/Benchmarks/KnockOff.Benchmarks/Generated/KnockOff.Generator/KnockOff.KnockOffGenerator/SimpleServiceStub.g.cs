@@ -27,15 +27,15 @@ partial class SimpleServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Benchmarks.Interfaces.ISimpleService - tracks invocations and configures behavior.</summary>
-	public sealed class ISimpleServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Benchmarks.Interfaces.ISimpleService.</summary>
+	public sealed class ISimpleServiceKO
 	{
 		/// <summary>Handler for DoWork.</summary>
 		public ISimpleService_DoWorkHandler DoWork { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Benchmarks.Interfaces.ISimpleService.</summary>
-	public ISimpleServiceSpy ISimpleService { get; } = new();
+	public ISimpleServiceKO ISimpleService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Benchmarks.Interfaces.ISimpleService.</summary>
 	public KnockOff.Benchmarks.Interfaces.ISimpleService AsSimpleService() => this;

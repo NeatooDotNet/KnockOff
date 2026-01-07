@@ -16,7 +16,7 @@
 /// - docs:methods:capturing-arguments
 /// - docs:methods:verifying-call-order
 /// - docs:methods:sequential-returns
-/// - docs:methods:accessing-spy-state
+/// - docs:methods:accessing-handler-state
 ///
 /// Corresponding tests: MethodsSamplesTests.cs
 /// </summary>
@@ -192,16 +192,16 @@ public partial class MethodSequentialKnockOff : IMethodSequential { }
 #endregion
 
 // ============================================================================
-// Accessing Spy State
+// Accessing Handler State
 // ============================================================================
 
-public interface IMethodSpyState
+public interface IMethodHandlerState
 {
     void Initialize();
     void Process();
 }
 
-#region docs:methods:accessing-spy-state
+#region docs:methods:accessing-handler-state
 [KnockOff]
-public partial class MethodSpyStateKnockOff : IMethodSpyState { }
+public partial class MethodHandlerStateKnockOff : IMethodHandlerState { }
 #endregion

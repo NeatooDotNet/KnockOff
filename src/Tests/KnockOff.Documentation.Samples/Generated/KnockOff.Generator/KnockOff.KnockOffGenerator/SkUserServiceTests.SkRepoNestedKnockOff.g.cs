@@ -32,15 +32,15 @@ partial class SkRepoNestedKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ISkRepository - tracks invocations and configures behavior.</summary>
-	public sealed class ISkRepositorySpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkRepository.</summary>
+	public sealed class ISkRepositoryKO
 	{
 		/// <summary>Handler for Save.</summary>
 		public ISkRepository_SaveHandler Save { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkRepository.</summary>
-	public ISkRepositorySpy ISkRepository { get; } = new();
+	public ISkRepositoryKO ISkRepository { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkRepository.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkRepository AsSkRepository() => this;

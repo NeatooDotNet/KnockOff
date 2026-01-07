@@ -71,8 +71,8 @@ partial class EmailServiceWithValidation
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation - tracks invocations and configures behavior.</summary>
-	public sealed class IEmailServiceWithValidationSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation.</summary>
+	public sealed class IEmailServiceWithValidationKO
 	{
 		/// <summary>Handler for IsConnected.</summary>
 		public IEmailServiceWithValidation_IsConnectedHandler IsConnected { get; } = new();
@@ -83,7 +83,7 @@ partial class EmailServiceWithValidation
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation.</summary>
-	public IEmailServiceWithValidationSpy IEmailServiceWithValidation { get; } = new();
+	public IEmailServiceWithValidationKO IEmailServiceWithValidation { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation.</summary>
 	public KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation AsEmailServiceWithValidation() => this;

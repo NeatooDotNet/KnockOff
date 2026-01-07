@@ -36,15 +36,15 @@ partial class HaPropertyStoreKnockOff
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.IHaPropertyStore - tracks invocations and configures behavior.</summary>
-	public sealed class IHaPropertyStoreSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaPropertyStore.</summary>
+	public sealed class IHaPropertyStoreKO
 	{
 		/// <summary>Handler for StringIndexer.</summary>
 		public IHaPropertyStore_StringIndexerHandler StringIndexer { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaPropertyStore.</summary>
-	public IHaPropertyStoreSpy IHaPropertyStore { get; } = new();
+	public IHaPropertyStoreKO IHaPropertyStore { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IHaPropertyStore.</summary>
 	public KnockOff.Documentation.Samples.Skills.IHaPropertyStore AsHaPropertyStore() => this;

@@ -30,15 +30,15 @@ partial class MigProcessorKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Comparison.IMigProcessor - tracks invocations and configures behavior.</summary>
-	public sealed class IMigProcessorSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigProcessor.</summary>
+	public sealed class IMigProcessorKO
 	{
 		/// <summary>Handler for Process.</summary>
 		public IMigProcessor_ProcessHandler Process { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigProcessor.</summary>
-	public IMigProcessorSpy IMigProcessor { get; } = new();
+	public IMigProcessorKO IMigProcessor { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IMigProcessor.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IMigProcessor AsMigProcessor() => this;

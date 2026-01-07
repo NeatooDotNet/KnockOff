@@ -77,8 +77,8 @@ partial class PatternCallbackServiceKnockOff
 		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Concepts.IPatternCallbackService - tracks invocations and configures behavior.</summary>
-	public sealed class IPatternCallbackServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternCallbackService.</summary>
+	public sealed class IPatternCallbackServiceKO
 	{
 		/// <summary>Handler for DoSomething.</summary>
 		public IPatternCallbackService_DoSomethingHandler DoSomething { get; } = new();
@@ -89,7 +89,7 @@ partial class PatternCallbackServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternCallbackService.</summary>
-	public IPatternCallbackServiceSpy IPatternCallbackService { get; } = new();
+	public IPatternCallbackServiceKO IPatternCallbackService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Concepts.IPatternCallbackService.</summary>
 	public KnockOff.Documentation.Samples.Concepts.IPatternCallbackService AsPatternCallbackService() => this;

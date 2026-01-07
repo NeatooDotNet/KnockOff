@@ -43,8 +43,8 @@ partial class PropConnectionKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IPropConnection - tracks invocations and configures behavior.</summary>
-	public sealed class IPropConnectionSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropConnection.</summary>
+	public sealed class IPropConnectionKO
 	{
 		/// <summary>Handler for IsConnected.</summary>
 		public IPropConnection_IsConnectedHandler IsConnected { get; } = new();
@@ -53,7 +53,7 @@ partial class PropConnectionKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropConnection.</summary>
-	public IPropConnectionSpy IPropConnection { get; } = new();
+	public IPropConnectionKO IPropConnection { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IPropConnection.</summary>
 	public KnockOff.Documentation.Samples.Guides.IPropConnection AsPropConnection() => this;

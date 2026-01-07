@@ -1,6 +1,6 @@
 # Handler API Reference
 
-Every interface member gets a dedicated Handler class in its interface spy property. This reference covers the complete API for each handler type.
+Every interface member gets a dedicated Handler class in its interface KO property. This reference covers the complete API for each handler type.
 
 ## Handler Types
 
@@ -22,9 +22,8 @@ For interface methods: `void M()`, `T M()`, `void M(args)`, `T M(args)`
 |----------|------|-------------|
 | `CallCount` | `int` | Number of times the method was called |
 | `WasCalled` | `bool` | `true` if `CallCount > 0` |
-| `LastCallArg` | `T` | Last argument (single-param methods only) |
+| `LastCallArg` | `T?` | Last argument (single-param methods only) |
 | `LastCallArgs` | `(T1, T2, ...)?` | Last arguments as named tuple (multi-param methods) |
-| `AllCalls` | `List<T>` or `List<(T1, T2, ...)>` | All call arguments in order |
 
 ### Callbacks
 
@@ -47,7 +46,7 @@ For interface methods: `void M()`, `T M()`, `void M(args)`, `T M(args)`
 
 | Method | Description |
 |--------|-------------|
-| `Reset()` | Clears `CallCount`, `AllCalls`, and `OnCall` |
+| `Reset()` | Clears `CallCount`, `LastCallArg`/`LastCallArgs`, and `OnCall` |
 | `RecordCall(...)` | Internal - records invocation (called by generated code) |
 
 ### Examples
@@ -143,9 +142,7 @@ Handler naming: `{KeyTypeName}IndexerHandler`
 | `GetCount` | `int` | Number of getter invocations |
 | `SetCount` | `int` | Number of setter invocations |
 | `LastGetKey` | `TKey?` | Last key used in getter |
-| `AllGetKeys` | `List<TKey>` | All keys used in getter, in order |
 | `LastSetEntry` | `(TKey key, TValue value)?` | Last key-value pair from setter |
-| `AllSetEntries` | `List<(TKey, TValue)>` | All key-value pairs from setter |
 
 ### Callbacks
 
@@ -300,12 +297,12 @@ knockOff.IEventSource.DataReceived.Clear();  // Clears tracking AND handlers
 
 | Handler Type | Reset Clears | Reset Does NOT Clear |
 |--------------|--------------|----------------------|
-| Method | `CallCount`, `AllCalls`, `OnCall` | — |
+| Method | `CallCount`, `LastCallArg`/`LastCallArgs`, `OnCall` | — |
 | Property | `GetCount`, `SetCount`, `LastSetValue`, `OnGet`, `OnSet` | Backing field |
-| Indexer | `GetCount`, `SetCount`, `AllGetKeys`, `AllSetEntries`, `OnGet`, `OnSet` | Backing dictionary |
+| Indexer | `GetCount`, `SetCount`, `LastGetKey`, `LastSetEntry`, `OnGet`, `OnSet` | Backing dictionary |
 | Event | `SubscribeCount`, `UnsubscribeCount`, `RaiseCount`, `AllRaises` | Handlers (use `Clear()` to remove) |
 | Generic Method | All typed handlers, `CalledTypeArguments` | — |
-| Generic Method `.Of<T>()` | `CallCount`, `AllCalls`, `OnCall` | — |
+| Generic Method `.Of<T>()` | `CallCount`, `LastCallArg`, `OnCall` | — |
 
 ## Async Method Handlers
 
@@ -356,7 +353,6 @@ Accessed via `.Of<T>()`:
 | `CallCount` | `int` | Calls with this type argument |
 | `WasCalled` | `bool` | `true` if `CallCount > 0` |
 | `LastCallArg` | `T?` | Last non-generic argument (if method has params) |
-| `AllCalls` | `IReadOnlyList<T>` | All non-generic arguments (if method has params) |
 | `OnCall` | Delegate | Callback for this type argument |
 
 ### Typed Handler Methods

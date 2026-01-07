@@ -52,8 +52,8 @@ partial class AsyncUserDefinedKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IAsyncUserDefined - tracks invocations and configures behavior.</summary>
-	public sealed class IAsyncUserDefinedSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IAsyncUserDefined.</summary>
+	public sealed class IAsyncUserDefinedKO
 	{
 		/// <summary>Handler for GetByIdAsync.</summary>
 		public IAsyncUserDefined_GetByIdAsyncHandler GetByIdAsync { get; } = new();
@@ -62,7 +62,7 @@ partial class AsyncUserDefinedKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IAsyncUserDefined.</summary>
-	public IAsyncUserDefinedSpy IAsyncUserDefined { get; } = new();
+	public IAsyncUserDefinedKO IAsyncUserDefined { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IAsyncUserDefined.</summary>
 	public KnockOff.Documentation.Samples.Guides.IAsyncUserDefined AsAsyncUserDefined() => this;

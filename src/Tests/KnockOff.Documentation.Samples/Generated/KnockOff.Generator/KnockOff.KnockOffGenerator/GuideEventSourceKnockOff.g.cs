@@ -223,8 +223,8 @@ partial class GuideEventSourceKnockOff
 		public void Clear() { _handler = null; Reset(); }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IGuideEventSource - tracks invocations and configures behavior.</summary>
-	public sealed class IGuideEventSourceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGuideEventSource.</summary>
+	public sealed class IGuideEventSourceKO
 	{
 		/// <summary>Handler for MessageReceived event.</summary>
 		public IGuideEventSource_MessageReceivedHandler MessageReceived { get; } = new();
@@ -237,7 +237,7 @@ partial class GuideEventSourceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGuideEventSource.</summary>
-	public IGuideEventSourceSpy IGuideEventSource { get; } = new();
+	public IGuideEventSourceKO IGuideEventSource { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IGuideEventSource.</summary>
 	public KnockOff.Documentation.Samples.Guides.IGuideEventSource AsGuideEventSource() => this;

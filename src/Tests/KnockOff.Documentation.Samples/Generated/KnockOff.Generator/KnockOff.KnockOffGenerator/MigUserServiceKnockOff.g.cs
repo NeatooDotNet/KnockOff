@@ -180,8 +180,8 @@ partial class MigUserServiceKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Comparison.IMigUserService - tracks invocations and configures behavior.</summary>
-	public sealed class IMigUserServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigUserService.</summary>
+	public sealed class IMigUserServiceKO
 	{
 		/// <summary>Handler for Name.</summary>
 		public IMigUserService_NameHandler Name { get; } = new();
@@ -200,7 +200,7 @@ partial class MigUserServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigUserService.</summary>
-	public IMigUserServiceSpy IMigUserService { get; } = new();
+	public IMigUserServiceKO IMigUserService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IMigUserService.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IMigUserService AsMigUserService() => this;

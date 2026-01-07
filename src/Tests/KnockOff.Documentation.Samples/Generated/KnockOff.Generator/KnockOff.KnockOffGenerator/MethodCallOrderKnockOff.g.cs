@@ -71,8 +71,8 @@ partial class MethodCallOrderKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IMethodCallOrder - tracks invocations and configures behavior.</summary>
-	public sealed class IMethodCallOrderSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodCallOrder.</summary>
+	public sealed class IMethodCallOrderKO
 	{
 		/// <summary>Handler for Initialize.</summary>
 		public IMethodCallOrder_InitializeHandler Initialize { get; } = new();
@@ -83,7 +83,7 @@ partial class MethodCallOrderKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodCallOrder.</summary>
-	public IMethodCallOrderSpy IMethodCallOrder { get; } = new();
+	public IMethodCallOrderKO IMethodCallOrder { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodCallOrder.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMethodCallOrder AsMethodCallOrder() => this;

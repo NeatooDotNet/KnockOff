@@ -30,15 +30,15 @@ partial class MethodFailureKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IMethodFailure - tracks invocations and configures behavior.</summary>
-	public sealed class IMethodFailureSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodFailure.</summary>
+	public sealed class IMethodFailureKO
 	{
 		/// <summary>Handler for Save.</summary>
 		public IMethodFailure_SaveHandler Save { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodFailure.</summary>
-	public IMethodFailureSpy IMethodFailure { get; } = new();
+	public IMethodFailureKO IMethodFailure { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodFailure.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMethodFailure AsMethodFailure() => this;

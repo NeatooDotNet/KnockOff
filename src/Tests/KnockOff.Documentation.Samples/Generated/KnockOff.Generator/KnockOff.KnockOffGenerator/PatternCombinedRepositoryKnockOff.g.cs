@@ -30,15 +30,15 @@ partial class PatternCombinedRepositoryKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Concepts.IPatternCombinedRepository - tracks invocations and configures behavior.</summary>
-	public sealed class IPatternCombinedRepositorySpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternCombinedRepository.</summary>
+	public sealed class IPatternCombinedRepositoryKO
 	{
 		/// <summary>Handler for GetById.</summary>
 		public IPatternCombinedRepository_GetByIdHandler GetById { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternCombinedRepository.</summary>
-	public IPatternCombinedRepositorySpy IPatternCombinedRepository { get; } = new();
+	public IPatternCombinedRepositoryKO IPatternCombinedRepository { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Concepts.IPatternCombinedRepository.</summary>
 	public KnockOff.Documentation.Samples.Concepts.IPatternCombinedRepository AsPatternCombinedRepository() => this;

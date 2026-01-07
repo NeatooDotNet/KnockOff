@@ -33,15 +33,15 @@ partial class CpPropertyServiceKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ICpPropertyService - tracks invocations and configures behavior.</summary>
-	public sealed class ICpPropertyServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpPropertyService.</summary>
+	public sealed class ICpPropertyServiceKO
 	{
 		/// <summary>Handler for CurrentUser.</summary>
 		public ICpPropertyService_CurrentUserHandler CurrentUser { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpPropertyService.</summary>
-	public ICpPropertyServiceSpy ICpPropertyService { get; } = new();
+	public ICpPropertyServiceKO ICpPropertyService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpPropertyService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ICpPropertyService AsCpPropertyService() => this;

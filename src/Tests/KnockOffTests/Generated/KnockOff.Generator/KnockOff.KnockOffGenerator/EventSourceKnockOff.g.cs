@@ -223,8 +223,8 @@ partial class EventSourceKnockOff
 		public void Clear() { _handler = null; Reset(); }
 	}
 
-	/// <summary>Spy for KnockOff.Tests.IEventSource - tracks invocations and configures behavior.</summary>
-	public sealed class IEventSourceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IEventSource.</summary>
+	public sealed class IEventSourceKO
 	{
 		/// <summary>Handler for MessageReceived event.</summary>
 		public IEventSource_MessageReceivedHandler MessageReceived { get; } = new();
@@ -237,7 +237,7 @@ partial class EventSourceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IEventSource.</summary>
-	public IEventSourceSpy IEventSource { get; } = new();
+	public IEventSourceKO IEventSource { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IEventSource.</summary>
 	public KnockOff.Tests.IEventSource AsEventSource() => this;

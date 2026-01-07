@@ -55,8 +55,8 @@ partial class CpCalculatorKnockOff
 		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ICpCalculator - tracks invocations and configures behavior.</summary>
-	public sealed class ICpCalculatorSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpCalculator.</summary>
+	public sealed class ICpCalculatorKO
 	{
 		/// <summary>Handler for Add.</summary>
 		public ICpCalculator_AddHandler Add { get; } = new();
@@ -65,7 +65,7 @@ partial class CpCalculatorKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpCalculator.</summary>
-	public ICpCalculatorSpy ICpCalculator { get; } = new();
+	public ICpCalculatorKO ICpCalculator { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpCalculator.</summary>
 	public KnockOff.Documentation.Samples.Skills.ICpCalculator AsCpCalculator() => this;

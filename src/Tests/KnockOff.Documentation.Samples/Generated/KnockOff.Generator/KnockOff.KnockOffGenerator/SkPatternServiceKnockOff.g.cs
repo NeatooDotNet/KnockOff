@@ -99,8 +99,8 @@ partial class SkPatternServiceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ISkPatternService - tracks invocations and configures behavior.</summary>
-	public sealed class ISkPatternServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkPatternService.</summary>
+	public sealed class ISkPatternServiceKO
 	{
 		/// <summary>Handler for GetUser.</summary>
 		public ISkPatternService_GetUserHandler GetUser { get; } = new();
@@ -113,7 +113,7 @@ partial class SkPatternServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkPatternService.</summary>
-	public ISkPatternServiceSpy ISkPatternService { get; } = new();
+	public ISkPatternServiceKO ISkPatternService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkPatternService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkPatternService AsSkPatternService() => this;

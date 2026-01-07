@@ -105,8 +105,8 @@ partial class HaOverloadServiceKnockOff
 		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.IHaOverloadService - tracks invocations and configures behavior.</summary>
-	public sealed class IHaOverloadServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaOverloadService.</summary>
+	public sealed class IHaOverloadServiceKO
 	{
 		/// <summary>Handler for Process overload 1.</summary>
 		public IHaOverloadService_Process1Handler Process1 { get; } = new();
@@ -119,7 +119,7 @@ partial class HaOverloadServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaOverloadService.</summary>
-	public IHaOverloadServiceSpy IHaOverloadService { get; } = new();
+	public IHaOverloadServiceKO IHaOverloadService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IHaOverloadService.</summary>
 	public KnockOff.Documentation.Samples.Skills.IHaOverloadService AsHaOverloadService() => this;

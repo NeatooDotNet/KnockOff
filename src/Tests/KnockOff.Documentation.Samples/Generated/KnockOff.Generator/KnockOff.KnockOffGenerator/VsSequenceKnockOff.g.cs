@@ -27,15 +27,15 @@ partial class VsSequenceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Comparison.IVsSequence - tracks invocations and configures behavior.</summary>
-	public sealed class IVsSequenceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsSequence.</summary>
+	public sealed class IVsSequenceKO
 	{
 		/// <summary>Handler for GetNext.</summary>
 		public IVsSequence_GetNextHandler GetNext { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsSequence.</summary>
-	public IVsSequenceSpy IVsSequence { get; } = new();
+	public IVsSequenceKO IVsSequence { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IVsSequence.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IVsSequence AsVsSequence() => this;

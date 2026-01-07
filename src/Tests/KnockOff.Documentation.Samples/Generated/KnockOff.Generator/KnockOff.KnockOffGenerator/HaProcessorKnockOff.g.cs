@@ -55,8 +55,8 @@ partial class HaProcessorKnockOff
 		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.IHaProcessor - tracks invocations and configures behavior.</summary>
-	public sealed class IHaProcessorSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaProcessor.</summary>
+	public sealed class IHaProcessorKO
 	{
 		/// <summary>Handler for Increment.</summary>
 		public IHaProcessor_IncrementHandler Increment { get; } = new();
@@ -65,7 +65,7 @@ partial class HaProcessorKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaProcessor.</summary>
-	public IHaProcessorSpy IHaProcessor { get; } = new();
+	public IHaProcessorKO IHaProcessor { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IHaProcessor.</summary>
 	public KnockOff.Documentation.Samples.Skills.IHaProcessor AsHaProcessor() => this;

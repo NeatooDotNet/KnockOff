@@ -55,8 +55,8 @@ partial class SkRepoKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ISkRepoService - tracks invocations and configures behavior.</summary>
-	public sealed class ISkRepoServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkRepoService.</summary>
+	public sealed class ISkRepoServiceKO
 	{
 		/// <summary>Handler for GetById.</summary>
 		public ISkRepoService_GetByIdHandler GetById { get; } = new();
@@ -65,7 +65,7 @@ partial class SkRepoKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkRepoService.</summary>
-	public ISkRepoServiceSpy ISkRepoService { get; } = new();
+	public ISkRepoServiceKO ISkRepoService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkRepoService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkRepoService AsSkRepoService() => this;

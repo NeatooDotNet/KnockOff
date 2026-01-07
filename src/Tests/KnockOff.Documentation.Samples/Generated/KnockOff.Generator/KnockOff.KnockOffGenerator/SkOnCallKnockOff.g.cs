@@ -102,8 +102,8 @@ partial class SkOnCallKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ISkOnCallService - tracks invocations and configures behavior.</summary>
-	public sealed class ISkOnCallServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkOnCallService.</summary>
+	public sealed class ISkOnCallServiceKO
 	{
 		/// <summary>Handler for Clear.</summary>
 		public ISkOnCallService_ClearHandler Clear { get; } = new();
@@ -116,7 +116,7 @@ partial class SkOnCallKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkOnCallService.</summary>
-	public ISkOnCallServiceSpy ISkOnCallService { get; } = new();
+	public ISkOnCallServiceKO ISkOnCallService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkOnCallService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkOnCallService AsSkOnCallService() => this;

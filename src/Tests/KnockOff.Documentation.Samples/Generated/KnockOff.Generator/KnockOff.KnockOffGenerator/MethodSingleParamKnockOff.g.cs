@@ -30,15 +30,15 @@ partial class MethodSingleParamKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IMethodSingleParam - tracks invocations and configures behavior.</summary>
-	public sealed class IMethodSingleParamSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodSingleParam.</summary>
+	public sealed class IMethodSingleParamKO
 	{
 		/// <summary>Handler for GetUser.</summary>
 		public IMethodSingleParam_GetUserHandler GetUser { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodSingleParam.</summary>
-	public IMethodSingleParamSpy IMethodSingleParam { get; } = new();
+	public IMethodSingleParamKO IMethodSingleParam { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodSingleParam.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMethodSingleParam AsMethodSingleParam() => this;

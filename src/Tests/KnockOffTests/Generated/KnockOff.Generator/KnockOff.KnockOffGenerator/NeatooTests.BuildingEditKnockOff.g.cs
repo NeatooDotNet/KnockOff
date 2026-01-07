@@ -108,8 +108,8 @@ partial class BuildingEditKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for Neatoo.IEntityBase - tracks invocations and configures behavior.</summary>
-	public sealed class IEntityBaseSpy
+	/// <summary>Tracks invocations and configures behavior for Neatoo.IEntityBase.</summary>
+	public sealed class IEntityBaseKO
 	{
 		/// <summary>Handler for ModifiedProperties.</summary>
 		public IEntityBase_ModifiedPropertiesHandler ModifiedProperties { get; } = new();
@@ -208,8 +208,8 @@ partial class BuildingEditKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for Neatoo.IValidateBase - tracks invocations and configures behavior.</summary>
-	public sealed class IValidateBaseSpy
+	/// <summary>Tracks invocations and configures behavior for Neatoo.IValidateBase.</summary>
+	public sealed class IValidateBaseKO
 	{
 		/// <summary>Handler for IsPaused.</summary>
 		public IValidateBase_IsPausedHandler IsPaused { get; } = new();
@@ -237,8 +237,8 @@ partial class BuildingEditKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Spy for Neatoo.IBase - tracks invocations and configures behavior.</summary>
-	public sealed class IBaseSpy
+	/// <summary>Tracks invocations and configures behavior for Neatoo.IBase.</summary>
+	public sealed class IBaseKO
 	{
 		/// <summary>Handler for Parent.</summary>
 		public IBase_ParentHandler Parent { get; } = new();
@@ -297,8 +297,8 @@ partial class BuildingEditKnockOff
 		public void Clear() { _handler = null; Reset(); }
 	}
 
-	/// <summary>Spy for System.ComponentModel.INotifyPropertyChanged - tracks invocations and configures behavior.</summary>
-	public sealed class INotifyPropertyChangedSpy
+	/// <summary>Tracks invocations and configures behavior for System.ComponentModel.INotifyPropertyChanged.</summary>
+	public sealed class INotifyPropertyChangedKO
 	{
 		/// <summary>Handler for PropertyChanged event.</summary>
 		public INotifyPropertyChanged_PropertyChangedHandler PropertyChanged { get; } = new();
@@ -359,8 +359,8 @@ partial class BuildingEditKnockOff
 		public void Clear() { _handler = null; Reset(); }
 	}
 
-	/// <summary>Spy for Neatoo.INotifyNeatooPropertyChanged - tracks invocations and configures behavior.</summary>
-	public sealed class INotifyNeatooPropertyChangedSpy
+	/// <summary>Tracks invocations and configures behavior for Neatoo.INotifyNeatooPropertyChanged.</summary>
+	public sealed class INotifyNeatooPropertyChangedKO
 	{
 		/// <summary>Handler for NeatooPropertyChanged event.</summary>
 		public INotifyNeatooPropertyChanged_NeatooPropertyChangedHandler NeatooPropertyChanged { get; } = new();
@@ -508,8 +508,8 @@ partial class BuildingEditKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for Neatoo.IValidateMetaProperties - tracks invocations and configures behavior.</summary>
-	public sealed class IValidateMetaPropertiesSpy
+	/// <summary>Tracks invocations and configures behavior for Neatoo.IValidateMetaProperties.</summary>
+	public sealed class IValidateMetaPropertiesKO
 	{
 		/// <summary>Handler for IsValid.</summary>
 		public IValidateMetaProperties_IsValidHandler IsValid { get; } = new();
@@ -565,8 +565,8 @@ partial class BuildingEditKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for Neatoo.IBaseMetaProperties - tracks invocations and configures behavior.</summary>
-	public sealed class IBaseMetaPropertiesSpy
+	/// <summary>Tracks invocations and configures behavior for Neatoo.IBaseMetaProperties.</summary>
+	public sealed class IBaseMetaPropertiesKO
 	{
 		/// <summary>Handler for IsBusy.</summary>
 		public IBaseMetaProperties_IsBusyHandler IsBusy { get; } = new();
@@ -654,8 +654,8 @@ partial class BuildingEditKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Spy for Neatoo.IEntityMetaProperties - tracks invocations and configures behavior.</summary>
-	public sealed class IEntityMetaPropertiesSpy
+	/// <summary>Tracks invocations and configures behavior for Neatoo.IEntityMetaProperties.</summary>
+	public sealed class IEntityMetaPropertiesKO
 	{
 		/// <summary>Handler for IsChild.</summary>
 		public IEntityMetaProperties_IsChildHandler IsChild { get; } = new();
@@ -701,8 +701,8 @@ partial class BuildingEditKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Spy for Neatoo.RemoteFactory.IFactorySaveMeta - tracks invocations and configures behavior.</summary>
-	public sealed class IFactorySaveMetaSpy
+	/// <summary>Tracks invocations and configures behavior for Neatoo.RemoteFactory.IFactorySaveMeta.</summary>
+	public sealed class IFactorySaveMetaKO
 	{
 		/// <summary>Handler for IsDeleted.</summary>
 		public IFactorySaveMeta_IsDeletedHandler IsDeleted { get; } = new();
@@ -711,31 +711,31 @@ partial class BuildingEditKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for Neatoo.IEntityBase.</summary>
-	public IEntityBaseSpy IEntityBase { get; } = new();
+	public IEntityBaseKO IEntityBase { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for Neatoo.IValidateBase.</summary>
-	public IValidateBaseSpy IValidateBase { get; } = new();
+	public IValidateBaseKO IValidateBase { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for Neatoo.IBase.</summary>
-	public IBaseSpy IBase { get; } = new();
+	public IBaseKO IBase { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for System.ComponentModel.INotifyPropertyChanged.</summary>
-	public INotifyPropertyChangedSpy INotifyPropertyChanged { get; } = new();
+	public INotifyPropertyChangedKO INotifyPropertyChanged { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for Neatoo.INotifyNeatooPropertyChanged.</summary>
-	public INotifyNeatooPropertyChangedSpy INotifyNeatooPropertyChanged { get; } = new();
+	public INotifyNeatooPropertyChangedKO INotifyNeatooPropertyChanged { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for Neatoo.IValidateMetaProperties.</summary>
-	public IValidateMetaPropertiesSpy IValidateMetaProperties { get; } = new();
+	public IValidateMetaPropertiesKO IValidateMetaProperties { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for Neatoo.IBaseMetaProperties.</summary>
-	public IBaseMetaPropertiesSpy IBaseMetaProperties { get; } = new();
+	public IBaseMetaPropertiesKO IBaseMetaProperties { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for Neatoo.IEntityMetaProperties.</summary>
-	public IEntityMetaPropertiesSpy IEntityMetaProperties { get; } = new();
+	public IEntityMetaPropertiesKO IEntityMetaProperties { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for Neatoo.RemoteFactory.IFactorySaveMeta.</summary>
-	public IFactorySaveMetaSpy IFactorySaveMeta { get; } = new();
+	public IFactorySaveMetaKO IFactorySaveMeta { get; } = new();
 
 	/// <summary>Returns this instance as Neatoo.IEntityBase.</summary>
 	public Neatoo.IEntityBase AsEntityBase() => this;

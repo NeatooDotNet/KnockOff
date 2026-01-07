@@ -64,13 +64,13 @@ public class SkillSamplesTests : SamplesTestBase
     }
 
     // ========================================================================
-    // skill:SKILL:interface-spy-access
+    // skill:SKILL:interface-access
     // ========================================================================
 
     [Fact]
-    public void InterfaceSpyAccess_MultipleInterfaces_HasSpiesForAll()
+    public void InterfaceAccess_MultipleInterfaces_HasHandlersForAll()
     {
-        var knockOff = new SkSpyExampleKnockOff();
+        var knockOff = new SkExampleKnockOff();
 
         Assert.NotNull(knockOff.ISkUserService);
         Assert.NotNull(knockOff.ISkPropertyStore);

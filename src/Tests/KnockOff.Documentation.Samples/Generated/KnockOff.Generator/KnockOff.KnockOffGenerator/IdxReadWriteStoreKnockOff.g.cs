@@ -36,15 +36,15 @@ partial class IdxReadWriteStoreKnockOff
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IIdxReadWriteStore - tracks invocations and configures behavior.</summary>
-	public sealed class IIdxReadWriteStoreSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIdxReadWriteStore.</summary>
+	public sealed class IIdxReadWriteStoreKO
 	{
 		/// <summary>Handler for StringIndexer.</summary>
 		public IIdxReadWriteStore_StringIndexerHandler StringIndexer { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIdxReadWriteStore.</summary>
-	public IIdxReadWriteStoreSpy IIdxReadWriteStore { get; } = new();
+	public IIdxReadWriteStoreKO IIdxReadWriteStore { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIdxReadWriteStore.</summary>
 	public KnockOff.Documentation.Samples.Guides.IIdxReadWriteStore AsIdxReadWriteStore() => this;

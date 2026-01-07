@@ -30,15 +30,15 @@ partial class MmRefProcessorKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.IMmRefProcessor - tracks invocations and configures behavior.</summary>
-	public sealed class IMmRefProcessorSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmRefProcessor.</summary>
+	public sealed class IMmRefProcessorKO
 	{
 		/// <summary>Handler for Increment.</summary>
 		public IMmRefProcessor_IncrementHandler Increment { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmRefProcessor.</summary>
-	public IMmRefProcessorSpy IMmRefProcessor { get; } = new();
+	public IMmRefProcessorKO IMmRefProcessor { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmRefProcessor.</summary>
 	public KnockOff.Documentation.Samples.Skills.IMmRefProcessor AsMmRefProcessor() => this;

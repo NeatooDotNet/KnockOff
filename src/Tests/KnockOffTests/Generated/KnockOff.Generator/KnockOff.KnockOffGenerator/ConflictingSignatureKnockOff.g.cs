@@ -46,8 +46,8 @@ partial class ConflictingSignatureKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Tests.IDataProvider - tracks invocations and configures behavior.</summary>
-	public sealed class IDataProviderSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IDataProvider.</summary>
+	public sealed class IDataProviderKO
 	{
 		/// <summary>Handler for Count.</summary>
 		public IDataProvider_CountHandler Count { get; } = new();
@@ -108,8 +108,8 @@ partial class ConflictingSignatureKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Tests.IKeyLookup - tracks invocations and configures behavior.</summary>
-	public sealed class IKeyLookupSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IKeyLookup.</summary>
+	public sealed class IKeyLookupKO
 	{
 		/// <summary>Handler for Count.</summary>
 		public IKeyLookup_CountHandler Count { get; } = new();
@@ -118,10 +118,10 @@ partial class ConflictingSignatureKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IDataProvider.</summary>
-	public IDataProviderSpy IDataProvider { get; } = new();
+	public IDataProviderKO IDataProvider { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IKeyLookup.</summary>
-	public IKeyLookupSpy IKeyLookup { get; } = new();
+	public IKeyLookupKO IKeyLookup { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IDataProvider.</summary>
 	public KnockOff.Tests.IDataProvider AsDataProvider() => this;

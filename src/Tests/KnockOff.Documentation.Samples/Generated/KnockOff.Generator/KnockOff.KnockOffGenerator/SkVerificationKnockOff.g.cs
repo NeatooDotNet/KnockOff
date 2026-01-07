@@ -83,8 +83,8 @@ partial class SkVerificationKnockOff
 		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ISkVerificationService - tracks invocations and configures behavior.</summary>
-	public sealed class ISkVerificationServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkVerificationService.</summary>
+	public sealed class ISkVerificationServiceKO
 	{
 		/// <summary>Handler for Name.</summary>
 		public ISkVerificationService_NameHandler Name { get; } = new();
@@ -95,7 +95,7 @@ partial class SkVerificationKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkVerificationService.</summary>
-	public ISkVerificationServiceSpy ISkVerificationService { get; } = new();
+	public ISkVerificationServiceKO ISkVerificationService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkVerificationService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkVerificationService AsSkVerificationService() => this;

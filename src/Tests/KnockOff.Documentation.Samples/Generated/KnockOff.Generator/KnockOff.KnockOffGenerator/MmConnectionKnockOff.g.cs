@@ -27,15 +27,15 @@ partial class MmConnectionKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.IMmConnectionService - tracks invocations and configures behavior.</summary>
-	public sealed class IMmConnectionServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmConnectionService.</summary>
+	public sealed class IMmConnectionServiceKO
 	{
 		/// <summary>Handler for Connect.</summary>
 		public IMmConnectionService_ConnectHandler Connect { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmConnectionService.</summary>
-	public IMmConnectionServiceSpy IMmConnectionService { get; } = new();
+	public IMmConnectionServiceKO IMmConnectionService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmConnectionService.</summary>
 	public KnockOff.Documentation.Samples.Skills.IMmConnectionService AsMmConnectionService() => this;

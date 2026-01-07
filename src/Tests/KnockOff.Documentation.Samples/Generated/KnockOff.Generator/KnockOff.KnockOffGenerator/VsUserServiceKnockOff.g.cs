@@ -155,8 +155,8 @@ partial class VsUserServiceKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Comparison.IVsUserService - tracks invocations and configures behavior.</summary>
-	public sealed class IVsUserServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsUserService.</summary>
+	public sealed class IVsUserServiceKO
 	{
 		/// <summary>Handler for CurrentUser.</summary>
 		public IVsUserService_CurrentUserHandler CurrentUser { get; } = new();
@@ -173,7 +173,7 @@ partial class VsUserServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsUserService.</summary>
-	public IVsUserServiceSpy IVsUserService { get; } = new();
+	public IVsUserServiceKO IVsUserService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IVsUserService.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IVsUserService AsVsUserService() => this;

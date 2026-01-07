@@ -36,15 +36,15 @@ partial class SkVerificationIndexerKnockOff
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ISkVerificationPropertyStore - tracks invocations and configures behavior.</summary>
-	public sealed class ISkVerificationPropertyStoreSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkVerificationPropertyStore.</summary>
+	public sealed class ISkVerificationPropertyStoreKO
 	{
 		/// <summary>Handler for StringIndexer.</summary>
 		public ISkVerificationPropertyStore_StringIndexerHandler StringIndexer { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkVerificationPropertyStore.</summary>
-	public ISkVerificationPropertyStoreSpy ISkVerificationPropertyStore { get; } = new();
+	public ISkVerificationPropertyStoreKO ISkVerificationPropertyStore { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkVerificationPropertyStore.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkVerificationPropertyStore AsSkVerificationPropertyStore() => this;

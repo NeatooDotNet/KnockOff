@@ -30,8 +30,8 @@ partial class MiCompositeRepositoryKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IMiUserRepository - tracks invocations and configures behavior.</summary>
-	public sealed class IMiUserRepositorySpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiUserRepository.</summary>
+	public sealed class IMiUserRepositoryKO
 	{
 		/// <summary>Handler for GetUser.</summary>
 		public IMiUserRepository_GetUserHandler GetUser { get; } = new();
@@ -62,18 +62,18 @@ partial class MiCompositeRepositoryKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IMiOrderRepository - tracks invocations and configures behavior.</summary>
-	public sealed class IMiOrderRepositorySpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiOrderRepository.</summary>
+	public sealed class IMiOrderRepositoryKO
 	{
 		/// <summary>Handler for GetOrder.</summary>
 		public IMiOrderRepository_GetOrderHandler GetOrder { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiUserRepository.</summary>
-	public IMiUserRepositorySpy IMiUserRepository { get; } = new();
+	public IMiUserRepositoryKO IMiUserRepository { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiOrderRepository.</summary>
-	public IMiOrderRepositorySpy IMiOrderRepository { get; } = new();
+	public IMiOrderRepositoryKO IMiOrderRepository { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMiUserRepository.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMiUserRepository AsMiUserRepository() => this;

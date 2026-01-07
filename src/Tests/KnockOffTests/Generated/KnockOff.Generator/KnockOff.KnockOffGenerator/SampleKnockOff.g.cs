@@ -127,8 +127,8 @@ partial class SampleKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Tests.ISampleService - tracks invocations and configures behavior.</summary>
-	public sealed class ISampleServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.ISampleService.</summary>
+	public sealed class ISampleServiceKO
 	{
 		/// <summary>Handler for Name.</summary>
 		public ISampleService_NameHandler Name { get; } = new();
@@ -143,7 +143,7 @@ partial class SampleKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.ISampleService.</summary>
-	public ISampleServiceSpy ISampleService { get; } = new();
+	public ISampleServiceKO ISampleService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.ISampleService.</summary>
 	public KnockOff.Tests.ISampleService AsSampleService() => this;

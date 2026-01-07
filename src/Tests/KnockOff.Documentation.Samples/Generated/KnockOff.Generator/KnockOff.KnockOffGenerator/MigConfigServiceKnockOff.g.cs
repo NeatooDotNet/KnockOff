@@ -27,15 +27,15 @@ partial class MigConfigServiceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Comparison.IMigConfigService - tracks invocations and configures behavior.</summary>
-	public sealed class IMigConfigServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigConfigService.</summary>
+	public sealed class IMigConfigServiceKO
 	{
 		/// <summary>Handler for GetConfig.</summary>
 		public IMigConfigService_GetConfigHandler GetConfig { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigConfigService.</summary>
-	public IMigConfigServiceSpy IMigConfigService { get; } = new();
+	public IMigConfigServiceKO IMigConfigService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IMigConfigService.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IMigConfigService AsMigConfigService() => this;

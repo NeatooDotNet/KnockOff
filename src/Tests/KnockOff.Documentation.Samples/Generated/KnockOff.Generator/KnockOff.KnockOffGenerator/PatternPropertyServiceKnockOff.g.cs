@@ -33,15 +33,15 @@ partial class PatternPropertyServiceKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Concepts.IPatternPropertyService - tracks invocations and configures behavior.</summary>
-	public sealed class IPatternPropertyServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternPropertyService.</summary>
+	public sealed class IPatternPropertyServiceKO
 	{
 		/// <summary>Handler for Name.</summary>
 		public IPatternPropertyService_NameHandler Name { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternPropertyService.</summary>
-	public IPatternPropertyServiceSpy IPatternPropertyService { get; } = new();
+	public IPatternPropertyServiceKO IPatternPropertyService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Concepts.IPatternPropertyService.</summary>
 	public KnockOff.Documentation.Samples.Concepts.IPatternPropertyService AsPatternPropertyService() => this;

@@ -36,15 +36,15 @@ partial class SkBackingPropertyStoreKnockOff
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ISkBackingPropertyStore - tracks invocations and configures behavior.</summary>
-	public sealed class ISkBackingPropertyStoreSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkBackingPropertyStore.</summary>
+	public sealed class ISkBackingPropertyStoreKO
 	{
 		/// <summary>Handler for StringIndexer.</summary>
 		public ISkBackingPropertyStore_StringIndexerHandler StringIndexer { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkBackingPropertyStore.</summary>
-	public ISkBackingPropertyStoreSpy ISkBackingPropertyStore { get; } = new();
+	public ISkBackingPropertyStoreKO ISkBackingPropertyStore { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkBackingPropertyStore.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkBackingPropertyStore AsSkBackingPropertyStore() => this;

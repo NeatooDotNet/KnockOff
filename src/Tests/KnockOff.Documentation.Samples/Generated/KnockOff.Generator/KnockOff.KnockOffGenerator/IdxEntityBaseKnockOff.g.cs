@@ -40,8 +40,8 @@ partial class IdxEntityBaseKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IIdxEntityBase - tracks invocations and configures behavior.</summary>
-	public sealed class IIdxEntityBaseSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIdxEntityBase.</summary>
+	public sealed class IIdxEntityBaseKO
 	{
 		/// <summary>Handler for StringIndexer.</summary>
 		public IIdxEntityBase_StringIndexerHandler StringIndexer { get; } = new();
@@ -50,7 +50,7 @@ partial class IdxEntityBaseKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIdxEntityBase.</summary>
-	public IIdxEntityBaseSpy IIdxEntityBase { get; } = new();
+	public IIdxEntityBaseKO IIdxEntityBase { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIdxEntityBase.</summary>
 	public KnockOff.Documentation.Samples.Guides.IIdxEntityBase AsIdxEntityBase() => this;

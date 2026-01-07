@@ -30,15 +30,15 @@ partial class MethodPriorityKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IMethodPriority - tracks invocations and configures behavior.</summary>
-	public sealed class IMethodPrioritySpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodPriority.</summary>
+	public sealed class IMethodPriorityKO
 	{
 		/// <summary>Handler for Calculate.</summary>
 		public IMethodPriority_CalculateHandler Calculate { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodPriority.</summary>
-	public IMethodPrioritySpy IMethodPriority { get; } = new();
+	public IMethodPriorityKO IMethodPriority { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodPriority.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMethodPriority AsMethodPriority() => this;

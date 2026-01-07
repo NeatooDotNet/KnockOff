@@ -55,8 +55,8 @@ partial class IhUserWriteRepositoryKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IIhWriteRepository<KnockOff.Documentation.Samples.Guides.IhUser> - tracks invocations and configures behavior.</summary>
-	public sealed class IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUserSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhWriteRepository<KnockOff.Documentation.Samples.Guides.IhUser>.</summary>
+	public sealed class IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUserKO
 	{
 		/// <summary>Handler for Add.</summary>
 		public IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUser_AddHandler Add { get; } = new();
@@ -111,8 +111,8 @@ partial class IhUserWriteRepositoryKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IIhReadRepository<KnockOff.Documentation.Samples.Guides.IhUser> - tracks invocations and configures behavior.</summary>
-	public sealed class IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUserSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhReadRepository<KnockOff.Documentation.Samples.Guides.IhUser>.</summary>
+	public sealed class IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUserKO
 	{
 		/// <summary>Handler for GetById.</summary>
 		public IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUser_GetByIdHandler GetById { get; } = new();
@@ -121,10 +121,10 @@ partial class IhUserWriteRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhWriteRepository<KnockOff.Documentation.Samples.Guides.IhUser>.</summary>
-	public IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUserSpy IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUser { get; } = new();
+	public IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUserKO IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUser { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhReadRepository<KnockOff.Documentation.Samples.Guides.IhUser>.</summary>
-	public IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUserSpy IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUser { get; } = new();
+	public IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUserKO IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUser { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIhWriteRepository<KnockOff.Documentation.Samples.Guides.IhUser>.</summary>
 	public KnockOff.Documentation.Samples.Guides.IIhWriteRepository<KnockOff.Documentation.Samples.Guides.IhUser> AsIhWriteRepository() => this;

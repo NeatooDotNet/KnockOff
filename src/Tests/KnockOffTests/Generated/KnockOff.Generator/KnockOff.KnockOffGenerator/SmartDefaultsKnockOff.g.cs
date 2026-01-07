@@ -345,8 +345,8 @@ partial class SmartDefaultsKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Tests.ISmartDefaultsService - tracks invocations and configures behavior.</summary>
-	public sealed class ISmartDefaultsServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.ISmartDefaultsService.</summary>
+	public sealed class ISmartDefaultsServiceKO
 	{
 		/// <summary>Handler for Count.</summary>
 		public ISmartDefaultsService_CountHandler Count { get; } = new();
@@ -383,7 +383,7 @@ partial class SmartDefaultsKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.ISmartDefaultsService.</summary>
-	public ISmartDefaultsServiceSpy ISmartDefaultsService { get; } = new();
+	public ISmartDefaultsServiceKO ISmartDefaultsService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.ISmartDefaultsService.</summary>
 	public KnockOff.Tests.ISmartDefaultsService AsSmartDefaultsService() => this;

@@ -30,8 +30,8 @@ partial class DataContextKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.GettingStarted.IRepository - tracks invocations and configures behavior.</summary>
-	public sealed class IRepositorySpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.GettingStarted.IRepository.</summary>
+	public sealed class IRepositoryKO
 	{
 		/// <summary>Handler for Save.</summary>
 		public IRepository_SaveHandler Save { get; } = new();
@@ -59,18 +59,18 @@ partial class DataContextKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork - tracks invocations and configures behavior.</summary>
-	public sealed class IUnitOfWorkSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork.</summary>
+	public sealed class IUnitOfWorkKO
 	{
 		/// <summary>Handler for Commit.</summary>
 		public IUnitOfWork_CommitHandler Commit { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.GettingStarted.IRepository.</summary>
-	public IRepositorySpy IRepository { get; } = new();
+	public IRepositoryKO IRepository { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork.</summary>
-	public IUnitOfWorkSpy IUnitOfWork { get; } = new();
+	public IUnitOfWorkKO IUnitOfWork { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.GettingStarted.IRepository.</summary>
 	public KnockOff.Documentation.Samples.GettingStarted.IRepository AsRepository() => this;

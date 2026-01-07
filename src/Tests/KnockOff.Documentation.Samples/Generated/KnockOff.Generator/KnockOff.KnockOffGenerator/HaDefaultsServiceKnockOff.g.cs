@@ -115,8 +115,8 @@ partial class HaDefaultsServiceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.IHaDefaultsService - tracks invocations and configures behavior.</summary>
-	public sealed class IHaDefaultsServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaDefaultsService.</summary>
+	public sealed class IHaDefaultsServiceKO
 	{
 		/// <summary>Handler for GetCount.</summary>
 		public IHaDefaultsService_GetCountHandler GetCount { get; } = new();
@@ -131,7 +131,7 @@ partial class HaDefaultsServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaDefaultsService.</summary>
-	public IHaDefaultsServiceSpy IHaDefaultsService { get; } = new();
+	public IHaDefaultsServiceKO IHaDefaultsService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IHaDefaultsService.</summary>
 	public KnockOff.Documentation.Samples.Skills.IHaDefaultsService AsHaDefaultsService() => this;

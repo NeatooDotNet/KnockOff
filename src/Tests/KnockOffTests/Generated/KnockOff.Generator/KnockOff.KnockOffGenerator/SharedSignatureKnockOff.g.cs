@@ -58,8 +58,8 @@ partial class SharedSignatureKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Tests.ILogger - tracks invocations and configures behavior.</summary>
-	public sealed class ILoggerSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.ILogger.</summary>
+	public sealed class ILoggerKO
 	{
 		/// <summary>Handler for Name.</summary>
 		public ILogger_NameHandler Name { get; } = new();
@@ -117,8 +117,8 @@ partial class SharedSignatureKnockOff
 		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Tests.IAuditor - tracks invocations and configures behavior.</summary>
-	public sealed class IAuditorSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IAuditor.</summary>
+	public sealed class IAuditorKO
 	{
 		/// <summary>Handler for Log.</summary>
 		public IAuditor_LogHandler Log { get; } = new();
@@ -127,10 +127,10 @@ partial class SharedSignatureKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.ILogger.</summary>
-	public ILoggerSpy ILogger { get; } = new();
+	public ILoggerKO ILogger { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IAuditor.</summary>
-	public IAuditorSpy IAuditor { get; } = new();
+	public IAuditorKO IAuditor { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.ILogger.</summary>
 	public KnockOff.Tests.ILogger AsLogger() => this;

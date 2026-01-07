@@ -55,8 +55,8 @@ partial class SkRefProcessorKnockOff
 		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ISkRefProcessor - tracks invocations and configures behavior.</summary>
-	public sealed class ISkRefProcessorSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkRefProcessor.</summary>
+	public sealed class ISkRefProcessorKO
 	{
 		/// <summary>Handler for Increment.</summary>
 		public ISkRefProcessor_IncrementHandler Increment { get; } = new();
@@ -65,7 +65,7 @@ partial class SkRefProcessorKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkRefProcessor.</summary>
-	public ISkRefProcessorSpy ISkRefProcessor { get; } = new();
+	public ISkRefProcessorKO ISkRefProcessor { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkRefProcessor.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkRefProcessor AsSkRefProcessor() => this;

@@ -21,15 +21,15 @@ partial class PropConfigKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IPropConfig - tracks invocations and configures behavior.</summary>
-	public sealed class IPropConfigSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropConfig.</summary>
+	public sealed class IPropConfigKO
 	{
 		/// <summary>Handler for ConnectionString.</summary>
 		public IPropConfig_ConnectionStringHandler ConnectionString { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropConfig.</summary>
-	public IPropConfigSpy IPropConfig { get; } = new();
+	public IPropConfigKO IPropConfig { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IPropConfig.</summary>
 	public KnockOff.Documentation.Samples.Guides.IPropConfig AsPropConfig() => this;

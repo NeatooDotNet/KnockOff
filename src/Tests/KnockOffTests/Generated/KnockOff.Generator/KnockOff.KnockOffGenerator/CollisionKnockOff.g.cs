@@ -55,8 +55,8 @@ partial class CollisionKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Tests.ICollision - tracks invocations and configures behavior.</summary>
-	public sealed class ICollision_Spy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.ICollision.</summary>
+	public sealed class ICollision_KO
 	{
 		/// <summary>Handler for ICollision.</summary>
 		public ICollision__ICollisionHandler ICollision { get; } = new();
@@ -65,7 +65,7 @@ partial class CollisionKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.ICollision.</summary>
-	public ICollision_Spy ICollision_ { get; } = new();
+	public ICollision_KO ICollision_ { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.ICollision.</summary>
 	public KnockOff.Tests.ICollision AsCollision() => this;

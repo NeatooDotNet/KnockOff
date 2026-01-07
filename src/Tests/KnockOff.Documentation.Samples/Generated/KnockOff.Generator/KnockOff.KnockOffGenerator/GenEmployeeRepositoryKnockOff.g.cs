@@ -30,15 +30,15 @@ partial class GenEmployeeRepositoryKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IGenEntityRepository<KnockOff.Documentation.Samples.Guides.GenEmployee> - tracks invocations and configures behavior.</summary>
-	public sealed class IGenEntityRepository_KnockOff_Documentation_Samples_Guides_GenEmployeeSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenEntityRepository<KnockOff.Documentation.Samples.Guides.GenEmployee>.</summary>
+	public sealed class IGenEntityRepository_KnockOff_Documentation_Samples_Guides_GenEmployeeKO
 	{
 		/// <summary>Handler for FindById.</summary>
 		public IGenEntityRepository_KnockOff_Documentation_Samples_Guides_GenEmployee_FindByIdHandler FindById { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenEntityRepository<KnockOff.Documentation.Samples.Guides.GenEmployee>.</summary>
-	public IGenEntityRepository_KnockOff_Documentation_Samples_Guides_GenEmployeeSpy IGenEntityRepository_KnockOff_Documentation_Samples_Guides_GenEmployee { get; } = new();
+	public IGenEntityRepository_KnockOff_Documentation_Samples_Guides_GenEmployeeKO IGenEntityRepository_KnockOff_Documentation_Samples_Guides_GenEmployee { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IGenEntityRepository<KnockOff.Documentation.Samples.Guides.GenEmployee>.</summary>
 	public KnockOff.Documentation.Samples.Guides.IGenEntityRepository<KnockOff.Documentation.Samples.Guides.GenEmployee> AsGenEntityRepository() => this;

@@ -77,8 +77,8 @@ partial class CpCallbackServiceKnockOff
 		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ICpCallbackService - tracks invocations and configures behavior.</summary>
-	public sealed class ICpCallbackServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpCallbackService.</summary>
+	public sealed class ICpCallbackServiceKO
 	{
 		/// <summary>Handler for Initialize.</summary>
 		public ICpCallbackService_InitializeHandler Initialize { get; } = new();
@@ -89,7 +89,7 @@ partial class CpCallbackServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpCallbackService.</summary>
-	public ICpCallbackServiceSpy ICpCallbackService { get; } = new();
+	public ICpCallbackServiceKO ICpCallbackService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpCallbackService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ICpCallbackService AsCpCallbackService() => this;

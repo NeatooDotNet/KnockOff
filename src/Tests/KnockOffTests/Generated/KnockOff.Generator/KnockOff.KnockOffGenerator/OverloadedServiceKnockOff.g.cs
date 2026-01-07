@@ -180,8 +180,8 @@ partial class OverloadedServiceKnockOff
 		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Tests.IOverloadedService - tracks invocations and configures behavior.</summary>
-	public sealed class IOverloadedServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IOverloadedService.</summary>
+	public sealed class IOverloadedServiceKO
 	{
 		/// <summary>Handler for GetByIdAsync overload 1.</summary>
 		public IOverloadedService_GetByIdAsync1Handler GetByIdAsync1 { get; } = new();
@@ -200,7 +200,7 @@ partial class OverloadedServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IOverloadedService.</summary>
-	public IOverloadedServiceSpy IOverloadedService { get; } = new();
+	public IOverloadedServiceKO IOverloadedService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IOverloadedService.</summary>
 	public KnockOff.Tests.IOverloadedService AsOverloadedService() => this;

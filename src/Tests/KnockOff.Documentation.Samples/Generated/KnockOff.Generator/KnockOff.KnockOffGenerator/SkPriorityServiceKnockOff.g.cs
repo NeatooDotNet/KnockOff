@@ -30,15 +30,15 @@ partial class SkPriorityServiceKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ISkPriorityService - tracks invocations and configures behavior.</summary>
-	public sealed class ISkPriorityServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkPriorityService.</summary>
+	public sealed class ISkPriorityServiceKO
 	{
 		/// <summary>Handler for Calculate.</summary>
 		public ISkPriorityService_CalculateHandler Calculate { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkPriorityService.</summary>
-	public ISkPriorityServiceSpy ISkPriorityService { get; } = new();
+	public ISkPriorityServiceKO ISkPriorityService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkPriorityService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkPriorityService AsSkPriorityService() => this;

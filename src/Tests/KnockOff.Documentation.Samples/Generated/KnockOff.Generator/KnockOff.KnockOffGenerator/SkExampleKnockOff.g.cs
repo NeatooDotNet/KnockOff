@@ -3,13 +3,13 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class SkSpyExampleKnockOff
+partial class SkExampleKnockOff
 {
 	/// <summary>Tracks and configures behavior for ISkUserService.GetUser.</summary>
 	public sealed class ISkUserService_GetUserHandler
 	{
 		/// <summary>Delegate for GetUser(int id).</summary>
-		public delegate global::KnockOff.Documentation.Samples.Skills.SkUser GetUserDelegate(SkSpyExampleKnockOff ko, int id);
+		public delegate global::KnockOff.Documentation.Samples.Skills.SkUser GetUserDelegate(SkExampleKnockOff ko, int id);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
@@ -30,8 +30,8 @@ partial class SkSpyExampleKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ISkUserService - tracks invocations and configures behavior.</summary>
-	public sealed class ISkUserServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkUserService.</summary>
+	public sealed class ISkUserServiceKO
 	{
 		/// <summary>Handler for GetUser.</summary>
 		public ISkUserService_GetUserHandler GetUser { get; } = new();
@@ -47,7 +47,7 @@ partial class SkSpyExampleKnockOff
 		public string? LastGetKey { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<SkSpyExampleKnockOff, string, global::KnockOff.Documentation.Samples.Skills.SkUser?>? OnGet { get; set; }
+		public global::System.Func<SkExampleKnockOff, string, global::KnockOff.Documentation.Samples.Skills.SkUser?>? OnGet { get; set; }
 
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet(string key) { GetCount++; LastGetKey = key; }
@@ -59,7 +59,7 @@ partial class SkSpyExampleKnockOff
 		public (string key, global::KnockOff.Documentation.Samples.Skills.SkUser? value)? LastSetEntry { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<SkSpyExampleKnockOff, string, global::KnockOff.Documentation.Samples.Skills.SkUser?>? OnSet { get; set; }
+		public global::System.Action<SkExampleKnockOff, string, global::KnockOff.Documentation.Samples.Skills.SkUser?>? OnSet { get; set; }
 
 		/// <summary>Records a setter access.</summary>
 		public void RecordSet(string key, global::KnockOff.Documentation.Samples.Skills.SkUser? value) { SetCount++; LastSetEntry = (key, value); }
@@ -68,8 +68,8 @@ partial class SkSpyExampleKnockOff
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ISkPropertyStore - tracks invocations and configures behavior.</summary>
-	public sealed class ISkPropertyStoreSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkPropertyStore.</summary>
+	public sealed class ISkPropertyStoreKO
 	{
 		/// <summary>Handler for StringIndexer.</summary>
 		public ISkPropertyStore_StringIndexerHandler StringIndexer { get; } = new();
@@ -131,21 +131,21 @@ partial class SkSpyExampleKnockOff
 		public void Clear() { _handler = null; Reset(); }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ISkEventSource - tracks invocations and configures behavior.</summary>
-	public sealed class ISkEventSourceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkEventSource.</summary>
+	public sealed class ISkEventSourceKO
 	{
 		/// <summary>Handler for DataReceived event.</summary>
 		public ISkEventSource_DataReceivedHandler DataReceived { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkUserService.</summary>
-	public ISkUserServiceSpy ISkUserService { get; } = new();
+	public ISkUserServiceKO ISkUserService { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkPropertyStore.</summary>
-	public ISkPropertyStoreSpy ISkPropertyStore { get; } = new();
+	public ISkPropertyStoreKO ISkPropertyStore { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkEventSource.</summary>
-	public ISkEventSourceSpy ISkEventSource { get; } = new();
+	public ISkEventSourceKO ISkEventSource { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkUserService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkUserService AsSkUserService() => this;

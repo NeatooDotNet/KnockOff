@@ -58,8 +58,8 @@ partial class UserServiceKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple - tracks invocations and configures behavior.</summary>
-	public sealed class IUserServiceSimpleSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple.</summary>
+	public sealed class IUserServiceSimpleKO
 	{
 		/// <summary>Handler for Name.</summary>
 		public IUserServiceSimple_NameHandler Name { get; } = new();
@@ -68,7 +68,7 @@ partial class UserServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple.</summary>
-	public IUserServiceSimpleSpy IUserServiceSimple { get; } = new();
+	public IUserServiceSimpleKO IUserServiceSimple { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple.</summary>
 	public KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple AsUserServiceSimple() => this;

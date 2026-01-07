@@ -30,15 +30,15 @@ partial class SkParserKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ISkParser - tracks invocations and configures behavior.</summary>
-	public sealed class ISkParserSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkParser.</summary>
+	public sealed class ISkParserKO
 	{
 		/// <summary>Handler for TryParse.</summary>
 		public ISkParser_TryParseHandler TryParse { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkParser.</summary>
-	public ISkParserSpy ISkParser { get; } = new();
+	public ISkParserKO ISkParser { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkParser.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkParser AsSkParser() => this;

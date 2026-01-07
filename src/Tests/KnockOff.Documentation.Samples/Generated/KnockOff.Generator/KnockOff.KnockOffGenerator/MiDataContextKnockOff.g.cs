@@ -55,8 +55,8 @@ partial class MiDataContextKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IMiRepository - tracks invocations and configures behavior.</summary>
-	public sealed class IMiRepositorySpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiRepository.</summary>
+	public sealed class IMiRepositoryKO
 	{
 		/// <summary>Handler for GetById.</summary>
 		public IMiRepository_GetByIdHandler GetById { get; } = new();
@@ -89,18 +89,18 @@ partial class MiDataContextKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IMiUnitOfWork - tracks invocations and configures behavior.</summary>
-	public sealed class IMiUnitOfWorkSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiUnitOfWork.</summary>
+	public sealed class IMiUnitOfWorkKO
 	{
 		/// <summary>Handler for SaveChangesAsync.</summary>
 		public IMiUnitOfWork_SaveChangesAsyncHandler SaveChangesAsync { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiRepository.</summary>
-	public IMiRepositorySpy IMiRepository { get; } = new();
+	public IMiRepositoryKO IMiRepository { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiUnitOfWork.</summary>
-	public IMiUnitOfWorkSpy IMiUnitOfWork { get; } = new();
+	public IMiUnitOfWorkKO IMiUnitOfWork { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMiRepository.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMiRepository AsMiRepository() => this;

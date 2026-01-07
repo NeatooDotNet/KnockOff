@@ -33,15 +33,15 @@ partial class PropStatusKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Guides.IPropStatus - tracks invocations and configures behavior.</summary>
-	public sealed class IPropStatusSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropStatus.</summary>
+	public sealed class IPropStatusKO
 	{
 		/// <summary>Handler for Status.</summary>
 		public IPropStatus_StatusHandler Status { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropStatus.</summary>
-	public IPropStatusSpy IPropStatus { get; } = new();
+	public IPropStatusKO IPropStatus { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IPropStatus.</summary>
 	public KnockOff.Documentation.Samples.Guides.IPropStatus AsPropStatus() => this;

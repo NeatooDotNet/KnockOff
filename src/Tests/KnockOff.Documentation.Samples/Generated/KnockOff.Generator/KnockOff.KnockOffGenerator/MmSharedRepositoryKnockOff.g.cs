@@ -30,15 +30,15 @@ partial class MmSharedRepositoryKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.IMmRepository - tracks invocations and configures behavior.</summary>
-	public sealed class IMmRepositorySpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmRepository.</summary>
+	public sealed class IMmRepositoryKO
 	{
 		/// <summary>Handler for Save.</summary>
 		public IMmRepository_SaveHandler Save { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmRepository.</summary>
-	public IMmRepositorySpy IMmRepository { get; } = new();
+	public IMmRepositoryKO IMmRepository { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmRepository.</summary>
 	public KnockOff.Documentation.Samples.Skills.IMmRepository AsMmRepository() => this;

@@ -383,8 +383,8 @@ partial class GenericMethodServiceKnockOff
 		}
 	}
 
-	/// <summary>Spy for KnockOff.Tests.IGenericMethodService - tracks invocations and configures behavior.</summary>
-	public sealed class IGenericMethodServiceSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IGenericMethodService.</summary>
+	public sealed class IGenericMethodServiceKO
 	{
 		/// <summary>Handler for Create.</summary>
 		public IGenericMethodService_CreateHandler Create { get; } = new();
@@ -401,7 +401,7 @@ partial class GenericMethodServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IGenericMethodService.</summary>
-	public IGenericMethodServiceSpy IGenericMethodService { get; } = new();
+	public IGenericMethodServiceKO IGenericMethodService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IGenericMethodService.</summary>
 	public KnockOff.Tests.IGenericMethodService AsGenericMethodService() => this;

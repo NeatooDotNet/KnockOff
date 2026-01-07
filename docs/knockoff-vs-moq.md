@@ -168,9 +168,6 @@ repo.Save(new Entity { Id = 1 });
 
 var captured = knockOff.IRepository.Save.LastCallArg;
 Assert.Equal(1, captured?.Id);
-
-// All calls are available
-var allSaved = knockOff.IRepository.Save.AllCalls;
 ```
 
 ### Multiple Interface Implementation

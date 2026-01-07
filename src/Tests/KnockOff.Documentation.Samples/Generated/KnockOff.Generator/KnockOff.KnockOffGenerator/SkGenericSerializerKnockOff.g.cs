@@ -152,8 +152,8 @@ partial class SkGenericSerializerKnockOff
 		}
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ISkGenericSerializer - tracks invocations and configures behavior.</summary>
-	public sealed class ISkGenericSerializerSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkGenericSerializer.</summary>
+	public sealed class ISkGenericSerializerKO
 	{
 		/// <summary>Handler for Deserialize.</summary>
 		public ISkGenericSerializer_DeserializeHandler Deserialize { get; } = new();
@@ -162,7 +162,7 @@ partial class SkGenericSerializerKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkGenericSerializer.</summary>
-	public ISkGenericSerializerSpy ISkGenericSerializer { get; } = new();
+	public ISkGenericSerializerKO ISkGenericSerializer { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkGenericSerializer.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkGenericSerializer AsSkGenericSerializer() => this;

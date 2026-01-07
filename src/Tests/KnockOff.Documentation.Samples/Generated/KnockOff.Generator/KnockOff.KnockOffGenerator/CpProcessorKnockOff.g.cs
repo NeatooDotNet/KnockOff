@@ -55,8 +55,8 @@ partial class CpProcessorKnockOff
 		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 	}
 
-	/// <summary>Spy for KnockOff.Documentation.Samples.Skills.ICpProcessor - tracks invocations and configures behavior.</summary>
-	public sealed class ICpProcessorSpy
+	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpProcessor.</summary>
+	public sealed class ICpProcessorKO
 	{
 		/// <summary>Handler for Increment.</summary>
 		public ICpProcessor_IncrementHandler Increment { get; } = new();
@@ -65,7 +65,7 @@ partial class CpProcessorKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpProcessor.</summary>
-	public ICpProcessorSpy ICpProcessor { get; } = new();
+	public ICpProcessorKO ICpProcessor { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpProcessor.</summary>
 	public KnockOff.Documentation.Samples.Skills.ICpProcessor AsCpProcessor() => this;
