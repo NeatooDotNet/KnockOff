@@ -6,7 +6,7 @@ namespace KnockOff.Tests;
 partial class SmartDefaultsKnockOff
 {
 	/// <summary>Tracks and configures behavior for ISmartDefaultsService.Count.</summary>
-	public sealed class ISmartDefaultsService_CountHandler
+	public sealed class ISmartDefaultsService_CountInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -22,7 +22,7 @@ partial class SmartDefaultsKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISmartDefaultsService.Items.</summary>
-	public sealed class ISmartDefaultsService_ItemsHandler
+	public sealed class ISmartDefaultsService_ItemsInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -38,7 +38,7 @@ partial class SmartDefaultsKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISmartDefaultsService.GetInt.</summary>
-	public sealed class ISmartDefaultsService_GetIntHandler
+	public sealed class ISmartDefaultsService_GetIntInterceptor
 	{
 		/// <summary>Delegate for GetInt().</summary>
 		public delegate int GetIntDelegate(SmartDefaultsKnockOff ko);
@@ -60,7 +60,7 @@ partial class SmartDefaultsKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISmartDefaultsService.GetBool.</summary>
-	public sealed class ISmartDefaultsService_GetBoolHandler
+	public sealed class ISmartDefaultsService_GetBoolInterceptor
 	{
 		/// <summary>Delegate for GetBool().</summary>
 		public delegate bool GetBoolDelegate(SmartDefaultsKnockOff ko);
@@ -82,7 +82,7 @@ partial class SmartDefaultsKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISmartDefaultsService.GetDateTime.</summary>
-	public sealed class ISmartDefaultsService_GetDateTimeHandler
+	public sealed class ISmartDefaultsService_GetDateTimeInterceptor
 	{
 		/// <summary>Delegate for GetDateTime().</summary>
 		public delegate global::System.DateTime GetDateTimeDelegate(SmartDefaultsKnockOff ko);
@@ -104,7 +104,7 @@ partial class SmartDefaultsKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISmartDefaultsService.GetNullableString.</summary>
-	public sealed class ISmartDefaultsService_GetNullableStringHandler
+	public sealed class ISmartDefaultsService_GetNullableStringInterceptor
 	{
 		/// <summary>Delegate for GetNullableString().</summary>
 		public delegate string? GetNullableStringDelegate(SmartDefaultsKnockOff ko);
@@ -126,7 +126,7 @@ partial class SmartDefaultsKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISmartDefaultsService.GetNullableEntity.</summary>
-	public sealed class ISmartDefaultsService_GetNullableEntityHandler
+	public sealed class ISmartDefaultsService_GetNullableEntityInterceptor
 	{
 		/// <summary>Delegate for GetNullableEntity().</summary>
 		public delegate global::KnockOff.Tests.TestEntity? GetNullableEntityDelegate(SmartDefaultsKnockOff ko);
@@ -148,7 +148,7 @@ partial class SmartDefaultsKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISmartDefaultsService.GetList.</summary>
-	public sealed class ISmartDefaultsService_GetListHandler
+	public sealed class ISmartDefaultsService_GetListInterceptor
 	{
 		/// <summary>Delegate for GetList().</summary>
 		public delegate global::System.Collections.Generic.List<string> GetListDelegate(SmartDefaultsKnockOff ko);
@@ -170,7 +170,7 @@ partial class SmartDefaultsKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISmartDefaultsService.GetDictionary.</summary>
-	public sealed class ISmartDefaultsService_GetDictionaryHandler
+	public sealed class ISmartDefaultsService_GetDictionaryInterceptor
 	{
 		/// <summary>Delegate for GetDictionary().</summary>
 		public delegate global::System.Collections.Generic.Dictionary<string, int> GetDictionaryDelegate(SmartDefaultsKnockOff ko);
@@ -192,7 +192,7 @@ partial class SmartDefaultsKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISmartDefaultsService.GetEntity.</summary>
-	public sealed class ISmartDefaultsService_GetEntityHandler
+	public sealed class ISmartDefaultsService_GetEntityInterceptor
 	{
 		/// <summary>Delegate for GetEntity().</summary>
 		public delegate global::KnockOff.Tests.TestEntity GetEntityDelegate(SmartDefaultsKnockOff ko);
@@ -214,7 +214,7 @@ partial class SmartDefaultsKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISmartDefaultsService.GetIList.</summary>
-	public sealed class ISmartDefaultsService_GetIListHandler
+	public sealed class ISmartDefaultsService_GetIListInterceptor
 	{
 		/// <summary>Delegate for GetIList().</summary>
 		public delegate global::System.Collections.Generic.IList<string> GetIListDelegate(SmartDefaultsKnockOff ko);
@@ -236,7 +236,7 @@ partial class SmartDefaultsKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISmartDefaultsService.GetString.</summary>
-	public sealed class ISmartDefaultsService_GetStringHandler
+	public sealed class ISmartDefaultsService_GetStringInterceptor
 	{
 		/// <summary>Delegate for GetString().</summary>
 		public delegate string GetStringDelegate(SmartDefaultsKnockOff ko);
@@ -258,7 +258,7 @@ partial class SmartDefaultsKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISmartDefaultsService.GetDisposable.</summary>
-	public sealed class ISmartDefaultsService_GetDisposableHandler
+	public sealed class ISmartDefaultsService_GetDisposableInterceptor
 	{
 		/// <summary>Delegate for GetDisposable().</summary>
 		public delegate global::System.IDisposable GetDisposableDelegate(SmartDefaultsKnockOff ko);
@@ -280,7 +280,7 @@ partial class SmartDefaultsKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISmartDefaultsService.GetIntAsync.</summary>
-	public sealed class ISmartDefaultsService_GetIntAsyncHandler
+	public sealed class ISmartDefaultsService_GetIntAsyncInterceptor
 	{
 		/// <summary>Delegate for GetIntAsync().</summary>
 		public delegate global::System.Threading.Tasks.Task<int> GetIntAsyncDelegate(SmartDefaultsKnockOff ko);
@@ -302,7 +302,7 @@ partial class SmartDefaultsKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISmartDefaultsService.GetListAsync.</summary>
-	public sealed class ISmartDefaultsService_GetListAsyncHandler
+	public sealed class ISmartDefaultsService_GetListAsyncInterceptor
 	{
 		/// <summary>Delegate for GetListAsync().</summary>
 		public delegate global::System.Threading.Tasks.Task<global::System.Collections.Generic.List<string>> GetListAsyncDelegate(SmartDefaultsKnockOff ko);
@@ -324,7 +324,7 @@ partial class SmartDefaultsKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISmartDefaultsService.GetStringAsync.</summary>
-	public sealed class ISmartDefaultsService_GetStringAsyncHandler
+	public sealed class ISmartDefaultsService_GetStringAsyncInterceptor
 	{
 		/// <summary>Delegate for GetStringAsync().</summary>
 		public delegate global::System.Threading.Tasks.Task<string> GetStringAsyncDelegate(SmartDefaultsKnockOff ko);
@@ -346,44 +346,44 @@ partial class SmartDefaultsKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.ISmartDefaultsService.</summary>
-	public sealed class ISmartDefaultsServiceKO
+	public sealed class ISmartDefaultsServiceInterceptorors
 	{
-		/// <summary>Handler for Count.</summary>
-		public ISmartDefaultsService_CountHandler Count { get; } = new();
-		/// <summary>Handler for Items.</summary>
-		public ISmartDefaultsService_ItemsHandler Items { get; } = new();
-		/// <summary>Handler for GetInt.</summary>
-		public ISmartDefaultsService_GetIntHandler GetInt { get; } = new();
-		/// <summary>Handler for GetBool.</summary>
-		public ISmartDefaultsService_GetBoolHandler GetBool { get; } = new();
-		/// <summary>Handler for GetDateTime.</summary>
-		public ISmartDefaultsService_GetDateTimeHandler GetDateTime { get; } = new();
-		/// <summary>Handler for GetNullableString.</summary>
-		public ISmartDefaultsService_GetNullableStringHandler GetNullableString { get; } = new();
-		/// <summary>Handler for GetNullableEntity.</summary>
-		public ISmartDefaultsService_GetNullableEntityHandler GetNullableEntity { get; } = new();
-		/// <summary>Handler for GetList.</summary>
-		public ISmartDefaultsService_GetListHandler GetList { get; } = new();
-		/// <summary>Handler for GetDictionary.</summary>
-		public ISmartDefaultsService_GetDictionaryHandler GetDictionary { get; } = new();
-		/// <summary>Handler for GetEntity.</summary>
-		public ISmartDefaultsService_GetEntityHandler GetEntity { get; } = new();
-		/// <summary>Handler for GetIList.</summary>
-		public ISmartDefaultsService_GetIListHandler GetIList { get; } = new();
-		/// <summary>Handler for GetString.</summary>
-		public ISmartDefaultsService_GetStringHandler GetString { get; } = new();
-		/// <summary>Handler for GetDisposable.</summary>
-		public ISmartDefaultsService_GetDisposableHandler GetDisposable { get; } = new();
-		/// <summary>Handler for GetIntAsync.</summary>
-		public ISmartDefaultsService_GetIntAsyncHandler GetIntAsync { get; } = new();
-		/// <summary>Handler for GetListAsync.</summary>
-		public ISmartDefaultsService_GetListAsyncHandler GetListAsync { get; } = new();
-		/// <summary>Handler for GetStringAsync.</summary>
-		public ISmartDefaultsService_GetStringAsyncHandler GetStringAsync { get; } = new();
+		/// <summary>Interceptor for Count.</summary>
+		public ISmartDefaultsService_CountInterceptor Count { get; } = new();
+		/// <summary>Interceptor for Items.</summary>
+		public ISmartDefaultsService_ItemsInterceptor Items { get; } = new();
+		/// <summary>Interceptor for GetInt.</summary>
+		public ISmartDefaultsService_GetIntInterceptor GetInt { get; } = new();
+		/// <summary>Interceptor for GetBool.</summary>
+		public ISmartDefaultsService_GetBoolInterceptor GetBool { get; } = new();
+		/// <summary>Interceptor for GetDateTime.</summary>
+		public ISmartDefaultsService_GetDateTimeInterceptor GetDateTime { get; } = new();
+		/// <summary>Interceptor for GetNullableString.</summary>
+		public ISmartDefaultsService_GetNullableStringInterceptor GetNullableString { get; } = new();
+		/// <summary>Interceptor for GetNullableEntity.</summary>
+		public ISmartDefaultsService_GetNullableEntityInterceptor GetNullableEntity { get; } = new();
+		/// <summary>Interceptor for GetList.</summary>
+		public ISmartDefaultsService_GetListInterceptor GetList { get; } = new();
+		/// <summary>Interceptor for GetDictionary.</summary>
+		public ISmartDefaultsService_GetDictionaryInterceptor GetDictionary { get; } = new();
+		/// <summary>Interceptor for GetEntity.</summary>
+		public ISmartDefaultsService_GetEntityInterceptor GetEntity { get; } = new();
+		/// <summary>Interceptor for GetIList.</summary>
+		public ISmartDefaultsService_GetIListInterceptor GetIList { get; } = new();
+		/// <summary>Interceptor for GetString.</summary>
+		public ISmartDefaultsService_GetStringInterceptor GetString { get; } = new();
+		/// <summary>Interceptor for GetDisposable.</summary>
+		public ISmartDefaultsService_GetDisposableInterceptor GetDisposable { get; } = new();
+		/// <summary>Interceptor for GetIntAsync.</summary>
+		public ISmartDefaultsService_GetIntAsyncInterceptor GetIntAsync { get; } = new();
+		/// <summary>Interceptor for GetListAsync.</summary>
+		public ISmartDefaultsService_GetListAsyncInterceptor GetListAsync { get; } = new();
+		/// <summary>Interceptor for GetStringAsync.</summary>
+		public ISmartDefaultsService_GetStringAsyncInterceptor GetStringAsync { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.ISmartDefaultsService.</summary>
-	public ISmartDefaultsServiceKO ISmartDefaultsService { get; } = new();
+	public ISmartDefaultsServiceInterceptorors ISmartDefaultsService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.ISmartDefaultsService.</summary>
 	public KnockOff.Tests.ISmartDefaultsService AsSmartDefaultsService() => this;

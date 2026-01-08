@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class CpCalculatorKnockOff
 {
 	/// <summary>Tracks and configures behavior for ICpCalculator.Add.</summary>
-	public sealed class ICpCalculator_AddHandler
+	public sealed class ICpCalculator_AddInterceptor
 	{
 		/// <summary>Delegate for Add(int a, int b).</summary>
 		public delegate int AddDelegate(CpCalculatorKnockOff ko, int a, int b);
@@ -31,7 +31,7 @@ partial class CpCalculatorKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ICpCalculator.Divide.</summary>
-	public sealed class ICpCalculator_DivideHandler
+	public sealed class ICpCalculator_DivideInterceptor
 	{
 		/// <summary>Delegate for Divide(int numerator, int denominator).</summary>
 		public delegate double DivideDelegate(CpCalculatorKnockOff ko, int numerator, int denominator);
@@ -56,16 +56,16 @@ partial class CpCalculatorKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpCalculator.</summary>
-	public sealed class ICpCalculatorKO
+	public sealed class ICpCalculatorInterceptorors
 	{
-		/// <summary>Handler for Add.</summary>
-		public ICpCalculator_AddHandler Add { get; } = new();
-		/// <summary>Handler for Divide.</summary>
-		public ICpCalculator_DivideHandler Divide { get; } = new();
+		/// <summary>Interceptor for Add.</summary>
+		public ICpCalculator_AddInterceptor Add { get; } = new();
+		/// <summary>Interceptor for Divide.</summary>
+		public ICpCalculator_DivideInterceptor Divide { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpCalculator.</summary>
-	public ICpCalculatorKO ICpCalculator { get; } = new();
+	public ICpCalculatorInterceptorors ICpCalculator { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpCalculator.</summary>
 	public KnockOff.Documentation.Samples.Skills.ICpCalculator AsCpCalculator() => this;

@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class MmRefProcessorKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMmRefProcessor.Increment.</summary>
-	public sealed class IMmRefProcessor_IncrementHandler
+	public sealed class IMmRefProcessor_IncrementInterceptor
 	{
 		/// <summary>Delegate for Increment(ref int value).</summary>
 		public delegate void IncrementDelegate(MmRefProcessorKnockOff ko, ref int value);
@@ -31,14 +31,14 @@ partial class MmRefProcessorKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmRefProcessor.</summary>
-	public sealed class IMmRefProcessorKO
+	public sealed class IMmRefProcessorInterceptorors
 	{
-		/// <summary>Handler for Increment.</summary>
-		public IMmRefProcessor_IncrementHandler Increment { get; } = new();
+		/// <summary>Interceptor for Increment.</summary>
+		public IMmRefProcessor_IncrementInterceptor Increment { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmRefProcessor.</summary>
-	public IMmRefProcessorKO IMmRefProcessor { get; } = new();
+	public IMmRefProcessorInterceptorors IMmRefProcessor { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmRefProcessor.</summary>
 	public KnockOff.Documentation.Samples.Skills.IMmRefProcessor AsMmRefProcessor() => this;

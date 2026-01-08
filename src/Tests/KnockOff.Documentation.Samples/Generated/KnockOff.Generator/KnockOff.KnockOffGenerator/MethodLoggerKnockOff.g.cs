@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class MethodLoggerKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMethodLogger.Log.</summary>
-	public sealed class IMethodLogger_LogHandler
+	public sealed class IMethodLogger_LogInterceptor
 	{
 		/// <summary>Delegate for Log(string message).</summary>
 		public delegate void LogDelegate(MethodLoggerKnockOff ko, string message);
@@ -31,7 +31,7 @@ partial class MethodLoggerKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IMethodLogger.LogError.</summary>
-	public sealed class IMethodLogger_LogErrorHandler
+	public sealed class IMethodLogger_LogErrorInterceptor
 	{
 		/// <summary>Delegate for LogError(string message, global::System.Exception ex).</summary>
 		public delegate void LogErrorDelegate(MethodLoggerKnockOff ko, string message, global::System.Exception ex);
@@ -56,16 +56,16 @@ partial class MethodLoggerKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodLogger.</summary>
-	public sealed class IMethodLoggerKO
+	public sealed class IMethodLoggerInterceptorors
 	{
-		/// <summary>Handler for Log.</summary>
-		public IMethodLogger_LogHandler Log { get; } = new();
-		/// <summary>Handler for LogError.</summary>
-		public IMethodLogger_LogErrorHandler LogError { get; } = new();
+		/// <summary>Interceptor for Log.</summary>
+		public IMethodLogger_LogInterceptor Log { get; } = new();
+		/// <summary>Interceptor for LogError.</summary>
+		public IMethodLogger_LogErrorInterceptor LogError { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodLogger.</summary>
-	public IMethodLoggerKO IMethodLogger { get; } = new();
+	public IMethodLoggerInterceptorors IMethodLogger { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodLogger.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMethodLogger AsMethodLogger() => this;

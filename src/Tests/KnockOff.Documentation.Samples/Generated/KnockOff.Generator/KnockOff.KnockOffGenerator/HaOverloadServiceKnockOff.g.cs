@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class HaOverloadServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for IHaOverloadService.Process1.</summary>
-	public sealed class IHaOverloadService_Process1Handler
+	public sealed class IHaOverloadService_Process1Interceptor
 	{
 		/// <summary>Delegate for Process(string data).</summary>
 		public delegate void ProcessDelegate(HaOverloadServiceKnockOff ko, string data);
@@ -31,7 +31,7 @@ partial class HaOverloadServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IHaOverloadService.Process2.</summary>
-	public sealed class IHaOverloadService_Process2Handler
+	public sealed class IHaOverloadService_Process2Interceptor
 	{
 		/// <summary>Delegate for Process(string data, int priority).</summary>
 		public delegate void ProcessDelegate(HaOverloadServiceKnockOff ko, string data, int priority);
@@ -56,7 +56,7 @@ partial class HaOverloadServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IHaOverloadService.Calculate1.</summary>
-	public sealed class IHaOverloadService_Calculate1Handler
+	public sealed class IHaOverloadService_Calculate1Interceptor
 	{
 		/// <summary>Delegate for Calculate(int value).</summary>
 		public delegate int CalculateDelegate(HaOverloadServiceKnockOff ko, int value);
@@ -81,7 +81,7 @@ partial class HaOverloadServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IHaOverloadService.Calculate2.</summary>
-	public sealed class IHaOverloadService_Calculate2Handler
+	public sealed class IHaOverloadService_Calculate2Interceptor
 	{
 		/// <summary>Delegate for Calculate(int a, int b).</summary>
 		public delegate int CalculateDelegate(HaOverloadServiceKnockOff ko, int a, int b);
@@ -106,20 +106,20 @@ partial class HaOverloadServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaOverloadService.</summary>
-	public sealed class IHaOverloadServiceKO
+	public sealed class IHaOverloadServiceInterceptorors
 	{
-		/// <summary>Handler for Process overload 1.</summary>
-		public IHaOverloadService_Process1Handler Process1 { get; } = new();
-		/// <summary>Handler for Process overload 2.</summary>
-		public IHaOverloadService_Process2Handler Process2 { get; } = new();
-		/// <summary>Handler for Calculate overload 1.</summary>
-		public IHaOverloadService_Calculate1Handler Calculate1 { get; } = new();
-		/// <summary>Handler for Calculate overload 2.</summary>
-		public IHaOverloadService_Calculate2Handler Calculate2 { get; } = new();
+		/// <summary>Interceptor for Process overload 1.</summary>
+		public IHaOverloadService_Process1Interceptor Process1 { get; } = new();
+		/// <summary>Interceptor for Process overload 2.</summary>
+		public IHaOverloadService_Process2Interceptor Process2 { get; } = new();
+		/// <summary>Interceptor for Calculate overload 1.</summary>
+		public IHaOverloadService_Calculate1Interceptor Calculate1 { get; } = new();
+		/// <summary>Interceptor for Calculate overload 2.</summary>
+		public IHaOverloadService_Calculate2Interceptor Calculate2 { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaOverloadService.</summary>
-	public IHaOverloadServiceKO IHaOverloadService { get; } = new();
+	public IHaOverloadServiceInterceptorors IHaOverloadService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IHaOverloadService.</summary>
 	public KnockOff.Documentation.Samples.Skills.IHaOverloadService AsHaOverloadService() => this;

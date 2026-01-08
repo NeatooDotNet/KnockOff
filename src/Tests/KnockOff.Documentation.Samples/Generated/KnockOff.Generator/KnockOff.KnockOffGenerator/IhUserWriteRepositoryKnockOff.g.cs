@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class IhUserWriteRepositoryKnockOff
 {
 	/// <summary>Tracks and configures behavior for IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUser.Add.</summary>
-	public sealed class IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUser_AddHandler
+	public sealed class IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUser_AddInterceptor
 	{
 		/// <summary>Delegate for Add(global::KnockOff.Documentation.Samples.Guides.IhUser entity).</summary>
 		public delegate void AddDelegate(IhUserWriteRepositoryKnockOff ko, global::KnockOff.Documentation.Samples.Guides.IhUser entity);
@@ -31,7 +31,7 @@ partial class IhUserWriteRepositoryKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUser.Delete.</summary>
-	public sealed class IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUser_DeleteHandler
+	public sealed class IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUser_DeleteInterceptor
 	{
 		/// <summary>Delegate for Delete(int id).</summary>
 		public delegate void DeleteDelegate(IhUserWriteRepositoryKnockOff ko, int id);
@@ -56,16 +56,16 @@ partial class IhUserWriteRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhWriteRepository<KnockOff.Documentation.Samples.Guides.IhUser>.</summary>
-	public sealed class IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUserKO
+	public sealed class IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUserInterceptorors
 	{
-		/// <summary>Handler for Add.</summary>
-		public IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUser_AddHandler Add { get; } = new();
-		/// <summary>Handler for Delete.</summary>
-		public IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUser_DeleteHandler Delete { get; } = new();
+		/// <summary>Interceptor for Add.</summary>
+		public IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUser_AddInterceptor Add { get; } = new();
+		/// <summary>Interceptor for Delete.</summary>
+		public IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUser_DeleteInterceptor Delete { get; } = new();
 	}
 
 	/// <summary>Tracks and configures behavior for IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUser.GetById.</summary>
-	public sealed class IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUser_GetByIdHandler
+	public sealed class IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUser_GetByIdInterceptor
 	{
 		/// <summary>Delegate for GetById(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Guides.IhUser? GetByIdDelegate(IhUserWriteRepositoryKnockOff ko, int id);
@@ -90,7 +90,7 @@ partial class IhUserWriteRepositoryKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUser.GetAll.</summary>
-	public sealed class IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUser_GetAllHandler
+	public sealed class IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUser_GetAllInterceptor
 	{
 		/// <summary>Delegate for GetAll().</summary>
 		public delegate global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Guides.IhUser> GetAllDelegate(IhUserWriteRepositoryKnockOff ko);
@@ -112,19 +112,19 @@ partial class IhUserWriteRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhReadRepository<KnockOff.Documentation.Samples.Guides.IhUser>.</summary>
-	public sealed class IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUserKO
+	public sealed class IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUserInterceptorors
 	{
-		/// <summary>Handler for GetById.</summary>
-		public IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUser_GetByIdHandler GetById { get; } = new();
-		/// <summary>Handler for GetAll.</summary>
-		public IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUser_GetAllHandler GetAll { get; } = new();
+		/// <summary>Interceptor for GetById.</summary>
+		public IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUser_GetByIdInterceptor GetById { get; } = new();
+		/// <summary>Interceptor for GetAll.</summary>
+		public IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUser_GetAllInterceptor GetAll { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhWriteRepository<KnockOff.Documentation.Samples.Guides.IhUser>.</summary>
-	public IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUserKO IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUser { get; } = new();
+	public IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUserInterceptorors IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUser { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhReadRepository<KnockOff.Documentation.Samples.Guides.IhUser>.</summary>
-	public IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUserKO IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUser { get; } = new();
+	public IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUserInterceptorors IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUser { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIhWriteRepository<KnockOff.Documentation.Samples.Guides.IhUser>.</summary>
 	public KnockOff.Documentation.Samples.Guides.IIhWriteRepository<KnockOff.Documentation.Samples.Guides.IhUser> AsIhWriteRepository() => this;

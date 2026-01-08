@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class SkExampleKnockOff
 {
 	/// <summary>Tracks and configures behavior for ISkUserService.GetUser.</summary>
-	public sealed class ISkUserService_GetUserHandler
+	public sealed class ISkUserService_GetUserInterceptor
 	{
 		/// <summary>Delegate for GetUser(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.SkUser GetUserDelegate(SkExampleKnockOff ko, int id);
@@ -31,14 +31,14 @@ partial class SkExampleKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkUserService.</summary>
-	public sealed class ISkUserServiceKO
+	public sealed class ISkUserServiceInterceptorors
 	{
-		/// <summary>Handler for GetUser.</summary>
-		public ISkUserService_GetUserHandler GetUser { get; } = new();
+		/// <summary>Interceptor for GetUser.</summary>
+		public ISkUserService_GetUserInterceptor GetUser { get; } = new();
 	}
 
 	/// <summary>Tracks and configures behavior for ISkPropertyStore.StringIndexer.</summary>
-	public sealed class ISkPropertyStore_StringIndexerHandler
+	public sealed class ISkPropertyStore_StringIndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -69,14 +69,14 @@ partial class SkExampleKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkPropertyStore.</summary>
-	public sealed class ISkPropertyStoreKO
+	public sealed class ISkPropertyStoreInterceptorors
 	{
-		/// <summary>Handler for StringIndexer.</summary>
-		public ISkPropertyStore_StringIndexerHandler StringIndexer { get; } = new();
+		/// <summary>Interceptor for StringIndexer.</summary>
+		public ISkPropertyStore_StringIndexerInterceptor StringIndexer { get; } = new();
 	}
 
 	/// <summary>Tracks and raises ISkEventSource.DataReceived.</summary>
-	public sealed class ISkEventSource_DataReceivedHandler
+	public sealed class ISkEventSource_DataReceivedInterceptor
 	{
 		private global::System.EventHandler<string>? _handler;
 		private readonly global::System.Collections.Generic.List<(object? sender, string e)> _raises = new();
@@ -132,20 +132,20 @@ partial class SkExampleKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkEventSource.</summary>
-	public sealed class ISkEventSourceKO
+	public sealed class ISkEventSourceInterceptorors
 	{
-		/// <summary>Handler for DataReceived event.</summary>
-		public ISkEventSource_DataReceivedHandler DataReceived { get; } = new();
+		/// <summary>Interceptor for DataReceived event.</summary>
+		public ISkEventSource_DataReceivedInterceptor DataReceived { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkUserService.</summary>
-	public ISkUserServiceKO ISkUserService { get; } = new();
+	public ISkUserServiceInterceptorors ISkUserService { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkPropertyStore.</summary>
-	public ISkPropertyStoreKO ISkPropertyStore { get; } = new();
+	public ISkPropertyStoreInterceptorors ISkPropertyStore { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkEventSource.</summary>
-	public ISkEventSourceKO ISkEventSource { get; } = new();
+	public ISkEventSourceInterceptorors ISkEventSource { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkUserService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkUserService AsSkUserService() => this;

@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Comparison;
 partial class MigConnectionKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMigConnection.Connect.</summary>
-	public sealed class IMigConnection_ConnectHandler
+	public sealed class IMigConnection_ConnectInterceptor
 	{
 		/// <summary>Delegate for Connect().</summary>
 		public delegate void ConnectDelegate(MigConnectionKnockOff ko);
@@ -28,14 +28,14 @@ partial class MigConnectionKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigConnection.</summary>
-	public sealed class IMigConnectionKO
+	public sealed class IMigConnectionInterceptorors
 	{
-		/// <summary>Handler for Connect.</summary>
-		public IMigConnection_ConnectHandler Connect { get; } = new();
+		/// <summary>Interceptor for Connect.</summary>
+		public IMigConnection_ConnectInterceptor Connect { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigConnection.</summary>
-	public IMigConnectionKO IMigConnection { get; } = new();
+	public IMigConnectionInterceptorors IMigConnection { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IMigConnection.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IMigConnection AsMigConnection() => this;

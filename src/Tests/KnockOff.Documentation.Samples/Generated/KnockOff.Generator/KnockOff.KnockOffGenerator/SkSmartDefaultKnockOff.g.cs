@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class SkSmartDefaultKnockOff
 {
 	/// <summary>Tracks and configures behavior for ISkSmartDefaultService.GetCount.</summary>
-	public sealed class ISkSmartDefaultService_GetCountHandler
+	public sealed class ISkSmartDefaultService_GetCountInterceptor
 	{
 		/// <summary>Delegate for GetCount().</summary>
 		public delegate int GetCountDelegate(SkSmartDefaultKnockOff ko);
@@ -28,7 +28,7 @@ partial class SkSmartDefaultKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISkSmartDefaultService.GetItems.</summary>
-	public sealed class ISkSmartDefaultService_GetItemsHandler
+	public sealed class ISkSmartDefaultService_GetItemsInterceptor
 	{
 		/// <summary>Delegate for GetItems().</summary>
 		public delegate global::System.Collections.Generic.List<string> GetItemsDelegate(SkSmartDefaultKnockOff ko);
@@ -50,7 +50,7 @@ partial class SkSmartDefaultKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISkSmartDefaultService.GetIList.</summary>
-	public sealed class ISkSmartDefaultService_GetIListHandler
+	public sealed class ISkSmartDefaultService_GetIListInterceptor
 	{
 		/// <summary>Delegate for GetIList().</summary>
 		public delegate global::System.Collections.Generic.IList<string> GetIListDelegate(SkSmartDefaultKnockOff ko);
@@ -72,7 +72,7 @@ partial class SkSmartDefaultKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISkSmartDefaultService.GetOptional.</summary>
-	public sealed class ISkSmartDefaultService_GetOptionalHandler
+	public sealed class ISkSmartDefaultService_GetOptionalInterceptor
 	{
 		/// <summary>Delegate for GetOptional().</summary>
 		public delegate string? GetOptionalDelegate(SkSmartDefaultKnockOff ko);
@@ -94,7 +94,7 @@ partial class SkSmartDefaultKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISkSmartDefaultService.GetDisposable.</summary>
-	public sealed class ISkSmartDefaultService_GetDisposableHandler
+	public sealed class ISkSmartDefaultService_GetDisposableInterceptor
 	{
 		/// <summary>Delegate for GetDisposable().</summary>
 		public delegate global::System.IDisposable GetDisposableDelegate(SkSmartDefaultKnockOff ko);
@@ -116,22 +116,22 @@ partial class SkSmartDefaultKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.</summary>
-	public sealed class ISkSmartDefaultServiceKO
+	public sealed class ISkSmartDefaultServiceInterceptorors
 	{
-		/// <summary>Handler for GetCount.</summary>
-		public ISkSmartDefaultService_GetCountHandler GetCount { get; } = new();
-		/// <summary>Handler for GetItems.</summary>
-		public ISkSmartDefaultService_GetItemsHandler GetItems { get; } = new();
-		/// <summary>Handler for GetIList.</summary>
-		public ISkSmartDefaultService_GetIListHandler GetIList { get; } = new();
-		/// <summary>Handler for GetOptional.</summary>
-		public ISkSmartDefaultService_GetOptionalHandler GetOptional { get; } = new();
-		/// <summary>Handler for GetDisposable.</summary>
-		public ISkSmartDefaultService_GetDisposableHandler GetDisposable { get; } = new();
+		/// <summary>Interceptor for GetCount.</summary>
+		public ISkSmartDefaultService_GetCountInterceptor GetCount { get; } = new();
+		/// <summary>Interceptor for GetItems.</summary>
+		public ISkSmartDefaultService_GetItemsInterceptor GetItems { get; } = new();
+		/// <summary>Interceptor for GetIList.</summary>
+		public ISkSmartDefaultService_GetIListInterceptor GetIList { get; } = new();
+		/// <summary>Interceptor for GetOptional.</summary>
+		public ISkSmartDefaultService_GetOptionalInterceptor GetOptional { get; } = new();
+		/// <summary>Interceptor for GetDisposable.</summary>
+		public ISkSmartDefaultService_GetDisposableInterceptor GetDisposable { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.</summary>
-	public ISkSmartDefaultServiceKO ISkSmartDefaultService { get; } = new();
+	public ISkSmartDefaultServiceInterceptorors ISkSmartDefaultService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService AsSkSmartDefaultService() => this;

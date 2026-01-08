@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Comparison;
 partial class MigSharedRepositoryKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMigSharedRepository.GetById.</summary>
-	public sealed class IMigSharedRepository_GetByIdHandler
+	public sealed class IMigSharedRepository_GetByIdInterceptor
 	{
 		/// <summary>Delegate for GetById(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Comparison.MigUser? GetByIdDelegate(MigSharedRepositoryKnockOff ko, int id);
@@ -31,14 +31,14 @@ partial class MigSharedRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigSharedRepository.</summary>
-	public sealed class IMigSharedRepositoryKO
+	public sealed class IMigSharedRepositoryInterceptorors
 	{
-		/// <summary>Handler for GetById.</summary>
-		public IMigSharedRepository_GetByIdHandler GetById { get; } = new();
+		/// <summary>Interceptor for GetById.</summary>
+		public IMigSharedRepository_GetByIdInterceptor GetById { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigSharedRepository.</summary>
-	public IMigSharedRepositoryKO IMigSharedRepository { get; } = new();
+	public IMigSharedRepositoryInterceptorors IMigSharedRepository { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IMigSharedRepository.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IMigSharedRepository AsMigSharedRepository() => this;

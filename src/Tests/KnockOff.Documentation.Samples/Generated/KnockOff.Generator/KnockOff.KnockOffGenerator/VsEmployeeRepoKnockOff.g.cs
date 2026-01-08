@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Comparison;
 partial class VsEmployeeRepoKnockOff
 {
 	/// <summary>Tracks and configures behavior for IVsEmployeeRepository.GetEmployee.</summary>
-	public sealed class IVsEmployeeRepository_GetEmployeeHandler
+	public sealed class IVsEmployeeRepository_GetEmployeeInterceptor
 	{
 		/// <summary>Delegate for GetEmployee(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Comparison.VsUser? GetEmployeeDelegate(VsEmployeeRepoKnockOff ko, int id);
@@ -31,14 +31,14 @@ partial class VsEmployeeRepoKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsEmployeeRepository.</summary>
-	public sealed class IVsEmployeeRepositoryKO
+	public sealed class IVsEmployeeRepositoryInterceptorors
 	{
-		/// <summary>Handler for GetEmployee.</summary>
-		public IVsEmployeeRepository_GetEmployeeHandler GetEmployee { get; } = new();
+		/// <summary>Interceptor for GetEmployee.</summary>
+		public IVsEmployeeRepository_GetEmployeeInterceptor GetEmployee { get; } = new();
 	}
 
 	/// <summary>Tracks and configures behavior for IVsUnitOfWork.SaveChangesAsync.</summary>
-	public sealed class IVsUnitOfWork_SaveChangesAsyncHandler
+	public sealed class IVsUnitOfWork_SaveChangesAsyncInterceptor
 	{
 		/// <summary>Delegate for SaveChangesAsync(global::System.Threading.CancellationToken cancellationToken).</summary>
 		public delegate global::System.Threading.Tasks.Task<int> SaveChangesAsyncDelegate(VsEmployeeRepoKnockOff ko, global::System.Threading.CancellationToken cancellationToken);
@@ -63,17 +63,17 @@ partial class VsEmployeeRepoKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsUnitOfWork.</summary>
-	public sealed class IVsUnitOfWorkKO
+	public sealed class IVsUnitOfWorkInterceptorors
 	{
-		/// <summary>Handler for SaveChangesAsync.</summary>
-		public IVsUnitOfWork_SaveChangesAsyncHandler SaveChangesAsync { get; } = new();
+		/// <summary>Interceptor for SaveChangesAsync.</summary>
+		public IVsUnitOfWork_SaveChangesAsyncInterceptor SaveChangesAsync { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsEmployeeRepository.</summary>
-	public IVsEmployeeRepositoryKO IVsEmployeeRepository { get; } = new();
+	public IVsEmployeeRepositoryInterceptorors IVsEmployeeRepository { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsUnitOfWork.</summary>
-	public IVsUnitOfWorkKO IVsUnitOfWork { get; } = new();
+	public IVsUnitOfWorkInterceptorors IVsUnitOfWork { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IVsEmployeeRepository.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IVsEmployeeRepository AsVsEmployeeRepository() => this;

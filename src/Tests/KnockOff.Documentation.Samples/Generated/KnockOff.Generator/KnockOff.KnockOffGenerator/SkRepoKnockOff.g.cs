@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class SkRepoKnockOff
 {
 	/// <summary>Tracks and configures behavior for ISkRepoService.GetById.</summary>
-	public sealed class ISkRepoService_GetByIdHandler
+	public sealed class ISkRepoService_GetByIdInterceptor
 	{
 		/// <summary>Delegate for GetById(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.SkUser? GetByIdDelegate(SkRepoKnockOff ko, int id);
@@ -31,7 +31,7 @@ partial class SkRepoKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISkRepoService.GetByIdAsync.</summary>
-	public sealed class ISkRepoService_GetByIdAsyncHandler
+	public sealed class ISkRepoService_GetByIdAsyncInterceptor
 	{
 		/// <summary>Delegate for GetByIdAsync(int id).</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.SkUser?> GetByIdAsyncDelegate(SkRepoKnockOff ko, int id);
@@ -56,16 +56,16 @@ partial class SkRepoKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkRepoService.</summary>
-	public sealed class ISkRepoServiceKO
+	public sealed class ISkRepoServiceInterceptorors
 	{
-		/// <summary>Handler for GetById.</summary>
-		public ISkRepoService_GetByIdHandler GetById { get; } = new();
-		/// <summary>Handler for GetByIdAsync.</summary>
-		public ISkRepoService_GetByIdAsyncHandler GetByIdAsync { get; } = new();
+		/// <summary>Interceptor for GetById.</summary>
+		public ISkRepoService_GetByIdInterceptor GetById { get; } = new();
+		/// <summary>Interceptor for GetByIdAsync.</summary>
+		public ISkRepoService_GetByIdAsyncInterceptor GetByIdAsync { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkRepoService.</summary>
-	public ISkRepoServiceKO ISkRepoService { get; } = new();
+	public ISkRepoServiceInterceptorors ISkRepoService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkRepoService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkRepoService AsSkRepoService() => this;

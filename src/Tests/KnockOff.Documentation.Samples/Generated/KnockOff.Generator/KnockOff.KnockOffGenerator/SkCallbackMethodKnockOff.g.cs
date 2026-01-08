@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class SkCallbackMethodKnockOff
 {
 	/// <summary>Tracks and configures behavior for ISkCallbackService.Name.</summary>
-	public sealed class ISkCallbackService_NameHandler
+	public sealed class ISkCallbackService_NameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -34,7 +34,7 @@ partial class SkCallbackMethodKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISkCallbackService.CurrentUser.</summary>
-	public sealed class ISkCallbackService_CurrentUserHandler
+	public sealed class ISkCallbackService_CurrentUserInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -62,7 +62,7 @@ partial class SkCallbackMethodKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISkCallbackService.DoWork.</summary>
-	public sealed class ISkCallbackService_DoWorkHandler
+	public sealed class ISkCallbackService_DoWorkInterceptor
 	{
 		/// <summary>Delegate for DoWork().</summary>
 		public delegate void DoWorkDelegate(SkCallbackMethodKnockOff ko);
@@ -84,7 +84,7 @@ partial class SkCallbackMethodKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISkCallbackService.GetById.</summary>
-	public sealed class ISkCallbackService_GetByIdHandler
+	public sealed class ISkCallbackService_GetByIdInterceptor
 	{
 		/// <summary>Delegate for GetById(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.SkUser GetByIdDelegate(SkCallbackMethodKnockOff ko, int id);
@@ -109,7 +109,7 @@ partial class SkCallbackMethodKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISkCallbackService.Search.</summary>
-	public sealed class ISkCallbackService_SearchHandler
+	public sealed class ISkCallbackService_SearchInterceptor
 	{
 		/// <summary>Delegate for Search(string query, int limit, int offset).</summary>
 		public delegate global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser> SearchDelegate(SkCallbackMethodKnockOff ko, string query, int limit, int offset);
@@ -134,22 +134,22 @@ partial class SkCallbackMethodKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkCallbackService.</summary>
-	public sealed class ISkCallbackServiceKO
+	public sealed class ISkCallbackServiceInterceptorors
 	{
-		/// <summary>Handler for Name.</summary>
-		public ISkCallbackService_NameHandler Name { get; } = new();
-		/// <summary>Handler for CurrentUser.</summary>
-		public ISkCallbackService_CurrentUserHandler CurrentUser { get; } = new();
-		/// <summary>Handler for DoWork.</summary>
-		public ISkCallbackService_DoWorkHandler DoWork { get; } = new();
-		/// <summary>Handler for GetById.</summary>
-		public ISkCallbackService_GetByIdHandler GetById { get; } = new();
-		/// <summary>Handler for Search.</summary>
-		public ISkCallbackService_SearchHandler Search { get; } = new();
+		/// <summary>Interceptor for Name.</summary>
+		public ISkCallbackService_NameInterceptor Name { get; } = new();
+		/// <summary>Interceptor for CurrentUser.</summary>
+		public ISkCallbackService_CurrentUserInterceptor CurrentUser { get; } = new();
+		/// <summary>Interceptor for DoWork.</summary>
+		public ISkCallbackService_DoWorkInterceptor DoWork { get; } = new();
+		/// <summary>Interceptor for GetById.</summary>
+		public ISkCallbackService_GetByIdInterceptor GetById { get; } = new();
+		/// <summary>Interceptor for Search.</summary>
+		public ISkCallbackService_SearchInterceptor Search { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkCallbackService.</summary>
-	public ISkCallbackServiceKO ISkCallbackService { get; } = new();
+	public ISkCallbackServiceInterceptorors ISkCallbackService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkCallbackService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkCallbackService AsSkCallbackService() => this;

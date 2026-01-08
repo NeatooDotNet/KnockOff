@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class SkVerificationKnockOff
 {
 	/// <summary>Tracks and configures behavior for ISkVerificationService.Name.</summary>
-	public sealed class ISkVerificationService_NameHandler
+	public sealed class ISkVerificationService_NameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -34,7 +34,7 @@ partial class SkVerificationKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISkVerificationService.GetUser.</summary>
-	public sealed class ISkVerificationService_GetUserHandler
+	public sealed class ISkVerificationService_GetUserInterceptor
 	{
 		/// <summary>Delegate for GetUser(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.SkUser GetUserDelegate(SkVerificationKnockOff ko, int id);
@@ -59,7 +59,7 @@ partial class SkVerificationKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISkVerificationService.Create.</summary>
-	public sealed class ISkVerificationService_CreateHandler
+	public sealed class ISkVerificationService_CreateInterceptor
 	{
 		/// <summary>Delegate for Create(string name, int value).</summary>
 		public delegate void CreateDelegate(SkVerificationKnockOff ko, string name, int value);
@@ -84,18 +84,18 @@ partial class SkVerificationKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkVerificationService.</summary>
-	public sealed class ISkVerificationServiceKO
+	public sealed class ISkVerificationServiceInterceptorors
 	{
-		/// <summary>Handler for Name.</summary>
-		public ISkVerificationService_NameHandler Name { get; } = new();
-		/// <summary>Handler for GetUser.</summary>
-		public ISkVerificationService_GetUserHandler GetUser { get; } = new();
-		/// <summary>Handler for Create.</summary>
-		public ISkVerificationService_CreateHandler Create { get; } = new();
+		/// <summary>Interceptor for Name.</summary>
+		public ISkVerificationService_NameInterceptor Name { get; } = new();
+		/// <summary>Interceptor for GetUser.</summary>
+		public ISkVerificationService_GetUserInterceptor GetUser { get; } = new();
+		/// <summary>Interceptor for Create.</summary>
+		public ISkVerificationService_CreateInterceptor Create { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkVerificationService.</summary>
-	public ISkVerificationServiceKO ISkVerificationService { get; } = new();
+	public ISkVerificationServiceInterceptorors ISkVerificationService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkVerificationService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkVerificationService AsSkVerificationService() => this;

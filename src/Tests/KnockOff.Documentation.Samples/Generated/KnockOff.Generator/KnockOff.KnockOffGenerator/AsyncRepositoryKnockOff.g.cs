@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class AsyncRepositoryKnockOff
 {
 	/// <summary>Tracks and configures behavior for IAsyncRepository.InitializeAsync.</summary>
-	public sealed class IAsyncRepository_InitializeAsyncHandler
+	public sealed class IAsyncRepository_InitializeAsyncInterceptor
 	{
 		/// <summary>Delegate for InitializeAsync().</summary>
 		public delegate global::System.Threading.Tasks.Task InitializeAsyncDelegate(AsyncRepositoryKnockOff ko);
@@ -28,7 +28,7 @@ partial class AsyncRepositoryKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IAsyncRepository.GetByIdAsync.</summary>
-	public sealed class IAsyncRepository_GetByIdAsyncHandler
+	public sealed class IAsyncRepository_GetByIdAsyncInterceptor
 	{
 		/// <summary>Delegate for GetByIdAsync(int id).</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.AsyncUser?> GetByIdAsyncDelegate(AsyncRepositoryKnockOff ko, int id);
@@ -53,7 +53,7 @@ partial class AsyncRepositoryKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IAsyncRepository.CountAsync.</summary>
-	public sealed class IAsyncRepository_CountAsyncHandler
+	public sealed class IAsyncRepository_CountAsyncInterceptor
 	{
 		/// <summary>Delegate for CountAsync().</summary>
 		public delegate global::System.Threading.Tasks.ValueTask<int> CountAsyncDelegate(AsyncRepositoryKnockOff ko);
@@ -75,18 +75,18 @@ partial class AsyncRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IAsyncRepository.</summary>
-	public sealed class IAsyncRepositoryKO
+	public sealed class IAsyncRepositoryInterceptorors
 	{
-		/// <summary>Handler for InitializeAsync.</summary>
-		public IAsyncRepository_InitializeAsyncHandler InitializeAsync { get; } = new();
-		/// <summary>Handler for GetByIdAsync.</summary>
-		public IAsyncRepository_GetByIdAsyncHandler GetByIdAsync { get; } = new();
-		/// <summary>Handler for CountAsync.</summary>
-		public IAsyncRepository_CountAsyncHandler CountAsync { get; } = new();
+		/// <summary>Interceptor for InitializeAsync.</summary>
+		public IAsyncRepository_InitializeAsyncInterceptor InitializeAsync { get; } = new();
+		/// <summary>Interceptor for GetByIdAsync.</summary>
+		public IAsyncRepository_GetByIdAsyncInterceptor GetByIdAsync { get; } = new();
+		/// <summary>Interceptor for CountAsync.</summary>
+		public IAsyncRepository_CountAsyncInterceptor CountAsync { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IAsyncRepository.</summary>
-	public IAsyncRepositoryKO IAsyncRepository { get; } = new();
+	public IAsyncRepositoryInterceptorors IAsyncRepository { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IAsyncRepository.</summary>
 	public KnockOff.Documentation.Samples.Guides.IAsyncRepository AsAsyncRepository() => this;

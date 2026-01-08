@@ -6,7 +6,7 @@ namespace KnockOff.Tests;
 partial class OutParameterServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for IOutParameterService.TryGetValue.</summary>
-	public sealed class IOutParameterService_TryGetValueHandler
+	public sealed class IOutParameterService_TryGetValueInterceptor
 	{
 		/// <summary>Delegate for TryGetValue(string key, out string? value).</summary>
 		public delegate bool TryGetValueDelegate(OutParameterServiceKnockOff ko, string key, out string? value);
@@ -31,7 +31,7 @@ partial class OutParameterServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IOutParameterService.TryParse.</summary>
-	public sealed class IOutParameterService_TryParseHandler
+	public sealed class IOutParameterService_TryParseInterceptor
 	{
 		/// <summary>Delegate for TryParse(string input, out int result).</summary>
 		public delegate bool TryParseDelegate(OutParameterServiceKnockOff ko, string input, out int result);
@@ -56,7 +56,7 @@ partial class OutParameterServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IOutParameterService.GetData.</summary>
-	public sealed class IOutParameterService_GetDataHandler
+	public sealed class IOutParameterService_GetDataInterceptor
 	{
 		/// <summary>Delegate for GetData(out string name, out int count).</summary>
 		public delegate void GetDataDelegate(OutParameterServiceKnockOff ko, out string name, out int count);
@@ -78,18 +78,18 @@ partial class OutParameterServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IOutParameterService.</summary>
-	public sealed class IOutParameterServiceKO
+	public sealed class IOutParameterServiceInterceptorors
 	{
-		/// <summary>Handler for TryGetValue.</summary>
-		public IOutParameterService_TryGetValueHandler TryGetValue { get; } = new();
-		/// <summary>Handler for TryParse.</summary>
-		public IOutParameterService_TryParseHandler TryParse { get; } = new();
-		/// <summary>Handler for GetData.</summary>
-		public IOutParameterService_GetDataHandler GetData { get; } = new();
+		/// <summary>Interceptor for TryGetValue.</summary>
+		public IOutParameterService_TryGetValueInterceptor TryGetValue { get; } = new();
+		/// <summary>Interceptor for TryParse.</summary>
+		public IOutParameterService_TryParseInterceptor TryParse { get; } = new();
+		/// <summary>Interceptor for GetData.</summary>
+		public IOutParameterService_GetDataInterceptor GetData { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IOutParameterService.</summary>
-	public IOutParameterServiceKO IOutParameterService { get; } = new();
+	public IOutParameterServiceInterceptorors IOutParameterService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IOutParameterService.</summary>
 	public KnockOff.Tests.IOutParameterService AsOutParameterService() => this;

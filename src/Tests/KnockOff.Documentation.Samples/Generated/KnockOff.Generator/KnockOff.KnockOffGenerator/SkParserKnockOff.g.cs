@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class SkParserKnockOff
 {
 	/// <summary>Tracks and configures behavior for ISkParser.TryParse.</summary>
-	public sealed class ISkParser_TryParseHandler
+	public sealed class ISkParser_TryParseInterceptor
 	{
 		/// <summary>Delegate for TryParse(string input, out int result).</summary>
 		public delegate bool TryParseDelegate(SkParserKnockOff ko, string input, out int result);
@@ -31,14 +31,14 @@ partial class SkParserKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkParser.</summary>
-	public sealed class ISkParserKO
+	public sealed class ISkParserInterceptorors
 	{
-		/// <summary>Handler for TryParse.</summary>
-		public ISkParser_TryParseHandler TryParse { get; } = new();
+		/// <summary>Interceptor for TryParse.</summary>
+		public ISkParser_TryParseInterceptor TryParse { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkParser.</summary>
-	public ISkParserKO ISkParser { get; } = new();
+	public ISkParserInterceptorors ISkParser { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkParser.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkParser AsSkParser() => this;

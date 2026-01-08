@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Concepts;
 partial class PatternIndexerServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for IPatternIndexerService.StringIndexer.</summary>
-	public sealed class IPatternIndexerService_StringIndexerHandler
+	public sealed class IPatternIndexerService_StringIndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -37,14 +37,14 @@ partial class PatternIndexerServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternIndexerService.</summary>
-	public sealed class IPatternIndexerServiceKO
+	public sealed class IPatternIndexerServiceInterceptorors
 	{
-		/// <summary>Handler for StringIndexer.</summary>
-		public IPatternIndexerService_StringIndexerHandler StringIndexer { get; } = new();
+		/// <summary>Interceptor for StringIndexer.</summary>
+		public IPatternIndexerService_StringIndexerInterceptor StringIndexer { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternIndexerService.</summary>
-	public IPatternIndexerServiceKO IPatternIndexerService { get; } = new();
+	public IPatternIndexerServiceInterceptorors IPatternIndexerService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Concepts.IPatternIndexerService.</summary>
 	public KnockOff.Documentation.Samples.Concepts.IPatternIndexerService AsPatternIndexerService() => this;

@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Comparison;
 partial class VsVerificationRepositoryKnockOff
 {
 	/// <summary>Tracks and configures behavior for IVsVerificationRepository.Save.</summary>
-	public sealed class IVsVerificationRepository_SaveHandler
+	public sealed class IVsVerificationRepository_SaveInterceptor
 	{
 		/// <summary>Delegate for Save(global::KnockOff.Documentation.Samples.Comparison.VsEntity entity).</summary>
 		public delegate void SaveDelegate(VsVerificationRepositoryKnockOff ko, global::KnockOff.Documentation.Samples.Comparison.VsEntity entity);
@@ -31,7 +31,7 @@ partial class VsVerificationRepositoryKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IVsVerificationRepository.Delete.</summary>
-	public sealed class IVsVerificationRepository_DeleteHandler
+	public sealed class IVsVerificationRepository_DeleteInterceptor
 	{
 		/// <summary>Delegate for Delete(int id).</summary>
 		public delegate void DeleteDelegate(VsVerificationRepositoryKnockOff ko, int id);
@@ -56,7 +56,7 @@ partial class VsVerificationRepositoryKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IVsVerificationRepository.GetAll.</summary>
-	public sealed class IVsVerificationRepository_GetAllHandler
+	public sealed class IVsVerificationRepository_GetAllInterceptor
 	{
 		/// <summary>Delegate for GetAll().</summary>
 		public delegate global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Comparison.VsEntity> GetAllDelegate(VsVerificationRepositoryKnockOff ko);
@@ -78,7 +78,7 @@ partial class VsVerificationRepositoryKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IVsVerificationRepository.Update.</summary>
-	public sealed class IVsVerificationRepository_UpdateHandler
+	public sealed class IVsVerificationRepository_UpdateInterceptor
 	{
 		/// <summary>Delegate for Update(global::KnockOff.Documentation.Samples.Comparison.VsEntity entity).</summary>
 		public delegate void UpdateDelegate(VsVerificationRepositoryKnockOff ko, global::KnockOff.Documentation.Samples.Comparison.VsEntity entity);
@@ -103,20 +103,20 @@ partial class VsVerificationRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository.</summary>
-	public sealed class IVsVerificationRepositoryKO
+	public sealed class IVsVerificationRepositoryInterceptorors
 	{
-		/// <summary>Handler for Save.</summary>
-		public IVsVerificationRepository_SaveHandler Save { get; } = new();
-		/// <summary>Handler for Delete.</summary>
-		public IVsVerificationRepository_DeleteHandler Delete { get; } = new();
-		/// <summary>Handler for GetAll.</summary>
-		public IVsVerificationRepository_GetAllHandler GetAll { get; } = new();
-		/// <summary>Handler for Update.</summary>
-		public IVsVerificationRepository_UpdateHandler Update { get; } = new();
+		/// <summary>Interceptor for Save.</summary>
+		public IVsVerificationRepository_SaveInterceptor Save { get; } = new();
+		/// <summary>Interceptor for Delete.</summary>
+		public IVsVerificationRepository_DeleteInterceptor Delete { get; } = new();
+		/// <summary>Interceptor for GetAll.</summary>
+		public IVsVerificationRepository_GetAllInterceptor GetAll { get; } = new();
+		/// <summary>Interceptor for Update.</summary>
+		public IVsVerificationRepository_UpdateInterceptor Update { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository.</summary>
-	public IVsVerificationRepositoryKO IVsVerificationRepository { get; } = new();
+	public IVsVerificationRepositoryInterceptorors IVsVerificationRepository { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository AsVsVerificationRepository() => this;

@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class MiCompositeRepositoryKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMiUserRepository.GetUser.</summary>
-	public sealed class IMiUserRepository_GetUserHandler
+	public sealed class IMiUserRepository_GetUserInterceptor
 	{
 		/// <summary>Delegate for GetUser(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Guides.MiUser? GetUserDelegate(MiCompositeRepositoryKnockOff ko, int id);
@@ -31,14 +31,14 @@ partial class MiCompositeRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiUserRepository.</summary>
-	public sealed class IMiUserRepositoryKO
+	public sealed class IMiUserRepositoryInterceptorors
 	{
-		/// <summary>Handler for GetUser.</summary>
-		public IMiUserRepository_GetUserHandler GetUser { get; } = new();
+		/// <summary>Interceptor for GetUser.</summary>
+		public IMiUserRepository_GetUserInterceptor GetUser { get; } = new();
 	}
 
 	/// <summary>Tracks and configures behavior for IMiOrderRepository.GetOrder.</summary>
-	public sealed class IMiOrderRepository_GetOrderHandler
+	public sealed class IMiOrderRepository_GetOrderInterceptor
 	{
 		/// <summary>Delegate for GetOrder(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Guides.MiOrder? GetOrderDelegate(MiCompositeRepositoryKnockOff ko, int id);
@@ -63,17 +63,17 @@ partial class MiCompositeRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiOrderRepository.</summary>
-	public sealed class IMiOrderRepositoryKO
+	public sealed class IMiOrderRepositoryInterceptorors
 	{
-		/// <summary>Handler for GetOrder.</summary>
-		public IMiOrderRepository_GetOrderHandler GetOrder { get; } = new();
+		/// <summary>Interceptor for GetOrder.</summary>
+		public IMiOrderRepository_GetOrderInterceptor GetOrder { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiUserRepository.</summary>
-	public IMiUserRepositoryKO IMiUserRepository { get; } = new();
+	public IMiUserRepositoryInterceptorors IMiUserRepository { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiOrderRepository.</summary>
-	public IMiOrderRepositoryKO IMiOrderRepository { get; } = new();
+	public IMiOrderRepositoryInterceptorors IMiOrderRepository { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMiUserRepository.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMiUserRepository AsMiUserRepository() => this;

@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class MiLoggerAuditorKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMiLoggerSame.Log.</summary>
-	public sealed class IMiLoggerSame_LogHandler
+	public sealed class IMiLoggerSame_LogInterceptor
 	{
 		/// <summary>Delegate for Log(string message).</summary>
 		public delegate void LogDelegate(MiLoggerAuditorKnockOff ko, string message);
@@ -31,14 +31,14 @@ partial class MiLoggerAuditorKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiLoggerSame.</summary>
-	public sealed class IMiLoggerSameKO
+	public sealed class IMiLoggerSameInterceptorors
 	{
-		/// <summary>Handler for Log.</summary>
-		public IMiLoggerSame_LogHandler Log { get; } = new();
+		/// <summary>Interceptor for Log.</summary>
+		public IMiLoggerSame_LogInterceptor Log { get; } = new();
 	}
 
 	/// <summary>Tracks and configures behavior for IMiAuditor.Log.</summary>
-	public sealed class IMiAuditor_LogHandler
+	public sealed class IMiAuditor_LogInterceptor
 	{
 		/// <summary>Delegate for Log(string message).</summary>
 		public delegate void LogDelegate(MiLoggerAuditorKnockOff ko, string message);
@@ -63,7 +63,7 @@ partial class MiLoggerAuditorKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IMiAuditor.Audit.</summary>
-	public sealed class IMiAuditor_AuditHandler
+	public sealed class IMiAuditor_AuditInterceptor
 	{
 		/// <summary>Delegate for Audit(string action, int userId).</summary>
 		public delegate void AuditDelegate(MiLoggerAuditorKnockOff ko, string action, int userId);
@@ -88,19 +88,19 @@ partial class MiLoggerAuditorKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiAuditor.</summary>
-	public sealed class IMiAuditorKO
+	public sealed class IMiAuditorInterceptorors
 	{
-		/// <summary>Handler for Log.</summary>
-		public IMiAuditor_LogHandler Log { get; } = new();
-		/// <summary>Handler for Audit.</summary>
-		public IMiAuditor_AuditHandler Audit { get; } = new();
+		/// <summary>Interceptor for Log.</summary>
+		public IMiAuditor_LogInterceptor Log { get; } = new();
+		/// <summary>Interceptor for Audit.</summary>
+		public IMiAuditor_AuditInterceptor Audit { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiLoggerSame.</summary>
-	public IMiLoggerSameKO IMiLoggerSame { get; } = new();
+	public IMiLoggerSameInterceptorors IMiLoggerSame { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiAuditor.</summary>
-	public IMiAuditorKO IMiAuditor { get; } = new();
+	public IMiAuditorInterceptorors IMiAuditor { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMiLoggerSame.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMiLoggerSame AsMiLoggerSame() => this;

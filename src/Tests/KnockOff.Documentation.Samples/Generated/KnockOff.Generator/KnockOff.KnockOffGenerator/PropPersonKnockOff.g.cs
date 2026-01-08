@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class PropPersonKnockOff
 {
 	/// <summary>Tracks and configures behavior for IPropPerson.FirstName.</summary>
-	public sealed class IPropPerson_FirstNameHandler
+	public sealed class IPropPerson_FirstNameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -34,7 +34,7 @@ partial class PropPersonKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IPropPerson.LastName.</summary>
-	public sealed class IPropPerson_LastNameHandler
+	public sealed class IPropPerson_LastNameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -62,7 +62,7 @@ partial class PropPersonKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IPropPerson.FullName.</summary>
-	public sealed class IPropPerson_FullNameHandler
+	public sealed class IPropPerson_FullNameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -78,18 +78,18 @@ partial class PropPersonKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropPerson.</summary>
-	public sealed class IPropPersonKO
+	public sealed class IPropPersonInterceptorors
 	{
-		/// <summary>Handler for FirstName.</summary>
-		public IPropPerson_FirstNameHandler FirstName { get; } = new();
-		/// <summary>Handler for LastName.</summary>
-		public IPropPerson_LastNameHandler LastName { get; } = new();
-		/// <summary>Handler for FullName.</summary>
-		public IPropPerson_FullNameHandler FullName { get; } = new();
+		/// <summary>Interceptor for FirstName.</summary>
+		public IPropPerson_FirstNameInterceptor FirstName { get; } = new();
+		/// <summary>Interceptor for LastName.</summary>
+		public IPropPerson_LastNameInterceptor LastName { get; } = new();
+		/// <summary>Interceptor for FullName.</summary>
+		public IPropPerson_FullNameInterceptor FullName { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropPerson.</summary>
-	public IPropPersonKO IPropPerson { get; } = new();
+	public IPropPersonInterceptorors IPropPerson { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IPropPerson.</summary>
 	public KnockOff.Documentation.Samples.Guides.IPropPerson AsPropPerson() => this;

@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.GettingStarted;
 partial class DataContextKnockOff
 {
 	/// <summary>Tracks and configures behavior for IRepository.Save.</summary>
-	public sealed class IRepository_SaveHandler
+	public sealed class IRepository_SaveInterceptor
 	{
 		/// <summary>Delegate for Save(object entity).</summary>
 		public delegate void SaveDelegate(DataContextKnockOff ko, object entity);
@@ -31,14 +31,14 @@ partial class DataContextKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.GettingStarted.IRepository.</summary>
-	public sealed class IRepositoryKO
+	public sealed class IRepositoryInterceptorors
 	{
-		/// <summary>Handler for Save.</summary>
-		public IRepository_SaveHandler Save { get; } = new();
+		/// <summary>Interceptor for Save.</summary>
+		public IRepository_SaveInterceptor Save { get; } = new();
 	}
 
 	/// <summary>Tracks and configures behavior for IUnitOfWork.Commit.</summary>
-	public sealed class IUnitOfWork_CommitHandler
+	public sealed class IUnitOfWork_CommitInterceptor
 	{
 		/// <summary>Delegate for Commit().</summary>
 		public delegate void CommitDelegate(DataContextKnockOff ko);
@@ -60,17 +60,17 @@ partial class DataContextKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork.</summary>
-	public sealed class IUnitOfWorkKO
+	public sealed class IUnitOfWorkInterceptorors
 	{
-		/// <summary>Handler for Commit.</summary>
-		public IUnitOfWork_CommitHandler Commit { get; } = new();
+		/// <summary>Interceptor for Commit.</summary>
+		public IUnitOfWork_CommitInterceptor Commit { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.GettingStarted.IRepository.</summary>
-	public IRepositoryKO IRepository { get; } = new();
+	public IRepositoryInterceptorors IRepository { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork.</summary>
-	public IUnitOfWorkKO IUnitOfWork { get; } = new();
+	public IUnitOfWorkInterceptorors IUnitOfWork { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.GettingStarted.IRepository.</summary>
 	public KnockOff.Documentation.Samples.GettingStarted.IRepository AsRepository() => this;

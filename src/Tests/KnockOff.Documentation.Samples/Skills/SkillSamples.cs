@@ -337,27 +337,18 @@ public interface ISkPriorityService
     int Calculate(int x);
 }
 
-#region skill:SKILL:priority-order
 [KnockOff]
 public partial class SkPriorityServiceKnockOff : ISkPriorityService
 {
     protected int Calculate(int x) => x * 2;  // User method
 }
 
+// Priority order usage:
 // var knockOff = new SkPriorityServiceKnockOff();
 // ISkPriorityService service = knockOff;
-
-// No callback -> uses user method
-// var r1 = service.Calculate(5);  // Returns 10
-
-// Callback -> overrides user method
-// knockOff.ISkPriorityService.Calculate.OnCall = (ko, x) => x * 100;
-// var r2 = service.Calculate(5);  // Returns 500
-
-// Reset -> back to user method
-// knockOff.ISkPriorityService.Calculate.Reset();
-// var r3 = service.Calculate(5);  // Returns 10
-#endregion
+// No callback -> uses user method: service.Calculate(5) returns 10
+// Callback -> overrides: knockOff.ISkPriorityService.Calculate.OnCall = (ko, x) => x * 100;
+// Reset -> back to user method: knockOff.ISkPriorityService.Calculate.Reset();
 
 // ============================================================================
 // Verification Patterns

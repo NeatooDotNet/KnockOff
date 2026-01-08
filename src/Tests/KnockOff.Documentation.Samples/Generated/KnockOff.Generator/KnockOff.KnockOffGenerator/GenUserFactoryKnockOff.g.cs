@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class GenUserFactoryKnockOff
 {
 	/// <summary>Tracks and configures behavior for IGenFactory_KnockOff_Documentation_Samples_Guides_GenUser.Create.</summary>
-	public sealed class IGenFactory_KnockOff_Documentation_Samples_Guides_GenUser_CreateHandler
+	public sealed class IGenFactory_KnockOff_Documentation_Samples_Guides_GenUser_CreateInterceptor
 	{
 		/// <summary>Delegate for Create().</summary>
 		public delegate global::KnockOff.Documentation.Samples.Guides.GenUser CreateDelegate(GenUserFactoryKnockOff ko);
@@ -28,14 +28,14 @@ partial class GenUserFactoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenFactory<KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
-	public sealed class IGenFactory_KnockOff_Documentation_Samples_Guides_GenUserKO
+	public sealed class IGenFactory_KnockOff_Documentation_Samples_Guides_GenUserInterceptorors
 	{
-		/// <summary>Handler for Create.</summary>
-		public IGenFactory_KnockOff_Documentation_Samples_Guides_GenUser_CreateHandler Create { get; } = new();
+		/// <summary>Interceptor for Create.</summary>
+		public IGenFactory_KnockOff_Documentation_Samples_Guides_GenUser_CreateInterceptor Create { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenFactory<KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
-	public IGenFactory_KnockOff_Documentation_Samples_Guides_GenUserKO IGenFactory_KnockOff_Documentation_Samples_Guides_GenUser { get; } = new();
+	public IGenFactory_KnockOff_Documentation_Samples_Guides_GenUserInterceptorors IGenFactory_KnockOff_Documentation_Samples_Guides_GenUser { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IGenFactory<KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
 	public KnockOff.Documentation.Samples.Guides.IGenFactory<KnockOff.Documentation.Samples.Guides.GenUser> AsGenFactory() => this;

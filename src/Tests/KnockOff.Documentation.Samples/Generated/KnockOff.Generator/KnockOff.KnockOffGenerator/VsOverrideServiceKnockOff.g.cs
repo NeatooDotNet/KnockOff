@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Comparison;
 partial class VsOverrideServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for IVsOverrideService.GetUser.</summary>
-	public sealed class IVsOverrideService_GetUserHandler
+	public sealed class IVsOverrideService_GetUserInterceptor
 	{
 		/// <summary>Delegate for GetUser(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Comparison.VsUser GetUserDelegate(VsOverrideServiceKnockOff ko, int id);
@@ -31,14 +31,14 @@ partial class VsOverrideServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsOverrideService.</summary>
-	public sealed class IVsOverrideServiceKO
+	public sealed class IVsOverrideServiceInterceptorors
 	{
-		/// <summary>Handler for GetUser.</summary>
-		public IVsOverrideService_GetUserHandler GetUser { get; } = new();
+		/// <summary>Interceptor for GetUser.</summary>
+		public IVsOverrideService_GetUserInterceptor GetUser { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsOverrideService.</summary>
-	public IVsOverrideServiceKO IVsOverrideService { get; } = new();
+	public IVsOverrideServiceInterceptorors IVsOverrideService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IVsOverrideService.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IVsOverrideService AsVsOverrideService() => this;

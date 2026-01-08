@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class AsyncCallOrderKnockOff
 {
 	/// <summary>Tracks and configures behavior for IAsyncCallOrder.StartAsync.</summary>
-	public sealed class IAsyncCallOrder_StartAsyncHandler
+	public sealed class IAsyncCallOrder_StartAsyncInterceptor
 	{
 		/// <summary>Delegate for StartAsync().</summary>
 		public delegate global::System.Threading.Tasks.Task StartAsyncDelegate(AsyncCallOrderKnockOff ko);
@@ -28,7 +28,7 @@ partial class AsyncCallOrderKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IAsyncCallOrder.ProcessAsync.</summary>
-	public sealed class IAsyncCallOrder_ProcessAsyncHandler
+	public sealed class IAsyncCallOrder_ProcessAsyncInterceptor
 	{
 		/// <summary>Delegate for ProcessAsync().</summary>
 		public delegate global::System.Threading.Tasks.Task ProcessAsyncDelegate(AsyncCallOrderKnockOff ko);
@@ -50,16 +50,16 @@ partial class AsyncCallOrderKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IAsyncCallOrder.</summary>
-	public sealed class IAsyncCallOrderKO
+	public sealed class IAsyncCallOrderInterceptorors
 	{
-		/// <summary>Handler for StartAsync.</summary>
-		public IAsyncCallOrder_StartAsyncHandler StartAsync { get; } = new();
-		/// <summary>Handler for ProcessAsync.</summary>
-		public IAsyncCallOrder_ProcessAsyncHandler ProcessAsync { get; } = new();
+		/// <summary>Interceptor for StartAsync.</summary>
+		public IAsyncCallOrder_StartAsyncInterceptor StartAsync { get; } = new();
+		/// <summary>Interceptor for ProcessAsync.</summary>
+		public IAsyncCallOrder_ProcessAsyncInterceptor ProcessAsync { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IAsyncCallOrder.</summary>
-	public IAsyncCallOrderKO IAsyncCallOrder { get; } = new();
+	public IAsyncCallOrderInterceptorors IAsyncCallOrder { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IAsyncCallOrder.</summary>
 	public KnockOff.Documentation.Samples.Guides.IAsyncCallOrder AsAsyncCallOrder() => this;

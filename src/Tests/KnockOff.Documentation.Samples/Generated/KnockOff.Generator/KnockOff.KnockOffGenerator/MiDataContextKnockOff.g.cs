@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class MiDataContextKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMiRepository.GetById.</summary>
-	public sealed class IMiRepository_GetByIdHandler
+	public sealed class IMiRepository_GetByIdInterceptor
 	{
 		/// <summary>Delegate for GetById(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Guides.MiUser? GetByIdDelegate(MiDataContextKnockOff ko, int id);
@@ -31,7 +31,7 @@ partial class MiDataContextKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IMiRepository.Add.</summary>
-	public sealed class IMiRepository_AddHandler
+	public sealed class IMiRepository_AddInterceptor
 	{
 		/// <summary>Delegate for Add(global::KnockOff.Documentation.Samples.Guides.MiUser user).</summary>
 		public delegate void AddDelegate(MiDataContextKnockOff ko, global::KnockOff.Documentation.Samples.Guides.MiUser user);
@@ -56,16 +56,16 @@ partial class MiDataContextKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiRepository.</summary>
-	public sealed class IMiRepositoryKO
+	public sealed class IMiRepositoryInterceptorors
 	{
-		/// <summary>Handler for GetById.</summary>
-		public IMiRepository_GetByIdHandler GetById { get; } = new();
-		/// <summary>Handler for Add.</summary>
-		public IMiRepository_AddHandler Add { get; } = new();
+		/// <summary>Interceptor for GetById.</summary>
+		public IMiRepository_GetByIdInterceptor GetById { get; } = new();
+		/// <summary>Interceptor for Add.</summary>
+		public IMiRepository_AddInterceptor Add { get; } = new();
 	}
 
 	/// <summary>Tracks and configures behavior for IMiUnitOfWork.SaveChangesAsync.</summary>
-	public sealed class IMiUnitOfWork_SaveChangesAsyncHandler
+	public sealed class IMiUnitOfWork_SaveChangesAsyncInterceptor
 	{
 		/// <summary>Delegate for SaveChangesAsync(global::System.Threading.CancellationToken ct).</summary>
 		public delegate global::System.Threading.Tasks.Task<int> SaveChangesAsyncDelegate(MiDataContextKnockOff ko, global::System.Threading.CancellationToken ct);
@@ -90,17 +90,17 @@ partial class MiDataContextKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiUnitOfWork.</summary>
-	public sealed class IMiUnitOfWorkKO
+	public sealed class IMiUnitOfWorkInterceptorors
 	{
-		/// <summary>Handler for SaveChangesAsync.</summary>
-		public IMiUnitOfWork_SaveChangesAsyncHandler SaveChangesAsync { get; } = new();
+		/// <summary>Interceptor for SaveChangesAsync.</summary>
+		public IMiUnitOfWork_SaveChangesAsyncInterceptor SaveChangesAsync { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiRepository.</summary>
-	public IMiRepositoryKO IMiRepository { get; } = new();
+	public IMiRepositoryInterceptorors IMiRepository { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiUnitOfWork.</summary>
-	public IMiUnitOfWorkKO IMiUnitOfWork { get; } = new();
+	public IMiUnitOfWorkInterceptorors IMiUnitOfWork { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMiRepository.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMiRepository AsMiRepository() => this;

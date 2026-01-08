@@ -1,18 +1,18 @@
-# Handler API Reference
+# Interceptor API Reference
 
-Every interface member gets a dedicated Handler class in its interface KO property. This reference covers the complete API for each handler type.
+Every interface member gets a dedicated Interceptor class in its interface Interceptors property. This reference covers the complete API for each intercept type.
 
-## Handler Types
+## Interceptor Types
 
-| Interface Member | Handler Type | Access Pattern |
+| Interface Member | Interceptor Type | Access Pattern |
 |------------------|--------------|----------------|
-| Method | `{InterfaceName}_{MethodName}Handler` | `IInterface.MethodName` |
-| Property | `{InterfaceName}_{PropertyName}Handler` | `IInterface.PropertyName` |
-| Indexer | `{InterfaceName}_{KeyType}IndexerHandler` | `IInterface.StringIndexer`, `IInterface.IntIndexer`, etc. |
-| Event | `{InterfaceName}_{EventName}Handler` | `IInterface.EventName` |
-| Generic Method | `{InterfaceName}_{MethodName}Handler` | `IInterface.MethodName.Of<T>()` |
+| Method | `{InterfaceName}_{MethodName}Interceptor` | `IInterface.MethodName` |
+| Property | `{InterfaceName}_{PropertyName}Interceptor` | `IInterface.PropertyName` |
+| Indexer | `{InterfaceName}_{KeyType}IndexerInterceptor` | `IInterface.StringIndexer`, `IInterface.IntIndexer`, etc. |
+| Event | `{InterfaceName}_{EventName}Interceptor` | `IInterface.EventName` |
+| Generic Method | `{InterfaceName}_{MethodName}Interceptor` | `IInterface.MethodName.Of<T>()` |
 
-## Method Handler
+## Method Interceptor
 
 For interface methods: `void M()`, `T M()`, `void M(args)`, `T M(args)`
 
@@ -71,7 +71,7 @@ knockOff.IService.Log.OnCall = (ko, level, message) =>
 };
 ```
 
-## Property Handler
+## Property Interceptor
 
 For interface properties: `T Prop { get; }`, `T Prop { set; }`, `T Prop { get; set; }`
 
@@ -127,13 +127,13 @@ knockOff.IService.Name.Reset();
 Assert.Equal(0, knockOff.IService.Name.GetCount);
 ```
 
-## Indexer Handler
+## Indexer Interceptor
 
 For interface indexers: `T this[K key] { get; }`, `T this[K key] { get; set; }`
 
-Handler naming: `{KeyTypeName}IndexerHandler`
-- `this[string key]` → `StringIndexerHandler`
-- `this[int index]` → `IntIndexerHandler`
+Interceptor naming: `{KeyTypeName}IndexerInterceptor`
+- `this[string key]` → `StringIndexerInterceptor`
+- `this[int index]` → `IntIndexerInterceptor`
 
 ### Properties
 
@@ -204,7 +204,7 @@ knockOff.IPropertyStore.StringIndexer.OnGet = (ko, key) =>
 store["NewKey"] = newValue;
 Assert.Equal("NewKey", knockOff.IPropertyStore.StringIndexer.LastSetEntry?.key);
 
-// Intercept setter
+// Interceptor setter
 knockOff.IPropertyStore.StringIndexer.OnSet = (ko, key, value) =>
 {
     // Custom logic
@@ -212,7 +212,7 @@ knockOff.IPropertyStore.StringIndexer.OnSet = (ko, key, value) =>
 };
 ```
 
-## Event Handler
+## Event Interceptor
 
 For interface events: `event EventHandler E`, `event EventHandler<T> E`, `event Action<T> E`
 
@@ -295,18 +295,18 @@ knockOff.IEventSource.DataReceived.Clear();  // Clears tracking AND handlers
 
 ## Reset Behavior Summary
 
-| Handler Type | Reset Clears | Reset Does NOT Clear |
+| Interceptor Type | Reset Clears | Reset Does NOT Clear |
 |--------------|--------------|----------------------|
 | Method | `CallCount`, `LastCallArg`/`LastCallArgs`, `OnCall` | — |
 | Property | `GetCount`, `SetCount`, `LastSetValue`, `OnGet`, `OnSet` | Backing field |
 | Indexer | `GetCount`, `SetCount`, `LastGetKey`, `LastSetEntry`, `OnGet`, `OnSet` | Backing dictionary |
-| Event | `SubscribeCount`, `UnsubscribeCount`, `RaiseCount`, `AllRaises` | Handlers (use `Clear()` to remove) |
-| Generic Method | All typed handlers, `CalledTypeArguments` | — |
+| Event | `SubscribeCount`, `UnsubscribeCount`, `RaiseCount`, `AllRaises` | Event handlers (use `Clear()` to remove) |
+| Generic Method | All typed intercepts, `CalledTypeArguments` | — |
 | Generic Method `.Of<T>()` | `CallCount`, `LastCallArg`, `OnCall` | — |
 
-## Async Method Handlers
+## Async Method Interceptors
 
-Async methods use the same handler structure as sync methods. The `OnCall` callback returns the async type:
+Async methods use the same intercept structure as sync methods. The `OnCall` callback returns the async type:
 
 | Return Type | OnCall Return Type |
 |-------------|-------------------|
@@ -323,11 +323,11 @@ knockOff.IRepository.SaveAsync.OnCall = (ko, entity) =>
     Task.FromException<int>(new DbException("Failed"));
 ```
 
-## Generic Method Handlers
+## Generic Method Interceptors
 
-Generic methods use a two-tier handler structure with the `.Of<T>()` pattern.
+Generic methods use a two-tier intercept structure with the `.Of<T>()` pattern.
 
-### Base Handler Properties
+### Base Interceptor Properties
 
 | Property | Type | Description |
 |----------|------|-------------|
@@ -335,16 +335,16 @@ Generic methods use a two-tier handler structure with the `.Of<T>()` pattern.
 | `WasCalled` | `bool` | `true` if called with any type argument |
 | `CalledTypeArguments` | `IReadOnlyList<Type>` | All type arguments that were used |
 
-### Base Handler Methods
+### Base Interceptor Methods
 
 | Method | Description |
 |--------|-------------|
-| `Of<T>()` | Get typed handler for specific type argument(s) |
-| `Reset()` | Clear all typed handlers |
+| `Of<T>()` | Get typed intercept for specific type argument(s) |
+| `Reset()` | Clear all typed intercepts |
 
 For multiple type parameters, use `Of<T1, T2>()` or `Of<T1, T2, T3>()`.
 
-### Typed Handler Properties
+### Typed Interceptor Properties
 
 Accessed via `.Of<T>()`:
 
@@ -355,11 +355,11 @@ Accessed via `.Of<T>()`:
 | `LastCallArg` | `T?` | Last non-generic argument (if method has params) |
 | `OnCall` | Delegate | Callback for this type argument |
 
-### Typed Handler Methods
+### Typed Interceptor Methods
 
 | Method | Description |
 |--------|-------------|
-| `Reset()` | Clear this typed handler's tracking and callback |
+| `Reset()` | Clear this typed intercept's tracking and callback |
 | `RecordCall(...)` | Internal - records invocation |
 
 ### OnCall Signatures

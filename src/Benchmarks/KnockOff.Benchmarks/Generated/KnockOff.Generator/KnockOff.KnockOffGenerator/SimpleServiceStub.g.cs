@@ -6,7 +6,7 @@ namespace KnockOff.Benchmarks.Stubs;
 partial class SimpleServiceStub
 {
 	/// <summary>Tracks and configures behavior for ISimpleService.DoWork.</summary>
-	public sealed class ISimpleService_DoWorkHandler
+	public sealed class ISimpleService_DoWorkInterceptor
 	{
 		/// <summary>Delegate for DoWork().</summary>
 		public delegate void DoWorkDelegate(SimpleServiceStub ko);
@@ -28,14 +28,14 @@ partial class SimpleServiceStub
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Benchmarks.Interfaces.ISimpleService.</summary>
-	public sealed class ISimpleServiceKO
+	public sealed class ISimpleServiceInterceptorors
 	{
-		/// <summary>Handler for DoWork.</summary>
-		public ISimpleService_DoWorkHandler DoWork { get; } = new();
+		/// <summary>Interceptor for DoWork.</summary>
+		public ISimpleService_DoWorkInterceptor DoWork { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Benchmarks.Interfaces.ISimpleService.</summary>
-	public ISimpleServiceKO ISimpleService { get; } = new();
+	public ISimpleServiceInterceptorors ISimpleService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Benchmarks.Interfaces.ISimpleService.</summary>
 	public KnockOff.Benchmarks.Interfaces.ISimpleService AsSimpleService() => this;

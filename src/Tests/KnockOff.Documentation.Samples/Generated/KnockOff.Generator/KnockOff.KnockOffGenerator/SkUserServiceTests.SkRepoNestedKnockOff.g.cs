@@ -8,7 +8,7 @@ public partial class SkUserServiceTests
 partial class SkRepoNestedKnockOff
 {
 	/// <summary>Tracks and configures behavior for ISkRepository.Save.</summary>
-	public sealed class ISkRepository_SaveHandler
+	public sealed class ISkRepository_SaveInterceptor
 	{
 		/// <summary>Delegate for Save(object entity).</summary>
 		public delegate void SaveDelegate(SkRepoNestedKnockOff ko, object entity);
@@ -33,14 +33,14 @@ partial class SkRepoNestedKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkRepository.</summary>
-	public sealed class ISkRepositoryKO
+	public sealed class ISkRepositoryInterceptorors
 	{
-		/// <summary>Handler for Save.</summary>
-		public ISkRepository_SaveHandler Save { get; } = new();
+		/// <summary>Interceptor for Save.</summary>
+		public ISkRepository_SaveInterceptor Save { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkRepository.</summary>
-	public ISkRepositoryKO ISkRepository { get; } = new();
+	public ISkRepositoryInterceptorors ISkRepository { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkRepository.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkRepository AsSkRepository() => this;

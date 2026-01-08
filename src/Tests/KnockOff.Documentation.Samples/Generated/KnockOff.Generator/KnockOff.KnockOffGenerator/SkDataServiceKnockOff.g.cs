@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class SkDataServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for ISkDataService.Name.</summary>
-	public sealed class ISkDataService_NameHandler
+	public sealed class ISkDataService_NameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -34,7 +34,7 @@ partial class SkDataServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISkDataService.GetDescription.</summary>
-	public sealed class ISkDataService_GetDescriptionHandler
+	public sealed class ISkDataService_GetDescriptionInterceptor
 	{
 		/// <summary>Delegate for GetDescription(int id).</summary>
 		public delegate string? GetDescriptionDelegate(SkDataServiceKnockOff ko, int id);
@@ -59,7 +59,7 @@ partial class SkDataServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISkDataService.GetCount.</summary>
-	public sealed class ISkDataService_GetCountHandler
+	public sealed class ISkDataService_GetCountInterceptor
 	{
 		/// <summary>Delegate for GetCount().</summary>
 		public delegate int GetCountDelegate(SkDataServiceKnockOff ko);
@@ -81,18 +81,18 @@ partial class SkDataServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkDataService.</summary>
-	public sealed class ISkDataServiceKO
+	public sealed class ISkDataServiceInterceptorors
 	{
-		/// <summary>Handler for Name.</summary>
-		public ISkDataService_NameHandler Name { get; } = new();
-		/// <summary>Handler for GetDescription.</summary>
-		public ISkDataService_GetDescriptionHandler GetDescription { get; } = new();
-		/// <summary>Handler for GetCount.</summary>
-		public ISkDataService_GetCountHandler GetCount { get; } = new();
+		/// <summary>Interceptor for Name.</summary>
+		public ISkDataService_NameInterceptor Name { get; } = new();
+		/// <summary>Interceptor for GetDescription.</summary>
+		public ISkDataService_GetDescriptionInterceptor GetDescription { get; } = new();
+		/// <summary>Interceptor for GetCount.</summary>
+		public ISkDataService_GetCountInterceptor GetCount { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkDataService.</summary>
-	public ISkDataServiceKO ISkDataService { get; } = new();
+	public ISkDataServiceInterceptorors ISkDataService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkDataService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkDataService AsSkDataService() => this;

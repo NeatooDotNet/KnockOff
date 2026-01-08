@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class PropConfigKnockOff
 {
 	/// <summary>Tracks and configures behavior for IPropConfig.ConnectionString.</summary>
-	public sealed class IPropConfig_ConnectionStringHandler
+	public sealed class IPropConfig_ConnectionStringInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -22,14 +22,14 @@ partial class PropConfigKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropConfig.</summary>
-	public sealed class IPropConfigKO
+	public sealed class IPropConfigInterceptorors
 	{
-		/// <summary>Handler for ConnectionString.</summary>
-		public IPropConfig_ConnectionStringHandler ConnectionString { get; } = new();
+		/// <summary>Interceptor for ConnectionString.</summary>
+		public IPropConfig_ConnectionStringInterceptor ConnectionString { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropConfig.</summary>
-	public IPropConfigKO IPropConfig { get; } = new();
+	public IPropConfigInterceptorors IPropConfig { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IPropConfig.</summary>
 	public KnockOff.Documentation.Samples.Guides.IPropConfig AsPropConfig() => this;

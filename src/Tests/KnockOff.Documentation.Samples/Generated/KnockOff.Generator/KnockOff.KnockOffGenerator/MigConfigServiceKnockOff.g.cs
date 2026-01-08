@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Comparison;
 partial class MigConfigServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMigConfigService.GetConfig.</summary>
-	public sealed class IMigConfigService_GetConfigHandler
+	public sealed class IMigConfigService_GetConfigInterceptor
 	{
 		/// <summary>Delegate for GetConfig().</summary>
 		public delegate global::KnockOff.Documentation.Samples.Comparison.MigConfig GetConfigDelegate(MigConfigServiceKnockOff ko);
@@ -28,14 +28,14 @@ partial class MigConfigServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigConfigService.</summary>
-	public sealed class IMigConfigServiceKO
+	public sealed class IMigConfigServiceInterceptorors
 	{
-		/// <summary>Handler for GetConfig.</summary>
-		public IMigConfigService_GetConfigHandler GetConfig { get; } = new();
+		/// <summary>Interceptor for GetConfig.</summary>
+		public IMigConfigService_GetConfigInterceptor GetConfig { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigConfigService.</summary>
-	public IMigConfigServiceKO IMigConfigService { get; } = new();
+	public IMigConfigServiceInterceptorors IMigConfigService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IMigConfigService.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IMigConfigService AsMigConfigService() => this;

@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class GenAsyncUserRepositoryKnockOff
 {
 	/// <summary>Tracks and configures behavior for IGenAsyncRepository_KnockOff_Documentation_Samples_Guides_GenUser.GetByIdAsync.</summary>
-	public sealed class IGenAsyncRepository_KnockOff_Documentation_Samples_Guides_GenUser_GetByIdAsyncHandler
+	public sealed class IGenAsyncRepository_KnockOff_Documentation_Samples_Guides_GenUser_GetByIdAsyncInterceptor
 	{
 		/// <summary>Delegate for GetByIdAsync(int id).</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.GenUser?> GetByIdAsyncDelegate(GenAsyncUserRepositoryKnockOff ko, int id);
@@ -31,7 +31,7 @@ partial class GenAsyncUserRepositoryKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IGenAsyncRepository_KnockOff_Documentation_Samples_Guides_GenUser.GetAllAsync.</summary>
-	public sealed class IGenAsyncRepository_KnockOff_Documentation_Samples_Guides_GenUser_GetAllAsyncHandler
+	public sealed class IGenAsyncRepository_KnockOff_Documentation_Samples_Guides_GenUser_GetAllAsyncInterceptor
 	{
 		/// <summary>Delegate for GetAllAsync().</summary>
 		public delegate global::System.Threading.Tasks.Task<global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Guides.GenUser>> GetAllAsyncDelegate(GenAsyncUserRepositoryKnockOff ko);
@@ -53,7 +53,7 @@ partial class GenAsyncUserRepositoryKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IGenAsyncRepository_KnockOff_Documentation_Samples_Guides_GenUser.SaveAsync.</summary>
-	public sealed class IGenAsyncRepository_KnockOff_Documentation_Samples_Guides_GenUser_SaveAsyncHandler
+	public sealed class IGenAsyncRepository_KnockOff_Documentation_Samples_Guides_GenUser_SaveAsyncInterceptor
 	{
 		/// <summary>Delegate for SaveAsync(global::KnockOff.Documentation.Samples.Guides.GenUser entity).</summary>
 		public delegate global::System.Threading.Tasks.Task SaveAsyncDelegate(GenAsyncUserRepositoryKnockOff ko, global::KnockOff.Documentation.Samples.Guides.GenUser entity);
@@ -78,18 +78,18 @@ partial class GenAsyncUserRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
-	public sealed class IGenAsyncRepository_KnockOff_Documentation_Samples_Guides_GenUserKO
+	public sealed class IGenAsyncRepository_KnockOff_Documentation_Samples_Guides_GenUserInterceptorors
 	{
-		/// <summary>Handler for GetByIdAsync.</summary>
-		public IGenAsyncRepository_KnockOff_Documentation_Samples_Guides_GenUser_GetByIdAsyncHandler GetByIdAsync { get; } = new();
-		/// <summary>Handler for GetAllAsync.</summary>
-		public IGenAsyncRepository_KnockOff_Documentation_Samples_Guides_GenUser_GetAllAsyncHandler GetAllAsync { get; } = new();
-		/// <summary>Handler for SaveAsync.</summary>
-		public IGenAsyncRepository_KnockOff_Documentation_Samples_Guides_GenUser_SaveAsyncHandler SaveAsync { get; } = new();
+		/// <summary>Interceptor for GetByIdAsync.</summary>
+		public IGenAsyncRepository_KnockOff_Documentation_Samples_Guides_GenUser_GetByIdAsyncInterceptor GetByIdAsync { get; } = new();
+		/// <summary>Interceptor for GetAllAsync.</summary>
+		public IGenAsyncRepository_KnockOff_Documentation_Samples_Guides_GenUser_GetAllAsyncInterceptor GetAllAsync { get; } = new();
+		/// <summary>Interceptor for SaveAsync.</summary>
+		public IGenAsyncRepository_KnockOff_Documentation_Samples_Guides_GenUser_SaveAsyncInterceptor SaveAsync { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
-	public IGenAsyncRepository_KnockOff_Documentation_Samples_Guides_GenUserKO IGenAsyncRepository_KnockOff_Documentation_Samples_Guides_GenUser { get; } = new();
+	public IGenAsyncRepository_KnockOff_Documentation_Samples_Guides_GenUserInterceptorors IGenAsyncRepository_KnockOff_Documentation_Samples_Guides_GenUser { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
 	public KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<KnockOff.Documentation.Samples.Guides.GenUser> AsGenAsyncRepository() => this;

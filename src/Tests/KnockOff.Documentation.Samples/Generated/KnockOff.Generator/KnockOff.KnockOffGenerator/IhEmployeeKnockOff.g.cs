@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class IhEmployeeKnockOff
 {
 	/// <summary>Tracks and configures behavior for IIhEmployee.Name.</summary>
-	public sealed class IIhEmployee_NameHandler
+	public sealed class IIhEmployee_NameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -34,7 +34,7 @@ partial class IhEmployeeKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IIhEmployee.Department.</summary>
-	public sealed class IIhEmployee_DepartmentHandler
+	public sealed class IIhEmployee_DepartmentInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -62,16 +62,16 @@ partial class IhEmployeeKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhEmployee.</summary>
-	public sealed class IIhEmployeeKO
+	public sealed class IIhEmployeeInterceptorors
 	{
-		/// <summary>Handler for Name.</summary>
-		public IIhEmployee_NameHandler Name { get; } = new();
-		/// <summary>Handler for Department.</summary>
-		public IIhEmployee_DepartmentHandler Department { get; } = new();
+		/// <summary>Interceptor for Name.</summary>
+		public IIhEmployee_NameInterceptor Name { get; } = new();
+		/// <summary>Interceptor for Department.</summary>
+		public IIhEmployee_DepartmentInterceptor Department { get; } = new();
 	}
 
 	/// <summary>Tracks and configures behavior for IIhEntityBase.Id.</summary>
-	public sealed class IIhEntityBase_IdHandler
+	public sealed class IIhEntityBase_IdInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -87,17 +87,17 @@ partial class IhEmployeeKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhEntityBase.</summary>
-	public sealed class IIhEntityBaseKO
+	public sealed class IIhEntityBaseInterceptorors
 	{
-		/// <summary>Handler for Id.</summary>
-		public IIhEntityBase_IdHandler Id { get; } = new();
+		/// <summary>Interceptor for Id.</summary>
+		public IIhEntityBase_IdInterceptor Id { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhEmployee.</summary>
-	public IIhEmployeeKO IIhEmployee { get; } = new();
+	public IIhEmployeeInterceptorors IIhEmployee { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhEntityBase.</summary>
-	public IIhEntityBaseKO IIhEntityBase { get; } = new();
+	public IIhEntityBaseInterceptorors IIhEntityBase { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIhEmployee.</summary>
 	public KnockOff.Documentation.Samples.Guides.IIhEmployee AsIhEmployee() => this;

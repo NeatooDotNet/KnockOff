@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class CpProcessorKnockOff
 {
 	/// <summary>Tracks and configures behavior for ICpProcessor.Increment.</summary>
-	public sealed class ICpProcessor_IncrementHandler
+	public sealed class ICpProcessor_IncrementInterceptor
 	{
 		/// <summary>Delegate for Increment(ref int value).</summary>
 		public delegate void IncrementDelegate(CpProcessorKnockOff ko, ref int value);
@@ -31,7 +31,7 @@ partial class CpProcessorKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ICpProcessor.TryUpdate.</summary>
-	public sealed class ICpProcessor_TryUpdateHandler
+	public sealed class ICpProcessor_TryUpdateInterceptor
 	{
 		/// <summary>Delegate for TryUpdate(string key, ref string value).</summary>
 		public delegate bool TryUpdateDelegate(CpProcessorKnockOff ko, string key, ref string value);
@@ -56,16 +56,16 @@ partial class CpProcessorKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpProcessor.</summary>
-	public sealed class ICpProcessorKO
+	public sealed class ICpProcessorInterceptorors
 	{
-		/// <summary>Handler for Increment.</summary>
-		public ICpProcessor_IncrementHandler Increment { get; } = new();
-		/// <summary>Handler for TryUpdate.</summary>
-		public ICpProcessor_TryUpdateHandler TryUpdate { get; } = new();
+		/// <summary>Interceptor for Increment.</summary>
+		public ICpProcessor_IncrementInterceptor Increment { get; } = new();
+		/// <summary>Interceptor for TryUpdate.</summary>
+		public ICpProcessor_TryUpdateInterceptor TryUpdate { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpProcessor.</summary>
-	public ICpProcessorKO ICpProcessor { get; } = new();
+	public ICpProcessorInterceptorors ICpProcessor { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpProcessor.</summary>
 	public KnockOff.Documentation.Samples.Skills.ICpProcessor AsCpProcessor() => this;

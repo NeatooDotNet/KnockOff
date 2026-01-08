@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class HaServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for IHaService.Initialize.</summary>
-	public sealed class IHaService_InitializeHandler
+	public sealed class IHaService_InitializeInterceptor
 	{
 		/// <summary>Delegate for Initialize().</summary>
 		public delegate void InitializeDelegate(HaServiceKnockOff ko);
@@ -28,7 +28,7 @@ partial class HaServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IHaService.GetById.</summary>
-	public sealed class IHaService_GetByIdHandler
+	public sealed class IHaService_GetByIdInterceptor
 	{
 		/// <summary>Delegate for GetById(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.HaUser GetByIdDelegate(HaServiceKnockOff ko, int id);
@@ -53,7 +53,7 @@ partial class HaServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IHaService.Create.</summary>
-	public sealed class IHaService_CreateHandler
+	public sealed class IHaService_CreateInterceptor
 	{
 		/// <summary>Delegate for Create(string name, int value).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.HaEntity CreateDelegate(HaServiceKnockOff ko, string name, int value);
@@ -78,18 +78,18 @@ partial class HaServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaService.</summary>
-	public sealed class IHaServiceKO
+	public sealed class IHaServiceInterceptorors
 	{
-		/// <summary>Handler for Initialize.</summary>
-		public IHaService_InitializeHandler Initialize { get; } = new();
-		/// <summary>Handler for GetById.</summary>
-		public IHaService_GetByIdHandler GetById { get; } = new();
-		/// <summary>Handler for Create.</summary>
-		public IHaService_CreateHandler Create { get; } = new();
+		/// <summary>Interceptor for Initialize.</summary>
+		public IHaService_InitializeInterceptor Initialize { get; } = new();
+		/// <summary>Interceptor for GetById.</summary>
+		public IHaService_GetByIdInterceptor GetById { get; } = new();
+		/// <summary>Interceptor for Create.</summary>
+		public IHaService_CreateInterceptor Create { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaService.</summary>
-	public IHaServiceKO IHaService { get; } = new();
+	public IHaServiceInterceptorors IHaService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IHaService.</summary>
 	public KnockOff.Documentation.Samples.Skills.IHaService AsHaService() => this;

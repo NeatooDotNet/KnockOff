@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Comparison;
 partial class MigLoggerKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMigLogger.Log.</summary>
-	public sealed class IMigLogger_LogHandler
+	public sealed class IMigLogger_LogInterceptor
 	{
 		/// <summary>Delegate for Log(string message).</summary>
 		public delegate void LogDelegate(MigLoggerKnockOff ko, string message);
@@ -31,14 +31,14 @@ partial class MigLoggerKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigLogger.</summary>
-	public sealed class IMigLoggerKO
+	public sealed class IMigLoggerInterceptorors
 	{
-		/// <summary>Handler for Log.</summary>
-		public IMigLogger_LogHandler Log { get; } = new();
+		/// <summary>Interceptor for Log.</summary>
+		public IMigLogger_LogInterceptor Log { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigLogger.</summary>
-	public IMigLoggerKO IMigLogger { get; } = new();
+	public IMigLoggerInterceptorors IMigLogger { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IMigLogger.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IMigLogger AsMigLogger() => this;

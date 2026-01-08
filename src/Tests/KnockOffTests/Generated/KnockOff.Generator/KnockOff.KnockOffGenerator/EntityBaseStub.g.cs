@@ -6,7 +6,7 @@ namespace KnockOff.Tests;
 partial class EntityBaseStub
 {
 	/// <summary>Tracks and configures behavior for IEntityBase.ModifiedProperties.</summary>
-	public sealed class IEntityBase_ModifiedPropertiesHandler
+	public sealed class IEntityBase_ModifiedPropertiesInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -22,7 +22,7 @@ partial class EntityBaseStub
 	}
 
 	/// <summary>Tracks and configures behavior for IEntityBase.StringIndexer.</summary>
-	public sealed class IEntityBase_StringIndexerHandler
+	public sealed class IEntityBase_StringIndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -41,7 +41,7 @@ partial class EntityBaseStub
 	}
 
 	/// <summary>Tracks and configures behavior for IEntityBase.Delete.</summary>
-	public sealed class IEntityBase_DeleteHandler
+	public sealed class IEntityBase_DeleteInterceptor
 	{
 		/// <summary>Delegate for Delete().</summary>
 		public delegate void DeleteDelegate(EntityBaseStub ko);
@@ -63,7 +63,7 @@ partial class EntityBaseStub
 	}
 
 	/// <summary>Tracks and configures behavior for IEntityBase.UnDelete.</summary>
-	public sealed class IEntityBase_UnDeleteHandler
+	public sealed class IEntityBase_UnDeleteInterceptor
 	{
 		/// <summary>Delegate for UnDelete().</summary>
 		public delegate void UnDeleteDelegate(EntityBaseStub ko);
@@ -85,7 +85,7 @@ partial class EntityBaseStub
 	}
 
 	/// <summary>Tracks and configures behavior for IEntityBase.Save.</summary>
-	public sealed class IEntityBase_SaveHandler
+	public sealed class IEntityBase_SaveInterceptor
 	{
 		/// <summary>Delegate for Save().</summary>
 		public delegate global::System.Threading.Tasks.Task<global::Neatoo.IEntityBase> SaveDelegate(EntityBaseStub ko);
@@ -107,22 +107,22 @@ partial class EntityBaseStub
 	}
 
 	/// <summary>Tracks invocations and configures behavior for Neatoo.IEntityBase.</summary>
-	public sealed class IEntityBaseKO
+	public sealed class IEntityBaseInterceptorors
 	{
-		/// <summary>Handler for ModifiedProperties.</summary>
-		public IEntityBase_ModifiedPropertiesHandler ModifiedProperties { get; } = new();
-		/// <summary>Handler for StringIndexer.</summary>
-		public IEntityBase_StringIndexerHandler StringIndexer { get; } = new();
-		/// <summary>Handler for Delete.</summary>
-		public IEntityBase_DeleteHandler Delete { get; } = new();
-		/// <summary>Handler for UnDelete.</summary>
-		public IEntityBase_UnDeleteHandler UnDelete { get; } = new();
-		/// <summary>Handler for Save.</summary>
-		public IEntityBase_SaveHandler Save { get; } = new();
+		/// <summary>Interceptor for ModifiedProperties.</summary>
+		public IEntityBase_ModifiedPropertiesInterceptor ModifiedProperties { get; } = new();
+		/// <summary>Interceptor for StringIndexer.</summary>
+		public IEntityBase_StringIndexerInterceptor StringIndexer { get; } = new();
+		/// <summary>Interceptor for Delete.</summary>
+		public IEntityBase_DeleteInterceptor Delete { get; } = new();
+		/// <summary>Interceptor for UnDelete.</summary>
+		public IEntityBase_UnDeleteInterceptor UnDelete { get; } = new();
+		/// <summary>Interceptor for Save.</summary>
+		public IEntityBase_SaveInterceptor Save { get; } = new();
 	}
 
 	/// <summary>Tracks and configures behavior for IValidateBase.IsPaused.</summary>
-	public sealed class IValidateBase_IsPausedHandler
+	public sealed class IValidateBase_IsPausedInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -138,7 +138,7 @@ partial class EntityBaseStub
 	}
 
 	/// <summary>Tracks and configures behavior for IValidateBase.StringIndexer.</summary>
-	public sealed class IValidateBase_StringIndexerHandler
+	public sealed class IValidateBase_StringIndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -157,7 +157,7 @@ partial class EntityBaseStub
 	}
 
 	/// <summary>Tracks and configures behavior for IValidateBase.GetProperty.</summary>
-	public sealed class IValidateBase_GetPropertyHandler
+	public sealed class IValidateBase_GetPropertyInterceptor
 	{
 		/// <summary>Delegate for GetProperty(string propertyName).</summary>
 		public delegate global::Neatoo.IValidateProperty GetPropertyDelegate(EntityBaseStub ko, string propertyName);
@@ -182,7 +182,7 @@ partial class EntityBaseStub
 	}
 
 	/// <summary>Tracks and configures behavior for IValidateBase.TryGetProperty.</summary>
-	public sealed class IValidateBase_TryGetPropertyHandler
+	public sealed class IValidateBase_TryGetPropertyInterceptor
 	{
 		/// <summary>Delegate for TryGetProperty(string propertyName, out global::Neatoo.IValidateProperty validateProperty).</summary>
 		public delegate bool TryGetPropertyDelegate(EntityBaseStub ko, string propertyName, out global::Neatoo.IValidateProperty validateProperty);
@@ -207,20 +207,20 @@ partial class EntityBaseStub
 	}
 
 	/// <summary>Tracks invocations and configures behavior for Neatoo.IValidateBase.</summary>
-	public sealed class IValidateBaseKO
+	public sealed class IValidateBaseInterceptorors
 	{
-		/// <summary>Handler for IsPaused.</summary>
-		public IValidateBase_IsPausedHandler IsPaused { get; } = new();
-		/// <summary>Handler for StringIndexer.</summary>
-		public IValidateBase_StringIndexerHandler StringIndexer { get; } = new();
-		/// <summary>Handler for GetProperty.</summary>
-		public IValidateBase_GetPropertyHandler GetProperty { get; } = new();
-		/// <summary>Handler for TryGetProperty.</summary>
-		public IValidateBase_TryGetPropertyHandler TryGetProperty { get; } = new();
+		/// <summary>Interceptor for IsPaused.</summary>
+		public IValidateBase_IsPausedInterceptor IsPaused { get; } = new();
+		/// <summary>Interceptor for StringIndexer.</summary>
+		public IValidateBase_StringIndexerInterceptor StringIndexer { get; } = new();
+		/// <summary>Interceptor for GetProperty.</summary>
+		public IValidateBase_GetPropertyInterceptor GetProperty { get; } = new();
+		/// <summary>Interceptor for TryGetProperty.</summary>
+		public IValidateBase_TryGetPropertyInterceptor TryGetProperty { get; } = new();
 	}
 
 	/// <summary>Tracks and configures behavior for IBase.Parent.</summary>
-	public sealed class IBase_ParentHandler
+	public sealed class IBase_ParentInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -236,14 +236,14 @@ partial class EntityBaseStub
 	}
 
 	/// <summary>Tracks invocations and configures behavior for Neatoo.IBase.</summary>
-	public sealed class IBaseKO
+	public sealed class IBaseInterceptorors
 	{
-		/// <summary>Handler for Parent.</summary>
-		public IBase_ParentHandler Parent { get; } = new();
+		/// <summary>Interceptor for Parent.</summary>
+		public IBase_ParentInterceptor Parent { get; } = new();
 	}
 
 	/// <summary>Tracks and raises INotifyPropertyChanged.PropertyChanged.</summary>
-	public sealed class INotifyPropertyChanged_PropertyChangedHandler
+	public sealed class INotifyPropertyChanged_PropertyChangedInterceptor
 	{
 		private global::System.ComponentModel.PropertyChangedEventHandler? _handler;
 		private readonly global::System.Collections.Generic.List<(object? sender, global::System.ComponentModel.PropertyChangedEventArgs e)> _raises = new();
@@ -296,14 +296,14 @@ partial class EntityBaseStub
 	}
 
 	/// <summary>Tracks invocations and configures behavior for System.ComponentModel.INotifyPropertyChanged.</summary>
-	public sealed class INotifyPropertyChangedKO
+	public sealed class INotifyPropertyChangedInterceptorors
 	{
-		/// <summary>Handler for PropertyChanged event.</summary>
-		public INotifyPropertyChanged_PropertyChangedHandler PropertyChanged { get; } = new();
+		/// <summary>Interceptor for PropertyChanged event.</summary>
+		public INotifyPropertyChanged_PropertyChangedInterceptor PropertyChanged { get; } = new();
 	}
 
 	/// <summary>Tracks and raises INotifyNeatooPropertyChanged.NeatooPropertyChanged.</summary>
-	public sealed class INotifyNeatooPropertyChanged_NeatooPropertyChangedHandler
+	public sealed class INotifyNeatooPropertyChanged_NeatooPropertyChangedInterceptor
 	{
 		private global::Neatoo.NeatooPropertyChanged? _handler;
 		private readonly global::System.Collections.Generic.List<global::Neatoo.NeatooPropertyChangedEventArgs> _raises = new();
@@ -358,14 +358,14 @@ partial class EntityBaseStub
 	}
 
 	/// <summary>Tracks invocations and configures behavior for Neatoo.INotifyNeatooPropertyChanged.</summary>
-	public sealed class INotifyNeatooPropertyChangedKO
+	public sealed class INotifyNeatooPropertyChangedInterceptorors
 	{
-		/// <summary>Handler for NeatooPropertyChanged event.</summary>
-		public INotifyNeatooPropertyChanged_NeatooPropertyChangedHandler NeatooPropertyChanged { get; } = new();
+		/// <summary>Interceptor for NeatooPropertyChanged event.</summary>
+		public INotifyNeatooPropertyChanged_NeatooPropertyChangedInterceptor NeatooPropertyChanged { get; } = new();
 	}
 
 	/// <summary>Tracks and configures behavior for IValidateMetaProperties.IsValid.</summary>
-	public sealed class IValidateMetaProperties_IsValidHandler
+	public sealed class IValidateMetaProperties_IsValidInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -381,7 +381,7 @@ partial class EntityBaseStub
 	}
 
 	/// <summary>Tracks and configures behavior for IValidateMetaProperties.IsSelfValid.</summary>
-	public sealed class IValidateMetaProperties_IsSelfValidHandler
+	public sealed class IValidateMetaProperties_IsSelfValidInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -397,7 +397,7 @@ partial class EntityBaseStub
 	}
 
 	/// <summary>Tracks and configures behavior for IValidateMetaProperties.PropertyMessages.</summary>
-	public sealed class IValidateMetaProperties_PropertyMessagesHandler
+	public sealed class IValidateMetaProperties_PropertyMessagesInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -413,7 +413,7 @@ partial class EntityBaseStub
 	}
 
 	/// <summary>Tracks and configures behavior for IValidateMetaProperties.RunRules1.</summary>
-	public sealed class IValidateMetaProperties_RunRules1Handler
+	public sealed class IValidateMetaProperties_RunRules1Interceptor
 	{
 		/// <summary>Delegate for RunRules(string propertyName, global::System.Threading.CancellationToken? token).</summary>
 		public delegate global::System.Threading.Tasks.Task RunRulesDelegate(EntityBaseStub ko, string propertyName, global::System.Threading.CancellationToken? token);
@@ -438,7 +438,7 @@ partial class EntityBaseStub
 	}
 
 	/// <summary>Tracks and configures behavior for IValidateMetaProperties.RunRules2.</summary>
-	public sealed class IValidateMetaProperties_RunRules2Handler
+	public sealed class IValidateMetaProperties_RunRules2Interceptor
 	{
 		/// <summary>Delegate for RunRules(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token).</summary>
 		public delegate global::System.Threading.Tasks.Task RunRulesDelegate(EntityBaseStub ko, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token);
@@ -463,7 +463,7 @@ partial class EntityBaseStub
 	}
 
 	/// <summary>Tracks and configures behavior for IValidateMetaProperties.ClearAllMessages.</summary>
-	public sealed class IValidateMetaProperties_ClearAllMessagesHandler
+	public sealed class IValidateMetaProperties_ClearAllMessagesInterceptor
 	{
 		/// <summary>Delegate for ClearAllMessages().</summary>
 		public delegate void ClearAllMessagesDelegate(EntityBaseStub ko);
@@ -485,7 +485,7 @@ partial class EntityBaseStub
 	}
 
 	/// <summary>Tracks and configures behavior for IValidateMetaProperties.ClearSelfMessages.</summary>
-	public sealed class IValidateMetaProperties_ClearSelfMessagesHandler
+	public sealed class IValidateMetaProperties_ClearSelfMessagesInterceptor
 	{
 		/// <summary>Delegate for ClearSelfMessages().</summary>
 		public delegate void ClearSelfMessagesDelegate(EntityBaseStub ko);
@@ -507,26 +507,26 @@ partial class EntityBaseStub
 	}
 
 	/// <summary>Tracks invocations and configures behavior for Neatoo.IValidateMetaProperties.</summary>
-	public sealed class IValidateMetaPropertiesKO
+	public sealed class IValidateMetaPropertiesInterceptorors
 	{
-		/// <summary>Handler for IsValid.</summary>
-		public IValidateMetaProperties_IsValidHandler IsValid { get; } = new();
-		/// <summary>Handler for IsSelfValid.</summary>
-		public IValidateMetaProperties_IsSelfValidHandler IsSelfValid { get; } = new();
-		/// <summary>Handler for PropertyMessages.</summary>
-		public IValidateMetaProperties_PropertyMessagesHandler PropertyMessages { get; } = new();
-		/// <summary>Handler for RunRules overload 1.</summary>
-		public IValidateMetaProperties_RunRules1Handler RunRules1 { get; } = new();
-		/// <summary>Handler for RunRules overload 2.</summary>
-		public IValidateMetaProperties_RunRules2Handler RunRules2 { get; } = new();
-		/// <summary>Handler for ClearAllMessages.</summary>
-		public IValidateMetaProperties_ClearAllMessagesHandler ClearAllMessages { get; } = new();
-		/// <summary>Handler for ClearSelfMessages.</summary>
-		public IValidateMetaProperties_ClearSelfMessagesHandler ClearSelfMessages { get; } = new();
+		/// <summary>Interceptor for IsValid.</summary>
+		public IValidateMetaProperties_IsValidInterceptor IsValid { get; } = new();
+		/// <summary>Interceptor for IsSelfValid.</summary>
+		public IValidateMetaProperties_IsSelfValidInterceptor IsSelfValid { get; } = new();
+		/// <summary>Interceptor for PropertyMessages.</summary>
+		public IValidateMetaProperties_PropertyMessagesInterceptor PropertyMessages { get; } = new();
+		/// <summary>Interceptor for RunRules overload 1.</summary>
+		public IValidateMetaProperties_RunRules1Interceptor RunRules1 { get; } = new();
+		/// <summary>Interceptor for RunRules overload 2.</summary>
+		public IValidateMetaProperties_RunRules2Interceptor RunRules2 { get; } = new();
+		/// <summary>Interceptor for ClearAllMessages.</summary>
+		public IValidateMetaProperties_ClearAllMessagesInterceptor ClearAllMessages { get; } = new();
+		/// <summary>Interceptor for ClearSelfMessages.</summary>
+		public IValidateMetaProperties_ClearSelfMessagesInterceptor ClearSelfMessages { get; } = new();
 	}
 
 	/// <summary>Tracks and configures behavior for IBaseMetaProperties.IsBusy.</summary>
-	public sealed class IBaseMetaProperties_IsBusyHandler
+	public sealed class IBaseMetaProperties_IsBusyInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -542,7 +542,7 @@ partial class EntityBaseStub
 	}
 
 	/// <summary>Tracks and configures behavior for IBaseMetaProperties.WaitForTasks.</summary>
-	public sealed class IBaseMetaProperties_WaitForTasksHandler
+	public sealed class IBaseMetaProperties_WaitForTasksInterceptor
 	{
 		/// <summary>Delegate for WaitForTasks().</summary>
 		public delegate global::System.Threading.Tasks.Task WaitForTasksDelegate(EntityBaseStub ko);
@@ -564,16 +564,16 @@ partial class EntityBaseStub
 	}
 
 	/// <summary>Tracks invocations and configures behavior for Neatoo.IBaseMetaProperties.</summary>
-	public sealed class IBaseMetaPropertiesKO
+	public sealed class IBaseMetaPropertiesInterceptorors
 	{
-		/// <summary>Handler for IsBusy.</summary>
-		public IBaseMetaProperties_IsBusyHandler IsBusy { get; } = new();
-		/// <summary>Handler for WaitForTasks.</summary>
-		public IBaseMetaProperties_WaitForTasksHandler WaitForTasks { get; } = new();
+		/// <summary>Interceptor for IsBusy.</summary>
+		public IBaseMetaProperties_IsBusyInterceptor IsBusy { get; } = new();
+		/// <summary>Interceptor for WaitForTasks.</summary>
+		public IBaseMetaProperties_WaitForTasksInterceptor WaitForTasks { get; } = new();
 	}
 
 	/// <summary>Tracks and configures behavior for IEntityMetaProperties.IsChild.</summary>
-	public sealed class IEntityMetaProperties_IsChildHandler
+	public sealed class IEntityMetaProperties_IsChildInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -589,7 +589,7 @@ partial class EntityBaseStub
 	}
 
 	/// <summary>Tracks and configures behavior for IEntityMetaProperties.IsModified.</summary>
-	public sealed class IEntityMetaProperties_IsModifiedHandler
+	public sealed class IEntityMetaProperties_IsModifiedInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -605,7 +605,7 @@ partial class EntityBaseStub
 	}
 
 	/// <summary>Tracks and configures behavior for IEntityMetaProperties.IsSelfModified.</summary>
-	public sealed class IEntityMetaProperties_IsSelfModifiedHandler
+	public sealed class IEntityMetaProperties_IsSelfModifiedInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -621,7 +621,7 @@ partial class EntityBaseStub
 	}
 
 	/// <summary>Tracks and configures behavior for IEntityMetaProperties.IsMarkedModified.</summary>
-	public sealed class IEntityMetaProperties_IsMarkedModifiedHandler
+	public sealed class IEntityMetaProperties_IsMarkedModifiedInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -637,7 +637,7 @@ partial class EntityBaseStub
 	}
 
 	/// <summary>Tracks and configures behavior for IEntityMetaProperties.IsSavable.</summary>
-	public sealed class IEntityMetaProperties_IsSavableHandler
+	public sealed class IEntityMetaProperties_IsSavableInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -653,22 +653,22 @@ partial class EntityBaseStub
 	}
 
 	/// <summary>Tracks invocations and configures behavior for Neatoo.IEntityMetaProperties.</summary>
-	public sealed class IEntityMetaPropertiesKO
+	public sealed class IEntityMetaPropertiesInterceptorors
 	{
-		/// <summary>Handler for IsChild.</summary>
-		public IEntityMetaProperties_IsChildHandler IsChild { get; } = new();
-		/// <summary>Handler for IsModified.</summary>
-		public IEntityMetaProperties_IsModifiedHandler IsModified { get; } = new();
-		/// <summary>Handler for IsSelfModified.</summary>
-		public IEntityMetaProperties_IsSelfModifiedHandler IsSelfModified { get; } = new();
-		/// <summary>Handler for IsMarkedModified.</summary>
-		public IEntityMetaProperties_IsMarkedModifiedHandler IsMarkedModified { get; } = new();
-		/// <summary>Handler for IsSavable.</summary>
-		public IEntityMetaProperties_IsSavableHandler IsSavable { get; } = new();
+		/// <summary>Interceptor for IsChild.</summary>
+		public IEntityMetaProperties_IsChildInterceptor IsChild { get; } = new();
+		/// <summary>Interceptor for IsModified.</summary>
+		public IEntityMetaProperties_IsModifiedInterceptor IsModified { get; } = new();
+		/// <summary>Interceptor for IsSelfModified.</summary>
+		public IEntityMetaProperties_IsSelfModifiedInterceptor IsSelfModified { get; } = new();
+		/// <summary>Interceptor for IsMarkedModified.</summary>
+		public IEntityMetaProperties_IsMarkedModifiedInterceptor IsMarkedModified { get; } = new();
+		/// <summary>Interceptor for IsSavable.</summary>
+		public IEntityMetaProperties_IsSavableInterceptor IsSavable { get; } = new();
 	}
 
 	/// <summary>Tracks and configures behavior for IFactorySaveMeta.IsDeleted.</summary>
-	public sealed class IFactorySaveMeta_IsDeletedHandler
+	public sealed class IFactorySaveMeta_IsDeletedInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -684,7 +684,7 @@ partial class EntityBaseStub
 	}
 
 	/// <summary>Tracks and configures behavior for IFactorySaveMeta.IsNew.</summary>
-	public sealed class IFactorySaveMeta_IsNewHandler
+	public sealed class IFactorySaveMeta_IsNewInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -700,40 +700,40 @@ partial class EntityBaseStub
 	}
 
 	/// <summary>Tracks invocations and configures behavior for Neatoo.RemoteFactory.IFactorySaveMeta.</summary>
-	public sealed class IFactorySaveMetaKO
+	public sealed class IFactorySaveMetaInterceptorors
 	{
-		/// <summary>Handler for IsDeleted.</summary>
-		public IFactorySaveMeta_IsDeletedHandler IsDeleted { get; } = new();
-		/// <summary>Handler for IsNew.</summary>
-		public IFactorySaveMeta_IsNewHandler IsNew { get; } = new();
+		/// <summary>Interceptor for IsDeleted.</summary>
+		public IFactorySaveMeta_IsDeletedInterceptor IsDeleted { get; } = new();
+		/// <summary>Interceptor for IsNew.</summary>
+		public IFactorySaveMeta_IsNewInterceptor IsNew { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for Neatoo.IEntityBase.</summary>
-	public IEntityBaseKO IEntityBase { get; } = new();
+	public IEntityBaseInterceptorors IEntityBase { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for Neatoo.IValidateBase.</summary>
-	public IValidateBaseKO IValidateBase { get; } = new();
+	public IValidateBaseInterceptorors IValidateBase { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for Neatoo.IBase.</summary>
-	public IBaseKO IBase { get; } = new();
+	public IBaseInterceptorors IBase { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for System.ComponentModel.INotifyPropertyChanged.</summary>
-	public INotifyPropertyChangedKO INotifyPropertyChanged { get; } = new();
+	public INotifyPropertyChangedInterceptorors INotifyPropertyChanged { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for Neatoo.INotifyNeatooPropertyChanged.</summary>
-	public INotifyNeatooPropertyChangedKO INotifyNeatooPropertyChanged { get; } = new();
+	public INotifyNeatooPropertyChangedInterceptorors INotifyNeatooPropertyChanged { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for Neatoo.IValidateMetaProperties.</summary>
-	public IValidateMetaPropertiesKO IValidateMetaProperties { get; } = new();
+	public IValidateMetaPropertiesInterceptorors IValidateMetaProperties { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for Neatoo.IBaseMetaProperties.</summary>
-	public IBaseMetaPropertiesKO IBaseMetaProperties { get; } = new();
+	public IBaseMetaPropertiesInterceptorors IBaseMetaProperties { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for Neatoo.IEntityMetaProperties.</summary>
-	public IEntityMetaPropertiesKO IEntityMetaProperties { get; } = new();
+	public IEntityMetaPropertiesInterceptorors IEntityMetaProperties { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for Neatoo.RemoteFactory.IFactorySaveMeta.</summary>
-	public IFactorySaveMetaKO IFactorySaveMeta { get; } = new();
+	public IFactorySaveMetaInterceptorors IFactorySaveMeta { get; } = new();
 
 	/// <summary>Returns this instance as Neatoo.IEntityBase.</summary>
 	public Neatoo.IEntityBase AsEntityBase() => this;

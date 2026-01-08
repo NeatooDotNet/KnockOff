@@ -6,7 +6,7 @@ namespace KnockOff.Tests;
 partial class EventSourceKnockOff
 {
 	/// <summary>Tracks and raises IEventSource.MessageReceived.</summary>
-	public sealed class IEventSource_MessageReceivedHandler
+	public sealed class IEventSource_MessageReceivedInterceptor
 	{
 		private global::System.EventHandler<string>? _handler;
 		private readonly global::System.Collections.Generic.List<(object? sender, string e)> _raises = new();
@@ -62,7 +62,7 @@ partial class EventSourceKnockOff
 	}
 
 	/// <summary>Tracks and raises IEventSource.OnCompleted.</summary>
-	public sealed class IEventSource_OnCompletedHandler
+	public sealed class IEventSource_OnCompletedInterceptor
 	{
 		private global::System.EventHandler? _handler;
 		private readonly global::System.Collections.Generic.List<(object? sender, global::System.EventArgs e)> _raises = new();
@@ -118,7 +118,7 @@ partial class EventSourceKnockOff
 	}
 
 	/// <summary>Tracks and raises IEventSource.OnProgress.</summary>
-	public sealed class IEventSource_OnProgressHandler
+	public sealed class IEventSource_OnProgressInterceptor
 	{
 		private global::System.Action<int>? _handler;
 		private readonly global::System.Collections.Generic.List<int> _raises = new();
@@ -171,7 +171,7 @@ partial class EventSourceKnockOff
 	}
 
 	/// <summary>Tracks and raises IEventSource.OnData.</summary>
-	public sealed class IEventSource_OnDataHandler
+	public sealed class IEventSource_OnDataInterceptor
 	{
 		private global::System.Action<string, int>? _handler;
 		private readonly global::System.Collections.Generic.List<(string arg1, int arg2)> _raises = new();
@@ -224,20 +224,20 @@ partial class EventSourceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IEventSource.</summary>
-	public sealed class IEventSourceKO
+	public sealed class IEventSourceInterceptorors
 	{
-		/// <summary>Handler for MessageReceived event.</summary>
-		public IEventSource_MessageReceivedHandler MessageReceived { get; } = new();
-		/// <summary>Handler for OnCompleted event.</summary>
-		public IEventSource_OnCompletedHandler OnCompleted { get; } = new();
-		/// <summary>Handler for OnProgress event.</summary>
-		public IEventSource_OnProgressHandler OnProgress { get; } = new();
-		/// <summary>Handler for OnData event.</summary>
-		public IEventSource_OnDataHandler OnData { get; } = new();
+		/// <summary>Interceptor for MessageReceived event.</summary>
+		public IEventSource_MessageReceivedInterceptor MessageReceived { get; } = new();
+		/// <summary>Interceptor for OnCompleted event.</summary>
+		public IEventSource_OnCompletedInterceptor OnCompleted { get; } = new();
+		/// <summary>Interceptor for OnProgress event.</summary>
+		public IEventSource_OnProgressInterceptor OnProgress { get; } = new();
+		/// <summary>Interceptor for OnData event.</summary>
+		public IEventSource_OnDataInterceptor OnData { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IEventSource.</summary>
-	public IEventSourceKO IEventSource { get; } = new();
+	public IEventSourceInterceptorors IEventSource { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IEventSource.</summary>
 	public KnockOff.Tests.IEventSource AsEventSource() => this;

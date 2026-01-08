@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Comparison;
 partial class MigSaveServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMigSaveService.Save.</summary>
-	public sealed class IMigSaveService_SaveHandler
+	public sealed class IMigSaveService_SaveInterceptor
 	{
 		/// <summary>Delegate for Save(global::KnockOff.Documentation.Samples.Comparison.MigEntity entity).</summary>
 		public delegate void SaveDelegate(MigSaveServiceKnockOff ko, global::KnockOff.Documentation.Samples.Comparison.MigEntity entity);
@@ -31,14 +31,14 @@ partial class MigSaveServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigSaveService.</summary>
-	public sealed class IMigSaveServiceKO
+	public sealed class IMigSaveServiceInterceptorors
 	{
-		/// <summary>Handler for Save.</summary>
-		public IMigSaveService_SaveHandler Save { get; } = new();
+		/// <summary>Interceptor for Save.</summary>
+		public IMigSaveService_SaveInterceptor Save { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigSaveService.</summary>
-	public IMigSaveServiceKO IMigSaveService { get; } = new();
+	public IMigSaveServiceInterceptorors IMigSaveService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IMigSaveService.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IMigSaveService AsMigSaveService() => this;

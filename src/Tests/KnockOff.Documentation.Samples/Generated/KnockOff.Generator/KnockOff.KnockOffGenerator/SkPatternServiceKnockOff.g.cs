@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class SkPatternServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for ISkPatternService.GetUser.</summary>
-	public sealed class ISkPatternService_GetUserHandler
+	public sealed class ISkPatternService_GetUserInterceptor
 	{
 		/// <summary>Delegate for GetUser(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.SkUser? GetUserDelegate(SkPatternServiceKnockOff ko, int id);
@@ -31,7 +31,7 @@ partial class SkPatternServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISkPatternService.Connect.</summary>
-	public sealed class ISkPatternService_ConnectHandler
+	public sealed class ISkPatternService_ConnectInterceptor
 	{
 		/// <summary>Delegate for Connect().</summary>
 		public delegate void ConnectDelegate(SkPatternServiceKnockOff ko);
@@ -53,7 +53,7 @@ partial class SkPatternServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISkPatternService.SaveAsync.</summary>
-	public sealed class ISkPatternService_SaveAsyncHandler
+	public sealed class ISkPatternService_SaveAsyncInterceptor
 	{
 		/// <summary>Delegate for SaveAsync(object entity).</summary>
 		public delegate global::System.Threading.Tasks.Task<int> SaveAsyncDelegate(SkPatternServiceKnockOff ko, object entity);
@@ -78,7 +78,7 @@ partial class SkPatternServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISkPatternService.GetNext.</summary>
-	public sealed class ISkPatternService_GetNextHandler
+	public sealed class ISkPatternService_GetNextInterceptor
 	{
 		/// <summary>Delegate for GetNext().</summary>
 		public delegate int GetNextDelegate(SkPatternServiceKnockOff ko);
@@ -100,20 +100,20 @@ partial class SkPatternServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkPatternService.</summary>
-	public sealed class ISkPatternServiceKO
+	public sealed class ISkPatternServiceInterceptorors
 	{
-		/// <summary>Handler for GetUser.</summary>
-		public ISkPatternService_GetUserHandler GetUser { get; } = new();
-		/// <summary>Handler for Connect.</summary>
-		public ISkPatternService_ConnectHandler Connect { get; } = new();
-		/// <summary>Handler for SaveAsync.</summary>
-		public ISkPatternService_SaveAsyncHandler SaveAsync { get; } = new();
-		/// <summary>Handler for GetNext.</summary>
-		public ISkPatternService_GetNextHandler GetNext { get; } = new();
+		/// <summary>Interceptor for GetUser.</summary>
+		public ISkPatternService_GetUserInterceptor GetUser { get; } = new();
+		/// <summary>Interceptor for Connect.</summary>
+		public ISkPatternService_ConnectInterceptor Connect { get; } = new();
+		/// <summary>Interceptor for SaveAsync.</summary>
+		public ISkPatternService_SaveAsyncInterceptor SaveAsync { get; } = new();
+		/// <summary>Interceptor for GetNext.</summary>
+		public ISkPatternService_GetNextInterceptor GetNext { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkPatternService.</summary>
-	public ISkPatternServiceKO ISkPatternService { get; } = new();
+	public ISkPatternServiceInterceptorors ISkPatternService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkPatternService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkPatternService AsSkPatternService() => this;

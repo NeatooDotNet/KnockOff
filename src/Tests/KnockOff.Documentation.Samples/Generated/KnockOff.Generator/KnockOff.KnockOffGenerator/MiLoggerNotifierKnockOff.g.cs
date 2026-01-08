@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class MiLoggerNotifierKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMiLogger.Name.</summary>
-	public sealed class IMiLogger_NameHandler
+	public sealed class IMiLogger_NameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -34,7 +34,7 @@ partial class MiLoggerNotifierKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IMiLogger.Log.</summary>
-	public sealed class IMiLogger_LogHandler
+	public sealed class IMiLogger_LogInterceptor
 	{
 		/// <summary>Delegate for Log(string message).</summary>
 		public delegate void LogDelegate(MiLoggerNotifierKnockOff ko, string message);
@@ -59,16 +59,16 @@ partial class MiLoggerNotifierKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiLogger.</summary>
-	public sealed class IMiLoggerKO
+	public sealed class IMiLoggerInterceptorors
 	{
-		/// <summary>Handler for Name.</summary>
-		public IMiLogger_NameHandler Name { get; } = new();
-		/// <summary>Handler for Log.</summary>
-		public IMiLogger_LogHandler Log { get; } = new();
+		/// <summary>Interceptor for Name.</summary>
+		public IMiLogger_NameInterceptor Name { get; } = new();
+		/// <summary>Interceptor for Log.</summary>
+		public IMiLogger_LogInterceptor Log { get; } = new();
 	}
 
 	/// <summary>Tracks and configures behavior for IMiNotifier.Name.</summary>
-	public sealed class IMiNotifier_NameHandler
+	public sealed class IMiNotifier_NameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -84,7 +84,7 @@ partial class MiLoggerNotifierKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IMiNotifier.Notify.</summary>
-	public sealed class IMiNotifier_NotifyHandler
+	public sealed class IMiNotifier_NotifyInterceptor
 	{
 		/// <summary>Delegate for Notify(string recipient).</summary>
 		public delegate void NotifyDelegate(MiLoggerNotifierKnockOff ko, string recipient);
@@ -109,19 +109,19 @@ partial class MiLoggerNotifierKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiNotifier.</summary>
-	public sealed class IMiNotifierKO
+	public sealed class IMiNotifierInterceptorors
 	{
-		/// <summary>Handler for Name.</summary>
-		public IMiNotifier_NameHandler Name { get; } = new();
-		/// <summary>Handler for Notify.</summary>
-		public IMiNotifier_NotifyHandler Notify { get; } = new();
+		/// <summary>Interceptor for Name.</summary>
+		public IMiNotifier_NameInterceptor Name { get; } = new();
+		/// <summary>Interceptor for Notify.</summary>
+		public IMiNotifier_NotifyInterceptor Notify { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiLogger.</summary>
-	public IMiLoggerKO IMiLogger { get; } = new();
+	public IMiLoggerInterceptorors IMiLogger { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMiNotifier.</summary>
-	public IMiNotifierKO IMiNotifier { get; } = new();
+	public IMiNotifierInterceptorors IMiNotifier { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMiLogger.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMiLogger AsMiLogger() => this;

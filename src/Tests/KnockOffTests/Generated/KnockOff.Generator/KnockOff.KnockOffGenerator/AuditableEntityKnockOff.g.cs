@@ -6,7 +6,7 @@ namespace KnockOff.Tests;
 partial class AuditableEntityKnockOff
 {
 	/// <summary>Tracks and configures behavior for IAuditableEntity.ModifiedAt.</summary>
-	public sealed class IAuditableEntity_ModifiedAtHandler
+	public sealed class IAuditableEntity_ModifiedAtInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -34,7 +34,7 @@ partial class AuditableEntityKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IAuditableEntity.ModifiedBy.</summary>
-	public sealed class IAuditableEntity_ModifiedByHandler
+	public sealed class IAuditableEntity_ModifiedByInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -62,16 +62,16 @@ partial class AuditableEntityKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IAuditableEntity.</summary>
-	public sealed class IAuditableEntityKO
+	public sealed class IAuditableEntityInterceptorors
 	{
-		/// <summary>Handler for ModifiedAt.</summary>
-		public IAuditableEntity_ModifiedAtHandler ModifiedAt { get; } = new();
-		/// <summary>Handler for ModifiedBy.</summary>
-		public IAuditableEntity_ModifiedByHandler ModifiedBy { get; } = new();
+		/// <summary>Interceptor for ModifiedAt.</summary>
+		public IAuditableEntity_ModifiedAtInterceptor ModifiedAt { get; } = new();
+		/// <summary>Interceptor for ModifiedBy.</summary>
+		public IAuditableEntity_ModifiedByInterceptor ModifiedBy { get; } = new();
 	}
 
 	/// <summary>Tracks and configures behavior for IBaseEntity.Id.</summary>
-	public sealed class IBaseEntity_IdHandler
+	public sealed class IBaseEntity_IdInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -87,7 +87,7 @@ partial class AuditableEntityKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IBaseEntity.CreatedAt.</summary>
-	public sealed class IBaseEntity_CreatedAtHandler
+	public sealed class IBaseEntity_CreatedAtInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -103,19 +103,19 @@ partial class AuditableEntityKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IBaseEntity.</summary>
-	public sealed class IBaseEntityKO
+	public sealed class IBaseEntityInterceptorors
 	{
-		/// <summary>Handler for Id.</summary>
-		public IBaseEntity_IdHandler Id { get; } = new();
-		/// <summary>Handler for CreatedAt.</summary>
-		public IBaseEntity_CreatedAtHandler CreatedAt { get; } = new();
+		/// <summary>Interceptor for Id.</summary>
+		public IBaseEntity_IdInterceptor Id { get; } = new();
+		/// <summary>Interceptor for CreatedAt.</summary>
+		public IBaseEntity_CreatedAtInterceptor CreatedAt { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IAuditableEntity.</summary>
-	public IAuditableEntityKO IAuditableEntity { get; } = new();
+	public IAuditableEntityInterceptorors IAuditableEntity { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IBaseEntity.</summary>
-	public IBaseEntityKO IBaseEntity { get; } = new();
+	public IBaseEntityInterceptorors IBaseEntity { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IAuditableEntity.</summary>
 	public KnockOff.Tests.IAuditableEntity AsAuditableEntity() => this;

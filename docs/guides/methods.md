@@ -292,7 +292,7 @@ Assert.Equal(2, service.GetNext());
 Assert.Equal(3, service.GetNext());
 ```
 
-### Accessing Other Handler State
+### Accessing Other Interceptor State
 
 <!-- snippet: docs:methods:accessing-handler-state -->
 ```csharp

@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class MethodMultiParamKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMethodMultiParam.Process.</summary>
-	public sealed class IMethodMultiParam_ProcessHandler
+	public sealed class IMethodMultiParam_ProcessInterceptor
 	{
 		/// <summary>Delegate for Process(string name, int value, bool flag).</summary>
 		public delegate void ProcessDelegate(MethodMultiParamKnockOff ko, string name, int value, bool flag);
@@ -31,14 +31,14 @@ partial class MethodMultiParamKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodMultiParam.</summary>
-	public sealed class IMethodMultiParamKO
+	public sealed class IMethodMultiParamInterceptorors
 	{
-		/// <summary>Handler for Process.</summary>
-		public IMethodMultiParam_ProcessHandler Process { get; } = new();
+		/// <summary>Interceptor for Process.</summary>
+		public IMethodMultiParam_ProcessInterceptor Process { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodMultiParam.</summary>
-	public IMethodMultiParamKO IMethodMultiParam { get; } = new();
+	public IMethodMultiParamInterceptorors IMethodMultiParam { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodMultiParam.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMethodMultiParam AsMethodMultiParam() => this;

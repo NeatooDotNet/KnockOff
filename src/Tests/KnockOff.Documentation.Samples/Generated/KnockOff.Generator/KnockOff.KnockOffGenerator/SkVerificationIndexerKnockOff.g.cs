@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class SkVerificationIndexerKnockOff
 {
 	/// <summary>Tracks and configures behavior for ISkVerificationPropertyStore.StringIndexer.</summary>
-	public sealed class ISkVerificationPropertyStore_StringIndexerHandler
+	public sealed class ISkVerificationPropertyStore_StringIndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -37,14 +37,14 @@ partial class SkVerificationIndexerKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkVerificationPropertyStore.</summary>
-	public sealed class ISkVerificationPropertyStoreKO
+	public sealed class ISkVerificationPropertyStoreInterceptorors
 	{
-		/// <summary>Handler for StringIndexer.</summary>
-		public ISkVerificationPropertyStore_StringIndexerHandler StringIndexer { get; } = new();
+		/// <summary>Interceptor for StringIndexer.</summary>
+		public ISkVerificationPropertyStore_StringIndexerInterceptor StringIndexer { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkVerificationPropertyStore.</summary>
-	public ISkVerificationPropertyStoreKO ISkVerificationPropertyStore { get; } = new();
+	public ISkVerificationPropertyStoreInterceptorors ISkVerificationPropertyStore { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkVerificationPropertyStore.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkVerificationPropertyStore AsSkVerificationPropertyStore() => this;

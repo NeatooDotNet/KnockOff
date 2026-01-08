@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class GuideDownloaderKnockOff
 {
 	/// <summary>Tracks and raises IGuideDownloader.ProgressChanged.</summary>
-	public sealed class IGuideDownloader_ProgressChangedHandler
+	public sealed class IGuideDownloader_ProgressChangedInterceptor
 	{
 		private global::System.Action<int>? _handler;
 		private readonly global::System.Collections.Generic.List<int> _raises = new();
@@ -59,14 +59,14 @@ partial class GuideDownloaderKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGuideDownloader.</summary>
-	public sealed class IGuideDownloaderKO
+	public sealed class IGuideDownloaderInterceptorors
 	{
-		/// <summary>Handler for ProgressChanged event.</summary>
-		public IGuideDownloader_ProgressChangedHandler ProgressChanged { get; } = new();
+		/// <summary>Interceptor for ProgressChanged event.</summary>
+		public IGuideDownloader_ProgressChangedInterceptor ProgressChanged { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGuideDownloader.</summary>
-	public IGuideDownloaderKO IGuideDownloader { get; } = new();
+	public IGuideDownloaderInterceptorors IGuideDownloader { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IGuideDownloader.</summary>
 	public KnockOff.Documentation.Samples.Guides.IGuideDownloader AsGuideDownloader() => this;

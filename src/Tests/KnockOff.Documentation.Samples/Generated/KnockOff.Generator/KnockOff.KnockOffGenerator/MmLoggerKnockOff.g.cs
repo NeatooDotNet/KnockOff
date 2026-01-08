@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class MmLoggerKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMmLogger.Log.</summary>
-	public sealed class IMmLogger_LogHandler
+	public sealed class IMmLogger_LogInterceptor
 	{
 		/// <summary>Delegate for Log(string message).</summary>
 		public delegate void LogDelegate(MmLoggerKnockOff ko, string message);
@@ -31,14 +31,14 @@ partial class MmLoggerKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmLogger.</summary>
-	public sealed class IMmLoggerKO
+	public sealed class IMmLoggerInterceptorors
 	{
-		/// <summary>Handler for Log.</summary>
-		public IMmLogger_LogHandler Log { get; } = new();
+		/// <summary>Interceptor for Log.</summary>
+		public IMmLogger_LogInterceptor Log { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmLogger.</summary>
-	public IMmLoggerKO IMmLogger { get; } = new();
+	public IMmLoggerInterceptorors IMmLogger { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmLogger.</summary>
 	public KnockOff.Documentation.Samples.Skills.IMmLogger AsMmLogger() => this;

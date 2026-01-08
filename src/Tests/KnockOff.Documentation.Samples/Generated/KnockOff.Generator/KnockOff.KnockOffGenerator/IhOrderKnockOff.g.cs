@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class IhOrderKnockOff
 {
 	/// <summary>Tracks and configures behavior for IIhOrder.Total.</summary>
-	public sealed class IIhOrder_TotalHandler
+	public sealed class IIhOrder_TotalInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -22,7 +22,7 @@ partial class IhOrderKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IIhOrder.Submit.</summary>
-	public sealed class IIhOrder_SubmitHandler
+	public sealed class IIhOrder_SubmitInterceptor
 	{
 		/// <summary>Delegate for Submit().</summary>
 		public delegate void SubmitDelegate(IhOrderKnockOff ko);
@@ -44,16 +44,16 @@ partial class IhOrderKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhOrder.</summary>
-	public sealed class IIhOrderKO
+	public sealed class IIhOrderInterceptorors
 	{
-		/// <summary>Handler for Total.</summary>
-		public IIhOrder_TotalHandler Total { get; } = new();
-		/// <summary>Handler for Submit.</summary>
-		public IIhOrder_SubmitHandler Submit { get; } = new();
+		/// <summary>Interceptor for Total.</summary>
+		public IIhOrder_TotalInterceptor Total { get; } = new();
+		/// <summary>Interceptor for Submit.</summary>
+		public IIhOrder_SubmitInterceptor Submit { get; } = new();
 	}
 
 	/// <summary>Tracks and configures behavior for IIhValidatable.IsValid.</summary>
-	public sealed class IIhValidatable_IsValidHandler
+	public sealed class IIhValidatable_IsValidInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -69,7 +69,7 @@ partial class IhOrderKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IIhValidatable.GetErrors.</summary>
-	public sealed class IIhValidatable_GetErrorsHandler
+	public sealed class IIhValidatable_GetErrorsInterceptor
 	{
 		/// <summary>Delegate for GetErrors().</summary>
 		public delegate global::System.Collections.Generic.IEnumerable<string> GetErrorsDelegate(IhOrderKnockOff ko);
@@ -91,19 +91,19 @@ partial class IhOrderKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhValidatable.</summary>
-	public sealed class IIhValidatableKO
+	public sealed class IIhValidatableInterceptorors
 	{
-		/// <summary>Handler for IsValid.</summary>
-		public IIhValidatable_IsValidHandler IsValid { get; } = new();
-		/// <summary>Handler for GetErrors.</summary>
-		public IIhValidatable_GetErrorsHandler GetErrors { get; } = new();
+		/// <summary>Interceptor for IsValid.</summary>
+		public IIhValidatable_IsValidInterceptor IsValid { get; } = new();
+		/// <summary>Interceptor for GetErrors.</summary>
+		public IIhValidatable_GetErrorsInterceptor GetErrors { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhOrder.</summary>
-	public IIhOrderKO IIhOrder { get; } = new();
+	public IIhOrderInterceptorors IIhOrder { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhValidatable.</summary>
-	public IIhValidatableKO IIhValidatable { get; } = new();
+	public IIhValidatableInterceptorors IIhValidatable { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIhOrder.</summary>
 	public KnockOff.Documentation.Samples.Guides.IIhOrder AsIhOrder() => this;

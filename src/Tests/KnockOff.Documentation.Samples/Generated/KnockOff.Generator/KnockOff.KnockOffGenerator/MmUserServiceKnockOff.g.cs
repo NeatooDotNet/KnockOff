@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class MmUserServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMmUserService.GetUser.</summary>
-	public sealed class IMmUserService_GetUserHandler
+	public sealed class IMmUserService_GetUserInterceptor
 	{
 		/// <summary>Delegate for GetUser(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.MmUser? GetUserDelegate(MmUserServiceKnockOff ko, int id);
@@ -31,7 +31,7 @@ partial class MmUserServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IMmUserService.GetUserAsync.</summary>
-	public sealed class IMmUserService_GetUserAsyncHandler
+	public sealed class IMmUserService_GetUserAsyncInterceptor
 	{
 		/// <summary>Delegate for GetUserAsync(int id).</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.MmUser?> GetUserAsyncDelegate(MmUserServiceKnockOff ko, int id);
@@ -56,7 +56,7 @@ partial class MmUserServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IMmUserService.Save.</summary>
-	public sealed class IMmUserService_SaveHandler
+	public sealed class IMmUserService_SaveInterceptor
 	{
 		/// <summary>Delegate for Save(global::KnockOff.Documentation.Samples.Skills.MmUser user).</summary>
 		public delegate void SaveDelegate(MmUserServiceKnockOff ko, global::KnockOff.Documentation.Samples.Skills.MmUser user);
@@ -81,7 +81,7 @@ partial class MmUserServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IMmUserService.Delete.</summary>
-	public sealed class IMmUserService_DeleteHandler
+	public sealed class IMmUserService_DeleteInterceptor
 	{
 		/// <summary>Delegate for Delete(int id).</summary>
 		public delegate void DeleteDelegate(MmUserServiceKnockOff ko, int id);
@@ -106,7 +106,7 @@ partial class MmUserServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IMmUserService.GetAll.</summary>
-	public sealed class IMmUserService_GetAllHandler
+	public sealed class IMmUserService_GetAllInterceptor
 	{
 		/// <summary>Delegate for GetAll().</summary>
 		public delegate global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Skills.MmUser> GetAllDelegate(MmUserServiceKnockOff ko);
@@ -128,7 +128,7 @@ partial class MmUserServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IMmUserService.Update.</summary>
-	public sealed class IMmUserService_UpdateHandler
+	public sealed class IMmUserService_UpdateInterceptor
 	{
 		/// <summary>Delegate for Update(global::KnockOff.Documentation.Samples.Skills.MmUser user).</summary>
 		public delegate void UpdateDelegate(MmUserServiceKnockOff ko, global::KnockOff.Documentation.Samples.Skills.MmUser user);
@@ -153,24 +153,24 @@ partial class MmUserServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmUserService.</summary>
-	public sealed class IMmUserServiceKO
+	public sealed class IMmUserServiceInterceptorors
 	{
-		/// <summary>Handler for GetUser.</summary>
-		public IMmUserService_GetUserHandler GetUser { get; } = new();
-		/// <summary>Handler for GetUserAsync.</summary>
-		public IMmUserService_GetUserAsyncHandler GetUserAsync { get; } = new();
-		/// <summary>Handler for Save.</summary>
-		public IMmUserService_SaveHandler Save { get; } = new();
-		/// <summary>Handler for Delete.</summary>
-		public IMmUserService_DeleteHandler Delete { get; } = new();
-		/// <summary>Handler for GetAll.</summary>
-		public IMmUserService_GetAllHandler GetAll { get; } = new();
-		/// <summary>Handler for Update.</summary>
-		public IMmUserService_UpdateHandler Update { get; } = new();
+		/// <summary>Interceptor for GetUser.</summary>
+		public IMmUserService_GetUserInterceptor GetUser { get; } = new();
+		/// <summary>Interceptor for GetUserAsync.</summary>
+		public IMmUserService_GetUserAsyncInterceptor GetUserAsync { get; } = new();
+		/// <summary>Interceptor for Save.</summary>
+		public IMmUserService_SaveInterceptor Save { get; } = new();
+		/// <summary>Interceptor for Delete.</summary>
+		public IMmUserService_DeleteInterceptor Delete { get; } = new();
+		/// <summary>Interceptor for GetAll.</summary>
+		public IMmUserService_GetAllInterceptor GetAll { get; } = new();
+		/// <summary>Interceptor for Update.</summary>
+		public IMmUserService_UpdateInterceptor Update { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmUserService.</summary>
-	public IMmUserServiceKO IMmUserService { get; } = new();
+	public IMmUserServiceInterceptorors IMmUserService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmUserService.</summary>
 	public KnockOff.Documentation.Samples.Skills.IMmUserService AsMmUserService() => this;

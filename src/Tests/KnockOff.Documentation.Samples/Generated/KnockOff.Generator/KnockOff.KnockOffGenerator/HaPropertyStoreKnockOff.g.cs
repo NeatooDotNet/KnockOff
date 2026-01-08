@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class HaPropertyStoreKnockOff
 {
 	/// <summary>Tracks and configures behavior for IHaPropertyStore.StringIndexer.</summary>
-	public sealed class IHaPropertyStore_StringIndexerHandler
+	public sealed class IHaPropertyStore_StringIndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -37,14 +37,14 @@ partial class HaPropertyStoreKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaPropertyStore.</summary>
-	public sealed class IHaPropertyStoreKO
+	public sealed class IHaPropertyStoreInterceptorors
 	{
-		/// <summary>Handler for StringIndexer.</summary>
-		public IHaPropertyStore_StringIndexerHandler StringIndexer { get; } = new();
+		/// <summary>Interceptor for StringIndexer.</summary>
+		public IHaPropertyStore_StringIndexerInterceptor StringIndexer { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaPropertyStore.</summary>
-	public IHaPropertyStoreKO IHaPropertyStore { get; } = new();
+	public IHaPropertyStoreInterceptorors IHaPropertyStore { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IHaPropertyStore.</summary>
 	public KnockOff.Documentation.Samples.Skills.IHaPropertyStore AsHaPropertyStore() => this;

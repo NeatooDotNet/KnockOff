@@ -6,7 +6,7 @@ namespace KnockOff.Tests;
 partial class AsyncServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for IAsyncService.DoWorkAsync.</summary>
-	public sealed class IAsyncService_DoWorkAsyncHandler
+	public sealed class IAsyncService_DoWorkAsyncInterceptor
 	{
 		/// <summary>Delegate for DoWorkAsync().</summary>
 		public delegate global::System.Threading.Tasks.Task DoWorkAsyncDelegate(AsyncServiceKnockOff ko);
@@ -28,7 +28,7 @@ partial class AsyncServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IAsyncService.GetValueAsync.</summary>
-	public sealed class IAsyncService_GetValueAsyncHandler
+	public sealed class IAsyncService_GetValueAsyncInterceptor
 	{
 		/// <summary>Delegate for GetValueAsync(int input).</summary>
 		public delegate global::System.Threading.Tasks.Task<int> GetValueAsyncDelegate(AsyncServiceKnockOff ko, int input);
@@ -53,7 +53,7 @@ partial class AsyncServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IAsyncService.GetOptionalAsync.</summary>
-	public sealed class IAsyncService_GetOptionalAsyncHandler
+	public sealed class IAsyncService_GetOptionalAsyncInterceptor
 	{
 		/// <summary>Delegate for GetOptionalAsync().</summary>
 		public delegate global::System.Threading.Tasks.Task<string?> GetOptionalAsyncDelegate(AsyncServiceKnockOff ko);
@@ -75,7 +75,7 @@ partial class AsyncServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IAsyncService.GetRequiredAsync.</summary>
-	public sealed class IAsyncService_GetRequiredAsyncHandler
+	public sealed class IAsyncService_GetRequiredAsyncInterceptor
 	{
 		/// <summary>Delegate for GetRequiredAsync().</summary>
 		public delegate global::System.Threading.Tasks.Task<string> GetRequiredAsyncDelegate(AsyncServiceKnockOff ko);
@@ -97,7 +97,7 @@ partial class AsyncServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IAsyncService.DoWorkValueTaskAsync.</summary>
-	public sealed class IAsyncService_DoWorkValueTaskAsyncHandler
+	public sealed class IAsyncService_DoWorkValueTaskAsyncInterceptor
 	{
 		/// <summary>Delegate for DoWorkValueTaskAsync().</summary>
 		public delegate global::System.Threading.Tasks.ValueTask DoWorkValueTaskAsyncDelegate(AsyncServiceKnockOff ko);
@@ -119,7 +119,7 @@ partial class AsyncServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IAsyncService.GetValueValueTaskAsync.</summary>
-	public sealed class IAsyncService_GetValueValueTaskAsyncHandler
+	public sealed class IAsyncService_GetValueValueTaskAsyncInterceptor
 	{
 		/// <summary>Delegate for GetValueValueTaskAsync(int input).</summary>
 		public delegate global::System.Threading.Tasks.ValueTask<int> GetValueValueTaskAsyncDelegate(AsyncServiceKnockOff ko, int input);
@@ -144,24 +144,24 @@ partial class AsyncServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IAsyncService.</summary>
-	public sealed class IAsyncServiceKO
+	public sealed class IAsyncServiceInterceptorors
 	{
-		/// <summary>Handler for DoWorkAsync.</summary>
-		public IAsyncService_DoWorkAsyncHandler DoWorkAsync { get; } = new();
-		/// <summary>Handler for GetValueAsync.</summary>
-		public IAsyncService_GetValueAsyncHandler GetValueAsync { get; } = new();
-		/// <summary>Handler for GetOptionalAsync.</summary>
-		public IAsyncService_GetOptionalAsyncHandler GetOptionalAsync { get; } = new();
-		/// <summary>Handler for GetRequiredAsync.</summary>
-		public IAsyncService_GetRequiredAsyncHandler GetRequiredAsync { get; } = new();
-		/// <summary>Handler for DoWorkValueTaskAsync.</summary>
-		public IAsyncService_DoWorkValueTaskAsyncHandler DoWorkValueTaskAsync { get; } = new();
-		/// <summary>Handler for GetValueValueTaskAsync.</summary>
-		public IAsyncService_GetValueValueTaskAsyncHandler GetValueValueTaskAsync { get; } = new();
+		/// <summary>Interceptor for DoWorkAsync.</summary>
+		public IAsyncService_DoWorkAsyncInterceptor DoWorkAsync { get; } = new();
+		/// <summary>Interceptor for GetValueAsync.</summary>
+		public IAsyncService_GetValueAsyncInterceptor GetValueAsync { get; } = new();
+		/// <summary>Interceptor for GetOptionalAsync.</summary>
+		public IAsyncService_GetOptionalAsyncInterceptor GetOptionalAsync { get; } = new();
+		/// <summary>Interceptor for GetRequiredAsync.</summary>
+		public IAsyncService_GetRequiredAsyncInterceptor GetRequiredAsync { get; } = new();
+		/// <summary>Interceptor for DoWorkValueTaskAsync.</summary>
+		public IAsyncService_DoWorkValueTaskAsyncInterceptor DoWorkValueTaskAsync { get; } = new();
+		/// <summary>Interceptor for GetValueValueTaskAsync.</summary>
+		public IAsyncService_GetValueValueTaskAsyncInterceptor GetValueValueTaskAsync { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IAsyncService.</summary>
-	public IAsyncServiceKO IAsyncService { get; } = new();
+	public IAsyncServiceInterceptorors IAsyncService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IAsyncService.</summary>
 	public KnockOff.Tests.IAsyncService AsAsyncService() => this;

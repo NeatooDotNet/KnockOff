@@ -6,7 +6,7 @@ namespace KnockOff.Sandbox;
 partial class OverloadedServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for IOverloadedService.Format1.</summary>
-	public sealed class IOverloadedService_Format1Handler
+	public sealed class IOverloadedService_Format1Interceptor
 	{
 		/// <summary>Delegate for Format(string input).</summary>
 		public delegate string FormatDelegate(OverloadedServiceKnockOff ko, string input);
@@ -31,7 +31,7 @@ partial class OverloadedServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IOverloadedService.Format2.</summary>
-	public sealed class IOverloadedService_Format2Handler
+	public sealed class IOverloadedService_Format2Interceptor
 	{
 		/// <summary>Delegate for Format(string input, bool uppercase).</summary>
 		public delegate string FormatDelegate(OverloadedServiceKnockOff ko, string input, bool uppercase);
@@ -56,7 +56,7 @@ partial class OverloadedServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IOverloadedService.Format3.</summary>
-	public sealed class IOverloadedService_Format3Handler
+	public sealed class IOverloadedService_Format3Interceptor
 	{
 		/// <summary>Delegate for Format(string input, int maxLength).</summary>
 		public delegate string FormatDelegate(OverloadedServiceKnockOff ko, string input, int maxLength);
@@ -81,18 +81,18 @@ partial class OverloadedServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Sandbox.IOverloadedService.</summary>
-	public sealed class IOverloadedServiceKO
+	public sealed class IOverloadedServiceInterceptorors
 	{
-		/// <summary>Handler for Format overload 1.</summary>
-		public IOverloadedService_Format1Handler Format1 { get; } = new();
-		/// <summary>Handler for Format overload 2.</summary>
-		public IOverloadedService_Format2Handler Format2 { get; } = new();
-		/// <summary>Handler for Format overload 3.</summary>
-		public IOverloadedService_Format3Handler Format3 { get; } = new();
+		/// <summary>Interceptor for Format overload 1.</summary>
+		public IOverloadedService_Format1Interceptor Format1 { get; } = new();
+		/// <summary>Interceptor for Format overload 2.</summary>
+		public IOverloadedService_Format2Interceptor Format2 { get; } = new();
+		/// <summary>Interceptor for Format overload 3.</summary>
+		public IOverloadedService_Format3Interceptor Format3 { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Sandbox.IOverloadedService.</summary>
-	public IOverloadedServiceKO IOverloadedService { get; } = new();
+	public IOverloadedServiceInterceptorors IOverloadedService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Sandbox.IOverloadedService.</summary>
 	public KnockOff.Sandbox.IOverloadedService AsOverloadedService() => this;

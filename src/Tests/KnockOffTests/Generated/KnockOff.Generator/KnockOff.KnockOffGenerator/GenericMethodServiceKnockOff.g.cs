@@ -36,7 +36,7 @@ partial class GenericMethodServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IGenericMethodService.Create.</summary>
-	public sealed class IGenericMethodService_CreateHandler
+	public sealed class IGenericMethodService_CreateInterceptor
 	{
 		private readonly global::System.Collections.Generic.Dictionary<global::System.Type, object> _typedHandlers = new();
 
@@ -93,7 +93,7 @@ partial class GenericMethodServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IGenericMethodService.Process.</summary>
-	public sealed class IGenericMethodService_ProcessHandler
+	public sealed class IGenericMethodService_ProcessInterceptor
 	{
 		private readonly global::System.Collections.Generic.Dictionary<global::System.Type, object> _typedHandlers = new();
 
@@ -150,7 +150,7 @@ partial class GenericMethodServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IGenericMethodService.Deserialize.</summary>
-	public sealed class IGenericMethodService_DeserializeHandler
+	public sealed class IGenericMethodService_DeserializeInterceptor
 	{
 		private readonly global::System.Collections.Generic.Dictionary<global::System.Type, object> _typedHandlers = new();
 
@@ -210,7 +210,7 @@ partial class GenericMethodServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IGenericMethodService.Convert.</summary>
-	public sealed class IGenericMethodService_ConvertHandler
+	public sealed class IGenericMethodService_ConvertInterceptor
 	{
 		private readonly global::System.Collections.Generic.Dictionary<(global::System.Type, global::System.Type), object> _typedHandlers = new();
 
@@ -267,7 +267,7 @@ partial class GenericMethodServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IGenericMethodService.Find.</summary>
-	public sealed class IGenericMethodService_FindHandler
+	public sealed class IGenericMethodService_FindInterceptor
 	{
 		private readonly global::System.Collections.Generic.Dictionary<global::System.Type, object> _typedHandlers = new();
 
@@ -327,7 +327,7 @@ partial class GenericMethodServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IGenericMethodService.Transfer.</summary>
-	public sealed class IGenericMethodService_TransferHandler
+	public sealed class IGenericMethodService_TransferInterceptor
 	{
 		private readonly global::System.Collections.Generic.Dictionary<(global::System.Type, global::System.Type), object> _typedHandlers = new();
 
@@ -384,24 +384,24 @@ partial class GenericMethodServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IGenericMethodService.</summary>
-	public sealed class IGenericMethodServiceKO
+	public sealed class IGenericMethodServiceInterceptorors
 	{
-		/// <summary>Handler for Create.</summary>
-		public IGenericMethodService_CreateHandler Create { get; } = new();
-		/// <summary>Handler for Process.</summary>
-		public IGenericMethodService_ProcessHandler Process { get; } = new();
-		/// <summary>Handler for Deserialize.</summary>
-		public IGenericMethodService_DeserializeHandler Deserialize { get; } = new();
-		/// <summary>Handler for Convert.</summary>
-		public IGenericMethodService_ConvertHandler Convert { get; } = new();
-		/// <summary>Handler for Find.</summary>
-		public IGenericMethodService_FindHandler Find { get; } = new();
-		/// <summary>Handler for Transfer.</summary>
-		public IGenericMethodService_TransferHandler Transfer { get; } = new();
+		/// <summary>Interceptor for Create.</summary>
+		public IGenericMethodService_CreateInterceptor Create { get; } = new();
+		/// <summary>Interceptor for Process.</summary>
+		public IGenericMethodService_ProcessInterceptor Process { get; } = new();
+		/// <summary>Interceptor for Deserialize.</summary>
+		public IGenericMethodService_DeserializeInterceptor Deserialize { get; } = new();
+		/// <summary>Interceptor for Convert.</summary>
+		public IGenericMethodService_ConvertInterceptor Convert { get; } = new();
+		/// <summary>Interceptor for Find.</summary>
+		public IGenericMethodService_FindInterceptor Find { get; } = new();
+		/// <summary>Interceptor for Transfer.</summary>
+		public IGenericMethodService_TransferInterceptor Transfer { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IGenericMethodService.</summary>
-	public IGenericMethodServiceKO IGenericMethodService { get; } = new();
+	public IGenericMethodServiceInterceptorors IGenericMethodService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IGenericMethodService.</summary>
 	public KnockOff.Tests.IGenericMethodService AsGenericMethodService() => this;

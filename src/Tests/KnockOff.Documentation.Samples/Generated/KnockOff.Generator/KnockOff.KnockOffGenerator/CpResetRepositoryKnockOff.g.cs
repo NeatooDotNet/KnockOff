@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class CpResetRepositoryKnockOff
 {
 	/// <summary>Tracks and configures behavior for ICpResetRepository.GetUser.</summary>
-	public sealed class ICpResetRepository_GetUserHandler
+	public sealed class ICpResetRepository_GetUserInterceptor
 	{
 		/// <summary>Delegate for GetUser(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.CpUser? GetUserDelegate(CpResetRepositoryKnockOff ko, int id);
@@ -31,14 +31,14 @@ partial class CpResetRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpResetRepository.</summary>
-	public sealed class ICpResetRepositoryKO
+	public sealed class ICpResetRepositoryInterceptorors
 	{
-		/// <summary>Handler for GetUser.</summary>
-		public ICpResetRepository_GetUserHandler GetUser { get; } = new();
+		/// <summary>Interceptor for GetUser.</summary>
+		public ICpResetRepository_GetUserInterceptor GetUser { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpResetRepository.</summary>
-	public ICpResetRepositoryKO ICpResetRepository { get; } = new();
+	public ICpResetRepositoryInterceptorors ICpResetRepository { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpResetRepository.</summary>
 	public KnockOff.Documentation.Samples.Skills.ICpResetRepository AsCpResetRepository() => this;

@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class MethodSequentialKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMethodSequential.GetNext.</summary>
-	public sealed class IMethodSequential_GetNextHandler
+	public sealed class IMethodSequential_GetNextInterceptor
 	{
 		/// <summary>Delegate for GetNext().</summary>
 		public delegate int GetNextDelegate(MethodSequentialKnockOff ko);
@@ -28,14 +28,14 @@ partial class MethodSequentialKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodSequential.</summary>
-	public sealed class IMethodSequentialKO
+	public sealed class IMethodSequentialInterceptorors
 	{
-		/// <summary>Handler for GetNext.</summary>
-		public IMethodSequential_GetNextHandler GetNext { get; } = new();
+		/// <summary>Interceptor for GetNext.</summary>
+		public IMethodSequential_GetNextInterceptor GetNext { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodSequential.</summary>
-	public IMethodSequentialKO IMethodSequential { get; } = new();
+	public IMethodSequentialInterceptorors IMethodSequential { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodSequential.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMethodSequential AsMethodSequential() => this;

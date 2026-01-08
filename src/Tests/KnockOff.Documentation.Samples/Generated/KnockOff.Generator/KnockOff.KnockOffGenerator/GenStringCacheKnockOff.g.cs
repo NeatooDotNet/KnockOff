@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class GenStringCacheKnockOff
 {
 	/// <summary>Tracks and configures behavior for IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUser.Get.</summary>
-	public sealed class IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUser_GetHandler
+	public sealed class IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUser_GetInterceptor
 	{
 		/// <summary>Delegate for Get(string key).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Guides.GenUser? GetDelegate(GenStringCacheKnockOff ko, string key);
@@ -31,7 +31,7 @@ partial class GenStringCacheKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUser.Set.</summary>
-	public sealed class IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUser_SetHandler
+	public sealed class IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUser_SetInterceptor
 	{
 		/// <summary>Delegate for Set(string key, global::KnockOff.Documentation.Samples.Guides.GenUser value).</summary>
 		public delegate void SetDelegate(GenStringCacheKnockOff ko, string key, global::KnockOff.Documentation.Samples.Guides.GenUser value);
@@ -56,16 +56,16 @@ partial class GenStringCacheKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenCache<string, KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
-	public sealed class IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUserKO
+	public sealed class IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUserInterceptorors
 	{
-		/// <summary>Handler for Get.</summary>
-		public IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUser_GetHandler Get { get; } = new();
-		/// <summary>Handler for Set.</summary>
-		public IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUser_SetHandler Set { get; } = new();
+		/// <summary>Interceptor for Get.</summary>
+		public IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUser_GetInterceptor Get { get; } = new();
+		/// <summary>Interceptor for Set.</summary>
+		public IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUser_SetInterceptor Set { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenCache<string, KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
-	public IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUserKO IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUser { get; } = new();
+	public IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUserInterceptorors IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUser { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IGenCache<string, KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
 	public KnockOff.Documentation.Samples.Guides.IGenCache<string, KnockOff.Documentation.Samples.Guides.GenUser> AsGenCache() => this;

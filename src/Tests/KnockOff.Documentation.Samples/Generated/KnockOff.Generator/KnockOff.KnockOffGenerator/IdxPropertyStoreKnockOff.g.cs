@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class IdxPropertyStoreKnockOff
 {
 	/// <summary>Tracks and configures behavior for IIdxPropertyStore.StringIndexer.</summary>
-	public sealed class IIdxPropertyStore_StringIndexerHandler
+	public sealed class IIdxPropertyStore_StringIndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -25,14 +25,14 @@ partial class IdxPropertyStoreKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIdxPropertyStore.</summary>
-	public sealed class IIdxPropertyStoreKO
+	public sealed class IIdxPropertyStoreInterceptorors
 	{
-		/// <summary>Handler for StringIndexer.</summary>
-		public IIdxPropertyStore_StringIndexerHandler StringIndexer { get; } = new();
+		/// <summary>Interceptor for StringIndexer.</summary>
+		public IIdxPropertyStore_StringIndexerInterceptor StringIndexer { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIdxPropertyStore.</summary>
-	public IIdxPropertyStoreKO IIdxPropertyStore { get; } = new();
+	public IIdxPropertyStoreInterceptorors IIdxPropertyStore { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIdxPropertyStore.</summary>
 	public KnockOff.Documentation.Samples.Guides.IIdxPropertyStore AsIdxPropertyStore() => this;

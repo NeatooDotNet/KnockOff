@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.GettingStarted;
 partial class EmailServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for IEmailService.IsConnected.</summary>
-	public sealed class IEmailService_IsConnectedHandler
+	public sealed class IEmailService_IsConnectedInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -22,7 +22,7 @@ partial class EmailServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IEmailService.SendEmail.</summary>
-	public sealed class IEmailService_SendEmailHandler
+	public sealed class IEmailService_SendEmailInterceptor
 	{
 		/// <summary>Delegate for SendEmail(string to, string subject, string body).</summary>
 		public delegate void SendEmailDelegate(EmailServiceKnockOff ko, string to, string subject, string body);
@@ -47,16 +47,16 @@ partial class EmailServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.GettingStarted.IEmailService.</summary>
-	public sealed class IEmailServiceKO
+	public sealed class IEmailServiceInterceptorors
 	{
-		/// <summary>Handler for IsConnected.</summary>
-		public IEmailService_IsConnectedHandler IsConnected { get; } = new();
-		/// <summary>Handler for SendEmail.</summary>
-		public IEmailService_SendEmailHandler SendEmail { get; } = new();
+		/// <summary>Interceptor for IsConnected.</summary>
+		public IEmailService_IsConnectedInterceptor IsConnected { get; } = new();
+		/// <summary>Interceptor for SendEmail.</summary>
+		public IEmailService_SendEmailInterceptor SendEmail { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.GettingStarted.IEmailService.</summary>
-	public IEmailServiceKO IEmailService { get; } = new();
+	public IEmailServiceInterceptorors IEmailService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.GettingStarted.IEmailService.</summary>
 	public KnockOff.Documentation.Samples.GettingStarted.IEmailService AsEmailService() => this;

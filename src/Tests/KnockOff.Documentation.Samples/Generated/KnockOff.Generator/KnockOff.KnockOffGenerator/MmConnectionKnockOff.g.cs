@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class MmConnectionKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMmConnectionService.Connect.</summary>
-	public sealed class IMmConnectionService_ConnectHandler
+	public sealed class IMmConnectionService_ConnectInterceptor
 	{
 		/// <summary>Delegate for Connect().</summary>
 		public delegate void ConnectDelegate(MmConnectionKnockOff ko);
@@ -28,14 +28,14 @@ partial class MmConnectionKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmConnectionService.</summary>
-	public sealed class IMmConnectionServiceKO
+	public sealed class IMmConnectionServiceInterceptorors
 	{
-		/// <summary>Handler for Connect.</summary>
-		public IMmConnectionService_ConnectHandler Connect { get; } = new();
+		/// <summary>Interceptor for Connect.</summary>
+		public IMmConnectionService_ConnectInterceptor Connect { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmConnectionService.</summary>
-	public IMmConnectionServiceKO IMmConnectionService { get; } = new();
+	public IMmConnectionServiceInterceptorors IMmConnectionService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmConnectionService.</summary>
 	public KnockOff.Documentation.Samples.Skills.IMmConnectionService AsMmConnectionService() => this;

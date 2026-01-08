@@ -1,18 +1,18 @@
 /// <summary>
-/// Code samples for ~/.claude/skills/knockoff/handler-api.md
+/// Code samples for ~/.claude/skills/knockoff/interceptor-api.md
 ///
 /// Snippets in this file:
-/// - skill:handler-api:method-handler-example
-/// - skill:handler-api:property-handler-example
-/// - skill:handler-api:indexer-handler-example
-/// - skill:handler-api:event-handler-example
-/// - skill:handler-api:overload-handler-example
-/// - skill:handler-api:out-param-callback
-/// - skill:handler-api:ref-param-callback
-/// - skill:handler-api:ref-param-tracking
-/// - skill:handler-api:async-handler-example
-/// - skill:handler-api:generic-handler-example
-/// - skill:handler-api:smart-defaults-example
+/// - skill:interceptor-api:method-interceptor-example
+/// - skill:interceptor-api:property-interceptor-example
+/// - skill:interceptor-api:indexer-interceptor-example
+/// - skill:interceptor-api:event-interceptor-example
+/// - skill:interceptor-api:overload-interceptor-example
+/// - skill:interceptor-api:out-param-callback
+/// - skill:interceptor-api:ref-param-callback
+/// - skill:interceptor-api:ref-param-tracking
+/// - skill:interceptor-api:async-interceptor-example
+/// - skill:interceptor-api:generic-interceptor-example
+/// - skill:interceptor-api:smart-defaults-example
 ///
 /// Corresponding tests: HandlerApiSamplesTests.cs
 /// </summary>
@@ -45,7 +45,7 @@ public interface IHaService
     HaEntity Create(string name, int value);
 }
 
-#region skill:handler-api:method-handler-example
+#region skill:interceptor-api:method-interceptor-example
 [KnockOff]
 public partial class HaServiceKnockOff : IHaService { }
 
@@ -73,7 +73,7 @@ public interface IHaPropertyService
     string Name { get; set; }
 }
 
-#region skill:handler-api:property-handler-example
+#region skill:interceptor-api:property-interceptor-example
 [KnockOff]
 public partial class HaPropertyServiceKnockOff : IHaPropertyService { }
 
@@ -99,7 +99,7 @@ public interface IHaPropertyStore
     object? this[string key] { get; set; }
 }
 
-#region skill:handler-api:indexer-handler-example
+#region skill:interceptor-api:indexer-interceptor-example
 [KnockOff]
 public partial class HaPropertyStoreKnockOff : IHaPropertyStore { }
 
@@ -144,7 +144,7 @@ public interface IHaEventSource
     event Action<string, int> DataUpdated;
 }
 
-#region skill:handler-api:event-handler-example
+#region skill:interceptor-api:event-interceptor-example
 [KnockOff]
 public partial class HaEventSourceKnockOff : IHaEventSource { }
 
@@ -186,7 +186,7 @@ public interface IHaOverloadService
     int Calculate(int a, int b);
 }
 
-#region skill:handler-api:overload-handler-example
+#region skill:interceptor-api:overload-interceptor-example
 [KnockOff]
 public partial class HaOverloadServiceKnockOff : IHaOverloadService { }
 
@@ -221,13 +221,13 @@ public interface IHaParser
     void GetData(out string name, out int count);
 }
 
-#region skill:handler-api:out-param-callback
+#region skill:interceptor-api:out-param-callback
 [KnockOff]
 public partial class HaParserKnockOff : IHaParser { }
 
 // Explicit delegate type required
 // knockOff.IHaParser.TryParse.OnCall =
-//     (IHaParser_TryParseHandler.TryParseDelegate)((ko, string input, out int result) =>
+//     (IHaParser_TryParseInterceptor.TryParseDelegate)((ko, string input, out int result) =>
 //     {
 //         result = int.Parse(input);
 //         return true;
@@ -235,7 +235,7 @@ public partial class HaParserKnockOff : IHaParser { }
 
 // Void with multiple out params
 // knockOff.IHaParser.GetData.OnCall =
-//     (IHaParser_GetDataHandler.GetDataDelegate)((ko, out string name, out int count) =>
+//     (IHaParser_GetDataInterceptor.GetDataDelegate)((ko, out string name, out int count) =>
 //     {
 //         name = "Test";
 //         count = 42;
@@ -252,27 +252,27 @@ public interface IHaProcessor
     bool TryUpdate(string key, ref string value);
 }
 
-#region skill:handler-api:ref-param-callback
+#region skill:interceptor-api:ref-param-callback
 [KnockOff]
 public partial class HaProcessorKnockOff : IHaProcessor { }
 
 // Explicit delegate type required
 // knockOff.IHaProcessor.Increment.OnCall =
-//     (IHaProcessor_IncrementHandler.IncrementDelegate)((ko, ref int value) =>
+//     (IHaProcessor_IncrementInterceptor.IncrementDelegate)((ko, ref int value) =>
 //     {
 //         value = value * 2;  // Modify the ref param
 //     });
 
 // Mixed regular + ref params
 // knockOff.IHaProcessor.TryUpdate.OnCall =
-//     (IHaProcessor_TryUpdateHandler.TryUpdateDelegate)((ko, string key, ref string value) =>
+//     (IHaProcessor_TryUpdateInterceptor.TryUpdateDelegate)((ko, string key, ref string value) =>
 //     {
 //         value = value.ToUpper();
 //         return true;
 //     });
 #endregion
 
-#region skill:handler-api:ref-param-tracking
+#region skill:interceptor-api:ref-param-tracking
 // int x = 5;
 // processor.Increment(ref x);
 
@@ -290,7 +290,7 @@ public interface IHaAsyncRepository
     Task<int> SaveAsync(object entity);
 }
 
-#region skill:handler-api:async-handler-example
+#region skill:interceptor-api:async-interceptor-example
 [KnockOff]
 public partial class HaAsyncRepositoryKnockOff : IHaAsyncRepository { }
 
@@ -311,7 +311,7 @@ public interface IHaSerializer
     TOut Convert<TIn, TOut>(TIn input);
 }
 
-#region skill:handler-api:generic-handler-example
+#region skill:interceptor-api:generic-interceptor-example
 [KnockOff]
 public partial class HaSerializerKnockOff : IHaSerializer { }
 
@@ -348,7 +348,7 @@ public interface IHaDefaultsService
     IDisposable GetDisposable();
 }
 
-#region skill:handler-api:smart-defaults-example
+#region skill:interceptor-api:smart-defaults-example
 [KnockOff]
 public partial class HaDefaultsServiceKnockOff : IHaDefaultsService { }
 

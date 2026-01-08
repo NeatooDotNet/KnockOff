@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class GenOrderRepositoryKnockOff
 {
 	/// <summary>Tracks and configures behavior for IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder.GetById.</summary>
-	public sealed class IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder_GetByIdHandler
+	public sealed class IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder_GetByIdInterceptor
 	{
 		/// <summary>Delegate for GetById(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Guides.GenOrder? GetByIdDelegate(GenOrderRepositoryKnockOff ko, int id);
@@ -31,7 +31,7 @@ partial class GenOrderRepositoryKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder.Save.</summary>
-	public sealed class IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder_SaveHandler
+	public sealed class IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder_SaveInterceptor
 	{
 		/// <summary>Delegate for Save(global::KnockOff.Documentation.Samples.Guides.GenOrder entity).</summary>
 		public delegate void SaveDelegate(GenOrderRepositoryKnockOff ko, global::KnockOff.Documentation.Samples.Guides.GenOrder entity);
@@ -56,7 +56,7 @@ partial class GenOrderRepositoryKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder.GetByIdAsync.</summary>
-	public sealed class IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder_GetByIdAsyncHandler
+	public sealed class IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder_GetByIdAsyncInterceptor
 	{
 		/// <summary>Delegate for GetByIdAsync(int id).</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.GenOrder?> GetByIdAsyncDelegate(GenOrderRepositoryKnockOff ko, int id);
@@ -81,18 +81,18 @@ partial class GenOrderRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenRepository<KnockOff.Documentation.Samples.Guides.GenOrder>.</summary>
-	public sealed class IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrderKO
+	public sealed class IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrderInterceptorors
 	{
-		/// <summary>Handler for GetById.</summary>
-		public IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder_GetByIdHandler GetById { get; } = new();
-		/// <summary>Handler for Save.</summary>
-		public IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder_SaveHandler Save { get; } = new();
-		/// <summary>Handler for GetByIdAsync.</summary>
-		public IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder_GetByIdAsyncHandler GetByIdAsync { get; } = new();
+		/// <summary>Interceptor for GetById.</summary>
+		public IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder_GetByIdInterceptor GetById { get; } = new();
+		/// <summary>Interceptor for Save.</summary>
+		public IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder_SaveInterceptor Save { get; } = new();
+		/// <summary>Interceptor for GetByIdAsync.</summary>
+		public IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder_GetByIdAsyncInterceptor GetByIdAsync { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenRepository<KnockOff.Documentation.Samples.Guides.GenOrder>.</summary>
-	public IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrderKO IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder { get; } = new();
+	public IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrderInterceptorors IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IGenRepository<KnockOff.Documentation.Samples.Guides.GenOrder>.</summary>
 	public KnockOff.Documentation.Samples.Guides.IGenRepository<KnockOff.Documentation.Samples.Guides.GenOrder> AsGenRepository() => this;

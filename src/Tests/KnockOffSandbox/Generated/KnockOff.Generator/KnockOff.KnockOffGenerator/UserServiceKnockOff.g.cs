@@ -6,7 +6,7 @@ namespace KnockOff.Sandbox;
 partial class UserServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for IUserService.Name.</summary>
-	public sealed class IUserService_NameHandler
+	public sealed class IUserService_NameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -34,7 +34,7 @@ partial class UserServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IUserService.Count.</summary>
-	public sealed class IUserService_CountHandler
+	public sealed class IUserService_CountInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -50,7 +50,7 @@ partial class UserServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IUserService.DoWork.</summary>
-	public sealed class IUserService_DoWorkHandler
+	public sealed class IUserService_DoWorkInterceptor
 	{
 		/// <summary>Delegate for DoWork().</summary>
 		public delegate void DoWorkDelegate(UserServiceKnockOff ko);
@@ -72,7 +72,7 @@ partial class UserServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IUserService.GetGreeting.</summary>
-	public sealed class IUserService_GetGreetingHandler
+	public sealed class IUserService_GetGreetingInterceptor
 	{
 		/// <summary>Delegate for GetGreeting(string name).</summary>
 		public delegate string GetGreetingDelegate(UserServiceKnockOff ko, string name);
@@ -97,7 +97,7 @@ partial class UserServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IUserService.Process.</summary>
-	public sealed class IUserService_ProcessHandler
+	public sealed class IUserService_ProcessInterceptor
 	{
 		/// <summary>Delegate for Process(string id, int count, bool urgent).</summary>
 		public delegate void ProcessDelegate(UserServiceKnockOff ko, string id, int count, bool urgent);
@@ -122,22 +122,22 @@ partial class UserServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Sandbox.IUserService.</summary>
-	public sealed class IUserServiceKO
+	public sealed class IUserServiceInterceptorors
 	{
-		/// <summary>Handler for Name.</summary>
-		public IUserService_NameHandler Name { get; } = new();
-		/// <summary>Handler for Count.</summary>
-		public IUserService_CountHandler Count { get; } = new();
-		/// <summary>Handler for DoWork.</summary>
-		public IUserService_DoWorkHandler DoWork { get; } = new();
-		/// <summary>Handler for GetGreeting.</summary>
-		public IUserService_GetGreetingHandler GetGreeting { get; } = new();
-		/// <summary>Handler for Process.</summary>
-		public IUserService_ProcessHandler Process { get; } = new();
+		/// <summary>Interceptor for Name.</summary>
+		public IUserService_NameInterceptor Name { get; } = new();
+		/// <summary>Interceptor for Count.</summary>
+		public IUserService_CountInterceptor Count { get; } = new();
+		/// <summary>Interceptor for DoWork.</summary>
+		public IUserService_DoWorkInterceptor DoWork { get; } = new();
+		/// <summary>Interceptor for GetGreeting.</summary>
+		public IUserService_GetGreetingInterceptor GetGreeting { get; } = new();
+		/// <summary>Interceptor for Process.</summary>
+		public IUserService_ProcessInterceptor Process { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Sandbox.IUserService.</summary>
-	public IUserServiceKO IUserService { get; } = new();
+	public IUserServiceInterceptorors IUserService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Sandbox.IUserService.</summary>
 	public KnockOff.Sandbox.IUserService AsUserService() => this;

@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Comparison;
 partial class MigProcessorKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMigProcessor.Process.</summary>
-	public sealed class IMigProcessor_ProcessHandler
+	public sealed class IMigProcessor_ProcessInterceptor
 	{
 		/// <summary>Delegate for Process(string data).</summary>
 		public delegate void ProcessDelegate(MigProcessorKnockOff ko, string data);
@@ -31,14 +31,14 @@ partial class MigProcessorKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigProcessor.</summary>
-	public sealed class IMigProcessorKO
+	public sealed class IMigProcessorInterceptorors
 	{
-		/// <summary>Handler for Process.</summary>
-		public IMigProcessor_ProcessHandler Process { get; } = new();
+		/// <summary>Interceptor for Process.</summary>
+		public IMigProcessor_ProcessInterceptor Process { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigProcessor.</summary>
-	public IMigProcessorKO IMigProcessor { get; } = new();
+	public IMigProcessorInterceptorors IMigProcessor { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IMigProcessor.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IMigProcessor AsMigProcessor() => this;

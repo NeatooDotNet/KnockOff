@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Comparison;
 partial class MigSequenceKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMigSequence.GetNext.</summary>
-	public sealed class IMigSequence_GetNextHandler
+	public sealed class IMigSequence_GetNextInterceptor
 	{
 		/// <summary>Delegate for GetNext().</summary>
 		public delegate int GetNextDelegate(MigSequenceKnockOff ko);
@@ -28,14 +28,14 @@ partial class MigSequenceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigSequence.</summary>
-	public sealed class IMigSequenceKO
+	public sealed class IMigSequenceInterceptorors
 	{
-		/// <summary>Handler for GetNext.</summary>
-		public IMigSequence_GetNextHandler GetNext { get; } = new();
+		/// <summary>Interceptor for GetNext.</summary>
+		public IMigSequence_GetNextInterceptor GetNext { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigSequence.</summary>
-	public IMigSequenceKO IMigSequence { get; } = new();
+	public IMigSequenceInterceptorors IMigSequence { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IMigSequence.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IMigSequence AsMigSequence() => this;

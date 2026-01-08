@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class SkServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for ISkService.GetValue.</summary>
-	public sealed class ISkService_GetValueHandler
+	public sealed class ISkService_GetValueInterceptor
 	{
 		/// <summary>Delegate for GetValue(int id).</summary>
 		public delegate int GetValueDelegate(SkServiceKnockOff ko, int id);
@@ -31,14 +31,14 @@ partial class SkServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkService.</summary>
-	public sealed class ISkServiceKO
+	public sealed class ISkServiceInterceptorors
 	{
-		/// <summary>Handler for GetValue.</summary>
-		public ISkService_GetValueHandler GetValue { get; } = new();
+		/// <summary>Interceptor for GetValue.</summary>
+		public ISkService_GetValueInterceptor GetValue { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkService.</summary>
-	public ISkServiceKO ISkService { get; } = new();
+	public ISkServiceInterceptorors ISkService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkService AsSkService() => this;

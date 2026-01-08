@@ -569,7 +569,7 @@ public class SkillSamplesTests : SamplesTestBase
         ISkOutParamParser parser = knockOff;
 
         knockOff.ISkOutParamParser.TryParse.OnCall =
-            (SkOutParamParserKnockOff.ISkOutParamParser_TryParseHandler.TryParseDelegate)((SkOutParamParserKnockOff ko, string input, out int result) =>
+            (SkOutParamParserKnockOff.ISkOutParamParser_TryParseInterceptor.TryParseDelegate)((SkOutParamParserKnockOff ko, string input, out int result) =>
             {
                 if (int.TryParse(input, out result))
                     return true;
@@ -595,7 +595,7 @@ public class SkillSamplesTests : SamplesTestBase
         ISkRefProcessor processor = knockOff;
 
         knockOff.ISkRefProcessor.Increment.OnCall =
-            (SkRefProcessorKnockOff.ISkRefProcessor_IncrementHandler.IncrementDelegate)((SkRefProcessorKnockOff ko, ref int value) =>
+            (SkRefProcessorKnockOff.ISkRefProcessor_IncrementInterceptor.IncrementDelegate)((SkRefProcessorKnockOff ko, ref int value) =>
             {
                 value = value * 2;
             });

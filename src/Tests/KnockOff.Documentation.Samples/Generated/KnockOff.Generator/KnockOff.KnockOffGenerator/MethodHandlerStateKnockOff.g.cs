@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class MethodHandlerStateKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMethodHandlerState.Initialize.</summary>
-	public sealed class IMethodHandlerState_InitializeHandler
+	public sealed class IMethodHandlerState_InitializeInterceptor
 	{
 		/// <summary>Delegate for Initialize().</summary>
 		public delegate void InitializeDelegate(MethodHandlerStateKnockOff ko);
@@ -28,7 +28,7 @@ partial class MethodHandlerStateKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IMethodHandlerState.Process.</summary>
-	public sealed class IMethodHandlerState_ProcessHandler
+	public sealed class IMethodHandlerState_ProcessInterceptor
 	{
 		/// <summary>Delegate for Process().</summary>
 		public delegate void ProcessDelegate(MethodHandlerStateKnockOff ko);
@@ -50,16 +50,16 @@ partial class MethodHandlerStateKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodHandlerState.</summary>
-	public sealed class IMethodHandlerStateKO
+	public sealed class IMethodHandlerStateInterceptorors
 	{
-		/// <summary>Handler for Initialize.</summary>
-		public IMethodHandlerState_InitializeHandler Initialize { get; } = new();
-		/// <summary>Handler for Process.</summary>
-		public IMethodHandlerState_ProcessHandler Process { get; } = new();
+		/// <summary>Interceptor for Initialize.</summary>
+		public IMethodHandlerState_InitializeInterceptor Initialize { get; } = new();
+		/// <summary>Interceptor for Process.</summary>
+		public IMethodHandlerState_ProcessInterceptor Process { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodHandlerState.</summary>
-	public IMethodHandlerStateKO IMethodHandlerState { get; } = new();
+	public IMethodHandlerStateInterceptorors IMethodHandlerState { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodHandlerState.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMethodHandlerState AsMethodHandlerState() => this;

@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class MethodFailureKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMethodFailure.Save.</summary>
-	public sealed class IMethodFailure_SaveHandler
+	public sealed class IMethodFailure_SaveInterceptor
 	{
 		/// <summary>Delegate for Save(global::KnockOff.Documentation.Samples.Guides.MethodEntity entity).</summary>
 		public delegate void SaveDelegate(MethodFailureKnockOff ko, global::KnockOff.Documentation.Samples.Guides.MethodEntity entity);
@@ -31,14 +31,14 @@ partial class MethodFailureKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodFailure.</summary>
-	public sealed class IMethodFailureKO
+	public sealed class IMethodFailureInterceptorors
 	{
-		/// <summary>Handler for Save.</summary>
-		public IMethodFailure_SaveHandler Save { get; } = new();
+		/// <summary>Interceptor for Save.</summary>
+		public IMethodFailure_SaveInterceptor Save { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodFailure.</summary>
-	public IMethodFailureKO IMethodFailure { get; } = new();
+	public IMethodFailureInterceptorors IMethodFailure { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodFailure.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMethodFailure AsMethodFailure() => this;

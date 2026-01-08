@@ -375,7 +375,7 @@ public class HandlerApiSamplesTests : SamplesTestBase
         IHaParser parser = knockOff;
 
         knockOff.IHaParser.TryParse.OnCall =
-            (HaParserKnockOff.IHaParser_TryParseHandler.TryParseDelegate)((HaParserKnockOff ko, string input, out int result) =>
+            (HaParserKnockOff.IHaParser_TryParseInterceptor.TryParseDelegate)((HaParserKnockOff ko, string input, out int result) =>
             {
                 result = int.Parse(input);
                 return true;
@@ -394,7 +394,7 @@ public class HandlerApiSamplesTests : SamplesTestBase
         IHaParser parser = knockOff;
 
         knockOff.IHaParser.GetData.OnCall =
-            (HaParserKnockOff.IHaParser_GetDataHandler.GetDataDelegate)((HaParserKnockOff ko, out string name, out int count) =>
+            (HaParserKnockOff.IHaParser_GetDataInterceptor.GetDataDelegate)((HaParserKnockOff ko, out string name, out int count) =>
             {
                 name = "Test";
                 count = 42;
@@ -417,7 +417,7 @@ public class HandlerApiSamplesTests : SamplesTestBase
         IHaProcessor processor = knockOff;
 
         knockOff.IHaProcessor.Increment.OnCall =
-            (HaProcessorKnockOff.IHaProcessor_IncrementHandler.IncrementDelegate)((HaProcessorKnockOff ko, ref int value) =>
+            (HaProcessorKnockOff.IHaProcessor_IncrementInterceptor.IncrementDelegate)((HaProcessorKnockOff ko, ref int value) =>
             {
                 value = value * 2;
             });
@@ -435,7 +435,7 @@ public class HandlerApiSamplesTests : SamplesTestBase
         IHaProcessor processor = knockOff;
 
         knockOff.IHaProcessor.TryUpdate.OnCall =
-            (HaProcessorKnockOff.IHaProcessor_TryUpdateHandler.TryUpdateDelegate)((HaProcessorKnockOff ko, string key, ref string value) =>
+            (HaProcessorKnockOff.IHaProcessor_TryUpdateInterceptor.TryUpdateDelegate)((HaProcessorKnockOff ko, string key, ref string value) =>
             {
                 value = value.ToUpper();
                 return true;
@@ -459,7 +459,7 @@ public class HandlerApiSamplesTests : SamplesTestBase
         IHaProcessor processor = knockOff;
 
         knockOff.IHaProcessor.Increment.OnCall =
-            (HaProcessorKnockOff.IHaProcessor_IncrementHandler.IncrementDelegate)((HaProcessorKnockOff ko, ref int value) =>
+            (HaProcessorKnockOff.IHaProcessor_IncrementInterceptor.IncrementDelegate)((HaProcessorKnockOff ko, ref int value) =>
             {
                 value = value * 2;
             });

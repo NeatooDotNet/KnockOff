@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Comparison;
 partial class VsEventSourceKnockOff
 {
 	/// <summary>Tracks and raises IVsEventSource.DataReceived.</summary>
-	public sealed class IVsEventSource_DataReceivedHandler
+	public sealed class IVsEventSource_DataReceivedInterceptor
 	{
 		private global::System.EventHandler<string>? _handler;
 		private readonly global::System.Collections.Generic.List<(object? sender, string e)> _raises = new();
@@ -62,14 +62,14 @@ partial class VsEventSourceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsEventSource.</summary>
-	public sealed class IVsEventSourceKO
+	public sealed class IVsEventSourceInterceptorors
 	{
-		/// <summary>Handler for DataReceived event.</summary>
-		public IVsEventSource_DataReceivedHandler DataReceived { get; } = new();
+		/// <summary>Interceptor for DataReceived event.</summary>
+		public IVsEventSource_DataReceivedInterceptor DataReceived { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsEventSource.</summary>
-	public IVsEventSourceKO IVsEventSource { get; } = new();
+	public IVsEventSourceInterceptorors IVsEventSource { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IVsEventSource.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IVsEventSource AsVsEventSource() => this;

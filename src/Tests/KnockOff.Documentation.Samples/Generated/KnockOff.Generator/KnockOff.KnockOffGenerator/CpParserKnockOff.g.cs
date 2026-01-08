@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class CpParserKnockOff
 {
 	/// <summary>Tracks and configures behavior for ICpParser.TryParse.</summary>
-	public sealed class ICpParser_TryParseHandler
+	public sealed class ICpParser_TryParseInterceptor
 	{
 		/// <summary>Delegate for TryParse(string input, out int result).</summary>
 		public delegate bool TryParseDelegate(CpParserKnockOff ko, string input, out int result);
@@ -31,7 +31,7 @@ partial class CpParserKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ICpParser.GetStats.</summary>
-	public sealed class ICpParser_GetStatsHandler
+	public sealed class ICpParser_GetStatsInterceptor
 	{
 		/// <summary>Delegate for GetStats(out int count, out double average).</summary>
 		public delegate void GetStatsDelegate(CpParserKnockOff ko, out int count, out double average);
@@ -53,16 +53,16 @@ partial class CpParserKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpParser.</summary>
-	public sealed class ICpParserKO
+	public sealed class ICpParserInterceptorors
 	{
-		/// <summary>Handler for TryParse.</summary>
-		public ICpParser_TryParseHandler TryParse { get; } = new();
-		/// <summary>Handler for GetStats.</summary>
-		public ICpParser_GetStatsHandler GetStats { get; } = new();
+		/// <summary>Interceptor for TryParse.</summary>
+		public ICpParser_TryParseInterceptor TryParse { get; } = new();
+		/// <summary>Interceptor for GetStats.</summary>
+		public ICpParser_GetStatsInterceptor GetStats { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpParser.</summary>
-	public ICpParserKO ICpParser { get; } = new();
+	public ICpParserInterceptorors ICpParser { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpParser.</summary>
 	public KnockOff.Documentation.Samples.Skills.ICpParser AsCpParser() => this;

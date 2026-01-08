@@ -36,7 +36,7 @@ partial class SkGenericSerializerKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISkGenericSerializer.Deserialize.</summary>
-	public sealed class ISkGenericSerializer_DeserializeHandler
+	public sealed class ISkGenericSerializer_DeserializeInterceptor
 	{
 		private readonly global::System.Collections.Generic.Dictionary<global::System.Type, object> _typedHandlers = new();
 
@@ -96,7 +96,7 @@ partial class SkGenericSerializerKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISkGenericSerializer.Convert.</summary>
-	public sealed class ISkGenericSerializer_ConvertHandler
+	public sealed class ISkGenericSerializer_ConvertInterceptor
 	{
 		private readonly global::System.Collections.Generic.Dictionary<(global::System.Type, global::System.Type), object> _typedHandlers = new();
 
@@ -153,16 +153,16 @@ partial class SkGenericSerializerKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkGenericSerializer.</summary>
-	public sealed class ISkGenericSerializerKO
+	public sealed class ISkGenericSerializerInterceptorors
 	{
-		/// <summary>Handler for Deserialize.</summary>
-		public ISkGenericSerializer_DeserializeHandler Deserialize { get; } = new();
-		/// <summary>Handler for Convert.</summary>
-		public ISkGenericSerializer_ConvertHandler Convert { get; } = new();
+		/// <summary>Interceptor for Deserialize.</summary>
+		public ISkGenericSerializer_DeserializeInterceptor Deserialize { get; } = new();
+		/// <summary>Interceptor for Convert.</summary>
+		public ISkGenericSerializer_ConvertInterceptor Convert { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkGenericSerializer.</summary>
-	public ISkGenericSerializerKO ISkGenericSerializer { get; } = new();
+	public ISkGenericSerializerInterceptorors ISkGenericSerializer { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkGenericSerializer.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkGenericSerializer AsSkGenericSerializer() => this;

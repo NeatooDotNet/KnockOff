@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class MmSequenceKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMmSequenceService.GetNext.</summary>
-	public sealed class IMmSequenceService_GetNextHandler
+	public sealed class IMmSequenceService_GetNextInterceptor
 	{
 		/// <summary>Delegate for GetNext().</summary>
 		public delegate int GetNextDelegate(MmSequenceKnockOff ko);
@@ -28,14 +28,14 @@ partial class MmSequenceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmSequenceService.</summary>
-	public sealed class IMmSequenceServiceKO
+	public sealed class IMmSequenceServiceInterceptorors
 	{
-		/// <summary>Handler for GetNext.</summary>
-		public IMmSequenceService_GetNextHandler GetNext { get; } = new();
+		/// <summary>Interceptor for GetNext.</summary>
+		public IMmSequenceService_GetNextInterceptor GetNext { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmSequenceService.</summary>
-	public IMmSequenceServiceKO IMmSequenceService { get; } = new();
+	public IMmSequenceServiceInterceptorors IMmSequenceService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmSequenceService.</summary>
 	public KnockOff.Documentation.Samples.Skills.IMmSequenceService AsMmSequenceService() => this;

@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class HaEventSourceKnockOff
 {
 	/// <summary>Tracks and raises IHaEventSource.DataReceived.</summary>
-	public sealed class IHaEventSource_DataReceivedHandler
+	public sealed class IHaEventSource_DataReceivedInterceptor
 	{
 		private global::System.EventHandler<string>? _handler;
 		private readonly global::System.Collections.Generic.List<(object? sender, string e)> _raises = new();
@@ -62,7 +62,7 @@ partial class HaEventSourceKnockOff
 	}
 
 	/// <summary>Tracks and raises IHaEventSource.Completed.</summary>
-	public sealed class IHaEventSource_CompletedHandler
+	public sealed class IHaEventSource_CompletedInterceptor
 	{
 		private global::System.EventHandler? _handler;
 		private readonly global::System.Collections.Generic.List<(object? sender, global::System.EventArgs e)> _raises = new();
@@ -118,7 +118,7 @@ partial class HaEventSourceKnockOff
 	}
 
 	/// <summary>Tracks and raises IHaEventSource.ProgressChanged.</summary>
-	public sealed class IHaEventSource_ProgressChangedHandler
+	public sealed class IHaEventSource_ProgressChangedInterceptor
 	{
 		private global::System.Action<int>? _handler;
 		private readonly global::System.Collections.Generic.List<int> _raises = new();
@@ -171,7 +171,7 @@ partial class HaEventSourceKnockOff
 	}
 
 	/// <summary>Tracks and raises IHaEventSource.DataUpdated.</summary>
-	public sealed class IHaEventSource_DataUpdatedHandler
+	public sealed class IHaEventSource_DataUpdatedInterceptor
 	{
 		private global::System.Action<string, int>? _handler;
 		private readonly global::System.Collections.Generic.List<(string arg1, int arg2)> _raises = new();
@@ -224,20 +224,20 @@ partial class HaEventSourceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaEventSource.</summary>
-	public sealed class IHaEventSourceKO
+	public sealed class IHaEventSourceInterceptorors
 	{
-		/// <summary>Handler for DataReceived event.</summary>
-		public IHaEventSource_DataReceivedHandler DataReceived { get; } = new();
-		/// <summary>Handler for Completed event.</summary>
-		public IHaEventSource_CompletedHandler Completed { get; } = new();
-		/// <summary>Handler for ProgressChanged event.</summary>
-		public IHaEventSource_ProgressChangedHandler ProgressChanged { get; } = new();
-		/// <summary>Handler for DataUpdated event.</summary>
-		public IHaEventSource_DataUpdatedHandler DataUpdated { get; } = new();
+		/// <summary>Interceptor for DataReceived event.</summary>
+		public IHaEventSource_DataReceivedInterceptor DataReceived { get; } = new();
+		/// <summary>Interceptor for Completed event.</summary>
+		public IHaEventSource_CompletedInterceptor Completed { get; } = new();
+		/// <summary>Interceptor for ProgressChanged event.</summary>
+		public IHaEventSource_ProgressChangedInterceptor ProgressChanged { get; } = new();
+		/// <summary>Interceptor for DataUpdated event.</summary>
+		public IHaEventSource_DataUpdatedInterceptor DataUpdated { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaEventSource.</summary>
-	public IHaEventSourceKO IHaEventSource { get; } = new();
+	public IHaEventSourceInterceptorors IHaEventSource { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IHaEventSource.</summary>
 	public KnockOff.Documentation.Samples.Skills.IHaEventSource AsHaEventSource() => this;

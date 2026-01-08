@@ -6,9 +6,9 @@ This document explains what KnockOff generates and the conventions used.
 
 For each `[KnockOff]` class, the generator creates:
 
-1. **Interface KO classes** — One per implemented interface, containing handlers for that interface's members
-2. **Interface KO properties** — `public {InterfaceName}KO {InterfaceName} { get; } = new();`
-3. **Handler classes** — One per interface member
+1. **Interface Interceptors classes** — One per implemented interface, containing interceptors for that interface's members
+2. **Interface Interceptors properties** — `public {InterfaceName}Interceptors {InterfaceName} { get; } = new();`
+3. **Interceptor classes** — One per interface member
 4. **Backing fields** — For properties (prefixed with interface name)
 5. **Backing dictionaries** — For indexers (prefixed with interface name)
 6. **Explicit interface implementations** — Recording + delegation
@@ -57,21 +57,21 @@ KnockOff generates:
 ```csharp
 public partial class UserServiceKnockOff
 {
-    // Interface KO property
-    public IUserServiceKO IUserService { get; } = new();
+    // Interface Interceptors property
+    public IUserServiceInterceptors IUserService { get; } = new();
 
     // Backing field for property (interface-prefixed)
     protected string IUserService_NameBacking { get; set; } = "";
 
-    // Interface KO class
-    public sealed class IUserServiceKO
+    // Interface Interceptors class
+    public sealed class IUserServiceInterceptors
     {
-        public IUserService_NameHandler Name { get; } = new();
-        public IUserService_GetUserHandler GetUser { get; } = new();
+        public IUserService_NameInterceptor Name { get; } = new();
+        public IUserService_GetUserInterceptor GetUser { get; } = new();
     }
 
-    // Handler for Name property
-    public sealed class IUserService_NameHandler
+    // Interceptor for Name property
+    public sealed class IUserService_NameInterceptor
     {
         public int GetCount { get; private set; }
         public int SetCount { get; private set; }
@@ -97,8 +97,8 @@ public partial class UserServiceKnockOff
         }
     }
 
-    // Handler for GetUser method
-    public sealed class IUserService_GetUserHandler
+    // Interceptor for GetUser method
+    public sealed class IUserService_GetUserInterceptor
     {
         public int CallCount { get; private set; }
         public bool WasCalled => CallCount > 0;
@@ -156,18 +156,18 @@ public partial class UserServiceKnockOff
 
 ## Naming Conventions
 
-### Interface KO Class
-- Name: `{InterfaceName}KO`
-- Example: `IUserService` → `IUserServiceKO`
+### Interface Interceptors Class
+- Name: `{InterfaceName}Interceptors`
+- Example: `IUserService` → `IUserServiceInterceptors`
 
-### Interface KO Property
+### Interface Interceptors Property
 - Name: `{InterfaceName}` (same as interface name)
-- Example: `public IUserServiceKO IUserService { get; }`
+- Example: `public IUserServiceInterceptors IUserService { get; }`
 
-### Handlers
-- Properties: `{InterfaceName}_{PropertyName}Handler`
-- Methods: `{InterfaceName}_{MethodName}Handler`
-- Indexers: `{InterfaceName}_{KeyTypeName}IndexerHandler`
+### Interceptors
+- Properties: `{InterfaceName}_{PropertyName}Interceptor`
+- Methods: `{InterfaceName}_{MethodName}Interceptor`
+- Indexers: `{InterfaceName}_{KeyTypeName}IndexerInterceptor`
 
 ### Backing Storage
 - Properties: `{InterfaceName}_{PropertyName}Backing`
@@ -205,7 +205,7 @@ Rules:
 
 Indexer handlers use the key type name with interface prefix:
 
-| Interface | Indexer | Handler Access | Backing Name |
+| Interface | Indexer | Interceptor Access | Backing Name |
 |-----------|---------|----------------|--------------|
 | `IPropertyStore` | `this[string key]` | `IPropertyStore.StringIndexer` | `IPropertyStore_StringIndexerBacking` |
 | `IList` | `this[int index]` | `IList.IntIndexer` | `IList_IntIndexerBacking` |
@@ -235,7 +235,7 @@ knockOff.ILogger.Log.OnCall = (ko, level, message, code) =>
 
 ## Multiple Interfaces
 
-When a KnockOff class implements multiple interfaces, each interface gets its own KO class with separate handlers:
+When a KnockOff class implements multiple interfaces, each interface gets its own Interceptors class with separate interceptors:
 
 ```csharp
 interface ILogger { void Log(string msg); }
@@ -245,25 +245,25 @@ interface IAuditor { void Log(string msg); }
 public partial class LoggerKnockOff : ILogger, IAuditor { }
 ```
 
-Separate handlers are generated for each interface:
+Separate interceptors are generated for each interface:
 
 ```csharp
-// Interface KO classes
-public sealed class ILoggerKO
+// Interface Interceptors classes
+public sealed class ILoggerInterceptors
 {
-    public ILogger_LogHandler Log { get; } = new();
+    public ILogger_LogInterceptor Log { get; } = new();
 }
 
-public sealed class IAuditorKO
+public sealed class IAuditorInterceptors
 {
-    public IAuditor_LogHandler Log { get; } = new();
+    public IAuditor_LogInterceptor Log { get; } = new();
 }
 
-// Interface KO properties
-public ILoggerKO ILogger { get; } = new();
-public IAuditorKO IAuditor { get; } = new();
+// Interface Interceptors properties
+public ILoggerInterceptors ILogger { get; } = new();
+public IAuditorInterceptors IAuditor { get; } = new();
 
-// Each implementation uses its own handler
+// Each implementation uses its own interceptor
 void ILogger.Log(string msg) { ILogger.Log.RecordCall(msg); ... }
 void IAuditor.Log(string msg) { IAuditor.Log.RecordCall(msg); ... }
 ```

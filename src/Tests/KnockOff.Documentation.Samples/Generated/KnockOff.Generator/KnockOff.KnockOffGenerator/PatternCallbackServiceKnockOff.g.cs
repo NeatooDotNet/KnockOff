@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Concepts;
 partial class PatternCallbackServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for IPatternCallbackService.DoSomething.</summary>
-	public sealed class IPatternCallbackService_DoSomethingHandler
+	public sealed class IPatternCallbackService_DoSomethingInterceptor
 	{
 		/// <summary>Delegate for DoSomething().</summary>
 		public delegate void DoSomethingDelegate(PatternCallbackServiceKnockOff ko);
@@ -28,7 +28,7 @@ partial class PatternCallbackServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IPatternCallbackService.GetUser.</summary>
-	public sealed class IPatternCallbackService_GetUserHandler
+	public sealed class IPatternCallbackService_GetUserInterceptor
 	{
 		/// <summary>Delegate for GetUser(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Concepts.PatternUser GetUserDelegate(PatternCallbackServiceKnockOff ko, int id);
@@ -53,7 +53,7 @@ partial class PatternCallbackServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IPatternCallbackService.Calculate.</summary>
-	public sealed class IPatternCallbackService_CalculateHandler
+	public sealed class IPatternCallbackService_CalculateInterceptor
 	{
 		/// <summary>Delegate for Calculate(string name, int value, bool flag).</summary>
 		public delegate int CalculateDelegate(PatternCallbackServiceKnockOff ko, string name, int value, bool flag);
@@ -78,18 +78,18 @@ partial class PatternCallbackServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternCallbackService.</summary>
-	public sealed class IPatternCallbackServiceKO
+	public sealed class IPatternCallbackServiceInterceptorors
 	{
-		/// <summary>Handler for DoSomething.</summary>
-		public IPatternCallbackService_DoSomethingHandler DoSomething { get; } = new();
-		/// <summary>Handler for GetUser.</summary>
-		public IPatternCallbackService_GetUserHandler GetUser { get; } = new();
-		/// <summary>Handler for Calculate.</summary>
-		public IPatternCallbackService_CalculateHandler Calculate { get; } = new();
+		/// <summary>Interceptor for DoSomething.</summary>
+		public IPatternCallbackService_DoSomethingInterceptor DoSomething { get; } = new();
+		/// <summary>Interceptor for GetUser.</summary>
+		public IPatternCallbackService_GetUserInterceptor GetUser { get; } = new();
+		/// <summary>Interceptor for Calculate.</summary>
+		public IPatternCallbackService_CalculateInterceptor Calculate { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternCallbackService.</summary>
-	public IPatternCallbackServiceKO IPatternCallbackService { get; } = new();
+	public IPatternCallbackServiceInterceptorors IPatternCallbackService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Concepts.IPatternCallbackService.</summary>
 	public KnockOff.Documentation.Samples.Concepts.IPatternCallbackService AsPatternCallbackService() => this;

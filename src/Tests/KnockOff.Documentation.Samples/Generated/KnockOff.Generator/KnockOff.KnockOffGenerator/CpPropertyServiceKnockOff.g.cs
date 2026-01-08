@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class CpPropertyServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for ICpPropertyService.CurrentUser.</summary>
-	public sealed class ICpPropertyService_CurrentUserHandler
+	public sealed class ICpPropertyService_CurrentUserInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -34,14 +34,14 @@ partial class CpPropertyServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpPropertyService.</summary>
-	public sealed class ICpPropertyServiceKO
+	public sealed class ICpPropertyServiceInterceptorors
 	{
-		/// <summary>Handler for CurrentUser.</summary>
-		public ICpPropertyService_CurrentUserHandler CurrentUser { get; } = new();
+		/// <summary>Interceptor for CurrentUser.</summary>
+		public ICpPropertyService_CurrentUserInterceptor CurrentUser { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpPropertyService.</summary>
-	public ICpPropertyServiceKO ICpPropertyService { get; } = new();
+	public ICpPropertyServiceInterceptorors ICpPropertyService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpPropertyService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ICpPropertyService AsCpPropertyService() => this;

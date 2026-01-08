@@ -173,7 +173,7 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
     }
 
     [Fact]
-    public void CallbackIndexer_OnSet_InterceptsValue()
+    public void CallbackIndexer_OnSet_InterceptorsValue()
     {
         var knockOff = new CpPropertyStoreKnockOff();
         ICpPropertyStore store = knockOff;
@@ -236,7 +236,7 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         ICpParser parser = knockOff;
 
         knockOff.ICpParser.TryParse.OnCall =
-            (CpParserKnockOff.ICpParser_TryParseHandler.TryParseDelegate)((CpParserKnockOff ko, string input, out int result) =>
+            (CpParserKnockOff.ICpParser_TryParseInterceptor.TryParseDelegate)((CpParserKnockOff ko, string input, out int result) =>
             {
                 if (int.TryParse(input, out result))
                     return true;
@@ -258,7 +258,7 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         ICpParser parser = knockOff;
 
         knockOff.ICpParser.GetStats.OnCall =
-            (CpParserKnockOff.ICpParser_GetStatsHandler.GetStatsDelegate)((CpParserKnockOff ko, out int count, out double average) =>
+            (CpParserKnockOff.ICpParser_GetStatsInterceptor.GetStatsDelegate)((CpParserKnockOff ko, out int count, out double average) =>
             {
                 count = 42;
                 average = 3.14;
@@ -281,7 +281,7 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         ICpProcessor processor = knockOff;
 
         knockOff.ICpProcessor.Increment.OnCall =
-            (CpProcessorKnockOff.ICpProcessor_IncrementHandler.IncrementDelegate)((CpProcessorKnockOff ko, ref int value) =>
+            (CpProcessorKnockOff.ICpProcessor_IncrementInterceptor.IncrementDelegate)((CpProcessorKnockOff ko, ref int value) =>
             {
                 value = value * 2;
             });
@@ -299,7 +299,7 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         ICpProcessor processor = knockOff;
 
         knockOff.ICpProcessor.TryUpdate.OnCall =
-            (CpProcessorKnockOff.ICpProcessor_TryUpdateHandler.TryUpdateDelegate)((CpProcessorKnockOff ko, string key, ref string value) =>
+            (CpProcessorKnockOff.ICpProcessor_TryUpdateInterceptor.TryUpdateDelegate)((CpProcessorKnockOff ko, string key, ref string value) =>
             {
                 if (key == "valid")
                 {
@@ -325,7 +325,7 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         ICpProcessor processor = knockOff;
 
         knockOff.ICpProcessor.Increment.OnCall =
-            (CpProcessorKnockOff.ICpProcessor_IncrementHandler.IncrementDelegate)((CpProcessorKnockOff ko, ref int value) =>
+            (CpProcessorKnockOff.ICpProcessor_IncrementInterceptor.IncrementDelegate)((CpProcessorKnockOff ko, ref int value) =>
             {
                 value = value * 2;
             });

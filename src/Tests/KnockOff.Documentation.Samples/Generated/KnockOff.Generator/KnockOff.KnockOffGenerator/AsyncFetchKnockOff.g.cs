@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class AsyncFetchKnockOff
 {
 	/// <summary>Tracks and configures behavior for IAsyncFetch.FetchAsync.</summary>
-	public sealed class IAsyncFetch_FetchAsyncHandler
+	public sealed class IAsyncFetch_FetchAsyncInterceptor
 	{
 		/// <summary>Delegate for FetchAsync(int id, global::System.Threading.CancellationToken ct).</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.AsyncData> FetchAsyncDelegate(AsyncFetchKnockOff ko, int id, global::System.Threading.CancellationToken ct);
@@ -31,14 +31,14 @@ partial class AsyncFetchKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IAsyncFetch.</summary>
-	public sealed class IAsyncFetchKO
+	public sealed class IAsyncFetchInterceptorors
 	{
-		/// <summary>Handler for FetchAsync.</summary>
-		public IAsyncFetch_FetchAsyncHandler FetchAsync { get; } = new();
+		/// <summary>Interceptor for FetchAsync.</summary>
+		public IAsyncFetch_FetchAsyncInterceptor FetchAsync { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IAsyncFetch.</summary>
-	public IAsyncFetchKO IAsyncFetch { get; } = new();
+	public IAsyncFetchInterceptorors IAsyncFetch { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IAsyncFetch.</summary>
 	public KnockOff.Documentation.Samples.Guides.IAsyncFetch AsAsyncFetch() => this;

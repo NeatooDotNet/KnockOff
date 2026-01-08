@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class CpPriorityServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for ICpPriorityService.Calculate.</summary>
-	public sealed class ICpPriorityService_CalculateHandler
+	public sealed class ICpPriorityService_CalculateInterceptor
 	{
 		/// <summary>Delegate for Calculate(int x).</summary>
 		public delegate int CalculateDelegate(CpPriorityServiceKnockOff ko, int x);
@@ -31,14 +31,14 @@ partial class CpPriorityServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpPriorityService.</summary>
-	public sealed class ICpPriorityServiceKO
+	public sealed class ICpPriorityServiceInterceptorors
 	{
-		/// <summary>Handler for Calculate.</summary>
-		public ICpPriorityService_CalculateHandler Calculate { get; } = new();
+		/// <summary>Interceptor for Calculate.</summary>
+		public ICpPriorityService_CalculateInterceptor Calculate { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpPriorityService.</summary>
-	public ICpPriorityServiceKO ICpPriorityService { get; } = new();
+	public ICpPriorityServiceInterceptorors ICpPriorityService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpPriorityService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ICpPriorityService AsCpPriorityService() => this;

@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class SkEventPatternSourceKnockOff
 {
 	/// <summary>Tracks and raises ISkEventPatternSource.DataReceived.</summary>
-	public sealed class ISkEventPatternSource_DataReceivedHandler
+	public sealed class ISkEventPatternSource_DataReceivedInterceptor
 	{
 		private global::System.EventHandler<string>? _handler;
 		private readonly global::System.Collections.Generic.List<(object? sender, string e)> _raises = new();
@@ -62,7 +62,7 @@ partial class SkEventPatternSourceKnockOff
 	}
 
 	/// <summary>Tracks and raises ISkEventPatternSource.ProgressChanged.</summary>
-	public sealed class ISkEventPatternSource_ProgressChangedHandler
+	public sealed class ISkEventPatternSource_ProgressChangedInterceptor
 	{
 		private global::System.Action<int>? _handler;
 		private readonly global::System.Collections.Generic.List<int> _raises = new();
@@ -115,16 +115,16 @@ partial class SkEventPatternSourceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkEventPatternSource.</summary>
-	public sealed class ISkEventPatternSourceKO
+	public sealed class ISkEventPatternSourceInterceptorors
 	{
-		/// <summary>Handler for DataReceived event.</summary>
-		public ISkEventPatternSource_DataReceivedHandler DataReceived { get; } = new();
-		/// <summary>Handler for ProgressChanged event.</summary>
-		public ISkEventPatternSource_ProgressChangedHandler ProgressChanged { get; } = new();
+		/// <summary>Interceptor for DataReceived event.</summary>
+		public ISkEventPatternSource_DataReceivedInterceptor DataReceived { get; } = new();
+		/// <summary>Interceptor for ProgressChanged event.</summary>
+		public ISkEventPatternSource_ProgressChangedInterceptor ProgressChanged { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkEventPatternSource.</summary>
-	public ISkEventPatternSourceKO ISkEventPatternSource { get; } = new();
+	public ISkEventPatternSourceInterceptorors ISkEventPatternSource { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkEventPatternSource.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkEventPatternSource AsSkEventPatternSource() => this;

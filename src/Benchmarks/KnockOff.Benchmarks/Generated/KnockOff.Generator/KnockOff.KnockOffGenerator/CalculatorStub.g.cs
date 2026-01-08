@@ -6,7 +6,7 @@ namespace KnockOff.Benchmarks.Stubs;
 partial class CalculatorStub
 {
 	/// <summary>Tracks and configures behavior for ICalculator.Add.</summary>
-	public sealed class ICalculator_AddHandler
+	public sealed class ICalculator_AddInterceptor
 	{
 		/// <summary>Delegate for Add(int a, int b).</summary>
 		public delegate int AddDelegate(CalculatorStub ko, int a, int b);
@@ -31,7 +31,7 @@ partial class CalculatorStub
 	}
 
 	/// <summary>Tracks and configures behavior for ICalculator.Subtract.</summary>
-	public sealed class ICalculator_SubtractHandler
+	public sealed class ICalculator_SubtractInterceptor
 	{
 		/// <summary>Delegate for Subtract(int a, int b).</summary>
 		public delegate int SubtractDelegate(CalculatorStub ko, int a, int b);
@@ -56,7 +56,7 @@ partial class CalculatorStub
 	}
 
 	/// <summary>Tracks and configures behavior for ICalculator.Multiply.</summary>
-	public sealed class ICalculator_MultiplyHandler
+	public sealed class ICalculator_MultiplyInterceptor
 	{
 		/// <summary>Delegate for Multiply(int a, int b).</summary>
 		public delegate int MultiplyDelegate(CalculatorStub ko, int a, int b);
@@ -81,7 +81,7 @@ partial class CalculatorStub
 	}
 
 	/// <summary>Tracks and configures behavior for ICalculator.Divide.</summary>
-	public sealed class ICalculator_DivideHandler
+	public sealed class ICalculator_DivideInterceptor
 	{
 		/// <summary>Delegate for Divide(double a, double b).</summary>
 		public delegate double DivideDelegate(CalculatorStub ko, double a, double b);
@@ -106,7 +106,7 @@ partial class CalculatorStub
 	}
 
 	/// <summary>Tracks and configures behavior for ICalculator.Square.</summary>
-	public sealed class ICalculator_SquareHandler
+	public sealed class ICalculator_SquareInterceptor
 	{
 		/// <summary>Delegate for Square(int x).</summary>
 		public delegate int SquareDelegate(CalculatorStub ko, int x);
@@ -131,22 +131,22 @@ partial class CalculatorStub
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Benchmarks.Interfaces.ICalculator.</summary>
-	public sealed class ICalculatorKO
+	public sealed class ICalculatorInterceptorors
 	{
-		/// <summary>Handler for Add.</summary>
-		public ICalculator_AddHandler Add { get; } = new();
-		/// <summary>Handler for Subtract.</summary>
-		public ICalculator_SubtractHandler Subtract { get; } = new();
-		/// <summary>Handler for Multiply.</summary>
-		public ICalculator_MultiplyHandler Multiply { get; } = new();
-		/// <summary>Handler for Divide.</summary>
-		public ICalculator_DivideHandler Divide { get; } = new();
-		/// <summary>Handler for Square.</summary>
-		public ICalculator_SquareHandler Square { get; } = new();
+		/// <summary>Interceptor for Add.</summary>
+		public ICalculator_AddInterceptor Add { get; } = new();
+		/// <summary>Interceptor for Subtract.</summary>
+		public ICalculator_SubtractInterceptor Subtract { get; } = new();
+		/// <summary>Interceptor for Multiply.</summary>
+		public ICalculator_MultiplyInterceptor Multiply { get; } = new();
+		/// <summary>Interceptor for Divide.</summary>
+		public ICalculator_DivideInterceptor Divide { get; } = new();
+		/// <summary>Interceptor for Square.</summary>
+		public ICalculator_SquareInterceptor Square { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Benchmarks.Interfaces.ICalculator.</summary>
-	public ICalculatorKO ICalculator { get; } = new();
+	public ICalculatorInterceptorors ICalculator { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Benchmarks.Interfaces.ICalculator.</summary>
 	public KnockOff.Benchmarks.Interfaces.ICalculator AsCalculator() => this;

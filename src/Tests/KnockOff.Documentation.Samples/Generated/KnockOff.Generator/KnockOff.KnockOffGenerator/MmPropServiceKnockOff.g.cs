@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class MmPropServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMmPropService.Name.</summary>
-	public sealed class IMmPropService_NameHandler
+	public sealed class IMmPropService_NameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -34,14 +34,14 @@ partial class MmPropServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmPropService.</summary>
-	public sealed class IMmPropServiceKO
+	public sealed class IMmPropServiceInterceptorors
 	{
-		/// <summary>Handler for Name.</summary>
-		public IMmPropService_NameHandler Name { get; } = new();
+		/// <summary>Interceptor for Name.</summary>
+		public IMmPropService_NameInterceptor Name { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmPropService.</summary>
-	public IMmPropServiceKO IMmPropService { get; } = new();
+	public IMmPropServiceInterceptorors IMmPropService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmPropService.</summary>
 	public KnockOff.Documentation.Samples.Skills.IMmPropService AsMmPropService() => this;

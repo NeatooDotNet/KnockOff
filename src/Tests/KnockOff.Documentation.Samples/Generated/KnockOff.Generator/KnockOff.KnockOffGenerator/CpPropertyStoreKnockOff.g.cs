@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class CpPropertyStoreKnockOff
 {
 	/// <summary>Tracks and configures behavior for ICpPropertyStore.StringIndexer.</summary>
-	public sealed class ICpPropertyStore_StringIndexerHandler
+	public sealed class ICpPropertyStore_StringIndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -37,14 +37,14 @@ partial class CpPropertyStoreKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpPropertyStore.</summary>
-	public sealed class ICpPropertyStoreKO
+	public sealed class ICpPropertyStoreInterceptorors
 	{
-		/// <summary>Handler for StringIndexer.</summary>
-		public ICpPropertyStore_StringIndexerHandler StringIndexer { get; } = new();
+		/// <summary>Interceptor for StringIndexer.</summary>
+		public ICpPropertyStore_StringIndexerInterceptor StringIndexer { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpPropertyStore.</summary>
-	public ICpPropertyStoreKO ICpPropertyStore { get; } = new();
+	public ICpPropertyStoreInterceptorors ICpPropertyStore { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpPropertyStore.</summary>
 	public KnockOff.Documentation.Samples.Skills.ICpPropertyStore AsCpPropertyStore() => this;

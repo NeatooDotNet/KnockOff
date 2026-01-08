@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class IdxReadWriteStoreKnockOff
 {
 	/// <summary>Tracks and configures behavior for IIdxReadWriteStore.StringIndexer.</summary>
-	public sealed class IIdxReadWriteStore_StringIndexerHandler
+	public sealed class IIdxReadWriteStore_StringIndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -37,14 +37,14 @@ partial class IdxReadWriteStoreKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIdxReadWriteStore.</summary>
-	public sealed class IIdxReadWriteStoreKO
+	public sealed class IIdxReadWriteStoreInterceptorors
 	{
-		/// <summary>Handler for StringIndexer.</summary>
-		public IIdxReadWriteStore_StringIndexerHandler StringIndexer { get; } = new();
+		/// <summary>Interceptor for StringIndexer.</summary>
+		public IIdxReadWriteStore_StringIndexerInterceptor StringIndexer { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIdxReadWriteStore.</summary>
-	public IIdxReadWriteStoreKO IIdxReadWriteStore { get; } = new();
+	public IIdxReadWriteStoreInterceptorors IIdxReadWriteStore { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIdxReadWriteStore.</summary>
 	public KnockOff.Documentation.Samples.Guides.IIdxReadWriteStore AsIdxReadWriteStore() => this;

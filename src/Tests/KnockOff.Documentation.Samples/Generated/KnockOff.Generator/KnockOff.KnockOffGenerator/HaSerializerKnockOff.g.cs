@@ -36,7 +36,7 @@ partial class HaSerializerKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IHaSerializer.Deserialize.</summary>
-	public sealed class IHaSerializer_DeserializeHandler
+	public sealed class IHaSerializer_DeserializeInterceptor
 	{
 		private readonly global::System.Collections.Generic.Dictionary<global::System.Type, object> _typedHandlers = new();
 
@@ -96,7 +96,7 @@ partial class HaSerializerKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IHaSerializer.Convert.</summary>
-	public sealed class IHaSerializer_ConvertHandler
+	public sealed class IHaSerializer_ConvertInterceptor
 	{
 		private readonly global::System.Collections.Generic.Dictionary<(global::System.Type, global::System.Type), object> _typedHandlers = new();
 
@@ -153,16 +153,16 @@ partial class HaSerializerKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaSerializer.</summary>
-	public sealed class IHaSerializerKO
+	public sealed class IHaSerializerInterceptorors
 	{
-		/// <summary>Handler for Deserialize.</summary>
-		public IHaSerializer_DeserializeHandler Deserialize { get; } = new();
-		/// <summary>Handler for Convert.</summary>
-		public IHaSerializer_ConvertHandler Convert { get; } = new();
+		/// <summary>Interceptor for Deserialize.</summary>
+		public IHaSerializer_DeserializeInterceptor Deserialize { get; } = new();
+		/// <summary>Interceptor for Convert.</summary>
+		public IHaSerializer_ConvertInterceptor Convert { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaSerializer.</summary>
-	public IHaSerializerKO IHaSerializer { get; } = new();
+	public IHaSerializerInterceptorors IHaSerializer { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IHaSerializer.</summary>
 	public KnockOff.Documentation.Samples.Skills.IHaSerializer AsHaSerializer() => this;

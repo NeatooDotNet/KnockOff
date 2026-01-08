@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class GenEmployeeRepositoryKnockOff
 {
 	/// <summary>Tracks and configures behavior for IGenEntityRepository_KnockOff_Documentation_Samples_Guides_GenEmployee.FindById.</summary>
-	public sealed class IGenEntityRepository_KnockOff_Documentation_Samples_Guides_GenEmployee_FindByIdHandler
+	public sealed class IGenEntityRepository_KnockOff_Documentation_Samples_Guides_GenEmployee_FindByIdInterceptor
 	{
 		/// <summary>Delegate for FindById(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Guides.GenEmployee? FindByIdDelegate(GenEmployeeRepositoryKnockOff ko, int id);
@@ -31,14 +31,14 @@ partial class GenEmployeeRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenEntityRepository<KnockOff.Documentation.Samples.Guides.GenEmployee>.</summary>
-	public sealed class IGenEntityRepository_KnockOff_Documentation_Samples_Guides_GenEmployeeKO
+	public sealed class IGenEntityRepository_KnockOff_Documentation_Samples_Guides_GenEmployeeInterceptorors
 	{
-		/// <summary>Handler for FindById.</summary>
-		public IGenEntityRepository_KnockOff_Documentation_Samples_Guides_GenEmployee_FindByIdHandler FindById { get; } = new();
+		/// <summary>Interceptor for FindById.</summary>
+		public IGenEntityRepository_KnockOff_Documentation_Samples_Guides_GenEmployee_FindByIdInterceptor FindById { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenEntityRepository<KnockOff.Documentation.Samples.Guides.GenEmployee>.</summary>
-	public IGenEntityRepository_KnockOff_Documentation_Samples_Guides_GenEmployeeKO IGenEntityRepository_KnockOff_Documentation_Samples_Guides_GenEmployee { get; } = new();
+	public IGenEntityRepository_KnockOff_Documentation_Samples_Guides_GenEmployeeInterceptorors IGenEntityRepository_KnockOff_Documentation_Samples_Guides_GenEmployee { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IGenEntityRepository<KnockOff.Documentation.Samples.Guides.GenEmployee>.</summary>
 	public KnockOff.Documentation.Samples.Guides.IGenEntityRepository<KnockOff.Documentation.Samples.Guides.GenEmployee> AsGenEntityRepository() => this;

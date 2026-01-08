@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class SkPriorityServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for ISkPriorityService.Calculate.</summary>
-	public sealed class ISkPriorityService_CalculateHandler
+	public sealed class ISkPriorityService_CalculateInterceptor
 	{
 		/// <summary>Delegate for Calculate(int x).</summary>
 		public delegate int CalculateDelegate(SkPriorityServiceKnockOff ko, int x);
@@ -31,14 +31,14 @@ partial class SkPriorityServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkPriorityService.</summary>
-	public sealed class ISkPriorityServiceKO
+	public sealed class ISkPriorityServiceInterceptorors
 	{
-		/// <summary>Handler for Calculate.</summary>
-		public ISkPriorityService_CalculateHandler Calculate { get; } = new();
+		/// <summary>Interceptor for Calculate.</summary>
+		public ISkPriorityService_CalculateInterceptor Calculate { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkPriorityService.</summary>
-	public ISkPriorityServiceKO ISkPriorityService { get; } = new();
+	public ISkPriorityServiceInterceptorors ISkPriorityService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkPriorityService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkPriorityService AsSkPriorityService() => this;

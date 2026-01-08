@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class MethodServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMethodService.Initialize.</summary>
-	public sealed class IMethodService_InitializeHandler
+	public sealed class IMethodService_InitializeInterceptor
 	{
 		/// <summary>Delegate for Initialize().</summary>
 		public delegate void InitializeDelegate(MethodServiceKnockOff ko);
@@ -28,14 +28,14 @@ partial class MethodServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodService.</summary>
-	public sealed class IMethodServiceKO
+	public sealed class IMethodServiceInterceptorors
 	{
-		/// <summary>Handler for Initialize.</summary>
-		public IMethodService_InitializeHandler Initialize { get; } = new();
+		/// <summary>Interceptor for Initialize.</summary>
+		public IMethodService_InitializeInterceptor Initialize { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodService.</summary>
-	public IMethodServiceKO IMethodService { get; } = new();
+	public IMethodServiceInterceptorors IMethodService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodService.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMethodService AsMethodService() => this;

@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Comparison;
 partial class VsUserServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for IVsUserService.CurrentUser.</summary>
-	public sealed class IVsUserService_CurrentUserHandler
+	public sealed class IVsUserService_CurrentUserInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -34,7 +34,7 @@ partial class VsUserServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IVsUserService.GetUser.</summary>
-	public sealed class IVsUserService_GetUserHandler
+	public sealed class IVsUserService_GetUserInterceptor
 	{
 		/// <summary>Delegate for GetUser(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Comparison.VsUser GetUserDelegate(VsUserServiceKnockOff ko, int id);
@@ -59,7 +59,7 @@ partial class VsUserServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IVsUserService.Save.</summary>
-	public sealed class IVsUserService_SaveHandler
+	public sealed class IVsUserService_SaveInterceptor
 	{
 		/// <summary>Delegate for Save(global::KnockOff.Documentation.Samples.Comparison.VsUser user).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Comparison.VsUser? SaveDelegate(VsUserServiceKnockOff ko, global::KnockOff.Documentation.Samples.Comparison.VsUser user);
@@ -84,7 +84,7 @@ partial class VsUserServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IVsUserService.Delete.</summary>
-	public sealed class IVsUserService_DeleteHandler
+	public sealed class IVsUserService_DeleteInterceptor
 	{
 		/// <summary>Delegate for Delete(int id).</summary>
 		public delegate void DeleteDelegate(VsUserServiceKnockOff ko, int id);
@@ -109,7 +109,7 @@ partial class VsUserServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IVsUserService.GetAll.</summary>
-	public sealed class IVsUserService_GetAllHandler
+	public sealed class IVsUserService_GetAllInterceptor
 	{
 		/// <summary>Delegate for GetAll().</summary>
 		public delegate global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Comparison.VsUser> GetAllDelegate(VsUserServiceKnockOff ko);
@@ -131,7 +131,7 @@ partial class VsUserServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IVsUserService.Update.</summary>
-	public sealed class IVsUserService_UpdateHandler
+	public sealed class IVsUserService_UpdateInterceptor
 	{
 		/// <summary>Delegate for Update(global::KnockOff.Documentation.Samples.Comparison.VsUser user).</summary>
 		public delegate void UpdateDelegate(VsUserServiceKnockOff ko, global::KnockOff.Documentation.Samples.Comparison.VsUser user);
@@ -156,24 +156,24 @@ partial class VsUserServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsUserService.</summary>
-	public sealed class IVsUserServiceKO
+	public sealed class IVsUserServiceInterceptorors
 	{
-		/// <summary>Handler for CurrentUser.</summary>
-		public IVsUserService_CurrentUserHandler CurrentUser { get; } = new();
-		/// <summary>Handler for GetUser.</summary>
-		public IVsUserService_GetUserHandler GetUser { get; } = new();
-		/// <summary>Handler for Save.</summary>
-		public IVsUserService_SaveHandler Save { get; } = new();
-		/// <summary>Handler for Delete.</summary>
-		public IVsUserService_DeleteHandler Delete { get; } = new();
-		/// <summary>Handler for GetAll.</summary>
-		public IVsUserService_GetAllHandler GetAll { get; } = new();
-		/// <summary>Handler for Update.</summary>
-		public IVsUserService_UpdateHandler Update { get; } = new();
+		/// <summary>Interceptor for CurrentUser.</summary>
+		public IVsUserService_CurrentUserInterceptor CurrentUser { get; } = new();
+		/// <summary>Interceptor for GetUser.</summary>
+		public IVsUserService_GetUserInterceptor GetUser { get; } = new();
+		/// <summary>Interceptor for Save.</summary>
+		public IVsUserService_SaveInterceptor Save { get; } = new();
+		/// <summary>Interceptor for Delete.</summary>
+		public IVsUserService_DeleteInterceptor Delete { get; } = new();
+		/// <summary>Interceptor for GetAll.</summary>
+		public IVsUserService_GetAllInterceptor GetAll { get; } = new();
+		/// <summary>Interceptor for Update.</summary>
+		public IVsUserService_UpdateInterceptor Update { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsUserService.</summary>
-	public IVsUserServiceKO IVsUserService { get; } = new();
+	public IVsUserServiceInterceptorors IVsUserService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IVsUserService.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IVsUserService AsVsUserService() => this;

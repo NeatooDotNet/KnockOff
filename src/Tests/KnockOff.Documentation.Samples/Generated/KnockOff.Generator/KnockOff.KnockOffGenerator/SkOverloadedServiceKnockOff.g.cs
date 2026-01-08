@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class SkOverloadedServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for ISkOverloadedService.Process1.</summary>
-	public sealed class ISkOverloadedService_Process1Handler
+	public sealed class ISkOverloadedService_Process1Interceptor
 	{
 		/// <summary>Delegate for Process(string data).</summary>
 		public delegate void ProcessDelegate(SkOverloadedServiceKnockOff ko, string data);
@@ -31,7 +31,7 @@ partial class SkOverloadedServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISkOverloadedService.Process2.</summary>
-	public sealed class ISkOverloadedService_Process2Handler
+	public sealed class ISkOverloadedService_Process2Interceptor
 	{
 		/// <summary>Delegate for Process(string data, int priority).</summary>
 		public delegate void ProcessDelegate(SkOverloadedServiceKnockOff ko, string data, int priority);
@@ -56,7 +56,7 @@ partial class SkOverloadedServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISkOverloadedService.Process3.</summary>
-	public sealed class ISkOverloadedService_Process3Handler
+	public sealed class ISkOverloadedService_Process3Interceptor
 	{
 		/// <summary>Delegate for Process(string data, int priority, bool async).</summary>
 		public delegate void ProcessDelegate(SkOverloadedServiceKnockOff ko, string data, int priority, bool async);
@@ -81,18 +81,18 @@ partial class SkOverloadedServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkOverloadedService.</summary>
-	public sealed class ISkOverloadedServiceKO
+	public sealed class ISkOverloadedServiceInterceptorors
 	{
-		/// <summary>Handler for Process overload 1.</summary>
-		public ISkOverloadedService_Process1Handler Process1 { get; } = new();
-		/// <summary>Handler for Process overload 2.</summary>
-		public ISkOverloadedService_Process2Handler Process2 { get; } = new();
-		/// <summary>Handler for Process overload 3.</summary>
-		public ISkOverloadedService_Process3Handler Process3 { get; } = new();
+		/// <summary>Interceptor for Process overload 1.</summary>
+		public ISkOverloadedService_Process1Interceptor Process1 { get; } = new();
+		/// <summary>Interceptor for Process overload 2.</summary>
+		public ISkOverloadedService_Process2Interceptor Process2 { get; } = new();
+		/// <summary>Interceptor for Process overload 3.</summary>
+		public ISkOverloadedService_Process3Interceptor Process3 { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkOverloadedService.</summary>
-	public ISkOverloadedServiceKO ISkOverloadedService { get; } = new();
+	public ISkOverloadedServiceInterceptorors ISkOverloadedService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkOverloadedService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkOverloadedService AsSkOverloadedService() => this;

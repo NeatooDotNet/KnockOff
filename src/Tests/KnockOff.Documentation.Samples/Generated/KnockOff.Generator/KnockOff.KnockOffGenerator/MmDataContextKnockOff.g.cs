@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class MmDataContextKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMmRepository.Save.</summary>
-	public sealed class IMmRepository_SaveHandler
+	public sealed class IMmRepository_SaveInterceptor
 	{
 		/// <summary>Delegate for Save(object entity).</summary>
 		public delegate void SaveDelegate(MmDataContextKnockOff ko, object entity);
@@ -31,14 +31,14 @@ partial class MmDataContextKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmRepository.</summary>
-	public sealed class IMmRepositoryKO
+	public sealed class IMmRepositoryInterceptorors
 	{
-		/// <summary>Handler for Save.</summary>
-		public IMmRepository_SaveHandler Save { get; } = new();
+		/// <summary>Interceptor for Save.</summary>
+		public IMmRepository_SaveInterceptor Save { get; } = new();
 	}
 
 	/// <summary>Tracks and configures behavior for IMmUnitOfWork.SaveChangesAsync.</summary>
-	public sealed class IMmUnitOfWork_SaveChangesAsyncHandler
+	public sealed class IMmUnitOfWork_SaveChangesAsyncInterceptor
 	{
 		/// <summary>Delegate for SaveChangesAsync(global::System.Threading.CancellationToken ct).</summary>
 		public delegate global::System.Threading.Tasks.Task<int> SaveChangesAsyncDelegate(MmDataContextKnockOff ko, global::System.Threading.CancellationToken ct);
@@ -63,17 +63,17 @@ partial class MmDataContextKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmUnitOfWork.</summary>
-	public sealed class IMmUnitOfWorkKO
+	public sealed class IMmUnitOfWorkInterceptorors
 	{
-		/// <summary>Handler for SaveChangesAsync.</summary>
-		public IMmUnitOfWork_SaveChangesAsyncHandler SaveChangesAsync { get; } = new();
+		/// <summary>Interceptor for SaveChangesAsync.</summary>
+		public IMmUnitOfWork_SaveChangesAsyncInterceptor SaveChangesAsync { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmRepository.</summary>
-	public IMmRepositoryKO IMmRepository { get; } = new();
+	public IMmRepositoryInterceptorors IMmRepository { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmUnitOfWork.</summary>
-	public IMmUnitOfWorkKO IMmUnitOfWork { get; } = new();
+	public IMmUnitOfWorkInterceptorors IMmUnitOfWork { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmRepository.</summary>
 	public KnockOff.Documentation.Samples.Skills.IMmRepository AsMmRepository() => this;

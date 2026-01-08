@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class MethodSingleParamKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMethodSingleParam.GetUser.</summary>
-	public sealed class IMethodSingleParam_GetUserHandler
+	public sealed class IMethodSingleParam_GetUserInterceptor
 	{
 		/// <summary>Delegate for GetUser(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Guides.MethodUser GetUserDelegate(MethodSingleParamKnockOff ko, int id);
@@ -31,14 +31,14 @@ partial class MethodSingleParamKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodSingleParam.</summary>
-	public sealed class IMethodSingleParamKO
+	public sealed class IMethodSingleParamInterceptorors
 	{
-		/// <summary>Handler for GetUser.</summary>
-		public IMethodSingleParam_GetUserHandler GetUser { get; } = new();
+		/// <summary>Interceptor for GetUser.</summary>
+		public IMethodSingleParam_GetUserInterceptor GetUser { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodSingleParam.</summary>
-	public IMethodSingleParamKO IMethodSingleParam { get; } = new();
+	public IMethodSingleParamInterceptorors IMethodSingleParam { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodSingleParam.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMethodSingleParam AsMethodSingleParam() => this;

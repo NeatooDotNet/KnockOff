@@ -6,7 +6,7 @@ namespace KnockOff.Tests;
 partial class RefParameterServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for IRefParameterService.Increment.</summary>
-	public sealed class IRefParameterService_IncrementHandler
+	public sealed class IRefParameterService_IncrementInterceptor
 	{
 		/// <summary>Delegate for Increment(ref int value).</summary>
 		public delegate void IncrementDelegate(RefParameterServiceKnockOff ko, ref int value);
@@ -31,7 +31,7 @@ partial class RefParameterServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IRefParameterService.TryUpdate.</summary>
-	public sealed class IRefParameterService_TryUpdateHandler
+	public sealed class IRefParameterService_TryUpdateInterceptor
 	{
 		/// <summary>Delegate for TryUpdate(string key, ref string value).</summary>
 		public delegate bool TryUpdateDelegate(RefParameterServiceKnockOff ko, string key, ref string value);
@@ -56,16 +56,16 @@ partial class RefParameterServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IRefParameterService.</summary>
-	public sealed class IRefParameterServiceKO
+	public sealed class IRefParameterServiceInterceptorors
 	{
-		/// <summary>Handler for Increment.</summary>
-		public IRefParameterService_IncrementHandler Increment { get; } = new();
-		/// <summary>Handler for TryUpdate.</summary>
-		public IRefParameterService_TryUpdateHandler TryUpdate { get; } = new();
+		/// <summary>Interceptor for Increment.</summary>
+		public IRefParameterService_IncrementInterceptor Increment { get; } = new();
+		/// <summary>Interceptor for TryUpdate.</summary>
+		public IRefParameterService_TryUpdateInterceptor TryUpdate { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IRefParameterService.</summary>
-	public IRefParameterServiceKO IRefParameterService { get; } = new();
+	public IRefParameterServiceInterceptorors IRefParameterService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IRefParameterService.</summary>
 	public KnockOff.Tests.IRefParameterService AsRefParameterService() => this;

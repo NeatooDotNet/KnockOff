@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Comparison;
 partial class VsSequenceKnockOff
 {
 	/// <summary>Tracks and configures behavior for IVsSequence.GetNext.</summary>
-	public sealed class IVsSequence_GetNextHandler
+	public sealed class IVsSequence_GetNextInterceptor
 	{
 		/// <summary>Delegate for GetNext().</summary>
 		public delegate int GetNextDelegate(VsSequenceKnockOff ko);
@@ -28,14 +28,14 @@ partial class VsSequenceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsSequence.</summary>
-	public sealed class IVsSequenceKO
+	public sealed class IVsSequenceInterceptorors
 	{
-		/// <summary>Handler for GetNext.</summary>
-		public IVsSequence_GetNextHandler GetNext { get; } = new();
+		/// <summary>Interceptor for GetNext.</summary>
+		public IVsSequence_GetNextInterceptor GetNext { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsSequence.</summary>
-	public IVsSequenceKO IVsSequence { get; } = new();
+	public IVsSequenceInterceptorors IVsSequence { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IVsSequence.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IVsSequence AsVsSequence() => this;

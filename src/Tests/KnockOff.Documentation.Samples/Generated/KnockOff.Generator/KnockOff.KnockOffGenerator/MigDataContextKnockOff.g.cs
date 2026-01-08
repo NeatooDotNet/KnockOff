@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Comparison;
 partial class MigDataContextKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMigRepository.GetById.</summary>
-	public sealed class IMigRepository_GetByIdHandler
+	public sealed class IMigRepository_GetByIdInterceptor
 	{
 		/// <summary>Delegate for GetById(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Comparison.MigEntity? GetByIdDelegate(MigDataContextKnockOff ko, int id);
@@ -31,14 +31,14 @@ partial class MigDataContextKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigRepository.</summary>
-	public sealed class IMigRepositoryKO
+	public sealed class IMigRepositoryInterceptorors
 	{
-		/// <summary>Handler for GetById.</summary>
-		public IMigRepository_GetByIdHandler GetById { get; } = new();
+		/// <summary>Interceptor for GetById.</summary>
+		public IMigRepository_GetByIdInterceptor GetById { get; } = new();
 	}
 
 	/// <summary>Tracks and configures behavior for IMigUnitOfWork.SaveChangesAsync.</summary>
-	public sealed class IMigUnitOfWork_SaveChangesAsyncHandler
+	public sealed class IMigUnitOfWork_SaveChangesAsyncInterceptor
 	{
 		/// <summary>Delegate for SaveChangesAsync(global::System.Threading.CancellationToken cancellationToken).</summary>
 		public delegate global::System.Threading.Tasks.Task<int> SaveChangesAsyncDelegate(MigDataContextKnockOff ko, global::System.Threading.CancellationToken cancellationToken);
@@ -63,17 +63,17 @@ partial class MigDataContextKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigUnitOfWork.</summary>
-	public sealed class IMigUnitOfWorkKO
+	public sealed class IMigUnitOfWorkInterceptorors
 	{
-		/// <summary>Handler for SaveChangesAsync.</summary>
-		public IMigUnitOfWork_SaveChangesAsyncHandler SaveChangesAsync { get; } = new();
+		/// <summary>Interceptor for SaveChangesAsync.</summary>
+		public IMigUnitOfWork_SaveChangesAsyncInterceptor SaveChangesAsync { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigRepository.</summary>
-	public IMigRepositoryKO IMigRepository { get; } = new();
+	public IMigRepositoryInterceptorors IMigRepository { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigUnitOfWork.</summary>
-	public IMigUnitOfWorkKO IMigUnitOfWork { get; } = new();
+	public IMigUnitOfWorkInterceptorors IMigUnitOfWork { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IMigRepository.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IMigRepository AsMigRepository() => this;

@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Concepts;
 partial class PatternRepositoryKnockOff
 {
 	/// <summary>Tracks and configures behavior for IPatternRepository.GetByIdAsync.</summary>
-	public sealed class IPatternRepository_GetByIdAsyncHandler
+	public sealed class IPatternRepository_GetByIdAsyncInterceptor
 	{
 		/// <summary>Delegate for GetByIdAsync(int id).</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Concepts.PatternUser?> GetByIdAsyncDelegate(PatternRepositoryKnockOff ko, int id);
@@ -31,7 +31,7 @@ partial class PatternRepositoryKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IPatternRepository.CountAsync.</summary>
-	public sealed class IPatternRepository_CountAsyncHandler
+	public sealed class IPatternRepository_CountAsyncInterceptor
 	{
 		/// <summary>Delegate for CountAsync().</summary>
 		public delegate global::System.Threading.Tasks.ValueTask<int> CountAsyncDelegate(PatternRepositoryKnockOff ko);
@@ -53,16 +53,16 @@ partial class PatternRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternRepository.</summary>
-	public sealed class IPatternRepositoryKO
+	public sealed class IPatternRepositoryInterceptorors
 	{
-		/// <summary>Handler for GetByIdAsync.</summary>
-		public IPatternRepository_GetByIdAsyncHandler GetByIdAsync { get; } = new();
-		/// <summary>Handler for CountAsync.</summary>
-		public IPatternRepository_CountAsyncHandler CountAsync { get; } = new();
+		/// <summary>Interceptor for GetByIdAsync.</summary>
+		public IPatternRepository_GetByIdAsyncInterceptor GetByIdAsync { get; } = new();
+		/// <summary>Interceptor for CountAsync.</summary>
+		public IPatternRepository_CountAsyncInterceptor CountAsync { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternRepository.</summary>
-	public IPatternRepositoryKO IPatternRepository { get; } = new();
+	public IPatternRepositoryInterceptorors IPatternRepository { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Concepts.IPatternRepository.</summary>
 	public KnockOff.Documentation.Samples.Concepts.IPatternRepository AsPatternRepository() => this;

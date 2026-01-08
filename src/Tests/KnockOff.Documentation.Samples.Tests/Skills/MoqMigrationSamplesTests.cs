@@ -362,7 +362,7 @@ public class MoqMigrationSamplesTests : SamplesTestBase
         IMmParser parser = knockOff;
 
         knockOff.IMmParser.TryParse.OnCall =
-            (MmParserKnockOff.IMmParser_TryParseHandler.TryParseDelegate)((MmParserKnockOff ko, string input, out int result) =>
+            (MmParserKnockOff.IMmParser_TryParseInterceptor.TryParseDelegate)((MmParserKnockOff ko, string input, out int result) =>
             {
                 return int.TryParse(input, out result);
             });
@@ -378,7 +378,7 @@ public class MoqMigrationSamplesTests : SamplesTestBase
         IMmParser parser = knockOff;
 
         knockOff.IMmParser.TryParse.OnCall =
-            (MmParserKnockOff.IMmParser_TryParseHandler.TryParseDelegate)((MmParserKnockOff ko, string input, out int result) =>
+            (MmParserKnockOff.IMmParser_TryParseInterceptor.TryParseDelegate)((MmParserKnockOff ko, string input, out int result) =>
             {
                 return int.TryParse(input, out result);
             });
@@ -399,7 +399,7 @@ public class MoqMigrationSamplesTests : SamplesTestBase
         IMmRefProcessor processor = knockOff;
 
         knockOff.IMmRefProcessor.Increment.OnCall =
-            (MmRefProcessorKnockOff.IMmRefProcessor_IncrementHandler.IncrementDelegate)((MmRefProcessorKnockOff ko, ref int value) =>
+            (MmRefProcessorKnockOff.IMmRefProcessor_IncrementInterceptor.IncrementDelegate)((MmRefProcessorKnockOff ko, ref int value) =>
             {
                 value++;
             });
@@ -417,7 +417,7 @@ public class MoqMigrationSamplesTests : SamplesTestBase
         IMmRefProcessor processor = knockOff;
 
         knockOff.IMmRefProcessor.Increment.OnCall =
-            (MmRefProcessorKnockOff.IMmRefProcessor_IncrementHandler.IncrementDelegate)((MmRefProcessorKnockOff ko, ref int value) =>
+            (MmRefProcessorKnockOff.IMmRefProcessor_IncrementInterceptor.IncrementDelegate)((MmRefProcessorKnockOff ko, ref int value) =>
             {
                 value++;
             });

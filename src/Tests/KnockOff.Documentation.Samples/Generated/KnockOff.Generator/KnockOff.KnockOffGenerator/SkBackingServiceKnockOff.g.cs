@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class SkBackingServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for ISkBackingService.Name.</summary>
-	public sealed class ISkBackingService_NameHandler
+	public sealed class ISkBackingService_NameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -34,14 +34,14 @@ partial class SkBackingServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkBackingService.</summary>
-	public sealed class ISkBackingServiceKO
+	public sealed class ISkBackingServiceInterceptorors
 	{
-		/// <summary>Handler for Name.</summary>
-		public ISkBackingService_NameHandler Name { get; } = new();
+		/// <summary>Interceptor for Name.</summary>
+		public ISkBackingService_NameInterceptor Name { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkBackingService.</summary>
-	public ISkBackingServiceKO ISkBackingService { get; } = new();
+	public ISkBackingServiceInterceptorors ISkBackingService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkBackingService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkBackingService AsSkBackingService() => this;

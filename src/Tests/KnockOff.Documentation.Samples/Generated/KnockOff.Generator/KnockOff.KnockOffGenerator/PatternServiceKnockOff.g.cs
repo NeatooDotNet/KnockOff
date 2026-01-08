@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Concepts;
 partial class PatternServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for IPatternService.Calculate.</summary>
-	public sealed class IPatternService_CalculateHandler
+	public sealed class IPatternService_CalculateInterceptor
 	{
 		/// <summary>Delegate for Calculate(int input).</summary>
 		public delegate int CalculateDelegate(PatternServiceKnockOff ko, int input);
@@ -31,14 +31,14 @@ partial class PatternServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternService.</summary>
-	public sealed class IPatternServiceKO
+	public sealed class IPatternServiceInterceptorors
 	{
-		/// <summary>Handler for Calculate.</summary>
-		public IPatternService_CalculateHandler Calculate { get; } = new();
+		/// <summary>Interceptor for Calculate.</summary>
+		public IPatternService_CalculateInterceptor Calculate { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternService.</summary>
-	public IPatternServiceKO IPatternService { get; } = new();
+	public IPatternServiceInterceptorors IPatternService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Concepts.IPatternService.</summary>
 	public KnockOff.Documentation.Samples.Concepts.IPatternService AsPatternService() => this;

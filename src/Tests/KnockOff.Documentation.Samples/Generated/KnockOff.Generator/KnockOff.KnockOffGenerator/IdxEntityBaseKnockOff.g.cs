@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class IdxEntityBaseKnockOff
 {
 	/// <summary>Tracks and configures behavior for IIdxEntityBase.StringIndexer.</summary>
-	public sealed class IIdxEntityBase_StringIndexerHandler
+	public sealed class IIdxEntityBase_StringIndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -25,7 +25,7 @@ partial class IdxEntityBaseKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IIdxEntityBase.IsNew.</summary>
-	public sealed class IIdxEntityBase_IsNewHandler
+	public sealed class IIdxEntityBase_IsNewInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -41,16 +41,16 @@ partial class IdxEntityBaseKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIdxEntityBase.</summary>
-	public sealed class IIdxEntityBaseKO
+	public sealed class IIdxEntityBaseInterceptorors
 	{
-		/// <summary>Handler for StringIndexer.</summary>
-		public IIdxEntityBase_StringIndexerHandler StringIndexer { get; } = new();
-		/// <summary>Handler for IsNew.</summary>
-		public IIdxEntityBase_IsNewHandler IsNew { get; } = new();
+		/// <summary>Interceptor for StringIndexer.</summary>
+		public IIdxEntityBase_StringIndexerInterceptor StringIndexer { get; } = new();
+		/// <summary>Interceptor for IsNew.</summary>
+		public IIdxEntityBase_IsNewInterceptor IsNew { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIdxEntityBase.</summary>
-	public IIdxEntityBaseKO IIdxEntityBase { get; } = new();
+	public IIdxEntityBaseInterceptorors IIdxEntityBase { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIdxEntityBase.</summary>
 	public KnockOff.Documentation.Samples.Guides.IIdxEntityBase AsIdxEntityBase() => this;

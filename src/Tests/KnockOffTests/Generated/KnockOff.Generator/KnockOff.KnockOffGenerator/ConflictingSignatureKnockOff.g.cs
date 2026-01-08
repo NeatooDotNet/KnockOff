@@ -6,7 +6,7 @@ namespace KnockOff.Tests;
 partial class ConflictingSignatureKnockOff
 {
 	/// <summary>Tracks and configures behavior for IDataProvider.Count.</summary>
-	public sealed class IDataProvider_CountHandler
+	public sealed class IDataProvider_CountInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -22,7 +22,7 @@ partial class ConflictingSignatureKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IDataProvider.GetData.</summary>
-	public sealed class IDataProvider_GetDataHandler
+	public sealed class IDataProvider_GetDataInterceptor
 	{
 		/// <summary>Delegate for GetData(int id).</summary>
 		public delegate string GetDataDelegate(ConflictingSignatureKnockOff ko, int id);
@@ -47,16 +47,16 @@ partial class ConflictingSignatureKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IDataProvider.</summary>
-	public sealed class IDataProviderKO
+	public sealed class IDataProviderInterceptorors
 	{
-		/// <summary>Handler for Count.</summary>
-		public IDataProvider_CountHandler Count { get; } = new();
-		/// <summary>Handler for GetData.</summary>
-		public IDataProvider_GetDataHandler GetData { get; } = new();
+		/// <summary>Interceptor for Count.</summary>
+		public IDataProvider_CountInterceptor Count { get; } = new();
+		/// <summary>Interceptor for GetData.</summary>
+		public IDataProvider_GetDataInterceptor GetData { get; } = new();
 	}
 
 	/// <summary>Tracks and configures behavior for IKeyLookup.Count.</summary>
-	public sealed class IKeyLookup_CountHandler
+	public sealed class IKeyLookup_CountInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -84,7 +84,7 @@ partial class ConflictingSignatureKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IKeyLookup.GetData.</summary>
-	public sealed class IKeyLookup_GetDataHandler
+	public sealed class IKeyLookup_GetDataInterceptor
 	{
 		/// <summary>Delegate for GetData(string key).</summary>
 		public delegate int GetDataDelegate(ConflictingSignatureKnockOff ko, string key);
@@ -109,19 +109,19 @@ partial class ConflictingSignatureKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IKeyLookup.</summary>
-	public sealed class IKeyLookupKO
+	public sealed class IKeyLookupInterceptorors
 	{
-		/// <summary>Handler for Count.</summary>
-		public IKeyLookup_CountHandler Count { get; } = new();
-		/// <summary>Handler for GetData.</summary>
-		public IKeyLookup_GetDataHandler GetData { get; } = new();
+		/// <summary>Interceptor for Count.</summary>
+		public IKeyLookup_CountInterceptor Count { get; } = new();
+		/// <summary>Interceptor for GetData.</summary>
+		public IKeyLookup_GetDataInterceptor GetData { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IDataProvider.</summary>
-	public IDataProviderKO IDataProvider { get; } = new();
+	public IDataProviderInterceptorors IDataProvider { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IKeyLookup.</summary>
-	public IKeyLookupKO IKeyLookup { get; } = new();
+	public IKeyLookupInterceptorors IKeyLookup { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IDataProvider.</summary>
 	public KnockOff.Tests.IDataProvider AsDataProvider() => this;

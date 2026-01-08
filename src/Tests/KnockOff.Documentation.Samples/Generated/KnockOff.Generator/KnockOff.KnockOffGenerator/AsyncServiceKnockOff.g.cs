@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.GettingStarted;
 partial class AsyncServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for IAsyncSaveService.SaveAsync.</summary>
-	public sealed class IAsyncSaveService_SaveAsyncHandler
+	public sealed class IAsyncSaveService_SaveAsyncInterceptor
 	{
 		/// <summary>Delegate for SaveAsync(object entity).</summary>
 		public delegate global::System.Threading.Tasks.Task<int> SaveAsyncDelegate(AsyncServiceKnockOff ko, object entity);
@@ -31,14 +31,14 @@ partial class AsyncServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.GettingStarted.IAsyncSaveService.</summary>
-	public sealed class IAsyncSaveServiceKO
+	public sealed class IAsyncSaveServiceInterceptorors
 	{
-		/// <summary>Handler for SaveAsync.</summary>
-		public IAsyncSaveService_SaveAsyncHandler SaveAsync { get; } = new();
+		/// <summary>Interceptor for SaveAsync.</summary>
+		public IAsyncSaveService_SaveAsyncInterceptor SaveAsync { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.GettingStarted.IAsyncSaveService.</summary>
-	public IAsyncSaveServiceKO IAsyncSaveService { get; } = new();
+	public IAsyncSaveServiceInterceptorors IAsyncSaveService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.GettingStarted.IAsyncSaveService.</summary>
 	public KnockOff.Documentation.Samples.GettingStarted.IAsyncSaveService AsAsyncSaveService() => this;

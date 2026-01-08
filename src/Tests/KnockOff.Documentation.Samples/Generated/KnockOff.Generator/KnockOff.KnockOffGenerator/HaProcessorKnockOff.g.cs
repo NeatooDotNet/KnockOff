@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class HaProcessorKnockOff
 {
 	/// <summary>Tracks and configures behavior for IHaProcessor.Increment.</summary>
-	public sealed class IHaProcessor_IncrementHandler
+	public sealed class IHaProcessor_IncrementInterceptor
 	{
 		/// <summary>Delegate for Increment(ref int value).</summary>
 		public delegate void IncrementDelegate(HaProcessorKnockOff ko, ref int value);
@@ -31,7 +31,7 @@ partial class HaProcessorKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IHaProcessor.TryUpdate.</summary>
-	public sealed class IHaProcessor_TryUpdateHandler
+	public sealed class IHaProcessor_TryUpdateInterceptor
 	{
 		/// <summary>Delegate for TryUpdate(string key, ref string value).</summary>
 		public delegate bool TryUpdateDelegate(HaProcessorKnockOff ko, string key, ref string value);
@@ -56,16 +56,16 @@ partial class HaProcessorKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaProcessor.</summary>
-	public sealed class IHaProcessorKO
+	public sealed class IHaProcessorInterceptorors
 	{
-		/// <summary>Handler for Increment.</summary>
-		public IHaProcessor_IncrementHandler Increment { get; } = new();
-		/// <summary>Handler for TryUpdate.</summary>
-		public IHaProcessor_TryUpdateHandler TryUpdate { get; } = new();
+		/// <summary>Interceptor for Increment.</summary>
+		public IHaProcessor_IncrementInterceptor Increment { get; } = new();
+		/// <summary>Interceptor for TryUpdate.</summary>
+		public IHaProcessor_TryUpdateInterceptor TryUpdate { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaProcessor.</summary>
-	public IHaProcessorKO IHaProcessor { get; } = new();
+	public IHaProcessorInterceptorors IHaProcessor { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IHaProcessor.</summary>
 	public KnockOff.Documentation.Samples.Skills.IHaProcessor AsHaProcessor() => this;

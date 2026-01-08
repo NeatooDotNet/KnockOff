@@ -6,7 +6,7 @@ namespace KnockOff.Tests;
 partial class OverloadedServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for IOverloadedService.GetByIdAsync1.</summary>
-	public sealed class IOverloadedService_GetByIdAsync1Handler
+	public sealed class IOverloadedService_GetByIdAsync1Interceptor
 	{
 		/// <summary>Delegate for GetByIdAsync(int id).</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> GetByIdAsyncDelegate(OverloadedServiceKnockOff ko, int id);
@@ -31,7 +31,7 @@ partial class OverloadedServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IOverloadedService.GetByIdAsync2.</summary>
-	public sealed class IOverloadedService_GetByIdAsync2Handler
+	public sealed class IOverloadedService_GetByIdAsync2Interceptor
 	{
 		/// <summary>Delegate for GetByIdAsync(int id, global::System.Threading.CancellationToken cancellationToken).</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> GetByIdAsyncDelegate(OverloadedServiceKnockOff ko, int id, global::System.Threading.CancellationToken cancellationToken);
@@ -56,7 +56,7 @@ partial class OverloadedServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IOverloadedService.Process1.</summary>
-	public sealed class IOverloadedService_Process1Handler
+	public sealed class IOverloadedService_Process1Interceptor
 	{
 		/// <summary>Delegate for Process(string data).</summary>
 		public delegate void ProcessDelegate(OverloadedServiceKnockOff ko, string data);
@@ -81,7 +81,7 @@ partial class OverloadedServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IOverloadedService.Process2.</summary>
-	public sealed class IOverloadedService_Process2Handler
+	public sealed class IOverloadedService_Process2Interceptor
 	{
 		/// <summary>Delegate for Process(string data, int priority).</summary>
 		public delegate void ProcessDelegate(OverloadedServiceKnockOff ko, string data, int priority);
@@ -106,7 +106,7 @@ partial class OverloadedServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IOverloadedService.Process3.</summary>
-	public sealed class IOverloadedService_Process3Handler
+	public sealed class IOverloadedService_Process3Interceptor
 	{
 		/// <summary>Delegate for Process(string data, int priority, bool async).</summary>
 		public delegate void ProcessDelegate(OverloadedServiceKnockOff ko, string data, int priority, bool async);
@@ -131,7 +131,7 @@ partial class OverloadedServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IOverloadedService.Calculate1.</summary>
-	public sealed class IOverloadedService_Calculate1Handler
+	public sealed class IOverloadedService_Calculate1Interceptor
 	{
 		/// <summary>Delegate for Calculate(int value).</summary>
 		public delegate int CalculateDelegate(OverloadedServiceKnockOff ko, int value);
@@ -156,7 +156,7 @@ partial class OverloadedServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IOverloadedService.Calculate2.</summary>
-	public sealed class IOverloadedService_Calculate2Handler
+	public sealed class IOverloadedService_Calculate2Interceptor
 	{
 		/// <summary>Delegate for Calculate(int a, int b).</summary>
 		public delegate int CalculateDelegate(OverloadedServiceKnockOff ko, int a, int b);
@@ -181,26 +181,26 @@ partial class OverloadedServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IOverloadedService.</summary>
-	public sealed class IOverloadedServiceKO
+	public sealed class IOverloadedServiceInterceptorors
 	{
-		/// <summary>Handler for GetByIdAsync overload 1.</summary>
-		public IOverloadedService_GetByIdAsync1Handler GetByIdAsync1 { get; } = new();
-		/// <summary>Handler for GetByIdAsync overload 2.</summary>
-		public IOverloadedService_GetByIdAsync2Handler GetByIdAsync2 { get; } = new();
-		/// <summary>Handler for Process overload 1.</summary>
-		public IOverloadedService_Process1Handler Process1 { get; } = new();
-		/// <summary>Handler for Process overload 2.</summary>
-		public IOverloadedService_Process2Handler Process2 { get; } = new();
-		/// <summary>Handler for Process overload 3.</summary>
-		public IOverloadedService_Process3Handler Process3 { get; } = new();
-		/// <summary>Handler for Calculate overload 1.</summary>
-		public IOverloadedService_Calculate1Handler Calculate1 { get; } = new();
-		/// <summary>Handler for Calculate overload 2.</summary>
-		public IOverloadedService_Calculate2Handler Calculate2 { get; } = new();
+		/// <summary>Interceptor for GetByIdAsync overload 1.</summary>
+		public IOverloadedService_GetByIdAsync1Interceptor GetByIdAsync1 { get; } = new();
+		/// <summary>Interceptor for GetByIdAsync overload 2.</summary>
+		public IOverloadedService_GetByIdAsync2Interceptor GetByIdAsync2 { get; } = new();
+		/// <summary>Interceptor for Process overload 1.</summary>
+		public IOverloadedService_Process1Interceptor Process1 { get; } = new();
+		/// <summary>Interceptor for Process overload 2.</summary>
+		public IOverloadedService_Process2Interceptor Process2 { get; } = new();
+		/// <summary>Interceptor for Process overload 3.</summary>
+		public IOverloadedService_Process3Interceptor Process3 { get; } = new();
+		/// <summary>Interceptor for Calculate overload 1.</summary>
+		public IOverloadedService_Calculate1Interceptor Calculate1 { get; } = new();
+		/// <summary>Interceptor for Calculate overload 2.</summary>
+		public IOverloadedService_Calculate2Interceptor Calculate2 { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IOverloadedService.</summary>
-	public IOverloadedServiceKO IOverloadedService { get; } = new();
+	public IOverloadedServiceInterceptorors IOverloadedService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IOverloadedService.</summary>
 	public KnockOff.Tests.IOverloadedService AsOverloadedService() => this;

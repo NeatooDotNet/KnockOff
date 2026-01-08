@@ -36,7 +36,7 @@ partial class ConstrainedGenericServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IConstrainedGenericService.CreateEntity.</summary>
-	public sealed class IConstrainedGenericService_CreateEntityHandler
+	public sealed class IConstrainedGenericService_CreateEntityInterceptor
 	{
 		private readonly global::System.Collections.Generic.Dictionary<global::System.Type, object> _typedHandlers = new();
 
@@ -93,7 +93,7 @@ partial class ConstrainedGenericServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IConstrainedGenericService.SaveEntity.</summary>
-	public sealed class IConstrainedGenericService_SaveEntityHandler
+	public sealed class IConstrainedGenericService_SaveEntityInterceptor
 	{
 		private readonly global::System.Collections.Generic.Dictionary<global::System.Type, object> _typedHandlers = new();
 
@@ -150,16 +150,16 @@ partial class ConstrainedGenericServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IConstrainedGenericService.</summary>
-	public sealed class IConstrainedGenericServiceKO
+	public sealed class IConstrainedGenericServiceInterceptorors
 	{
-		/// <summary>Handler for CreateEntity.</summary>
-		public IConstrainedGenericService_CreateEntityHandler CreateEntity { get; } = new();
-		/// <summary>Handler for SaveEntity.</summary>
-		public IConstrainedGenericService_SaveEntityHandler SaveEntity { get; } = new();
+		/// <summary>Interceptor for CreateEntity.</summary>
+		public IConstrainedGenericService_CreateEntityInterceptor CreateEntity { get; } = new();
+		/// <summary>Interceptor for SaveEntity.</summary>
+		public IConstrainedGenericService_SaveEntityInterceptor SaveEntity { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IConstrainedGenericService.</summary>
-	public IConstrainedGenericServiceKO IConstrainedGenericService { get; } = new();
+	public IConstrainedGenericServiceInterceptorors IConstrainedGenericService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IConstrainedGenericService.</summary>
 	public KnockOff.Tests.IConstrainedGenericService AsConstrainedGenericService() => this;

@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class SkAsyncPatternRepositoryKnockOff
 {
 	/// <summary>Tracks and configures behavior for ISkAsyncPatternRepository.GetUserAsync.</summary>
-	public sealed class ISkAsyncPatternRepository_GetUserAsyncHandler
+	public sealed class ISkAsyncPatternRepository_GetUserAsyncInterceptor
 	{
 		/// <summary>Delegate for GetUserAsync(int id).</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.SkUser?> GetUserAsyncDelegate(SkAsyncPatternRepositoryKnockOff ko, int id);
@@ -31,7 +31,7 @@ partial class SkAsyncPatternRepositoryKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISkAsyncPatternRepository.SaveAsync.</summary>
-	public sealed class ISkAsyncPatternRepository_SaveAsyncHandler
+	public sealed class ISkAsyncPatternRepository_SaveAsyncInterceptor
 	{
 		/// <summary>Delegate for SaveAsync(object entity).</summary>
 		public delegate global::System.Threading.Tasks.Task<int> SaveAsyncDelegate(SkAsyncPatternRepositoryKnockOff ko, object entity);
@@ -56,16 +56,16 @@ partial class SkAsyncPatternRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkAsyncPatternRepository.</summary>
-	public sealed class ISkAsyncPatternRepositoryKO
+	public sealed class ISkAsyncPatternRepositoryInterceptorors
 	{
-		/// <summary>Handler for GetUserAsync.</summary>
-		public ISkAsyncPatternRepository_GetUserAsyncHandler GetUserAsync { get; } = new();
-		/// <summary>Handler for SaveAsync.</summary>
-		public ISkAsyncPatternRepository_SaveAsyncHandler SaveAsync { get; } = new();
+		/// <summary>Interceptor for GetUserAsync.</summary>
+		public ISkAsyncPatternRepository_GetUserAsyncInterceptor GetUserAsync { get; } = new();
+		/// <summary>Interceptor for SaveAsync.</summary>
+		public ISkAsyncPatternRepository_SaveAsyncInterceptor SaveAsync { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkAsyncPatternRepository.</summary>
-	public ISkAsyncPatternRepositoryKO ISkAsyncPatternRepository { get; } = new();
+	public ISkAsyncPatternRepositoryInterceptorors ISkAsyncPatternRepository { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkAsyncPatternRepository.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkAsyncPatternRepository AsSkAsyncPatternRepository() => this;

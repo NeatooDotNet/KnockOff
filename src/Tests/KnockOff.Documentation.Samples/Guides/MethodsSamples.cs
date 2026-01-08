@@ -91,10 +91,8 @@ public interface IMethodSingleParam
     MethodUser GetUser(int id);
 }
 
-#region docs:methods:single-param
 [KnockOff]
 public partial class MethodSingleParamKnockOff : IMethodSingleParam { }
-#endregion
 
 // ============================================================================
 // Multiple Parameters
@@ -105,10 +103,8 @@ public interface IMethodMultiParam
     void Process(string name, int value, bool flag);
 }
 
-#region docs:methods:multiple-params
 [KnockOff]
 public partial class MethodMultiParamKnockOff : IMethodMultiParam { }
-#endregion
 
 // ============================================================================
 // User-Defined Methods

@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class MethodRepositoryKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMethodRepository.GetById.</summary>
-	public sealed class IMethodRepository_GetByIdHandler
+	public sealed class IMethodRepository_GetByIdInterceptor
 	{
 		/// <summary>Delegate for GetById(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Guides.MethodUser? GetByIdDelegate(MethodRepositoryKnockOff ko, int id);
@@ -31,7 +31,7 @@ partial class MethodRepositoryKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IMethodRepository.Count.</summary>
-	public sealed class IMethodRepository_CountHandler
+	public sealed class IMethodRepository_CountInterceptor
 	{
 		/// <summary>Delegate for Count().</summary>
 		public delegate int CountDelegate(MethodRepositoryKnockOff ko);
@@ -53,16 +53,16 @@ partial class MethodRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodRepository.</summary>
-	public sealed class IMethodRepositoryKO
+	public sealed class IMethodRepositoryInterceptorors
 	{
-		/// <summary>Handler for GetById.</summary>
-		public IMethodRepository_GetByIdHandler GetById { get; } = new();
-		/// <summary>Handler for Count.</summary>
-		public IMethodRepository_CountHandler Count { get; } = new();
+		/// <summary>Interceptor for GetById.</summary>
+		public IMethodRepository_GetByIdInterceptor GetById { get; } = new();
+		/// <summary>Interceptor for Count.</summary>
+		public IMethodRepository_CountInterceptor Count { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodRepository.</summary>
-	public IMethodRepositoryKO IMethodRepository { get; } = new();
+	public IMethodRepositoryInterceptorors IMethodRepository { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodRepository.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMethodRepository AsMethodRepository() => this;

@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Comparison;
 partial class VsRepositoryKnockOff
 {
 	/// <summary>Tracks and configures behavior for IVsRepository.GetByIdAsync.</summary>
-	public sealed class IVsRepository_GetByIdAsyncHandler
+	public sealed class IVsRepository_GetByIdAsyncInterceptor
 	{
 		/// <summary>Delegate for GetByIdAsync(int id).</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Comparison.VsEntity?> GetByIdAsyncDelegate(VsRepositoryKnockOff ko, int id);
@@ -31,7 +31,7 @@ partial class VsRepositoryKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IVsRepository.Save.</summary>
-	public sealed class IVsRepository_SaveHandler
+	public sealed class IVsRepository_SaveInterceptor
 	{
 		/// <summary>Delegate for Save(global::KnockOff.Documentation.Samples.Comparison.VsEntity entity).</summary>
 		public delegate void SaveDelegate(VsRepositoryKnockOff ko, global::KnockOff.Documentation.Samples.Comparison.VsEntity entity);
@@ -56,16 +56,16 @@ partial class VsRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsRepository.</summary>
-	public sealed class IVsRepositoryKO
+	public sealed class IVsRepositoryInterceptorors
 	{
-		/// <summary>Handler for GetByIdAsync.</summary>
-		public IVsRepository_GetByIdAsyncHandler GetByIdAsync { get; } = new();
-		/// <summary>Handler for Save.</summary>
-		public IVsRepository_SaveHandler Save { get; } = new();
+		/// <summary>Interceptor for GetByIdAsync.</summary>
+		public IVsRepository_GetByIdAsyncInterceptor GetByIdAsync { get; } = new();
+		/// <summary>Interceptor for Save.</summary>
+		public IVsRepository_SaveInterceptor Save { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsRepository.</summary>
-	public IVsRepositoryKO IVsRepository { get; } = new();
+	public IVsRepositoryInterceptorors IVsRepository { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IVsRepository.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IVsRepository AsVsRepository() => this;

@@ -6,7 +6,7 @@ namespace KnockOff.Benchmarks.Stubs;
 partial class OrderServiceStub
 {
 	/// <summary>Tracks and configures behavior for IOrderService.GetOrder.</summary>
-	public sealed class IOrderService_GetOrderHandler
+	public sealed class IOrderService_GetOrderInterceptor
 	{
 		/// <summary>Delegate for GetOrder(int orderId).</summary>
 		public delegate global::KnockOff.Benchmarks.Interfaces.Order? GetOrderDelegate(OrderServiceStub ko, int orderId);
@@ -31,7 +31,7 @@ partial class OrderServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for IOrderService.GetOrdersByCustomer.</summary>
-	public sealed class IOrderService_GetOrdersByCustomerHandler
+	public sealed class IOrderService_GetOrdersByCustomerInterceptor
 	{
 		/// <summary>Delegate for GetOrdersByCustomer(int customerId).</summary>
 		public delegate global::System.Collections.Generic.IEnumerable<global::KnockOff.Benchmarks.Interfaces.Order> GetOrdersByCustomerDelegate(OrderServiceStub ko, int customerId);
@@ -56,7 +56,7 @@ partial class OrderServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for IOrderService.SaveOrder.</summary>
-	public sealed class IOrderService_SaveOrderHandler
+	public sealed class IOrderService_SaveOrderInterceptor
 	{
 		/// <summary>Delegate for SaveOrder(global::KnockOff.Benchmarks.Interfaces.Order order).</summary>
 		public delegate void SaveOrderDelegate(OrderServiceStub ko, global::KnockOff.Benchmarks.Interfaces.Order order);
@@ -81,7 +81,7 @@ partial class OrderServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for IOrderService.DeleteOrder.</summary>
-	public sealed class IOrderService_DeleteOrderHandler
+	public sealed class IOrderService_DeleteOrderInterceptor
 	{
 		/// <summary>Delegate for DeleteOrder(int orderId).</summary>
 		public delegate void DeleteOrderDelegate(OrderServiceStub ko, int orderId);
@@ -106,7 +106,7 @@ partial class OrderServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for IOrderService.ValidateOrder.</summary>
-	public sealed class IOrderService_ValidateOrderHandler
+	public sealed class IOrderService_ValidateOrderInterceptor
 	{
 		/// <summary>Delegate for ValidateOrder(global::KnockOff.Benchmarks.Interfaces.Order order).</summary>
 		public delegate bool ValidateOrderDelegate(OrderServiceStub ko, global::KnockOff.Benchmarks.Interfaces.Order order);
@@ -131,7 +131,7 @@ partial class OrderServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for IOrderService.CalculateTotal.</summary>
-	public sealed class IOrderService_CalculateTotalHandler
+	public sealed class IOrderService_CalculateTotalInterceptor
 	{
 		/// <summary>Delegate for CalculateTotal(global::KnockOff.Benchmarks.Interfaces.Order order).</summary>
 		public delegate decimal CalculateTotalDelegate(OrderServiceStub ko, global::KnockOff.Benchmarks.Interfaces.Order order);
@@ -156,24 +156,24 @@ partial class OrderServiceStub
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Benchmarks.Interfaces.IOrderService.</summary>
-	public sealed class IOrderServiceKO
+	public sealed class IOrderServiceInterceptorors
 	{
-		/// <summary>Handler for GetOrder.</summary>
-		public IOrderService_GetOrderHandler GetOrder { get; } = new();
-		/// <summary>Handler for GetOrdersByCustomer.</summary>
-		public IOrderService_GetOrdersByCustomerHandler GetOrdersByCustomer { get; } = new();
-		/// <summary>Handler for SaveOrder.</summary>
-		public IOrderService_SaveOrderHandler SaveOrder { get; } = new();
-		/// <summary>Handler for DeleteOrder.</summary>
-		public IOrderService_DeleteOrderHandler DeleteOrder { get; } = new();
-		/// <summary>Handler for ValidateOrder.</summary>
-		public IOrderService_ValidateOrderHandler ValidateOrder { get; } = new();
-		/// <summary>Handler for CalculateTotal.</summary>
-		public IOrderService_CalculateTotalHandler CalculateTotal { get; } = new();
+		/// <summary>Interceptor for GetOrder.</summary>
+		public IOrderService_GetOrderInterceptor GetOrder { get; } = new();
+		/// <summary>Interceptor for GetOrdersByCustomer.</summary>
+		public IOrderService_GetOrdersByCustomerInterceptor GetOrdersByCustomer { get; } = new();
+		/// <summary>Interceptor for SaveOrder.</summary>
+		public IOrderService_SaveOrderInterceptor SaveOrder { get; } = new();
+		/// <summary>Interceptor for DeleteOrder.</summary>
+		public IOrderService_DeleteOrderInterceptor DeleteOrder { get; } = new();
+		/// <summary>Interceptor for ValidateOrder.</summary>
+		public IOrderService_ValidateOrderInterceptor ValidateOrder { get; } = new();
+		/// <summary>Interceptor for CalculateTotal.</summary>
+		public IOrderService_CalculateTotalInterceptor CalculateTotal { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Benchmarks.Interfaces.IOrderService.</summary>
-	public IOrderServiceKO IOrderService { get; } = new();
+	public IOrderServiceInterceptorors IOrderService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Benchmarks.Interfaces.IOrderService.</summary>
 	public KnockOff.Benchmarks.Interfaces.IOrderService AsOrderService() => this;

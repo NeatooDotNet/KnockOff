@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Concepts;
 partial class PatternCombinedRepositoryKnockOff
 {
 	/// <summary>Tracks and configures behavior for IPatternCombinedRepository.GetById.</summary>
-	public sealed class IPatternCombinedRepository_GetByIdHandler
+	public sealed class IPatternCombinedRepository_GetByIdInterceptor
 	{
 		/// <summary>Delegate for GetById(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Concepts.PatternUser? GetByIdDelegate(PatternCombinedRepositoryKnockOff ko, int id);
@@ -31,14 +31,14 @@ partial class PatternCombinedRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternCombinedRepository.</summary>
-	public sealed class IPatternCombinedRepositoryKO
+	public sealed class IPatternCombinedRepositoryInterceptorors
 	{
-		/// <summary>Handler for GetById.</summary>
-		public IPatternCombinedRepository_GetByIdHandler GetById { get; } = new();
+		/// <summary>Interceptor for GetById.</summary>
+		public IPatternCombinedRepository_GetByIdInterceptor GetById { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternCombinedRepository.</summary>
-	public IPatternCombinedRepositoryKO IPatternCombinedRepository { get; } = new();
+	public IPatternCombinedRepositoryInterceptorors IPatternCombinedRepository { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Concepts.IPatternCombinedRepository.</summary>
 	public KnockOff.Documentation.Samples.Concepts.IPatternCombinedRepository AsPatternCombinedRepository() => this;

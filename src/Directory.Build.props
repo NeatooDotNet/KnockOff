@@ -13,15 +13,15 @@
 		<Nullable>enable</Nullable>
 		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-		<FileVersion>10.7.0</FileVersion>
-		<PackageVersion>10.7.0</PackageVersion>
+		<FileVersion>10.8.0</FileVersion>
+		<PackageVersion>10.8.0</PackageVersion>
 		<PackageTags>Unit Testing Mocking Stubs Source Generator .NET</PackageTags>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<RepositoryUrl>https://github.com/NeatooDotNet/KnockOff</RepositoryUrl>
 		<PackageProjectUrl>https://github.com/NeatooDotNet/KnockOff</PackageProjectUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageReleaseNotes>Breaking: Handler classes renamed from {Interface}Spy to {Interface}KO; AllCalls/AllGetKeys/AllSetEntries removed for zero-allocation tracking</PackageReleaseNotes>
+		<PackageReleaseNotes>New: Inline stubs [KnockOff&lt;T&gt;], delegate stubs, class stubs via inheritance; Terminology: Handler→Interceptor</PackageReleaseNotes>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	</PropertyGroup>
 </Project>

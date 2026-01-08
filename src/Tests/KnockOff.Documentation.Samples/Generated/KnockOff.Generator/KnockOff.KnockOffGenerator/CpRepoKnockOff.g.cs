@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class CpRepoKnockOff
 {
 	/// <summary>Tracks and configures behavior for ICpRepository.GetByIdAsync.</summary>
-	public sealed class ICpRepository_GetByIdAsyncHandler
+	public sealed class ICpRepository_GetByIdAsyncInterceptor
 	{
 		/// <summary>Delegate for GetByIdAsync(int id).</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.CpUser?> GetByIdAsyncDelegate(CpRepoKnockOff ko, int id);
@@ -31,7 +31,7 @@ partial class CpRepoKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ICpRepository.CountAsync.</summary>
-	public sealed class ICpRepository_CountAsyncHandler
+	public sealed class ICpRepository_CountAsyncInterceptor
 	{
 		/// <summary>Delegate for CountAsync().</summary>
 		public delegate global::System.Threading.Tasks.ValueTask<int> CountAsyncDelegate(CpRepoKnockOff ko);
@@ -53,16 +53,16 @@ partial class CpRepoKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpRepository.</summary>
-	public sealed class ICpRepositoryKO
+	public sealed class ICpRepositoryInterceptorors
 	{
-		/// <summary>Handler for GetByIdAsync.</summary>
-		public ICpRepository_GetByIdAsyncHandler GetByIdAsync { get; } = new();
-		/// <summary>Handler for CountAsync.</summary>
-		public ICpRepository_CountAsyncHandler CountAsync { get; } = new();
+		/// <summary>Interceptor for GetByIdAsync.</summary>
+		public ICpRepository_GetByIdAsyncInterceptor GetByIdAsync { get; } = new();
+		/// <summary>Interceptor for CountAsync.</summary>
+		public ICpRepository_CountAsyncInterceptor CountAsync { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpRepository.</summary>
-	public ICpRepositoryKO ICpRepository { get; } = new();
+	public ICpRepositoryInterceptorors ICpRepository { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpRepository.</summary>
 	public KnockOff.Documentation.Samples.Skills.ICpRepository AsCpRepository() => this;

@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Comparison;
 partial class MigUserServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMigUserService.Name.</summary>
-	public sealed class IMigUserService_NameHandler
+	public sealed class IMigUserService_NameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -34,7 +34,7 @@ partial class MigUserServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IMigUserService.GetUser.</summary>
-	public sealed class IMigUserService_GetUserHandler
+	public sealed class IMigUserService_GetUserInterceptor
 	{
 		/// <summary>Delegate for GetUser(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Comparison.MigUser GetUserDelegate(MigUserServiceKnockOff ko, int id);
@@ -59,7 +59,7 @@ partial class MigUserServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IMigUserService.GetUserAsync.</summary>
-	public sealed class IMigUserService_GetUserAsyncHandler
+	public sealed class IMigUserService_GetUserAsyncInterceptor
 	{
 		/// <summary>Delegate for GetUserAsync(int id).</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Comparison.MigUser?> GetUserAsyncDelegate(MigUserServiceKnockOff ko, int id);
@@ -84,7 +84,7 @@ partial class MigUserServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IMigUserService.Save.</summary>
-	public sealed class IMigUserService_SaveHandler
+	public sealed class IMigUserService_SaveInterceptor
 	{
 		/// <summary>Delegate for Save(global::KnockOff.Documentation.Samples.Comparison.MigUser user).</summary>
 		public delegate void SaveDelegate(MigUserServiceKnockOff ko, global::KnockOff.Documentation.Samples.Comparison.MigUser user);
@@ -109,7 +109,7 @@ partial class MigUserServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IMigUserService.Delete.</summary>
-	public sealed class IMigUserService_DeleteHandler
+	public sealed class IMigUserService_DeleteInterceptor
 	{
 		/// <summary>Delegate for Delete(int id).</summary>
 		public delegate void DeleteDelegate(MigUserServiceKnockOff ko, int id);
@@ -134,7 +134,7 @@ partial class MigUserServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IMigUserService.GetAll.</summary>
-	public sealed class IMigUserService_GetAllHandler
+	public sealed class IMigUserService_GetAllInterceptor
 	{
 		/// <summary>Delegate for GetAll().</summary>
 		public delegate global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Comparison.MigUser> GetAllDelegate(MigUserServiceKnockOff ko);
@@ -156,7 +156,7 @@ partial class MigUserServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IMigUserService.Update.</summary>
-	public sealed class IMigUserService_UpdateHandler
+	public sealed class IMigUserService_UpdateInterceptor
 	{
 		/// <summary>Delegate for Update(global::KnockOff.Documentation.Samples.Comparison.MigUser user).</summary>
 		public delegate void UpdateDelegate(MigUserServiceKnockOff ko, global::KnockOff.Documentation.Samples.Comparison.MigUser user);
@@ -181,26 +181,26 @@ partial class MigUserServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigUserService.</summary>
-	public sealed class IMigUserServiceKO
+	public sealed class IMigUserServiceInterceptorors
 	{
-		/// <summary>Handler for Name.</summary>
-		public IMigUserService_NameHandler Name { get; } = new();
-		/// <summary>Handler for GetUser.</summary>
-		public IMigUserService_GetUserHandler GetUser { get; } = new();
-		/// <summary>Handler for GetUserAsync.</summary>
-		public IMigUserService_GetUserAsyncHandler GetUserAsync { get; } = new();
-		/// <summary>Handler for Save.</summary>
-		public IMigUserService_SaveHandler Save { get; } = new();
-		/// <summary>Handler for Delete.</summary>
-		public IMigUserService_DeleteHandler Delete { get; } = new();
-		/// <summary>Handler for GetAll.</summary>
-		public IMigUserService_GetAllHandler GetAll { get; } = new();
-		/// <summary>Handler for Update.</summary>
-		public IMigUserService_UpdateHandler Update { get; } = new();
+		/// <summary>Interceptor for Name.</summary>
+		public IMigUserService_NameInterceptor Name { get; } = new();
+		/// <summary>Interceptor for GetUser.</summary>
+		public IMigUserService_GetUserInterceptor GetUser { get; } = new();
+		/// <summary>Interceptor for GetUserAsync.</summary>
+		public IMigUserService_GetUserAsyncInterceptor GetUserAsync { get; } = new();
+		/// <summary>Interceptor for Save.</summary>
+		public IMigUserService_SaveInterceptor Save { get; } = new();
+		/// <summary>Interceptor for Delete.</summary>
+		public IMigUserService_DeleteInterceptor Delete { get; } = new();
+		/// <summary>Interceptor for GetAll.</summary>
+		public IMigUserService_GetAllInterceptor GetAll { get; } = new();
+		/// <summary>Interceptor for Update.</summary>
+		public IMigUserService_UpdateInterceptor Update { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigUserService.</summary>
-	public IMigUserServiceKO IMigUserService { get; } = new();
+	public IMigUserServiceInterceptorors IMigUserService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IMigUserService.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IMigUserService AsMigUserService() => this;

@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class CpCallbackServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for ICpCallbackService.Initialize.</summary>
-	public sealed class ICpCallbackService_InitializeHandler
+	public sealed class ICpCallbackService_InitializeInterceptor
 	{
 		/// <summary>Delegate for Initialize().</summary>
 		public delegate void InitializeDelegate(CpCallbackServiceKnockOff ko);
@@ -28,7 +28,7 @@ partial class CpCallbackServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ICpCallbackService.GetById.</summary>
-	public sealed class ICpCallbackService_GetByIdHandler
+	public sealed class ICpCallbackService_GetByIdInterceptor
 	{
 		/// <summary>Delegate for GetById(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.CpUser GetByIdDelegate(CpCallbackServiceKnockOff ko, int id);
@@ -53,7 +53,7 @@ partial class CpCallbackServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ICpCallbackService.Search.</summary>
-	public sealed class ICpCallbackService_SearchHandler
+	public sealed class ICpCallbackService_SearchInterceptor
 	{
 		/// <summary>Delegate for Search(string query, int limit, int offset).</summary>
 		public delegate global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.CpUser> SearchDelegate(CpCallbackServiceKnockOff ko, string query, int limit, int offset);
@@ -78,18 +78,18 @@ partial class CpCallbackServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpCallbackService.</summary>
-	public sealed class ICpCallbackServiceKO
+	public sealed class ICpCallbackServiceInterceptorors
 	{
-		/// <summary>Handler for Initialize.</summary>
-		public ICpCallbackService_InitializeHandler Initialize { get; } = new();
-		/// <summary>Handler for GetById.</summary>
-		public ICpCallbackService_GetByIdHandler GetById { get; } = new();
-		/// <summary>Handler for Search.</summary>
-		public ICpCallbackService_SearchHandler Search { get; } = new();
+		/// <summary>Interceptor for Initialize.</summary>
+		public ICpCallbackService_InitializeInterceptor Initialize { get; } = new();
+		/// <summary>Interceptor for GetById.</summary>
+		public ICpCallbackService_GetByIdInterceptor GetById { get; } = new();
+		/// <summary>Interceptor for Search.</summary>
+		public ICpCallbackService_SearchInterceptor Search { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpCallbackService.</summary>
-	public ICpCallbackServiceKO ICpCallbackService { get; } = new();
+	public ICpCallbackServiceInterceptorors ICpCallbackService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpCallbackService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ICpCallbackService AsCpCallbackService() => this;

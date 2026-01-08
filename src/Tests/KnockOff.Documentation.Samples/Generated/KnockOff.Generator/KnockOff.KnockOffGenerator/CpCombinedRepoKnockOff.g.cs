@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class CpCombinedRepoKnockOff
 {
 	/// <summary>Tracks and configures behavior for ICpCombinedRepository.GetById.</summary>
-	public sealed class ICpCombinedRepository_GetByIdHandler
+	public sealed class ICpCombinedRepository_GetByIdInterceptor
 	{
 		/// <summary>Delegate for GetById(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.CpUser? GetByIdDelegate(CpCombinedRepoKnockOff ko, int id);
@@ -31,14 +31,14 @@ partial class CpCombinedRepoKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpCombinedRepository.</summary>
-	public sealed class ICpCombinedRepositoryKO
+	public sealed class ICpCombinedRepositoryInterceptorors
 	{
-		/// <summary>Handler for GetById.</summary>
-		public ICpCombinedRepository_GetByIdHandler GetById { get; } = new();
+		/// <summary>Interceptor for GetById.</summary>
+		public ICpCombinedRepository_GetByIdInterceptor GetById { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpCombinedRepository.</summary>
-	public ICpCombinedRepositoryKO ICpCombinedRepository { get; } = new();
+	public ICpCombinedRepositoryInterceptorors ICpCombinedRepository { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpCombinedRepository.</summary>
 	public KnockOff.Documentation.Samples.Skills.ICpCombinedRepository AsCpCombinedRepository() => this;

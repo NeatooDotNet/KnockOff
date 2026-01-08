@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class PropStatusKnockOff
 {
 	/// <summary>Tracks and configures behavior for IPropStatus.Status.</summary>
-	public sealed class IPropStatus_StatusHandler
+	public sealed class IPropStatus_StatusInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -34,14 +34,14 @@ partial class PropStatusKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropStatus.</summary>
-	public sealed class IPropStatusKO
+	public sealed class IPropStatusInterceptorors
 	{
-		/// <summary>Handler for Status.</summary>
-		public IPropStatus_StatusHandler Status { get; } = new();
+		/// <summary>Interceptor for Status.</summary>
+		public IPropStatus_StatusInterceptor Status { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropStatus.</summary>
-	public IPropStatusKO IPropStatus { get; } = new();
+	public IPropStatusInterceptorors IPropStatus { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IPropStatus.</summary>
 	public KnockOff.Documentation.Samples.Guides.IPropStatus AsPropStatus() => this;

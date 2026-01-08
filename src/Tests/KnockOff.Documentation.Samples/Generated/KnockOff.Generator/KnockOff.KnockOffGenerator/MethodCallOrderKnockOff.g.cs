@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class MethodCallOrderKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMethodCallOrder.Initialize.</summary>
-	public sealed class IMethodCallOrder_InitializeHandler
+	public sealed class IMethodCallOrder_InitializeInterceptor
 	{
 		/// <summary>Delegate for Initialize().</summary>
 		public delegate void InitializeDelegate(MethodCallOrderKnockOff ko);
@@ -28,7 +28,7 @@ partial class MethodCallOrderKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IMethodCallOrder.Process.</summary>
-	public sealed class IMethodCallOrder_ProcessHandler
+	public sealed class IMethodCallOrder_ProcessInterceptor
 	{
 		/// <summary>Delegate for Process().</summary>
 		public delegate void ProcessDelegate(MethodCallOrderKnockOff ko);
@@ -50,7 +50,7 @@ partial class MethodCallOrderKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IMethodCallOrder.Cleanup.</summary>
-	public sealed class IMethodCallOrder_CleanupHandler
+	public sealed class IMethodCallOrder_CleanupInterceptor
 	{
 		/// <summary>Delegate for Cleanup().</summary>
 		public delegate void CleanupDelegate(MethodCallOrderKnockOff ko);
@@ -72,18 +72,18 @@ partial class MethodCallOrderKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodCallOrder.</summary>
-	public sealed class IMethodCallOrderKO
+	public sealed class IMethodCallOrderInterceptorors
 	{
-		/// <summary>Handler for Initialize.</summary>
-		public IMethodCallOrder_InitializeHandler Initialize { get; } = new();
-		/// <summary>Handler for Process.</summary>
-		public IMethodCallOrder_ProcessHandler Process { get; } = new();
-		/// <summary>Handler for Cleanup.</summary>
-		public IMethodCallOrder_CleanupHandler Cleanup { get; } = new();
+		/// <summary>Interceptor for Initialize.</summary>
+		public IMethodCallOrder_InitializeInterceptor Initialize { get; } = new();
+		/// <summary>Interceptor for Process.</summary>
+		public IMethodCallOrder_ProcessInterceptor Process { get; } = new();
+		/// <summary>Interceptor for Cleanup.</summary>
+		public IMethodCallOrder_CleanupInterceptor Cleanup { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodCallOrder.</summary>
-	public IMethodCallOrderKO IMethodCallOrder { get; } = new();
+	public IMethodCallOrderInterceptorors IMethodCallOrder { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodCallOrder.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMethodCallOrder AsMethodCallOrder() => this;

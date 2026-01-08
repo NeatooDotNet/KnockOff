@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class HaAsyncRepositoryKnockOff
 {
 	/// <summary>Tracks and configures behavior for IHaAsyncRepository.GetByIdAsync.</summary>
-	public sealed class IHaAsyncRepository_GetByIdAsyncHandler
+	public sealed class IHaAsyncRepository_GetByIdAsyncInterceptor
 	{
 		/// <summary>Delegate for GetByIdAsync(int id).</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.HaUser?> GetByIdAsyncDelegate(HaAsyncRepositoryKnockOff ko, int id);
@@ -31,7 +31,7 @@ partial class HaAsyncRepositoryKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IHaAsyncRepository.SaveAsync.</summary>
-	public sealed class IHaAsyncRepository_SaveAsyncHandler
+	public sealed class IHaAsyncRepository_SaveAsyncInterceptor
 	{
 		/// <summary>Delegate for SaveAsync(object entity).</summary>
 		public delegate global::System.Threading.Tasks.Task<int> SaveAsyncDelegate(HaAsyncRepositoryKnockOff ko, object entity);
@@ -56,16 +56,16 @@ partial class HaAsyncRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaAsyncRepository.</summary>
-	public sealed class IHaAsyncRepositoryKO
+	public sealed class IHaAsyncRepositoryInterceptorors
 	{
-		/// <summary>Handler for GetByIdAsync.</summary>
-		public IHaAsyncRepository_GetByIdAsyncHandler GetByIdAsync { get; } = new();
-		/// <summary>Handler for SaveAsync.</summary>
-		public IHaAsyncRepository_SaveAsyncHandler SaveAsync { get; } = new();
+		/// <summary>Interceptor for GetByIdAsync.</summary>
+		public IHaAsyncRepository_GetByIdAsyncInterceptor GetByIdAsync { get; } = new();
+		/// <summary>Interceptor for SaveAsync.</summary>
+		public IHaAsyncRepository_SaveAsyncInterceptor SaveAsync { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaAsyncRepository.</summary>
-	public IHaAsyncRepositoryKO IHaAsyncRepository { get; } = new();
+	public IHaAsyncRepositoryInterceptorors IHaAsyncRepository { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IHaAsyncRepository.</summary>
 	public KnockOff.Documentation.Samples.Skills.IHaAsyncRepository AsHaAsyncRepository() => this;

@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class PropConnectionKnockOff
 {
 	/// <summary>Tracks and configures behavior for IPropConnection.IsConnected.</summary>
-	public sealed class IPropConnection_IsConnectedHandler
+	public sealed class IPropConnection_IsConnectedInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -22,7 +22,7 @@ partial class PropConnectionKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IPropConnection.Connect.</summary>
-	public sealed class IPropConnection_ConnectHandler
+	public sealed class IPropConnection_ConnectInterceptor
 	{
 		/// <summary>Delegate for Connect().</summary>
 		public delegate void ConnectDelegate(PropConnectionKnockOff ko);
@@ -44,16 +44,16 @@ partial class PropConnectionKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropConnection.</summary>
-	public sealed class IPropConnectionKO
+	public sealed class IPropConnectionInterceptorors
 	{
-		/// <summary>Handler for IsConnected.</summary>
-		public IPropConnection_IsConnectedHandler IsConnected { get; } = new();
-		/// <summary>Handler for Connect.</summary>
-		public IPropConnection_ConnectHandler Connect { get; } = new();
+		/// <summary>Interceptor for IsConnected.</summary>
+		public IPropConnection_IsConnectedInterceptor IsConnected { get; } = new();
+		/// <summary>Interceptor for Connect.</summary>
+		public IPropConnection_ConnectInterceptor Connect { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropConnection.</summary>
-	public IPropConnectionKO IPropConnection { get; } = new();
+	public IPropConnectionInterceptorors IPropConnection { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IPropConnection.</summary>
 	public KnockOff.Documentation.Samples.Guides.IPropConnection AsPropConnection() => this;

@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class MethodUserDefinedKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMethodUserDefined.GetById.</summary>
-	public sealed class IMethodUserDefined_GetByIdHandler
+	public sealed class IMethodUserDefined_GetByIdInterceptor
 	{
 		/// <summary>Delegate for GetById(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Guides.MethodUser? GetByIdDelegate(MethodUserDefinedKnockOff ko, int id);
@@ -31,7 +31,7 @@ partial class MethodUserDefinedKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IMethodUserDefined.Count.</summary>
-	public sealed class IMethodUserDefined_CountHandler
+	public sealed class IMethodUserDefined_CountInterceptor
 	{
 		/// <summary>Delegate for Count().</summary>
 		public delegate int CountDelegate(MethodUserDefinedKnockOff ko);
@@ -53,16 +53,16 @@ partial class MethodUserDefinedKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodUserDefined.</summary>
-	public sealed class IMethodUserDefinedKO
+	public sealed class IMethodUserDefinedInterceptorors
 	{
-		/// <summary>Handler for GetById.</summary>
-		public IMethodUserDefined_GetByIdHandler GetById { get; } = new();
-		/// <summary>Handler for Count.</summary>
-		public IMethodUserDefined_CountHandler Count { get; } = new();
+		/// <summary>Interceptor for GetById.</summary>
+		public IMethodUserDefined_GetByIdInterceptor GetById { get; } = new();
+		/// <summary>Interceptor for Count.</summary>
+		public IMethodUserDefined_CountInterceptor Count { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodUserDefined.</summary>
-	public IMethodUserDefinedKO IMethodUserDefined { get; } = new();
+	public IMethodUserDefinedInterceptorors IMethodUserDefined { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodUserDefined.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMethodUserDefined AsMethodUserDefined() => this;

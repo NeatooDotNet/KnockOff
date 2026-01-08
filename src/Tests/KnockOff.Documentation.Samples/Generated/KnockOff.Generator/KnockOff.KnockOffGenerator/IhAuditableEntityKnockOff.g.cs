@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class IhAuditableEntityKnockOff
 {
 	/// <summary>Tracks and configures behavior for IIhAuditableEntity.ModifiedAt.</summary>
-	public sealed class IIhAuditableEntity_ModifiedAtHandler
+	public sealed class IIhAuditableEntity_ModifiedAtInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -34,7 +34,7 @@ partial class IhAuditableEntityKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IIhAuditableEntity.ModifiedBy.</summary>
-	public sealed class IIhAuditableEntity_ModifiedByHandler
+	public sealed class IIhAuditableEntity_ModifiedByInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -62,16 +62,16 @@ partial class IhAuditableEntityKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhAuditableEntity.</summary>
-	public sealed class IIhAuditableEntityKO
+	public sealed class IIhAuditableEntityInterceptorors
 	{
-		/// <summary>Handler for ModifiedAt.</summary>
-		public IIhAuditableEntity_ModifiedAtHandler ModifiedAt { get; } = new();
-		/// <summary>Handler for ModifiedBy.</summary>
-		public IIhAuditableEntity_ModifiedByHandler ModifiedBy { get; } = new();
+		/// <summary>Interceptor for ModifiedAt.</summary>
+		public IIhAuditableEntity_ModifiedAtInterceptor ModifiedAt { get; } = new();
+		/// <summary>Interceptor for ModifiedBy.</summary>
+		public IIhAuditableEntity_ModifiedByInterceptor ModifiedBy { get; } = new();
 	}
 
 	/// <summary>Tracks and configures behavior for IIhBaseEntity.Id.</summary>
-	public sealed class IIhBaseEntity_IdHandler
+	public sealed class IIhBaseEntity_IdInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -87,7 +87,7 @@ partial class IhAuditableEntityKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IIhBaseEntity.CreatedAt.</summary>
-	public sealed class IIhBaseEntity_CreatedAtHandler
+	public sealed class IIhBaseEntity_CreatedAtInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -103,19 +103,19 @@ partial class IhAuditableEntityKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhBaseEntity.</summary>
-	public sealed class IIhBaseEntityKO
+	public sealed class IIhBaseEntityInterceptorors
 	{
-		/// <summary>Handler for Id.</summary>
-		public IIhBaseEntity_IdHandler Id { get; } = new();
-		/// <summary>Handler for CreatedAt.</summary>
-		public IIhBaseEntity_CreatedAtHandler CreatedAt { get; } = new();
+		/// <summary>Interceptor for Id.</summary>
+		public IIhBaseEntity_IdInterceptor Id { get; } = new();
+		/// <summary>Interceptor for CreatedAt.</summary>
+		public IIhBaseEntity_CreatedAtInterceptor CreatedAt { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhAuditableEntity.</summary>
-	public IIhAuditableEntityKO IIhAuditableEntity { get; } = new();
+	public IIhAuditableEntityInterceptorors IIhAuditableEntity { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhBaseEntity.</summary>
-	public IIhBaseEntityKO IIhBaseEntity { get; } = new();
+	public IIhBaseEntityInterceptorors IIhBaseEntity { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIhAuditableEntity.</summary>
 	public KnockOff.Documentation.Samples.Guides.IIhAuditableEntity AsIhAuditableEntity() => this;

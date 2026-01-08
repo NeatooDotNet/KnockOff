@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class HaParserKnockOff
 {
 	/// <summary>Tracks and configures behavior for IHaParser.TryParse.</summary>
-	public sealed class IHaParser_TryParseHandler
+	public sealed class IHaParser_TryParseInterceptor
 	{
 		/// <summary>Delegate for TryParse(string input, out int result).</summary>
 		public delegate bool TryParseDelegate(HaParserKnockOff ko, string input, out int result);
@@ -31,7 +31,7 @@ partial class HaParserKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IHaParser.GetData.</summary>
-	public sealed class IHaParser_GetDataHandler
+	public sealed class IHaParser_GetDataInterceptor
 	{
 		/// <summary>Delegate for GetData(out string name, out int count).</summary>
 		public delegate void GetDataDelegate(HaParserKnockOff ko, out string name, out int count);
@@ -53,16 +53,16 @@ partial class HaParserKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaParser.</summary>
-	public sealed class IHaParserKO
+	public sealed class IHaParserInterceptorors
 	{
-		/// <summary>Handler for TryParse.</summary>
-		public IHaParser_TryParseHandler TryParse { get; } = new();
-		/// <summary>Handler for GetData.</summary>
-		public IHaParser_GetDataHandler GetData { get; } = new();
+		/// <summary>Interceptor for TryParse.</summary>
+		public IHaParser_TryParseInterceptor TryParse { get; } = new();
+		/// <summary>Interceptor for GetData.</summary>
+		public IHaParser_GetDataInterceptor GetData { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaParser.</summary>
-	public IHaParserKO IHaParser { get; } = new();
+	public IHaParserInterceptorors IHaParser { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IHaParser.</summary>
 	public KnockOff.Documentation.Samples.Skills.IHaParser AsHaParser() => this;

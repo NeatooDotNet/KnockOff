@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Comparison;
 partial class VsPropertyStoreKnockOff
 {
 	/// <summary>Tracks and configures behavior for IVsPropertyStore.StringIndexer.</summary>
-	public sealed class IVsPropertyStore_StringIndexerHandler
+	public sealed class IVsPropertyStore_StringIndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -37,14 +37,14 @@ partial class VsPropertyStoreKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsPropertyStore.</summary>
-	public sealed class IVsPropertyStoreKO
+	public sealed class IVsPropertyStoreInterceptorors
 	{
-		/// <summary>Handler for StringIndexer.</summary>
-		public IVsPropertyStore_StringIndexerHandler StringIndexer { get; } = new();
+		/// <summary>Interceptor for StringIndexer.</summary>
+		public IVsPropertyStore_StringIndexerInterceptor StringIndexer { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsPropertyStore.</summary>
-	public IVsPropertyStoreKO IVsPropertyStore { get; } = new();
+	public IVsPropertyStoreInterceptorors IVsPropertyStore { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IVsPropertyStore.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IVsPropertyStore AsVsPropertyStore() => this;

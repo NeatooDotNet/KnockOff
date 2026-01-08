@@ -6,7 +6,7 @@ namespace KnockOff.Tests;
 partial class UserRepositoryKnockOff
 {
 	/// <summary>Tracks and configures behavior for IRepository_KnockOff_Tests_User.GetById.</summary>
-	public sealed class IRepository_KnockOff_Tests_User_GetByIdHandler
+	public sealed class IRepository_KnockOff_Tests_User_GetByIdInterceptor
 	{
 		/// <summary>Delegate for GetById(int id).</summary>
 		public delegate global::KnockOff.Tests.User? GetByIdDelegate(UserRepositoryKnockOff ko, int id);
@@ -31,7 +31,7 @@ partial class UserRepositoryKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IRepository_KnockOff_Tests_User.Save.</summary>
-	public sealed class IRepository_KnockOff_Tests_User_SaveHandler
+	public sealed class IRepository_KnockOff_Tests_User_SaveInterceptor
 	{
 		/// <summary>Delegate for Save(global::KnockOff.Tests.User entity).</summary>
 		public delegate void SaveDelegate(UserRepositoryKnockOff ko, global::KnockOff.Tests.User entity);
@@ -56,7 +56,7 @@ partial class UserRepositoryKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IRepository_KnockOff_Tests_User.GetByIdAsync.</summary>
-	public sealed class IRepository_KnockOff_Tests_User_GetByIdAsyncHandler
+	public sealed class IRepository_KnockOff_Tests_User_GetByIdAsyncInterceptor
 	{
 		/// <summary>Delegate for GetByIdAsync(int id).</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> GetByIdAsyncDelegate(UserRepositoryKnockOff ko, int id);
@@ -81,18 +81,18 @@ partial class UserRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IRepository<KnockOff.Tests.User>.</summary>
-	public sealed class IRepository_KnockOff_Tests_UserKO
+	public sealed class IRepository_KnockOff_Tests_UserInterceptorors
 	{
-		/// <summary>Handler for GetById.</summary>
-		public IRepository_KnockOff_Tests_User_GetByIdHandler GetById { get; } = new();
-		/// <summary>Handler for Save.</summary>
-		public IRepository_KnockOff_Tests_User_SaveHandler Save { get; } = new();
-		/// <summary>Handler for GetByIdAsync.</summary>
-		public IRepository_KnockOff_Tests_User_GetByIdAsyncHandler GetByIdAsync { get; } = new();
+		/// <summary>Interceptor for GetById.</summary>
+		public IRepository_KnockOff_Tests_User_GetByIdInterceptor GetById { get; } = new();
+		/// <summary>Interceptor for Save.</summary>
+		public IRepository_KnockOff_Tests_User_SaveInterceptor Save { get; } = new();
+		/// <summary>Interceptor for GetByIdAsync.</summary>
+		public IRepository_KnockOff_Tests_User_GetByIdAsyncInterceptor GetByIdAsync { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IRepository<KnockOff.Tests.User>.</summary>
-	public IRepository_KnockOff_Tests_UserKO IRepository_KnockOff_Tests_User { get; } = new();
+	public IRepository_KnockOff_Tests_UserInterceptorors IRepository_KnockOff_Tests_User { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IRepository<KnockOff.Tests.User>.</summary>
 	public KnockOff.Tests.IRepository<KnockOff.Tests.User> AsRepository() => this;

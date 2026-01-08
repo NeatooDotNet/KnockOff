@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class MmParserKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMmParser.TryParse.</summary>
-	public sealed class IMmParser_TryParseHandler
+	public sealed class IMmParser_TryParseInterceptor
 	{
 		/// <summary>Delegate for TryParse(string input, out int result).</summary>
 		public delegate bool TryParseDelegate(MmParserKnockOff ko, string input, out int result);
@@ -31,14 +31,14 @@ partial class MmParserKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmParser.</summary>
-	public sealed class IMmParserKO
+	public sealed class IMmParserInterceptorors
 	{
-		/// <summary>Handler for TryParse.</summary>
-		public IMmParser_TryParseHandler TryParse { get; } = new();
+		/// <summary>Interceptor for TryParse.</summary>
+		public IMmParser_TryParseInterceptor TryParse { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmParser.</summary>
-	public IMmParserKO IMmParser { get; } = new();
+	public IMmParserInterceptorors IMmParser { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmParser.</summary>
 	public KnockOff.Documentation.Samples.Skills.IMmParser AsMmParser() => this;

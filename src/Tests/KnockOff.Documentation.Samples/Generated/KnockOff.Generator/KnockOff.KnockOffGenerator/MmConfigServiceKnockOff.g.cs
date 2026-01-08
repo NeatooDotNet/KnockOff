@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class MmConfigServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMmConfigService.GetConfig.</summary>
-	public sealed class IMmConfigService_GetConfigHandler
+	public sealed class IMmConfigService_GetConfigInterceptor
 	{
 		/// <summary>Delegate for GetConfig().</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.MmConfig GetConfigDelegate(MmConfigServiceKnockOff ko);
@@ -28,14 +28,14 @@ partial class MmConfigServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmConfigService.</summary>
-	public sealed class IMmConfigServiceKO
+	public sealed class IMmConfigServiceInterceptorors
 	{
-		/// <summary>Handler for GetConfig.</summary>
-		public IMmConfigService_GetConfigHandler GetConfig { get; } = new();
+		/// <summary>Interceptor for GetConfig.</summary>
+		public IMmConfigService_GetConfigInterceptor GetConfig { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmConfigService.</summary>
-	public IMmConfigServiceKO IMmConfigService { get; } = new();
+	public IMmConfigServiceInterceptorors IMmConfigService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmConfigService.</summary>
 	public KnockOff.Documentation.Samples.Skills.IMmConfigService AsMmConfigService() => this;

@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class GenProductRepositoryKnockOff
 {
 	/// <summary>Tracks and configures behavior for IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProduct.GetAll.</summary>
-	public sealed class IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProduct_GetAllHandler
+	public sealed class IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProduct_GetAllInterceptor
 	{
 		/// <summary>Delegate for GetAll().</summary>
 		public delegate global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Guides.GenProduct> GetAllDelegate(GenProductRepositoryKnockOff ko);
@@ -28,7 +28,7 @@ partial class GenProductRepositoryKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProduct.FindFirst.</summary>
-	public sealed class IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProduct_FindFirstHandler
+	public sealed class IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProduct_FindFirstInterceptor
 	{
 		/// <summary>Delegate for FindFirst(global::System.Func<global::KnockOff.Documentation.Samples.Guides.GenProduct, bool> predicate).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Guides.GenProduct? FindFirstDelegate(GenProductRepositoryKnockOff ko, global::System.Func<global::KnockOff.Documentation.Samples.Guides.GenProduct, bool> predicate);
@@ -53,16 +53,16 @@ partial class GenProductRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<KnockOff.Documentation.Samples.Guides.GenProduct>.</summary>
-	public sealed class IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProductKO
+	public sealed class IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProductInterceptorors
 	{
-		/// <summary>Handler for GetAll.</summary>
-		public IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProduct_GetAllHandler GetAll { get; } = new();
-		/// <summary>Handler for FindFirst.</summary>
-		public IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProduct_FindFirstHandler FindFirst { get; } = new();
+		/// <summary>Interceptor for GetAll.</summary>
+		public IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProduct_GetAllInterceptor GetAll { get; } = new();
+		/// <summary>Interceptor for FindFirst.</summary>
+		public IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProduct_FindFirstInterceptor FindFirst { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<KnockOff.Documentation.Samples.Guides.GenProduct>.</summary>
-	public IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProductKO IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProduct { get; } = new();
+	public IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProductInterceptorors IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProduct { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<KnockOff.Documentation.Samples.Guides.GenProduct>.</summary>
 	public KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<KnockOff.Documentation.Samples.Guides.GenProduct> AsGenReadOnlyRepository() => this;

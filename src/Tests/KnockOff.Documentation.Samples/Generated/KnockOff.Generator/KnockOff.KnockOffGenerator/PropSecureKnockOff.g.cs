@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class PropSecureKnockOff
 {
 	/// <summary>Tracks and configures behavior for IPropSecure.SecretKey.</summary>
-	public sealed class IPropSecure_SecretKeyHandler
+	public sealed class IPropSecure_SecretKeyInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -22,14 +22,14 @@ partial class PropSecureKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropSecure.</summary>
-	public sealed class IPropSecureKO
+	public sealed class IPropSecureInterceptorors
 	{
-		/// <summary>Handler for SecretKey.</summary>
-		public IPropSecure_SecretKeyHandler SecretKey { get; } = new();
+		/// <summary>Interceptor for SecretKey.</summary>
+		public IPropSecure_SecretKeyInterceptor SecretKey { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropSecure.</summary>
-	public IPropSecureKO IPropSecure { get; } = new();
+	public IPropSecureInterceptorors IPropSecure { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IPropSecure.</summary>
 	public KnockOff.Documentation.Samples.Guides.IPropSecure AsPropSecure() => this;

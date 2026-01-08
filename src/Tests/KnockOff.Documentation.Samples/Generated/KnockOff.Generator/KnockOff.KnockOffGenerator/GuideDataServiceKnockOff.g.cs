@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class GuideDataServiceKnockOff
 {
 	/// <summary>Tracks and raises IGuideDataService.DataChanged.</summary>
-	public sealed class IGuideDataService_DataChangedHandler
+	public sealed class IGuideDataService_DataChangedInterceptor
 	{
 		private global::System.EventHandler<global::KnockOff.Documentation.Samples.Guides.DataChangedEventArgs>? _handler;
 		private readonly global::System.Collections.Generic.List<(object? sender, global::KnockOff.Documentation.Samples.Guides.DataChangedEventArgs e)> _raises = new();
@@ -62,14 +62,14 @@ partial class GuideDataServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGuideDataService.</summary>
-	public sealed class IGuideDataServiceKO
+	public sealed class IGuideDataServiceInterceptorors
 	{
-		/// <summary>Handler for DataChanged event.</summary>
-		public IGuideDataService_DataChangedHandler DataChanged { get; } = new();
+		/// <summary>Interceptor for DataChanged event.</summary>
+		public IGuideDataService_DataChangedInterceptor DataChanged { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGuideDataService.</summary>
-	public IGuideDataServiceKO IGuideDataService { get; } = new();
+	public IGuideDataServiceInterceptorors IGuideDataService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IGuideDataService.</summary>
 	public KnockOff.Documentation.Samples.Guides.IGuideDataService AsGuideDataService() => this;

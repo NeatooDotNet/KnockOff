@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class PropUserServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for IPropUserService.Name.</summary>
-	public sealed class IPropUserService_NameHandler
+	public sealed class IPropUserService_NameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -34,14 +34,14 @@ partial class PropUserServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropUserService.</summary>
-	public sealed class IPropUserServiceKO
+	public sealed class IPropUserServiceInterceptorors
 	{
-		/// <summary>Handler for Name.</summary>
-		public IPropUserService_NameHandler Name { get; } = new();
+		/// <summary>Interceptor for Name.</summary>
+		public IPropUserService_NameInterceptor Name { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropUserService.</summary>
-	public IPropUserServiceKO IPropUserService { get; } = new();
+	public IPropUserServiceInterceptorors IPropUserService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IPropUserService.</summary>
 	public KnockOff.Documentation.Samples.Guides.IPropUserService AsPropUserService() => this;

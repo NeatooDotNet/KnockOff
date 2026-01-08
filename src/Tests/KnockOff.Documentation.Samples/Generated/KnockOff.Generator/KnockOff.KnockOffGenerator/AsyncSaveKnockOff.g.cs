@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class AsyncSaveKnockOff
 {
 	/// <summary>Tracks and configures behavior for IAsyncSave.SaveAsync.</summary>
-	public sealed class IAsyncSave_SaveAsyncHandler
+	public sealed class IAsyncSave_SaveAsyncInterceptor
 	{
 		/// <summary>Delegate for SaveAsync(global::KnockOff.Documentation.Samples.Guides.AsyncData entity).</summary>
 		public delegate global::System.Threading.Tasks.Task<int> SaveAsyncDelegate(AsyncSaveKnockOff ko, global::KnockOff.Documentation.Samples.Guides.AsyncData entity);
@@ -31,14 +31,14 @@ partial class AsyncSaveKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IAsyncSave.</summary>
-	public sealed class IAsyncSaveKO
+	public sealed class IAsyncSaveInterceptorors
 	{
-		/// <summary>Handler for SaveAsync.</summary>
-		public IAsyncSave_SaveAsyncHandler SaveAsync { get; } = new();
+		/// <summary>Interceptor for SaveAsync.</summary>
+		public IAsyncSave_SaveAsyncInterceptor SaveAsync { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IAsyncSave.</summary>
-	public IAsyncSaveKO IAsyncSave { get; } = new();
+	public IAsyncSaveInterceptorors IAsyncSave { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IAsyncSave.</summary>
 	public KnockOff.Documentation.Samples.Guides.IAsyncSave AsAsyncSave() => this;

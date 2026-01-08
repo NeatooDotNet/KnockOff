@@ -6,7 +6,7 @@ namespace KnockOff.Tests;
 partial class CollisionKnockOff
 {
 	/// <summary>Tracks and configures behavior for ICollision_.ICollision.</summary>
-	public sealed class ICollision__ICollisionHandler
+	public sealed class ICollision__ICollisionInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -34,7 +34,7 @@ partial class CollisionKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ICollision_.DoWork.</summary>
-	public sealed class ICollision__DoWorkHandler
+	public sealed class ICollision__DoWorkInterceptor
 	{
 		/// <summary>Delegate for DoWork().</summary>
 		public delegate void DoWorkDelegate(CollisionKnockOff ko);
@@ -56,16 +56,16 @@ partial class CollisionKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.ICollision.</summary>
-	public sealed class ICollision_KO
+	public sealed class ICollision_Interceptorors
 	{
-		/// <summary>Handler for ICollision.</summary>
-		public ICollision__ICollisionHandler ICollision { get; } = new();
-		/// <summary>Handler for DoWork.</summary>
-		public ICollision__DoWorkHandler DoWork { get; } = new();
+		/// <summary>Interceptor for ICollision.</summary>
+		public ICollision__ICollisionInterceptor ICollision { get; } = new();
+		/// <summary>Interceptor for DoWork.</summary>
+		public ICollision__DoWorkInterceptor DoWork { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.ICollision.</summary>
-	public ICollision_KO ICollision_ { get; } = new();
+	public ICollision_Interceptorors ICollision_ { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.ICollision.</summary>
 	public KnockOff.Tests.ICollision AsCollision() => this;

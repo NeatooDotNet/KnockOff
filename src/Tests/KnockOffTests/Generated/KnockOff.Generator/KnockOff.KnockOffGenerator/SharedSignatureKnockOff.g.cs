@@ -6,7 +6,7 @@ namespace KnockOff.Tests;
 partial class SharedSignatureKnockOff
 {
 	/// <summary>Tracks and configures behavior for ILogger.Name.</summary>
-	public sealed class ILogger_NameHandler
+	public sealed class ILogger_NameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -34,7 +34,7 @@ partial class SharedSignatureKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ILogger.Log.</summary>
-	public sealed class ILogger_LogHandler
+	public sealed class ILogger_LogInterceptor
 	{
 		/// <summary>Delegate for Log(string message).</summary>
 		public delegate void LogDelegate(SharedSignatureKnockOff ko, string message);
@@ -59,16 +59,16 @@ partial class SharedSignatureKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.ILogger.</summary>
-	public sealed class ILoggerKO
+	public sealed class ILoggerInterceptorors
 	{
-		/// <summary>Handler for Name.</summary>
-		public ILogger_NameHandler Name { get; } = new();
-		/// <summary>Handler for Log.</summary>
-		public ILogger_LogHandler Log { get; } = new();
+		/// <summary>Interceptor for Name.</summary>
+		public ILogger_NameInterceptor Name { get; } = new();
+		/// <summary>Interceptor for Log.</summary>
+		public ILogger_LogInterceptor Log { get; } = new();
 	}
 
 	/// <summary>Tracks and configures behavior for IAuditor.Log.</summary>
-	public sealed class IAuditor_LogHandler
+	public sealed class IAuditor_LogInterceptor
 	{
 		/// <summary>Delegate for Log(string message).</summary>
 		public delegate void LogDelegate(SharedSignatureKnockOff ko, string message);
@@ -93,7 +93,7 @@ partial class SharedSignatureKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IAuditor.Audit.</summary>
-	public sealed class IAuditor_AuditHandler
+	public sealed class IAuditor_AuditInterceptor
 	{
 		/// <summary>Delegate for Audit(string action, int userId).</summary>
 		public delegate void AuditDelegate(SharedSignatureKnockOff ko, string action, int userId);
@@ -118,19 +118,19 @@ partial class SharedSignatureKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IAuditor.</summary>
-	public sealed class IAuditorKO
+	public sealed class IAuditorInterceptorors
 	{
-		/// <summary>Handler for Log.</summary>
-		public IAuditor_LogHandler Log { get; } = new();
-		/// <summary>Handler for Audit.</summary>
-		public IAuditor_AuditHandler Audit { get; } = new();
+		/// <summary>Interceptor for Log.</summary>
+		public IAuditor_LogInterceptor Log { get; } = new();
+		/// <summary>Interceptor for Audit.</summary>
+		public IAuditor_AuditInterceptor Audit { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.ILogger.</summary>
-	public ILoggerKO ILogger { get; } = new();
+	public ILoggerInterceptorors ILogger { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IAuditor.</summary>
-	public IAuditorKO IAuditor { get; } = new();
+	public IAuditorInterceptorors IAuditor { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.ILogger.</summary>
 	public KnockOff.Tests.ILogger AsLogger() => this;

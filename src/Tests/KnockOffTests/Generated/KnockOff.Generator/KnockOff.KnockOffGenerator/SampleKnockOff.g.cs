@@ -6,7 +6,7 @@ namespace KnockOff.Tests;
 partial class SampleKnockOff
 {
 	/// <summary>Tracks and configures behavior for ISampleService.Name.</summary>
-	public sealed class ISampleService_NameHandler
+	public sealed class ISampleService_NameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -34,7 +34,7 @@ partial class SampleKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISampleService.DoSomething.</summary>
-	public sealed class ISampleService_DoSomethingHandler
+	public sealed class ISampleService_DoSomethingInterceptor
 	{
 		/// <summary>Delegate for DoSomething().</summary>
 		public delegate void DoSomethingDelegate(SampleKnockOff ko);
@@ -56,7 +56,7 @@ partial class SampleKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISampleService.GetValue.</summary>
-	public sealed class ISampleService_GetValueHandler
+	public sealed class ISampleService_GetValueInterceptor
 	{
 		/// <summary>Delegate for GetValue(int input).</summary>
 		public delegate int GetValueDelegate(SampleKnockOff ko, int input);
@@ -81,7 +81,7 @@ partial class SampleKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISampleService.Calculate.</summary>
-	public sealed class ISampleService_CalculateHandler
+	public sealed class ISampleService_CalculateInterceptor
 	{
 		/// <summary>Delegate for Calculate(string name, int value, bool flag).</summary>
 		public delegate void CalculateDelegate(SampleKnockOff ko, string name, int value, bool flag);
@@ -106,7 +106,7 @@ partial class SampleKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISampleService.GetOptional.</summary>
-	public sealed class ISampleService_GetOptionalHandler
+	public sealed class ISampleService_GetOptionalInterceptor
 	{
 		/// <summary>Delegate for GetOptional().</summary>
 		public delegate string? GetOptionalDelegate(SampleKnockOff ko);
@@ -128,22 +128,22 @@ partial class SampleKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.ISampleService.</summary>
-	public sealed class ISampleServiceKO
+	public sealed class ISampleServiceInterceptorors
 	{
-		/// <summary>Handler for Name.</summary>
-		public ISampleService_NameHandler Name { get; } = new();
-		/// <summary>Handler for DoSomething.</summary>
-		public ISampleService_DoSomethingHandler DoSomething { get; } = new();
-		/// <summary>Handler for GetValue.</summary>
-		public ISampleService_GetValueHandler GetValue { get; } = new();
-		/// <summary>Handler for Calculate.</summary>
-		public ISampleService_CalculateHandler Calculate { get; } = new();
-		/// <summary>Handler for GetOptional.</summary>
-		public ISampleService_GetOptionalHandler GetOptional { get; } = new();
+		/// <summary>Interceptor for Name.</summary>
+		public ISampleService_NameInterceptor Name { get; } = new();
+		/// <summary>Interceptor for DoSomething.</summary>
+		public ISampleService_DoSomethingInterceptor DoSomething { get; } = new();
+		/// <summary>Interceptor for GetValue.</summary>
+		public ISampleService_GetValueInterceptor GetValue { get; } = new();
+		/// <summary>Interceptor for Calculate.</summary>
+		public ISampleService_CalculateInterceptor Calculate { get; } = new();
+		/// <summary>Interceptor for GetOptional.</summary>
+		public ISampleService_GetOptionalInterceptor GetOptional { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.ISampleService.</summary>
-	public ISampleServiceKO ISampleService { get; } = new();
+	public ISampleServiceInterceptorors ISampleService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.ISampleService.</summary>
 	public KnockOff.Tests.ISampleService AsSampleService() => this;

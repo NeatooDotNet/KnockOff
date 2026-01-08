@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.GettingStarted;
 partial class EmailServiceWithValidation
 {
 	/// <summary>Tracks and configures behavior for IEmailServiceWithValidation.IsConnected.</summary>
-	public sealed class IEmailServiceWithValidation_IsConnectedHandler
+	public sealed class IEmailServiceWithValidation_IsConnectedInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -22,7 +22,7 @@ partial class EmailServiceWithValidation
 	}
 
 	/// <summary>Tracks and configures behavior for IEmailServiceWithValidation.SendEmail.</summary>
-	public sealed class IEmailServiceWithValidation_SendEmailHandler
+	public sealed class IEmailServiceWithValidation_SendEmailInterceptor
 	{
 		/// <summary>Delegate for SendEmail(string to, string subject, string body).</summary>
 		public delegate void SendEmailDelegate(EmailServiceWithValidation ko, string to, string subject, string body);
@@ -47,7 +47,7 @@ partial class EmailServiceWithValidation
 	}
 
 	/// <summary>Tracks and configures behavior for IEmailServiceWithValidation.IsValidAddress.</summary>
-	public sealed class IEmailServiceWithValidation_IsValidAddressHandler
+	public sealed class IEmailServiceWithValidation_IsValidAddressInterceptor
 	{
 		/// <summary>Delegate for IsValidAddress(string email).</summary>
 		public delegate bool IsValidAddressDelegate(EmailServiceWithValidation ko, string email);
@@ -72,18 +72,18 @@ partial class EmailServiceWithValidation
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation.</summary>
-	public sealed class IEmailServiceWithValidationKO
+	public sealed class IEmailServiceWithValidationInterceptorors
 	{
-		/// <summary>Handler for IsConnected.</summary>
-		public IEmailServiceWithValidation_IsConnectedHandler IsConnected { get; } = new();
-		/// <summary>Handler for SendEmail.</summary>
-		public IEmailServiceWithValidation_SendEmailHandler SendEmail { get; } = new();
-		/// <summary>Handler for IsValidAddress.</summary>
-		public IEmailServiceWithValidation_IsValidAddressHandler IsValidAddress { get; } = new();
+		/// <summary>Interceptor for IsConnected.</summary>
+		public IEmailServiceWithValidation_IsConnectedInterceptor IsConnected { get; } = new();
+		/// <summary>Interceptor for SendEmail.</summary>
+		public IEmailServiceWithValidation_SendEmailInterceptor SendEmail { get; } = new();
+		/// <summary>Interceptor for IsValidAddress.</summary>
+		public IEmailServiceWithValidation_IsValidAddressInterceptor IsValidAddress { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation.</summary>
-	public IEmailServiceWithValidationKO IEmailServiceWithValidation { get; } = new();
+	public IEmailServiceWithValidationInterceptorors IEmailServiceWithValidation { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation.</summary>
 	public KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation AsEmailServiceWithValidation() => this;

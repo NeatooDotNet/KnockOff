@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Concepts;
 partial class PatternUserServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for IPatternUserService.GetUser.</summary>
-	public sealed class IPatternUserService_GetUserHandler
+	public sealed class IPatternUserService_GetUserInterceptor
 	{
 		/// <summary>Delegate for GetUser(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Concepts.PatternUser GetUserDelegate(PatternUserServiceKnockOff ko, int id);
@@ -31,7 +31,7 @@ partial class PatternUserServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IPatternUserService.CalculateScore.</summary>
-	public sealed class IPatternUserService_CalculateScoreHandler
+	public sealed class IPatternUserService_CalculateScoreInterceptor
 	{
 		/// <summary>Delegate for CalculateScore(string name, int baseScore).</summary>
 		public delegate int CalculateScoreDelegate(PatternUserServiceKnockOff ko, string name, int baseScore);
@@ -56,16 +56,16 @@ partial class PatternUserServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternUserService.</summary>
-	public sealed class IPatternUserServiceKO
+	public sealed class IPatternUserServiceInterceptorors
 	{
-		/// <summary>Handler for GetUser.</summary>
-		public IPatternUserService_GetUserHandler GetUser { get; } = new();
-		/// <summary>Handler for CalculateScore.</summary>
-		public IPatternUserService_CalculateScoreHandler CalculateScore { get; } = new();
+		/// <summary>Interceptor for GetUser.</summary>
+		public IPatternUserService_GetUserInterceptor GetUser { get; } = new();
+		/// <summary>Interceptor for CalculateScore.</summary>
+		public IPatternUserService_CalculateScoreInterceptor CalculateScore { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternUserService.</summary>
-	public IPatternUserServiceKO IPatternUserService { get; } = new();
+	public IPatternUserServiceInterceptorors IPatternUserService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Concepts.IPatternUserService.</summary>
 	public KnockOff.Documentation.Samples.Concepts.IPatternUserService AsPatternUserService() => this;

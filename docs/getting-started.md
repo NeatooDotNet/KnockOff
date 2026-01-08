@@ -329,7 +329,7 @@ This works for any nesting depth—just ensure every class in the hierarchy is `
 ## Next Steps
 
 - [Customization Patterns](concepts/customization-patterns.md) — Deep dive into user methods vs callbacks
-- [Handler API Reference](reference/handler-api.md) — Complete API for tracking and callbacks
+- [Interceptor API Reference](reference/interceptor-api.md) — Complete API for tracking and callbacks
 - [KnockOff vs Moq](knockoff-vs-moq.md) — Comparison with Moq patterns
 - [Migration from Moq](migration-from-moq.md) — Step-by-step migration guide
 

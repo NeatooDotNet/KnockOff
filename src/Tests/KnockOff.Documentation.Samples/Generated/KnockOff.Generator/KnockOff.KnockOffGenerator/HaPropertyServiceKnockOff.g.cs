@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class HaPropertyServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for IHaPropertyService.Name.</summary>
-	public sealed class IHaPropertyService_NameHandler
+	public sealed class IHaPropertyService_NameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -34,14 +34,14 @@ partial class HaPropertyServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaPropertyService.</summary>
-	public sealed class IHaPropertyServiceKO
+	public sealed class IHaPropertyServiceInterceptorors
 	{
-		/// <summary>Handler for Name.</summary>
-		public IHaPropertyService_NameHandler Name { get; } = new();
+		/// <summary>Interceptor for Name.</summary>
+		public IHaPropertyService_NameInterceptor Name { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaPropertyService.</summary>
-	public IHaPropertyServiceKO IHaPropertyService { get; } = new();
+	public IHaPropertyServiceInterceptorors IHaPropertyService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IHaPropertyService.</summary>
 	public KnockOff.Documentation.Samples.Skills.IHaPropertyService AsHaPropertyService() => this;

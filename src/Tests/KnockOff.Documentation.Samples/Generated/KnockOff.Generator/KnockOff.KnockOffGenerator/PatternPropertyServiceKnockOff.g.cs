@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Concepts;
 partial class PatternPropertyServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for IPatternPropertyService.Name.</summary>
-	public sealed class IPatternPropertyService_NameHandler
+	public sealed class IPatternPropertyService_NameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -34,14 +34,14 @@ partial class PatternPropertyServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternPropertyService.</summary>
-	public sealed class IPatternPropertyServiceKO
+	public sealed class IPatternPropertyServiceInterceptorors
 	{
-		/// <summary>Handler for Name.</summary>
-		public IPatternPropertyService_NameHandler Name { get; } = new();
+		/// <summary>Interceptor for Name.</summary>
+		public IPatternPropertyService_NameInterceptor Name { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternPropertyService.</summary>
-	public IPatternPropertyServiceKO IPatternPropertyService { get; } = new();
+	public IPatternPropertyServiceInterceptorors IPatternPropertyService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Concepts.IPatternPropertyService.</summary>
 	public KnockOff.Documentation.Samples.Concepts.IPatternPropertyService AsPatternPropertyService() => this;

@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class GenUserRepositoryKnockOff
 {
 	/// <summary>Tracks and configures behavior for IGenRepository_KnockOff_Documentation_Samples_Guides_GenUser.GetById.</summary>
-	public sealed class IGenRepository_KnockOff_Documentation_Samples_Guides_GenUser_GetByIdHandler
+	public sealed class IGenRepository_KnockOff_Documentation_Samples_Guides_GenUser_GetByIdInterceptor
 	{
 		/// <summary>Delegate for GetById(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Guides.GenUser? GetByIdDelegate(GenUserRepositoryKnockOff ko, int id);
@@ -31,7 +31,7 @@ partial class GenUserRepositoryKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IGenRepository_KnockOff_Documentation_Samples_Guides_GenUser.Save.</summary>
-	public sealed class IGenRepository_KnockOff_Documentation_Samples_Guides_GenUser_SaveHandler
+	public sealed class IGenRepository_KnockOff_Documentation_Samples_Guides_GenUser_SaveInterceptor
 	{
 		/// <summary>Delegate for Save(global::KnockOff.Documentation.Samples.Guides.GenUser entity).</summary>
 		public delegate void SaveDelegate(GenUserRepositoryKnockOff ko, global::KnockOff.Documentation.Samples.Guides.GenUser entity);
@@ -56,7 +56,7 @@ partial class GenUserRepositoryKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IGenRepository_KnockOff_Documentation_Samples_Guides_GenUser.GetByIdAsync.</summary>
-	public sealed class IGenRepository_KnockOff_Documentation_Samples_Guides_GenUser_GetByIdAsyncHandler
+	public sealed class IGenRepository_KnockOff_Documentation_Samples_Guides_GenUser_GetByIdAsyncInterceptor
 	{
 		/// <summary>Delegate for GetByIdAsync(int id).</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.GenUser?> GetByIdAsyncDelegate(GenUserRepositoryKnockOff ko, int id);
@@ -81,18 +81,18 @@ partial class GenUserRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenRepository<KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
-	public sealed class IGenRepository_KnockOff_Documentation_Samples_Guides_GenUserKO
+	public sealed class IGenRepository_KnockOff_Documentation_Samples_Guides_GenUserInterceptorors
 	{
-		/// <summary>Handler for GetById.</summary>
-		public IGenRepository_KnockOff_Documentation_Samples_Guides_GenUser_GetByIdHandler GetById { get; } = new();
-		/// <summary>Handler for Save.</summary>
-		public IGenRepository_KnockOff_Documentation_Samples_Guides_GenUser_SaveHandler Save { get; } = new();
-		/// <summary>Handler for GetByIdAsync.</summary>
-		public IGenRepository_KnockOff_Documentation_Samples_Guides_GenUser_GetByIdAsyncHandler GetByIdAsync { get; } = new();
+		/// <summary>Interceptor for GetById.</summary>
+		public IGenRepository_KnockOff_Documentation_Samples_Guides_GenUser_GetByIdInterceptor GetById { get; } = new();
+		/// <summary>Interceptor for Save.</summary>
+		public IGenRepository_KnockOff_Documentation_Samples_Guides_GenUser_SaveInterceptor Save { get; } = new();
+		/// <summary>Interceptor for GetByIdAsync.</summary>
+		public IGenRepository_KnockOff_Documentation_Samples_Guides_GenUser_GetByIdAsyncInterceptor GetByIdAsync { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenRepository<KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
-	public IGenRepository_KnockOff_Documentation_Samples_Guides_GenUserKO IGenRepository_KnockOff_Documentation_Samples_Guides_GenUser { get; } = new();
+	public IGenRepository_KnockOff_Documentation_Samples_Guides_GenUserInterceptorors IGenRepository_KnockOff_Documentation_Samples_Guides_GenUser { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IGenRepository<KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
 	public KnockOff.Documentation.Samples.Guides.IGenRepository<KnockOff.Documentation.Samples.Guides.GenUser> AsGenRepository() => this;

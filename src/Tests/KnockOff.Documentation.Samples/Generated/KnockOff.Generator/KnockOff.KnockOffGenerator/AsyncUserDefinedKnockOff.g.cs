@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class AsyncUserDefinedKnockOff
 {
 	/// <summary>Tracks and configures behavior for IAsyncUserDefined.GetByIdAsync.</summary>
-	public sealed class IAsyncUserDefined_GetByIdAsyncHandler
+	public sealed class IAsyncUserDefined_GetByIdAsyncInterceptor
 	{
 		/// <summary>Delegate for GetByIdAsync(int id).</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.AsyncUser?> GetByIdAsyncDelegate(AsyncUserDefinedKnockOff ko, int id);
@@ -31,7 +31,7 @@ partial class AsyncUserDefinedKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IAsyncUserDefined.CountAsync.</summary>
-	public sealed class IAsyncUserDefined_CountAsyncHandler
+	public sealed class IAsyncUserDefined_CountAsyncInterceptor
 	{
 		/// <summary>Delegate for CountAsync().</summary>
 		public delegate global::System.Threading.Tasks.ValueTask<int> CountAsyncDelegate(AsyncUserDefinedKnockOff ko);
@@ -53,16 +53,16 @@ partial class AsyncUserDefinedKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IAsyncUserDefined.</summary>
-	public sealed class IAsyncUserDefinedKO
+	public sealed class IAsyncUserDefinedInterceptorors
 	{
-		/// <summary>Handler for GetByIdAsync.</summary>
-		public IAsyncUserDefined_GetByIdAsyncHandler GetByIdAsync { get; } = new();
-		/// <summary>Handler for CountAsync.</summary>
-		public IAsyncUserDefined_CountAsyncHandler CountAsync { get; } = new();
+		/// <summary>Interceptor for GetByIdAsync.</summary>
+		public IAsyncUserDefined_GetByIdAsyncInterceptor GetByIdAsync { get; } = new();
+		/// <summary>Interceptor for CountAsync.</summary>
+		public IAsyncUserDefined_CountAsyncInterceptor CountAsync { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IAsyncUserDefined.</summary>
-	public IAsyncUserDefinedKO IAsyncUserDefined { get; } = new();
+	public IAsyncUserDefinedInterceptorors IAsyncUserDefined { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IAsyncUserDefined.</summary>
 	public KnockOff.Documentation.Samples.Guides.IAsyncUserDefined AsAsyncUserDefined() => this;

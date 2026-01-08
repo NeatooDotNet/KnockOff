@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class MmSharedRepositoryKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMmRepository.Save.</summary>
-	public sealed class IMmRepository_SaveHandler
+	public sealed class IMmRepository_SaveInterceptor
 	{
 		/// <summary>Delegate for Save(object entity).</summary>
 		public delegate void SaveDelegate(MmSharedRepositoryKnockOff ko, object entity);
@@ -31,14 +31,14 @@ partial class MmSharedRepositoryKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmRepository.</summary>
-	public sealed class IMmRepositoryKO
+	public sealed class IMmRepositoryInterceptorors
 	{
-		/// <summary>Handler for Save.</summary>
-		public IMmRepository_SaveHandler Save { get; } = new();
+		/// <summary>Interceptor for Save.</summary>
+		public IMmRepository_SaveInterceptor Save { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmRepository.</summary>
-	public IMmRepositoryKO IMmRepository { get; } = new();
+	public IMmRepositoryInterceptorors IMmRepository { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmRepository.</summary>
 	public KnockOff.Documentation.Samples.Skills.IMmRepository AsMmRepository() => this;

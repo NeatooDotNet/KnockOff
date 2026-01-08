@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class IdxListKnockOff
 {
 	/// <summary>Tracks and configures behavior for IIdxList.Int32Indexer.</summary>
-	public sealed class IIdxList_Int32IndexerHandler
+	public sealed class IIdxList_Int32IndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -37,14 +37,14 @@ partial class IdxListKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIdxList.</summary>
-	public sealed class IIdxListKO
+	public sealed class IIdxListInterceptorors
 	{
-		/// <summary>Handler for Int32Indexer.</summary>
-		public IIdxList_Int32IndexerHandler Int32Indexer { get; } = new();
+		/// <summary>Interceptor for Int32Indexer.</summary>
+		public IIdxList_Int32IndexerInterceptor Int32Indexer { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIdxList.</summary>
-	public IIdxListKO IIdxList { get; } = new();
+	public IIdxListInterceptorors IIdxList { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIdxList.</summary>
 	public KnockOff.Documentation.Samples.Guides.IIdxList AsIdxList() => this;

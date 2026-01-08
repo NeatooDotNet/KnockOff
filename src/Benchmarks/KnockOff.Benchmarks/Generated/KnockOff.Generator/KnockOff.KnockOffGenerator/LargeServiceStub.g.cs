@@ -6,7 +6,7 @@ namespace KnockOff.Benchmarks.Stubs;
 partial class LargeServiceStub
 {
 	/// <summary>Tracks and configures behavior for ILargeService.VoidMethod01.</summary>
-	public sealed class ILargeService_VoidMethod01Handler
+	public sealed class ILargeService_VoidMethod01Interceptor
 	{
 		/// <summary>Delegate for VoidMethod01().</summary>
 		public delegate void VoidMethod01Delegate(LargeServiceStub ko);
@@ -28,7 +28,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.VoidMethod02.</summary>
-	public sealed class ILargeService_VoidMethod02Handler
+	public sealed class ILargeService_VoidMethod02Interceptor
 	{
 		/// <summary>Delegate for VoidMethod02().</summary>
 		public delegate void VoidMethod02Delegate(LargeServiceStub ko);
@@ -50,7 +50,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.VoidMethod03.</summary>
-	public sealed class ILargeService_VoidMethod03Handler
+	public sealed class ILargeService_VoidMethod03Interceptor
 	{
 		/// <summary>Delegate for VoidMethod03().</summary>
 		public delegate void VoidMethod03Delegate(LargeServiceStub ko);
@@ -72,7 +72,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.VoidMethod04.</summary>
-	public sealed class ILargeService_VoidMethod04Handler
+	public sealed class ILargeService_VoidMethod04Interceptor
 	{
 		/// <summary>Delegate for VoidMethod04().</summary>
 		public delegate void VoidMethod04Delegate(LargeServiceStub ko);
@@ -94,7 +94,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.VoidMethod05.</summary>
-	public sealed class ILargeService_VoidMethod05Handler
+	public sealed class ILargeService_VoidMethod05Interceptor
 	{
 		/// <summary>Delegate for VoidMethod05().</summary>
 		public delegate void VoidMethod05Delegate(LargeServiceStub ko);
@@ -116,7 +116,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.VoidMethod06.</summary>
-	public sealed class ILargeService_VoidMethod06Handler
+	public sealed class ILargeService_VoidMethod06Interceptor
 	{
 		/// <summary>Delegate for VoidMethod06().</summary>
 		public delegate void VoidMethod06Delegate(LargeServiceStub ko);
@@ -138,7 +138,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.VoidMethod07.</summary>
-	public sealed class ILargeService_VoidMethod07Handler
+	public sealed class ILargeService_VoidMethod07Interceptor
 	{
 		/// <summary>Delegate for VoidMethod07().</summary>
 		public delegate void VoidMethod07Delegate(LargeServiceStub ko);
@@ -160,7 +160,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.VoidMethod08.</summary>
-	public sealed class ILargeService_VoidMethod08Handler
+	public sealed class ILargeService_VoidMethod08Interceptor
 	{
 		/// <summary>Delegate for VoidMethod08().</summary>
 		public delegate void VoidMethod08Delegate(LargeServiceStub ko);
@@ -182,7 +182,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.VoidMethod09.</summary>
-	public sealed class ILargeService_VoidMethod09Handler
+	public sealed class ILargeService_VoidMethod09Interceptor
 	{
 		/// <summary>Delegate for VoidMethod09().</summary>
 		public delegate void VoidMethod09Delegate(LargeServiceStub ko);
@@ -204,7 +204,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.VoidMethod10.</summary>
-	public sealed class ILargeService_VoidMethod10Handler
+	public sealed class ILargeService_VoidMethod10Interceptor
 	{
 		/// <summary>Delegate for VoidMethod10().</summary>
 		public delegate void VoidMethod10Delegate(LargeServiceStub ko);
@@ -226,7 +226,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.VoidMethodWithParam01.</summary>
-	public sealed class ILargeService_VoidMethodWithParam01Handler
+	public sealed class ILargeService_VoidMethodWithParam01Interceptor
 	{
 		/// <summary>Delegate for VoidMethodWithParam01(int p).</summary>
 		public delegate void VoidMethodWithParam01Delegate(LargeServiceStub ko, int p);
@@ -251,7 +251,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.VoidMethodWithParam02.</summary>
-	public sealed class ILargeService_VoidMethodWithParam02Handler
+	public sealed class ILargeService_VoidMethodWithParam02Interceptor
 	{
 		/// <summary>Delegate for VoidMethodWithParam02(int p).</summary>
 		public delegate void VoidMethodWithParam02Delegate(LargeServiceStub ko, int p);
@@ -276,7 +276,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.VoidMethodWithParam03.</summary>
-	public sealed class ILargeService_VoidMethodWithParam03Handler
+	public sealed class ILargeService_VoidMethodWithParam03Interceptor
 	{
 		/// <summary>Delegate for VoidMethodWithParam03(int p).</summary>
 		public delegate void VoidMethodWithParam03Delegate(LargeServiceStub ko, int p);
@@ -301,7 +301,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.VoidMethodWithParam04.</summary>
-	public sealed class ILargeService_VoidMethodWithParam04Handler
+	public sealed class ILargeService_VoidMethodWithParam04Interceptor
 	{
 		/// <summary>Delegate for VoidMethodWithParam04(int p).</summary>
 		public delegate void VoidMethodWithParam04Delegate(LargeServiceStub ko, int p);
@@ -326,7 +326,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.VoidMethodWithParam05.</summary>
-	public sealed class ILargeService_VoidMethodWithParam05Handler
+	public sealed class ILargeService_VoidMethodWithParam05Interceptor
 	{
 		/// <summary>Delegate for VoidMethodWithParam05(int p).</summary>
 		public delegate void VoidMethodWithParam05Delegate(LargeServiceStub ko, int p);
@@ -351,7 +351,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.VoidMethodWithParam06.</summary>
-	public sealed class ILargeService_VoidMethodWithParam06Handler
+	public sealed class ILargeService_VoidMethodWithParam06Interceptor
 	{
 		/// <summary>Delegate for VoidMethodWithParam06(int p).</summary>
 		public delegate void VoidMethodWithParam06Delegate(LargeServiceStub ko, int p);
@@ -376,7 +376,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.VoidMethodWithParam07.</summary>
-	public sealed class ILargeService_VoidMethodWithParam07Handler
+	public sealed class ILargeService_VoidMethodWithParam07Interceptor
 	{
 		/// <summary>Delegate for VoidMethodWithParam07(int p).</summary>
 		public delegate void VoidMethodWithParam07Delegate(LargeServiceStub ko, int p);
@@ -401,7 +401,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.VoidMethodWithParam08.</summary>
-	public sealed class ILargeService_VoidMethodWithParam08Handler
+	public sealed class ILargeService_VoidMethodWithParam08Interceptor
 	{
 		/// <summary>Delegate for VoidMethodWithParam08(int p).</summary>
 		public delegate void VoidMethodWithParam08Delegate(LargeServiceStub ko, int p);
@@ -426,7 +426,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.VoidMethodWithParam09.</summary>
-	public sealed class ILargeService_VoidMethodWithParam09Handler
+	public sealed class ILargeService_VoidMethodWithParam09Interceptor
 	{
 		/// <summary>Delegate for VoidMethodWithParam09(int p).</summary>
 		public delegate void VoidMethodWithParam09Delegate(LargeServiceStub ko, int p);
@@ -451,7 +451,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.VoidMethodWithParam10.</summary>
-	public sealed class ILargeService_VoidMethodWithParam10Handler
+	public sealed class ILargeService_VoidMethodWithParam10Interceptor
 	{
 		/// <summary>Delegate for VoidMethodWithParam10(int p).</summary>
 		public delegate void VoidMethodWithParam10Delegate(LargeServiceStub ko, int p);
@@ -476,7 +476,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.IntMethod01.</summary>
-	public sealed class ILargeService_IntMethod01Handler
+	public sealed class ILargeService_IntMethod01Interceptor
 	{
 		/// <summary>Delegate for IntMethod01().</summary>
 		public delegate int IntMethod01Delegate(LargeServiceStub ko);
@@ -498,7 +498,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.IntMethod02.</summary>
-	public sealed class ILargeService_IntMethod02Handler
+	public sealed class ILargeService_IntMethod02Interceptor
 	{
 		/// <summary>Delegate for IntMethod02().</summary>
 		public delegate int IntMethod02Delegate(LargeServiceStub ko);
@@ -520,7 +520,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.IntMethod03.</summary>
-	public sealed class ILargeService_IntMethod03Handler
+	public sealed class ILargeService_IntMethod03Interceptor
 	{
 		/// <summary>Delegate for IntMethod03().</summary>
 		public delegate int IntMethod03Delegate(LargeServiceStub ko);
@@ -542,7 +542,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.IntMethod04.</summary>
-	public sealed class ILargeService_IntMethod04Handler
+	public sealed class ILargeService_IntMethod04Interceptor
 	{
 		/// <summary>Delegate for IntMethod04().</summary>
 		public delegate int IntMethod04Delegate(LargeServiceStub ko);
@@ -564,7 +564,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.IntMethod05.</summary>
-	public sealed class ILargeService_IntMethod05Handler
+	public sealed class ILargeService_IntMethod05Interceptor
 	{
 		/// <summary>Delegate for IntMethod05().</summary>
 		public delegate int IntMethod05Delegate(LargeServiceStub ko);
@@ -586,7 +586,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.IntMethod06.</summary>
-	public sealed class ILargeService_IntMethod06Handler
+	public sealed class ILargeService_IntMethod06Interceptor
 	{
 		/// <summary>Delegate for IntMethod06().</summary>
 		public delegate int IntMethod06Delegate(LargeServiceStub ko);
@@ -608,7 +608,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.IntMethod07.</summary>
-	public sealed class ILargeService_IntMethod07Handler
+	public sealed class ILargeService_IntMethod07Interceptor
 	{
 		/// <summary>Delegate for IntMethod07().</summary>
 		public delegate int IntMethod07Delegate(LargeServiceStub ko);
@@ -630,7 +630,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.IntMethod08.</summary>
-	public sealed class ILargeService_IntMethod08Handler
+	public sealed class ILargeService_IntMethod08Interceptor
 	{
 		/// <summary>Delegate for IntMethod08().</summary>
 		public delegate int IntMethod08Delegate(LargeServiceStub ko);
@@ -652,7 +652,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.IntMethod09.</summary>
-	public sealed class ILargeService_IntMethod09Handler
+	public sealed class ILargeService_IntMethod09Interceptor
 	{
 		/// <summary>Delegate for IntMethod09().</summary>
 		public delegate int IntMethod09Delegate(LargeServiceStub ko);
@@ -674,7 +674,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.IntMethod10.</summary>
-	public sealed class ILargeService_IntMethod10Handler
+	public sealed class ILargeService_IntMethod10Interceptor
 	{
 		/// <summary>Delegate for IntMethod10().</summary>
 		public delegate int IntMethod10Delegate(LargeServiceStub ko);
@@ -696,7 +696,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.StringMethod01.</summary>
-	public sealed class ILargeService_StringMethod01Handler
+	public sealed class ILargeService_StringMethod01Interceptor
 	{
 		/// <summary>Delegate for StringMethod01().</summary>
 		public delegate string StringMethod01Delegate(LargeServiceStub ko);
@@ -718,7 +718,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.StringMethod02.</summary>
-	public sealed class ILargeService_StringMethod02Handler
+	public sealed class ILargeService_StringMethod02Interceptor
 	{
 		/// <summary>Delegate for StringMethod02().</summary>
 		public delegate string StringMethod02Delegate(LargeServiceStub ko);
@@ -740,7 +740,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.StringMethod03.</summary>
-	public sealed class ILargeService_StringMethod03Handler
+	public sealed class ILargeService_StringMethod03Interceptor
 	{
 		/// <summary>Delegate for StringMethod03().</summary>
 		public delegate string StringMethod03Delegate(LargeServiceStub ko);
@@ -762,7 +762,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.StringMethod04.</summary>
-	public sealed class ILargeService_StringMethod04Handler
+	public sealed class ILargeService_StringMethod04Interceptor
 	{
 		/// <summary>Delegate for StringMethod04().</summary>
 		public delegate string StringMethod04Delegate(LargeServiceStub ko);
@@ -784,7 +784,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.StringMethod05.</summary>
-	public sealed class ILargeService_StringMethod05Handler
+	public sealed class ILargeService_StringMethod05Interceptor
 	{
 		/// <summary>Delegate for StringMethod05().</summary>
 		public delegate string StringMethod05Delegate(LargeServiceStub ko);
@@ -806,7 +806,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.StringMethod06.</summary>
-	public sealed class ILargeService_StringMethod06Handler
+	public sealed class ILargeService_StringMethod06Interceptor
 	{
 		/// <summary>Delegate for StringMethod06().</summary>
 		public delegate string StringMethod06Delegate(LargeServiceStub ko);
@@ -828,7 +828,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.StringMethod07.</summary>
-	public sealed class ILargeService_StringMethod07Handler
+	public sealed class ILargeService_StringMethod07Interceptor
 	{
 		/// <summary>Delegate for StringMethod07().</summary>
 		public delegate string StringMethod07Delegate(LargeServiceStub ko);
@@ -850,7 +850,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.StringMethod08.</summary>
-	public sealed class ILargeService_StringMethod08Handler
+	public sealed class ILargeService_StringMethod08Interceptor
 	{
 		/// <summary>Delegate for StringMethod08().</summary>
 		public delegate string StringMethod08Delegate(LargeServiceStub ko);
@@ -872,7 +872,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.StringMethod09.</summary>
-	public sealed class ILargeService_StringMethod09Handler
+	public sealed class ILargeService_StringMethod09Interceptor
 	{
 		/// <summary>Delegate for StringMethod09().</summary>
 		public delegate string StringMethod09Delegate(LargeServiceStub ko);
@@ -894,7 +894,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.StringMethod10.</summary>
-	public sealed class ILargeService_StringMethod10Handler
+	public sealed class ILargeService_StringMethod10Interceptor
 	{
 		/// <summary>Delegate for StringMethod10().</summary>
 		public delegate string StringMethod10Delegate(LargeServiceStub ko);
@@ -916,7 +916,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.IntMethodWithParam01.</summary>
-	public sealed class ILargeService_IntMethodWithParam01Handler
+	public sealed class ILargeService_IntMethodWithParam01Interceptor
 	{
 		/// <summary>Delegate for IntMethodWithParam01(int p).</summary>
 		public delegate int IntMethodWithParam01Delegate(LargeServiceStub ko, int p);
@@ -941,7 +941,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.IntMethodWithParam02.</summary>
-	public sealed class ILargeService_IntMethodWithParam02Handler
+	public sealed class ILargeService_IntMethodWithParam02Interceptor
 	{
 		/// <summary>Delegate for IntMethodWithParam02(int p).</summary>
 		public delegate int IntMethodWithParam02Delegate(LargeServiceStub ko, int p);
@@ -966,7 +966,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.IntMethodWithParam03.</summary>
-	public sealed class ILargeService_IntMethodWithParam03Handler
+	public sealed class ILargeService_IntMethodWithParam03Interceptor
 	{
 		/// <summary>Delegate for IntMethodWithParam03(int p).</summary>
 		public delegate int IntMethodWithParam03Delegate(LargeServiceStub ko, int p);
@@ -991,7 +991,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.IntMethodWithParam04.</summary>
-	public sealed class ILargeService_IntMethodWithParam04Handler
+	public sealed class ILargeService_IntMethodWithParam04Interceptor
 	{
 		/// <summary>Delegate for IntMethodWithParam04(int p).</summary>
 		public delegate int IntMethodWithParam04Delegate(LargeServiceStub ko, int p);
@@ -1016,7 +1016,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.IntMethodWithParam05.</summary>
-	public sealed class ILargeService_IntMethodWithParam05Handler
+	public sealed class ILargeService_IntMethodWithParam05Interceptor
 	{
 		/// <summary>Delegate for IntMethodWithParam05(int p).</summary>
 		public delegate int IntMethodWithParam05Delegate(LargeServiceStub ko, int p);
@@ -1041,7 +1041,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.IntMethodWithParam06.</summary>
-	public sealed class ILargeService_IntMethodWithParam06Handler
+	public sealed class ILargeService_IntMethodWithParam06Interceptor
 	{
 		/// <summary>Delegate for IntMethodWithParam06(int p).</summary>
 		public delegate int IntMethodWithParam06Delegate(LargeServiceStub ko, int p);
@@ -1066,7 +1066,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.IntMethodWithParam07.</summary>
-	public sealed class ILargeService_IntMethodWithParam07Handler
+	public sealed class ILargeService_IntMethodWithParam07Interceptor
 	{
 		/// <summary>Delegate for IntMethodWithParam07(int p).</summary>
 		public delegate int IntMethodWithParam07Delegate(LargeServiceStub ko, int p);
@@ -1091,7 +1091,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.IntMethodWithParam08.</summary>
-	public sealed class ILargeService_IntMethodWithParam08Handler
+	public sealed class ILargeService_IntMethodWithParam08Interceptor
 	{
 		/// <summary>Delegate for IntMethodWithParam08(int p).</summary>
 		public delegate int IntMethodWithParam08Delegate(LargeServiceStub ko, int p);
@@ -1116,7 +1116,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.IntMethodWithParam09.</summary>
-	public sealed class ILargeService_IntMethodWithParam09Handler
+	public sealed class ILargeService_IntMethodWithParam09Interceptor
 	{
 		/// <summary>Delegate for IntMethodWithParam09(int p).</summary>
 		public delegate int IntMethodWithParam09Delegate(LargeServiceStub ko, int p);
@@ -1141,7 +1141,7 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for ILargeService.IntMethodWithParam10.</summary>
-	public sealed class ILargeService_IntMethodWithParam10Handler
+	public sealed class ILargeService_IntMethodWithParam10Interceptor
 	{
 		/// <summary>Delegate for IntMethodWithParam10(int p).</summary>
 		public delegate int IntMethodWithParam10Delegate(LargeServiceStub ko, int p);
@@ -1166,112 +1166,112 @@ partial class LargeServiceStub
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Benchmarks.Interfaces.ILargeService.</summary>
-	public sealed class ILargeServiceKO
+	public sealed class ILargeServiceInterceptorors
 	{
-		/// <summary>Handler for VoidMethod01.</summary>
-		public ILargeService_VoidMethod01Handler VoidMethod01 { get; } = new();
-		/// <summary>Handler for VoidMethod02.</summary>
-		public ILargeService_VoidMethod02Handler VoidMethod02 { get; } = new();
-		/// <summary>Handler for VoidMethod03.</summary>
-		public ILargeService_VoidMethod03Handler VoidMethod03 { get; } = new();
-		/// <summary>Handler for VoidMethod04.</summary>
-		public ILargeService_VoidMethod04Handler VoidMethod04 { get; } = new();
-		/// <summary>Handler for VoidMethod05.</summary>
-		public ILargeService_VoidMethod05Handler VoidMethod05 { get; } = new();
-		/// <summary>Handler for VoidMethod06.</summary>
-		public ILargeService_VoidMethod06Handler VoidMethod06 { get; } = new();
-		/// <summary>Handler for VoidMethod07.</summary>
-		public ILargeService_VoidMethod07Handler VoidMethod07 { get; } = new();
-		/// <summary>Handler for VoidMethod08.</summary>
-		public ILargeService_VoidMethod08Handler VoidMethod08 { get; } = new();
-		/// <summary>Handler for VoidMethod09.</summary>
-		public ILargeService_VoidMethod09Handler VoidMethod09 { get; } = new();
-		/// <summary>Handler for VoidMethod10.</summary>
-		public ILargeService_VoidMethod10Handler VoidMethod10 { get; } = new();
-		/// <summary>Handler for VoidMethodWithParam01.</summary>
-		public ILargeService_VoidMethodWithParam01Handler VoidMethodWithParam01 { get; } = new();
-		/// <summary>Handler for VoidMethodWithParam02.</summary>
-		public ILargeService_VoidMethodWithParam02Handler VoidMethodWithParam02 { get; } = new();
-		/// <summary>Handler for VoidMethodWithParam03.</summary>
-		public ILargeService_VoidMethodWithParam03Handler VoidMethodWithParam03 { get; } = new();
-		/// <summary>Handler for VoidMethodWithParam04.</summary>
-		public ILargeService_VoidMethodWithParam04Handler VoidMethodWithParam04 { get; } = new();
-		/// <summary>Handler for VoidMethodWithParam05.</summary>
-		public ILargeService_VoidMethodWithParam05Handler VoidMethodWithParam05 { get; } = new();
-		/// <summary>Handler for VoidMethodWithParam06.</summary>
-		public ILargeService_VoidMethodWithParam06Handler VoidMethodWithParam06 { get; } = new();
-		/// <summary>Handler for VoidMethodWithParam07.</summary>
-		public ILargeService_VoidMethodWithParam07Handler VoidMethodWithParam07 { get; } = new();
-		/// <summary>Handler for VoidMethodWithParam08.</summary>
-		public ILargeService_VoidMethodWithParam08Handler VoidMethodWithParam08 { get; } = new();
-		/// <summary>Handler for VoidMethodWithParam09.</summary>
-		public ILargeService_VoidMethodWithParam09Handler VoidMethodWithParam09 { get; } = new();
-		/// <summary>Handler for VoidMethodWithParam10.</summary>
-		public ILargeService_VoidMethodWithParam10Handler VoidMethodWithParam10 { get; } = new();
-		/// <summary>Handler for IntMethod01.</summary>
-		public ILargeService_IntMethod01Handler IntMethod01 { get; } = new();
-		/// <summary>Handler for IntMethod02.</summary>
-		public ILargeService_IntMethod02Handler IntMethod02 { get; } = new();
-		/// <summary>Handler for IntMethod03.</summary>
-		public ILargeService_IntMethod03Handler IntMethod03 { get; } = new();
-		/// <summary>Handler for IntMethod04.</summary>
-		public ILargeService_IntMethod04Handler IntMethod04 { get; } = new();
-		/// <summary>Handler for IntMethod05.</summary>
-		public ILargeService_IntMethod05Handler IntMethod05 { get; } = new();
-		/// <summary>Handler for IntMethod06.</summary>
-		public ILargeService_IntMethod06Handler IntMethod06 { get; } = new();
-		/// <summary>Handler for IntMethod07.</summary>
-		public ILargeService_IntMethod07Handler IntMethod07 { get; } = new();
-		/// <summary>Handler for IntMethod08.</summary>
-		public ILargeService_IntMethod08Handler IntMethod08 { get; } = new();
-		/// <summary>Handler for IntMethod09.</summary>
-		public ILargeService_IntMethod09Handler IntMethod09 { get; } = new();
-		/// <summary>Handler for IntMethod10.</summary>
-		public ILargeService_IntMethod10Handler IntMethod10 { get; } = new();
-		/// <summary>Handler for StringMethod01.</summary>
-		public ILargeService_StringMethod01Handler StringMethod01 { get; } = new();
-		/// <summary>Handler for StringMethod02.</summary>
-		public ILargeService_StringMethod02Handler StringMethod02 { get; } = new();
-		/// <summary>Handler for StringMethod03.</summary>
-		public ILargeService_StringMethod03Handler StringMethod03 { get; } = new();
-		/// <summary>Handler for StringMethod04.</summary>
-		public ILargeService_StringMethod04Handler StringMethod04 { get; } = new();
-		/// <summary>Handler for StringMethod05.</summary>
-		public ILargeService_StringMethod05Handler StringMethod05 { get; } = new();
-		/// <summary>Handler for StringMethod06.</summary>
-		public ILargeService_StringMethod06Handler StringMethod06 { get; } = new();
-		/// <summary>Handler for StringMethod07.</summary>
-		public ILargeService_StringMethod07Handler StringMethod07 { get; } = new();
-		/// <summary>Handler for StringMethod08.</summary>
-		public ILargeService_StringMethod08Handler StringMethod08 { get; } = new();
-		/// <summary>Handler for StringMethod09.</summary>
-		public ILargeService_StringMethod09Handler StringMethod09 { get; } = new();
-		/// <summary>Handler for StringMethod10.</summary>
-		public ILargeService_StringMethod10Handler StringMethod10 { get; } = new();
-		/// <summary>Handler for IntMethodWithParam01.</summary>
-		public ILargeService_IntMethodWithParam01Handler IntMethodWithParam01 { get; } = new();
-		/// <summary>Handler for IntMethodWithParam02.</summary>
-		public ILargeService_IntMethodWithParam02Handler IntMethodWithParam02 { get; } = new();
-		/// <summary>Handler for IntMethodWithParam03.</summary>
-		public ILargeService_IntMethodWithParam03Handler IntMethodWithParam03 { get; } = new();
-		/// <summary>Handler for IntMethodWithParam04.</summary>
-		public ILargeService_IntMethodWithParam04Handler IntMethodWithParam04 { get; } = new();
-		/// <summary>Handler for IntMethodWithParam05.</summary>
-		public ILargeService_IntMethodWithParam05Handler IntMethodWithParam05 { get; } = new();
-		/// <summary>Handler for IntMethodWithParam06.</summary>
-		public ILargeService_IntMethodWithParam06Handler IntMethodWithParam06 { get; } = new();
-		/// <summary>Handler for IntMethodWithParam07.</summary>
-		public ILargeService_IntMethodWithParam07Handler IntMethodWithParam07 { get; } = new();
-		/// <summary>Handler for IntMethodWithParam08.</summary>
-		public ILargeService_IntMethodWithParam08Handler IntMethodWithParam08 { get; } = new();
-		/// <summary>Handler for IntMethodWithParam09.</summary>
-		public ILargeService_IntMethodWithParam09Handler IntMethodWithParam09 { get; } = new();
-		/// <summary>Handler for IntMethodWithParam10.</summary>
-		public ILargeService_IntMethodWithParam10Handler IntMethodWithParam10 { get; } = new();
+		/// <summary>Interceptor for VoidMethod01.</summary>
+		public ILargeService_VoidMethod01Interceptor VoidMethod01 { get; } = new();
+		/// <summary>Interceptor for VoidMethod02.</summary>
+		public ILargeService_VoidMethod02Interceptor VoidMethod02 { get; } = new();
+		/// <summary>Interceptor for VoidMethod03.</summary>
+		public ILargeService_VoidMethod03Interceptor VoidMethod03 { get; } = new();
+		/// <summary>Interceptor for VoidMethod04.</summary>
+		public ILargeService_VoidMethod04Interceptor VoidMethod04 { get; } = new();
+		/// <summary>Interceptor for VoidMethod05.</summary>
+		public ILargeService_VoidMethod05Interceptor VoidMethod05 { get; } = new();
+		/// <summary>Interceptor for VoidMethod06.</summary>
+		public ILargeService_VoidMethod06Interceptor VoidMethod06 { get; } = new();
+		/// <summary>Interceptor for VoidMethod07.</summary>
+		public ILargeService_VoidMethod07Interceptor VoidMethod07 { get; } = new();
+		/// <summary>Interceptor for VoidMethod08.</summary>
+		public ILargeService_VoidMethod08Interceptor VoidMethod08 { get; } = new();
+		/// <summary>Interceptor for VoidMethod09.</summary>
+		public ILargeService_VoidMethod09Interceptor VoidMethod09 { get; } = new();
+		/// <summary>Interceptor for VoidMethod10.</summary>
+		public ILargeService_VoidMethod10Interceptor VoidMethod10 { get; } = new();
+		/// <summary>Interceptor for VoidMethodWithParam01.</summary>
+		public ILargeService_VoidMethodWithParam01Interceptor VoidMethodWithParam01 { get; } = new();
+		/// <summary>Interceptor for VoidMethodWithParam02.</summary>
+		public ILargeService_VoidMethodWithParam02Interceptor VoidMethodWithParam02 { get; } = new();
+		/// <summary>Interceptor for VoidMethodWithParam03.</summary>
+		public ILargeService_VoidMethodWithParam03Interceptor VoidMethodWithParam03 { get; } = new();
+		/// <summary>Interceptor for VoidMethodWithParam04.</summary>
+		public ILargeService_VoidMethodWithParam04Interceptor VoidMethodWithParam04 { get; } = new();
+		/// <summary>Interceptor for VoidMethodWithParam05.</summary>
+		public ILargeService_VoidMethodWithParam05Interceptor VoidMethodWithParam05 { get; } = new();
+		/// <summary>Interceptor for VoidMethodWithParam06.</summary>
+		public ILargeService_VoidMethodWithParam06Interceptor VoidMethodWithParam06 { get; } = new();
+		/// <summary>Interceptor for VoidMethodWithParam07.</summary>
+		public ILargeService_VoidMethodWithParam07Interceptor VoidMethodWithParam07 { get; } = new();
+		/// <summary>Interceptor for VoidMethodWithParam08.</summary>
+		public ILargeService_VoidMethodWithParam08Interceptor VoidMethodWithParam08 { get; } = new();
+		/// <summary>Interceptor for VoidMethodWithParam09.</summary>
+		public ILargeService_VoidMethodWithParam09Interceptor VoidMethodWithParam09 { get; } = new();
+		/// <summary>Interceptor for VoidMethodWithParam10.</summary>
+		public ILargeService_VoidMethodWithParam10Interceptor VoidMethodWithParam10 { get; } = new();
+		/// <summary>Interceptor for IntMethod01.</summary>
+		public ILargeService_IntMethod01Interceptor IntMethod01 { get; } = new();
+		/// <summary>Interceptor for IntMethod02.</summary>
+		public ILargeService_IntMethod02Interceptor IntMethod02 { get; } = new();
+		/// <summary>Interceptor for IntMethod03.</summary>
+		public ILargeService_IntMethod03Interceptor IntMethod03 { get; } = new();
+		/// <summary>Interceptor for IntMethod04.</summary>
+		public ILargeService_IntMethod04Interceptor IntMethod04 { get; } = new();
+		/// <summary>Interceptor for IntMethod05.</summary>
+		public ILargeService_IntMethod05Interceptor IntMethod05 { get; } = new();
+		/// <summary>Interceptor for IntMethod06.</summary>
+		public ILargeService_IntMethod06Interceptor IntMethod06 { get; } = new();
+		/// <summary>Interceptor for IntMethod07.</summary>
+		public ILargeService_IntMethod07Interceptor IntMethod07 { get; } = new();
+		/// <summary>Interceptor for IntMethod08.</summary>
+		public ILargeService_IntMethod08Interceptor IntMethod08 { get; } = new();
+		/// <summary>Interceptor for IntMethod09.</summary>
+		public ILargeService_IntMethod09Interceptor IntMethod09 { get; } = new();
+		/// <summary>Interceptor for IntMethod10.</summary>
+		public ILargeService_IntMethod10Interceptor IntMethod10 { get; } = new();
+		/// <summary>Interceptor for StringMethod01.</summary>
+		public ILargeService_StringMethod01Interceptor StringMethod01 { get; } = new();
+		/// <summary>Interceptor for StringMethod02.</summary>
+		public ILargeService_StringMethod02Interceptor StringMethod02 { get; } = new();
+		/// <summary>Interceptor for StringMethod03.</summary>
+		public ILargeService_StringMethod03Interceptor StringMethod03 { get; } = new();
+		/// <summary>Interceptor for StringMethod04.</summary>
+		public ILargeService_StringMethod04Interceptor StringMethod04 { get; } = new();
+		/// <summary>Interceptor for StringMethod05.</summary>
+		public ILargeService_StringMethod05Interceptor StringMethod05 { get; } = new();
+		/// <summary>Interceptor for StringMethod06.</summary>
+		public ILargeService_StringMethod06Interceptor StringMethod06 { get; } = new();
+		/// <summary>Interceptor for StringMethod07.</summary>
+		public ILargeService_StringMethod07Interceptor StringMethod07 { get; } = new();
+		/// <summary>Interceptor for StringMethod08.</summary>
+		public ILargeService_StringMethod08Interceptor StringMethod08 { get; } = new();
+		/// <summary>Interceptor for StringMethod09.</summary>
+		public ILargeService_StringMethod09Interceptor StringMethod09 { get; } = new();
+		/// <summary>Interceptor for StringMethod10.</summary>
+		public ILargeService_StringMethod10Interceptor StringMethod10 { get; } = new();
+		/// <summary>Interceptor for IntMethodWithParam01.</summary>
+		public ILargeService_IntMethodWithParam01Interceptor IntMethodWithParam01 { get; } = new();
+		/// <summary>Interceptor for IntMethodWithParam02.</summary>
+		public ILargeService_IntMethodWithParam02Interceptor IntMethodWithParam02 { get; } = new();
+		/// <summary>Interceptor for IntMethodWithParam03.</summary>
+		public ILargeService_IntMethodWithParam03Interceptor IntMethodWithParam03 { get; } = new();
+		/// <summary>Interceptor for IntMethodWithParam04.</summary>
+		public ILargeService_IntMethodWithParam04Interceptor IntMethodWithParam04 { get; } = new();
+		/// <summary>Interceptor for IntMethodWithParam05.</summary>
+		public ILargeService_IntMethodWithParam05Interceptor IntMethodWithParam05 { get; } = new();
+		/// <summary>Interceptor for IntMethodWithParam06.</summary>
+		public ILargeService_IntMethodWithParam06Interceptor IntMethodWithParam06 { get; } = new();
+		/// <summary>Interceptor for IntMethodWithParam07.</summary>
+		public ILargeService_IntMethodWithParam07Interceptor IntMethodWithParam07 { get; } = new();
+		/// <summary>Interceptor for IntMethodWithParam08.</summary>
+		public ILargeService_IntMethodWithParam08Interceptor IntMethodWithParam08 { get; } = new();
+		/// <summary>Interceptor for IntMethodWithParam09.</summary>
+		public ILargeService_IntMethodWithParam09Interceptor IntMethodWithParam09 { get; } = new();
+		/// <summary>Interceptor for IntMethodWithParam10.</summary>
+		public ILargeService_IntMethodWithParam10Interceptor IntMethodWithParam10 { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Benchmarks.Interfaces.ILargeService.</summary>
-	public ILargeServiceKO ILargeService { get; } = new();
+	public ILargeServiceInterceptorors ILargeService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Benchmarks.Interfaces.ILargeService.</summary>
 	public KnockOff.Benchmarks.Interfaces.ILargeService AsLargeService() => this;

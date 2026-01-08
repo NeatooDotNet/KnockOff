@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class SkRefProcessorKnockOff
 {
 	/// <summary>Tracks and configures behavior for ISkRefProcessor.Increment.</summary>
-	public sealed class ISkRefProcessor_IncrementHandler
+	public sealed class ISkRefProcessor_IncrementInterceptor
 	{
 		/// <summary>Delegate for Increment(ref int value).</summary>
 		public delegate void IncrementDelegate(SkRefProcessorKnockOff ko, ref int value);
@@ -31,7 +31,7 @@ partial class SkRefProcessorKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISkRefProcessor.TryUpdate.</summary>
-	public sealed class ISkRefProcessor_TryUpdateHandler
+	public sealed class ISkRefProcessor_TryUpdateInterceptor
 	{
 		/// <summary>Delegate for TryUpdate(string key, ref string value).</summary>
 		public delegate bool TryUpdateDelegate(SkRefProcessorKnockOff ko, string key, ref string value);
@@ -56,16 +56,16 @@ partial class SkRefProcessorKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkRefProcessor.</summary>
-	public sealed class ISkRefProcessorKO
+	public sealed class ISkRefProcessorInterceptorors
 	{
-		/// <summary>Handler for Increment.</summary>
-		public ISkRefProcessor_IncrementHandler Increment { get; } = new();
-		/// <summary>Handler for TryUpdate.</summary>
-		public ISkRefProcessor_TryUpdateHandler TryUpdate { get; } = new();
+		/// <summary>Interceptor for Increment.</summary>
+		public ISkRefProcessor_IncrementInterceptor Increment { get; } = new();
+		/// <summary>Interceptor for TryUpdate.</summary>
+		public ISkRefProcessor_TryUpdateInterceptor TryUpdate { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkRefProcessor.</summary>
-	public ISkRefProcessorKO ISkRefProcessor { get; } = new();
+	public ISkRefProcessorInterceptorors ISkRefProcessor { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkRefProcessor.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkRefProcessor AsSkRefProcessor() => this;

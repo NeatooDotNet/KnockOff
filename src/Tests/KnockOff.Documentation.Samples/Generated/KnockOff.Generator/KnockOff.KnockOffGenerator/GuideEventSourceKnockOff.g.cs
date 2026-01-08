@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class GuideEventSourceKnockOff
 {
 	/// <summary>Tracks and raises IGuideEventSource.MessageReceived.</summary>
-	public sealed class IGuideEventSource_MessageReceivedHandler
+	public sealed class IGuideEventSource_MessageReceivedInterceptor
 	{
 		private global::System.EventHandler<string>? _handler;
 		private readonly global::System.Collections.Generic.List<(object? sender, string e)> _raises = new();
@@ -62,7 +62,7 @@ partial class GuideEventSourceKnockOff
 	}
 
 	/// <summary>Tracks and raises IGuideEventSource.OnCompleted.</summary>
-	public sealed class IGuideEventSource_OnCompletedHandler
+	public sealed class IGuideEventSource_OnCompletedInterceptor
 	{
 		private global::System.EventHandler? _handler;
 		private readonly global::System.Collections.Generic.List<(object? sender, global::System.EventArgs e)> _raises = new();
@@ -118,7 +118,7 @@ partial class GuideEventSourceKnockOff
 	}
 
 	/// <summary>Tracks and raises IGuideEventSource.OnProgress.</summary>
-	public sealed class IGuideEventSource_OnProgressHandler
+	public sealed class IGuideEventSource_OnProgressInterceptor
 	{
 		private global::System.Action<int>? _handler;
 		private readonly global::System.Collections.Generic.List<int> _raises = new();
@@ -171,7 +171,7 @@ partial class GuideEventSourceKnockOff
 	}
 
 	/// <summary>Tracks and raises IGuideEventSource.OnData.</summary>
-	public sealed class IGuideEventSource_OnDataHandler
+	public sealed class IGuideEventSource_OnDataInterceptor
 	{
 		private global::System.Action<string, int>? _handler;
 		private readonly global::System.Collections.Generic.List<(string arg1, int arg2)> _raises = new();
@@ -224,20 +224,20 @@ partial class GuideEventSourceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGuideEventSource.</summary>
-	public sealed class IGuideEventSourceKO
+	public sealed class IGuideEventSourceInterceptorors
 	{
-		/// <summary>Handler for MessageReceived event.</summary>
-		public IGuideEventSource_MessageReceivedHandler MessageReceived { get; } = new();
-		/// <summary>Handler for OnCompleted event.</summary>
-		public IGuideEventSource_OnCompletedHandler OnCompleted { get; } = new();
-		/// <summary>Handler for OnProgress event.</summary>
-		public IGuideEventSource_OnProgressHandler OnProgress { get; } = new();
-		/// <summary>Handler for OnData event.</summary>
-		public IGuideEventSource_OnDataHandler OnData { get; } = new();
+		/// <summary>Interceptor for MessageReceived event.</summary>
+		public IGuideEventSource_MessageReceivedInterceptor MessageReceived { get; } = new();
+		/// <summary>Interceptor for OnCompleted event.</summary>
+		public IGuideEventSource_OnCompletedInterceptor OnCompleted { get; } = new();
+		/// <summary>Interceptor for OnProgress event.</summary>
+		public IGuideEventSource_OnProgressInterceptor OnProgress { get; } = new();
+		/// <summary>Interceptor for OnData event.</summary>
+		public IGuideEventSource_OnDataInterceptor OnData { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGuideEventSource.</summary>
-	public IGuideEventSourceKO IGuideEventSource { get; } = new();
+	public IGuideEventSourceInterceptorors IGuideEventSource { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IGuideEventSource.</summary>
 	public KnockOff.Documentation.Samples.Guides.IGuideEventSource AsGuideEventSource() => this;

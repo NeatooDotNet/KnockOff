@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 partial class MethodPriorityKnockOff
 {
 	/// <summary>Tracks and configures behavior for IMethodPriority.Calculate.</summary>
-	public sealed class IMethodPriority_CalculateHandler
+	public sealed class IMethodPriority_CalculateInterceptor
 	{
 		/// <summary>Delegate for Calculate(int x).</summary>
 		public delegate int CalculateDelegate(MethodPriorityKnockOff ko, int x);
@@ -31,14 +31,14 @@ partial class MethodPriorityKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodPriority.</summary>
-	public sealed class IMethodPriorityKO
+	public sealed class IMethodPriorityInterceptorors
 	{
-		/// <summary>Handler for Calculate.</summary>
-		public IMethodPriority_CalculateHandler Calculate { get; } = new();
+		/// <summary>Interceptor for Calculate.</summary>
+		public IMethodPriority_CalculateInterceptor Calculate { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodPriority.</summary>
-	public IMethodPriorityKO IMethodPriority { get; } = new();
+	public IMethodPriorityInterceptorors IMethodPriority { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodPriority.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMethodPriority AsMethodPriority() => this;

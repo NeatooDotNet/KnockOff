@@ -6,7 +6,7 @@ namespace KnockOff.Tests;
 partial class MultiInterfaceKnockOff
 {
 	/// <summary>Tracks and configures behavior for ILogger.Name.</summary>
-	public sealed class ILogger_NameHandler
+	public sealed class ILogger_NameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -34,7 +34,7 @@ partial class MultiInterfaceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ILogger.Log.</summary>
-	public sealed class ILogger_LogHandler
+	public sealed class ILogger_LogInterceptor
 	{
 		/// <summary>Delegate for Log(string message).</summary>
 		public delegate void LogDelegate(MultiInterfaceKnockOff ko, string message);
@@ -59,16 +59,16 @@ partial class MultiInterfaceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.ILogger.</summary>
-	public sealed class ILoggerKO
+	public sealed class ILoggerInterceptorors
 	{
-		/// <summary>Handler for Name.</summary>
-		public ILogger_NameHandler Name { get; } = new();
-		/// <summary>Handler for Log.</summary>
-		public ILogger_LogHandler Log { get; } = new();
+		/// <summary>Interceptor for Name.</summary>
+		public ILogger_NameInterceptor Name { get; } = new();
+		/// <summary>Interceptor for Log.</summary>
+		public ILogger_LogInterceptor Log { get; } = new();
 	}
 
 	/// <summary>Tracks and configures behavior for INotifier.Name.</summary>
-	public sealed class INotifier_NameHandler
+	public sealed class INotifier_NameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -84,7 +84,7 @@ partial class MultiInterfaceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for INotifier.Notify.</summary>
-	public sealed class INotifier_NotifyHandler
+	public sealed class INotifier_NotifyInterceptor
 	{
 		/// <summary>Delegate for Notify(string recipient).</summary>
 		public delegate void NotifyDelegate(MultiInterfaceKnockOff ko, string recipient);
@@ -109,19 +109,19 @@ partial class MultiInterfaceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.INotifier.</summary>
-	public sealed class INotifierKO
+	public sealed class INotifierInterceptorors
 	{
-		/// <summary>Handler for Name.</summary>
-		public INotifier_NameHandler Name { get; } = new();
-		/// <summary>Handler for Notify.</summary>
-		public INotifier_NotifyHandler Notify { get; } = new();
+		/// <summary>Interceptor for Name.</summary>
+		public INotifier_NameInterceptor Name { get; } = new();
+		/// <summary>Interceptor for Notify.</summary>
+		public INotifier_NotifyInterceptor Notify { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.ILogger.</summary>
-	public ILoggerKO ILogger { get; } = new();
+	public ILoggerInterceptorors ILogger { get; } = new();
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.INotifier.</summary>
-	public INotifierKO INotifier { get; } = new();
+	public INotifierInterceptorors INotifier { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.ILogger.</summary>
 	public KnockOff.Tests.ILogger AsLogger() => this;

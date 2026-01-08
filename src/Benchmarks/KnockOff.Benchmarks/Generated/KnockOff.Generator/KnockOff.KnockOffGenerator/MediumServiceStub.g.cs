@@ -6,7 +6,7 @@ namespace KnockOff.Benchmarks.Stubs;
 partial class MediumServiceStub
 {
 	/// <summary>Tracks and configures behavior for IMediumService.Method1.</summary>
-	public sealed class IMediumService_Method1Handler
+	public sealed class IMediumService_Method1Interceptor
 	{
 		/// <summary>Delegate for Method1().</summary>
 		public delegate void Method1Delegate(MediumServiceStub ko);
@@ -28,7 +28,7 @@ partial class MediumServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for IMediumService.Method2.</summary>
-	public sealed class IMediumService_Method2Handler
+	public sealed class IMediumService_Method2Interceptor
 	{
 		/// <summary>Delegate for Method2(int param).</summary>
 		public delegate void Method2Delegate(MediumServiceStub ko, int param);
@@ -53,7 +53,7 @@ partial class MediumServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for IMediumService.Method3.</summary>
-	public sealed class IMediumService_Method3Handler
+	public sealed class IMediumService_Method3Interceptor
 	{
 		/// <summary>Delegate for Method3(string param).</summary>
 		public delegate void Method3Delegate(MediumServiceStub ko, string param);
@@ -78,7 +78,7 @@ partial class MediumServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for IMediumService.Method4.</summary>
-	public sealed class IMediumService_Method4Handler
+	public sealed class IMediumService_Method4Interceptor
 	{
 		/// <summary>Delegate for Method4(int a, string b).</summary>
 		public delegate void Method4Delegate(MediumServiceStub ko, int a, string b);
@@ -103,7 +103,7 @@ partial class MediumServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for IMediumService.Method5.</summary>
-	public sealed class IMediumService_Method5Handler
+	public sealed class IMediumService_Method5Interceptor
 	{
 		/// <summary>Delegate for Method5(int a, int b, int c).</summary>
 		public delegate void Method5Delegate(MediumServiceStub ko, int a, int b, int c);
@@ -128,7 +128,7 @@ partial class MediumServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for IMediumService.Method6.</summary>
-	public sealed class IMediumService_Method6Handler
+	public sealed class IMediumService_Method6Interceptor
 	{
 		/// <summary>Delegate for Method6().</summary>
 		public delegate int Method6Delegate(MediumServiceStub ko);
@@ -150,7 +150,7 @@ partial class MediumServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for IMediumService.Method7.</summary>
-	public sealed class IMediumService_Method7Handler
+	public sealed class IMediumService_Method7Interceptor
 	{
 		/// <summary>Delegate for Method7().</summary>
 		public delegate string Method7Delegate(MediumServiceStub ko);
@@ -172,7 +172,7 @@ partial class MediumServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for IMediumService.Method8.</summary>
-	public sealed class IMediumService_Method8Handler
+	public sealed class IMediumService_Method8Interceptor
 	{
 		/// <summary>Delegate for Method8(int param).</summary>
 		public delegate int Method8Delegate(MediumServiceStub ko, int param);
@@ -197,7 +197,7 @@ partial class MediumServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for IMediumService.Method9.</summary>
-	public sealed class IMediumService_Method9Handler
+	public sealed class IMediumService_Method9Interceptor
 	{
 		/// <summary>Delegate for Method9(string param).</summary>
 		public delegate string Method9Delegate(MediumServiceStub ko, string param);
@@ -222,7 +222,7 @@ partial class MediumServiceStub
 	}
 
 	/// <summary>Tracks and configures behavior for IMediumService.Method10.</summary>
-	public sealed class IMediumService_Method10Handler
+	public sealed class IMediumService_Method10Interceptor
 	{
 		/// <summary>Delegate for Method10(int a, string b).</summary>
 		public delegate bool Method10Delegate(MediumServiceStub ko, int a, string b);
@@ -247,32 +247,32 @@ partial class MediumServiceStub
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Benchmarks.Interfaces.IMediumService.</summary>
-	public sealed class IMediumServiceKO
+	public sealed class IMediumServiceInterceptorors
 	{
-		/// <summary>Handler for Method1.</summary>
-		public IMediumService_Method1Handler Method1 { get; } = new();
-		/// <summary>Handler for Method2.</summary>
-		public IMediumService_Method2Handler Method2 { get; } = new();
-		/// <summary>Handler for Method3.</summary>
-		public IMediumService_Method3Handler Method3 { get; } = new();
-		/// <summary>Handler for Method4.</summary>
-		public IMediumService_Method4Handler Method4 { get; } = new();
-		/// <summary>Handler for Method5.</summary>
-		public IMediumService_Method5Handler Method5 { get; } = new();
-		/// <summary>Handler for Method6.</summary>
-		public IMediumService_Method6Handler Method6 { get; } = new();
-		/// <summary>Handler for Method7.</summary>
-		public IMediumService_Method7Handler Method7 { get; } = new();
-		/// <summary>Handler for Method8.</summary>
-		public IMediumService_Method8Handler Method8 { get; } = new();
-		/// <summary>Handler for Method9.</summary>
-		public IMediumService_Method9Handler Method9 { get; } = new();
-		/// <summary>Handler for Method10.</summary>
-		public IMediumService_Method10Handler Method10 { get; } = new();
+		/// <summary>Interceptor for Method1.</summary>
+		public IMediumService_Method1Interceptor Method1 { get; } = new();
+		/// <summary>Interceptor for Method2.</summary>
+		public IMediumService_Method2Interceptor Method2 { get; } = new();
+		/// <summary>Interceptor for Method3.</summary>
+		public IMediumService_Method3Interceptor Method3 { get; } = new();
+		/// <summary>Interceptor for Method4.</summary>
+		public IMediumService_Method4Interceptor Method4 { get; } = new();
+		/// <summary>Interceptor for Method5.</summary>
+		public IMediumService_Method5Interceptor Method5 { get; } = new();
+		/// <summary>Interceptor for Method6.</summary>
+		public IMediumService_Method6Interceptor Method6 { get; } = new();
+		/// <summary>Interceptor for Method7.</summary>
+		public IMediumService_Method7Interceptor Method7 { get; } = new();
+		/// <summary>Interceptor for Method8.</summary>
+		public IMediumService_Method8Interceptor Method8 { get; } = new();
+		/// <summary>Interceptor for Method9.</summary>
+		public IMediumService_Method9Interceptor Method9 { get; } = new();
+		/// <summary>Interceptor for Method10.</summary>
+		public IMediumService_Method10Interceptor Method10 { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Benchmarks.Interfaces.IMediumService.</summary>
-	public IMediumServiceKO IMediumService { get; } = new();
+	public IMediumServiceInterceptorors IMediumService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Benchmarks.Interfaces.IMediumService.</summary>
 	public KnockOff.Benchmarks.Interfaces.IMediumService AsMediumService() => this;

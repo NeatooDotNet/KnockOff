@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.GettingStarted;
 partial class UserServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for IUserServiceSimple.Name.</summary>
-	public sealed class IUserServiceSimple_NameHandler
+	public sealed class IUserServiceSimple_NameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -34,7 +34,7 @@ partial class UserServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IUserServiceSimple.GetUser.</summary>
-	public sealed class IUserServiceSimple_GetUserHandler
+	public sealed class IUserServiceSimple_GetUserInterceptor
 	{
 		/// <summary>Delegate for GetUser(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.GettingStarted.User GetUserDelegate(UserServiceKnockOff ko, int id);
@@ -59,16 +59,16 @@ partial class UserServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple.</summary>
-	public sealed class IUserServiceSimpleKO
+	public sealed class IUserServiceSimpleInterceptorors
 	{
-		/// <summary>Handler for Name.</summary>
-		public IUserServiceSimple_NameHandler Name { get; } = new();
-		/// <summary>Handler for GetUser.</summary>
-		public IUserServiceSimple_GetUserHandler GetUser { get; } = new();
+		/// <summary>Interceptor for Name.</summary>
+		public IUserServiceSimple_NameInterceptor Name { get; } = new();
+		/// <summary>Interceptor for GetUser.</summary>
+		public IUserServiceSimple_GetUserInterceptor GetUser { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple.</summary>
-	public IUserServiceSimpleKO IUserServiceSimple { get; } = new();
+	public IUserServiceSimpleInterceptorors IUserServiceSimple { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple.</summary>
 	public KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple AsUserServiceSimple() => this;

@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class HaDefaultsServiceKnockOff
 {
 	/// <summary>Tracks and configures behavior for IHaDefaultsService.GetCount.</summary>
-	public sealed class IHaDefaultsService_GetCountHandler
+	public sealed class IHaDefaultsService_GetCountInterceptor
 	{
 		/// <summary>Delegate for GetCount().</summary>
 		public delegate int GetCountDelegate(HaDefaultsServiceKnockOff ko);
@@ -28,7 +28,7 @@ partial class HaDefaultsServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IHaDefaultsService.GetItems.</summary>
-	public sealed class IHaDefaultsService_GetItemsHandler
+	public sealed class IHaDefaultsService_GetItemsInterceptor
 	{
 		/// <summary>Delegate for GetItems().</summary>
 		public delegate global::System.Collections.Generic.List<string> GetItemsDelegate(HaDefaultsServiceKnockOff ko);
@@ -50,7 +50,7 @@ partial class HaDefaultsServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IHaDefaultsService.GetIList.</summary>
-	public sealed class IHaDefaultsService_GetIListHandler
+	public sealed class IHaDefaultsService_GetIListInterceptor
 	{
 		/// <summary>Delegate for GetIList().</summary>
 		public delegate global::System.Collections.Generic.IList<string> GetIListDelegate(HaDefaultsServiceKnockOff ko);
@@ -72,7 +72,7 @@ partial class HaDefaultsServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IHaDefaultsService.GetOptional.</summary>
-	public sealed class IHaDefaultsService_GetOptionalHandler
+	public sealed class IHaDefaultsService_GetOptionalInterceptor
 	{
 		/// <summary>Delegate for GetOptional().</summary>
 		public delegate string? GetOptionalDelegate(HaDefaultsServiceKnockOff ko);
@@ -94,7 +94,7 @@ partial class HaDefaultsServiceKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for IHaDefaultsService.GetDisposable.</summary>
-	public sealed class IHaDefaultsService_GetDisposableHandler
+	public sealed class IHaDefaultsService_GetDisposableInterceptor
 	{
 		/// <summary>Delegate for GetDisposable().</summary>
 		public delegate global::System.IDisposable GetDisposableDelegate(HaDefaultsServiceKnockOff ko);
@@ -116,22 +116,22 @@ partial class HaDefaultsServiceKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaDefaultsService.</summary>
-	public sealed class IHaDefaultsServiceKO
+	public sealed class IHaDefaultsServiceInterceptorors
 	{
-		/// <summary>Handler for GetCount.</summary>
-		public IHaDefaultsService_GetCountHandler GetCount { get; } = new();
-		/// <summary>Handler for GetItems.</summary>
-		public IHaDefaultsService_GetItemsHandler GetItems { get; } = new();
-		/// <summary>Handler for GetIList.</summary>
-		public IHaDefaultsService_GetIListHandler GetIList { get; } = new();
-		/// <summary>Handler for GetOptional.</summary>
-		public IHaDefaultsService_GetOptionalHandler GetOptional { get; } = new();
-		/// <summary>Handler for GetDisposable.</summary>
-		public IHaDefaultsService_GetDisposableHandler GetDisposable { get; } = new();
+		/// <summary>Interceptor for GetCount.</summary>
+		public IHaDefaultsService_GetCountInterceptor GetCount { get; } = new();
+		/// <summary>Interceptor for GetItems.</summary>
+		public IHaDefaultsService_GetItemsInterceptor GetItems { get; } = new();
+		/// <summary>Interceptor for GetIList.</summary>
+		public IHaDefaultsService_GetIListInterceptor GetIList { get; } = new();
+		/// <summary>Interceptor for GetOptional.</summary>
+		public IHaDefaultsService_GetOptionalInterceptor GetOptional { get; } = new();
+		/// <summary>Interceptor for GetDisposable.</summary>
+		public IHaDefaultsService_GetDisposableInterceptor GetDisposable { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaDefaultsService.</summary>
-	public IHaDefaultsServiceKO IHaDefaultsService { get; } = new();
+	public IHaDefaultsServiceInterceptorors IHaDefaultsService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IHaDefaultsService.</summary>
 	public KnockOff.Documentation.Samples.Skills.IHaDefaultsService AsHaDefaultsService() => this;

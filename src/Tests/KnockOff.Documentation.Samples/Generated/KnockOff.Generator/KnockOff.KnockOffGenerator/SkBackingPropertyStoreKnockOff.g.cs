@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class SkBackingPropertyStoreKnockOff
 {
 	/// <summary>Tracks and configures behavior for ISkBackingPropertyStore.StringIndexer.</summary>
-	public sealed class ISkBackingPropertyStore_StringIndexerHandler
+	public sealed class ISkBackingPropertyStore_StringIndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -37,14 +37,14 @@ partial class SkBackingPropertyStoreKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkBackingPropertyStore.</summary>
-	public sealed class ISkBackingPropertyStoreKO
+	public sealed class ISkBackingPropertyStoreInterceptorors
 	{
-		/// <summary>Handler for StringIndexer.</summary>
-		public ISkBackingPropertyStore_StringIndexerHandler StringIndexer { get; } = new();
+		/// <summary>Interceptor for StringIndexer.</summary>
+		public ISkBackingPropertyStore_StringIndexerInterceptor StringIndexer { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkBackingPropertyStore.</summary>
-	public ISkBackingPropertyStoreKO ISkBackingPropertyStore { get; } = new();
+	public ISkBackingPropertyStoreInterceptorors ISkBackingPropertyStore { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkBackingPropertyStore.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkBackingPropertyStore AsSkBackingPropertyStore() => this;

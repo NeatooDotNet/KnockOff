@@ -6,7 +6,7 @@ namespace KnockOff.Tests;
 partial class ReadWriteStoreKnockOff
 {
 	/// <summary>Tracks and configures behavior for IReadWriteStore.StringIndexer.</summary>
-	public sealed class IReadWriteStore_StringIndexerHandler
+	public sealed class IReadWriteStore_StringIndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -37,14 +37,14 @@ partial class ReadWriteStoreKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IReadWriteStore.</summary>
-	public sealed class IReadWriteStoreKO
+	public sealed class IReadWriteStoreInterceptorors
 	{
-		/// <summary>Handler for StringIndexer.</summary>
-		public IReadWriteStore_StringIndexerHandler StringIndexer { get; } = new();
+		/// <summary>Interceptor for StringIndexer.</summary>
+		public IReadWriteStore_StringIndexerInterceptor StringIndexer { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IReadWriteStore.</summary>
-	public IReadWriteStoreKO IReadWriteStore { get; } = new();
+	public IReadWriteStoreInterceptorors IReadWriteStore { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IReadWriteStore.</summary>
 	public KnockOff.Tests.IReadWriteStore AsReadWriteStore() => this;

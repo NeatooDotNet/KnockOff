@@ -9,7 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Key concept: A class marked with `[KnockOff]` that implements an interface will have:
 1. Explicit interface implementations generated for all members
 2. Interface-named properties for test verification (call counts, args, callbacks)
-3. User-defined methods detected and called from generated intercepts
+3. User-defined methods detected and called from generated interceptors
 
 ## Project Status
 
@@ -88,6 +88,29 @@ Reference generator as analyzer:
                   ReferenceOutputAssembly="false" />
 ```
 
+## Generator Principles
+
+1. **Generated code must compile.** If valid code cannot be generated for a scenario, emit a diagnostic error/warning instead of generating broken code.
+2. **Fail fast with clear diagnostics.** Users should understand why generation failed and how to fix it.
+3. **No silent failures.** Every unsupported scenario should have a corresponding diagnostic.
+
+## Naming Conventions
+
+### Interceptor Terminology
+
+Use **Interceptor** (singular) and **Interceptors** (plural) for generated tracking/callback classes:
+
+| Concept | Name | Example |
+|---------|------|---------|
+| Per-member class | `{Interface}_{Member}Interceptor` | `IUserService_GetUserInterceptor` |
+| Container class | `{Interface}Interceptors` | `IUserServiceInterceptors` |
+| Delegate stub property | `Interceptor` | `stub.Interceptor` |
+
+**Do NOT use:**
+- `*Intercept` (verb form, not a noun)
+- `*Intercepts` (not a valid plural)
+- `*Handler` (legacy naming, being phased out)
+
 ## Testing Approach
 
 Use "create objects then test them" pattern:
@@ -112,11 +135,11 @@ Central configuration via `Directory.Build.props` and `Directory.Packages.props`
 
 For a `[KnockOff]` class implementing an interface:
 
-1. **Interface-named property** (e.g., `IUserService`) - Contains Handler classes for that interface's members
-2. **Handler types**:
-   - Method handlers (CallCount, WasCalled, LastCallArg/LastCallArgs, OnCall, Reset)
-   - Property handlers (GetCount, SetCount, LastSetValue, OnGet, OnSet)
-   - Indexer handlers (GetCount, SetCount, LastGetKey, LastSetEntry, OnGet, OnSet)
+1. **Interface-named property** (e.g., `IUserService`) - Contains Interceptor classes for that interface's members
+2. **Interceptor types**:
+   - Method interceptors (CallCount, WasCalled, LastCallArg/LastCallArgs, OnCall, Reset)
+   - Property interceptors (GetCount, SetCount, LastSetValue, OnGet, OnSet)
+   - Indexer interceptors (GetCount, SetCount, LastGetKey, LastSetEntry, OnGet, OnSet)
 3. **Protected backing members** - Properties get backing field, allows override
 4. **Explicit interface implementations** - Record invocation, delegate to callback/user method/default
 5. **User method detection** - If user defines matching protected method, generated code calls it

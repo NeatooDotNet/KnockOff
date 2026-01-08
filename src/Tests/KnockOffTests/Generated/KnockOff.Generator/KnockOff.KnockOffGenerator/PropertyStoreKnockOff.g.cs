@@ -6,7 +6,7 @@ namespace KnockOff.Tests;
 partial class PropertyStoreKnockOff
 {
 	/// <summary>Tracks and configures behavior for IPropertyStore.StringIndexer.</summary>
-	public sealed class IPropertyStore_StringIndexerHandler
+	public sealed class IPropertyStore_StringIndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -25,14 +25,14 @@ partial class PropertyStoreKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IPropertyStore.</summary>
-	public sealed class IPropertyStoreKO
+	public sealed class IPropertyStoreInterceptorors
 	{
-		/// <summary>Handler for StringIndexer.</summary>
-		public IPropertyStore_StringIndexerHandler StringIndexer { get; } = new();
+		/// <summary>Interceptor for StringIndexer.</summary>
+		public IPropertyStore_StringIndexerInterceptor StringIndexer { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IPropertyStore.</summary>
-	public IPropertyStoreKO IPropertyStore { get; } = new();
+	public IPropertyStoreInterceptorors IPropertyStore { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IPropertyStore.</summary>
 	public KnockOff.Tests.IPropertyStore AsPropertyStore() => this;

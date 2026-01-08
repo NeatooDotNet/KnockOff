@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class SkOutParamParserKnockOff
 {
 	/// <summary>Tracks and configures behavior for ISkOutParamParser.TryParse.</summary>
-	public sealed class ISkOutParamParser_TryParseHandler
+	public sealed class ISkOutParamParser_TryParseInterceptor
 	{
 		/// <summary>Delegate for TryParse(string input, out int result).</summary>
 		public delegate bool TryParseDelegate(SkOutParamParserKnockOff ko, string input, out int result);
@@ -31,7 +31,7 @@ partial class SkOutParamParserKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISkOutParamParser.GetData.</summary>
-	public sealed class ISkOutParamParser_GetDataHandler
+	public sealed class ISkOutParamParser_GetDataInterceptor
 	{
 		/// <summary>Delegate for GetData(out string name, out int count).</summary>
 		public delegate void GetDataDelegate(SkOutParamParserKnockOff ko, out string name, out int count);
@@ -53,16 +53,16 @@ partial class SkOutParamParserKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkOutParamParser.</summary>
-	public sealed class ISkOutParamParserKO
+	public sealed class ISkOutParamParserInterceptorors
 	{
-		/// <summary>Handler for TryParse.</summary>
-		public ISkOutParamParser_TryParseHandler TryParse { get; } = new();
-		/// <summary>Handler for GetData.</summary>
-		public ISkOutParamParser_GetDataHandler GetData { get; } = new();
+		/// <summary>Interceptor for TryParse.</summary>
+		public ISkOutParamParser_TryParseInterceptor TryParse { get; } = new();
+		/// <summary>Interceptor for GetData.</summary>
+		public ISkOutParamParser_GetDataInterceptor GetData { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkOutParamParser.</summary>
-	public ISkOutParamParserKO ISkOutParamParser { get; } = new();
+	public ISkOutParamParserInterceptorors ISkOutParamParser { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkOutParamParser.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkOutParamParser AsSkOutParamParser() => this;

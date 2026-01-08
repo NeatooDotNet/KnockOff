@@ -6,7 +6,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 partial class SkOnCallKnockOff
 {
 	/// <summary>Tracks and configures behavior for ISkOnCallService.Clear.</summary>
-	public sealed class ISkOnCallService_ClearHandler
+	public sealed class ISkOnCallService_ClearInterceptor
 	{
 		/// <summary>Delegate for Clear().</summary>
 		public delegate void ClearDelegate(SkOnCallKnockOff ko);
@@ -28,7 +28,7 @@ partial class SkOnCallKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISkOnCallService.GetById.</summary>
-	public sealed class ISkOnCallService_GetByIdHandler
+	public sealed class ISkOnCallService_GetByIdInterceptor
 	{
 		/// <summary>Delegate for GetById(int id).</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.SkUser GetByIdDelegate(SkOnCallKnockOff ko, int id);
@@ -53,7 +53,7 @@ partial class SkOnCallKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISkOnCallService.Find.</summary>
-	public sealed class ISkOnCallService_FindHandler
+	public sealed class ISkOnCallService_FindInterceptor
 	{
 		/// <summary>Delegate for Find(string name, bool active).</summary>
 		public delegate global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser> FindDelegate(SkOnCallKnockOff ko, string name, bool active);
@@ -78,7 +78,7 @@ partial class SkOnCallKnockOff
 	}
 
 	/// <summary>Tracks and configures behavior for ISkOnCallService.Save.</summary>
-	public sealed class ISkOnCallService_SaveHandler
+	public sealed class ISkOnCallService_SaveInterceptor
 	{
 		/// <summary>Delegate for Save(object entity).</summary>
 		public delegate void SaveDelegate(SkOnCallKnockOff ko, object entity);
@@ -103,20 +103,20 @@ partial class SkOnCallKnockOff
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkOnCallService.</summary>
-	public sealed class ISkOnCallServiceKO
+	public sealed class ISkOnCallServiceInterceptorors
 	{
-		/// <summary>Handler for Clear.</summary>
-		public ISkOnCallService_ClearHandler Clear { get; } = new();
-		/// <summary>Handler for GetById.</summary>
-		public ISkOnCallService_GetByIdHandler GetById { get; } = new();
-		/// <summary>Handler for Find.</summary>
-		public ISkOnCallService_FindHandler Find { get; } = new();
-		/// <summary>Handler for Save.</summary>
-		public ISkOnCallService_SaveHandler Save { get; } = new();
+		/// <summary>Interceptor for Clear.</summary>
+		public ISkOnCallService_ClearInterceptor Clear { get; } = new();
+		/// <summary>Interceptor for GetById.</summary>
+		public ISkOnCallService_GetByIdInterceptor GetById { get; } = new();
+		/// <summary>Interceptor for Find.</summary>
+		public ISkOnCallService_FindInterceptor Find { get; } = new();
+		/// <summary>Interceptor for Save.</summary>
+		public ISkOnCallService_SaveInterceptor Save { get; } = new();
 	}
 
 	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkOnCallService.</summary>
-	public ISkOnCallServiceKO ISkOnCallService { get; } = new();
+	public ISkOnCallServiceInterceptorors ISkOnCallService { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkOnCallService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkOnCallService AsSkOnCallService() => this;
