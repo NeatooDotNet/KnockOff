@@ -5,8 +5,8 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class IdxListKnockOff
 {
-	/// <summary>Tracks and configures behavior for IIdxList.Int32Indexer.</summary>
-	public sealed class IIdxList_Int32IndexerInterceptor
+	/// <summary>Tracks and configures behavior for Int32Indexer.</summary>
+	public sealed class Int32IndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -14,63 +14,41 @@ partial class IdxListKnockOff
 		/// <summary>The key from the most recent getter access.</summary>
 		public int? LastGetKey { get; private set; }
 
-		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when the getter is accessed.</summary>
 		public global::System.Func<IdxListKnockOff, int, object?>? OnGet { get; set; }
-
-		/// <summary>Records a getter access.</summary>
-		public void RecordGet(int index) { GetCount++; LastGetKey = index; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
 
-		/// <summary>The key-value pair from the most recent setter access.</summary>
-		public (int index, object? value)? LastSetEntry { get; private set; }
+		/// <summary>The key and value from the most recent setter call.</summary>
+		public (int? Key, object? Value)? LastSetEntry { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
 		public global::System.Action<IdxListKnockOff, int, object?>? OnSet { get; set; }
 
+		/// <summary>Records a getter access.</summary>
+		public void RecordGet(int? index) { GetCount++; LastGetKey = index; }
+
 		/// <summary>Records a setter access.</summary>
-		public void RecordSet(int index, object? value) { SetCount++; LastSetEntry = (index, value); }
+		public void RecordSet(int? index, object? value) { SetCount++; LastSetEntry = (index, value); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
+		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIdxList.</summary>
-	public sealed class IIdxListInterceptorors
-	{
-		/// <summary>Interceptor for Int32Indexer.</summary>
-		public IIdxList_Int32IndexerInterceptor Int32Indexer { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIdxList.</summary>
-	public IIdxListInterceptorors IIdxList { get; } = new();
+	/// <summary>Interceptor for Int32Indexer.</summary>
+	public Int32IndexerInterceptor Int32Indexer { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIdxList.</summary>
 	public KnockOff.Documentation.Samples.Guides.IIdxList AsIdxList() => this;
 
-	/// <summary>Backing dictionary for IIdxList.Int32Indexer. Pre-populate with values or use OnGet callback.</summary>
-	public global::System.Collections.Generic.Dictionary<int, object?> IIdxList_Int32IndexerBacking { get; } = new();
+	/// <summary>Backing storage for Int32Indexer indexer.</summary>
+	public global::System.Collections.Generic.Dictionary<int, object?> Int32IndexerBacking { get; } = new();
 
 	object? KnockOff.Documentation.Samples.Guides.IIdxList.this[int index]
 	{
-		get
-		{
-			IIdxList.Int32Indexer.RecordGet(index);
-			if (IIdxList.Int32Indexer.OnGet is { } onGetCallback)
-				return onGetCallback(this, index);
-			if (IIdxList_Int32IndexerBacking.TryGetValue(index, out var value))
-				return value;
-			return default!;
-		}
-		set
-		{
-			IIdxList.Int32Indexer.RecordSet(index, value);
-			if (IIdxList.Int32Indexer.OnSet is { } onSetCallback)
-				onSetCallback(this, index, value);
-			else
-				IIdxList_Int32IndexerBacking[index] = value;
-		}
+		get { Int32Indexer.RecordGet(index); if (Int32Indexer.OnGet != null) return Int32Indexer.OnGet(this, index); return Int32IndexerBacking.TryGetValue(index, out var v) ? v : default; }
+		set { Int32Indexer.RecordSet(index, value); if (Int32Indexer.OnSet != null) Int32Indexer.OnSet(this, index, value); else Int32IndexerBacking[index] = value; }
 	}
 
 }

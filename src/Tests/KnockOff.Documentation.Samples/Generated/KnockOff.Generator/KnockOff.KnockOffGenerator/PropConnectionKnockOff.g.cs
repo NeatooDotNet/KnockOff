@@ -5,8 +5,8 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class PropConnectionKnockOff
 {
-	/// <summary>Tracks and configures behavior for IPropConnection.IsConnected.</summary>
-	public sealed class IPropConnection_IsConnectedInterceptor
+	/// <summary>Tracks and configures behavior for IsConnected.</summary>
+	public sealed class IsConnectedInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -21,20 +21,17 @@ partial class PropConnectionKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IPropConnection.Connect.</summary>
-	public sealed class IPropConnection_ConnectInterceptor
+	/// <summary>Tracks and configures behavior for Connect.</summary>
+	public sealed class ConnectInterceptor
 	{
-		/// <summary>Delegate for Connect().</summary>
-		public delegate void ConnectDelegate(PropConnectionKnockOff ko);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public ConnectDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<PropConnectionKnockOff>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
@@ -43,40 +40,27 @@ partial class PropConnectionKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropConnection.</summary>
-	public sealed class IPropConnectionInterceptorors
-	{
-		/// <summary>Interceptor for IsConnected.</summary>
-		public IPropConnection_IsConnectedInterceptor IsConnected { get; } = new();
-		/// <summary>Interceptor for Connect.</summary>
-		public IPropConnection_ConnectInterceptor Connect { get; } = new();
-	}
+	/// <summary>Interceptor for IsConnected.</summary>
+	public IsConnectedInterceptor IsConnected { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropConnection.</summary>
-	public IPropConnectionInterceptorors IPropConnection { get; } = new();
+	/// <summary>Interceptor for Connect.</summary>
+	public ConnectInterceptor Connect { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IPropConnection.</summary>
 	public KnockOff.Documentation.Samples.Guides.IPropConnection AsPropConnection() => this;
 
-	/// <summary>Backing field for IPropConnection.IsConnected.</summary>
-	protected bool IPropConnection_IsConnectedBacking { get; set; }
+	/// <summary>Backing storage for IsConnected.</summary>
+	protected bool IsConnectedBacking { get; set; } = default!;
 
 	bool KnockOff.Documentation.Samples.Guides.IPropConnection.IsConnected
 	{
-		get
-		{
-			IPropConnection.IsConnected.RecordGet();
-			if (IPropConnection.IsConnected.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IPropConnection_IsConnectedBacking;
-		}
+		get { IsConnected.RecordGet(); return IsConnected.OnGet?.Invoke(this) ?? IsConnectedBacking; }
 	}
 
 	void KnockOff.Documentation.Samples.Guides.IPropConnection.Connect()
 	{
-		IPropConnection.Connect.RecordCall();
-		if (IPropConnection.Connect.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		Connect.RecordCall();
+		Connect.OnCall?.Invoke(this);
 	}
 
 }

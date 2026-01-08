@@ -127,7 +127,7 @@ Wire stubs together using callbacks:
 // propStub.Value.Value = 42;
 //
 // // Wire nested stub to indexer
-// store.IInPropertyStore.Indexer.OnGet = (ko, index) => propStub;
+// store.Indexer.OnGet = (ko, index) => propStub;
 //
 // // Now store[0].Name returns "TestProp"
 // IInPropertyStore service = store;
@@ -214,3 +214,119 @@ Use setup methods to reset stubs between tests:
 - Stubs scoped to a single test class
 - Multiple stub types in one place
 - Partial property auto-instantiation
+
+## Class Stubs
+
+Use `[KnockOff<TClass>]` to stub virtual/abstract class members:
+
+<!-- snippet: docs:inline-stubs:class-stub-example -->
+```csharp
+public class EmailService
+{
+	public virtual void Send(string to, string subject, string body)
+		=> Console.WriteLine($"Sending to {to}: {subject}");
+
+	public virtual string ServerName { get; set; } = "default";
+}
+
+[KnockOff<EmailService>]
+public partial class EmailServiceTests
+{
+	// Usage:
+	// var stub = new Stubs.EmailService();
+	// stub.Send.OnCall = (ko, to, subject, body) =>
+	//     Console.WriteLine($"STUBBED: {to}");
+	//
+	// // Use .Object to get the EmailService instance
+	// EmailService service = stub.Object;
+	// service.Send("test@example.com", "Hello", "World");
+	//
+	// Assert.True(stub.Send.WasCalled);
+	// Assert.Equal("test@example.com", stub.Send.LastCallArgs?.to);
+}
+```
+<!-- /snippet -->
+
+### Key Differences from Interface Stubs
+
+| Aspect | Interface Stubs | Class Stubs |
+|--------|-----------------|-------------|
+| Get typed instance | `stub` (direct) | `stub.Object` |
+| Interceptor access | `stub.Member` | `stub.Member` (unified!) |
+| Base behavior | N/A | Calls base class when no callback |
+| Virtual only | N/A | Only virtual/abstract members intercepted |
+
+### Accessing Non-Virtual Members
+
+Non-virtual members are not intercepted. Access them through `.Object`:
+
+<!-- snippet: docs:inline-stubs:class-stub-mixed -->
+```csharp
+public class MixedService
+{
+	public virtual string VirtualProp { get; set; } = "";
+	public string NonVirtualProp { get; set; } = "";  // Not intercepted
+}
+
+[KnockOff<MixedService>]
+public partial class MixedTests
+{
+	// Virtual member - has interceptor
+	// stub.VirtualProp.OnGet = (ko) => "Intercepted";
+	// Assert.Equal("Intercepted", stub.Object.VirtualProp);
+	//
+	// Non-virtual member - no interceptor, use .Object
+	// stub.Object.NonVirtualProp = "Direct";
+	// Assert.Equal("Direct", stub.Object.NonVirtualProp);
+}
+```
+<!-- /snippet -->
+
+### Constructor Chaining
+
+Class stubs support constructor parameters:
+
+<!-- snippet: docs:inline-stubs:class-stub-constructor -->
+```csharp
+public class Repository
+{
+	public string ConnectionString { get; }
+	public Repository(string connectionString) => ConnectionString = connectionString;
+	public virtual InUser? GetUser(int id) => null;
+}
+
+[KnockOff<Repository>]
+public partial class RepoTests
+{
+	// Constructor parameters chain to base:
+	// var stub = new Stubs.Repository("Server=test");
+	// Assert.Equal("Server=test", stub.Object.ConnectionString);
+}
+```
+<!-- /snippet -->
+
+### Abstract Classes
+
+Abstract members return defaults unless configured:
+
+<!-- snippet: docs:inline-stubs:class-stub-abstract -->
+```csharp
+public static void AbstractClassExample()
+	{
+		var stub = new AbstractTests.Stubs.BaseRepository();
+
+		// Without callback - returns defaults
+		var defaultConnection = stub.Object.ConnectionString;  // null
+		var defaultExecute = stub.Object.Execute("SELECT 1");  // 0
+
+		// With callback
+		stub.ConnectionString.OnGet = (ko) => "Server=test";
+		stub.Execute.OnCall = (ko, sql) => sql.Length;
+
+		var configuredConnection = stub.Object.ConnectionString;  // "Server=test"
+		var configuredExecute = stub.Object.Execute("SELECT 1");  // 8
+
+		_ = (defaultConnection, defaultExecute, configuredConnection, configuredExecute);
+	}
+```
+<!-- /snippet -->

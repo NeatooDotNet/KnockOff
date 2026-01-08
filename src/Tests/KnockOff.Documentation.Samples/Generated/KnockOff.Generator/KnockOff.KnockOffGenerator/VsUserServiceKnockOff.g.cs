@@ -5,8 +5,8 @@ namespace KnockOff.Documentation.Samples.Comparison;
 
 partial class VsUserServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for IVsUserService.CurrentUser.</summary>
-	public sealed class IVsUserService_CurrentUserInterceptor
+	/// <summary>Tracks and configures behavior for CurrentUser.</summary>
+	public sealed class CurrentUserInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -33,94 +33,91 @@ partial class VsUserServiceKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IVsUserService.GetUser.</summary>
-	public sealed class IVsUserService_GetUserInterceptor
+	/// <summary>Tracks and configures behavior for GetUser.</summary>
+	public sealed class GetUser2Interceptor
 	{
-		/// <summary>Delegate for GetUser(int id).</summary>
+		/// <summary>Delegate for GetUser.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Comparison.VsUser GetUserDelegate(VsUserServiceKnockOff ko, int id);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetUserDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IVsUserService.Save.</summary>
-	public sealed class IVsUserService_SaveInterceptor
+	/// <summary>Tracks and configures behavior for Save.</summary>
+	public sealed class SaveInterceptor
 	{
-		/// <summary>Delegate for Save(global::KnockOff.Documentation.Samples.Comparison.VsUser user).</summary>
+		/// <summary>Delegate for Save.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Comparison.VsUser? SaveDelegate(VsUserServiceKnockOff ko, global::KnockOff.Documentation.Samples.Comparison.VsUser user);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'user' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public global::KnockOff.Documentation.Samples.Comparison.VsUser? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public SaveDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::KnockOff.Documentation.Samples.Comparison.VsUser user) { CallCount++; LastCallArg = user; }
+		public void RecordCall(global::KnockOff.Documentation.Samples.Comparison.VsUser? user) { CallCount++; LastCallArg = user; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IVsUserService.Delete.</summary>
-	public sealed class IVsUserService_DeleteInterceptor
+	/// <summary>Tracks and configures behavior for Delete.</summary>
+	public sealed class DeleteInterceptor
 	{
-		/// <summary>Delegate for Delete(int id).</summary>
-		public delegate void DeleteDelegate(VsUserServiceKnockOff ko, int id);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public DeleteDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<VsUserServiceKnockOff, int>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IVsUserService.GetAll.</summary>
-	public sealed class IVsUserService_GetAllInterceptor
+	/// <summary>Tracks and configures behavior for GetAll.</summary>
+	public sealed class GetAllInterceptor
 	{
-		/// <summary>Delegate for GetAll().</summary>
+		/// <summary>Delegate for GetAll.</summary>
 		public delegate global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Comparison.VsUser> GetAllDelegate(VsUserServiceKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetAllDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -130,112 +127,87 @@ partial class VsUserServiceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IVsUserService.Update.</summary>
-	public sealed class IVsUserService_UpdateInterceptor
+	/// <summary>Tracks and configures behavior for Update.</summary>
+	public sealed class UpdateInterceptor
 	{
-		/// <summary>Delegate for Update(global::KnockOff.Documentation.Samples.Comparison.VsUser user).</summary>
-		public delegate void UpdateDelegate(VsUserServiceKnockOff ko, global::KnockOff.Documentation.Samples.Comparison.VsUser user);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'user' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public global::KnockOff.Documentation.Samples.Comparison.VsUser? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public UpdateDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<VsUserServiceKnockOff, global::KnockOff.Documentation.Samples.Comparison.VsUser>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::KnockOff.Documentation.Samples.Comparison.VsUser user) { CallCount++; LastCallArg = user; }
+		public void RecordCall(global::KnockOff.Documentation.Samples.Comparison.VsUser? user) { CallCount++; LastCallArg = user; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsUserService.</summary>
-	public sealed class IVsUserServiceInterceptorors
-	{
-		/// <summary>Interceptor for CurrentUser.</summary>
-		public IVsUserService_CurrentUserInterceptor CurrentUser { get; } = new();
-		/// <summary>Interceptor for GetUser.</summary>
-		public IVsUserService_GetUserInterceptor GetUser { get; } = new();
-		/// <summary>Interceptor for Save.</summary>
-		public IVsUserService_SaveInterceptor Save { get; } = new();
-		/// <summary>Interceptor for Delete.</summary>
-		public IVsUserService_DeleteInterceptor Delete { get; } = new();
-		/// <summary>Interceptor for GetAll.</summary>
-		public IVsUserService_GetAllInterceptor GetAll { get; } = new();
-		/// <summary>Interceptor for Update.</summary>
-		public IVsUserService_UpdateInterceptor Update { get; } = new();
-	}
+	/// <summary>Interceptor for CurrentUser.</summary>
+	public CurrentUserInterceptor CurrentUser { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsUserService.</summary>
-	public IVsUserServiceInterceptorors IVsUserService { get; } = new();
+	/// <summary>Interceptor for GetUser.</summary>
+	public GetUser2Interceptor GetUser2 { get; } = new();
+
+	/// <summary>Interceptor for Save.</summary>
+	public SaveInterceptor Save { get; } = new();
+
+	/// <summary>Interceptor for Delete.</summary>
+	public DeleteInterceptor Delete { get; } = new();
+
+	/// <summary>Interceptor for GetAll.</summary>
+	public GetAllInterceptor GetAll { get; } = new();
+
+	/// <summary>Interceptor for Update.</summary>
+	public UpdateInterceptor Update { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IVsUserService.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IVsUserService AsVsUserService() => this;
 
-	/// <summary>Backing field for IVsUserService.CurrentUser.</summary>
-	protected global::KnockOff.Documentation.Samples.Comparison.VsUser? IVsUserService_CurrentUserBacking { get; set; }
+	/// <summary>Backing storage for CurrentUser.</summary>
+	protected global::KnockOff.Documentation.Samples.Comparison.VsUser? CurrentUserBacking { get; set; } = default!;
 
 	global::KnockOff.Documentation.Samples.Comparison.VsUser KnockOff.Documentation.Samples.Comparison.IVsUserService.GetUser(int id)
 	{
-		IVsUserService.GetUser.RecordCall(id);
-		if (IVsUserService.GetUser.OnCall is { } onCallCallback)
-			return onCallCallback(this, id);
+		GetUser2.RecordCall(id);
+		if (GetUser2.OnCall != null) return GetUser2.OnCall(this, id);
 		return GetUser(id);
 	}
 
 	global::KnockOff.Documentation.Samples.Comparison.VsUser? KnockOff.Documentation.Samples.Comparison.IVsUserService.CurrentUser
 	{
-		get
-		{
-			IVsUserService.CurrentUser.RecordGet();
-			if (IVsUserService.CurrentUser.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IVsUserService_CurrentUserBacking;
-		}
-		set
-		{
-			IVsUserService.CurrentUser.RecordSet(value);
-			if (IVsUserService.CurrentUser.OnSet is { } onSetCallback)
-				onSetCallback(this, value);
-			else
-				IVsUserService_CurrentUserBacking = value;
-		}
+		get { CurrentUser.RecordGet(); return CurrentUser.OnGet?.Invoke(this) ?? CurrentUserBacking; }
+		set { CurrentUser.RecordSet(value); if (CurrentUser.OnSet != null) CurrentUser.OnSet(this, value); else CurrentUserBacking = value; }
 	}
 
 	global::KnockOff.Documentation.Samples.Comparison.VsUser? KnockOff.Documentation.Samples.Comparison.IVsUserService.Save(global::KnockOff.Documentation.Samples.Comparison.VsUser user)
 	{
-		IVsUserService.Save.RecordCall(user);
-		if (IVsUserService.Save.OnCall is { } onCallCallback)
-			return onCallCallback(this, user);
-		return default!;
+		Save.RecordCall(user);
+		return Save.OnCall?.Invoke(this, user) ?? default!;
 	}
 
 	void KnockOff.Documentation.Samples.Comparison.IVsUserService.Delete(int id)
 	{
-		IVsUserService.Delete.RecordCall(id);
-		if (IVsUserService.Delete.OnCall is { } onCallCallback)
-		{ onCallCallback(this, id); return; }
+		Delete.RecordCall(id);
+		Delete.OnCall?.Invoke(this, id);
 	}
 
 	global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Comparison.VsUser> KnockOff.Documentation.Samples.Comparison.IVsUserService.GetAll()
 	{
-		IVsUserService.GetAll.RecordCall();
-		if (IVsUserService.GetAll.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Comparison.VsUser>();
+		GetAll.RecordCall();
+		return GetAll.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Comparison.VsUser>();
 	}
 
 	void KnockOff.Documentation.Samples.Comparison.IVsUserService.Update(global::KnockOff.Documentation.Samples.Comparison.VsUser user)
 	{
-		IVsUserService.Update.RecordCall(user);
-		if (IVsUserService.Update.OnCall is { } onCallCallback)
-		{ onCallCallback(this, user); return; }
+		Update.RecordCall(user);
+		Update.OnCall?.Invoke(this, user);
 	}
 
 }

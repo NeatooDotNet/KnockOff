@@ -5,20 +5,17 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class SkOnCallKnockOff
 {
-	/// <summary>Tracks and configures behavior for ISkOnCallService.Clear.</summary>
-	public sealed class ISkOnCallService_ClearInterceptor
+	/// <summary>Tracks and configures behavior for Clear.</summary>
+	public sealed class ClearInterceptor
 	{
-		/// <summary>Delegate for Clear().</summary>
-		public delegate void ClearDelegate(SkOnCallKnockOff ko);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public ClearDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<SkOnCallKnockOff>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
@@ -27,128 +24,115 @@ partial class SkOnCallKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ISkOnCallService.GetById.</summary>
-	public sealed class ISkOnCallService_GetByIdInterceptor
+	/// <summary>Tracks and configures behavior for GetById.</summary>
+	public sealed class GetByIdInterceptor
 	{
-		/// <summary>Delegate for GetById(int id).</summary>
+		/// <summary>Delegate for GetById.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.SkUser GetByIdDelegate(SkOnCallKnockOff ko, int id);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetByIdDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ISkOnCallService.Find.</summary>
-	public sealed class ISkOnCallService_FindInterceptor
+	/// <summary>Tracks and configures behavior for Find.</summary>
+	public sealed class FindInterceptor
 	{
-		/// <summary>Delegate for Find(string name, bool active).</summary>
+		/// <summary>Delegate for Find.</summary>
 		public delegate global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser> FindDelegate(SkOnCallKnockOff ko, string name, bool active);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Arguments from the most recent call.</summary>
-		public (string name, bool active)? LastCallArgs { get; private set; }
+		/// <summary>The arguments from the most recent call.</summary>
+		public (string? name, bool? active)? LastCallArgs { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public FindDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string name, bool active) { CallCount++; LastCallArgs = (name, active); }
+		public void RecordCall(string? name, bool? active) { CallCount++; LastCallArgs = (name, active); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ISkOnCallService.Save.</summary>
-	public sealed class ISkOnCallService_SaveInterceptor
+	/// <summary>Tracks and configures behavior for Save.</summary>
+	public sealed class SaveInterceptor
 	{
-		/// <summary>Delegate for Save(object entity).</summary>
-		public delegate void SaveDelegate(SkOnCallKnockOff ko, object entity);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'entity' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public object? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public SaveDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<SkOnCallKnockOff, object>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(object entity) { CallCount++; LastCallArg = entity; }
+		public void RecordCall(object? entity) { CallCount++; LastCallArg = entity; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkOnCallService.</summary>
-	public sealed class ISkOnCallServiceInterceptorors
-	{
-		/// <summary>Interceptor for Clear.</summary>
-		public ISkOnCallService_ClearInterceptor Clear { get; } = new();
-		/// <summary>Interceptor for GetById.</summary>
-		public ISkOnCallService_GetByIdInterceptor GetById { get; } = new();
-		/// <summary>Interceptor for Find.</summary>
-		public ISkOnCallService_FindInterceptor Find { get; } = new();
-		/// <summary>Interceptor for Save.</summary>
-		public ISkOnCallService_SaveInterceptor Save { get; } = new();
-	}
+	/// <summary>Interceptor for Clear.</summary>
+	public ClearInterceptor Clear { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkOnCallService.</summary>
-	public ISkOnCallServiceInterceptorors ISkOnCallService { get; } = new();
+	/// <summary>Interceptor for GetById.</summary>
+	public GetByIdInterceptor GetById { get; } = new();
+
+	/// <summary>Interceptor for Find.</summary>
+	public FindInterceptor Find { get; } = new();
+
+	/// <summary>Interceptor for Save.</summary>
+	public SaveInterceptor Save { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkOnCallService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkOnCallService AsSkOnCallService() => this;
 
 	void KnockOff.Documentation.Samples.Skills.ISkOnCallService.Clear()
 	{
-		ISkOnCallService.Clear.RecordCall();
-		if (ISkOnCallService.Clear.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		Clear.RecordCall();
+		Clear.OnCall?.Invoke(this);
 	}
 
 	global::KnockOff.Documentation.Samples.Skills.SkUser KnockOff.Documentation.Samples.Skills.ISkOnCallService.GetById(int id)
 	{
-		ISkOnCallService.GetById.RecordCall(id);
-		if (ISkOnCallService.GetById.OnCall is { } onCallCallback)
-			return onCallCallback(this, id);
-		return new global::KnockOff.Documentation.Samples.Skills.SkUser();
+		GetById.RecordCall(id);
+		return GetById.OnCall?.Invoke(this, id) ?? new global::KnockOff.Documentation.Samples.Skills.SkUser();
 	}
 
 	global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser> KnockOff.Documentation.Samples.Skills.ISkOnCallService.Find(string name, bool active)
 	{
-		ISkOnCallService.Find.RecordCall(name, active);
-		if (ISkOnCallService.Find.OnCall is { } onCallCallback)
-			return onCallCallback(this, name, active);
-		return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser>();
+		Find.RecordCall(name, active);
+		return Find.OnCall?.Invoke(this, name, active) ?? new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser>();
 	}
 
 	void KnockOff.Documentation.Samples.Skills.ISkOnCallService.Save(object entity)
 	{
-		ISkOnCallService.Save.RecordCall(entity);
-		if (ISkOnCallService.Save.OnCall is { } onCallCallback)
-		{ onCallCallback(this, entity); return; }
+		Save.RecordCall(entity);
+		Save.OnCall?.Invoke(this, entity);
 	}
 
 }

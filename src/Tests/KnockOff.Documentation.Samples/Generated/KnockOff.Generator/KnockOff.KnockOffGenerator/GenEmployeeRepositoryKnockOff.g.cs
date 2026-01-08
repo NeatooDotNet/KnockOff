@@ -5,50 +5,41 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class GenEmployeeRepositoryKnockOff
 {
-	/// <summary>Tracks and configures behavior for IGenEntityRepository_KnockOff_Documentation_Samples_Guides_GenEmployee.FindById.</summary>
-	public sealed class IGenEntityRepository_KnockOff_Documentation_Samples_Guides_GenEmployee_FindByIdInterceptor
+	/// <summary>Tracks and configures behavior for FindById.</summary>
+	public sealed class FindByIdInterceptor
 	{
-		/// <summary>Delegate for FindById(int id).</summary>
+		/// <summary>Delegate for FindById.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Guides.GenEmployee? FindByIdDelegate(GenEmployeeRepositoryKnockOff ko, int id);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public FindByIdDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenEntityRepository<KnockOff.Documentation.Samples.Guides.GenEmployee>.</summary>
-	public sealed class IGenEntityRepository_KnockOff_Documentation_Samples_Guides_GenEmployeeInterceptorors
-	{
-		/// <summary>Interceptor for FindById.</summary>
-		public IGenEntityRepository_KnockOff_Documentation_Samples_Guides_GenEmployee_FindByIdInterceptor FindById { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenEntityRepository<KnockOff.Documentation.Samples.Guides.GenEmployee>.</summary>
-	public IGenEntityRepository_KnockOff_Documentation_Samples_Guides_GenEmployeeInterceptorors IGenEntityRepository_KnockOff_Documentation_Samples_Guides_GenEmployee { get; } = new();
+	/// <summary>Interceptor for FindById.</summary>
+	public FindByIdInterceptor FindById { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IGenEntityRepository<KnockOff.Documentation.Samples.Guides.GenEmployee>.</summary>
 	public KnockOff.Documentation.Samples.Guides.IGenEntityRepository<KnockOff.Documentation.Samples.Guides.GenEmployee> AsGenEntityRepository() => this;
 
 	global::KnockOff.Documentation.Samples.Guides.GenEmployee? KnockOff.Documentation.Samples.Guides.IGenEntityRepository<KnockOff.Documentation.Samples.Guides.GenEmployee>.FindById(int id)
 	{
-		IGenEntityRepository_KnockOff_Documentation_Samples_Guides_GenEmployee.FindById.RecordCall(id);
-		if (IGenEntityRepository_KnockOff_Documentation_Samples_Guides_GenEmployee.FindById.OnCall is { } onCallCallback)
-			return onCallCallback(this, id);
-		return default!;
+		FindById.RecordCall(id);
+		return FindById.OnCall?.Invoke(this, id) ?? default!;
 	}
 
 }

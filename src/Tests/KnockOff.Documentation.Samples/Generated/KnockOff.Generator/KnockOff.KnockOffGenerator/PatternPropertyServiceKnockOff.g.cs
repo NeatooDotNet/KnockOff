@@ -5,8 +5,8 @@ namespace KnockOff.Documentation.Samples.Concepts;
 
 partial class PatternPropertyServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for IPatternPropertyService.Name.</summary>
-	public sealed class IPatternPropertyService_NameInterceptor
+	/// <summary>Tracks and configures behavior for Name.</summary>
+	public sealed class NameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -33,39 +33,19 @@ partial class PatternPropertyServiceKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternPropertyService.</summary>
-	public sealed class IPatternPropertyServiceInterceptorors
-	{
-		/// <summary>Interceptor for Name.</summary>
-		public IPatternPropertyService_NameInterceptor Name { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternPropertyService.</summary>
-	public IPatternPropertyServiceInterceptorors IPatternPropertyService { get; } = new();
+	/// <summary>Interceptor for Name.</summary>
+	public NameInterceptor Name { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Concepts.IPatternPropertyService.</summary>
 	public KnockOff.Documentation.Samples.Concepts.IPatternPropertyService AsPatternPropertyService() => this;
 
-	/// <summary>Backing field for IPatternPropertyService.Name.</summary>
-	protected string IPatternPropertyService_NameBacking { get; set; } = "";
+	/// <summary>Backing storage for Name.</summary>
+	protected string NameBacking { get; set; } = "";
 
 	string KnockOff.Documentation.Samples.Concepts.IPatternPropertyService.Name
 	{
-		get
-		{
-			IPatternPropertyService.Name.RecordGet();
-			if (IPatternPropertyService.Name.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IPatternPropertyService_NameBacking;
-		}
-		set
-		{
-			IPatternPropertyService.Name.RecordSet(value);
-			if (IPatternPropertyService.Name.OnSet is { } onSetCallback)
-				onSetCallback(this, value);
-			else
-				IPatternPropertyService_NameBacking = value;
-		}
+		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
+		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else NameBacking = value; }
 	}
 
 }

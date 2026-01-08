@@ -121,8 +121,8 @@ partial class ClassStubTestClass
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Container for all SimpleService interceptors.</summary>
-		public sealed class SimpleServiceInterceptors
+		/// <summary>Stub for KnockOff.Tests.SimpleService via composition.</summary>
+		public class SimpleService
 		{
 			/// <summary>Interceptor for Name.</summary>
 			public SimpleService_NameInterceptor Name { get; } = new();
@@ -135,8 +135,21 @@ partial class ClassStubTestClass
 			/// <summary>Interceptor for Format.</summary>
 			public SimpleService_FormatInterceptor Format { get; } = new();
 
-			/// <summary>Resets all interceptors.</summary>
-			public void Reset()
+			/// <summary>The KnockOff.Tests.SimpleService instance. Pass this to code expecting the target class.</summary>
+			public KnockOff.Tests.SimpleService Object { get; }
+
+			public SimpleService()
+			{
+				Object = new Impl(this);
+			}
+
+			public SimpleService(string name)
+			{
+				Object = new Impl(this, name);
+			}
+
+			/// <summary>Resets all interceptor state.</summary>
+			public void ResetInterceptors()
 			{
 				Name.Reset();
 				Value.Reset();
@@ -144,78 +157,81 @@ partial class ClassStubTestClass
 				Calculate.Reset();
 				Format.Reset();
 			}
-		}
 
-		/// <summary>Stub for KnockOff.Tests.SimpleService via inheritance.</summary>
-		public class SimpleService : KnockOff.Tests.SimpleService
-		{
-			/// <summary>Interceptors for tracking and configuring member behavior.</summary>
-			public SimpleServiceInterceptors Interceptor { get; } = new();
-
-			public SimpleService() : base() { }
-
-			public SimpleService(string name) : base(name) { }
-
-			/// <inheritdoc />
-			public override string Name
+			/// <summary>Internal implementation that inherits from KnockOff.Tests.SimpleService.</summary>
+			private sealed class Impl : KnockOff.Tests.SimpleService
 			{
-				get
+				private readonly SimpleService _stub;
+
+				public Impl(SimpleService stub) : base()
 				{
-					Interceptor.Name.RecordGet();
-					if (Interceptor.Name.OnGet is { } onGet) return onGet(this);
-					return base.Name;
+					_stub = stub;
 				}
-				set
+
+				public Impl(SimpleService stub, string name) : base(name)
 				{
-					Interceptor.Name.RecordSet(value);
-					if (Interceptor.Name.OnSet is { } onSet) onSet(this, value);
-					else base.Name = value;
+					_stub = stub;
 				}
-			}
 
-			/// <inheritdoc />
-			public override int Value
-			{
-				get
+				/// <inheritdoc />
+				public override string Name
 				{
-					Interceptor.Value.RecordGet();
-					if (Interceptor.Value.OnGet is { } onGet) return onGet(this);
-					return base.Value;
+					get
+					{
+						_stub?.Name.RecordGet();
+						if (_stub?.Name.OnGet is { } onGet) return onGet(_stub);
+						return base.Name;
+					}
+					set
+					{
+						_stub?.Name.RecordSet(value);
+						if (_stub?.Name.OnSet is { } onSet) onSet(_stub, value);
+						else base.Name = value;
+					}
 				}
-				set
+
+				/// <inheritdoc />
+				public override int Value
 				{
-					Interceptor.Value.RecordSet(value);
-					if (Interceptor.Value.OnSet is { } onSet) onSet(this, value);
-					else base.Value = value;
+					get
+					{
+						_stub?.Value.RecordGet();
+						if (_stub?.Value.OnGet is { } onGet) return onGet(_stub);
+						return base.Value;
+					}
+					set
+					{
+						_stub?.Value.RecordSet(value);
+						if (_stub?.Value.OnSet is { } onSet) onSet(_stub, value);
+						else base.Value = value;
+					}
 				}
-			}
 
-			/// <inheritdoc />
-			public override void DoWork()
-			{
-				Interceptor.DoWork.RecordCall();
-				if (Interceptor.DoWork.OnCall is { } onCall) { onCall(this); return; }
-				base.DoWork();
-			}
+				/// <inheritdoc />
+				public override void DoWork()
+				{
+					_stub?.DoWork.RecordCall();
+					if (_stub?.DoWork.OnCall is { } onCall) { onCall(_stub); return; }
+					base.DoWork();
+				}
 
-			/// <inheritdoc />
-			public override int Calculate(int x)
-			{
-				Interceptor.Calculate.RecordCall(x);
-				if (Interceptor.Calculate.OnCall is { } onCall) return onCall(this, x);
-				return base.Calculate(x);
-			}
+				/// <inheritdoc />
+				public override int Calculate(int x)
+				{
+					_stub?.Calculate.RecordCall(x);
+					if (_stub?.Calculate.OnCall is { } onCall) return onCall(_stub, x);
+					return base.Calculate(x);
+				}
 
-			/// <inheritdoc />
-			public override string Format(string input, int count)
-			{
-				Interceptor.Format.RecordCall(input, count);
-				if (Interceptor.Format.OnCall is { } onCall) return onCall(this, input, count);
-				return base.Format(input, count);
-			}
+				/// <inheritdoc />
+				public override string Format(string input, int count)
+				{
+					_stub?.Format.RecordCall(input, count);
+					if (_stub?.Format.OnCall is { } onCall) return onCall(_stub, input, count);
+					return base.Format(input, count);
+				}
 
-			/// <summary>Resets all interceptor state.</summary>
-			public void ResetInterceptors() => Interceptor.Reset();
+			}
 		}
 
 	}

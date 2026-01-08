@@ -5,8 +5,8 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class PropConfigKnockOff
 {
-	/// <summary>Tracks and configures behavior for IPropConfig.ConnectionString.</summary>
-	public sealed class IPropConfig_ConnectionStringInterceptor
+	/// <summary>Tracks and configures behavior for ConnectionString.</summary>
+	public sealed class ConnectionStringInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -21,31 +21,18 @@ partial class PropConfigKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropConfig.</summary>
-	public sealed class IPropConfigInterceptorors
-	{
-		/// <summary>Interceptor for ConnectionString.</summary>
-		public IPropConfig_ConnectionStringInterceptor ConnectionString { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropConfig.</summary>
-	public IPropConfigInterceptorors IPropConfig { get; } = new();
+	/// <summary>Interceptor for ConnectionString.</summary>
+	public ConnectionStringInterceptor ConnectionString { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IPropConfig.</summary>
 	public KnockOff.Documentation.Samples.Guides.IPropConfig AsPropConfig() => this;
 
-	/// <summary>Backing field for IPropConfig.ConnectionString.</summary>
-	protected string IPropConfig_ConnectionStringBacking { get; set; } = "";
+	/// <summary>Backing storage for ConnectionString.</summary>
+	protected string ConnectionStringBacking { get; set; } = "";
 
 	string KnockOff.Documentation.Samples.Guides.IPropConfig.ConnectionString
 	{
-		get
-		{
-			IPropConfig.ConnectionString.RecordGet();
-			if (IPropConfig.ConnectionString.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IPropConfig_ConnectionStringBacking;
-		}
+		get { ConnectionString.RecordGet(); return ConnectionString.OnGet?.Invoke(this) ?? ConnectionStringBacking; }
 	}
 
 }

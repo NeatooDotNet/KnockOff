@@ -78,57 +78,61 @@ Set delegates on the interface handlers at runtime. Callbacks provide per-test c
 
 ### Method Callbacks (`OnCall`)
 
+<!-- snippet: docs:customization-patterns:callback-method -->
 ```csharp
-var knockOff = new UserServiceKnockOff();
-
 // Void method
-knockOff.IUserService.DoSomething.OnCall = (ko) =>
-{
-    // Custom logic for this test
-};
+        knockOff.DoSomething.OnCall = (ko) =>
+        {
+            // Custom logic for this test
+        };
 
-// Method with return value
-knockOff.IUserService.GetUser.OnCall = (ko, id) => new User { Id = id, Name = "Mocked" };
+        // Method with return value
+        knockOff.GetUser.OnCall = (ko, id) => new PatternUser { Id = id, Name = "Mocked" };
 
-// Method with multiple parameters (individual params)
-knockOff.IUserService.Calculate.OnCall = (ko, name, value, flag) =>
-{
-    return flag ? value * 2 : value;
-};
+        // Method with multiple parameters (individual params)
+        knockOff.Calculate.OnCall = (ko, name, value, flag) =>
+        {
+            return flag ? value * 2 : value;
+        };
 ```
+<!-- /snippet -->
 
 ### Property Callbacks (`OnGet` / `OnSet`)
 
+<!-- snippet: docs:customization-patterns:callback-property -->
 ```csharp
 // Getter callback
-knockOff.IUserService.Name.OnGet = (ko) => "Dynamic Value";
+        knockOff.Name.OnGet = (ko) => "Dynamic Value";
 
-// Setter callback
-knockOff.IUserService.Name.OnSet = (ko, value) =>
-{
-    // Custom logic when property is set
-    // Note: When OnSet is set, value does NOT go to backing field
-};
+        // Setter callback
+        knockOff.Name.OnSet = (ko, value) =>
+        {
+            // Custom logic when property is set
+            // Note: When OnSet is set, value does NOT go to backing field
+        };
 ```
+<!-- /snippet -->
 
 ### Indexer Callbacks
 
+<!-- snippet: docs:customization-patterns:callback-indexer -->
 ```csharp
 // Getter with key parameter
-knockOff.IPropertyStore.StringIndexer.OnGet = (ko, key) => key switch
-{
-    "Name" => new PropertyInfo { Value = "Test" },
-    "Age" => new PropertyInfo { Value = "25" },
-    _ => null
-};
+        knockOff.StringIndexer.OnGet = (ko, key) => key switch
+        {
+            "Name" => new PatternPropertyInfo { Value = "Test" },
+            "Age" => new PatternPropertyInfo { Value = "25" },
+            _ => null
+        };
 
-// Setter with key and value parameters
-knockOff.IPropertyStore.StringIndexer.OnSet = (ko, key, value) =>
-{
-    // Custom logic
-    // Note: When OnSet is set, value does NOT go to backing dictionary
-};
+        // Setter with key and value parameters
+        knockOff.StringIndexer.OnSet = (ko, key, value) =>
+        {
+            // Custom logic
+            // Note: When OnSet is set, value does NOT go to backing dictionary
+        };
 ```
+<!-- /snippet -->
 
 ### Callback Signatures
 
@@ -150,14 +154,14 @@ Each method gets a generated delegate type. The callback signature varies by mem
 All callbacks receive the KnockOff instance (`ko`) as the first parameter. This allows:
 
 ```csharp
-knockOff.IUserService.GetUser.OnCall = (ko, id) =>
+knockOff.GetUser.OnCall = (ko, id) =>
 {
-    // Access other handlers
-    if (ko.IUserService.IsInitialized.WasCalled)
+    // Access other interceptors
+    if (ko.IsInitialized.WasCalled)
         return new User { Id = id, Name = "Initialized" };
 
     // Access backing fields
-    return new User { Id = id, Name = ko.IUserService_NameBacking };
+    return new User { Id = id, Name = ko.NameBacking };
 };
 ```
 
@@ -211,18 +215,18 @@ public partial class PatternServiceKnockOff : IPatternService
 <!-- /snippet -->
 
 // Test
-var knockOff = new ServiceKnockOff();
-IService service = knockOff;
+var knockOff = new PatternServiceKnockOff();
+IPatternService service = knockOff;
 
 // No callback set → uses user method
 var result1 = service.Calculate(5);  // Returns 10 (5 * 2)
 
 // Set callback → overrides user method
-knockOff.IService.Calculate.OnCall = (ko, input) => input * 100;
+knockOff.Calculate.OnCall = (ko, input) => input * 100;
 var result2 = service.Calculate(5);  // Returns 500 (callback)
 
 // Reset clears callback → back to user method
-knockOff.IService.Calculate.Reset();
+knockOff.Calculate.Reset();
 var result3 = service.Calculate(5);  // Returns 10 (user method)
 ```
 
@@ -238,17 +242,17 @@ It does **NOT** clear:
 
 ```csharp
 // Set up state
-knockOff.IUserService.GetUser.OnCall = (ko, id) => new User { Name = "Callback" };
+knockOff.GetUser.OnCall = (ko, id) => new User { Name = "Callback" };
 service.GetUser(1);
 service.GetUser(2);
 
-Assert.Equal(2, knockOff.IUserService.GetUser.CallCount);
+Assert.Equal(2, knockOff.GetUser.CallCount);
 
 // Reset
-knockOff.IUserService.GetUser.Reset();
+knockOff.GetUser.Reset();
 
-Assert.Equal(0, knockOff.IUserService.GetUser.CallCount);  // Tracking cleared
-Assert.Null(knockOff.IUserService.GetUser.OnCall);  // Callback cleared
+Assert.Equal(0, knockOff.GetUser.CallCount);  // Tracking cleared
+Assert.Null(knockOff.GetUser.OnCall);  // Callback cleared
 
 // Now uses user method (or default if no user method)
 var user = service.GetUser(3);
@@ -275,26 +279,26 @@ public partial class PatternCombinedRepositoryKnockOff : IPatternCombinedReposit
 <!-- /snippet -->
 
 // Test 1: Uses default (null)
-var knockOff = new RepositoryKnockOff();
-Assert.Null(knockOff.AsRepository().GetById(999));
+var knockOff = new PatternCombinedRepositoryKnockOff();
+Assert.Null(knockOff.AsIPatternCombinedRepository().GetById(999));
 
 // Test 2: Override for specific IDs
-knockOff.IRepository.GetById.OnCall = (ko, id) => id switch
+knockOff.GetById.OnCall = (ko, id) => id switch
 {
-    1 => new User { Id = 1, Name = "Admin" },
-    2 => new User { Id = 2, Name = "Guest" },
+    1 => new PatternUser { Id = 1, Name = "Admin" },
+    2 => new PatternUser { Id = 2, Name = "Guest" },
     _ => null  // Fall through to "not found"
 };
 
-Assert.Equal("Admin", knockOff.AsRepository().GetById(1)?.Name);
-Assert.Null(knockOff.AsRepository().GetById(999));  // Still null
+Assert.Equal("Admin", knockOff.AsIPatternCombinedRepository().GetById(1)?.Name);
+Assert.Null(knockOff.AsIPatternCombinedRepository().GetById(999));  // Still null
 
 // Test 3: Reset and use different callback
-knockOff.IRepository.GetById.Reset();
-knockOff.IRepository.GetById.OnCall = (ko, id) =>
-    new User { Id = id, Name = $"User-{id}" };
+knockOff.GetById.Reset();
+knockOff.GetById.OnCall = (ko, id) =>
+    new PatternUser { Id = id, Name = $"User-{id}" };
 
-Assert.Equal("User-999", knockOff.AsRepository().GetById(999)?.Name);
+Assert.Equal("User-999", knockOff.AsIPatternCombinedRepository().GetById(999)?.Name);
 ```
 
 ## Decision Guide

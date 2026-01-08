@@ -14,8 +14,8 @@ public class GenericInterfaceTests
 		var user = new User { Id = 1, Name = "Test" };
 		repo.Save(user);
 
-		Assert.True(knockOff.IRepository_KnockOff_Tests_User.Save.WasCalled);
-		Assert.Same(user, knockOff.IRepository_KnockOff_Tests_User.Save.LastCallArg);
+		Assert.True(knockOff.Save.WasCalled);
+		Assert.Same(user, knockOff.Save.LastCallArg);
 	}
 
 	[Fact]
@@ -27,7 +27,7 @@ public class GenericInterfaceTests
 		var result = repo.GetById(42);
 
 		Assert.Null(result);
-		Assert.Equal(42, knockOff.IRepository_KnockOff_Tests_User.GetById.LastCallArg);
+		Assert.Equal(42, knockOff.GetById.LastCallArg);
 	}
 
 	[Fact]
@@ -39,7 +39,7 @@ public class GenericInterfaceTests
 		var result = await repo.GetByIdAsync(100);
 
 		Assert.Null(result);
-		Assert.Equal(100, knockOff.IRepository_KnockOff_Tests_User.GetByIdAsync.LastCallArg);
+		Assert.Equal(100, knockOff.GetByIdAsync.LastCallArg);
 	}
 
 	[Fact]
@@ -50,6 +50,6 @@ public class GenericInterfaceTests
 		IRepository<User> repo = knockOff.AsRepository();
 
 		repo.Save(new User { Id = 1, Name = "Via AsRepository" });
-		Assert.True(knockOff.IRepository_KnockOff_Tests_User.Save.WasCalled);
+		Assert.True(knockOff.Save.WasCalled);
 	}
 }

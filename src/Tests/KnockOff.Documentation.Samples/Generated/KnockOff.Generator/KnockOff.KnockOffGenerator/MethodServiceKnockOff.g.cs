@@ -5,20 +5,17 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class MethodServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for IMethodService.Initialize.</summary>
-	public sealed class IMethodService_InitializeInterceptor
+	/// <summary>Tracks and configures behavior for Initialize.</summary>
+	public sealed class InitializeInterceptor
 	{
-		/// <summary>Delegate for Initialize().</summary>
-		public delegate void InitializeDelegate(MethodServiceKnockOff ko);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public InitializeDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<MethodServiceKnockOff>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
@@ -27,24 +24,16 @@ partial class MethodServiceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodService.</summary>
-	public sealed class IMethodServiceInterceptorors
-	{
-		/// <summary>Interceptor for Initialize.</summary>
-		public IMethodService_InitializeInterceptor Initialize { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodService.</summary>
-	public IMethodServiceInterceptorors IMethodService { get; } = new();
+	/// <summary>Interceptor for Initialize.</summary>
+	public InitializeInterceptor Initialize { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodService.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMethodService AsMethodService() => this;
 
 	void KnockOff.Documentation.Samples.Guides.IMethodService.Initialize()
 	{
-		IMethodService.Initialize.RecordCall();
-		if (IMethodService.Initialize.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		Initialize.RecordCall();
+		Initialize.OnCall?.Invoke(this);
 	}
 
 }

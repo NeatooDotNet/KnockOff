@@ -79,7 +79,7 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         ICpCallbackService service = knockOff;
         var called = false;
 
-        knockOff.ICpCallbackService.Initialize.OnCall = (ko) => { called = true; };
+        knockOff.Initialize.OnCall = (ko) => { called = true; };
         service.Initialize();
 
         Assert.True(called);
@@ -91,7 +91,7 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new CpCallbackServiceKnockOff();
         ICpCallbackService service = knockOff;
 
-        knockOff.ICpCallbackService.GetById.OnCall = (ko, id) =>
+        knockOff.GetById.OnCall = (ko, id) =>
             new CpUser { Id = id, Name = "Mocked" };
 
         var user = service.GetById(42);
@@ -106,7 +106,7 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new CpCallbackServiceKnockOff();
         ICpCallbackService service = knockOff;
 
-        knockOff.ICpCallbackService.Search.OnCall = (ko, query, limit, offset) =>
+        knockOff.Search.OnCall = (ko, query, limit, offset) =>
             new List<CpUser> { new() { Name = $"{query}:{limit}:{offset}" } };
 
         var result = service.Search("test", 10, 5);
@@ -125,7 +125,7 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new CpPropertyServiceKnockOff();
         ICpPropertyService service = knockOff;
 
-        knockOff.ICpPropertyService.CurrentUser.OnGet = (ko) =>
+        knockOff.CurrentUser.OnGet = (ko) =>
             new CpUser { Name = "TestUser" };
 
         Assert.Equal("TestUser", service.CurrentUser?.Name);
@@ -138,7 +138,7 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         ICpPropertyService service = knockOff;
         CpUser? capturedUser = null;
 
-        knockOff.ICpPropertyService.CurrentUser.OnSet = (ko, value) =>
+        knockOff.CurrentUser.OnSet = (ko, value) =>
         {
             capturedUser = value;
         };
@@ -160,7 +160,7 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new CpPropertyStoreKnockOff();
         ICpPropertyStore store = knockOff;
 
-        knockOff.ICpPropertyStore.StringIndexer.OnGet = (ko, key) => key switch
+        knockOff.StringIndexer.OnGet = (ko, key) => key switch
         {
             "admin" => "AdminConfig",
             "guest" => "GuestConfig",
@@ -179,7 +179,7 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         ICpPropertyStore store = knockOff;
         (string key, object? value)? captured = null;
 
-        knockOff.ICpPropertyStore.StringIndexer.OnSet = (ko, key, value) =>
+        knockOff.StringIndexer.OnSet = (ko, key, value) =>
         {
             captured = (key, value);
         };
@@ -202,8 +202,8 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var oneParam = false;
         var twoParam = false;
 
-        knockOff.ICpOverloadService.Process1.OnCall = (ko, data) => oneParam = true;
-        knockOff.ICpOverloadService.Process2.OnCall = (ko, data, priority) => twoParam = true;
+        knockOff.Process1.OnCall = (ko, data) => oneParam = true;
+        knockOff.Process2.OnCall = (ko, data, priority) => twoParam = true;
 
         service.Process("a");
         service.Process("b", 1);
@@ -218,8 +218,8 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new CpOverloadServiceKnockOff();
         ICpOverloadService service = knockOff;
 
-        knockOff.ICpOverloadService.Calculate1.OnCall = (ko, value) => value * 2;
-        knockOff.ICpOverloadService.Calculate2.OnCall = (ko, a, b) => a + b;
+        knockOff.Calculate1.OnCall = (ko, value) => value * 2;
+        knockOff.Calculate2.OnCall = (ko, a, b) => a + b;
 
         Assert.Equal(10, service.Calculate(5));
         Assert.Equal(8, service.Calculate(3, 5));
@@ -235,8 +235,8 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new CpParserKnockOff();
         ICpParser parser = knockOff;
 
-        knockOff.ICpParser.TryParse.OnCall =
-            (CpParserKnockOff.ICpParser_TryParseInterceptor.TryParseDelegate)((CpParserKnockOff ko, string input, out int result) =>
+        knockOff.TryParse.OnCall =
+            (CpParserKnockOff.TryParseInterceptor.TryParseDelegate)((CpParserKnockOff ko, string input, out int result) =>
             {
                 if (int.TryParse(input, out result))
                     return true;
@@ -257,8 +257,8 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new CpParserKnockOff();
         ICpParser parser = knockOff;
 
-        knockOff.ICpParser.GetStats.OnCall =
-            (CpParserKnockOff.ICpParser_GetStatsInterceptor.GetStatsDelegate)((CpParserKnockOff ko, out int count, out double average) =>
+        knockOff.GetStats.OnCall =
+            (CpParserKnockOff.GetStatsInterceptor.GetStatsDelegate)((CpParserKnockOff ko, out int count, out double average) =>
             {
                 count = 42;
                 average = 3.14;
@@ -280,8 +280,8 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new CpProcessorKnockOff();
         ICpProcessor processor = knockOff;
 
-        knockOff.ICpProcessor.Increment.OnCall =
-            (CpProcessorKnockOff.ICpProcessor_IncrementInterceptor.IncrementDelegate)((CpProcessorKnockOff ko, ref int value) =>
+        knockOff.Increment.OnCall =
+            (CpProcessorKnockOff.IncrementInterceptor.IncrementDelegate)((CpProcessorKnockOff ko, ref int value) =>
             {
                 value = value * 2;
             });
@@ -298,8 +298,8 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new CpProcessorKnockOff();
         ICpProcessor processor = knockOff;
 
-        knockOff.ICpProcessor.TryUpdate.OnCall =
-            (CpProcessorKnockOff.ICpProcessor_TryUpdateInterceptor.TryUpdateDelegate)((CpProcessorKnockOff ko, string key, ref string value) =>
+        knockOff.TryUpdate.OnCall =
+            (CpProcessorKnockOff.TryUpdateInterceptor.TryUpdateDelegate)((CpProcessorKnockOff ko, string key, ref string value) =>
             {
                 if (key == "valid")
                 {
@@ -324,8 +324,8 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new CpProcessorKnockOff();
         ICpProcessor processor = knockOff;
 
-        knockOff.ICpProcessor.Increment.OnCall =
-            (CpProcessorKnockOff.ICpProcessor_IncrementInterceptor.IncrementDelegate)((CpProcessorKnockOff ko, ref int value) =>
+        knockOff.Increment.OnCall =
+            (CpProcessorKnockOff.IncrementInterceptor.IncrementDelegate)((CpProcessorKnockOff ko, ref int value) =>
             {
                 value = value * 2;
             });
@@ -334,7 +334,7 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         processor.Increment(ref x);
 
         Assert.Equal(10, x); // Modified
-        Assert.Equal(5, knockOff.ICpProcessor.Increment.LastCallArg); // Original
+        Assert.Equal(5, knockOff.Increment.LastCallArg); // Original
     }
 
     // ========================================================================
@@ -356,7 +356,7 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new CpPriorityServiceKnockOff();
         ICpPriorityService service = knockOff;
 
-        knockOff.ICpPriorityService.Calculate.OnCall = (ko, x) => x * 100;
+        knockOff.Calculate2.OnCall = (ko, x) => x * 100;
 
         Assert.Equal(500, service.Calculate(5)); // callback
     }
@@ -367,10 +367,10 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new CpPriorityServiceKnockOff();
         ICpPriorityService service = knockOff;
 
-        knockOff.ICpPriorityService.Calculate.OnCall = (ko, x) => x * 100;
+        knockOff.Calculate2.OnCall = (ko, x) => x * 100;
         Assert.Equal(500, service.Calculate(5)); // callback
 
-        knockOff.ICpPriorityService.Calculate.Reset();
+        knockOff.Calculate2.Reset();
 
         Assert.Equal(10, service.Calculate(5)); // user method
     }
@@ -386,15 +386,15 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         ICpResetRepository service = knockOff;
         var specialUser = new CpUser { Name = "Special" };
 
-        knockOff.ICpResetRepository.GetUser.OnCall = (ko, id) => specialUser;
+        knockOff.GetUser.OnCall = (ko, id) => specialUser;
         service.GetUser(1);
         service.GetUser(2);
 
-        Assert.Equal(2, knockOff.ICpResetRepository.GetUser.CallCount);
+        Assert.Equal(2, knockOff.GetUser.CallCount);
 
-        knockOff.ICpResetRepository.GetUser.Reset();
+        knockOff.GetUser.Reset();
 
-        Assert.Equal(0, knockOff.ICpResetRepository.GetUser.CallCount);
+        Assert.Equal(0, knockOff.GetUser.CallCount);
     }
 
     [Fact]
@@ -403,10 +403,10 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new CpResetRepositoryKnockOff();
         ICpResetRepository service = knockOff;
 
-        knockOff.ICpResetRepository.GetUser.OnCall = (ko, id) => new CpUser { Name = "FromCallback" };
+        knockOff.GetUser.OnCall = (ko, id) => new CpUser { Name = "FromCallback" };
         Assert.Equal("FromCallback", service.GetUser(1)?.Name);
 
-        knockOff.ICpResetRepository.GetUser.Reset();
+        knockOff.GetUser.Reset();
 
         // Now returns default (null for nullable)
         Assert.Null(service.GetUser(1));
@@ -431,7 +431,7 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new CpCombinedRepoKnockOff();
         ICpCombinedRepository repo = knockOff;
 
-        knockOff.ICpCombinedRepository.GetById.OnCall = (ko, id) => id == 1
+        knockOff.GetById2.OnCall = (ko, id) => id == 1
             ? new CpUser { Name = "Admin" }
             : null;
 
@@ -445,11 +445,11 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new CpCombinedRepoKnockOff();
         ICpCombinedRepository repo = knockOff;
 
-        knockOff.ICpCombinedRepository.GetById.OnCall = (ko, id) => new CpUser { Name = "First" };
+        knockOff.GetById2.OnCall = (ko, id) => new CpUser { Name = "First" };
         Assert.Equal("First", repo.GetById(1)?.Name);
 
-        knockOff.ICpCombinedRepository.GetById.Reset();
-        knockOff.ICpCombinedRepository.GetById.OnCall = (ko, id) =>
+        knockOff.GetById2.Reset();
+        knockOff.GetById2.OnCall = (ko, id) =>
             new CpUser { Name = $"User-{id}" };
 
         Assert.Equal("User-999", repo.GetById(999)?.Name);

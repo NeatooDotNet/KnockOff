@@ -19,7 +19,7 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
         var knockOff = new MigUserServiceKnockOff();
 
         Assert.NotNull(knockOff);
-        Assert.NotNull(knockOff.IMigUserService);
+        Assert.NotNull(knockOff.Name);
     }
 
     // ========================================================================
@@ -55,7 +55,7 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
     {
         var knockOff = new MigUserServiceKnockOff();
 
-        knockOff.IMigUserService.GetUser.OnCall = (ko, id) =>
+        knockOff.GetUser.OnCall = (ko, id) =>
             new MigUser { Id = id, Name = "Test" };
 
         var user = knockOff.AsMigUserService().GetUser(42);
@@ -73,7 +73,7 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
     {
         var knockOff = new MigUserServiceKnockOff();
 
-        knockOff.IMigUserService.GetUserAsync.OnCall = (ko, id) =>
+        knockOff.GetUserAsync.OnCall = (ko, id) =>
             Task.FromResult<MigUser?>(new MigUser { Id = id });
 
         var user = await knockOff.AsMigUserService().GetUserAsync(42);
@@ -93,7 +93,7 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
         IMigUserService service = knockOff;
 
         // Set up GetAll to return empty collection (required for non-nullable return type)
-        knockOff.IMigUserService.GetAll.OnCall = (ko) => Enumerable.Empty<MigUser>();
+        knockOff.GetAll.OnCall = (ko) => Enumerable.Empty<MigUser>();
 
         service.Save(new MigUser());
         _ = service.GetAll();
@@ -101,10 +101,10 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
         service.Update(new MigUser());
         service.Update(new MigUser());
 
-        Assert.Equal(1, knockOff.IMigUserService.Save.CallCount);
-        Assert.Equal(0, knockOff.IMigUserService.Delete.CallCount);
-        Assert.True(knockOff.IMigUserService.GetAll.WasCalled);
-        Assert.Equal(3, knockOff.IMigUserService.Update.CallCount);
+        Assert.Equal(1, knockOff.Save.CallCount);
+        Assert.Equal(0, knockOff.Delete.CallCount);
+        Assert.True(knockOff.GetAll.WasCalled);
+        Assert.Equal(3, knockOff.Update.CallCount);
     }
 
     // ========================================================================
@@ -119,7 +119,7 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
 
         service.Save(new MigUser { Id = 42 });
 
-        var captured = knockOff.IMigUserService.Save.LastCallArg;
+        var captured = knockOff.Save.LastCallArg;
         Assert.Equal(42, captured?.Id);
     }
 
@@ -130,7 +130,7 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
         IMigUserService service = knockOff;
         var customList = new List<MigUser>();
 
-        knockOff.IMigUserService.Save.OnCall = (ko, user) =>
+        knockOff.Save.OnCall = (ko, user) =>
         {
             customList.Add(user);
         };
@@ -151,7 +151,7 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
         var knockOff = new MigUserServiceKnockOff();
         IMigUserService service = knockOff;
 
-        knockOff.IMigUserService.Name.OnGet = (ko) => "Test";
+        knockOff.Name.OnGet = (ko) => "Test";
 
         Assert.Equal("Test", service.Name);
     }
@@ -164,7 +164,7 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
 
         service.Name = "Value";
 
-        Assert.Equal("Value", knockOff.IMigUserService.Name.LastSetValue);
+        Assert.Equal("Value", knockOff.Name.LastSetValue);
     }
 
     // ========================================================================
@@ -193,7 +193,7 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
         IMigConfigService service = knockOff;
 
         // Override user method with callback
-        knockOff.IMigConfigService.GetConfig.OnCall = (ko) => new MigConfig { Timeout = 60 };
+        knockOff.GetConfig2.OnCall = (ko) => new MigConfig { Timeout = 60 };
 
         var config = service.GetConfig();
 
@@ -210,7 +210,7 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
         var knockOff = new MigUserServiceKnockOff();
         IMigUserService service = knockOff;
 
-        knockOff.IMigUserService.GetUser.OnCall = (ko, id) => id switch
+        knockOff.GetUser.OnCall = (ko, id) => id switch
         {
             1 => new MigUser { Name = "Admin" },
             2 => new MigUser { Name = "Guest" },
@@ -232,7 +232,7 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
         var knockOff = new MigConnectionKnockOff();
         IMigConnection connection = knockOff;
 
-        knockOff.IMigConnection.Connect.OnCall = (ko) =>
+        knockOff.Connect.OnCall = (ko) =>
             throw new TimeoutException();
 
         Assert.Throws<TimeoutException>(() => connection.Connect());
@@ -249,7 +249,7 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
         IMigSequence sequence = knockOff;
 
         var values = new Queue<int>([1, 2, 3]);
-        knockOff.IMigSequence.GetNext.OnCall = (ko) => values.Dequeue();
+        knockOff.GetNext.OnCall = (ko) => values.Dequeue();
 
         Assert.Equal(1, sequence.GetNext());
         Assert.Equal(2, sequence.GetNext());
@@ -257,23 +257,8 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
     }
 
     // ========================================================================
-    // docs:migration-from-moq:multiple-interfaces
+    // docs:migration-from-moq:multiple-interfaces - Multi-interface tests removed (KO0010)
     // ========================================================================
-
-    [Fact]
-    public async Task MultipleInterfaces_BothWork()
-    {
-        var knockOff = new MigDataContextKnockOff();
-
-        knockOff.IMigUnitOfWork.SaveChangesAsync.OnCall = (ko, ct) => Task.FromResult(1);
-
-        IMigRepository repo = knockOff.AsMigRepository();
-        IMigUnitOfWork uow = knockOff.AsMigUnitOfWork();
-
-        var result = await uow.SaveChangesAsync(CancellationToken.None);
-
-        Assert.Equal(1, result);
-    }
 
     // ========================================================================
     // docs:migration-from-moq:argument-matching
@@ -286,7 +271,7 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
         IMigLogger logger = knockOff;
         var errors = new List<string>();
 
-        knockOff.IMigLogger.Log.OnCall = (ko, message) =>
+        knockOff.Log.OnCall = (ko, message) =>
         {
             if (message.Contains("error"))
                 errors.Add(message);
@@ -328,7 +313,7 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
         var nextId = 100;
         var savedEntities = new List<MigEntity>();
 
-        knockOff.IMigSaveService.Save.OnCall = (ko, entity) =>
+        knockOff.Save.OnCall = (ko, entity) =>
         {
             entity.Id = nextId++;
             savedEntities.Add(entity);
@@ -356,6 +341,6 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
         processor.Process("data");
 
         // Args are captured automatically
-        Assert.Equal("data", knockOff.IMigProcessor.Process.LastCallArg);
+        Assert.Equal("data", knockOff.Process.LastCallArg);
     }
 }

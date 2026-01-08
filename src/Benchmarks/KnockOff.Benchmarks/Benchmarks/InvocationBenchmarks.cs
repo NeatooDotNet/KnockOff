@@ -31,7 +31,7 @@ public class InvocationBenchmarks
         _moqCalculator = moqCalc.Object;
 
         var knockOffCalc = new CalculatorStub();
-        knockOffCalc.ICalculator.Add.OnCall = (ko, a, b) => a + b;
+        knockOffCalc.Add.OnCall = (ko, a, b) => a + b;
         _knockOffCalculator = knockOffCalc;
 
         _moqMedium = new Mock<IMediumService>().Object;

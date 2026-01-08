@@ -5,69 +5,69 @@ namespace KnockOff.Tests;
 
 partial class OutParameterServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for IOutParameterService.TryGetValue.</summary>
-	public sealed class IOutParameterService_TryGetValueInterceptor
+	/// <summary>Tracks and configures behavior for TryGetValue.</summary>
+	public sealed class TryGetValueInterceptor
 	{
-		/// <summary>Delegate for TryGetValue(string key, out string? value).</summary>
-		public delegate bool TryGetValueDelegate(OutParameterServiceKnockOff ko, string key, out string? value);
+		/// <summary>Delegate for TryGetValue.</summary>
+		public delegate bool TryGetValueDelegate(OutParameterServiceKnockOff ko, string key, out string? @value);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'key' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public string? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public TryGetValueDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string key) { CallCount++; LastCallArg = key; }
+		public void RecordCall(string? key) { CallCount++; LastCallArg = key; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IOutParameterService.TryParse.</summary>
-	public sealed class IOutParameterService_TryParseInterceptor
+	/// <summary>Tracks and configures behavior for TryParse.</summary>
+	public sealed class TryParseInterceptor
 	{
-		/// <summary>Delegate for TryParse(string input, out int result).</summary>
+		/// <summary>Delegate for TryParse.</summary>
 		public delegate bool TryParseDelegate(OutParameterServiceKnockOff ko, string input, out int result);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'input' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public string? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public TryParseDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string input) { CallCount++; LastCallArg = input; }
+		public void RecordCall(string? input) { CallCount++; LastCallArg = input; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IOutParameterService.GetData.</summary>
-	public sealed class IOutParameterService_GetDataInterceptor
+	/// <summary>Tracks and configures behavior for GetData.</summary>
+	public sealed class GetDataInterceptor
 	{
-		/// <summary>Delegate for GetData(out string name, out int count).</summary>
+		/// <summary>Delegate for GetData.</summary>
 		public delegate void GetDataDelegate(OutParameterServiceKnockOff ko, out string name, out int count);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetDataDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -77,37 +77,32 @@ partial class OutParameterServiceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IOutParameterService.</summary>
-	public sealed class IOutParameterServiceInterceptorors
-	{
-		/// <summary>Interceptor for TryGetValue.</summary>
-		public IOutParameterService_TryGetValueInterceptor TryGetValue { get; } = new();
-		/// <summary>Interceptor for TryParse.</summary>
-		public IOutParameterService_TryParseInterceptor TryParse { get; } = new();
-		/// <summary>Interceptor for GetData.</summary>
-		public IOutParameterService_GetDataInterceptor GetData { get; } = new();
-	}
+	/// <summary>Interceptor for TryGetValue.</summary>
+	public TryGetValueInterceptor TryGetValue { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IOutParameterService.</summary>
-	public IOutParameterServiceInterceptorors IOutParameterService { get; } = new();
+	/// <summary>Interceptor for TryParse.</summary>
+	public TryParseInterceptor TryParse { get; } = new();
+
+	/// <summary>Interceptor for GetData.</summary>
+	public GetDataInterceptor GetData { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IOutParameterService.</summary>
 	public KnockOff.Tests.IOutParameterService AsOutParameterService() => this;
 
-	bool KnockOff.Tests.IOutParameterService.TryGetValue(string key, out string? value)
+	bool KnockOff.Tests.IOutParameterService.TryGetValue(string key, out string? @value)
 	{
-		value = default!;
-		IOutParameterService.TryGetValue.RecordCall(key);
-		if (IOutParameterService.TryGetValue.OnCall is { } onCallCallback)
-			return onCallCallback(this, key, out value);
+		@value = default!;
+		TryGetValue.RecordCall(key);
+		if (TryGetValue.OnCall is { } onCallCallback)
+			return onCallCallback(this, key, out @value);
 		return default!;
 	}
 
 	bool KnockOff.Tests.IOutParameterService.TryParse(string input, out int result)
 	{
 		result = default!;
-		IOutParameterService.TryParse.RecordCall(input);
-		if (IOutParameterService.TryParse.OnCall is { } onCallCallback)
+		TryParse.RecordCall(input);
+		if (TryParse.OnCall is { } onCallCallback)
 			return onCallCallback(this, input, out result);
 		return default!;
 	}
@@ -116,8 +111,8 @@ partial class OutParameterServiceKnockOff
 	{
 		name = default!;
 		count = default!;
-		IOutParameterService.GetData.RecordCall();
-		if (IOutParameterService.GetData.OnCall is { } onCallCallback)
+		GetData.RecordCall();
+		if (GetData.OnCall is { } onCallCallback)
 		{ onCallCallback(this, out name, out count); return; }
 	}
 

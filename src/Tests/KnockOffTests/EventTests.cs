@@ -11,13 +11,13 @@ public class EventTests
 		var knockOff = new EventSourceKnockOff();
 		IEventSource source = knockOff;
 
-		Assert.False(knockOff.IEventSource.MessageReceived.HasSubscribers);
-		Assert.Equal(0, knockOff.IEventSource.MessageReceived.SubscribeCount);
+		Assert.False(knockOff.MessageReceived.HasSubscribers);
+		Assert.Equal(0, knockOff.MessageReceived.AddCount);
 
 		source.MessageReceived += (sender, e) => { };
 
-		Assert.True(knockOff.IEventSource.MessageReceived.HasSubscribers);
-		Assert.Equal(1, knockOff.IEventSource.MessageReceived.SubscribeCount);
+		Assert.True(knockOff.MessageReceived.HasSubscribers);
+		Assert.Equal(1, knockOff.MessageReceived.AddCount);
 	}
 
 	[Fact]
@@ -30,8 +30,8 @@ public class EventTests
 		source.MessageReceived += handler;
 		source.MessageReceived -= handler;
 
-		Assert.Equal(1, knockOff.IEventSource.MessageReceived.SubscribeCount);
-		Assert.Equal(1, knockOff.IEventSource.MessageReceived.UnsubscribeCount);
+		Assert.Equal(1, knockOff.MessageReceived.AddCount);
+		Assert.Equal(1, knockOff.MessageReceived.RemoveCount);
 	}
 
 	[Fact]
@@ -48,69 +48,29 @@ public class EventTests
 			receivedMessage = e;
 		};
 
-		knockOff.IEventSource.MessageReceived.Raise(knockOff, "Hello World");
+		knockOff.MessageReceived.Raise(knockOff, "Hello World");
 
 		Assert.Same(knockOff, receivedSender);
 		Assert.Equal("Hello World", receivedMessage);
 	}
 
 	[Fact]
-	public void Event_Raise_TracksRaiseCount()
+	public void Event_Raise_MultipleInvocations()
 	{
 		var knockOff = new EventSourceKnockOff();
 		IEventSource source = knockOff;
 
-		source.MessageReceived += (sender, e) => { };
+		var invocationCount = 0;
+		source.MessageReceived += (sender, e) => invocationCount++;
 
-		Assert.False(knockOff.IEventSource.MessageReceived.WasRaised);
-		Assert.Equal(0, knockOff.IEventSource.MessageReceived.RaiseCount);
+		knockOff.MessageReceived.Raise(null, "First");
+		knockOff.MessageReceived.Raise(null, "Second");
 
-		knockOff.IEventSource.MessageReceived.Raise("First");
-		knockOff.IEventSource.MessageReceived.Raise("Second");
-
-		Assert.True(knockOff.IEventSource.MessageReceived.WasRaised);
-		Assert.Equal(2, knockOff.IEventSource.MessageReceived.RaiseCount);
+		Assert.Equal(2, invocationCount);
 	}
 
 	[Fact]
-	public void Event_Raise_TracksLastRaiseArgs()
-	{
-		var knockOff = new EventSourceKnockOff();
-		IEventSource source = knockOff;
-
-		source.MessageReceived += (sender, e) => { };
-
-		knockOff.IEventSource.MessageReceived.Raise(knockOff, "First");
-		knockOff.IEventSource.MessageReceived.Raise(knockOff, "Second");
-		knockOff.IEventSource.MessageReceived.Raise(knockOff, "Last");
-
-		var lastArgs = knockOff.IEventSource.MessageReceived.LastRaiseArgs;
-		Assert.NotNull(lastArgs);
-		Assert.Same(knockOff, lastArgs.Value.sender);
-		Assert.Equal("Last", lastArgs.Value.e);
-	}
-
-	[Fact]
-	public void Event_Raise_TracksAllRaises()
-	{
-		var knockOff = new EventSourceKnockOff();
-		IEventSource source = knockOff;
-
-		source.MessageReceived += (sender, e) => { };
-
-		knockOff.IEventSource.MessageReceived.Raise("First");
-		knockOff.IEventSource.MessageReceived.Raise("Second");
-		knockOff.IEventSource.MessageReceived.Raise("Third");
-
-		var allRaises = knockOff.IEventSource.MessageReceived.AllRaises;
-		Assert.Equal(3, allRaises.Count);
-		Assert.Equal("First", allRaises[0].e);
-		Assert.Equal("Second", allRaises[1].e);
-		Assert.Equal("Third", allRaises[2].e);
-	}
-
-	[Fact]
-	public void Event_EventHandler_Raise_WithNoArgs()
+	public void Event_EventHandler_Raise_WithSenderAndArgs()
 	{
 		var knockOff = new EventSourceKnockOff();
 		IEventSource source = knockOff;
@@ -118,10 +78,9 @@ public class EventTests
 		var invoked = false;
 		source.OnCompleted += (sender, e) => { invoked = true; };
 
-		knockOff.IEventSource.OnCompleted.Raise();
+		knockOff.OnCompleted.Raise(null, EventArgs.Empty);
 
 		Assert.True(invoked);
-		Assert.True(knockOff.IEventSource.OnCompleted.WasRaised);
 	}
 
 	[Fact]
@@ -133,11 +92,9 @@ public class EventTests
 		int? capturedProgress = null;
 		source.OnProgress += (value) => { capturedProgress = value; };
 
-		knockOff.IEventSource.OnProgress.Raise(75);
+		knockOff.OnProgress.Raise(75);
 
 		Assert.Equal(75, capturedProgress);
-		Assert.Equal(1, knockOff.IEventSource.OnProgress.RaiseCount);
-		Assert.Equal(75, knockOff.IEventSource.OnProgress.LastRaiseArgs);
 	}
 
 	[Fact]
@@ -154,83 +111,28 @@ public class EventTests
 			capturedValue = value;
 		};
 
-		knockOff.IEventSource.OnData.Raise("DataPoint", 42);
+		knockOff.OnData.Raise("DataPoint", 42);
 
 		Assert.Equal("DataPoint", capturedName);
 		Assert.Equal(42, capturedValue);
-
-		var lastArgs = knockOff.IEventSource.OnData.LastRaiseArgs;
-		Assert.NotNull(lastArgs);
-		Assert.Equal("DataPoint", lastArgs.Value.arg1);
-		Assert.Equal(42, lastArgs.Value.arg2);
 	}
 
 	[Fact]
-	public void Event_AllRaises_TracksMultiParamTuples()
+	public void Event_Reset_ClearsTrackingAndHandlers()
 	{
 		var knockOff = new EventSourceKnockOff();
 		IEventSource source = knockOff;
 
-		source.OnData += (name, value) => { };
+		source.MessageReceived += (sender, e) => { };
 
-		knockOff.IEventSource.OnData.Raise("First", 1);
-		knockOff.IEventSource.OnData.Raise("Second", 2);
-		knockOff.IEventSource.OnData.Raise("Third", 3);
+		Assert.True(knockOff.MessageReceived.HasSubscribers);
+		Assert.Equal(1, knockOff.MessageReceived.AddCount);
 
-		var allRaises = knockOff.IEventSource.OnData.AllRaises;
-		Assert.Equal(3, allRaises.Count);
-		Assert.Equal(("First", 1), allRaises[0]);
-		Assert.Equal(("Second", 2), allRaises[1]);
-		Assert.Equal(("Third", 3), allRaises[2]);
-	}
+		knockOff.MessageReceived.Reset();
 
-	[Fact]
-	public void Event_Reset_ClearsTrackingButNotHandlers()
-	{
-		var knockOff = new EventSourceKnockOff();
-		IEventSource source = knockOff;
-
-		var invoked = false;
-		source.MessageReceived += (sender, e) => { invoked = true; };
-
-		knockOff.IEventSource.MessageReceived.Raise("Before reset");
-		Assert.True(knockOff.IEventSource.MessageReceived.WasRaised);
-		Assert.Equal(1, knockOff.IEventSource.MessageReceived.RaiseCount);
-
-		knockOff.IEventSource.MessageReceived.Reset();
-
-		Assert.Equal(0, knockOff.IEventSource.MessageReceived.SubscribeCount);
-		Assert.Equal(0, knockOff.IEventSource.MessageReceived.UnsubscribeCount);
-		Assert.Equal(0, knockOff.IEventSource.MessageReceived.RaiseCount);
-		Assert.Empty(knockOff.IEventSource.MessageReceived.AllRaises);
-
-		// But handlers should still work
-		invoked = false;
-		knockOff.IEventSource.MessageReceived.Raise("After reset");
-		Assert.True(invoked);
-	}
-
-	[Fact]
-	public void Event_Clear_ClearsHandlersAndTracking()
-	{
-		var knockOff = new EventSourceKnockOff();
-		IEventSource source = knockOff;
-
-		var invoked = false;
-		source.MessageReceived += (sender, e) => { invoked = true; };
-
-		knockOff.IEventSource.MessageReceived.Raise("Before clear");
-		Assert.True(invoked);
-
-		knockOff.IEventSource.MessageReceived.Clear();
-
-		Assert.Equal(0, knockOff.IEventSource.MessageReceived.RaiseCount);
-		Assert.False(knockOff.IEventSource.MessageReceived.HasSubscribers);
-
-		// Handlers should also be cleared
-		invoked = false;
-		knockOff.IEventSource.MessageReceived.Raise("After clear");
-		Assert.False(invoked);
+		Assert.Equal(0, knockOff.MessageReceived.AddCount);
+		Assert.Equal(0, knockOff.MessageReceived.RemoveCount);
+		Assert.False(knockOff.MessageReceived.HasSubscribers);
 	}
 
 	[Fact]
@@ -240,12 +142,10 @@ public class EventTests
 
 		var exception = Record.Exception(() =>
 		{
-			knockOff.IEventSource.MessageReceived.Raise("No subscribers");
+			knockOff.MessageReceived.Raise(null, "No subscribers");
 		});
 
 		Assert.Null(exception);
-		Assert.True(knockOff.IEventSource.MessageReceived.WasRaised);
-		Assert.Equal(1, knockOff.IEventSource.MessageReceived.RaiseCount);
 	}
 
 	[Fact]
@@ -259,9 +159,9 @@ public class EventTests
 		source.MessageReceived += (sender, e) => invocations.Add(2);
 		source.MessageReceived += (sender, e) => invocations.Add(3);
 
-		Assert.Equal(3, knockOff.IEventSource.MessageReceived.SubscribeCount);
+		Assert.Equal(3, knockOff.MessageReceived.AddCount);
 
-		knockOff.IEventSource.MessageReceived.Raise("Test");
+		knockOff.MessageReceived.Raise(null, "Test");
 
 		Assert.Equal(3, invocations.Count);
 		Assert.Contains(1, invocations);

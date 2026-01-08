@@ -1,252 +1,117 @@
 # Multiple Interfaces
 
-KnockOff supports implementing multiple interfaces in a single stub class. Each interface gets its own KO class with separate handlers.
+Starting in v10.9, standalone KnockOff stubs implement **one interface** (plus its inheritance chain). For multiple unrelated interfaces, use inline stubs or separate standalone stubs.
 
-## Basic Usage
+## Single Interface Constraint
 
-<!-- snippet: docs:multiple-interfaces:basic-usage -->
+Standalone stubs must implement exactly one interface:
+
 ```csharp
-public interface IMiLogger
-{
-    void Log(string message);
-    string Name { get; set; }
-}
+// Valid - single interface
+[KnockOff]
+public partial class UserServiceKnockOff : IUserService { }
 
-public interface IMiNotifier
-{
-    void Notify(string recipient);
-    string Name { get; }  // Same name, different accessor
-}
+// Valid - interface with inheritance chain
+[KnockOff]
+public partial class EntityKnockOff : IEntityBase { }  // IEntityBase : IValidatable
+
+// INVALID - multiple unrelated interfaces (emits KO0010)
+[KnockOff]
+public partial class DataContextKnockOff : IRepository, IUnitOfWork { }  // Error!
+```
+
+**Diagnostic KO0010:** "KnockOff stubs should implement a single interface. Create separate stubs for IRepository and IUnitOfWork."
+
+## Option 1: Separate Standalone Stubs
+
+Create separate stub classes for each interface:
+
+```csharp
+[KnockOff]
+public partial class RepositoryKnockOff : IRepository { }
 
 [KnockOff]
-public partial class MiLoggerNotifierKnockOff : IMiLogger, IMiNotifier { }
-```
-<!-- /snippet -->
+public partial class UnitOfWorkKnockOff : IUnitOfWork { }
 
-## Interface KO Classes
-
-Each interface gets its own KO class and property:
-
-```csharp
-var knockOff = new LoggerNotifierKnockOff();
-
-// Each interface has its own KO class
-knockOff.ILogger.Log.CallCount;
-knockOff.ILogger.Name.GetCount;
-
-knockOff.INotifier.Notify.CallCount;
-knockOff.INotifier.Name.GetCount;
-```
-
-## AsXYZ() Helper Methods
-
-KnockOff generates a helper method for each interface:
-
-```csharp
-var knockOff = new LoggerNotifierKnockOff();
-
-// Get typed references
-ILogger logger = knockOff.AsLogger();
-INotifier notifier = knockOff.AsNotifier();
-
-// Or cast directly
-ILogger logger2 = knockOff;
-INotifier notifier2 = knockOff;
-```
-
-## Separate Tracking
-
-Each interface's members are tracked independently, even for same-named members:
-
-<!-- snippet: docs:multiple-interfaces:shared-method -->
-```csharp
-public interface IMiLoggerSame
-{
-    void Log(string message);
-}
-
-public interface IMiAuditor
-{
-    void Log(string message);  // Same signature
-    void Audit(string action, int userId);
-}
-
-[KnockOff]
-public partial class MiLoggerAuditorKnockOff : IMiLoggerSame, IMiAuditor { }
-```
-<!-- /snippet -->
-
-Usage:
-
-```csharp
-var knockOff = new LoggerAuditorKnockOff();
-ILogger logger = knockOff;
-IAuditor auditor = knockOff;
-
-logger.Log("from logger");
-auditor.Log("from auditor");
-
-// Each interface tracks its own calls
-Assert.Equal(1, knockOff.ILogger.Log.CallCount);
-Assert.Equal("from logger", knockOff.ILogger.Log.LastCallArg);
-
-Assert.Equal(1, knockOff.IAuditor.Log.CallCount);
-Assert.Equal("from auditor", knockOff.IAuditor.Log.LastCallArg);
-
-// Audit is only on IAuditor
-Assert.Equal(0, knockOff.IAuditor.Audit.CallCount);
-```
-
-## Separate Backing Fields
-
-Each interface gets its own backing fields:
-
-```csharp
-ILogger logger = knockOff;
-INotifier notifier = knockOff;
-
-// Each interface has its own backing
-logger.Name = "LoggerValue";
-
-// INotifier.Name has a separate backing
-Assert.Equal("LoggerValue", knockOff.ILogger_NameBacking);
-Assert.Equal("", knockOff.INotifier_NameBacking);  // Still default
-
-// Access via interface uses its own backing
-Assert.Equal("LoggerValue", logger.Name);
-Assert.Equal("", notifier.Name);  // Different value!
-```
-
-## Callbacks
-
-Set callbacks using the interface KO class:
-
-```csharp
-// ILogger.Log callback
-knockOff.ILogger.Log.OnCall = (ko, message) =>
-{
-    Console.WriteLine($"[Logger] {message}");
-};
-
-// IAuditor.Log callback (separate from ILogger.Log)
-knockOff.IAuditor.Log.OnCall = (ko, message) =>
-{
-    Console.WriteLine($"[Auditor] {message}");
-};
-
-// IAuditor.Audit callback
-knockOff.IAuditor.Audit.OnCall = (ko, action, userId) =>
-{
-    Console.WriteLine($"[Audit] {action} by user {userId}");
-};
-```
-
-## Common Patterns
-
-### Repository + Unit of Work
-
-<!-- snippet: docs:multiple-interfaces:repo-uow -->
-```csharp
-public interface IMiRepository
-{
-    MiUser? GetById(int id);
-    void Add(MiUser user);
-}
-
-public interface IMiUnitOfWork
-{
-    Task<int> SaveChangesAsync(CancellationToken ct = default);
-}
-
-[KnockOff]
-public partial class MiDataContextKnockOff : IMiRepository, IMiUnitOfWork { }
-```
-<!-- /snippet -->
-
-```csharp
 // Usage
-var knockOff = new MiDataContextKnockOff();
+var repo = new RepositoryKnockOff();
+var uow = new UnitOfWorkKnockOff();
 
-knockOff.IUnitOfWork.SaveChangesAsync.OnCall = (ko, ct) =>
-    Task.FromResult(ko.IRepository.Add.CallCount);  // Return count of adds
-
-IRepository repo = knockOff.AsRepository();
-IUnitOfWork uow = knockOff.AsUnitOfWork();
-
-repo.Add(new User { Name = "New" });
-repo.Add(new User { Name = "Another" });
-var saved = await uow.SaveChangesAsync();
-
-Assert.Equal(2, saved);
+// Configure each independently
+repo.GetById.OnCall = (ko, id) => new User { Id = id };
+uow.SaveChangesAsync.OnCall = (ko, ct) => Task.FromResult(1);
 ```
 
-### Logger + Disposable
+## Option 2: Inline Stubs
+
+For tests that need multiple interfaces, use inline stubs with the `[InlineStub<T>]` attribute:
 
 ```csharp
-public interface ILogger
+public partial class DataContextTests
 {
-    void Log(string message);
-}
+    [InlineStub<IRepository>]
+    [InlineStub<IUnitOfWork>]
+    partial void DefineStubs();
 
-public interface IDisposable
-{
-    void Dispose();
+    [Fact]
+    public async Task SaveChanges_ReturnsAddCount()
+    {
+        var repo = new Stubs.IRepository();
+        var uow = new Stubs.IUnitOfWork();
+
+        // Configure via flat API
+        uow.SaveChangesAsync.OnCall = (ko, ct) => Task.FromResult(repo.Add.CallCount);
+
+        repo.Add.OnCall = (ko, user) => { };
+
+        // Use in test
+        IRepository repoService = repo;
+        IUnitOfWork uowService = uow;
+
+        repoService.Add(new User { Name = "New" });
+        repoService.Add(new User { Name = "Another" });
+        var saved = await uowService.SaveChangesAsync();
+
+        Assert.Equal(2, saved);
+    }
 }
+```
+
+See [Inline Stubs Guide](inline-stubs.md) for more details.
+
+## Why Single Interface?
+
+The single interface constraint exists because:
+
+1. **Stubs satisfy dependencies.** Dependencies are typed as a single interface. Multiple unrelated interfaces on one stub is not a realistic use case.
+
+2. **Flat API simplicity.** With a single interface, member names don't conflict and don't need disambiguation prefixes.
+
+3. **Interface inheritance is different.** Implementing `IEntityBase` (which extends `IValidatable`) is still one interface - the inheritance chain is flattened automatically.
+
+## Migration from v10
+
+If you have existing stubs implementing multiple interfaces:
+
+```csharp
+// v10 - worked but now deprecated
+[KnockOff]
+public partial class DataContextKnockOff : IRepository, IUnitOfWork { }
+
+// v10.9 - Option A: Separate stubs
+[KnockOff]
+public partial class RepositoryKnockOff : IRepository { }
 
 [KnockOff]
-public partial class DisposableLoggerKnockOff : ILogger, IDisposable { }
+public partial class UnitOfWorkKnockOff : IUnitOfWork { }
 
-// Verify cleanup
-knockOff.IDisposable.Dispose.OnCall = (ko) =>
-{
-    Assert.True(ko.ILogger.Log.WasCalled, "Should log before disposing");
-};
+// v10.9 - Option B: Inline stubs
+[InlineStub<IRepository>]
+[InlineStub<IUnitOfWork>]
+partial void DefineStubs();
 ```
 
-### Multiple Repositories
+## Related Guides
 
-<!-- snippet: docs:multiple-interfaces:multiple-repos -->
-```csharp
-[KnockOff]
-public partial class MiCompositeRepositoryKnockOff : IMiUserRepository, IMiOrderRepository { }
-```
-<!-- /snippet -->
-
-```csharp
-// Configure each interface independently
-knockOff.IMiUserRepository.GetUser.OnCall = (ko, id) => new MiUser { Id = id };
-knockOff.IMiOrderRepository.GetOrder.OnCall = (ko, id) => new MiOrder { Id = id };
-```
-
-## Same-Named Members
-
-When interfaces have members with the same name (even with identical signatures), each interface gets its own handler:
-
-```csharp
-public interface IStringProcessor
-{
-    void Process(string input);
-}
-
-public interface IIntProcessor
-{
-    void Process(int input);  // Different parameter type
-}
-
-[KnockOff]
-public partial class DualProcessorKnockOff : IStringProcessor, IIntProcessor { }
-```
-
-Each interface has its own handler accessed via its KO class:
-
-```csharp
-knockOff.IStringProcessor.Process.OnCall = (ko, input) =>
-    Console.WriteLine($"String: {input}");
-
-knockOff.IIntProcessor.Process.OnCall = (ko, input) =>
-    Console.WriteLine($"Int: {input}");
-
-// Track separately
-Assert.Equal(1, knockOff.IStringProcessor.Process.CallCount);
-Assert.Equal(1, knockOff.IIntProcessor.Process.CallCount);
-```
+- [Inline Stubs](inline-stubs.md) - Creating stubs inside test classes
+- [Interface Inheritance](interface-inheritance.md) - Single interface with inheritance chain

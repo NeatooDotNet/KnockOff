@@ -5,265 +5,151 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class GuideEventSourceKnockOff
 {
-	/// <summary>Tracks and raises IGuideEventSource.MessageReceived.</summary>
-	public sealed class IGuideEventSource_MessageReceivedInterceptor
+	/// <summary>Interceptor for MessageReceived event.</summary>
+	public sealed class MessageReceivedInterceptor
 	{
 		private global::System.EventHandler<string>? _handler;
-		private readonly global::System.Collections.Generic.List<(object? sender, string e)> _raises = new();
 
-		/// <summary>Number of times handlers were added.</summary>
-		public int SubscribeCount { get; private set; }
+		/// <summary>Number of times event was subscribed to.</summary>
+		public int AddCount { get; private set; }
 
-		/// <summary>Number of times handlers were removed.</summary>
-		public int UnsubscribeCount { get; private set; }
+		/// <summary>Number of times event subscription was removed.</summary>
+		public int RemoveCount { get; private set; }
 
-		/// <summary>True if at least one handler is subscribed.</summary>
+		/// <summary>Whether any handlers are subscribed.</summary>
 		public bool HasSubscribers => _handler != null;
 
-		/// <summary>Number of times the event was raised.</summary>
-		public int RaiseCount => _raises.Count;
+		/// <summary>Records an event subscription.</summary>
+		public void RecordAdd(global::System.EventHandler<string>? value) { AddCount++; _handler = (global::System.EventHandler<string>?)global::System.Delegate.Combine(_handler, value); }
 
-		/// <summary>True if the event was raised at least once.</summary>
-		public bool WasRaised => RaiseCount > 0;
+		/// <summary>Records an event unsubscription.</summary>
+		public void RecordRemove(global::System.EventHandler<string>? value) { RemoveCount++; _handler = (global::System.EventHandler<string>?)global::System.Delegate.Remove(_handler, value); }
 
-		/// <summary>Arguments from the most recent raise.</summary>
-		public (object? sender, string e)? LastRaiseArgs => _raises.Count > 0 ? _raises[_raises.Count - 1] : null;
+		/// <summary>Raises the event with the specified arguments.</summary>
+		public void Raise(object? sender, string e) => _handler?.Invoke(sender, e);
 
-		/// <summary>All recorded raise invocations.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(object? sender, string e)> AllRaises => _raises;
-
-		internal void Add(global::System.EventHandler<string>? handler)
-		{
-			_handler += handler;
-			SubscribeCount++;
-		}
-
-		internal void Remove(global::System.EventHandler<string>? handler)
-		{
-			_handler -= handler;
-			UnsubscribeCount++;
-		}
-
-		/// <summary>Raises the event.</summary>
-		public void Raise(object? sender, string e)
-		{
-			_raises.Add((sender, e));
-			_handler?.Invoke(sender, e);
-		}
-
-		/// <summary>Raises the event with null sender.</summary>
-		public void Raise(string e) => Raise(null, e);
-
-		/// <summary>Resets all tracking counters.</summary>
-		public void Reset() { SubscribeCount = 0; UnsubscribeCount = 0; _raises.Clear(); }
-
-		/// <summary>Clears all handlers and resets tracking.</summary>
-		public void Clear() { _handler = null; Reset(); }
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
 	}
 
-	/// <summary>Tracks and raises IGuideEventSource.OnCompleted.</summary>
-	public sealed class IGuideEventSource_OnCompletedInterceptor
+	/// <summary>Interceptor for OnCompleted event.</summary>
+	public sealed class OnCompletedInterceptor
 	{
 		private global::System.EventHandler? _handler;
-		private readonly global::System.Collections.Generic.List<(object? sender, global::System.EventArgs e)> _raises = new();
 
-		/// <summary>Number of times handlers were added.</summary>
-		public int SubscribeCount { get; private set; }
+		/// <summary>Number of times event was subscribed to.</summary>
+		public int AddCount { get; private set; }
 
-		/// <summary>Number of times handlers were removed.</summary>
-		public int UnsubscribeCount { get; private set; }
+		/// <summary>Number of times event subscription was removed.</summary>
+		public int RemoveCount { get; private set; }
 
-		/// <summary>True if at least one handler is subscribed.</summary>
+		/// <summary>Whether any handlers are subscribed.</summary>
 		public bool HasSubscribers => _handler != null;
 
-		/// <summary>Number of times the event was raised.</summary>
-		public int RaiseCount => _raises.Count;
+		/// <summary>Records an event subscription.</summary>
+		public void RecordAdd(global::System.EventHandler? value) { AddCount++; _handler = (global::System.EventHandler?)global::System.Delegate.Combine(_handler, value); }
 
-		/// <summary>True if the event was raised at least once.</summary>
-		public bool WasRaised => RaiseCount > 0;
+		/// <summary>Records an event unsubscription.</summary>
+		public void RecordRemove(global::System.EventHandler? value) { RemoveCount++; _handler = (global::System.EventHandler?)global::System.Delegate.Remove(_handler, value); }
 
-		/// <summary>Arguments from the most recent raise.</summary>
-		public (object? sender, global::System.EventArgs e)? LastRaiseArgs => _raises.Count > 0 ? _raises[_raises.Count - 1] : null;
+		/// <summary>Raises the event with the specified arguments.</summary>
+		public void Raise(object? sender, global::System.EventArgs e) => _handler?.Invoke(sender, e);
 
-		/// <summary>All recorded raise invocations.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(object? sender, global::System.EventArgs e)> AllRaises => _raises;
-
-		internal void Add(global::System.EventHandler? handler)
-		{
-			_handler += handler;
-			SubscribeCount++;
-		}
-
-		internal void Remove(global::System.EventHandler? handler)
-		{
-			_handler -= handler;
-			UnsubscribeCount++;
-		}
-
-		/// <summary>Raises the event.</summary>
-		public void Raise(object? sender, global::System.EventArgs e)
-		{
-			_raises.Add((sender, e));
-			_handler?.Invoke(sender, e);
-		}
-
-		/// <summary>Raises the event with null sender and empty args.</summary>
-		public void Raise() => Raise(null, global::System.EventArgs.Empty);
-
-		/// <summary>Resets all tracking counters.</summary>
-		public void Reset() { SubscribeCount = 0; UnsubscribeCount = 0; _raises.Clear(); }
-
-		/// <summary>Clears all handlers and resets tracking.</summary>
-		public void Clear() { _handler = null; Reset(); }
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
 	}
 
-	/// <summary>Tracks and raises IGuideEventSource.OnProgress.</summary>
-	public sealed class IGuideEventSource_OnProgressInterceptor
+	/// <summary>Interceptor for OnProgress event.</summary>
+	public sealed class OnProgressInterceptor
 	{
 		private global::System.Action<int>? _handler;
-		private readonly global::System.Collections.Generic.List<int> _raises = new();
 
-		/// <summary>Number of times handlers were added.</summary>
-		public int SubscribeCount { get; private set; }
+		/// <summary>Number of times event was subscribed to.</summary>
+		public int AddCount { get; private set; }
 
-		/// <summary>Number of times handlers were removed.</summary>
-		public int UnsubscribeCount { get; private set; }
+		/// <summary>Number of times event subscription was removed.</summary>
+		public int RemoveCount { get; private set; }
 
-		/// <summary>True if at least one handler is subscribed.</summary>
+		/// <summary>Whether any handlers are subscribed.</summary>
 		public bool HasSubscribers => _handler != null;
 
-		/// <summary>Number of times the event was raised.</summary>
-		public int RaiseCount => _raises.Count;
+		/// <summary>Records an event subscription.</summary>
+		public void RecordAdd(global::System.Action<int>? value) { AddCount++; _handler = (global::System.Action<int>?)global::System.Delegate.Combine(_handler, value); }
 
-		/// <summary>True if the event was raised at least once.</summary>
-		public bool WasRaised => RaiseCount > 0;
+		/// <summary>Records an event unsubscription.</summary>
+		public void RecordRemove(global::System.Action<int>? value) { RemoveCount++; _handler = (global::System.Action<int>?)global::System.Delegate.Remove(_handler, value); }
 
-		/// <summary>Arguments from the most recent raise.</summary>
-		public int? LastRaiseArgs => _raises.Count > 0 ? _raises[_raises.Count - 1] : default;
+		/// <summary>Raises the event with the specified arguments.</summary>
+		public void Raise(int obj) => _handler?.Invoke(obj);
 
-		/// <summary>All recorded raise invocations.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<int> AllRaises => _raises;
-
-		internal void Add(global::System.Action<int>? handler)
-		{
-			_handler += handler;
-			SubscribeCount++;
-		}
-
-		internal void Remove(global::System.Action<int>? handler)
-		{
-			_handler -= handler;
-			UnsubscribeCount++;
-		}
-
-		/// <summary>Raises the event.</summary>
-		public void Raise(int obj)
-		{
-			_raises.Add(obj);
-			_handler?.Invoke(obj);
-		}
-
-		/// <summary>Resets all tracking counters.</summary>
-		public void Reset() { SubscribeCount = 0; UnsubscribeCount = 0; _raises.Clear(); }
-
-		/// <summary>Clears all handlers and resets tracking.</summary>
-		public void Clear() { _handler = null; Reset(); }
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
 	}
 
-	/// <summary>Tracks and raises IGuideEventSource.OnData.</summary>
-	public sealed class IGuideEventSource_OnDataInterceptor
+	/// <summary>Interceptor for OnData event.</summary>
+	public sealed class OnDataInterceptor
 	{
 		private global::System.Action<string, int>? _handler;
-		private readonly global::System.Collections.Generic.List<(string arg1, int arg2)> _raises = new();
 
-		/// <summary>Number of times handlers were added.</summary>
-		public int SubscribeCount { get; private set; }
+		/// <summary>Number of times event was subscribed to.</summary>
+		public int AddCount { get; private set; }
 
-		/// <summary>Number of times handlers were removed.</summary>
-		public int UnsubscribeCount { get; private set; }
+		/// <summary>Number of times event subscription was removed.</summary>
+		public int RemoveCount { get; private set; }
 
-		/// <summary>True if at least one handler is subscribed.</summary>
+		/// <summary>Whether any handlers are subscribed.</summary>
 		public bool HasSubscribers => _handler != null;
 
-		/// <summary>Number of times the event was raised.</summary>
-		public int RaiseCount => _raises.Count;
+		/// <summary>Records an event subscription.</summary>
+		public void RecordAdd(global::System.Action<string, int>? value) { AddCount++; _handler = (global::System.Action<string, int>?)global::System.Delegate.Combine(_handler, value); }
 
-		/// <summary>True if the event was raised at least once.</summary>
-		public bool WasRaised => RaiseCount > 0;
+		/// <summary>Records an event unsubscription.</summary>
+		public void RecordRemove(global::System.Action<string, int>? value) { RemoveCount++; _handler = (global::System.Action<string, int>?)global::System.Delegate.Remove(_handler, value); }
 
-		/// <summary>Arguments from the most recent raise.</summary>
-		public (string arg1, int arg2)? LastRaiseArgs => _raises.Count > 0 ? _raises[_raises.Count - 1] : null;
+		/// <summary>Raises the event with the specified arguments.</summary>
+		public void Raise(string arg1, int arg2) => _handler?.Invoke(arg1, arg2);
 
-		/// <summary>All recorded raise invocations.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(string arg1, int arg2)> AllRaises => _raises;
-
-		internal void Add(global::System.Action<string, int>? handler)
-		{
-			_handler += handler;
-			SubscribeCount++;
-		}
-
-		internal void Remove(global::System.Action<string, int>? handler)
-		{
-			_handler -= handler;
-			UnsubscribeCount++;
-		}
-
-		/// <summary>Raises the event.</summary>
-		public void Raise(string arg1, int arg2)
-		{
-			_raises.Add((arg1, arg2));
-			_handler?.Invoke(arg1, arg2);
-		}
-
-		/// <summary>Resets all tracking counters.</summary>
-		public void Reset() { SubscribeCount = 0; UnsubscribeCount = 0; _raises.Clear(); }
-
-		/// <summary>Clears all handlers and resets tracking.</summary>
-		public void Clear() { _handler = null; Reset(); }
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGuideEventSource.</summary>
-	public sealed class IGuideEventSourceInterceptorors
-	{
-		/// <summary>Interceptor for MessageReceived event.</summary>
-		public IGuideEventSource_MessageReceivedInterceptor MessageReceived { get; } = new();
-		/// <summary>Interceptor for OnCompleted event.</summary>
-		public IGuideEventSource_OnCompletedInterceptor OnCompleted { get; } = new();
-		/// <summary>Interceptor for OnProgress event.</summary>
-		public IGuideEventSource_OnProgressInterceptor OnProgress { get; } = new();
-		/// <summary>Interceptor for OnData event.</summary>
-		public IGuideEventSource_OnDataInterceptor OnData { get; } = new();
-	}
+	/// <summary>Interceptor for MessageReceived event.</summary>
+	public MessageReceivedInterceptor MessageReceived { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGuideEventSource.</summary>
-	public IGuideEventSourceInterceptorors IGuideEventSource { get; } = new();
+	/// <summary>Interceptor for OnCompleted event.</summary>
+	public OnCompletedInterceptor OnCompleted { get; } = new();
+
+	/// <summary>Interceptor for OnProgress event.</summary>
+	public OnProgressInterceptor OnProgress { get; } = new();
+
+	/// <summary>Interceptor for OnData event.</summary>
+	public OnDataInterceptor OnData { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IGuideEventSource.</summary>
 	public KnockOff.Documentation.Samples.Guides.IGuideEventSource AsGuideEventSource() => this;
 
 	event global::System.EventHandler<string>? KnockOff.Documentation.Samples.Guides.IGuideEventSource.MessageReceived
 	{
-		add => IGuideEventSource.MessageReceived.Add(value);
-		remove => IGuideEventSource.MessageReceived.Remove(value);
+		add => MessageReceived.RecordAdd(value);
+		remove => MessageReceived.RecordRemove(value);
 	}
 
 	event global::System.EventHandler? KnockOff.Documentation.Samples.Guides.IGuideEventSource.OnCompleted
 	{
-		add => IGuideEventSource.OnCompleted.Add(value);
-		remove => IGuideEventSource.OnCompleted.Remove(value);
+		add => OnCompleted.RecordAdd(value);
+		remove => OnCompleted.RecordRemove(value);
 	}
 
 	event global::System.Action<int>? KnockOff.Documentation.Samples.Guides.IGuideEventSource.OnProgress
 	{
-		add => IGuideEventSource.OnProgress.Add(value);
-		remove => IGuideEventSource.OnProgress.Remove(value);
+		add => OnProgress.RecordAdd(value);
+		remove => OnProgress.RecordRemove(value);
 	}
 
 	event global::System.Action<string, int>? KnockOff.Documentation.Samples.Guides.IGuideEventSource.OnData
 	{
-		add => IGuideEventSource.OnData.Add(value);
-		remove => IGuideEventSource.OnData.Remove(value);
+		add => OnData.RecordAdd(value);
+		remove => OnData.RecordRemove(value);
 	}
 
 }

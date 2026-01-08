@@ -5,44 +5,44 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class CpParserKnockOff
 {
-	/// <summary>Tracks and configures behavior for ICpParser.TryParse.</summary>
-	public sealed class ICpParser_TryParseInterceptor
+	/// <summary>Tracks and configures behavior for TryParse.</summary>
+	public sealed class TryParseInterceptor
 	{
-		/// <summary>Delegate for TryParse(string input, out int result).</summary>
+		/// <summary>Delegate for TryParse.</summary>
 		public delegate bool TryParseDelegate(CpParserKnockOff ko, string input, out int result);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'input' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public string? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public TryParseDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string input) { CallCount++; LastCallArg = input; }
+		public void RecordCall(string? input) { CallCount++; LastCallArg = input; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ICpParser.GetStats.</summary>
-	public sealed class ICpParser_GetStatsInterceptor
+	/// <summary>Tracks and configures behavior for GetStats.</summary>
+	public sealed class GetStatsInterceptor
 	{
-		/// <summary>Delegate for GetStats(out int count, out double average).</summary>
+		/// <summary>Delegate for GetStats.</summary>
 		public delegate void GetStatsDelegate(CpParserKnockOff ko, out int count, out double average);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetStatsDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -52,17 +52,11 @@ partial class CpParserKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpParser.</summary>
-	public sealed class ICpParserInterceptorors
-	{
-		/// <summary>Interceptor for TryParse.</summary>
-		public ICpParser_TryParseInterceptor TryParse { get; } = new();
-		/// <summary>Interceptor for GetStats.</summary>
-		public ICpParser_GetStatsInterceptor GetStats { get; } = new();
-	}
+	/// <summary>Interceptor for TryParse.</summary>
+	public TryParseInterceptor TryParse { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpParser.</summary>
-	public ICpParserInterceptorors ICpParser { get; } = new();
+	/// <summary>Interceptor for GetStats.</summary>
+	public GetStatsInterceptor GetStats { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpParser.</summary>
 	public KnockOff.Documentation.Samples.Skills.ICpParser AsCpParser() => this;
@@ -70,8 +64,8 @@ partial class CpParserKnockOff
 	bool KnockOff.Documentation.Samples.Skills.ICpParser.TryParse(string input, out int result)
 	{
 		result = default!;
-		ICpParser.TryParse.RecordCall(input);
-		if (ICpParser.TryParse.OnCall is { } onCallCallback)
+		TryParse.RecordCall(input);
+		if (TryParse.OnCall is { } onCallCallback)
 			return onCallCallback(this, input, out result);
 		return default!;
 	}
@@ -80,8 +74,8 @@ partial class CpParserKnockOff
 	{
 		count = default!;
 		average = default!;
-		ICpParser.GetStats.RecordCall();
-		if (ICpParser.GetStats.OnCall is { } onCallCallback)
+		GetStats.RecordCall();
+		if (GetStats.OnCall is { } onCallCallback)
 		{ onCallCallback(this, out count, out average); return; }
 	}
 

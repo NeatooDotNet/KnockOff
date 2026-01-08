@@ -5,119 +5,113 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class MmUserServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for IMmUserService.GetUser.</summary>
-	public sealed class IMmUserService_GetUserInterceptor
+	/// <summary>Tracks and configures behavior for GetUser.</summary>
+	public sealed class GetUserInterceptor
 	{
-		/// <summary>Delegate for GetUser(int id).</summary>
+		/// <summary>Delegate for GetUser.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.MmUser? GetUserDelegate(MmUserServiceKnockOff ko, int id);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetUserDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IMmUserService.GetUserAsync.</summary>
-	public sealed class IMmUserService_GetUserAsyncInterceptor
+	/// <summary>Tracks and configures behavior for GetUserAsync.</summary>
+	public sealed class GetUserAsyncInterceptor
 	{
-		/// <summary>Delegate for GetUserAsync(int id).</summary>
+		/// <summary>Delegate for GetUserAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.MmUser?> GetUserAsyncDelegate(MmUserServiceKnockOff ko, int id);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetUserAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IMmUserService.Save.</summary>
-	public sealed class IMmUserService_SaveInterceptor
+	/// <summary>Tracks and configures behavior for Save.</summary>
+	public sealed class SaveInterceptor
 	{
-		/// <summary>Delegate for Save(global::KnockOff.Documentation.Samples.Skills.MmUser user).</summary>
-		public delegate void SaveDelegate(MmUserServiceKnockOff ko, global::KnockOff.Documentation.Samples.Skills.MmUser user);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'user' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public global::KnockOff.Documentation.Samples.Skills.MmUser? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public SaveDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<MmUserServiceKnockOff, global::KnockOff.Documentation.Samples.Skills.MmUser>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::KnockOff.Documentation.Samples.Skills.MmUser user) { CallCount++; LastCallArg = user; }
+		public void RecordCall(global::KnockOff.Documentation.Samples.Skills.MmUser? user) { CallCount++; LastCallArg = user; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IMmUserService.Delete.</summary>
-	public sealed class IMmUserService_DeleteInterceptor
+	/// <summary>Tracks and configures behavior for Delete.</summary>
+	public sealed class DeleteInterceptor
 	{
-		/// <summary>Delegate for Delete(int id).</summary>
-		public delegate void DeleteDelegate(MmUserServiceKnockOff ko, int id);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public DeleteDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<MmUserServiceKnockOff, int>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IMmUserService.GetAll.</summary>
-	public sealed class IMmUserService_GetAllInterceptor
+	/// <summary>Tracks and configures behavior for GetAll.</summary>
+	public sealed class GetAllInterceptor
 	{
-		/// <summary>Delegate for GetAll().</summary>
+		/// <summary>Delegate for GetAll.</summary>
 		public delegate global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Skills.MmUser> GetAllDelegate(MmUserServiceKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetAllDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -127,97 +121,83 @@ partial class MmUserServiceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IMmUserService.Update.</summary>
-	public sealed class IMmUserService_UpdateInterceptor
+	/// <summary>Tracks and configures behavior for Update.</summary>
+	public sealed class UpdateInterceptor
 	{
-		/// <summary>Delegate for Update(global::KnockOff.Documentation.Samples.Skills.MmUser user).</summary>
-		public delegate void UpdateDelegate(MmUserServiceKnockOff ko, global::KnockOff.Documentation.Samples.Skills.MmUser user);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'user' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public global::KnockOff.Documentation.Samples.Skills.MmUser? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public UpdateDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<MmUserServiceKnockOff, global::KnockOff.Documentation.Samples.Skills.MmUser>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::KnockOff.Documentation.Samples.Skills.MmUser user) { CallCount++; LastCallArg = user; }
+		public void RecordCall(global::KnockOff.Documentation.Samples.Skills.MmUser? user) { CallCount++; LastCallArg = user; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmUserService.</summary>
-	public sealed class IMmUserServiceInterceptorors
-	{
-		/// <summary>Interceptor for GetUser.</summary>
-		public IMmUserService_GetUserInterceptor GetUser { get; } = new();
-		/// <summary>Interceptor for GetUserAsync.</summary>
-		public IMmUserService_GetUserAsyncInterceptor GetUserAsync { get; } = new();
-		/// <summary>Interceptor for Save.</summary>
-		public IMmUserService_SaveInterceptor Save { get; } = new();
-		/// <summary>Interceptor for Delete.</summary>
-		public IMmUserService_DeleteInterceptor Delete { get; } = new();
-		/// <summary>Interceptor for GetAll.</summary>
-		public IMmUserService_GetAllInterceptor GetAll { get; } = new();
-		/// <summary>Interceptor for Update.</summary>
-		public IMmUserService_UpdateInterceptor Update { get; } = new();
-	}
+	/// <summary>Interceptor for GetUser.</summary>
+	public GetUserInterceptor GetUser { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmUserService.</summary>
-	public IMmUserServiceInterceptorors IMmUserService { get; } = new();
+	/// <summary>Interceptor for GetUserAsync.</summary>
+	public GetUserAsyncInterceptor GetUserAsync { get; } = new();
+
+	/// <summary>Interceptor for Save.</summary>
+	public SaveInterceptor Save { get; } = new();
+
+	/// <summary>Interceptor for Delete.</summary>
+	public DeleteInterceptor Delete { get; } = new();
+
+	/// <summary>Interceptor for GetAll.</summary>
+	public GetAllInterceptor GetAll { get; } = new();
+
+	/// <summary>Interceptor for Update.</summary>
+	public UpdateInterceptor Update { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmUserService.</summary>
 	public KnockOff.Documentation.Samples.Skills.IMmUserService AsMmUserService() => this;
 
 	global::KnockOff.Documentation.Samples.Skills.MmUser? KnockOff.Documentation.Samples.Skills.IMmUserService.GetUser(int id)
 	{
-		IMmUserService.GetUser.RecordCall(id);
-		if (IMmUserService.GetUser.OnCall is { } onCallCallback)
-			return onCallCallback(this, id);
-		return default!;
+		GetUser.RecordCall(id);
+		return GetUser.OnCall?.Invoke(this, id) ?? default!;
 	}
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.MmUser?> KnockOff.Documentation.Samples.Skills.IMmUserService.GetUserAsync(int id)
 	{
-		IMmUserService.GetUserAsync.RecordCall(id);
-		if (IMmUserService.GetUserAsync.OnCall is { } onCallCallback)
-			return onCallCallback(this, id);
-		return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Skills.MmUser?>(default!);
+		GetUserAsync.RecordCall(id);
+		return GetUserAsync.OnCall?.Invoke(this, id) ?? global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Skills.MmUser?>(default!);
 	}
 
 	void KnockOff.Documentation.Samples.Skills.IMmUserService.Save(global::KnockOff.Documentation.Samples.Skills.MmUser user)
 	{
-		IMmUserService.Save.RecordCall(user);
-		if (IMmUserService.Save.OnCall is { } onCallCallback)
-		{ onCallCallback(this, user); return; }
+		Save.RecordCall(user);
+		Save.OnCall?.Invoke(this, user);
 	}
 
 	void KnockOff.Documentation.Samples.Skills.IMmUserService.Delete(int id)
 	{
-		IMmUserService.Delete.RecordCall(id);
-		if (IMmUserService.Delete.OnCall is { } onCallCallback)
-		{ onCallCallback(this, id); return; }
+		Delete.RecordCall(id);
+		Delete.OnCall?.Invoke(this, id);
 	}
 
 	global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Skills.MmUser> KnockOff.Documentation.Samples.Skills.IMmUserService.GetAll()
 	{
-		IMmUserService.GetAll.RecordCall();
-		if (IMmUserService.GetAll.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.MmUser>();
+		GetAll.RecordCall();
+		return GetAll.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.MmUser>();
 	}
 
 	void KnockOff.Documentation.Samples.Skills.IMmUserService.Update(global::KnockOff.Documentation.Samples.Skills.MmUser user)
 	{
-		IMmUserService.Update.RecordCall(user);
-		if (IMmUserService.Update.OnCall is { } onCallCallback)
-		{ onCallCallback(this, user); return; }
+		Update.RecordCall(user);
+		Update.OnCall?.Invoke(this, user);
 	}
 
 }

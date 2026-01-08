@@ -7,12 +7,12 @@ This guide helps you migrate from Moq to KnockOff for interface stubbing.
 | Moq | KnockOff |
 |-----|----------|
 | `new Mock<IService>()` | `new ServiceKnockOff()` |
-| `mock.Object` | Cast to interface or `knockOff.AsService()` |
-| `.Setup(x => x.Method())` | `IInterface.Method.OnCall = ...` |
+| `mock.Object` | Cast to interface or `knockOff.AsIService()` |
+| `.Setup(x => x.Method())` | `Method.OnCall = ...` |
 | `.Returns(value)` | `OnCall = (ko) => value` |
 | `.ReturnsAsync(value)` | `OnCall = (ko) => Task.FromResult(value)` |
 | `.Callback(action)` | Logic inside `OnCall` |
-| `.Verify(Times.Once)` | `Assert.Equal(1, IInterface.Method.CallCount)` |
+| `.Verify(Times.Once)` | `Assert.Equal(1, Method.CallCount)` |
 | `It.IsAny<T>()` | Implicit (callback receives all args) |
 | `It.Is<T>(predicate)` | Check in callback body |
 
@@ -34,10 +34,11 @@ public partial class MigUserServiceKnockOff : IMigUserService { }
 ```
 <!-- /snippet -->
 
+<!-- snippet: docs:migration-from-moq:instantiate-knockoff -->
 ```csharp
-// In test
-var knockOff = new MigUserServiceKnockOff();
+// var knockOff = new MigUserServiceKnockOff();
 ```
+<!-- /snippet -->
 
 ### Step 2: Replace mock.Object
 
@@ -48,11 +49,13 @@ DoSomething(mock.Object);
 ```
 
 **After (KnockOff):**
+<!-- snippet: docs:migration-from-moq:replace-mock-object -->
 ```csharp
-IUserService service = knockOff;
-// or
-DoSomething(knockOff.AsUserService());
+// IMigUserService service = knockOff;
+// // or
+// DoSomething(knockOff.AsIMigUserService());
 ```
+<!-- /snippet -->
 
 ### Step 3: Convert Setup/Returns
 
@@ -63,10 +66,12 @@ mock.Setup(x => x.GetUser(It.IsAny<int>()))
 ```
 
 **After (KnockOff):**
+<!-- snippet: docs:migration-from-moq:convert-setup-returns -->
 ```csharp
-knockOff.IUserService.GetUser.OnCall = (ko, id) =>
-    new User { Id = id, Name = "Test" };
+// knockOff.GetUser.OnCall = (ko, id) =>
+//     new User { Id = id, Name = "Test" };
 ```
+<!-- /snippet -->
 
 ### Step 4: Convert Async Returns
 
@@ -77,10 +82,12 @@ mock.Setup(x => x.GetUserAsync(It.IsAny<int>()))
 ```
 
 **After (KnockOff):**
+<!-- snippet: docs:migration-from-moq:convert-async-returns -->
 ```csharp
-knockOff.IUserService.GetUserAsync.OnCall = (ko, id) =>
-    Task.FromResult<User?>(new User { Id = id });
+// knockOff.GetUserAsync.OnCall = (ko, id) =>
+//     Task.FromResult<User?>(new User { Id = id });
 ```
+<!-- /snippet -->
 
 ### Step 5: Convert Verification
 
@@ -93,12 +100,14 @@ mock.Verify(x => x.Update(It.IsAny<User>()), Times.Exactly(3));
 ```
 
 **After (KnockOff):**
+<!-- snippet: docs:migration-from-moq:convert-verification -->
 ```csharp
-Assert.Equal(1, knockOff.IUserService.Save.CallCount);
-Assert.Equal(0, knockOff.IUserService.Delete.CallCount);
-Assert.True(knockOff.IUserService.GetAll.WasCalled);
-Assert.Equal(3, knockOff.IUserService.Update.CallCount);
+// Assert.Equal(1, knockOff.Save.CallCount);
+// Assert.Equal(0, knockOff.Delete.CallCount);
+// Assert.True(knockOff.GetAll.WasCalled);
+// Assert.Equal(3, knockOff.Update.CallCount);
 ```
+<!-- /snippet -->
 
 ### Step 6: Convert Callback
 
@@ -110,16 +119,18 @@ mock.Setup(x => x.Save(It.IsAny<User>()))
 ```
 
 **After (KnockOff):**
+<!-- snippet: docs:migration-from-moq:convert-callback -->
 ```csharp
-// Arguments are captured automatically
-var captured = knockOff.IUserService.Save.LastCallArg;
-
-// Or use callback for custom logic
-knockOff.IUserService.Save.OnCall = (ko, user) =>
-{
-    customList.Add(user);
-};
+// // Arguments are captured automatically
+// var captured = knockOff.Save.LastCallArg;
+//
+// // Or use callback for custom logic
+// knockOff.Save.OnCall = (ko, user) =>
+// {
+//     customList.Add(user);
+// };
 ```
+<!-- /snippet -->
 
 ### Step 7: Convert Property Setup
 
@@ -130,13 +141,15 @@ mock.SetupSet(x => x.Name = It.IsAny<string>()).Verifiable();
 ```
 
 **After (KnockOff):**
+<!-- snippet: docs:migration-from-moq:convert-property-setup -->
 ```csharp
-knockOff.IUserService.Name.OnGet = (ko) => "Test";
-
-// Setter tracking is automatic
-service.Name = "Value";
-Assert.Equal("Value", knockOff.IUserService.Name.LastSetValue);
+// knockOff.Name.OnGet = (ko) => "Test";
+//
+// // Setter tracking is automatic
+// service.Name = "Value";
+// Assert.Equal("Value", knockOff.Name.LastSetValue);
 ```
+<!-- /snippet -->
 
 ## Common Patterns
 
@@ -160,9 +173,11 @@ public partial class MigConfigServiceKnockOff : IMigConfigService
 <!-- /snippet -->
 
 **KnockOff Option 2 - Callback (runtime):**
+<!-- snippet: docs:migration-from-moq:static-returns-callback -->
 ```csharp
-knockOff.IConfigService.GetConfig.OnCall = (ko) => new Config { Timeout = 30 };
+// knockOff.GetConfig.OnCall = (ko) => new MigConfig { Timeout = 30 };
 ```
+<!-- /snippet -->
 
 ### Conditional Returns
 
@@ -174,14 +189,16 @@ mock.Setup(x => x.GetUser(It.IsAny<int>())).Returns((User?)null);
 ```
 
 **KnockOff:**
+<!-- snippet: docs:migration-from-moq:conditional-returns -->
 ```csharp
-knockOff.IUserService.GetUser.OnCall = (ko, id) => id switch
-{
-    1 => new User { Name = "Admin" },
-    2 => new User { Name = "Guest" },
-    _ => null
-};
+// knockOff.GetUser.OnCall = (ko, id) => id switch
+// {
+//     1 => new User { Name = "Admin" },
+//     2 => new User { Name = "Guest" },
+//     _ => null
+// };
 ```
+<!-- /snippet -->
 
 ### Throwing Exceptions
 
@@ -199,10 +216,12 @@ public partial class MigConnectionKnockOff : IMigConnection { }
 ```
 <!-- /snippet -->
 
+<!-- snippet: docs:migration-from-moq:throwing-exceptions-usage -->
 ```csharp
-knockOff.IMigConnection.Connect.OnCall = (ko) =>
-    throw new TimeoutException();
+// knockOff.Connect.OnCall = (ko) =>
+//     throw new TimeoutException();
 ```
+<!-- /snippet -->
 
 ### Sequential Returns
 
@@ -223,10 +242,12 @@ public partial class MigSequenceKnockOff : IMigSequence { }
 ```
 <!-- /snippet -->
 
+<!-- snippet: docs:migration-from-moq:sequential-returns-usage -->
 ```csharp
-var values = new Queue<int>([1, 2, 3]);
-knockOff.IMigSequence.GetNext.OnCall = (ko) => values.Dequeue();
+// var values = new Queue<int>([1, 2, 3]);
+// knockOff.GetNext.OnCall = (ko) => values.Dequeue();
 ```
+<!-- /snippet -->
 
 ### Multiple Interfaces
 
@@ -246,17 +267,24 @@ var uow = mock.As<IUnitOfWork>().Object;
 <!-- snippet: docs:migration-from-moq:multiple-interfaces -->
 ```csharp
 [KnockOff]
-public partial class MigDataContextKnockOff : IMigRepository, IMigUnitOfWork { }
+public partial class MigRepositoryKnockOff : IMigRepository { }
+
+[KnockOff]
+public partial class MigUnitOfWorkKnockOff : IMigUnitOfWork { }
 ```
 <!-- /snippet -->
 
+<!-- snippet: docs:migration-from-moq:multiple-interfaces-usage -->
 ```csharp
-var knockOff = new MigDataContextKnockOff();
-knockOff.IMigUnitOfWork.SaveChangesAsync.OnCall = (ko, ct) => Task.FromResult(1);
-
-IMigRepository repo = knockOff.AsMigRepository();
-IMigUnitOfWork uow = knockOff.AsMigUnitOfWork();
+// // Separate stubs for each interface
+// var repoKnockOff = new MigRepositoryKnockOff();
+// IMigRepository repo = repoKnockOff.AsIMigRepository();
+//
+// var uowKnockOff = new MigUnitOfWorkKnockOff();
+// uowKnockOff.SaveChangesAsync.OnCall = (ko, ct) => Task.FromResult(1);
+// IMigUnitOfWork uow = uowKnockOff.AsIMigUnitOfWork();
 ```
+<!-- /snippet -->
 
 ### Argument Matching
 
@@ -275,13 +303,15 @@ public partial class MigLoggerKnockOff : IMigLogger { }
 ```
 <!-- /snippet -->
 
+<!-- snippet: docs:migration-from-moq:argument-matching-usage -->
 ```csharp
-knockOff.IMigLogger.Log.OnCall = (ko, message) =>
-{
-    if (message.Contains("error"))
-        errors.Add(message);
-};
+// knockOff.Log.OnCall = (ko, message) =>
+// {
+//     if (message.Contains("error"))
+//         errors.Add(message);
+// };
 ```
+<!-- /snippet -->
 
 ## Feature Comparison
 
@@ -303,11 +333,13 @@ knockOff.IMigLogger.Log.OnCall = (ko, message) =>
 ### Start with Simple Tests
 
 Begin with tests that only verify calls:
+<!-- snippet: docs:migration-from-moq:simple-verification -->
 ```csharp
-// These translate directly
-Assert.True(knockOff.IService.Method.WasCalled);
-Assert.Equal(expectedCount, knockOff.IService.Method.CallCount);
+// // These translate directly
+// Assert.True(knockOff.Method.WasCalled);
+// Assert.Equal(expectedCount, knockOff.Method.CallCount);
 ```
+<!-- /snippet -->
 
 ### Use User Methods for Shared Stubs
 
@@ -341,13 +373,15 @@ public partial class MigSaveServiceKnockOff : IMigSaveService { }
 ```
 <!-- /snippet -->
 
+<!-- snippet: docs:migration-from-moq:complex-callbacks-usage -->
 ```csharp
-knockOff.IMigSaveService.Save.OnCall = (ko, entity) =>
-{
-    entity.Id = nextId++;
-    savedEntities.Add(entity);
-};
+// knockOff.Save.OnCall = (ko, entity) =>
+// {
+//     entity.Id = nextId++;
+//     savedEntities.Add(entity);
+// };
 ```
+<!-- /snippet -->
 
 ### Leverage Automatic Tracking
 
@@ -360,13 +394,15 @@ public partial class MigProcessorKnockOff : IMigProcessor { }
 ```
 <!-- /snippet -->
 
+<!-- snippet: docs:migration-from-moq:automatic-tracking-usage -->
 ```csharp
-// No setup needed - just call the method
-service.Process("data");
-
-// Args are captured
-Assert.Equal("data", knockOff.IMigProcessor.Process.LastCallArg);
+// // No setup needed - just call the method
+// service.Process("data");
+//
+// // Args are captured
+// Assert.Equal("data", knockOff.Process.LastCallArg);
 ```
+<!-- /snippet -->
 
 ## What to Keep in Moq
 

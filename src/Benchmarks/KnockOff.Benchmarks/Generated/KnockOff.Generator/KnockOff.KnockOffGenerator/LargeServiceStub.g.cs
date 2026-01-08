@@ -5,20 +5,17 @@ namespace KnockOff.Benchmarks.Stubs;
 
 partial class LargeServiceStub
 {
-	/// <summary>Tracks and configures behavior for ILargeService.VoidMethod01.</summary>
-	public sealed class ILargeService_VoidMethod01Interceptor
+	/// <summary>Tracks and configures behavior for VoidMethod01.</summary>
+	public sealed class VoidMethod01Interceptor
 	{
-		/// <summary>Delegate for VoidMethod01().</summary>
-		public delegate void VoidMethod01Delegate(LargeServiceStub ko);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public VoidMethod01Delegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<LargeServiceStub>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
@@ -27,20 +24,17 @@ partial class LargeServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.VoidMethod02.</summary>
-	public sealed class ILargeService_VoidMethod02Interceptor
+	/// <summary>Tracks and configures behavior for VoidMethod02.</summary>
+	public sealed class VoidMethod02Interceptor
 	{
-		/// <summary>Delegate for VoidMethod02().</summary>
-		public delegate void VoidMethod02Delegate(LargeServiceStub ko);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public VoidMethod02Delegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<LargeServiceStub>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
@@ -49,20 +43,17 @@ partial class LargeServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.VoidMethod03.</summary>
-	public sealed class ILargeService_VoidMethod03Interceptor
+	/// <summary>Tracks and configures behavior for VoidMethod03.</summary>
+	public sealed class VoidMethod03Interceptor
 	{
-		/// <summary>Delegate for VoidMethod03().</summary>
-		public delegate void VoidMethod03Delegate(LargeServiceStub ko);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public VoidMethod03Delegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<LargeServiceStub>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
@@ -71,20 +62,17 @@ partial class LargeServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.VoidMethod04.</summary>
-	public sealed class ILargeService_VoidMethod04Interceptor
+	/// <summary>Tracks and configures behavior for VoidMethod04.</summary>
+	public sealed class VoidMethod04Interceptor
 	{
-		/// <summary>Delegate for VoidMethod04().</summary>
-		public delegate void VoidMethod04Delegate(LargeServiceStub ko);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public VoidMethod04Delegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<LargeServiceStub>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
@@ -93,20 +81,17 @@ partial class LargeServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.VoidMethod05.</summary>
-	public sealed class ILargeService_VoidMethod05Interceptor
+	/// <summary>Tracks and configures behavior for VoidMethod05.</summary>
+	public sealed class VoidMethod05Interceptor
 	{
-		/// <summary>Delegate for VoidMethod05().</summary>
-		public delegate void VoidMethod05Delegate(LargeServiceStub ko);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public VoidMethod05Delegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<LargeServiceStub>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
@@ -115,20 +100,17 @@ partial class LargeServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.VoidMethod06.</summary>
-	public sealed class ILargeService_VoidMethod06Interceptor
+	/// <summary>Tracks and configures behavior for VoidMethod06.</summary>
+	public sealed class VoidMethod06Interceptor
 	{
-		/// <summary>Delegate for VoidMethod06().</summary>
-		public delegate void VoidMethod06Delegate(LargeServiceStub ko);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public VoidMethod06Delegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<LargeServiceStub>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
@@ -137,20 +119,17 @@ partial class LargeServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.VoidMethod07.</summary>
-	public sealed class ILargeService_VoidMethod07Interceptor
+	/// <summary>Tracks and configures behavior for VoidMethod07.</summary>
+	public sealed class VoidMethod07Interceptor
 	{
-		/// <summary>Delegate for VoidMethod07().</summary>
-		public delegate void VoidMethod07Delegate(LargeServiceStub ko);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public VoidMethod07Delegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<LargeServiceStub>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
@@ -159,20 +138,17 @@ partial class LargeServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.VoidMethod08.</summary>
-	public sealed class ILargeService_VoidMethod08Interceptor
+	/// <summary>Tracks and configures behavior for VoidMethod08.</summary>
+	public sealed class VoidMethod08Interceptor
 	{
-		/// <summary>Delegate for VoidMethod08().</summary>
-		public delegate void VoidMethod08Delegate(LargeServiceStub ko);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public VoidMethod08Delegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<LargeServiceStub>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
@@ -181,20 +157,17 @@ partial class LargeServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.VoidMethod09.</summary>
-	public sealed class ILargeService_VoidMethod09Interceptor
+	/// <summary>Tracks and configures behavior for VoidMethod09.</summary>
+	public sealed class VoidMethod09Interceptor
 	{
-		/// <summary>Delegate for VoidMethod09().</summary>
-		public delegate void VoidMethod09Delegate(LargeServiceStub ko);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public VoidMethod09Delegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<LargeServiceStub>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
@@ -203,20 +176,17 @@ partial class LargeServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.VoidMethod10.</summary>
-	public sealed class ILargeService_VoidMethod10Interceptor
+	/// <summary>Tracks and configures behavior for VoidMethod10.</summary>
+	public sealed class VoidMethod10Interceptor
 	{
-		/// <summary>Delegate for VoidMethod10().</summary>
-		public delegate void VoidMethod10Delegate(LargeServiceStub ko);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public VoidMethod10Delegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<LargeServiceStub>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
@@ -225,269 +195,239 @@ partial class LargeServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.VoidMethodWithParam01.</summary>
-	public sealed class ILargeService_VoidMethodWithParam01Interceptor
+	/// <summary>Tracks and configures behavior for VoidMethodWithParam01.</summary>
+	public sealed class VoidMethodWithParam01Interceptor
 	{
-		/// <summary>Delegate for VoidMethodWithParam01(int p).</summary>
-		public delegate void VoidMethodWithParam01Delegate(LargeServiceStub ko, int p);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'p' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public VoidMethodWithParam01Delegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<LargeServiceStub, int>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int p) { CallCount++; LastCallArg = p; }
+		public void RecordCall(int? p) { CallCount++; LastCallArg = p; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.VoidMethodWithParam02.</summary>
-	public sealed class ILargeService_VoidMethodWithParam02Interceptor
+	/// <summary>Tracks and configures behavior for VoidMethodWithParam02.</summary>
+	public sealed class VoidMethodWithParam02Interceptor
 	{
-		/// <summary>Delegate for VoidMethodWithParam02(int p).</summary>
-		public delegate void VoidMethodWithParam02Delegate(LargeServiceStub ko, int p);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'p' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public VoidMethodWithParam02Delegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<LargeServiceStub, int>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int p) { CallCount++; LastCallArg = p; }
+		public void RecordCall(int? p) { CallCount++; LastCallArg = p; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.VoidMethodWithParam03.</summary>
-	public sealed class ILargeService_VoidMethodWithParam03Interceptor
+	/// <summary>Tracks and configures behavior for VoidMethodWithParam03.</summary>
+	public sealed class VoidMethodWithParam03Interceptor
 	{
-		/// <summary>Delegate for VoidMethodWithParam03(int p).</summary>
-		public delegate void VoidMethodWithParam03Delegate(LargeServiceStub ko, int p);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'p' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public VoidMethodWithParam03Delegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<LargeServiceStub, int>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int p) { CallCount++; LastCallArg = p; }
+		public void RecordCall(int? p) { CallCount++; LastCallArg = p; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.VoidMethodWithParam04.</summary>
-	public sealed class ILargeService_VoidMethodWithParam04Interceptor
+	/// <summary>Tracks and configures behavior for VoidMethodWithParam04.</summary>
+	public sealed class VoidMethodWithParam04Interceptor
 	{
-		/// <summary>Delegate for VoidMethodWithParam04(int p).</summary>
-		public delegate void VoidMethodWithParam04Delegate(LargeServiceStub ko, int p);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'p' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public VoidMethodWithParam04Delegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<LargeServiceStub, int>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int p) { CallCount++; LastCallArg = p; }
+		public void RecordCall(int? p) { CallCount++; LastCallArg = p; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.VoidMethodWithParam05.</summary>
-	public sealed class ILargeService_VoidMethodWithParam05Interceptor
+	/// <summary>Tracks and configures behavior for VoidMethodWithParam05.</summary>
+	public sealed class VoidMethodWithParam05Interceptor
 	{
-		/// <summary>Delegate for VoidMethodWithParam05(int p).</summary>
-		public delegate void VoidMethodWithParam05Delegate(LargeServiceStub ko, int p);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'p' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public VoidMethodWithParam05Delegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<LargeServiceStub, int>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int p) { CallCount++; LastCallArg = p; }
+		public void RecordCall(int? p) { CallCount++; LastCallArg = p; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.VoidMethodWithParam06.</summary>
-	public sealed class ILargeService_VoidMethodWithParam06Interceptor
+	/// <summary>Tracks and configures behavior for VoidMethodWithParam06.</summary>
+	public sealed class VoidMethodWithParam06Interceptor
 	{
-		/// <summary>Delegate for VoidMethodWithParam06(int p).</summary>
-		public delegate void VoidMethodWithParam06Delegate(LargeServiceStub ko, int p);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'p' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public VoidMethodWithParam06Delegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<LargeServiceStub, int>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int p) { CallCount++; LastCallArg = p; }
+		public void RecordCall(int? p) { CallCount++; LastCallArg = p; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.VoidMethodWithParam07.</summary>
-	public sealed class ILargeService_VoidMethodWithParam07Interceptor
+	/// <summary>Tracks and configures behavior for VoidMethodWithParam07.</summary>
+	public sealed class VoidMethodWithParam07Interceptor
 	{
-		/// <summary>Delegate for VoidMethodWithParam07(int p).</summary>
-		public delegate void VoidMethodWithParam07Delegate(LargeServiceStub ko, int p);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'p' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public VoidMethodWithParam07Delegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<LargeServiceStub, int>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int p) { CallCount++; LastCallArg = p; }
+		public void RecordCall(int? p) { CallCount++; LastCallArg = p; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.VoidMethodWithParam08.</summary>
-	public sealed class ILargeService_VoidMethodWithParam08Interceptor
+	/// <summary>Tracks and configures behavior for VoidMethodWithParam08.</summary>
+	public sealed class VoidMethodWithParam08Interceptor
 	{
-		/// <summary>Delegate for VoidMethodWithParam08(int p).</summary>
-		public delegate void VoidMethodWithParam08Delegate(LargeServiceStub ko, int p);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'p' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public VoidMethodWithParam08Delegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<LargeServiceStub, int>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int p) { CallCount++; LastCallArg = p; }
+		public void RecordCall(int? p) { CallCount++; LastCallArg = p; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.VoidMethodWithParam09.</summary>
-	public sealed class ILargeService_VoidMethodWithParam09Interceptor
+	/// <summary>Tracks and configures behavior for VoidMethodWithParam09.</summary>
+	public sealed class VoidMethodWithParam09Interceptor
 	{
-		/// <summary>Delegate for VoidMethodWithParam09(int p).</summary>
-		public delegate void VoidMethodWithParam09Delegate(LargeServiceStub ko, int p);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'p' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public VoidMethodWithParam09Delegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<LargeServiceStub, int>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int p) { CallCount++; LastCallArg = p; }
+		public void RecordCall(int? p) { CallCount++; LastCallArg = p; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.VoidMethodWithParam10.</summary>
-	public sealed class ILargeService_VoidMethodWithParam10Interceptor
+	/// <summary>Tracks and configures behavior for VoidMethodWithParam10.</summary>
+	public sealed class VoidMethodWithParam10Interceptor
 	{
-		/// <summary>Delegate for VoidMethodWithParam10(int p).</summary>
-		public delegate void VoidMethodWithParam10Delegate(LargeServiceStub ko, int p);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'p' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public VoidMethodWithParam10Delegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<LargeServiceStub, int>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int p) { CallCount++; LastCallArg = p; }
+		public void RecordCall(int? p) { CallCount++; LastCallArg = p; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.IntMethod01.</summary>
-	public sealed class ILargeService_IntMethod01Interceptor
+	/// <summary>Tracks and configures behavior for IntMethod01.</summary>
+	public sealed class IntMethod01Interceptor
 	{
-		/// <summary>Delegate for IntMethod01().</summary>
+		/// <summary>Delegate for IntMethod01.</summary>
 		public delegate int IntMethod01Delegate(LargeServiceStub ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public IntMethod01Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -497,19 +437,19 @@ partial class LargeServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.IntMethod02.</summary>
-	public sealed class ILargeService_IntMethod02Interceptor
+	/// <summary>Tracks and configures behavior for IntMethod02.</summary>
+	public sealed class IntMethod02Interceptor
 	{
-		/// <summary>Delegate for IntMethod02().</summary>
+		/// <summary>Delegate for IntMethod02.</summary>
 		public delegate int IntMethod02Delegate(LargeServiceStub ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public IntMethod02Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -519,19 +459,19 @@ partial class LargeServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.IntMethod03.</summary>
-	public sealed class ILargeService_IntMethod03Interceptor
+	/// <summary>Tracks and configures behavior for IntMethod03.</summary>
+	public sealed class IntMethod03Interceptor
 	{
-		/// <summary>Delegate for IntMethod03().</summary>
+		/// <summary>Delegate for IntMethod03.</summary>
 		public delegate int IntMethod03Delegate(LargeServiceStub ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public IntMethod03Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -541,19 +481,19 @@ partial class LargeServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.IntMethod04.</summary>
-	public sealed class ILargeService_IntMethod04Interceptor
+	/// <summary>Tracks and configures behavior for IntMethod04.</summary>
+	public sealed class IntMethod04Interceptor
 	{
-		/// <summary>Delegate for IntMethod04().</summary>
+		/// <summary>Delegate for IntMethod04.</summary>
 		public delegate int IntMethod04Delegate(LargeServiceStub ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public IntMethod04Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -563,19 +503,19 @@ partial class LargeServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.IntMethod05.</summary>
-	public sealed class ILargeService_IntMethod05Interceptor
+	/// <summary>Tracks and configures behavior for IntMethod05.</summary>
+	public sealed class IntMethod05Interceptor
 	{
-		/// <summary>Delegate for IntMethod05().</summary>
+		/// <summary>Delegate for IntMethod05.</summary>
 		public delegate int IntMethod05Delegate(LargeServiceStub ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public IntMethod05Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -585,19 +525,19 @@ partial class LargeServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.IntMethod06.</summary>
-	public sealed class ILargeService_IntMethod06Interceptor
+	/// <summary>Tracks and configures behavior for IntMethod06.</summary>
+	public sealed class IntMethod06Interceptor
 	{
-		/// <summary>Delegate for IntMethod06().</summary>
+		/// <summary>Delegate for IntMethod06.</summary>
 		public delegate int IntMethod06Delegate(LargeServiceStub ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public IntMethod06Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -607,19 +547,19 @@ partial class LargeServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.IntMethod07.</summary>
-	public sealed class ILargeService_IntMethod07Interceptor
+	/// <summary>Tracks and configures behavior for IntMethod07.</summary>
+	public sealed class IntMethod07Interceptor
 	{
-		/// <summary>Delegate for IntMethod07().</summary>
+		/// <summary>Delegate for IntMethod07.</summary>
 		public delegate int IntMethod07Delegate(LargeServiceStub ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public IntMethod07Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -629,19 +569,19 @@ partial class LargeServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.IntMethod08.</summary>
-	public sealed class ILargeService_IntMethod08Interceptor
+	/// <summary>Tracks and configures behavior for IntMethod08.</summary>
+	public sealed class IntMethod08Interceptor
 	{
-		/// <summary>Delegate for IntMethod08().</summary>
+		/// <summary>Delegate for IntMethod08.</summary>
 		public delegate int IntMethod08Delegate(LargeServiceStub ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public IntMethod08Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -651,19 +591,19 @@ partial class LargeServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.IntMethod09.</summary>
-	public sealed class ILargeService_IntMethod09Interceptor
+	/// <summary>Tracks and configures behavior for IntMethod09.</summary>
+	public sealed class IntMethod09Interceptor
 	{
-		/// <summary>Delegate for IntMethod09().</summary>
+		/// <summary>Delegate for IntMethod09.</summary>
 		public delegate int IntMethod09Delegate(LargeServiceStub ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public IntMethod09Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -673,19 +613,19 @@ partial class LargeServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.IntMethod10.</summary>
-	public sealed class ILargeService_IntMethod10Interceptor
+	/// <summary>Tracks and configures behavior for IntMethod10.</summary>
+	public sealed class IntMethod10Interceptor
 	{
-		/// <summary>Delegate for IntMethod10().</summary>
+		/// <summary>Delegate for IntMethod10.</summary>
 		public delegate int IntMethod10Delegate(LargeServiceStub ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public IntMethod10Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -695,19 +635,19 @@ partial class LargeServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.StringMethod01.</summary>
-	public sealed class ILargeService_StringMethod01Interceptor
+	/// <summary>Tracks and configures behavior for StringMethod01.</summary>
+	public sealed class StringMethod01Interceptor
 	{
-		/// <summary>Delegate for StringMethod01().</summary>
+		/// <summary>Delegate for StringMethod01.</summary>
 		public delegate string StringMethod01Delegate(LargeServiceStub ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public StringMethod01Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -717,19 +657,19 @@ partial class LargeServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.StringMethod02.</summary>
-	public sealed class ILargeService_StringMethod02Interceptor
+	/// <summary>Tracks and configures behavior for StringMethod02.</summary>
+	public sealed class StringMethod02Interceptor
 	{
-		/// <summary>Delegate for StringMethod02().</summary>
+		/// <summary>Delegate for StringMethod02.</summary>
 		public delegate string StringMethod02Delegate(LargeServiceStub ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public StringMethod02Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -739,19 +679,19 @@ partial class LargeServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.StringMethod03.</summary>
-	public sealed class ILargeService_StringMethod03Interceptor
+	/// <summary>Tracks and configures behavior for StringMethod03.</summary>
+	public sealed class StringMethod03Interceptor
 	{
-		/// <summary>Delegate for StringMethod03().</summary>
+		/// <summary>Delegate for StringMethod03.</summary>
 		public delegate string StringMethod03Delegate(LargeServiceStub ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public StringMethod03Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -761,19 +701,19 @@ partial class LargeServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.StringMethod04.</summary>
-	public sealed class ILargeService_StringMethod04Interceptor
+	/// <summary>Tracks and configures behavior for StringMethod04.</summary>
+	public sealed class StringMethod04Interceptor
 	{
-		/// <summary>Delegate for StringMethod04().</summary>
+		/// <summary>Delegate for StringMethod04.</summary>
 		public delegate string StringMethod04Delegate(LargeServiceStub ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public StringMethod04Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -783,19 +723,19 @@ partial class LargeServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.StringMethod05.</summary>
-	public sealed class ILargeService_StringMethod05Interceptor
+	/// <summary>Tracks and configures behavior for StringMethod05.</summary>
+	public sealed class StringMethod05Interceptor
 	{
-		/// <summary>Delegate for StringMethod05().</summary>
+		/// <summary>Delegate for StringMethod05.</summary>
 		public delegate string StringMethod05Delegate(LargeServiceStub ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public StringMethod05Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -805,19 +745,19 @@ partial class LargeServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.StringMethod06.</summary>
-	public sealed class ILargeService_StringMethod06Interceptor
+	/// <summary>Tracks and configures behavior for StringMethod06.</summary>
+	public sealed class StringMethod06Interceptor
 	{
-		/// <summary>Delegate for StringMethod06().</summary>
+		/// <summary>Delegate for StringMethod06.</summary>
 		public delegate string StringMethod06Delegate(LargeServiceStub ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public StringMethod06Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -827,19 +767,19 @@ partial class LargeServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.StringMethod07.</summary>
-	public sealed class ILargeService_StringMethod07Interceptor
+	/// <summary>Tracks and configures behavior for StringMethod07.</summary>
+	public sealed class StringMethod07Interceptor
 	{
-		/// <summary>Delegate for StringMethod07().</summary>
+		/// <summary>Delegate for StringMethod07.</summary>
 		public delegate string StringMethod07Delegate(LargeServiceStub ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public StringMethod07Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -849,19 +789,19 @@ partial class LargeServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.StringMethod08.</summary>
-	public sealed class ILargeService_StringMethod08Interceptor
+	/// <summary>Tracks and configures behavior for StringMethod08.</summary>
+	public sealed class StringMethod08Interceptor
 	{
-		/// <summary>Delegate for StringMethod08().</summary>
+		/// <summary>Delegate for StringMethod08.</summary>
 		public delegate string StringMethod08Delegate(LargeServiceStub ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public StringMethod08Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -871,19 +811,19 @@ partial class LargeServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.StringMethod09.</summary>
-	public sealed class ILargeService_StringMethod09Interceptor
+	/// <summary>Tracks and configures behavior for StringMethod09.</summary>
+	public sealed class StringMethod09Interceptor
 	{
-		/// <summary>Delegate for StringMethod09().</summary>
+		/// <summary>Delegate for StringMethod09.</summary>
 		public delegate string StringMethod09Delegate(LargeServiceStub ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public StringMethod09Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -893,19 +833,19 @@ partial class LargeServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.StringMethod10.</summary>
-	public sealed class ILargeService_StringMethod10Interceptor
+	/// <summary>Tracks and configures behavior for StringMethod10.</summary>
+	public sealed class StringMethod10Interceptor
 	{
-		/// <summary>Delegate for StringMethod10().</summary>
+		/// <summary>Delegate for StringMethod10.</summary>
 		public delegate string StringMethod10Delegate(LargeServiceStub ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public StringMethod10Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -915,745 +855,727 @@ partial class LargeServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.IntMethodWithParam01.</summary>
-	public sealed class ILargeService_IntMethodWithParam01Interceptor
+	/// <summary>Tracks and configures behavior for IntMethodWithParam01.</summary>
+	public sealed class IntMethodWithParam01Interceptor
 	{
-		/// <summary>Delegate for IntMethodWithParam01(int p).</summary>
+		/// <summary>Delegate for IntMethodWithParam01.</summary>
 		public delegate int IntMethodWithParam01Delegate(LargeServiceStub ko, int p);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'p' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public IntMethodWithParam01Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int p) { CallCount++; LastCallArg = p; }
+		public void RecordCall(int? p) { CallCount++; LastCallArg = p; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.IntMethodWithParam02.</summary>
-	public sealed class ILargeService_IntMethodWithParam02Interceptor
+	/// <summary>Tracks and configures behavior for IntMethodWithParam02.</summary>
+	public sealed class IntMethodWithParam02Interceptor
 	{
-		/// <summary>Delegate for IntMethodWithParam02(int p).</summary>
+		/// <summary>Delegate for IntMethodWithParam02.</summary>
 		public delegate int IntMethodWithParam02Delegate(LargeServiceStub ko, int p);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'p' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public IntMethodWithParam02Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int p) { CallCount++; LastCallArg = p; }
+		public void RecordCall(int? p) { CallCount++; LastCallArg = p; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.IntMethodWithParam03.</summary>
-	public sealed class ILargeService_IntMethodWithParam03Interceptor
+	/// <summary>Tracks and configures behavior for IntMethodWithParam03.</summary>
+	public sealed class IntMethodWithParam03Interceptor
 	{
-		/// <summary>Delegate for IntMethodWithParam03(int p).</summary>
+		/// <summary>Delegate for IntMethodWithParam03.</summary>
 		public delegate int IntMethodWithParam03Delegate(LargeServiceStub ko, int p);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'p' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public IntMethodWithParam03Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int p) { CallCount++; LastCallArg = p; }
+		public void RecordCall(int? p) { CallCount++; LastCallArg = p; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.IntMethodWithParam04.</summary>
-	public sealed class ILargeService_IntMethodWithParam04Interceptor
+	/// <summary>Tracks and configures behavior for IntMethodWithParam04.</summary>
+	public sealed class IntMethodWithParam04Interceptor
 	{
-		/// <summary>Delegate for IntMethodWithParam04(int p).</summary>
+		/// <summary>Delegate for IntMethodWithParam04.</summary>
 		public delegate int IntMethodWithParam04Delegate(LargeServiceStub ko, int p);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'p' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public IntMethodWithParam04Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int p) { CallCount++; LastCallArg = p; }
+		public void RecordCall(int? p) { CallCount++; LastCallArg = p; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.IntMethodWithParam05.</summary>
-	public sealed class ILargeService_IntMethodWithParam05Interceptor
+	/// <summary>Tracks and configures behavior for IntMethodWithParam05.</summary>
+	public sealed class IntMethodWithParam05Interceptor
 	{
-		/// <summary>Delegate for IntMethodWithParam05(int p).</summary>
+		/// <summary>Delegate for IntMethodWithParam05.</summary>
 		public delegate int IntMethodWithParam05Delegate(LargeServiceStub ko, int p);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'p' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public IntMethodWithParam05Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int p) { CallCount++; LastCallArg = p; }
+		public void RecordCall(int? p) { CallCount++; LastCallArg = p; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.IntMethodWithParam06.</summary>
-	public sealed class ILargeService_IntMethodWithParam06Interceptor
+	/// <summary>Tracks and configures behavior for IntMethodWithParam06.</summary>
+	public sealed class IntMethodWithParam06Interceptor
 	{
-		/// <summary>Delegate for IntMethodWithParam06(int p).</summary>
+		/// <summary>Delegate for IntMethodWithParam06.</summary>
 		public delegate int IntMethodWithParam06Delegate(LargeServiceStub ko, int p);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'p' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public IntMethodWithParam06Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int p) { CallCount++; LastCallArg = p; }
+		public void RecordCall(int? p) { CallCount++; LastCallArg = p; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.IntMethodWithParam07.</summary>
-	public sealed class ILargeService_IntMethodWithParam07Interceptor
+	/// <summary>Tracks and configures behavior for IntMethodWithParam07.</summary>
+	public sealed class IntMethodWithParam07Interceptor
 	{
-		/// <summary>Delegate for IntMethodWithParam07(int p).</summary>
+		/// <summary>Delegate for IntMethodWithParam07.</summary>
 		public delegate int IntMethodWithParam07Delegate(LargeServiceStub ko, int p);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'p' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public IntMethodWithParam07Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int p) { CallCount++; LastCallArg = p; }
+		public void RecordCall(int? p) { CallCount++; LastCallArg = p; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.IntMethodWithParam08.</summary>
-	public sealed class ILargeService_IntMethodWithParam08Interceptor
+	/// <summary>Tracks and configures behavior for IntMethodWithParam08.</summary>
+	public sealed class IntMethodWithParam08Interceptor
 	{
-		/// <summary>Delegate for IntMethodWithParam08(int p).</summary>
+		/// <summary>Delegate for IntMethodWithParam08.</summary>
 		public delegate int IntMethodWithParam08Delegate(LargeServiceStub ko, int p);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'p' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public IntMethodWithParam08Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int p) { CallCount++; LastCallArg = p; }
+		public void RecordCall(int? p) { CallCount++; LastCallArg = p; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.IntMethodWithParam09.</summary>
-	public sealed class ILargeService_IntMethodWithParam09Interceptor
+	/// <summary>Tracks and configures behavior for IntMethodWithParam09.</summary>
+	public sealed class IntMethodWithParam09Interceptor
 	{
-		/// <summary>Delegate for IntMethodWithParam09(int p).</summary>
+		/// <summary>Delegate for IntMethodWithParam09.</summary>
 		public delegate int IntMethodWithParam09Delegate(LargeServiceStub ko, int p);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'p' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public IntMethodWithParam09Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int p) { CallCount++; LastCallArg = p; }
+		public void RecordCall(int? p) { CallCount++; LastCallArg = p; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ILargeService.IntMethodWithParam10.</summary>
-	public sealed class ILargeService_IntMethodWithParam10Interceptor
+	/// <summary>Tracks and configures behavior for IntMethodWithParam10.</summary>
+	public sealed class IntMethodWithParam10Interceptor
 	{
-		/// <summary>Delegate for IntMethodWithParam10(int p).</summary>
+		/// <summary>Delegate for IntMethodWithParam10.</summary>
 		public delegate int IntMethodWithParam10Delegate(LargeServiceStub ko, int p);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'p' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public IntMethodWithParam10Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int p) { CallCount++; LastCallArg = p; }
+		public void RecordCall(int? p) { CallCount++; LastCallArg = p; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Benchmarks.Interfaces.ILargeService.</summary>
-	public sealed class ILargeServiceInterceptorors
-	{
-		/// <summary>Interceptor for VoidMethod01.</summary>
-		public ILargeService_VoidMethod01Interceptor VoidMethod01 { get; } = new();
-		/// <summary>Interceptor for VoidMethod02.</summary>
-		public ILargeService_VoidMethod02Interceptor VoidMethod02 { get; } = new();
-		/// <summary>Interceptor for VoidMethod03.</summary>
-		public ILargeService_VoidMethod03Interceptor VoidMethod03 { get; } = new();
-		/// <summary>Interceptor for VoidMethod04.</summary>
-		public ILargeService_VoidMethod04Interceptor VoidMethod04 { get; } = new();
-		/// <summary>Interceptor for VoidMethod05.</summary>
-		public ILargeService_VoidMethod05Interceptor VoidMethod05 { get; } = new();
-		/// <summary>Interceptor for VoidMethod06.</summary>
-		public ILargeService_VoidMethod06Interceptor VoidMethod06 { get; } = new();
-		/// <summary>Interceptor for VoidMethod07.</summary>
-		public ILargeService_VoidMethod07Interceptor VoidMethod07 { get; } = new();
-		/// <summary>Interceptor for VoidMethod08.</summary>
-		public ILargeService_VoidMethod08Interceptor VoidMethod08 { get; } = new();
-		/// <summary>Interceptor for VoidMethod09.</summary>
-		public ILargeService_VoidMethod09Interceptor VoidMethod09 { get; } = new();
-		/// <summary>Interceptor for VoidMethod10.</summary>
-		public ILargeService_VoidMethod10Interceptor VoidMethod10 { get; } = new();
-		/// <summary>Interceptor for VoidMethodWithParam01.</summary>
-		public ILargeService_VoidMethodWithParam01Interceptor VoidMethodWithParam01 { get; } = new();
-		/// <summary>Interceptor for VoidMethodWithParam02.</summary>
-		public ILargeService_VoidMethodWithParam02Interceptor VoidMethodWithParam02 { get; } = new();
-		/// <summary>Interceptor for VoidMethodWithParam03.</summary>
-		public ILargeService_VoidMethodWithParam03Interceptor VoidMethodWithParam03 { get; } = new();
-		/// <summary>Interceptor for VoidMethodWithParam04.</summary>
-		public ILargeService_VoidMethodWithParam04Interceptor VoidMethodWithParam04 { get; } = new();
-		/// <summary>Interceptor for VoidMethodWithParam05.</summary>
-		public ILargeService_VoidMethodWithParam05Interceptor VoidMethodWithParam05 { get; } = new();
-		/// <summary>Interceptor for VoidMethodWithParam06.</summary>
-		public ILargeService_VoidMethodWithParam06Interceptor VoidMethodWithParam06 { get; } = new();
-		/// <summary>Interceptor for VoidMethodWithParam07.</summary>
-		public ILargeService_VoidMethodWithParam07Interceptor VoidMethodWithParam07 { get; } = new();
-		/// <summary>Interceptor for VoidMethodWithParam08.</summary>
-		public ILargeService_VoidMethodWithParam08Interceptor VoidMethodWithParam08 { get; } = new();
-		/// <summary>Interceptor for VoidMethodWithParam09.</summary>
-		public ILargeService_VoidMethodWithParam09Interceptor VoidMethodWithParam09 { get; } = new();
-		/// <summary>Interceptor for VoidMethodWithParam10.</summary>
-		public ILargeService_VoidMethodWithParam10Interceptor VoidMethodWithParam10 { get; } = new();
-		/// <summary>Interceptor for IntMethod01.</summary>
-		public ILargeService_IntMethod01Interceptor IntMethod01 { get; } = new();
-		/// <summary>Interceptor for IntMethod02.</summary>
-		public ILargeService_IntMethod02Interceptor IntMethod02 { get; } = new();
-		/// <summary>Interceptor for IntMethod03.</summary>
-		public ILargeService_IntMethod03Interceptor IntMethod03 { get; } = new();
-		/// <summary>Interceptor for IntMethod04.</summary>
-		public ILargeService_IntMethod04Interceptor IntMethod04 { get; } = new();
-		/// <summary>Interceptor for IntMethod05.</summary>
-		public ILargeService_IntMethod05Interceptor IntMethod05 { get; } = new();
-		/// <summary>Interceptor for IntMethod06.</summary>
-		public ILargeService_IntMethod06Interceptor IntMethod06 { get; } = new();
-		/// <summary>Interceptor for IntMethod07.</summary>
-		public ILargeService_IntMethod07Interceptor IntMethod07 { get; } = new();
-		/// <summary>Interceptor for IntMethod08.</summary>
-		public ILargeService_IntMethod08Interceptor IntMethod08 { get; } = new();
-		/// <summary>Interceptor for IntMethod09.</summary>
-		public ILargeService_IntMethod09Interceptor IntMethod09 { get; } = new();
-		/// <summary>Interceptor for IntMethod10.</summary>
-		public ILargeService_IntMethod10Interceptor IntMethod10 { get; } = new();
-		/// <summary>Interceptor for StringMethod01.</summary>
-		public ILargeService_StringMethod01Interceptor StringMethod01 { get; } = new();
-		/// <summary>Interceptor for StringMethod02.</summary>
-		public ILargeService_StringMethod02Interceptor StringMethod02 { get; } = new();
-		/// <summary>Interceptor for StringMethod03.</summary>
-		public ILargeService_StringMethod03Interceptor StringMethod03 { get; } = new();
-		/// <summary>Interceptor for StringMethod04.</summary>
-		public ILargeService_StringMethod04Interceptor StringMethod04 { get; } = new();
-		/// <summary>Interceptor for StringMethod05.</summary>
-		public ILargeService_StringMethod05Interceptor StringMethod05 { get; } = new();
-		/// <summary>Interceptor for StringMethod06.</summary>
-		public ILargeService_StringMethod06Interceptor StringMethod06 { get; } = new();
-		/// <summary>Interceptor for StringMethod07.</summary>
-		public ILargeService_StringMethod07Interceptor StringMethod07 { get; } = new();
-		/// <summary>Interceptor for StringMethod08.</summary>
-		public ILargeService_StringMethod08Interceptor StringMethod08 { get; } = new();
-		/// <summary>Interceptor for StringMethod09.</summary>
-		public ILargeService_StringMethod09Interceptor StringMethod09 { get; } = new();
-		/// <summary>Interceptor for StringMethod10.</summary>
-		public ILargeService_StringMethod10Interceptor StringMethod10 { get; } = new();
-		/// <summary>Interceptor for IntMethodWithParam01.</summary>
-		public ILargeService_IntMethodWithParam01Interceptor IntMethodWithParam01 { get; } = new();
-		/// <summary>Interceptor for IntMethodWithParam02.</summary>
-		public ILargeService_IntMethodWithParam02Interceptor IntMethodWithParam02 { get; } = new();
-		/// <summary>Interceptor for IntMethodWithParam03.</summary>
-		public ILargeService_IntMethodWithParam03Interceptor IntMethodWithParam03 { get; } = new();
-		/// <summary>Interceptor for IntMethodWithParam04.</summary>
-		public ILargeService_IntMethodWithParam04Interceptor IntMethodWithParam04 { get; } = new();
-		/// <summary>Interceptor for IntMethodWithParam05.</summary>
-		public ILargeService_IntMethodWithParam05Interceptor IntMethodWithParam05 { get; } = new();
-		/// <summary>Interceptor for IntMethodWithParam06.</summary>
-		public ILargeService_IntMethodWithParam06Interceptor IntMethodWithParam06 { get; } = new();
-		/// <summary>Interceptor for IntMethodWithParam07.</summary>
-		public ILargeService_IntMethodWithParam07Interceptor IntMethodWithParam07 { get; } = new();
-		/// <summary>Interceptor for IntMethodWithParam08.</summary>
-		public ILargeService_IntMethodWithParam08Interceptor IntMethodWithParam08 { get; } = new();
-		/// <summary>Interceptor for IntMethodWithParam09.</summary>
-		public ILargeService_IntMethodWithParam09Interceptor IntMethodWithParam09 { get; } = new();
-		/// <summary>Interceptor for IntMethodWithParam10.</summary>
-		public ILargeService_IntMethodWithParam10Interceptor IntMethodWithParam10 { get; } = new();
-	}
+	/// <summary>Interceptor for VoidMethod01.</summary>
+	public VoidMethod01Interceptor VoidMethod01 { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Benchmarks.Interfaces.ILargeService.</summary>
-	public ILargeServiceInterceptorors ILargeService { get; } = new();
+	/// <summary>Interceptor for VoidMethod02.</summary>
+	public VoidMethod02Interceptor VoidMethod02 { get; } = new();
+
+	/// <summary>Interceptor for VoidMethod03.</summary>
+	public VoidMethod03Interceptor VoidMethod03 { get; } = new();
+
+	/// <summary>Interceptor for VoidMethod04.</summary>
+	public VoidMethod04Interceptor VoidMethod04 { get; } = new();
+
+	/// <summary>Interceptor for VoidMethod05.</summary>
+	public VoidMethod05Interceptor VoidMethod05 { get; } = new();
+
+	/// <summary>Interceptor for VoidMethod06.</summary>
+	public VoidMethod06Interceptor VoidMethod06 { get; } = new();
+
+	/// <summary>Interceptor for VoidMethod07.</summary>
+	public VoidMethod07Interceptor VoidMethod07 { get; } = new();
+
+	/// <summary>Interceptor for VoidMethod08.</summary>
+	public VoidMethod08Interceptor VoidMethod08 { get; } = new();
+
+	/// <summary>Interceptor for VoidMethod09.</summary>
+	public VoidMethod09Interceptor VoidMethod09 { get; } = new();
+
+	/// <summary>Interceptor for VoidMethod10.</summary>
+	public VoidMethod10Interceptor VoidMethod10 { get; } = new();
+
+	/// <summary>Interceptor for VoidMethodWithParam01.</summary>
+	public VoidMethodWithParam01Interceptor VoidMethodWithParam01 { get; } = new();
+
+	/// <summary>Interceptor for VoidMethodWithParam02.</summary>
+	public VoidMethodWithParam02Interceptor VoidMethodWithParam02 { get; } = new();
+
+	/// <summary>Interceptor for VoidMethodWithParam03.</summary>
+	public VoidMethodWithParam03Interceptor VoidMethodWithParam03 { get; } = new();
+
+	/// <summary>Interceptor for VoidMethodWithParam04.</summary>
+	public VoidMethodWithParam04Interceptor VoidMethodWithParam04 { get; } = new();
+
+	/// <summary>Interceptor for VoidMethodWithParam05.</summary>
+	public VoidMethodWithParam05Interceptor VoidMethodWithParam05 { get; } = new();
+
+	/// <summary>Interceptor for VoidMethodWithParam06.</summary>
+	public VoidMethodWithParam06Interceptor VoidMethodWithParam06 { get; } = new();
+
+	/// <summary>Interceptor for VoidMethodWithParam07.</summary>
+	public VoidMethodWithParam07Interceptor VoidMethodWithParam07 { get; } = new();
+
+	/// <summary>Interceptor for VoidMethodWithParam08.</summary>
+	public VoidMethodWithParam08Interceptor VoidMethodWithParam08 { get; } = new();
+
+	/// <summary>Interceptor for VoidMethodWithParam09.</summary>
+	public VoidMethodWithParam09Interceptor VoidMethodWithParam09 { get; } = new();
+
+	/// <summary>Interceptor for VoidMethodWithParam10.</summary>
+	public VoidMethodWithParam10Interceptor VoidMethodWithParam10 { get; } = new();
+
+	/// <summary>Interceptor for IntMethod01.</summary>
+	public IntMethod01Interceptor IntMethod01 { get; } = new();
+
+	/// <summary>Interceptor for IntMethod02.</summary>
+	public IntMethod02Interceptor IntMethod02 { get; } = new();
+
+	/// <summary>Interceptor for IntMethod03.</summary>
+	public IntMethod03Interceptor IntMethod03 { get; } = new();
+
+	/// <summary>Interceptor for IntMethod04.</summary>
+	public IntMethod04Interceptor IntMethod04 { get; } = new();
+
+	/// <summary>Interceptor for IntMethod05.</summary>
+	public IntMethod05Interceptor IntMethod05 { get; } = new();
+
+	/// <summary>Interceptor for IntMethod06.</summary>
+	public IntMethod06Interceptor IntMethod06 { get; } = new();
+
+	/// <summary>Interceptor for IntMethod07.</summary>
+	public IntMethod07Interceptor IntMethod07 { get; } = new();
+
+	/// <summary>Interceptor for IntMethod08.</summary>
+	public IntMethod08Interceptor IntMethod08 { get; } = new();
+
+	/// <summary>Interceptor for IntMethod09.</summary>
+	public IntMethod09Interceptor IntMethod09 { get; } = new();
+
+	/// <summary>Interceptor for IntMethod10.</summary>
+	public IntMethod10Interceptor IntMethod10 { get; } = new();
+
+	/// <summary>Interceptor for StringMethod01.</summary>
+	public StringMethod01Interceptor StringMethod01 { get; } = new();
+
+	/// <summary>Interceptor for StringMethod02.</summary>
+	public StringMethod02Interceptor StringMethod02 { get; } = new();
+
+	/// <summary>Interceptor for StringMethod03.</summary>
+	public StringMethod03Interceptor StringMethod03 { get; } = new();
+
+	/// <summary>Interceptor for StringMethod04.</summary>
+	public StringMethod04Interceptor StringMethod04 { get; } = new();
+
+	/// <summary>Interceptor for StringMethod05.</summary>
+	public StringMethod05Interceptor StringMethod05 { get; } = new();
+
+	/// <summary>Interceptor for StringMethod06.</summary>
+	public StringMethod06Interceptor StringMethod06 { get; } = new();
+
+	/// <summary>Interceptor for StringMethod07.</summary>
+	public StringMethod07Interceptor StringMethod07 { get; } = new();
+
+	/// <summary>Interceptor for StringMethod08.</summary>
+	public StringMethod08Interceptor StringMethod08 { get; } = new();
+
+	/// <summary>Interceptor for StringMethod09.</summary>
+	public StringMethod09Interceptor StringMethod09 { get; } = new();
+
+	/// <summary>Interceptor for StringMethod10.</summary>
+	public StringMethod10Interceptor StringMethod10 { get; } = new();
+
+	/// <summary>Interceptor for IntMethodWithParam01.</summary>
+	public IntMethodWithParam01Interceptor IntMethodWithParam01 { get; } = new();
+
+	/// <summary>Interceptor for IntMethodWithParam02.</summary>
+	public IntMethodWithParam02Interceptor IntMethodWithParam02 { get; } = new();
+
+	/// <summary>Interceptor for IntMethodWithParam03.</summary>
+	public IntMethodWithParam03Interceptor IntMethodWithParam03 { get; } = new();
+
+	/// <summary>Interceptor for IntMethodWithParam04.</summary>
+	public IntMethodWithParam04Interceptor IntMethodWithParam04 { get; } = new();
+
+	/// <summary>Interceptor for IntMethodWithParam05.</summary>
+	public IntMethodWithParam05Interceptor IntMethodWithParam05 { get; } = new();
+
+	/// <summary>Interceptor for IntMethodWithParam06.</summary>
+	public IntMethodWithParam06Interceptor IntMethodWithParam06 { get; } = new();
+
+	/// <summary>Interceptor for IntMethodWithParam07.</summary>
+	public IntMethodWithParam07Interceptor IntMethodWithParam07 { get; } = new();
+
+	/// <summary>Interceptor for IntMethodWithParam08.</summary>
+	public IntMethodWithParam08Interceptor IntMethodWithParam08 { get; } = new();
+
+	/// <summary>Interceptor for IntMethodWithParam09.</summary>
+	public IntMethodWithParam09Interceptor IntMethodWithParam09 { get; } = new();
+
+	/// <summary>Interceptor for IntMethodWithParam10.</summary>
+	public IntMethodWithParam10Interceptor IntMethodWithParam10 { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Benchmarks.Interfaces.ILargeService.</summary>
 	public KnockOff.Benchmarks.Interfaces.ILargeService AsLargeService() => this;
 
 	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod01()
 	{
-		ILargeService.VoidMethod01.RecordCall();
-		if (ILargeService.VoidMethod01.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		VoidMethod01.RecordCall();
+		VoidMethod01.OnCall?.Invoke(this);
 	}
 
 	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod02()
 	{
-		ILargeService.VoidMethod02.RecordCall();
-		if (ILargeService.VoidMethod02.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		VoidMethod02.RecordCall();
+		VoidMethod02.OnCall?.Invoke(this);
 	}
 
 	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod03()
 	{
-		ILargeService.VoidMethod03.RecordCall();
-		if (ILargeService.VoidMethod03.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		VoidMethod03.RecordCall();
+		VoidMethod03.OnCall?.Invoke(this);
 	}
 
 	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod04()
 	{
-		ILargeService.VoidMethod04.RecordCall();
-		if (ILargeService.VoidMethod04.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		VoidMethod04.RecordCall();
+		VoidMethod04.OnCall?.Invoke(this);
 	}
 
 	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod05()
 	{
-		ILargeService.VoidMethod05.RecordCall();
-		if (ILargeService.VoidMethod05.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		VoidMethod05.RecordCall();
+		VoidMethod05.OnCall?.Invoke(this);
 	}
 
 	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod06()
 	{
-		ILargeService.VoidMethod06.RecordCall();
-		if (ILargeService.VoidMethod06.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		VoidMethod06.RecordCall();
+		VoidMethod06.OnCall?.Invoke(this);
 	}
 
 	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod07()
 	{
-		ILargeService.VoidMethod07.RecordCall();
-		if (ILargeService.VoidMethod07.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		VoidMethod07.RecordCall();
+		VoidMethod07.OnCall?.Invoke(this);
 	}
 
 	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod08()
 	{
-		ILargeService.VoidMethod08.RecordCall();
-		if (ILargeService.VoidMethod08.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		VoidMethod08.RecordCall();
+		VoidMethod08.OnCall?.Invoke(this);
 	}
 
 	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod09()
 	{
-		ILargeService.VoidMethod09.RecordCall();
-		if (ILargeService.VoidMethod09.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		VoidMethod09.RecordCall();
+		VoidMethod09.OnCall?.Invoke(this);
 	}
 
 	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod10()
 	{
-		ILargeService.VoidMethod10.RecordCall();
-		if (ILargeService.VoidMethod10.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		VoidMethod10.RecordCall();
+		VoidMethod10.OnCall?.Invoke(this);
 	}
 
 	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam01(int p)
 	{
-		ILargeService.VoidMethodWithParam01.RecordCall(p);
-		if (ILargeService.VoidMethodWithParam01.OnCall is { } onCallCallback)
-		{ onCallCallback(this, p); return; }
+		VoidMethodWithParam01.RecordCall(p);
+		VoidMethodWithParam01.OnCall?.Invoke(this, p);
 	}
 
 	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam02(int p)
 	{
-		ILargeService.VoidMethodWithParam02.RecordCall(p);
-		if (ILargeService.VoidMethodWithParam02.OnCall is { } onCallCallback)
-		{ onCallCallback(this, p); return; }
+		VoidMethodWithParam02.RecordCall(p);
+		VoidMethodWithParam02.OnCall?.Invoke(this, p);
 	}
 
 	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam03(int p)
 	{
-		ILargeService.VoidMethodWithParam03.RecordCall(p);
-		if (ILargeService.VoidMethodWithParam03.OnCall is { } onCallCallback)
-		{ onCallCallback(this, p); return; }
+		VoidMethodWithParam03.RecordCall(p);
+		VoidMethodWithParam03.OnCall?.Invoke(this, p);
 	}
 
 	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam04(int p)
 	{
-		ILargeService.VoidMethodWithParam04.RecordCall(p);
-		if (ILargeService.VoidMethodWithParam04.OnCall is { } onCallCallback)
-		{ onCallCallback(this, p); return; }
+		VoidMethodWithParam04.RecordCall(p);
+		VoidMethodWithParam04.OnCall?.Invoke(this, p);
 	}
 
 	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam05(int p)
 	{
-		ILargeService.VoidMethodWithParam05.RecordCall(p);
-		if (ILargeService.VoidMethodWithParam05.OnCall is { } onCallCallback)
-		{ onCallCallback(this, p); return; }
+		VoidMethodWithParam05.RecordCall(p);
+		VoidMethodWithParam05.OnCall?.Invoke(this, p);
 	}
 
 	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam06(int p)
 	{
-		ILargeService.VoidMethodWithParam06.RecordCall(p);
-		if (ILargeService.VoidMethodWithParam06.OnCall is { } onCallCallback)
-		{ onCallCallback(this, p); return; }
+		VoidMethodWithParam06.RecordCall(p);
+		VoidMethodWithParam06.OnCall?.Invoke(this, p);
 	}
 
 	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam07(int p)
 	{
-		ILargeService.VoidMethodWithParam07.RecordCall(p);
-		if (ILargeService.VoidMethodWithParam07.OnCall is { } onCallCallback)
-		{ onCallCallback(this, p); return; }
+		VoidMethodWithParam07.RecordCall(p);
+		VoidMethodWithParam07.OnCall?.Invoke(this, p);
 	}
 
 	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam08(int p)
 	{
-		ILargeService.VoidMethodWithParam08.RecordCall(p);
-		if (ILargeService.VoidMethodWithParam08.OnCall is { } onCallCallback)
-		{ onCallCallback(this, p); return; }
+		VoidMethodWithParam08.RecordCall(p);
+		VoidMethodWithParam08.OnCall?.Invoke(this, p);
 	}
 
 	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam09(int p)
 	{
-		ILargeService.VoidMethodWithParam09.RecordCall(p);
-		if (ILargeService.VoidMethodWithParam09.OnCall is { } onCallCallback)
-		{ onCallCallback(this, p); return; }
+		VoidMethodWithParam09.RecordCall(p);
+		VoidMethodWithParam09.OnCall?.Invoke(this, p);
 	}
 
 	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam10(int p)
 	{
-		ILargeService.VoidMethodWithParam10.RecordCall(p);
-		if (ILargeService.VoidMethodWithParam10.OnCall is { } onCallCallback)
-		{ onCallCallback(this, p); return; }
+		VoidMethodWithParam10.RecordCall(p);
+		VoidMethodWithParam10.OnCall?.Invoke(this, p);
 	}
 
 	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod01()
 	{
-		ILargeService.IntMethod01.RecordCall();
-		if (ILargeService.IntMethod01.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return default!;
+		IntMethod01.RecordCall();
+		return IntMethod01.OnCall?.Invoke(this) ?? default!;
 	}
 
 	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod02()
 	{
-		ILargeService.IntMethod02.RecordCall();
-		if (ILargeService.IntMethod02.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return default!;
+		IntMethod02.RecordCall();
+		return IntMethod02.OnCall?.Invoke(this) ?? default!;
 	}
 
 	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod03()
 	{
-		ILargeService.IntMethod03.RecordCall();
-		if (ILargeService.IntMethod03.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return default!;
+		IntMethod03.RecordCall();
+		return IntMethod03.OnCall?.Invoke(this) ?? default!;
 	}
 
 	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod04()
 	{
-		ILargeService.IntMethod04.RecordCall();
-		if (ILargeService.IntMethod04.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return default!;
+		IntMethod04.RecordCall();
+		return IntMethod04.OnCall?.Invoke(this) ?? default!;
 	}
 
 	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod05()
 	{
-		ILargeService.IntMethod05.RecordCall();
-		if (ILargeService.IntMethod05.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return default!;
+		IntMethod05.RecordCall();
+		return IntMethod05.OnCall?.Invoke(this) ?? default!;
 	}
 
 	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod06()
 	{
-		ILargeService.IntMethod06.RecordCall();
-		if (ILargeService.IntMethod06.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return default!;
+		IntMethod06.RecordCall();
+		return IntMethod06.OnCall?.Invoke(this) ?? default!;
 	}
 
 	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod07()
 	{
-		ILargeService.IntMethod07.RecordCall();
-		if (ILargeService.IntMethod07.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return default!;
+		IntMethod07.RecordCall();
+		return IntMethod07.OnCall?.Invoke(this) ?? default!;
 	}
 
 	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod08()
 	{
-		ILargeService.IntMethod08.RecordCall();
-		if (ILargeService.IntMethod08.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return default!;
+		IntMethod08.RecordCall();
+		return IntMethod08.OnCall?.Invoke(this) ?? default!;
 	}
 
 	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod09()
 	{
-		ILargeService.IntMethod09.RecordCall();
-		if (ILargeService.IntMethod09.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return default!;
+		IntMethod09.RecordCall();
+		return IntMethod09.OnCall?.Invoke(this) ?? default!;
 	}
 
 	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod10()
 	{
-		ILargeService.IntMethod10.RecordCall();
-		if (ILargeService.IntMethod10.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return default!;
+		IntMethod10.RecordCall();
+		return IntMethod10.OnCall?.Invoke(this) ?? default!;
 	}
 
 	string KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod01()
 	{
-		ILargeService.StringMethod01.RecordCall();
-		if (ILargeService.StringMethod01.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'StringMethod01' in your partial class, or set ILargeService.StringMethod01.OnCall.");
+		StringMethod01.RecordCall();
+		if (StringMethod01.OnCall is { } callback)
+			return callback(this);
+		throw new global::System.InvalidOperationException("No implementation provided for StringMethod01. Set StringMethod01.OnCall or define a protected method 'StringMethod01' in your partial class.");
 	}
 
 	string KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod02()
 	{
-		ILargeService.StringMethod02.RecordCall();
-		if (ILargeService.StringMethod02.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'StringMethod02' in your partial class, or set ILargeService.StringMethod02.OnCall.");
+		StringMethod02.RecordCall();
+		if (StringMethod02.OnCall is { } callback)
+			return callback(this);
+		throw new global::System.InvalidOperationException("No implementation provided for StringMethod02. Set StringMethod02.OnCall or define a protected method 'StringMethod02' in your partial class.");
 	}
 
 	string KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod03()
 	{
-		ILargeService.StringMethod03.RecordCall();
-		if (ILargeService.StringMethod03.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'StringMethod03' in your partial class, or set ILargeService.StringMethod03.OnCall.");
+		StringMethod03.RecordCall();
+		if (StringMethod03.OnCall is { } callback)
+			return callback(this);
+		throw new global::System.InvalidOperationException("No implementation provided for StringMethod03. Set StringMethod03.OnCall or define a protected method 'StringMethod03' in your partial class.");
 	}
 
 	string KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod04()
 	{
-		ILargeService.StringMethod04.RecordCall();
-		if (ILargeService.StringMethod04.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'StringMethod04' in your partial class, or set ILargeService.StringMethod04.OnCall.");
+		StringMethod04.RecordCall();
+		if (StringMethod04.OnCall is { } callback)
+			return callback(this);
+		throw new global::System.InvalidOperationException("No implementation provided for StringMethod04. Set StringMethod04.OnCall or define a protected method 'StringMethod04' in your partial class.");
 	}
 
 	string KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod05()
 	{
-		ILargeService.StringMethod05.RecordCall();
-		if (ILargeService.StringMethod05.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'StringMethod05' in your partial class, or set ILargeService.StringMethod05.OnCall.");
+		StringMethod05.RecordCall();
+		if (StringMethod05.OnCall is { } callback)
+			return callback(this);
+		throw new global::System.InvalidOperationException("No implementation provided for StringMethod05. Set StringMethod05.OnCall or define a protected method 'StringMethod05' in your partial class.");
 	}
 
 	string KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod06()
 	{
-		ILargeService.StringMethod06.RecordCall();
-		if (ILargeService.StringMethod06.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'StringMethod06' in your partial class, or set ILargeService.StringMethod06.OnCall.");
+		StringMethod06.RecordCall();
+		if (StringMethod06.OnCall is { } callback)
+			return callback(this);
+		throw new global::System.InvalidOperationException("No implementation provided for StringMethod06. Set StringMethod06.OnCall or define a protected method 'StringMethod06' in your partial class.");
 	}
 
 	string KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod07()
 	{
-		ILargeService.StringMethod07.RecordCall();
-		if (ILargeService.StringMethod07.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'StringMethod07' in your partial class, or set ILargeService.StringMethod07.OnCall.");
+		StringMethod07.RecordCall();
+		if (StringMethod07.OnCall is { } callback)
+			return callback(this);
+		throw new global::System.InvalidOperationException("No implementation provided for StringMethod07. Set StringMethod07.OnCall or define a protected method 'StringMethod07' in your partial class.");
 	}
 
 	string KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod08()
 	{
-		ILargeService.StringMethod08.RecordCall();
-		if (ILargeService.StringMethod08.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'StringMethod08' in your partial class, or set ILargeService.StringMethod08.OnCall.");
+		StringMethod08.RecordCall();
+		if (StringMethod08.OnCall is { } callback)
+			return callback(this);
+		throw new global::System.InvalidOperationException("No implementation provided for StringMethod08. Set StringMethod08.OnCall or define a protected method 'StringMethod08' in your partial class.");
 	}
 
 	string KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod09()
 	{
-		ILargeService.StringMethod09.RecordCall();
-		if (ILargeService.StringMethod09.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'StringMethod09' in your partial class, or set ILargeService.StringMethod09.OnCall.");
+		StringMethod09.RecordCall();
+		if (StringMethod09.OnCall is { } callback)
+			return callback(this);
+		throw new global::System.InvalidOperationException("No implementation provided for StringMethod09. Set StringMethod09.OnCall or define a protected method 'StringMethod09' in your partial class.");
 	}
 
 	string KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod10()
 	{
-		ILargeService.StringMethod10.RecordCall();
-		if (ILargeService.StringMethod10.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'StringMethod10' in your partial class, or set ILargeService.StringMethod10.OnCall.");
+		StringMethod10.RecordCall();
+		if (StringMethod10.OnCall is { } callback)
+			return callback(this);
+		throw new global::System.InvalidOperationException("No implementation provided for StringMethod10. Set StringMethod10.OnCall or define a protected method 'StringMethod10' in your partial class.");
 	}
 
 	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam01(int p)
 	{
-		ILargeService.IntMethodWithParam01.RecordCall(p);
-		if (ILargeService.IntMethodWithParam01.OnCall is { } onCallCallback)
-			return onCallCallback(this, p);
-		return default!;
+		IntMethodWithParam01.RecordCall(p);
+		return IntMethodWithParam01.OnCall?.Invoke(this, p) ?? default!;
 	}
 
 	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam02(int p)
 	{
-		ILargeService.IntMethodWithParam02.RecordCall(p);
-		if (ILargeService.IntMethodWithParam02.OnCall is { } onCallCallback)
-			return onCallCallback(this, p);
-		return default!;
+		IntMethodWithParam02.RecordCall(p);
+		return IntMethodWithParam02.OnCall?.Invoke(this, p) ?? default!;
 	}
 
 	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam03(int p)
 	{
-		ILargeService.IntMethodWithParam03.RecordCall(p);
-		if (ILargeService.IntMethodWithParam03.OnCall is { } onCallCallback)
-			return onCallCallback(this, p);
-		return default!;
+		IntMethodWithParam03.RecordCall(p);
+		return IntMethodWithParam03.OnCall?.Invoke(this, p) ?? default!;
 	}
 
 	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam04(int p)
 	{
-		ILargeService.IntMethodWithParam04.RecordCall(p);
-		if (ILargeService.IntMethodWithParam04.OnCall is { } onCallCallback)
-			return onCallCallback(this, p);
-		return default!;
+		IntMethodWithParam04.RecordCall(p);
+		return IntMethodWithParam04.OnCall?.Invoke(this, p) ?? default!;
 	}
 
 	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam05(int p)
 	{
-		ILargeService.IntMethodWithParam05.RecordCall(p);
-		if (ILargeService.IntMethodWithParam05.OnCall is { } onCallCallback)
-			return onCallCallback(this, p);
-		return default!;
+		IntMethodWithParam05.RecordCall(p);
+		return IntMethodWithParam05.OnCall?.Invoke(this, p) ?? default!;
 	}
 
 	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam06(int p)
 	{
-		ILargeService.IntMethodWithParam06.RecordCall(p);
-		if (ILargeService.IntMethodWithParam06.OnCall is { } onCallCallback)
-			return onCallCallback(this, p);
-		return default!;
+		IntMethodWithParam06.RecordCall(p);
+		return IntMethodWithParam06.OnCall?.Invoke(this, p) ?? default!;
 	}
 
 	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam07(int p)
 	{
-		ILargeService.IntMethodWithParam07.RecordCall(p);
-		if (ILargeService.IntMethodWithParam07.OnCall is { } onCallCallback)
-			return onCallCallback(this, p);
-		return default!;
+		IntMethodWithParam07.RecordCall(p);
+		return IntMethodWithParam07.OnCall?.Invoke(this, p) ?? default!;
 	}
 
 	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam08(int p)
 	{
-		ILargeService.IntMethodWithParam08.RecordCall(p);
-		if (ILargeService.IntMethodWithParam08.OnCall is { } onCallCallback)
-			return onCallCallback(this, p);
-		return default!;
+		IntMethodWithParam08.RecordCall(p);
+		return IntMethodWithParam08.OnCall?.Invoke(this, p) ?? default!;
 	}
 
 	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam09(int p)
 	{
-		ILargeService.IntMethodWithParam09.RecordCall(p);
-		if (ILargeService.IntMethodWithParam09.OnCall is { } onCallCallback)
-			return onCallCallback(this, p);
-		return default!;
+		IntMethodWithParam09.RecordCall(p);
+		return IntMethodWithParam09.OnCall?.Invoke(this, p) ?? default!;
 	}
 
 	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam10(int p)
 	{
-		ILargeService.IntMethodWithParam10.RecordCall(p);
-		if (ILargeService.IntMethodWithParam10.OnCall is { } onCallCallback)
-			return onCallCallback(this, p);
-		return default!;
+		IntMethodWithParam10.RecordCall(p);
+		return IntMethodWithParam10.OnCall?.Invoke(this, p) ?? default!;
 	}
 
 }

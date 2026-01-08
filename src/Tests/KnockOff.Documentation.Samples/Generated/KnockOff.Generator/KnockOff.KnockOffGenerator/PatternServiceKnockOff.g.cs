@@ -5,49 +5,41 @@ namespace KnockOff.Documentation.Samples.Concepts;
 
 partial class PatternServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for IPatternService.Calculate.</summary>
-	public sealed class IPatternService_CalculateInterceptor
+	/// <summary>Tracks and configures behavior for Calculate.</summary>
+	public sealed class Calculate2Interceptor
 	{
-		/// <summary>Delegate for Calculate(int input).</summary>
+		/// <summary>Delegate for Calculate.</summary>
 		public delegate int CalculateDelegate(PatternServiceKnockOff ko, int input);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'input' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public CalculateDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int input) { CallCount++; LastCallArg = input; }
+		public void RecordCall(int? input) { CallCount++; LastCallArg = input; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternService.</summary>
-	public sealed class IPatternServiceInterceptorors
-	{
-		/// <summary>Interceptor for Calculate.</summary>
-		public IPatternService_CalculateInterceptor Calculate { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternService.</summary>
-	public IPatternServiceInterceptorors IPatternService { get; } = new();
+	/// <summary>Interceptor for Calculate.</summary>
+	public Calculate2Interceptor Calculate2 { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Concepts.IPatternService.</summary>
 	public KnockOff.Documentation.Samples.Concepts.IPatternService AsPatternService() => this;
 
 	int KnockOff.Documentation.Samples.Concepts.IPatternService.Calculate(int input)
 	{
-		IPatternService.Calculate.RecordCall(input);
-		if (IPatternService.Calculate.OnCall is { } onCallCallback)
-			return onCallCallback(this, input);
+		Calculate2.RecordCall(input);
+		if (Calculate2.OnCall != null) return Calculate2.OnCall(this, input);
 		return Calculate(input);
 	}
 

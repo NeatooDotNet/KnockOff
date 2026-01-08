@@ -19,6 +19,69 @@ KnockOff has the benefits of source generation—no runtime reflection, no Castl
 - CI/CD pipelines complete faster, giving you quicker feedback
 - Local test runs feel instant, encouraging you to run tests more often
 
+## Compile-Time Advantages
+
+KnockOff generates real C# code. This unlocks benefits that runtime mocking frameworks can't provide.
+
+### Compile-Time Safety
+
+When an interface changes, KnockOff fails at compile time. Moq fails at runtime.
+
+```csharp
+// IUserService adds a new method: Task<User> GetUserAsync(int id);
+
+// Moq: Compiles fine, fails at runtime in CI
+var mock = new Mock<IUserService>();
+mock.Setup(x => x.GetUser(1)).Returns(new User());  // Oops, missed GetUserAsync
+
+// KnockOff: Compiler error immediately
+[KnockOff]
+public partial class UserServiceKnockOff : IUserService { }
+// CS0535: 'UserServiceKnockOff' does not implement interface member 'IUserService.GetUserAsync(int)'
+```
+
+### Full IDE Support
+
+Source-generated code means full IntelliSense, Ctrl+Click navigation, and refactoring:
+
+- **Rename a method?** All stubs update automatically
+- **Find all references?** Includes stub usages
+- **Hover for docs?** Shows parameter names and types
+
+### Debuggable Stubs
+
+Set breakpoints in your user-defined methods. Step through your stub logic like normal code.
+
+```csharp
+[KnockOff]
+public partial class RepositoryKnockOff : IRepository
+{
+    protected User? GetById(int id)
+    {
+        // Set a breakpoint here — it works!
+        return _testUsers.FirstOrDefault(u => u.Id == id);
+    }
+}
+```
+
+With Moq, you're stepping through Castle.Core proxy internals.
+
+### No Lambda Ceremony
+
+Define behavior with normal methods, not expression trees:
+
+```csharp
+// Moq
+mock.Setup(x => x.GetUser(It.IsAny<int>())).Returns((int id) => new User { Id = id });
+mock.Setup(x => x.IsActive).Returns(true);
+mock.Setup(x => x.SaveAsync(It.IsAny<User>())).ReturnsAsync(true);
+
+// KnockOff — just write methods
+protected User GetUser(int id) => new User { Id = id };
+protected bool IsActive => true;
+protected Task<bool> SaveAsync(User user) => Task.FromResult(true);
+```
+
 ## Documentation
 
 - [Getting Started](docs/getting-started.md) - Installation and first steps
@@ -37,107 +100,94 @@ Mark a partial class with `[KnockOff]` that implements an interface. The source 
 
 ## Quick Example
 
+### Inline Stubs — Interfaces and Classes
+
+Add `[KnockOff<T>]` to your test class. Works with interfaces and unsealed classes:
+
 ```csharp
-public interface IDataService
+[KnockOff<IUserService>]        // Interface
+[KnockOff<EmailService>]        // Unsealed class (virtual members only)
+public partial class UserTests
 {
-    string Name { get; set; }
-    string? GetDescription(int id);
-    int GetCount();
-}
-
-// Define your stub with behavior
-[KnockOff]
-public partial class DataServiceKnockOff : IDataService
-{
-    private readonly int _count;
-
-    public DataServiceKnockOff(int count = 42)
+    [Fact]
+    public void NotifiesUser_WhenOrderShipped()
     {
-        _count = count;
+        // Create stubs
+        var userStub = new Stubs.IUserService();
+        var emailStub = new Stubs.EmailService();
+
+        // Configure behavior (unified API for both interface and class stubs)
+        userStub.GetUser.OnCall = (ko, id) => new User { Id = id, Email = "test@example.com" };
+        emailStub.Send.OnCall = (ko, to, subject, body) => { };
+
+        // Inject and test (.Object for class stubs)
+        var service = new OrderService(userStub, emailStub.Object);
+        service.ShipOrder(orderId: 42, userId: 1);
+
+        // Verify
+        Assert.True(userStub.GetUser.WasCalled);
+        Assert.Equal(1, userStub.GetUser.LastCallArg);
+        Assert.Equal("test@example.com", emailStub.Send.LastCallArgs?.to);
     }
-
-    // Non-nullable method - define to return meaningful value
-    protected int GetCount() => _count;
-
-    // GetDescription not defined - generated code returns null by default
-}
-
-// Use in tests
-[Fact]
-public void Test_DataService()
-{
-    var knockOff = new DataServiceKnockOff(count: 100);
-    IDataService service = knockOff;
-
-    // Property - uses generated backing field
-    service.Name = "Test";
-    Assert.Equal("Test", service.Name);
-    Assert.Equal(1, knockOff.IDataService.Name.SetCount);
-
-    // Nullable method - returns null, call is still verified
-    var description = service.GetDescription(5);
-    Assert.Null(description);
-    Assert.True(knockOff.IDataService.GetDescription.WasCalled);
-    Assert.Equal(5, knockOff.IDataService.GetDescription.LastCallArg);
-
-    // Non-nullable method - returns constructor value
-    var count = service.GetCount();
-    Assert.Equal(100, count);
-    Assert.Equal(1, knockOff.IDataService.GetCount.CallCount);
 }
 ```
 
-The stub behavior is defined once in the partial class. Every test uses the same predictable behavior. Verification happens through the interface-named property.
+**Class stubs use composition** — access the target class via `.Object`. Virtual/abstract members are intercepted; non-virtual members accessed through `.Object`.
 
-## Defining Stub Behavior
+### Reusable Stubs with Default Behavior
 
-**Properties** use generated backing fields automatically—no code needed.
-
-**Methods** need a protected method in your stub if you want custom behavior:
+For stubs shared across test files, use the explicit pattern with user-defined methods:
 
 ```csharp
-public interface ICalculator
-{
-    int Add(int a, int b);
-    Task<int> AddAsync(int a, int b);
-    void Reset();
-}
-
 [KnockOff]
 public partial class CalculatorKnockOff : ICalculator
 {
+    // User-defined method — called by generated code
     protected int Add(int a, int b) => a + b;
-    protected Task<int> AddAsync(int a, int b) => Task.FromResult(a + b);
-    protected void Reset() { /* side effect logic */ }
+
+    // Multiply not defined — returns default(int) = 0
+}
+
+// Every test gets the same behavior
+[Fact]
+public void Test1()
+{
+    var calc = new CalculatorKnockOff();
+    Assert.Equal(5, calc.AsCalculator().Add(2, 3));  // Uses your method
+    Assert.Equal(1, calc.ICalculator.Add.CallCount);
+}
+
+[Fact]
+public void Test2_OverrideForThisTest()
+{
+    var calc = new CalculatorKnockOff();
+    calc.ICalculator.Add.OnCall = (ko, a, b) => 999;  // Override just here
+    Assert.Equal(999, calc.AsCalculator().Add(2, 3));
 }
 ```
 
-**Properties** use auto-generated backing fields. For custom behavior, use `OnGet`/`OnSet` callbacks:
+### Delegate Stubs
+
+Stub named delegates for validation rules, factories, and callbacks:
 
 ```csharp
-var knockOff = new UserServiceKnockOff();
+public delegate bool IsUniqueRule(string value);
 
-// Custom getter behavior
-knockOff.IUserService.Name.OnGet = (ko) => "Dynamic Value";
+[KnockOff<IsUniqueRule>]
+public partial class ValidationTests
+{
+    [Fact]
+    public void RejectsNonUniqueName()
+    {
+        var uniqueCheck = new Stubs.IsUniqueRule();
+        uniqueCheck.Interceptor.OnCall = (ko, value) => value != "duplicate";
 
-// Custom setter with side effects
-knockOff.IUserService.Name.OnSet = (ko, value) => Console.WriteLine($"Set to: {value}");
+        IsUniqueRule rule = uniqueCheck;  // Implicit conversion
+        Assert.False(rule("duplicate"));
+        Assert.True(uniqueCheck.Interceptor.WasCalled);
+    }
+}
 ```
-
-## Runtime Callbacks (Optional)
-
-If you need per-test behavior without creating a new stub class, use callbacks:
-
-```csharp
-var knockOff = new DataServiceKnockOff();
-
-// Override for this specific test
-knockOff.IDataService.GetCount.OnCall = (ko) => 999;
-knockOff.IDataService.Name.OnGet = (ko) => "FromCallback";
-knockOff.IDataService.Name.OnSet = (ko, value) => { /* custom logic */ };
-```
-
-Callbacks take precedence over user-defined methods. Use `Reset()` to clear callbacks and return to the stub's default behavior.
 
 ## Verification
 

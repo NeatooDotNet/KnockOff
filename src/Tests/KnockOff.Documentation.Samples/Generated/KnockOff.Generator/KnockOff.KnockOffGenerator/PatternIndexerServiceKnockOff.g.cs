@@ -5,8 +5,8 @@ namespace KnockOff.Documentation.Samples.Concepts;
 
 partial class PatternIndexerServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for IPatternIndexerService.StringIndexer.</summary>
-	public sealed class IPatternIndexerService_StringIndexerInterceptor
+	/// <summary>Tracks and configures behavior for StringIndexer.</summary>
+	public sealed class StringIndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -14,63 +14,41 @@ partial class PatternIndexerServiceKnockOff
 		/// <summary>The key from the most recent getter access.</summary>
 		public string? LastGetKey { get; private set; }
 
-		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when the getter is accessed.</summary>
 		public global::System.Func<PatternIndexerServiceKnockOff, string, global::KnockOff.Documentation.Samples.Concepts.PatternPropertyInfo?>? OnGet { get; set; }
-
-		/// <summary>Records a getter access.</summary>
-		public void RecordGet(string key) { GetCount++; LastGetKey = key; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
 
-		/// <summary>The key-value pair from the most recent setter access.</summary>
-		public (string key, global::KnockOff.Documentation.Samples.Concepts.PatternPropertyInfo? value)? LastSetEntry { get; private set; }
+		/// <summary>The key and value from the most recent setter call.</summary>
+		public (string? Key, global::KnockOff.Documentation.Samples.Concepts.PatternPropertyInfo? Value)? LastSetEntry { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
 		public global::System.Action<PatternIndexerServiceKnockOff, string, global::KnockOff.Documentation.Samples.Concepts.PatternPropertyInfo?>? OnSet { get; set; }
 
+		/// <summary>Records a getter access.</summary>
+		public void RecordGet(string? key) { GetCount++; LastGetKey = key; }
+
 		/// <summary>Records a setter access.</summary>
-		public void RecordSet(string key, global::KnockOff.Documentation.Samples.Concepts.PatternPropertyInfo? value) { SetCount++; LastSetEntry = (key, value); }
+		public void RecordSet(string? key, global::KnockOff.Documentation.Samples.Concepts.PatternPropertyInfo? value) { SetCount++; LastSetEntry = (key, value); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
+		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternIndexerService.</summary>
-	public sealed class IPatternIndexerServiceInterceptorors
-	{
-		/// <summary>Interceptor for StringIndexer.</summary>
-		public IPatternIndexerService_StringIndexerInterceptor StringIndexer { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternIndexerService.</summary>
-	public IPatternIndexerServiceInterceptorors IPatternIndexerService { get; } = new();
+	/// <summary>Interceptor for StringIndexer.</summary>
+	public StringIndexerInterceptor StringIndexer { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Concepts.IPatternIndexerService.</summary>
 	public KnockOff.Documentation.Samples.Concepts.IPatternIndexerService AsPatternIndexerService() => this;
 
-	/// <summary>Backing dictionary for IPatternIndexerService.StringIndexer. Pre-populate with values or use OnGet callback.</summary>
-	public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Documentation.Samples.Concepts.PatternPropertyInfo?> IPatternIndexerService_StringIndexerBacking { get; } = new();
+	/// <summary>Backing storage for StringIndexer indexer.</summary>
+	public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Documentation.Samples.Concepts.PatternPropertyInfo?> StringIndexerBacking { get; } = new();
 
 	global::KnockOff.Documentation.Samples.Concepts.PatternPropertyInfo? KnockOff.Documentation.Samples.Concepts.IPatternIndexerService.this[string key]
 	{
-		get
-		{
-			IPatternIndexerService.StringIndexer.RecordGet(key);
-			if (IPatternIndexerService.StringIndexer.OnGet is { } onGetCallback)
-				return onGetCallback(this, key);
-			if (IPatternIndexerService_StringIndexerBacking.TryGetValue(key, out var value))
-				return value;
-			return default!;
-		}
-		set
-		{
-			IPatternIndexerService.StringIndexer.RecordSet(key, value);
-			if (IPatternIndexerService.StringIndexer.OnSet is { } onSetCallback)
-				onSetCallback(this, key, value);
-			else
-				IPatternIndexerService_StringIndexerBacking[key] = value;
-		}
+		get { StringIndexer.RecordGet(key); if (StringIndexer.OnGet != null) return StringIndexer.OnGet(this, key); return StringIndexerBacking.TryGetValue(key, out var v) ? v : default; }
+		set { StringIndexer.RecordSet(key, value); if (StringIndexer.OnSet != null) StringIndexer.OnSet(this, key, value); else StringIndexerBacking[key] = value; }
 	}
 
 }

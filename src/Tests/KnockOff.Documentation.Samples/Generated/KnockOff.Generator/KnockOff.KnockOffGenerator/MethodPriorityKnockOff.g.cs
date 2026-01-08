@@ -5,49 +5,41 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class MethodPriorityKnockOff
 {
-	/// <summary>Tracks and configures behavior for IMethodPriority.Calculate.</summary>
-	public sealed class IMethodPriority_CalculateInterceptor
+	/// <summary>Tracks and configures behavior for Calculate.</summary>
+	public sealed class Calculate2Interceptor
 	{
-		/// <summary>Delegate for Calculate(int x).</summary>
+		/// <summary>Delegate for Calculate.</summary>
 		public delegate int CalculateDelegate(MethodPriorityKnockOff ko, int x);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'x' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public CalculateDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int x) { CallCount++; LastCallArg = x; }
+		public void RecordCall(int? x) { CallCount++; LastCallArg = x; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodPriority.</summary>
-	public sealed class IMethodPriorityInterceptorors
-	{
-		/// <summary>Interceptor for Calculate.</summary>
-		public IMethodPriority_CalculateInterceptor Calculate { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodPriority.</summary>
-	public IMethodPriorityInterceptorors IMethodPriority { get; } = new();
+	/// <summary>Interceptor for Calculate.</summary>
+	public Calculate2Interceptor Calculate2 { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodPriority.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMethodPriority AsMethodPriority() => this;
 
 	int KnockOff.Documentation.Samples.Guides.IMethodPriority.Calculate(int x)
 	{
-		IMethodPriority.Calculate.RecordCall(x);
-		if (IMethodPriority.Calculate.OnCall is { } onCallCallback)
-			return onCallCallback(this, x);
+		Calculate2.RecordCall(x);
+		if (Calculate2.OnCall != null) return Calculate2.OnCall(this, x);
 		return Calculate(x);
 	}
 

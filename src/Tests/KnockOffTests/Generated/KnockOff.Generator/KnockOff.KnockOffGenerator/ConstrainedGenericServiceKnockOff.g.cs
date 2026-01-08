@@ -35,8 +35,8 @@ partial class ConstrainedGenericServiceKnockOff
 			$"Define a protected method '{methodName}' in your partial class, or set the handler's OnCall.");
 	}
 
-	/// <summary>Tracks and configures behavior for IConstrainedGenericService.CreateEntity.</summary>
-	public sealed class IConstrainedGenericService_CreateEntityInterceptor
+	/// <summary>Interceptor for CreateEntity (generic method with Of&lt;T&gt;() access).</summary>
+	public sealed class CreateEntityInterceptor
 	{
 		private readonly global::System.Collections.Generic.Dictionary<global::System.Type, object> _typedHandlers = new();
 
@@ -53,10 +53,10 @@ partial class ConstrainedGenericServiceKnockOff
 		}
 
 		/// <summary>Total number of calls across all type arguments.</summary>
-		public int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
+		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>True if this method was called with any type argument.</summary>
-		public bool WasCalled => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Any(h => h.WasCalled);
+		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
 
 		/// <summary>All type argument(s) that were used in calls.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
@@ -64,8 +64,8 @@ partial class ConstrainedGenericServiceKnockOff
 		/// <summary>Resets all typed handlers.</summary>
 		public void Reset()
 		{
-			foreach (var handler in _typedHandlers.Values.Cast<IResettable>())
-				handler.Reset();
+			foreach (var handler in _typedHandlers.Values)
+				((IResettable)handler).Reset();
 			_typedHandlers.Clear();
 		}
 
@@ -92,8 +92,8 @@ partial class ConstrainedGenericServiceKnockOff
 		}
 	}
 
-	/// <summary>Tracks and configures behavior for IConstrainedGenericService.SaveEntity.</summary>
-	public sealed class IConstrainedGenericService_SaveEntityInterceptor
+	/// <summary>Interceptor for SaveEntity (generic method with Of&lt;T&gt;() access).</summary>
+	public sealed class SaveEntityInterceptor
 	{
 		private readonly global::System.Collections.Generic.Dictionary<global::System.Type, object> _typedHandlers = new();
 
@@ -110,10 +110,10 @@ partial class ConstrainedGenericServiceKnockOff
 		}
 
 		/// <summary>Total number of calls across all type arguments.</summary>
-		public int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
+		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>True if this method was called with any type argument.</summary>
-		public bool WasCalled => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Any(h => h.WasCalled);
+		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
 
 		/// <summary>All type argument(s) that were used in calls.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
@@ -121,8 +121,8 @@ partial class ConstrainedGenericServiceKnockOff
 		/// <summary>Resets all typed handlers.</summary>
 		public void Reset()
 		{
-			foreach (var handler in _typedHandlers.Values.Cast<IResettable>())
-				handler.Reset();
+			foreach (var handler in _typedHandlers.Values)
+				((IResettable)handler).Reset();
 			_typedHandlers.Clear();
 		}
 
@@ -149,36 +149,27 @@ partial class ConstrainedGenericServiceKnockOff
 		}
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IConstrainedGenericService.</summary>
-	public sealed class IConstrainedGenericServiceInterceptorors
-	{
-		/// <summary>Interceptor for CreateEntity.</summary>
-		public IConstrainedGenericService_CreateEntityInterceptor CreateEntity { get; } = new();
-		/// <summary>Interceptor for SaveEntity.</summary>
-		public IConstrainedGenericService_SaveEntityInterceptor SaveEntity { get; } = new();
-	}
+	/// <summary>Interceptor for CreateEntity (use .Of&lt;T&gt;() to access typed handler).</summary>
+	public CreateEntityInterceptor CreateEntity { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IConstrainedGenericService.</summary>
-	public IConstrainedGenericServiceInterceptorors IConstrainedGenericService { get; } = new();
+	/// <summary>Interceptor for SaveEntity (use .Of&lt;T&gt;() to access typed handler).</summary>
+	public SaveEntityInterceptor SaveEntity { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IConstrainedGenericService.</summary>
 	public KnockOff.Tests.IConstrainedGenericService AsConstrainedGenericService() => this;
 
-	T KnockOff.Tests.IConstrainedGenericService.CreateEntity<T>() where T : class
+	T KnockOff.Tests.IConstrainedGenericService.CreateEntity<T>()
 	{
-		var typedHandler = IConstrainedGenericService.CreateEntity.Of<T>();
-		typedHandler.RecordCall();
-		if (typedHandler.OnCall is { } onCallCallback)
-			return onCallCallback(this);
+		CreateEntity.Of<T>().RecordCall();
+		if (CreateEntity.Of<T>().OnCall is { } callback)
+			return callback(this);
 		return SmartDefault<T>("CreateEntity");
 	}
 
 	void KnockOff.Tests.IConstrainedGenericService.SaveEntity<T>(T entity)
 	{
-		var typedHandler = IConstrainedGenericService.SaveEntity.Of<T>();
-		typedHandler.RecordCall();
-		if (typedHandler.OnCall is { } onCallCallback)
-		{ onCallCallback(this, entity); return; }
+		SaveEntity.Of<T>().RecordCall();
+		SaveEntity.Of<T>().OnCall?.Invoke(this, entity);
 	}
 
 }

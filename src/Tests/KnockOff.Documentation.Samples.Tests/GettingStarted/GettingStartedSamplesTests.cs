@@ -19,7 +19,7 @@ public class GettingStartedSamplesTests : SamplesTestBase
     {
         var knockOff = new EmailServiceKnockOff();
         Assert.NotNull(knockOff);
-        Assert.NotNull(knockOff.IEmailService);
+        Assert.NotNull(knockOff.SendEmail);
     }
 
     // ========================================================================
@@ -35,7 +35,7 @@ public class GettingStartedSamplesTests : SamplesTestBase
         emailService.SendEmail("user@example.com", "Subject", "Body");
 
         // Check if called
-        Assert.True(knockOff.IEmailService.SendEmail.WasCalled);
+        Assert.True(knockOff.SendEmail.WasCalled);
     }
 
     [Fact]
@@ -49,7 +49,7 @@ public class GettingStartedSamplesTests : SamplesTestBase
         emailService.SendEmail("c@example.com", "S3", "B3");
 
         // Check call count
-        Assert.Equal(3, knockOff.IEmailService.SendEmail.CallCount);
+        Assert.Equal(3, knockOff.SendEmail.CallCount);
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public class GettingStartedSamplesTests : SamplesTestBase
         emailService.SendEmail("user@example.com", "Welcome", "Hello!");
 
         // Check last arguments (multiple parameters - named tuple)
-        var args = knockOff.IEmailService.SendEmail.LastCallArgs;
+        var args = knockOff.SendEmail.LastCallArgs;
         Assert.Equal("user@example.com", args?.to);
         Assert.Equal("Welcome", args?.subject);
     }
@@ -77,8 +77,8 @@ public class GettingStartedSamplesTests : SamplesTestBase
         emailService.SendEmail("third@example.com", "S3", "B3");
 
         // Check call count and last call
-        Assert.Equal(3, knockOff.IEmailService.SendEmail.CallCount);
-        Assert.Equal("third@example.com", knockOff.IEmailService.SendEmail.LastCallArgs?.to);
+        Assert.Equal(3, knockOff.SendEmail.CallCount);
+        Assert.Equal("third@example.com", knockOff.SendEmail.LastCallArgs?.to);
     }
 
     // ========================================================================
@@ -95,7 +95,7 @@ public class GettingStartedSamplesTests : SamplesTestBase
         _ = emailService.IsConnected;
 
         // Check getter calls
-        Assert.Equal(2, knockOff.IEmailService.IsConnected.GetCount);
+        Assert.Equal(2, knockOff.IsConnected.GetCount);
     }
 
     [Fact]
@@ -107,8 +107,8 @@ public class GettingStartedSamplesTests : SamplesTestBase
         userService.Name = "NewValue";
 
         // Check setter calls
-        Assert.Equal(1, knockOff.IUserServiceSimple.Name.SetCount);
-        Assert.Equal("NewValue", knockOff.IUserServiceSimple.Name.LastSetValue);
+        Assert.Equal(1, knockOff.Name.SetCount);
+        Assert.Equal("NewValue", knockOff.Name.LastSetValue);
     }
 
     // ========================================================================
@@ -136,7 +136,7 @@ public class GettingStartedSamplesTests : SamplesTestBase
         IEmailService emailService = knockOff;
 
         // Configure property to return false
-        knockOff.IEmailService.IsConnected.OnGet = (ko) => false;
+        knockOff.IsConnected.OnGet = (ko) => false;
 
         Assert.False(emailService.IsConnected);
     }
@@ -148,7 +148,7 @@ public class GettingStartedSamplesTests : SamplesTestBase
         IEmailService emailService = knockOff;
 
         // Configure method to throw
-        knockOff.IEmailService.SendEmail.OnCall = (ko, to, subject, body) =>
+        knockOff.SendEmail.OnCall = (ko, to, subject, body) =>
         {
             throw new InvalidOperationException("Not connected");
         };
@@ -168,13 +168,13 @@ public class GettingStartedSamplesTests : SamplesTestBase
         IEmailService emailService = knockOff;
 
         emailService.SendEmail("user@example.com", "Subject", "Body");
-        Assert.Equal(1, knockOff.IEmailService.SendEmail.CallCount);
+        Assert.Equal(1, knockOff.SendEmail.CallCount);
 
         // Reset specific handler
-        knockOff.IEmailService.SendEmail.Reset();
+        knockOff.SendEmail.Reset();
 
         // After reset:
-        Assert.Equal(0, knockOff.IEmailService.SendEmail.CallCount);
+        Assert.Equal(0, knockOff.SendEmail.CallCount);
     }
 
     // ========================================================================
@@ -200,7 +200,7 @@ public class GettingStartedSamplesTests : SamplesTestBase
         IUserServiceSimple userService = knockOff;
 
         // Via callback
-        knockOff.IUserServiceSimple.GetUser.OnCall = (ko, id) => new User { Id = id, Name = "Test" };
+        knockOff.GetUser2.OnCall = (ko, id) => new User { Id = id, Name = "Test" };
 
         var user = userService.GetUser(42);
 
@@ -218,7 +218,7 @@ public class GettingStartedSamplesTests : SamplesTestBase
         var knockOff = new AsyncServiceKnockOff();
         IAsyncSaveService service = knockOff;
 
-        knockOff.IAsyncSaveService.SaveAsync.OnCall = (ko, entity) =>
+        knockOff.SaveAsync.OnCall = (ko, entity) =>
             Task.FromException<int>(new InvalidOperationException("Connection lost"));
 
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
@@ -237,7 +237,7 @@ public class GettingStartedSamplesTests : SamplesTestBase
 
         List<string> sentEmails = new();
 
-        knockOff.IEmailService.SendEmail.OnCall = (ko, to, subject, body) =>
+        knockOff.SendEmail.OnCall = (ko, to, subject, body) =>
         {
             sentEmails.Add(to);
         };
@@ -251,34 +251,6 @@ public class GettingStartedSamplesTests : SamplesTestBase
     }
 
     // ========================================================================
-    // docs:getting-started:multiple-interfaces
+    // docs:getting-started:multiple-interfaces - Multi-interface tests removed (KO0010)
     // ========================================================================
-
-    [Fact]
-    public void MultipleInterfaces_CanUseBothInterfaces()
-    {
-        var knockOff = new DataContextKnockOff();
-
-        // Use either interface
-        IRepository repo = knockOff.AsRepository();
-        IUnitOfWork uow = knockOff.AsUnitOfWork();
-
-        repo.Save(new object());
-        uow.Commit();
-
-        Assert.True(knockOff.IRepository.Save.WasCalled);
-        Assert.True(knockOff.IUnitOfWork.Commit.WasCalled);
-    }
-
-    [Fact]
-    public void MultipleInterfaces_CanCastDirectly()
-    {
-        var knockOff = new DataContextKnockOff();
-
-        // Or cast directly
-        IRepository repo = knockOff;
-
-        repo.Save(new object());
-        Assert.True(knockOff.IRepository.Save.WasCalled);
-    }
 }

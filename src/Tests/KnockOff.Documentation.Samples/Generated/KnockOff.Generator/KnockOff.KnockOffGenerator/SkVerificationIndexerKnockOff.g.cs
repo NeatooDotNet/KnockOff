@@ -5,8 +5,8 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class SkVerificationIndexerKnockOff
 {
-	/// <summary>Tracks and configures behavior for ISkVerificationPropertyStore.StringIndexer.</summary>
-	public sealed class ISkVerificationPropertyStore_StringIndexerInterceptor
+	/// <summary>Tracks and configures behavior for StringIndexer.</summary>
+	public sealed class StringIndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -14,63 +14,41 @@ partial class SkVerificationIndexerKnockOff
 		/// <summary>The key from the most recent getter access.</summary>
 		public string? LastGetKey { get; private set; }
 
-		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when the getter is accessed.</summary>
 		public global::System.Func<SkVerificationIndexerKnockOff, string, object?>? OnGet { get; set; }
-
-		/// <summary>Records a getter access.</summary>
-		public void RecordGet(string key) { GetCount++; LastGetKey = key; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
 
-		/// <summary>The key-value pair from the most recent setter access.</summary>
-		public (string key, object? value)? LastSetEntry { get; private set; }
+		/// <summary>The key and value from the most recent setter call.</summary>
+		public (string? Key, object? Value)? LastSetEntry { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
 		public global::System.Action<SkVerificationIndexerKnockOff, string, object?>? OnSet { get; set; }
 
+		/// <summary>Records a getter access.</summary>
+		public void RecordGet(string? key) { GetCount++; LastGetKey = key; }
+
 		/// <summary>Records a setter access.</summary>
-		public void RecordSet(string key, object? value) { SetCount++; LastSetEntry = (key, value); }
+		public void RecordSet(string? key, object? value) { SetCount++; LastSetEntry = (key, value); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
+		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkVerificationPropertyStore.</summary>
-	public sealed class ISkVerificationPropertyStoreInterceptorors
-	{
-		/// <summary>Interceptor for StringIndexer.</summary>
-		public ISkVerificationPropertyStore_StringIndexerInterceptor StringIndexer { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkVerificationPropertyStore.</summary>
-	public ISkVerificationPropertyStoreInterceptorors ISkVerificationPropertyStore { get; } = new();
+	/// <summary>Interceptor for StringIndexer.</summary>
+	public StringIndexerInterceptor StringIndexer { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkVerificationPropertyStore.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkVerificationPropertyStore AsSkVerificationPropertyStore() => this;
 
-	/// <summary>Backing dictionary for ISkVerificationPropertyStore.StringIndexer. Pre-populate with values or use OnGet callback.</summary>
-	public global::System.Collections.Generic.Dictionary<string, object?> ISkVerificationPropertyStore_StringIndexerBacking { get; } = new();
+	/// <summary>Backing storage for StringIndexer indexer.</summary>
+	public global::System.Collections.Generic.Dictionary<string, object?> StringIndexerBacking { get; } = new();
 
 	object? KnockOff.Documentation.Samples.Skills.ISkVerificationPropertyStore.this[string key]
 	{
-		get
-		{
-			ISkVerificationPropertyStore.StringIndexer.RecordGet(key);
-			if (ISkVerificationPropertyStore.StringIndexer.OnGet is { } onGetCallback)
-				return onGetCallback(this, key);
-			if (ISkVerificationPropertyStore_StringIndexerBacking.TryGetValue(key, out var value))
-				return value;
-			return default!;
-		}
-		set
-		{
-			ISkVerificationPropertyStore.StringIndexer.RecordSet(key, value);
-			if (ISkVerificationPropertyStore.StringIndexer.OnSet is { } onSetCallback)
-				onSetCallback(this, key, value);
-			else
-				ISkVerificationPropertyStore_StringIndexerBacking[key] = value;
-		}
+		get { StringIndexer.RecordGet(key); if (StringIndexer.OnGet != null) return StringIndexer.OnGet(this, key); return StringIndexerBacking.TryGetValue(key, out var v) ? v : default; }
+		set { StringIndexer.RecordSet(key, value); if (StringIndexer.OnSet != null) StringIndexer.OnSet(this, key, value); else StringIndexerBacking[key] = value; }
 	}
 
 }

@@ -5,84 +5,72 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class GenStringCacheKnockOff
 {
-	/// <summary>Tracks and configures behavior for IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUser.Get.</summary>
-	public sealed class IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUser_GetInterceptor
+	/// <summary>Tracks and configures behavior for Get.</summary>
+	public sealed class GetInterceptor
 	{
-		/// <summary>Delegate for Get(string key).</summary>
+		/// <summary>Delegate for Get.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Guides.GenUser? GetDelegate(GenStringCacheKnockOff ko, string key);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'key' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public string? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string key) { CallCount++; LastCallArg = key; }
+		public void RecordCall(string? key) { CallCount++; LastCallArg = key; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUser.Set.</summary>
-	public sealed class IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUser_SetInterceptor
+	/// <summary>Tracks and configures behavior for Set.</summary>
+	public sealed class SetInterceptor
 	{
-		/// <summary>Delegate for Set(string key, global::KnockOff.Documentation.Samples.Guides.GenUser value).</summary>
-		public delegate void SetDelegate(GenStringCacheKnockOff ko, string key, global::KnockOff.Documentation.Samples.Guides.GenUser value);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Arguments from the most recent call.</summary>
-		public (string key, global::KnockOff.Documentation.Samples.Guides.GenUser value)? LastCallArgs { get; private set; }
+		/// <summary>The arguments from the most recent call.</summary>
+		public (string? key, global::KnockOff.Documentation.Samples.Guides.GenUser? @value)? LastCallArgs { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public SetDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<GenStringCacheKnockOff, string, global::KnockOff.Documentation.Samples.Guides.GenUser>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string key, global::KnockOff.Documentation.Samples.Guides.GenUser value) { CallCount++; LastCallArgs = (key, value); }
+		public void RecordCall(string? key, global::KnockOff.Documentation.Samples.Guides.GenUser? @value) { CallCount++; LastCallArgs = (key, @value); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenCache<string, KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
-	public sealed class IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUserInterceptorors
-	{
-		/// <summary>Interceptor for Get.</summary>
-		public IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUser_GetInterceptor Get { get; } = new();
-		/// <summary>Interceptor for Set.</summary>
-		public IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUser_SetInterceptor Set { get; } = new();
-	}
+	/// <summary>Interceptor for Get.</summary>
+	public GetInterceptor Get { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenCache<string, KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
-	public IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUserInterceptorors IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUser { get; } = new();
+	/// <summary>Interceptor for Set.</summary>
+	public SetInterceptor Set { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IGenCache<string, KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
 	public KnockOff.Documentation.Samples.Guides.IGenCache<string, KnockOff.Documentation.Samples.Guides.GenUser> AsGenCache() => this;
 
 	global::KnockOff.Documentation.Samples.Guides.GenUser? KnockOff.Documentation.Samples.Guides.IGenCache<string, KnockOff.Documentation.Samples.Guides.GenUser>.Get(string key)
 	{
-		IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUser.Get.RecordCall(key);
-		if (IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUser.Get.OnCall is { } onCallCallback)
-			return onCallCallback(this, key);
-		return default!;
+		Get.RecordCall(key);
+		return Get.OnCall?.Invoke(this, key) ?? default!;
 	}
 
-	void KnockOff.Documentation.Samples.Guides.IGenCache<string, KnockOff.Documentation.Samples.Guides.GenUser>.Set(string key, global::KnockOff.Documentation.Samples.Guides.GenUser value)
+	void KnockOff.Documentation.Samples.Guides.IGenCache<string, KnockOff.Documentation.Samples.Guides.GenUser>.Set(string key, global::KnockOff.Documentation.Samples.Guides.GenUser @value)
 	{
-		IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUser.Set.RecordCall(key, value);
-		if (IGenCache_string_KnockOff_Documentation_Samples_Guides_GenUser.Set.OnCall is { } onCallCallback)
-		{ onCallCallback(this, key, value); return; }
+		Set.RecordCall(key, @value);
+		Set.OnCall?.Invoke(this, key, @value);
 	}
 
 }

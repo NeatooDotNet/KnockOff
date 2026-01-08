@@ -5,8 +5,8 @@ namespace KnockOff.Tests;
 
 partial class ReadWriteStoreKnockOff
 {
-	/// <summary>Tracks and configures behavior for IReadWriteStore.StringIndexer.</summary>
-	public sealed class IReadWriteStore_StringIndexerInterceptor
+	/// <summary>Tracks and configures behavior for StringIndexer.</summary>
+	public sealed class StringIndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -14,63 +14,41 @@ partial class ReadWriteStoreKnockOff
 		/// <summary>The key from the most recent getter access.</summary>
 		public string? LastGetKey { get; private set; }
 
-		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when the getter is accessed.</summary>
 		public global::System.Func<ReadWriteStoreKnockOff, string, global::KnockOff.Tests.PropertyInfo?>? OnGet { get; set; }
-
-		/// <summary>Records a getter access.</summary>
-		public void RecordGet(string key) { GetCount++; LastGetKey = key; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
 
-		/// <summary>The key-value pair from the most recent setter access.</summary>
-		public (string key, global::KnockOff.Tests.PropertyInfo? value)? LastSetEntry { get; private set; }
+		/// <summary>The key and value from the most recent setter call.</summary>
+		public (string? Key, global::KnockOff.Tests.PropertyInfo? Value)? LastSetEntry { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
 		public global::System.Action<ReadWriteStoreKnockOff, string, global::KnockOff.Tests.PropertyInfo?>? OnSet { get; set; }
 
+		/// <summary>Records a getter access.</summary>
+		public void RecordGet(string? key) { GetCount++; LastGetKey = key; }
+
 		/// <summary>Records a setter access.</summary>
-		public void RecordSet(string key, global::KnockOff.Tests.PropertyInfo? value) { SetCount++; LastSetEntry = (key, value); }
+		public void RecordSet(string? key, global::KnockOff.Tests.PropertyInfo? value) { SetCount++; LastSetEntry = (key, value); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
+		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IReadWriteStore.</summary>
-	public sealed class IReadWriteStoreInterceptorors
-	{
-		/// <summary>Interceptor for StringIndexer.</summary>
-		public IReadWriteStore_StringIndexerInterceptor StringIndexer { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IReadWriteStore.</summary>
-	public IReadWriteStoreInterceptorors IReadWriteStore { get; } = new();
+	/// <summary>Interceptor for StringIndexer.</summary>
+	public StringIndexerInterceptor StringIndexer { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IReadWriteStore.</summary>
 	public KnockOff.Tests.IReadWriteStore AsReadWriteStore() => this;
 
-	/// <summary>Backing dictionary for IReadWriteStore.StringIndexer. Pre-populate with values or use OnGet callback.</summary>
-	public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Tests.PropertyInfo?> IReadWriteStore_StringIndexerBacking { get; } = new();
+	/// <summary>Backing storage for StringIndexer indexer.</summary>
+	public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Tests.PropertyInfo?> StringIndexerBacking { get; } = new();
 
 	global::KnockOff.Tests.PropertyInfo? KnockOff.Tests.IReadWriteStore.this[string key]
 	{
-		get
-		{
-			IReadWriteStore.StringIndexer.RecordGet(key);
-			if (IReadWriteStore.StringIndexer.OnGet is { } onGetCallback)
-				return onGetCallback(this, key);
-			if (IReadWriteStore_StringIndexerBacking.TryGetValue(key, out var value))
-				return value;
-			return default!;
-		}
-		set
-		{
-			IReadWriteStore.StringIndexer.RecordSet(key, value);
-			if (IReadWriteStore.StringIndexer.OnSet is { } onSetCallback)
-				onSetCallback(this, key, value);
-			else
-				IReadWriteStore_StringIndexerBacking[key] = value;
-		}
+		get { StringIndexer.RecordGet(key); if (StringIndexer.OnGet != null) return StringIndexer.OnGet(this, key); return StringIndexerBacking.TryGetValue(key, out var v) ? v : default; }
+		set { StringIndexer.RecordSet(key, value); if (StringIndexer.OnSet != null) StringIndexer.OnSet(this, key, value); else StringIndexerBacking[key] = value; }
 	}
 
 }

@@ -5,20 +5,17 @@ namespace KnockOff.Documentation.Samples.Concepts;
 
 partial class PatternCallbackServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for IPatternCallbackService.DoSomething.</summary>
-	public sealed class IPatternCallbackService_DoSomethingInterceptor
+	/// <summary>Tracks and configures behavior for DoSomething.</summary>
+	public sealed class DoSomethingInterceptor
 	{
-		/// <summary>Delegate for DoSomething().</summary>
-		public delegate void DoSomethingDelegate(PatternCallbackServiceKnockOff ko);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public DoSomethingDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<PatternCallbackServiceKnockOff>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
@@ -27,94 +24,84 @@ partial class PatternCallbackServiceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IPatternCallbackService.GetUser.</summary>
-	public sealed class IPatternCallbackService_GetUserInterceptor
+	/// <summary>Tracks and configures behavior for GetUser.</summary>
+	public sealed class GetUserInterceptor
 	{
-		/// <summary>Delegate for GetUser(int id).</summary>
+		/// <summary>Delegate for GetUser.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Concepts.PatternUser GetUserDelegate(PatternCallbackServiceKnockOff ko, int id);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetUserDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IPatternCallbackService.Calculate.</summary>
-	public sealed class IPatternCallbackService_CalculateInterceptor
+	/// <summary>Tracks and configures behavior for Calculate.</summary>
+	public sealed class CalculateInterceptor
 	{
-		/// <summary>Delegate for Calculate(string name, int value, bool flag).</summary>
-		public delegate int CalculateDelegate(PatternCallbackServiceKnockOff ko, string name, int value, bool flag);
+		/// <summary>Delegate for Calculate.</summary>
+		public delegate int CalculateDelegate(PatternCallbackServiceKnockOff ko, string name, int @value, bool flag);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Arguments from the most recent call.</summary>
-		public (string name, int value, bool flag)? LastCallArgs { get; private set; }
+		/// <summary>The arguments from the most recent call.</summary>
+		public (string? name, int? @value, bool? flag)? LastCallArgs { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public CalculateDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string name, int value, bool flag) { CallCount++; LastCallArgs = (name, value, flag); }
+		public void RecordCall(string? name, int? @value, bool? flag) { CallCount++; LastCallArgs = (name, @value, flag); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternCallbackService.</summary>
-	public sealed class IPatternCallbackServiceInterceptorors
-	{
-		/// <summary>Interceptor for DoSomething.</summary>
-		public IPatternCallbackService_DoSomethingInterceptor DoSomething { get; } = new();
-		/// <summary>Interceptor for GetUser.</summary>
-		public IPatternCallbackService_GetUserInterceptor GetUser { get; } = new();
-		/// <summary>Interceptor for Calculate.</summary>
-		public IPatternCallbackService_CalculateInterceptor Calculate { get; } = new();
-	}
+	/// <summary>Interceptor for DoSomething.</summary>
+	public DoSomethingInterceptor DoSomething { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternCallbackService.</summary>
-	public IPatternCallbackServiceInterceptorors IPatternCallbackService { get; } = new();
+	/// <summary>Interceptor for GetUser.</summary>
+	public GetUserInterceptor GetUser { get; } = new();
+
+	/// <summary>Interceptor for Calculate.</summary>
+	public CalculateInterceptor Calculate { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Concepts.IPatternCallbackService.</summary>
 	public KnockOff.Documentation.Samples.Concepts.IPatternCallbackService AsPatternCallbackService() => this;
 
 	void KnockOff.Documentation.Samples.Concepts.IPatternCallbackService.DoSomething()
 	{
-		IPatternCallbackService.DoSomething.RecordCall();
-		if (IPatternCallbackService.DoSomething.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		DoSomething.RecordCall();
+		DoSomething.OnCall?.Invoke(this);
 	}
 
 	global::KnockOff.Documentation.Samples.Concepts.PatternUser KnockOff.Documentation.Samples.Concepts.IPatternCallbackService.GetUser(int id)
 	{
-		IPatternCallbackService.GetUser.RecordCall(id);
-		if (IPatternCallbackService.GetUser.OnCall is { } onCallCallback)
-			return onCallCallback(this, id);
-		return new global::KnockOff.Documentation.Samples.Concepts.PatternUser();
+		GetUser.RecordCall(id);
+		return GetUser.OnCall?.Invoke(this, id) ?? new global::KnockOff.Documentation.Samples.Concepts.PatternUser();
 	}
 
-	int KnockOff.Documentation.Samples.Concepts.IPatternCallbackService.Calculate(string name, int value, bool flag)
+	int KnockOff.Documentation.Samples.Concepts.IPatternCallbackService.Calculate(string name, int @value, bool flag)
 	{
-		IPatternCallbackService.Calculate.RecordCall(name, value, flag);
-		if (IPatternCallbackService.Calculate.OnCall is { } onCallCallback)
-			return onCallCallback(this, name, value, flag);
-		return default!;
+		Calculate.RecordCall(name, @value, flag);
+		return Calculate.OnCall?.Invoke(this, name, @value, flag) ?? default!;
 	}
 
 }

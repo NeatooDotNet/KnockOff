@@ -5,19 +5,19 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class SkSmartDefaultKnockOff
 {
-	/// <summary>Tracks and configures behavior for ISkSmartDefaultService.GetCount.</summary>
-	public sealed class ISkSmartDefaultService_GetCountInterceptor
+	/// <summary>Tracks and configures behavior for GetCount.</summary>
+	public sealed class GetCountInterceptor
 	{
-		/// <summary>Delegate for GetCount().</summary>
+		/// <summary>Delegate for GetCount.</summary>
 		public delegate int GetCountDelegate(SkSmartDefaultKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetCountDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -27,19 +27,19 @@ partial class SkSmartDefaultKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ISkSmartDefaultService.GetItems.</summary>
-	public sealed class ISkSmartDefaultService_GetItemsInterceptor
+	/// <summary>Tracks and configures behavior for GetItems.</summary>
+	public sealed class GetItemsInterceptor
 	{
-		/// <summary>Delegate for GetItems().</summary>
+		/// <summary>Delegate for GetItems.</summary>
 		public delegate global::System.Collections.Generic.List<string> GetItemsDelegate(SkSmartDefaultKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetItemsDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -49,19 +49,19 @@ partial class SkSmartDefaultKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ISkSmartDefaultService.GetIList.</summary>
-	public sealed class ISkSmartDefaultService_GetIListInterceptor
+	/// <summary>Tracks and configures behavior for GetIList.</summary>
+	public sealed class GetIListInterceptor
 	{
-		/// <summary>Delegate for GetIList().</summary>
+		/// <summary>Delegate for GetIList.</summary>
 		public delegate global::System.Collections.Generic.IList<string> GetIListDelegate(SkSmartDefaultKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetIListDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -71,19 +71,19 @@ partial class SkSmartDefaultKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ISkSmartDefaultService.GetOptional.</summary>
-	public sealed class ISkSmartDefaultService_GetOptionalInterceptor
+	/// <summary>Tracks and configures behavior for GetOptional.</summary>
+	public sealed class GetOptionalInterceptor
 	{
-		/// <summary>Delegate for GetOptional().</summary>
+		/// <summary>Delegate for GetOptional.</summary>
 		public delegate string? GetOptionalDelegate(SkSmartDefaultKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetOptionalDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -93,19 +93,19 @@ partial class SkSmartDefaultKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ISkSmartDefaultService.GetDisposable.</summary>
-	public sealed class ISkSmartDefaultService_GetDisposableInterceptor
+	/// <summary>Tracks and configures behavior for GetDisposable.</summary>
+	public sealed class GetDisposableInterceptor
 	{
-		/// <summary>Delegate for GetDisposable().</summary>
+		/// <summary>Delegate for GetDisposable.</summary>
 		public delegate global::System.IDisposable GetDisposableDelegate(SkSmartDefaultKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetDisposableDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -115,65 +115,54 @@ partial class SkSmartDefaultKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.</summary>
-	public sealed class ISkSmartDefaultServiceInterceptorors
-	{
-		/// <summary>Interceptor for GetCount.</summary>
-		public ISkSmartDefaultService_GetCountInterceptor GetCount { get; } = new();
-		/// <summary>Interceptor for GetItems.</summary>
-		public ISkSmartDefaultService_GetItemsInterceptor GetItems { get; } = new();
-		/// <summary>Interceptor for GetIList.</summary>
-		public ISkSmartDefaultService_GetIListInterceptor GetIList { get; } = new();
-		/// <summary>Interceptor for GetOptional.</summary>
-		public ISkSmartDefaultService_GetOptionalInterceptor GetOptional { get; } = new();
-		/// <summary>Interceptor for GetDisposable.</summary>
-		public ISkSmartDefaultService_GetDisposableInterceptor GetDisposable { get; } = new();
-	}
+	/// <summary>Interceptor for GetCount.</summary>
+	public GetCountInterceptor GetCount { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.</summary>
-	public ISkSmartDefaultServiceInterceptorors ISkSmartDefaultService { get; } = new();
+	/// <summary>Interceptor for GetItems.</summary>
+	public GetItemsInterceptor GetItems { get; } = new();
+
+	/// <summary>Interceptor for GetIList.</summary>
+	public GetIListInterceptor GetIList { get; } = new();
+
+	/// <summary>Interceptor for GetOptional.</summary>
+	public GetOptionalInterceptor GetOptional { get; } = new();
+
+	/// <summary>Interceptor for GetDisposable.</summary>
+	public GetDisposableInterceptor GetDisposable { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService AsSkSmartDefaultService() => this;
 
 	int KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.GetCount()
 	{
-		ISkSmartDefaultService.GetCount.RecordCall();
-		if (ISkSmartDefaultService.GetCount.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return default!;
+		GetCount.RecordCall();
+		return GetCount.OnCall?.Invoke(this) ?? default!;
 	}
 
 	global::System.Collections.Generic.List<string> KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.GetItems()
 	{
-		ISkSmartDefaultService.GetItems.RecordCall();
-		if (ISkSmartDefaultService.GetItems.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return new global::System.Collections.Generic.List<string>();
+		GetItems.RecordCall();
+		return GetItems.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<string>();
 	}
 
 	global::System.Collections.Generic.IList<string> KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.GetIList()
 	{
-		ISkSmartDefaultService.GetIList.RecordCall();
-		if (ISkSmartDefaultService.GetIList.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return new global::System.Collections.Generic.List<string>();
+		GetIList.RecordCall();
+		return GetIList.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<string>();
 	}
 
 	string? KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.GetOptional()
 	{
-		ISkSmartDefaultService.GetOptional.RecordCall();
-		if (ISkSmartDefaultService.GetOptional.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return default!;
+		GetOptional.RecordCall();
+		return GetOptional.OnCall?.Invoke(this) ?? default!;
 	}
 
 	global::System.IDisposable KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.GetDisposable()
 	{
-		ISkSmartDefaultService.GetDisposable.RecordCall();
-		if (ISkSmartDefaultService.GetDisposable.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'GetDisposable' in your partial class, or set ISkSmartDefaultService.GetDisposable.OnCall.");
+		GetDisposable.RecordCall();
+		if (GetDisposable.OnCall is { } callback)
+			return callback(this);
+		throw new global::System.InvalidOperationException("No implementation provided for GetDisposable. Set GetDisposable.OnCall or define a protected method 'GetDisposable' in your partial class.");
 	}
 
 }

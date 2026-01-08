@@ -5,8 +5,8 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class PropUserServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for IPropUserService.Name.</summary>
-	public sealed class IPropUserService_NameInterceptor
+	/// <summary>Tracks and configures behavior for Name.</summary>
+	public sealed class NameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -33,39 +33,19 @@ partial class PropUserServiceKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropUserService.</summary>
-	public sealed class IPropUserServiceInterceptorors
-	{
-		/// <summary>Interceptor for Name.</summary>
-		public IPropUserService_NameInterceptor Name { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropUserService.</summary>
-	public IPropUserServiceInterceptorors IPropUserService { get; } = new();
+	/// <summary>Interceptor for Name.</summary>
+	public NameInterceptor Name { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IPropUserService.</summary>
 	public KnockOff.Documentation.Samples.Guides.IPropUserService AsPropUserService() => this;
 
-	/// <summary>Backing field for IPropUserService.Name.</summary>
-	protected string IPropUserService_NameBacking { get; set; } = "";
+	/// <summary>Backing storage for Name.</summary>
+	protected string NameBacking { get; set; } = "";
 
 	string KnockOff.Documentation.Samples.Guides.IPropUserService.Name
 	{
-		get
-		{
-			IPropUserService.Name.RecordGet();
-			if (IPropUserService.Name.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IPropUserService_NameBacking;
-		}
-		set
-		{
-			IPropUserService.Name.RecordSet(value);
-			if (IPropUserService.Name.OnSet is { } onSetCallback)
-				onSetCallback(this, value);
-			else
-				IPropUserService_NameBacking = value;
-		}
+		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
+		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else NameBacking = value; }
 	}
 
 }

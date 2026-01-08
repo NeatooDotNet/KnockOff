@@ -50,7 +50,7 @@ public class MoqMigrationSamplesTests : SamplesTestBase
         var knockOff = new MmUserServiceKnockOff();
         IMmUserService service = knockOff;
 
-        knockOff.IMmUserService.GetUser.OnCall = (ko, id) =>
+        knockOff.GetUser.OnCall = (ko, id) =>
             new MmUser { Id = id };
 
         var user = service.GetUser(42);
@@ -68,7 +68,7 @@ public class MoqMigrationSamplesTests : SamplesTestBase
         var knockOff = new MmUserServiceKnockOff();
         IMmUserService service = knockOff;
 
-        knockOff.IMmUserService.GetUserAsync.OnCall = (ko, id) =>
+        knockOff.GetUserAsync.OnCall = (ko, id) =>
             Task.FromResult<MmUser?>(new MmUser { Id = id });
 
         var user = await service.GetUserAsync(42);
@@ -88,7 +88,7 @@ public class MoqMigrationSamplesTests : SamplesTestBase
 
         service.Save(new MmUser());
 
-        Assert.Equal(1, knockOff.IMmUserService.Save.CallCount);
+        Assert.Equal(1, knockOff.Save.CallCount);
     }
 
     [Fact]
@@ -96,7 +96,7 @@ public class MoqMigrationSamplesTests : SamplesTestBase
     {
         var knockOff = new MmUserServiceKnockOff();
 
-        Assert.Equal(0, knockOff.IMmUserService.Delete.CallCount);
+        Assert.Equal(0, knockOff.Delete.CallCount);
     }
 
     [Fact]
@@ -107,7 +107,7 @@ public class MoqMigrationSamplesTests : SamplesTestBase
 
         service.GetAll();
 
-        Assert.True(knockOff.IMmUserService.GetAll.WasCalled);
+        Assert.True(knockOff.GetAll.WasCalled);
     }
 
     [Fact]
@@ -120,7 +120,7 @@ public class MoqMigrationSamplesTests : SamplesTestBase
         service.Update(new MmUser());
         service.Update(new MmUser());
 
-        Assert.Equal(3, knockOff.IMmUserService.Update.CallCount);
+        Assert.Equal(3, knockOff.Update.CallCount);
     }
 
     // ========================================================================
@@ -136,7 +136,7 @@ public class MoqMigrationSamplesTests : SamplesTestBase
         var user = new MmUser { Name = "Test" };
         service.Save(user);
 
-        Assert.Same(user, knockOff.IMmUserService.Save.LastCallArg);
+        Assert.Same(user, knockOff.Save.LastCallArg);
     }
 
     [Fact]
@@ -146,7 +146,7 @@ public class MoqMigrationSamplesTests : SamplesTestBase
         IMmUserService service = knockOff;
         var customList = new List<MmUser>();
 
-        knockOff.IMmUserService.Save.OnCall = (ko, user) =>
+        knockOff.Save.OnCall = (ko, user) =>
         {
             customList.Add(user);
         };
@@ -184,7 +184,7 @@ public class MoqMigrationSamplesTests : SamplesTestBase
         var knockOff = new MmUserServiceKnockOff();
         IMmUserService service = knockOff;
 
-        knockOff.IMmUserService.GetUser.OnCall = (ko, id) => id switch
+        knockOff.GetUser.OnCall = (ko, id) => id switch
         {
             1 => new MmUser { Name = "Admin" },
             2 => new MmUser { Name = "Guest" },
@@ -206,7 +206,7 @@ public class MoqMigrationSamplesTests : SamplesTestBase
         var knockOff = new MmConnectionKnockOff();
         IMmConnectionService service = knockOff;
 
-        knockOff.IMmConnectionService.Connect.OnCall = (ko) =>
+        knockOff.Connect.OnCall = (ko) =>
             throw new TimeoutException();
 
         Assert.Throws<TimeoutException>(() => service.Connect());
@@ -223,7 +223,7 @@ public class MoqMigrationSamplesTests : SamplesTestBase
         IMmSequenceService service = knockOff;
 
         var results = new Queue<int>([1, 2, 3]);
-        knockOff.IMmSequenceService.GetNext.OnCall = (ko) => results.Dequeue();
+        knockOff.GetNext.OnCall = (ko) => results.Dequeue();
 
         Assert.Equal(1, service.GetNext());
         Assert.Equal(2, service.GetNext());
@@ -240,7 +240,7 @@ public class MoqMigrationSamplesTests : SamplesTestBase
         var knockOff = new MmPropServiceKnockOff();
         IMmPropService service = knockOff;
 
-        knockOff.IMmPropService.Name.OnGet = (ko) => "Test";
+        knockOff.Name.OnGet = (ko) => "Test";
 
         Assert.Equal("Test", service.Name);
     }
@@ -253,41 +253,12 @@ public class MoqMigrationSamplesTests : SamplesTestBase
 
         service.Name = "Value";
 
-        Assert.Equal("Value", knockOff.IMmPropService.Name.LastSetValue);
+        Assert.Equal("Value", knockOff.Name.LastSetValue);
     }
 
     // ========================================================================
-    // skill:moq-migration:multiple-interfaces
+    // skill:moq-migration:multiple-interfaces - Multi-interface tests removed (KO0010)
     // ========================================================================
-
-    [Fact]
-    public void MultipleInterfaces_BothAccessible()
-    {
-        var knockOff = new MmDataContextKnockOff();
-
-        knockOff.IMmUnitOfWork.SaveChangesAsync.OnCall = (ko, ct) =>
-            Task.FromResult(1);
-
-        IMmRepository repo = knockOff.AsMmRepository();
-        IMmUnitOfWork uow = knockOff.AsMmUnitOfWork();
-
-        Assert.NotNull(repo);
-        Assert.NotNull(uow);
-    }
-
-    [Fact]
-    public async Task MultipleInterfaces_SetupSecondInterface()
-    {
-        var knockOff = new MmDataContextKnockOff();
-        IMmUnitOfWork uow = knockOff;
-
-        knockOff.IMmUnitOfWork.SaveChangesAsync.OnCall = (ko, ct) =>
-            Task.FromResult(42);
-
-        var result = await uow.SaveChangesAsync(CancellationToken.None);
-
-        Assert.Equal(42, result);
-    }
 
     // ========================================================================
     // skill:moq-migration:argument-matching
@@ -300,7 +271,7 @@ public class MoqMigrationSamplesTests : SamplesTestBase
         IMmLogger logger = knockOff;
         var errors = new List<string>();
 
-        knockOff.IMmLogger.Log.OnCall = (ko, message) =>
+        knockOff.Log.OnCall = (ko, message) =>
         {
             if (message.Contains("error"))
                 errors.Add(message);
@@ -328,8 +299,8 @@ public class MoqMigrationSamplesTests : SamplesTestBase
         var oneParam = false;
         var twoParam = false;
 
-        knockOff.IMmProcessorService.Process1.OnCall = (ko, data) => oneParam = true;
-        knockOff.IMmProcessorService.Process2.OnCall = (ko, data, priority) => twoParam = true;
+        knockOff.Process1.OnCall = (ko, data) => oneParam = true;
+        knockOff.Process2.OnCall = (ko, data, priority) => twoParam = true;
 
         service.Process("a");
         service.Process("b", 1);
@@ -344,8 +315,8 @@ public class MoqMigrationSamplesTests : SamplesTestBase
         var knockOff = new MmProcessorKnockOff();
         IMmProcessorService service = knockOff;
 
-        knockOff.IMmProcessorService.Calculate1.OnCall = (ko, value) => value * 2;
-        knockOff.IMmProcessorService.Calculate2.OnCall = (ko, a, b) => a + b;
+        knockOff.Calculate1.OnCall = (ko, value) => value * 2;
+        knockOff.Calculate2.OnCall = (ko, a, b) => a + b;
 
         Assert.Equal(10, service.Calculate(5));
         Assert.Equal(8, service.Calculate(3, 5));
@@ -361,8 +332,8 @@ public class MoqMigrationSamplesTests : SamplesTestBase
         var knockOff = new MmParserKnockOff();
         IMmParser parser = knockOff;
 
-        knockOff.IMmParser.TryParse.OnCall =
-            (MmParserKnockOff.IMmParser_TryParseInterceptor.TryParseDelegate)((MmParserKnockOff ko, string input, out int result) =>
+        knockOff.TryParse.OnCall =
+            (MmParserKnockOff.TryParseInterceptor.TryParseDelegate)((MmParserKnockOff ko, string input, out int result) =>
             {
                 return int.TryParse(input, out result);
             });
@@ -377,15 +348,15 @@ public class MoqMigrationSamplesTests : SamplesTestBase
         var knockOff = new MmParserKnockOff();
         IMmParser parser = knockOff;
 
-        knockOff.IMmParser.TryParse.OnCall =
-            (MmParserKnockOff.IMmParser_TryParseInterceptor.TryParseDelegate)((MmParserKnockOff ko, string input, out int result) =>
+        knockOff.TryParse.OnCall =
+            (MmParserKnockOff.TryParseInterceptor.TryParseDelegate)((MmParserKnockOff ko, string input, out int result) =>
             {
                 return int.TryParse(input, out result);
             });
 
         parser.TryParse("42", out _);
 
-        Assert.Equal("42", knockOff.IMmParser.TryParse.LastCallArg);
+        Assert.Equal("42", knockOff.TryParse.LastCallArg);
     }
 
     // ========================================================================
@@ -398,8 +369,8 @@ public class MoqMigrationSamplesTests : SamplesTestBase
         var knockOff = new MmRefProcessorKnockOff();
         IMmRefProcessor processor = knockOff;
 
-        knockOff.IMmRefProcessor.Increment.OnCall =
-            (MmRefProcessorKnockOff.IMmRefProcessor_IncrementInterceptor.IncrementDelegate)((MmRefProcessorKnockOff ko, ref int value) =>
+        knockOff.Increment.OnCall =
+            (MmRefProcessorKnockOff.IncrementInterceptor.IncrementDelegate)((MmRefProcessorKnockOff ko, ref int value) =>
             {
                 value++;
             });
@@ -416,8 +387,8 @@ public class MoqMigrationSamplesTests : SamplesTestBase
         var knockOff = new MmRefProcessorKnockOff();
         IMmRefProcessor processor = knockOff;
 
-        knockOff.IMmRefProcessor.Increment.OnCall =
-            (MmRefProcessorKnockOff.IMmRefProcessor_IncrementInterceptor.IncrementDelegate)((MmRefProcessorKnockOff ko, ref int value) =>
+        knockOff.Increment.OnCall =
+            (MmRefProcessorKnockOff.IncrementInterceptor.IncrementDelegate)((MmRefProcessorKnockOff ko, ref int value) =>
             {
                 value++;
             });
@@ -426,6 +397,6 @@ public class MoqMigrationSamplesTests : SamplesTestBase
         processor.Increment(ref x);
 
         Assert.Equal(6, x); // Modified
-        Assert.Equal(5, knockOff.IMmRefProcessor.Increment.LastCallArg); // Original
+        Assert.Equal(5, knockOff.Increment.LastCallArg); // Original
     }
 }

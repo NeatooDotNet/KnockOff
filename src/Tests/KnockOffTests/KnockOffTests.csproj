@@ -5,7 +5,7 @@
 		<IsTestProject>true</IsTestProject>
 		<AnalysisMode>default</AnalysisMode>
 		<RootNamespace>KnockOff.Tests</RootNamespace>
-		<NoWarn>CA1861;CA1865;CA1510;IDE0021;IDE0022;IDE0023;IDE1006;IDE0044;CS4014</NoWarn>
+		<NoWarn>CA1861;CA1865;CA1510;IDE0021;IDE0022;IDE0023;IDE1006;IDE0044;CS4014;xUnit1051</NoWarn>
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 		<CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
 	</PropertyGroup>

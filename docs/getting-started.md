@@ -46,63 +46,69 @@ public partial class EmailServiceKnockOff : IEmailService
 
 The source generator automatically creates:
 - Explicit interface implementations
-- Interface-named properties (e.g., `IEmailService`) with handlers for each member
-- Backing fields for properties (prefixed with interface name)
+- Interceptor properties for each member (directly on the stub class)
+- Backing fields for properties
 - An `AsEmailService()` helper method for explicit casting
 
 ### Step 3: Use in Tests
 
+<!-- snippet: docs:getting-started:step3-test -->
 ```csharp
-[Fact]
-public void NotificationService_SendsEmail_WhenUserRegisters()
-{
-    // Arrange
-    var emailKnockOff = new EmailServiceKnockOff();
-    IEmailService emailService = emailKnockOff;
-
-    var notificationService = new NotificationService(emailService);
-
-    // Act
-    notificationService.NotifyRegistration("user@example.com");
-
-    // Assert
-    Assert.True(emailKnockOff.IEmailService.SendEmail.WasCalled);
-    Assert.Equal("user@example.com", emailKnockOff.IEmailService.SendEmail.LastCallArgs?.to);
-}
+// [Fact]
+// public void NotificationService_SendsEmail_WhenUserRegisters()
+// {
+//     // Arrange
+//     var emailKnockOff = new EmailServiceKnockOff();
+//     IEmailService emailService = emailKnockOff;
+//
+//     var notificationService = new NotificationService(emailService);
+//
+//     // Act
+//     notificationService.NotifyRegistration("user@example.com");
+//
+//     // Assert
+//     Assert.True(emailKnockOff.SendEmail.WasCalled);
+//     Assert.Equal("user@example.com", emailKnockOff.SendEmail.LastCallArgs?.to);
+// }
 ```
+<!-- /snippet -->
 
 ## Verification Basics
 
-Every interface member gets a handler with tracking properties. Access handlers via the interface-named property (e.g., `knockOff.IEmailService`).
+Every interface member gets an interceptor with tracking properties. Access interceptors directly on the stub.
 
 ### For Methods
 
+<!-- snippet: docs:getting-started:method-verification -->
 ```csharp
 // Check if called
-Assert.True(knockOff.IEmailService.SendEmail.WasCalled);
-
+// Assert.True(knockOff.SendEmail.WasCalled);
+//
 // Check call count
-Assert.Equal(3, knockOff.IEmailService.SendEmail.CallCount);
-
+// Assert.Equal(3, knockOff.SendEmail.CallCount);
+//
 // Check last argument (single parameter)
-Assert.Equal(42, knockOff.IUserService.GetById.LastCallArg);
-
+// Assert.Equal(42, knockOff.GetById.LastCallArg);
+//
 // Check last arguments (multiple parameters - named tuple)
-var args = knockOff.IEmailService.SendEmail.LastCallArgs;
-Assert.Equal("user@example.com", args?.to);
-Assert.Equal("Welcome", args?.subject);
+// var args = knockOff.SendEmail.LastCallArgs;
+// Assert.Equal("user@example.com", args?.to);
+// Assert.Equal("Welcome", args?.subject);
 ```
+<!-- /snippet -->
 
 ### For Properties
 
+<!-- snippet: docs:getting-started:property-verification -->
 ```csharp
 // Check getter calls
-Assert.Equal(2, knockOff.IEmailService.IsConnected.GetCount);
-
+// Assert.Equal(2, knockOff.IsConnected.GetCount);
+//
 // Check setter calls
-Assert.Equal(1, knockOff.IUserService.Name.SetCount);
-Assert.Equal("NewValue", knockOff.IUserService.Name.LastSetValue);
+// Assert.Equal(1, knockOff.Name.SetCount);
+// Assert.Equal("NewValue", knockOff.Name.LastSetValue);
 ```
+<!-- /snippet -->
 
 ## Adding Custom Behavior
 
@@ -126,24 +132,26 @@ public partial class EmailServiceWithValidation : IEmailServiceWithValidation
 
 Set callbacks for per-test behavior:
 
+<!-- snippet: docs:getting-started:callbacks -->
 ```csharp
-[Fact]
-public void RejectsEmail_WhenNotConnected()
-{
-    var knockOff = new EmailServiceKnockOff();
-
-    // Configure property to return false
-    knockOff.IEmailService.IsConnected.OnGet = (ko) => false;
-
-    // Configure method to throw
-    knockOff.IEmailService.SendEmail.OnCall = (ko, to, subject, body) =>
-    {
-        throw new InvalidOperationException("Not connected");
-    };
-
-    // ... test code
-}
+// [Fact]
+// public void RejectsEmail_WhenNotConnected()
+// {
+//     var knockOff = new EmailServiceKnockOff();
+//
+//     // Configure property to return false
+//     knockOff.IsConnected.OnGet = (ko) => false;
+//
+//     // Configure method to throw
+//     knockOff.SendEmail.OnCall = (ko, to, subject, body) =>
+//     {
+//         throw new InvalidOperationException("Not connected");
+//     };
+//
+//     // ... test code
+// }
 ```
+<!-- /snippet -->
 
 See [Customization Patterns](concepts/customization-patterns.md) for detailed guidance.
 
@@ -151,14 +159,16 @@ See [Customization Patterns](concepts/customization-patterns.md) for detailed gu
 
 Clear tracking and callbacks between tests or test phases:
 
+<!-- snippet: docs:getting-started:reset -->
 ```csharp
 // Reset specific handler
-knockOff.IEmailService.SendEmail.Reset();
-
+// knockOff.SendEmail.Reset();
+//
 // After reset:
-Assert.Equal(0, knockOff.IEmailService.SendEmail.CallCount);
+// Assert.Equal(0, knockOff.SendEmail.CallCount);
 // Callbacks are also cleared
 ```
+<!-- /snippet -->
 
 ## Viewing Generated Code
 
@@ -178,9 +188,11 @@ Generated files appear in `Generated/KnockOff.Generator/KnockOff.KnockOffGenerat
 ### Returning Values from Methods
 
 Via callback:
+<!-- snippet: docs:getting-started:via-callback -->
 ```csharp
-knockOff.IUserService.GetUser.OnCall = (ko, id) => new User { Id = id, Name = "Test" };
+// knockOff.GetUser.OnCall = (ko, id) => new User { Id = id, Name = "Test" };
 ```
+<!-- /snippet -->
 
 Via user method (in stub class):
 
@@ -197,31 +209,36 @@ public partial class UserServiceKnockOff : IUserServiceSimple
 
 ### Simulating Failures
 
+<!-- snippet: docs:getting-started:simulating-failures -->
 ```csharp
-knockOff.IRepository.SaveAsync.OnCall = (ko, entity) =>
-    Task.FromException<int>(new DbException("Connection lost"));
+// knockOff.SaveAsync.OnCall = (ko, entity) =>
+//     Task.FromException<int>(new DbException("Connection lost"));
 ```
+<!-- /snippet -->
 
 ### Capturing Arguments for Later Assertions
 
+<!-- snippet: docs:getting-started:capturing-arguments -->
 ```csharp
-List<string> sentEmails = new();
-
-knockOff.IEmailService.SendEmail.OnCall = (ko, to, subject, body) =>
-{
-    sentEmails.Add(to);
-};
-
-// ... run test ...
-
-Assert.Equal(3, sentEmails.Count);
-Assert.Contains("admin@example.com", sentEmails);
+// List<string> sentEmails = new();
+//
+// knockOff.SendEmail.OnCall = (ko, to, subject, body) =>
+// {
+//     sentEmails.Add(to);
+// };
+//
+// // ... run test ...
+//
+// Assert.Equal(3, sentEmails.Count);
+// Assert.Contains("admin@example.com", sentEmails);
 ```
+<!-- /snippet -->
 
 ### Method Overloads
 
-When an interface has method overloads, each overload gets its own handler with a numeric suffix:
+When an interface has method overloads, each overload gets its own interceptor with a numeric suffix:
 
+<!-- snippet: docs:getting-started:method-overloads -->
 ```csharp
 public interface IProcessService
 {
@@ -233,62 +250,83 @@ public interface IProcessService
 [KnockOff]
 public partial class ProcessServiceKnockOff : IProcessService { }
 
-// Each overload has its own handler (1-based numbering)
-knockOff.IProcessService.Process1.CallCount;  // Calls to Process(string)
-knockOff.IProcessService.Process2.CallCount;  // Calls to Process(string, int)
-knockOff.IProcessService.Process3.CallCount;  // Calls to Process(string, int, bool)
-
+// Each overload has its own interceptor (1-based numbering)
+// knockOff.Process1.CallCount;  // Calls to Process(string)
+// knockOff.Process2.CallCount;  // Calls to Process(string, int)
+// knockOff.Process3.CallCount;  // Calls to Process(string, int, bool)
+//
 // Identify exactly which overload was called
-Assert.True(knockOff.IProcessService.Process2.WasCalled);
-Assert.False(knockOff.IProcessService.Process1.WasCalled);
-
+// Assert.True(knockOff.Process2.WasCalled);
+// Assert.False(knockOff.Process1.WasCalled);
+//
 // Simple callbacks - no delegate casting needed
-knockOff.IProcessService.Process1.OnCall = (ko, data) => { };
-knockOff.IProcessService.Process2.OnCall = (ko, data, priority) => { };
-knockOff.IProcessService.Process3.OnCall = (ko, data, priority, async) => { };
-
+// knockOff.Process1.OnCall = (ko, data) => { };
+// knockOff.Process2.OnCall = (ko, data, priority) => { };
+// knockOff.Process3.OnCall = (ko, data, priority, async) => { };
+//
 // Proper types - no nullable wrappers
-var args = knockOff.IProcessService.Process3.LastCallArgs;
-Assert.Equal("test", args.Value.data);
-Assert.Equal(5, args.Value.priority);  // int, not int?
-Assert.True(args.Value.async);
-```
-
-Methods without overloads don't get a suffix:
-```csharp
-knockOff.IEmailService.SendEmail.CallCount;  // Single method - no suffix
-```
-
-### Multiple Interfaces
-
-Each interface gets its own property with separate tracking:
-
-<!-- snippet: docs:getting-started:multiple-interfaces -->
-```csharp
-[KnockOff]
-public partial class DataContextKnockOff : IRepository, IUnitOfWork
-{
-}
+// var args = knockOff.Process3.LastCallArgs;
+// Assert.Equal("test", args.Value.data);
+// Assert.Equal(5, args.Value.priority);  // int, not int?
+// Assert.True(args.Value.async);
 ```
 <!-- /snippet -->
 
+Methods without overloads don't get a suffix:
+<!-- snippet: docs:getting-started:single-method-suffix -->
 ```csharp
-// Access via interface-named properties
-Assert.True(knockOff.IRepository.Save.WasCalled);
-Assert.True(knockOff.IUnitOfWork.Commit.WasCalled);
-
-// Use AsXxx() for explicit casting
-IRepository repo = knockOff.AsRepository();
-IUnitOfWork uow = knockOff.AsUnitOfWork();
-
-// Or cast directly
-IRepository repo = knockOff;
+// knockOff.SendEmail.CallCount;  // Single method - no suffix
 ```
+<!-- /snippet -->
+
+### Single Interface Constraint
+
+Standalone KnockOff stubs implement **one interface** (plus its inheritance chain). If you need multiple unrelated interfaces, create separate stubs:
+
+<!-- snippet: docs:getting-started:single-interface -->
+```csharp
+// Single interface - this is the standard pattern
+[KnockOff]
+public partial class SingleRepositoryKnockOff : IRepository { }
+
+[KnockOff]
+public partial class SingleUnitOfWorkKnockOff : IUnitOfWork { }
+
+// Interface inheritance is fine - IEntity is a single interface
+[KnockOff]
+public partial class EntityKnockOff : IEntity { }
+
+// Multiple unrelated interfaces - not supported
+// This emits diagnostic KO0010
+// [KnockOff]
+// public partial class DataContextKnockOff : IRepository, IUnitOfWork { }
+```
+<!-- /snippet -->
+
+For multiple unrelated interfaces, use [inline stubs](guides/inline-stubs.md) instead:
+
+<!-- snippet: docs:getting-started:inline-stubs-example -->
+```csharp
+[KnockOff<IRepository>]
+[KnockOff<IUnitOfWork>]
+public partial class InlineStubsExampleTests
+{
+    // [Fact]
+    // public void Test()
+    // {
+    //     var repo = new Stubs.IRepository();
+    //     var uow = new Stubs.IUnitOfWork();
+    //     // ...
+    // }
+}
+```
+<!-- /snippet -->
 
 ### Nested Classes
 
 KnockOff stubs can be nested inside test classes, which is a common pattern for organizing test fixtures:
 
+<!-- snippet: docs:getting-started:nested-classes -->
 ```csharp
 public partial class UserServiceTests  // Must be partial!
 {
@@ -297,32 +335,39 @@ public partial class UserServiceTests  // Must be partial!
     {
     }
 
-    [Fact]
-    public void GetUser_ReturnsUser()
-    {
-        var knockOff = new UserRepositoryKnockOff();
-        // ... test code
-    }
+    // [Fact]
+    // public void GetUser_ReturnsUser()
+    // {
+    //     var knockOff = new UserRepositoryKnockOff();
+    //     // ... test code
+    // }
 }
 ```
+<!-- /snippet -->
 
 **Important:** When nesting a `[KnockOff]` class inside another class, all containing classes must also be marked `partial`. This is a C# requirement—the generator produces a partial class that must merge with your nested class declaration.
 
+<!-- snippet: docs:getting-started:nested-partial-error -->
 ```csharp
-// ❌ Won't compile - containing class not partial
-public class MyTests
-{
-    [KnockOff]
-    public partial class ServiceKnockOff : IService { }
-}
-
-// ✅ Correct - containing class is partial
-public partial class MyTests
-{
-    [KnockOff]
-    public partial class ServiceKnockOff : IService { }
-}
+// Won't compile - containing class not partial
+// public class MyBadTests
+// {
+//     [KnockOff]
+//     public partial class ServiceKnockOff : IService { }
+// }
 ```
+<!-- /snippet -->
+
+<!-- snippet: docs:getting-started:nested-partial-correct -->
+```csharp
+// Correct - containing class is partial
+// public partial class MyGoodTests
+// {
+//     [KnockOff]
+//     public partial class ServiceKnockOff : IService { }
+// }
+```
+<!-- /snippet -->
 
 This works for any nesting depth—just ensure every class in the hierarchy is `partial`.
 

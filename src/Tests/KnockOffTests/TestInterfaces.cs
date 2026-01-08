@@ -19,7 +19,10 @@ public partial class SampleKnockOff : ISampleService
 
 #endregion
 
-#region Multi-Interface Test Types
+#region Multi-Interface Test Types (for inline stubs only)
+
+// Note: Multi-interface standalone stubs are no longer supported (KO0010).
+// Use inline stubs [KnockOff<T>] or create separate stubs per interface.
 
 public interface ILogger
 {
@@ -39,13 +42,19 @@ public interface INotifier
 	string Name { get; } // Same name but get-only (vs ILogger which is get/set)
 }
 
+// Separate single-interface stubs (the recommended pattern)
 [KnockOff]
-public partial class MultiInterfaceKnockOff : ILogger, INotifier
+public partial class LoggerKnockOff : ILogger
 {
 }
 
 [KnockOff]
-public partial class SharedSignatureKnockOff : ILogger, IAuditor
+public partial class AuditorKnockOff : IAuditor
+{
+}
+
+[KnockOff]
+public partial class NotifierKnockOff : INotifier
 {
 }
 
@@ -239,15 +248,18 @@ public interface IKeyLookup
 	int Count { get; set; }
 }
 
-/// <summary>
-/// Tests the original bug: conflicting method signatures across interfaces.
-/// Before the fix, this would fail because GetData couldn't have two different
-/// handler types in a single KO class.
-/// </summary>
+// Note: Multi-interface standalone stubs are no longer supported (KO0010).
+// Use separate single-interface stubs instead.
+
 [KnockOff]
-public partial class ConflictingSignatureKnockOff : IDataProvider, IKeyLookup
+public partial class DataProviderKnockOff : IDataProvider
 {
 	protected string GetData(int id) => $"Data-{id}";
+}
+
+[KnockOff]
+public partial class KeyLookupKnockOff : IKeyLookup
+{
 	protected int GetData(string key) => key.Length;
 }
 

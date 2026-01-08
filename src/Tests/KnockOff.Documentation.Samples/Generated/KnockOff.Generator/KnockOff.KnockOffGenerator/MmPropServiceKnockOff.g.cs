@@ -5,8 +5,8 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class MmPropServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for IMmPropService.Name.</summary>
-	public sealed class IMmPropService_NameInterceptor
+	/// <summary>Tracks and configures behavior for Name.</summary>
+	public sealed class NameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -33,39 +33,19 @@ partial class MmPropServiceKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmPropService.</summary>
-	public sealed class IMmPropServiceInterceptorors
-	{
-		/// <summary>Interceptor for Name.</summary>
-		public IMmPropService_NameInterceptor Name { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmPropService.</summary>
-	public IMmPropServiceInterceptorors IMmPropService { get; } = new();
+	/// <summary>Interceptor for Name.</summary>
+	public NameInterceptor Name { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmPropService.</summary>
 	public KnockOff.Documentation.Samples.Skills.IMmPropService AsMmPropService() => this;
 
-	/// <summary>Backing field for IMmPropService.Name.</summary>
-	protected string IMmPropService_NameBacking { get; set; } = "";
+	/// <summary>Backing storage for Name.</summary>
+	protected string NameBacking { get; set; } = "";
 
 	string KnockOff.Documentation.Samples.Skills.IMmPropService.Name
 	{
-		get
-		{
-			IMmPropService.Name.RecordGet();
-			if (IMmPropService.Name.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IMmPropService_NameBacking;
-		}
-		set
-		{
-			IMmPropService.Name.RecordSet(value);
-			if (IMmPropService.Name.OnSet is { } onSetCallback)
-				onSetCallback(this, value);
-			else
-				IMmPropService_NameBacking = value;
-		}
+		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
+		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else NameBacking = value; }
 	}
 
 }

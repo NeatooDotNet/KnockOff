@@ -5,8 +5,8 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class SkDataServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for ISkDataService.Name.</summary>
-	public sealed class ISkDataService_NameInterceptor
+	/// <summary>Tracks and configures behavior for Name.</summary>
+	public sealed class NameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -33,44 +33,44 @@ partial class SkDataServiceKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ISkDataService.GetDescription.</summary>
-	public sealed class ISkDataService_GetDescriptionInterceptor
+	/// <summary>Tracks and configures behavior for GetDescription.</summary>
+	public sealed class GetDescriptionInterceptor
 	{
-		/// <summary>Delegate for GetDescription(int id).</summary>
+		/// <summary>Delegate for GetDescription.</summary>
 		public delegate string? GetDescriptionDelegate(SkDataServiceKnockOff ko, int id);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetDescriptionDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ISkDataService.GetCount.</summary>
-	public sealed class ISkDataService_GetCountInterceptor
+	/// <summary>Tracks and configures behavior for GetCount.</summary>
+	public sealed class GetCount2Interceptor
 	{
-		/// <summary>Delegate for GetCount().</summary>
+		/// <summary>Delegate for GetCount.</summary>
 		public delegate int GetCountDelegate(SkDataServiceKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetCountDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -80,58 +80,37 @@ partial class SkDataServiceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkDataService.</summary>
-	public sealed class ISkDataServiceInterceptorors
-	{
-		/// <summary>Interceptor for Name.</summary>
-		public ISkDataService_NameInterceptor Name { get; } = new();
-		/// <summary>Interceptor for GetDescription.</summary>
-		public ISkDataService_GetDescriptionInterceptor GetDescription { get; } = new();
-		/// <summary>Interceptor for GetCount.</summary>
-		public ISkDataService_GetCountInterceptor GetCount { get; } = new();
-	}
+	/// <summary>Interceptor for Name.</summary>
+	public NameInterceptor Name { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkDataService.</summary>
-	public ISkDataServiceInterceptorors ISkDataService { get; } = new();
+	/// <summary>Interceptor for GetDescription.</summary>
+	public GetDescriptionInterceptor GetDescription { get; } = new();
+
+	/// <summary>Interceptor for GetCount.</summary>
+	public GetCount2Interceptor GetCount2 { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkDataService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkDataService AsSkDataService() => this;
 
-	/// <summary>Backing field for ISkDataService.Name.</summary>
-	protected string ISkDataService_NameBacking { get; set; } = "";
+	/// <summary>Backing storage for Name.</summary>
+	protected string NameBacking { get; set; } = "";
 
 	string KnockOff.Documentation.Samples.Skills.ISkDataService.Name
 	{
-		get
-		{
-			ISkDataService.Name.RecordGet();
-			if (ISkDataService.Name.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return ISkDataService_NameBacking;
-		}
-		set
-		{
-			ISkDataService.Name.RecordSet(value);
-			if (ISkDataService.Name.OnSet is { } onSetCallback)
-				onSetCallback(this, value);
-			else
-				ISkDataService_NameBacking = value;
-		}
+		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
+		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else NameBacking = value; }
 	}
 
 	string? KnockOff.Documentation.Samples.Skills.ISkDataService.GetDescription(int id)
 	{
-		ISkDataService.GetDescription.RecordCall(id);
-		if (ISkDataService.GetDescription.OnCall is { } onCallCallback)
-			return onCallCallback(this, id);
-		return default!;
+		GetDescription.RecordCall(id);
+		return GetDescription.OnCall?.Invoke(this, id) ?? default!;
 	}
 
 	int KnockOff.Documentation.Samples.Skills.ISkDataService.GetCount()
 	{
-		ISkDataService.GetCount.RecordCall();
-		if (ISkDataService.GetCount.OnCall is { } onCallCallback)
-			return onCallCallback(this);
+		GetCount2.RecordCall();
+		if (GetCount2.OnCall != null) return GetCount2.OnCall(this);
 		return GetCount();
 	}
 

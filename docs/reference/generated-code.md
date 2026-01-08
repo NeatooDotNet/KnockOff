@@ -6,13 +6,12 @@ This document explains what KnockOff generates and the conventions used.
 
 For each `[KnockOff]` class, the generator creates:
 
-1. **Interface Interceptors classes** — One per implemented interface, containing interceptors for that interface's members
-2. **Interface Interceptors properties** — `public {InterfaceName}Interceptors {InterfaceName} { get; } = new();`
-3. **Interceptor classes** — One per interface member
-4. **Backing fields** — For properties (prefixed with interface name)
-5. **Backing dictionaries** — For indexers (prefixed with interface name)
-6. **Explicit interface implementations** — Recording + delegation
-7. **AsXYZ() methods** — For typed interface access
+1. **Interceptor classes** — One per interface member (nested in the stub class)
+2. **Interceptor properties** — Direct access to each interceptor on the stub
+3. **Backing fields** — For properties
+4. **Backing dictionaries** — For indexers
+5. **Explicit interface implementations** — Recording + delegation
+6. **AsIXYZ() methods** — For typed interface access
 
 ## File Location
 
@@ -57,21 +56,15 @@ KnockOff generates:
 ```csharp
 public partial class UserServiceKnockOff
 {
-    // Interface Interceptors property
-    public IUserServiceInterceptors IUserService { get; } = new();
+    // Interceptor properties (flat API - direct access)
+    public NameInterceptor Name { get; } = new();
+    public GetUserInterceptor GetUser { get; } = new();
 
-    // Backing field for property (interface-prefixed)
-    protected string IUserService_NameBacking { get; set; } = "";
-
-    // Interface Interceptors class
-    public sealed class IUserServiceInterceptors
-    {
-        public IUserService_NameInterceptor Name { get; } = new();
-        public IUserService_GetUserInterceptor GetUser { get; } = new();
-    }
+    // Backing field for property
+    protected string NameBacking { get; set; } = "";
 
     // Interceptor for Name property
-    public sealed class IUserService_NameInterceptor
+    public sealed class NameInterceptor
     {
         public int GetCount { get; private set; }
         public int SetCount { get; private set; }
@@ -98,7 +91,7 @@ public partial class UserServiceKnockOff
     }
 
     // Interceptor for GetUser method
-    public sealed class IUserService_GetUserInterceptor
+    public sealed class GetUserInterceptor
     {
         public int CallCount { get; private set; }
         public bool WasCalled => CallCount > 0;
@@ -125,56 +118,53 @@ public partial class UserServiceKnockOff
     {
         get
         {
-            IUserService.Name.RecordGet();
-            if (IUserService.Name.OnGet is { } onGetCallback)
+            Name.RecordGet();
+            if (Name.OnGet is { } onGetCallback)
                 return onGetCallback(this);
-            return IUserService_NameBacking;
+            return NameBacking;
         }
         set
         {
-            IUserService.Name.RecordSet(value);
-            if (IUserService.Name.OnSet is { } onSetCallback)
+            Name.RecordSet(value);
+            if (Name.OnSet is { } onSetCallback)
                 onSetCallback(this, value);
             else
-                IUserService_NameBacking = value;
+                NameBacking = value;
         }
     }
 
     // Explicit interface implementation - method
     User? IUserService.GetUser(int id)
     {
-        IUserService.GetUser.RecordCall(id);
-        if (IUserService.GetUser.OnCall is { } onCallCallback)
+        GetUser.RecordCall(id);
+        if (GetUser.OnCall is { } onCallCallback)
             return onCallCallback(this, id);
         return GetUser(id);  // Calls user-defined method
     }
 
     // Interface accessor helper
-    public IUserService AsUserService() => this;
+    public IUserService AsIUserService() => this;
 }
 ```
 
 ## Naming Conventions
 
-### Interface Interceptors Class
-- Name: `{InterfaceName}Interceptors`
-- Example: `IUserService` → `IUserServiceInterceptors`
+### Interceptor Classes
+- Properties: `{PropertyName}Interceptor`
+- Methods: `{MethodName}Interceptor`
+- Indexers: `{KeyTypeName}IndexerInterceptor`
 
-### Interface Interceptors Property
-- Name: `{InterfaceName}` (same as interface name)
-- Example: `public IUserServiceInterceptors IUserService { get; }`
-
-### Interceptors
-- Properties: `{InterfaceName}_{PropertyName}Interceptor`
-- Methods: `{InterfaceName}_{MethodName}Interceptor`
-- Indexers: `{InterfaceName}_{KeyTypeName}IndexerInterceptor`
+### Interceptor Properties
+- Direct on stub: `knockOff.{MemberName}`
+- Example: `knockOff.GetUser`, `knockOff.Name`, `knockOff.StringIndexer`
 
 ### Backing Storage
-- Properties: `{InterfaceName}_{PropertyName}Backing`
-- Indexers: `{InterfaceName}_{KeyTypeName}IndexerBacking`
+- Properties: `{PropertyName}Backing`
+- Indexers: `{KeyTypeName}IndexerBacking`
 
 ### Helper Methods
-- Interface access: `As{InterfaceName}()`
+- Interface access: `AsI{InterfaceName}()` (includes the 'I' prefix)
+- Example: `knockOff.AsIUserService()`
 
 ## User Method Detection
 
@@ -203,13 +193,13 @@ Rules:
 
 ## Indexer Naming
 
-Indexer handlers use the key type name with interface prefix:
+Indexer interceptors use the key type name:
 
-| Interface | Indexer | Interceptor Access | Backing Name |
-|-----------|---------|----------------|--------------|
-| `IPropertyStore` | `this[string key]` | `IPropertyStore.StringIndexer` | `IPropertyStore_StringIndexerBacking` |
-| `IList` | `this[int index]` | `IList.IntIndexer` | `IList_IntIndexerBacking` |
-| `ICache` | `this[Guid id]` | `ICache.GuidIndexer` | `ICache_GuidIndexerBacking` |
+| Indexer | Interceptor Access | Backing Name |
+|---------|----------------|--------------|
+| `this[string key]` | `knockOff.StringIndexer` | `knockOff.StringIndexerBacking` |
+| `this[int index]` | `knockOff.IntIndexer` | `knockOff.IntIndexerBacking` |
+| `this[Guid id]` | `knockOff.GuidIndexer` | `knockOff.GuidIndexerBacking` |
 
 ## Multiple Parameters
 
@@ -224,63 +214,48 @@ public bool WasCalled => CallCount > 0;
 public (string level, string message, int code)? LastCallArgs { get; private set; }
 
 // Generated callback signature - individual parameters
-public Action<ServiceKnockOff, string, string, int>? OnCall { get; set; }
+public Action<LoggerKnockOff, string, string, int>? OnCall { get; set; }
 
 // Usage
-knockOff.ILogger.Log.OnCall = (ko, level, message, code) =>
+knockOff.Log.OnCall = (ko, level, message, code) =>
 {
     Console.WriteLine($"[{level}] {message} ({code})");
 };
 ```
 
-## Multiple Interfaces
+## Interface Constraint
 
-When a KnockOff class implements multiple interfaces, each interface gets its own Interceptors class with separate interceptors:
+Standalone `[KnockOff]` stubs implement exactly one interface. Attempting to implement multiple unrelated interfaces emits diagnostic `KO0010`:
 
 ```csharp
-interface ILogger { void Log(string msg); }
-interface IAuditor { void Log(string msg); }
+// VALID - single interface
+[KnockOff]
+public partial class LoggerKnockOff : ILogger { }
+
+// VALID - interface with inheritance (IChild : IParent)
+[KnockOff]
+public partial class ChildKnockOff : IChild { }  // Also implements IParent members
+
+// INVALID - multiple unrelated interfaces (emits KO0010)
+[KnockOff]
+public partial class BadKnockOff : ILogger, IAuditor { }  // Error!
+```
+
+If you need multiple unrelated interfaces, use separate stubs:
+
+```csharp
+[KnockOff]
+public partial class LoggerKnockOff : ILogger { }
 
 [KnockOff]
-public partial class LoggerKnockOff : ILogger, IAuditor { }
+public partial class AuditorKnockOff : IAuditor { }
+
+// In test
+var logger = new LoggerKnockOff();
+var auditor = new AuditorKnockOff();
 ```
 
-Separate interceptors are generated for each interface:
-
-```csharp
-// Interface Interceptors classes
-public sealed class ILoggerInterceptors
-{
-    public ILogger_LogInterceptor Log { get; } = new();
-}
-
-public sealed class IAuditorInterceptors
-{
-    public IAuditor_LogInterceptor Log { get; } = new();
-}
-
-// Interface Interceptors properties
-public ILoggerInterceptors ILogger { get; } = new();
-public IAuditorInterceptors IAuditor { get; } = new();
-
-// Each implementation uses its own interceptor
-void ILogger.Log(string msg) { ILogger.Log.RecordCall(msg); ... }
-void IAuditor.Log(string msg) { IAuditor.Log.RecordCall(msg); ... }
-```
-
-This allows tracking calls separately:
-
-```csharp
-var knockOff = new LoggerKnockOff();
-ILogger logger = knockOff;
-IAuditor auditor = knockOff;
-
-logger.Log("hello");
-auditor.Log("world");
-
-Assert.Equal(1, knockOff.ILogger.Log.CallCount);   // Only ILogger call
-Assert.Equal(1, knockOff.IAuditor.Log.CallCount);  // Only IAuditor call
-```
+For **inline stubs** within a test class, multiple interfaces are supported - see the inline stubs documentation.
 
 ## Null Handling
 

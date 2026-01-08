@@ -144,3 +144,80 @@ public partial class PatternCombinedRepositoryKnockOff : IPatternCombinedReposit
     protected PatternUser? GetById(int id) => null;
 }
 #endregion
+
+// ============================================================================
+// Usage Examples
+// ============================================================================
+
+/// <summary>
+/// Usage examples demonstrating customization patterns.
+/// Each method is compilable; snippets extract key portions.
+/// </summary>
+public static class CustomizationPatternsUsageExamples
+{
+    public static void MethodCallbackExample()
+    {
+        var knockOff = new PatternCallbackServiceKnockOff();
+
+        #region docs:customization-patterns:callback-method
+        // Void method
+        knockOff.DoSomething.OnCall = (ko) =>
+        {
+            // Custom logic for this test
+        };
+
+        // Method with return value
+        knockOff.GetUser.OnCall = (ko, id) => new PatternUser { Id = id, Name = "Mocked" };
+
+        // Method with multiple parameters (individual params)
+        knockOff.Calculate.OnCall = (ko, name, value, flag) =>
+        {
+            return flag ? value * 2 : value;
+        };
+        #endregion
+    }
+
+    public static void PropertyCallbackExample()
+    {
+        var knockOff = new PatternPropertyServiceKnockOff();
+
+        #region docs:customization-patterns:callback-property
+        // Getter callback
+        knockOff.Name.OnGet = (ko) => "Dynamic Value";
+
+        // Setter callback
+        knockOff.Name.OnSet = (ko, value) =>
+        {
+            // Custom logic when property is set
+            // Note: When OnSet is set, value does NOT go to backing field
+        };
+        #endregion
+    }
+
+    public static void IndexerCallbackExample()
+    {
+        var knockOff = new PatternIndexerServiceKnockOff();
+
+        #region docs:customization-patterns:callback-indexer
+        // Getter with key parameter
+        knockOff.StringIndexer.OnGet = (ko, key) => key switch
+        {
+            "Name" => new PatternPropertyInfo { Value = "Test" },
+            "Age" => new PatternPropertyInfo { Value = "25" },
+            _ => null
+        };
+
+        // Setter with key and value parameters
+        knockOff.StringIndexer.OnSet = (ko, key, value) =>
+        {
+            // Custom logic
+            // Note: When OnSet is set, value does NOT go to backing dictionary
+        };
+        #endregion
+    }
+
+    // NOTE: Priority/Reset/Combining examples are left inline in docs.
+    // The documentation describes callback > user method priority, but
+    // current generator implementation always calls user methods directly
+    // when they're defined, ignoring OnCall callbacks.
+}

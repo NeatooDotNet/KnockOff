@@ -5,83 +5,77 @@ namespace KnockOff.Sandbox;
 
 partial class RefParameterServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for IRefParameterService.Increment.</summary>
-	public sealed class IRefParameterService_IncrementInterceptor
+	/// <summary>Tracks and configures behavior for Increment.</summary>
+	public sealed class IncrementInterceptor
 	{
-		/// <summary>Delegate for Increment(ref int value).</summary>
-		public delegate void IncrementDelegate(RefParameterServiceKnockOff ko, ref int value);
+		/// <summary>Delegate for Increment.</summary>
+		public delegate void IncrementDelegate(RefParameterServiceKnockOff ko, ref int @value);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'value' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public IncrementDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int value) { CallCount++; LastCallArg = value; }
+		public void RecordCall(int? @value) { CallCount++; LastCallArg = @value; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IRefParameterService.TryUpdate.</summary>
-	public sealed class IRefParameterService_TryUpdateInterceptor
+	/// <summary>Tracks and configures behavior for TryUpdate.</summary>
+	public sealed class TryUpdateInterceptor
 	{
-		/// <summary>Delegate for TryUpdate(string key, ref string value).</summary>
-		public delegate bool TryUpdateDelegate(RefParameterServiceKnockOff ko, string key, ref string value);
+		/// <summary>Delegate for TryUpdate.</summary>
+		public delegate bool TryUpdateDelegate(RefParameterServiceKnockOff ko, string key, ref string @value);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Arguments from the most recent call.</summary>
-		public (string key, string value)? LastCallArgs { get; private set; }
+		/// <summary>The arguments from the most recent call.</summary>
+		public (string? key, string? @value)? LastCallArgs { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public TryUpdateDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string key, string value) { CallCount++; LastCallArgs = (key, value); }
+		public void RecordCall(string? key, string? @value) { CallCount++; LastCallArgs = (key, @value); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Sandbox.IRefParameterService.</summary>
-	public sealed class IRefParameterServiceInterceptorors
-	{
-		/// <summary>Interceptor for Increment.</summary>
-		public IRefParameterService_IncrementInterceptor Increment { get; } = new();
-		/// <summary>Interceptor for TryUpdate.</summary>
-		public IRefParameterService_TryUpdateInterceptor TryUpdate { get; } = new();
-	}
+	/// <summary>Interceptor for Increment.</summary>
+	public IncrementInterceptor Increment { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Sandbox.IRefParameterService.</summary>
-	public IRefParameterServiceInterceptorors IRefParameterService { get; } = new();
+	/// <summary>Interceptor for TryUpdate.</summary>
+	public TryUpdateInterceptor TryUpdate { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Sandbox.IRefParameterService.</summary>
 	public KnockOff.Sandbox.IRefParameterService AsRefParameterService() => this;
 
-	void KnockOff.Sandbox.IRefParameterService.Increment(ref int value)
+	void KnockOff.Sandbox.IRefParameterService.Increment(ref int @value)
 	{
-		IRefParameterService.Increment.RecordCall(value);
-		if (IRefParameterService.Increment.OnCall is { } onCallCallback)
-		{ onCallCallback(this, ref value); return; }
+		Increment.RecordCall(@value);
+		if (Increment.OnCall is { } onCallCallback)
+		{ onCallCallback(this, ref @value); return; }
 	}
 
-	bool KnockOff.Sandbox.IRefParameterService.TryUpdate(string key, ref string value)
+	bool KnockOff.Sandbox.IRefParameterService.TryUpdate(string key, ref string @value)
 	{
-		IRefParameterService.TryUpdate.RecordCall(key, value);
-		if (IRefParameterService.TryUpdate.OnCall is { } onCallCallback)
-			return onCallCallback(this, key, ref value);
+		TryUpdate.RecordCall(key, @value);
+		if (TryUpdate.OnCall is { } onCallCallback)
+			return onCallCallback(this, key, ref @value);
 		return default!;
 	}
 

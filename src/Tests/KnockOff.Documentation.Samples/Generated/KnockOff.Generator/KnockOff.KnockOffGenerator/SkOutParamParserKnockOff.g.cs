@@ -5,44 +5,44 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class SkOutParamParserKnockOff
 {
-	/// <summary>Tracks and configures behavior for ISkOutParamParser.TryParse.</summary>
-	public sealed class ISkOutParamParser_TryParseInterceptor
+	/// <summary>Tracks and configures behavior for TryParse.</summary>
+	public sealed class TryParseInterceptor
 	{
-		/// <summary>Delegate for TryParse(string input, out int result).</summary>
+		/// <summary>Delegate for TryParse.</summary>
 		public delegate bool TryParseDelegate(SkOutParamParserKnockOff ko, string input, out int result);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'input' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public string? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public TryParseDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string input) { CallCount++; LastCallArg = input; }
+		public void RecordCall(string? input) { CallCount++; LastCallArg = input; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ISkOutParamParser.GetData.</summary>
-	public sealed class ISkOutParamParser_GetDataInterceptor
+	/// <summary>Tracks and configures behavior for GetData.</summary>
+	public sealed class GetDataInterceptor
 	{
-		/// <summary>Delegate for GetData(out string name, out int count).</summary>
+		/// <summary>Delegate for GetData.</summary>
 		public delegate void GetDataDelegate(SkOutParamParserKnockOff ko, out string name, out int count);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetDataDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -52,17 +52,11 @@ partial class SkOutParamParserKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkOutParamParser.</summary>
-	public sealed class ISkOutParamParserInterceptorors
-	{
-		/// <summary>Interceptor for TryParse.</summary>
-		public ISkOutParamParser_TryParseInterceptor TryParse { get; } = new();
-		/// <summary>Interceptor for GetData.</summary>
-		public ISkOutParamParser_GetDataInterceptor GetData { get; } = new();
-	}
+	/// <summary>Interceptor for TryParse.</summary>
+	public TryParseInterceptor TryParse { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkOutParamParser.</summary>
-	public ISkOutParamParserInterceptorors ISkOutParamParser { get; } = new();
+	/// <summary>Interceptor for GetData.</summary>
+	public GetDataInterceptor GetData { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkOutParamParser.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkOutParamParser AsSkOutParamParser() => this;
@@ -70,8 +64,8 @@ partial class SkOutParamParserKnockOff
 	bool KnockOff.Documentation.Samples.Skills.ISkOutParamParser.TryParse(string input, out int result)
 	{
 		result = default!;
-		ISkOutParamParser.TryParse.RecordCall(input);
-		if (ISkOutParamParser.TryParse.OnCall is { } onCallCallback)
+		TryParse.RecordCall(input);
+		if (TryParse.OnCall is { } onCallCallback)
 			return onCallCallback(this, input, out result);
 		return default!;
 	}
@@ -80,8 +74,8 @@ partial class SkOutParamParserKnockOff
 	{
 		name = default!;
 		count = default!;
-		ISkOutParamParser.GetData.RecordCall();
-		if (ISkOutParamParser.GetData.OnCall is { } onCallCallback)
+		GetData.RecordCall();
+		if (GetData.OnCall is { } onCallCallback)
 		{ onCallCallback(this, out name, out count); return; }
 	}
 

@@ -26,134 +26,100 @@ public partial class IdxReadWriteStoreKnockOff : IIdxReadWriteStore { }
 
 ## Naming Convention
 
-Indexer handlers are named based on the key type and accessed via the interface KO property:
+Indexer interceptors are named based on the key type:
 - `string` key → `StringIndexer`
-- `int` key → `IntIndexer`
+- `int` key → `Int32Indexer`
 - Custom type → `{TypeName}Indexer`
 
 ```csharp
-knockOff.IPropertyStore.StringIndexer  // for this[string key]
-knockOff.IList.IntIndexer              // for this[int index]
+knockOff.StringIndexer       // for this[string key]
+knockOff.Int32Indexer        // for this[int index]
 ```
 
-Backing dictionaries are also interface-prefixed:
+Backing dictionaries:
 ```csharp
-knockOff.IPropertyStore_StringIndexerBacking  // Dictionary<string, PropertyInfo?>
-knockOff.IList_IntIndexerBacking              // Dictionary<int, object?>
+knockOff.StringIndexerBacking  // Dictionary<string, PropertyInfo?>
+knockOff.Int32IndexerBacking   // Dictionary<int, object?>
 ```
 
 ## Tracking
 
 ### Get Tracking
 
+<!-- snippet: docs:indexers:get-tracking -->
 ```csharp
-var knockOff = new PropertyStoreKnockOff();
-IPropertyStore store = knockOff;
-
-// Pre-populate backing dictionary
-knockOff.IPropertyStore_StringIndexerBacking["Name"] = new PropertyInfo { Value = "Test" };
-
 _ = store["Name"];
-_ = store["Age"];
-_ = store["Name"];
+        _ = store["Age"];
 
-Assert.Equal(3, knockOff.IPropertyStore.StringIndexer.GetCount);
-Assert.Equal("Name", knockOff.IPropertyStore.StringIndexer.LastGetKey);
-
-// All accessed keys
-Assert.Equal(3, knockOff.IPropertyStore.StringIndexer.AllGetKeys.Count);
-Assert.Equal("Name", knockOff.IPropertyStore.StringIndexer.AllGetKeys[0]);
-Assert.Equal("Age", knockOff.IPropertyStore.StringIndexer.AllGetKeys[1]);
-Assert.Equal("Name", knockOff.IPropertyStore.StringIndexer.AllGetKeys[2]);
+        var getCount = knockOff.StringIndexer.GetCount;       // 2
+        var lastKey = knockOff.StringIndexer.LastGetKey;      // "Age"
 ```
+<!-- /snippet -->
 
 ### Set Tracking
 
+<!-- snippet: docs:indexers:set-tracking -->
 ```csharp
-var knockOff = new ReadWriteStoreKnockOff();
-IReadWriteStore store = knockOff;
+store["Key"] = value1;
 
-var prop1 = new PropertyInfo { Name = "First" };
-var prop2 = new PropertyInfo { Name = "Second" };
-
-store["key1"] = prop1;
-store["key2"] = prop2;
-
-Assert.Equal(2, knockOff.IReadWriteStore.StringIndexer.SetCount);
-
-// Last set entry
-var last = knockOff.IReadWriteStore.StringIndexer.LastSetEntry;
-Assert.Equal("key2", last?.key);
-Assert.Same(prop2, last?.value);
-
-// All set entries
-Assert.Equal(2, knockOff.IReadWriteStore.StringIndexer.AllSetEntries.Count);
-Assert.Equal("key1", knockOff.IReadWriteStore.StringIndexer.AllSetEntries[0].key);
-Assert.Equal("key2", knockOff.IReadWriteStore.StringIndexer.AllSetEntries[1].key);
+        var setCount = knockOff.StringIndexer.SetCount;         // 1
+        var lastEntry = knockOff.StringIndexer.LastSetEntry;
+        var lastSetKey = lastEntry?.Key;                        // "Key"
+        var lastSetValue = lastEntry?.Value;                    // value1
 ```
+<!-- /snippet -->
 
 ## Backing Dictionary
 
-KnockOff generates a backing dictionary for each indexer (interface-prefixed):
+KnockOff generates a backing dictionary for each indexer:
 
+<!-- snippet: docs:indexers:backing-dictionary -->
 ```csharp
-// Access directly to pre-populate
-knockOff.IPropertyStore_StringIndexerBacking["Name"] = new PropertyInfo { Value = "Test" };
-knockOff.IPropertyStore_StringIndexerBacking["Age"] = new PropertyInfo { Value = "25" };
+// Pre-populate backing dictionary
+        knockOff.StringIndexerBacking["Config"] = new IdxPropertyInfo { Value = "Value1" };
+        knockOff.StringIndexerBacking["Setting"] = new IdxPropertyInfo { Value = "Value2" };
 
-// Values are returned when accessed via interface
-IPropertyStore store = knockOff;
-var name = store["Name"];
-Assert.Equal("Test", name?.Value);
+        // Access returns backing values
+        var config = store["Config"];   // Returns the pre-populated value
+        var setting = store["Setting"]; // Returns the pre-populated value
 ```
+<!-- /snippet -->
 
-For get/set indexers, setting via the interface stores in the backing:
-
-```csharp
-IReadWriteStore store = knockOff;
-store["Key"] = new PropertyInfo { Value = "Value" };
-
-// Verify it's in backing
-Assert.True(knockOff.IReadWriteStore_StringIndexerBacking.ContainsKey("Key"));
-```
+For get/set indexers, setting via the interface stores in the backing dictionary automatically (unless `OnSet` is defined).
 
 ## Callbacks
 
 ### OnGet Callback
 
+<!-- snippet: docs:indexers:onget-callback -->
 ```csharp
-knockOff.IPropertyStore.StringIndexer.OnGet = (ko, key) => key switch
-{
-    "Name" => new PropertyInfo { Value = "Test" },
-    "Age" => new PropertyInfo { Value = "25" },
-    _ => null
-};
+knockOff.StringIndexer.OnGet = (ko, key) =>
+        {
+            // Compute or fetch value dynamically
+            return new IdxPropertyInfo { Name = key, Value = key.Length };
+        };
 
-IPropertyStore store = knockOff;
-var name = store["Name"];
-Assert.Equal("Test", name?.Value);
-
-var unknown = store["Unknown"];
-Assert.Null(unknown);
+        var result = store["Hello"];  // Returns IdxPropertyInfo with Value = 5
 ```
+<!-- /snippet -->
 
 ### OnSet Callback
 
+<!-- snippet: docs:indexers:onset-callback -->
 ```csharp
-var captured = new Dictionary<string, PropertyInfo?>();
+knockOff.StringIndexer.OnSet = (ko, key, value) =>
+        {
+            changes.Add((key, value));
+        };
 
-knockOff.IReadWriteStore.StringIndexer.OnSet = (ko, key, value) =>
-{
-    captured[key] = value;
-    // Note: When OnSet is set, value does NOT go to backing dictionary
-};
+        store["Key1"] = new IdxPropertyInfo { Value = "A" };
+        store["Key2"] = new IdxPropertyInfo { Value = "B" };
 
-IReadWriteStore store = knockOff;
-store["Key"] = new PropertyInfo { Value = "Value" };
-
-Assert.True(captured.ContainsKey("Key"));
-Assert.False(knockOff.IReadWriteStore_StringIndexerBacking.ContainsKey("Key"));  // Not in backing
+        // changes contains [("Key1", ...), ("Key2", ...)]
 ```
+<!-- /snippet -->
+
+Note: When `OnSet` is set, values do NOT go to the backing dictionary.
 
 ### Callback Signatures
 
@@ -168,50 +134,29 @@ When **no `OnGet` callback** is set:
 1. Backing dictionary is checked (returns value if key exists)
 2. Returns `default(T)` if key not found
 
-When **`OnGet` callback is set**:
-- The callback **completely replaces** the getter logic
-- Backing dictionary is NOT checked automatically
-- You must handle all cases in your callback
-
-To combine callback with backing:
-
+<!-- snippet: docs:indexers:fallback-to-backing -->
 ```csharp
-knockOff.IPropertyStore.StringIndexer.OnGet = (ko, key) =>
-{
-    // Custom logic for some keys
-    if (key == "Special")
-        return new PropertyInfo { Value = "Custom" };
+// No OnGet callback - falls back to backing dictionary
+        knockOff.StringIndexerBacking["Existing"] = new IdxPropertyInfo { Value = "Found" };
 
-    // Fall back to backing dictionary
-    if (ko.IPropertyStore_StringIndexerBacking.TryGetValue(key, out var value))
-        return value;
-
-    return null;
-};
+        var existing = store["Existing"];  // Returns backing value
+        var missing = store["Missing"];    // Returns null (not in backing)
 ```
+<!-- /snippet -->
+
+When **`OnGet` callback is set**, the callback completely replaces the getter logic. The backing dictionary is NOT checked automatically.
 
 ## Reset
 
+<!-- snippet: docs:indexers:reset -->
 ```csharp
-_ = store["Key1"];
-_ = store["Key2"];
-store["Key3"] = prop;
+knockOff.StringIndexer.Reset();
 
-knockOff.IPropertyStore.StringIndexer.Reset();
-
-// Tracking cleared
-Assert.Equal(0, knockOff.IPropertyStore.StringIndexer.GetCount);
-Assert.Equal(0, knockOff.IPropertyStore.StringIndexer.SetCount);
-Assert.Empty(knockOff.IPropertyStore.StringIndexer.AllGetKeys);
-Assert.Empty(knockOff.IPropertyStore.StringIndexer.AllSetEntries);
-
-// Callbacks cleared
-Assert.Null(knockOff.IPropertyStore.StringIndexer.OnGet);
-Assert.Null(knockOff.IPropertyStore.StringIndexer.OnSet);
-
-// Backing dictionary is NOT cleared
-Assert.True(knockOff.IPropertyStore_StringIndexerBacking.ContainsKey("Key3"));
+        var getCount = knockOff.StringIndexer.GetCount;    // 0
+        var onGet = knockOff.StringIndexer.OnGet;          // null
+        // Note: Backing dictionary is NOT cleared
 ```
+<!-- /snippet -->
 
 ## Common Patterns
 
@@ -230,20 +175,6 @@ public partial class IdxEntityBaseKnockOff : IIdxEntityBase { }
 ```
 <!-- /snippet -->
 
-```csharp
-// Configure property access
-knockOff.IIdxEntityBase.StringIndexer.OnGet = (ko, propertyName) =>
-{
-    return propertyName switch
-    {
-        "FirstName" => new IdxEntityProperty { IsModified = true },
-        "LastName" => new IdxEntityProperty { IsModified = false },
-        "Id" => new IdxEntityProperty { IsModified = ko.IIdxEntityBase.IsNew.OnGet?.Invoke(ko) ?? false },
-        _ => null
-    };
-};
-```
-
 ### Dictionary-Like Behavior
 
 <!-- snippet: docs:indexers:dictionary-like -->
@@ -253,30 +184,7 @@ public partial class IdxConfigStoreKnockOff : IIdxConfigStore { }
 ```
 <!-- /snippet -->
 
-```csharp
-// Pre-populate like a dictionary
-knockOff.IIdxConfigStore_StringIndexerBacking["config:timeout"] = new IdxConfigValue { Value = "30" };
-knockOff.IIdxConfigStore_StringIndexerBacking["config:retries"] = new IdxConfigValue { Value = "3" };
-
-IIdxConfigStore config = knockOff;
-var timeout = config["config:timeout"];
-```
-
-### Conditional Access
-
-```csharp
-var accessLog = new List<string>();
-
-knockOff.IPropertyStore.StringIndexer.OnGet = (ko, key) =>
-{
-    accessLog.Add($"Accessed: {key}");
-
-    if (key.StartsWith("secure:"))
-        throw new UnauthorizedAccessException($"Cannot access {key}");
-
-    return ko.IPropertyStore_StringIndexerBacking.GetValueOrDefault(key);
-};
-```
+Pre-populate the backing dictionary for dictionary-like behavior.
 
 ### Integer Indexers
 
@@ -292,12 +200,14 @@ public partial class IdxListKnockOff : IIdxList { }
 ```
 <!-- /snippet -->
 
+<!-- snippet: docs:indexers:integer-indexer-usage -->
 ```csharp
-// IIdxList_IntIndexerBacking is Dictionary<int, object?>
-knockOff.IIdxList_IntIndexerBacking[0] = "First";
-knockOff.IIdxList_IntIndexerBacking[1] = "Second";
+knockOff.Int32IndexerBacking[0] = "First";
+        knockOff.Int32IndexerBacking[1] = "Second";
 
-IIdxList list = knockOff;
-Assert.Equal("First", list[0]);
-Assert.Equal(0, knockOff.IIdxList.IntIndexer.LastGetKey);
+        var first = list[0];   // "First"
+        var second = list[1];  // "Second"
+
+        var lastGetIndex = knockOff.Int32Indexer.LastGetKey;  // 1
 ```
+<!-- /snippet -->

@@ -5,153 +5,137 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class CpOverloadServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for ICpOverloadService.Process1.</summary>
-	public sealed class ICpOverloadService_Process1Interceptor
+	/// <summary>Tracks and configures behavior for Process.</summary>
+	public sealed class Process1Interceptor
 	{
-		/// <summary>Delegate for Process(string data).</summary>
-		public delegate void ProcessDelegate(CpOverloadServiceKnockOff ko, string data);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'data' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public string? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public ProcessDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<CpOverloadServiceKnockOff, string>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string data) { CallCount++; LastCallArg = data; }
+		public void RecordCall(string? data) { CallCount++; LastCallArg = data; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ICpOverloadService.Process2.</summary>
-	public sealed class ICpOverloadService_Process2Interceptor
+	/// <summary>Tracks and configures behavior for Process.</summary>
+	public sealed class Process2Interceptor
 	{
-		/// <summary>Delegate for Process(string data, int priority).</summary>
-		public delegate void ProcessDelegate(CpOverloadServiceKnockOff ko, string data, int priority);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Arguments from the most recent call.</summary>
-		public (string data, int priority)? LastCallArgs { get; private set; }
+		/// <summary>The arguments from the most recent call.</summary>
+		public (string? data, int? priority)? LastCallArgs { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public ProcessDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<CpOverloadServiceKnockOff, string, int>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string data, int priority) { CallCount++; LastCallArgs = (data, priority); }
+		public void RecordCall(string? data, int? priority) { CallCount++; LastCallArgs = (data, priority); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ICpOverloadService.Calculate1.</summary>
-	public sealed class ICpOverloadService_Calculate1Interceptor
+	/// <summary>Tracks and configures behavior for Calculate.</summary>
+	public sealed class Calculate1Interceptor
 	{
-		/// <summary>Delegate for Calculate(int value).</summary>
-		public delegate int CalculateDelegate(CpOverloadServiceKnockOff ko, int value);
+		/// <summary>Delegate for Calculate.</summary>
+		public delegate int CalculateDelegate(CpOverloadServiceKnockOff ko, int @value);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'value' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public CalculateDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int value) { CallCount++; LastCallArg = value; }
+		public void RecordCall(int? @value) { CallCount++; LastCallArg = @value; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ICpOverloadService.Calculate2.</summary>
-	public sealed class ICpOverloadService_Calculate2Interceptor
+	/// <summary>Tracks and configures behavior for Calculate.</summary>
+	public sealed class Calculate2Interceptor
 	{
-		/// <summary>Delegate for Calculate(int a, int b).</summary>
+		/// <summary>Delegate for Calculate.</summary>
 		public delegate int CalculateDelegate(CpOverloadServiceKnockOff ko, int a, int b);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Arguments from the most recent call.</summary>
-		public (int a, int b)? LastCallArgs { get; private set; }
+		/// <summary>The arguments from the most recent call.</summary>
+		public (int? a, int? b)? LastCallArgs { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public CalculateDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int a, int b) { CallCount++; LastCallArgs = (a, b); }
+		public void RecordCall(int? a, int? b) { CallCount++; LastCallArgs = (a, b); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpOverloadService.</summary>
-	public sealed class ICpOverloadServiceInterceptorors
-	{
-		/// <summary>Interceptor for Process overload 1.</summary>
-		public ICpOverloadService_Process1Interceptor Process1 { get; } = new();
-		/// <summary>Interceptor for Process overload 2.</summary>
-		public ICpOverloadService_Process2Interceptor Process2 { get; } = new();
-		/// <summary>Interceptor for Calculate overload 1.</summary>
-		public ICpOverloadService_Calculate1Interceptor Calculate1 { get; } = new();
-		/// <summary>Interceptor for Calculate overload 2.</summary>
-		public ICpOverloadService_Calculate2Interceptor Calculate2 { get; } = new();
-	}
+	/// <summary>Interceptor for Process.</summary>
+	public Process1Interceptor Process1 { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpOverloadService.</summary>
-	public ICpOverloadServiceInterceptorors ICpOverloadService { get; } = new();
+	/// <summary>Interceptor for Process.</summary>
+	public Process2Interceptor Process2 { get; } = new();
+
+	/// <summary>Interceptor for Calculate.</summary>
+	public Calculate1Interceptor Calculate1 { get; } = new();
+
+	/// <summary>Interceptor for Calculate.</summary>
+	public Calculate2Interceptor Calculate2 { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpOverloadService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ICpOverloadService AsCpOverloadService() => this;
 
 	void KnockOff.Documentation.Samples.Skills.ICpOverloadService.Process(string data)
 	{
-		ICpOverloadService.Process1.RecordCall(data);
-		if (ICpOverloadService.Process1.OnCall is { } onCallCallback)
-		{ onCallCallback(this, data); return; }
+		Process1.RecordCall(data);
+		Process1.OnCall?.Invoke(this, data);
 	}
 
 	void KnockOff.Documentation.Samples.Skills.ICpOverloadService.Process(string data, int priority)
 	{
-		ICpOverloadService.Process2.RecordCall(data, priority);
-		if (ICpOverloadService.Process2.OnCall is { } onCallCallback)
-		{ onCallCallback(this, data, priority); return; }
+		Process2.RecordCall(data, priority);
+		Process2.OnCall?.Invoke(this, data, priority);
 	}
 
-	int KnockOff.Documentation.Samples.Skills.ICpOverloadService.Calculate(int value)
+	int KnockOff.Documentation.Samples.Skills.ICpOverloadService.Calculate(int @value)
 	{
-		ICpOverloadService.Calculate1.RecordCall(value);
-		if (ICpOverloadService.Calculate1.OnCall is { } onCallCallback)
-			return onCallCallback(this, value);
-		return default!;
+		Calculate1.RecordCall(@value);
+		return Calculate1.OnCall?.Invoke(this, @value) ?? default!;
 	}
 
 	int KnockOff.Documentation.Samples.Skills.ICpOverloadService.Calculate(int a, int b)
 	{
-		ICpOverloadService.Calculate2.RecordCall(a, b);
-		if (ICpOverloadService.Calculate2.OnCall is { } onCallCallback)
-			return onCallCallback(this, a, b);
-		return default!;
+		Calculate2.RecordCall(a, b);
+		return Calculate2.OnCall?.Invoke(this, a, b) ?? default!;
 	}
 
 }

@@ -5,8 +5,8 @@ namespace KnockOff.Tests;
 
 partial class CollisionKnockOff
 {
-	/// <summary>Tracks and configures behavior for ICollision_.ICollision.</summary>
-	public sealed class ICollision__ICollisionInterceptor
+	/// <summary>Tracks and configures behavior for ICollision.</summary>
+	public sealed class ICollisionInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -33,20 +33,17 @@ partial class CollisionKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ICollision_.DoWork.</summary>
-	public sealed class ICollision__DoWorkInterceptor
+	/// <summary>Tracks and configures behavior for DoWork.</summary>
+	public sealed class DoWorkInterceptor
 	{
-		/// <summary>Delegate for DoWork().</summary>
-		public delegate void DoWorkDelegate(CollisionKnockOff ko);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public DoWorkDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<CollisionKnockOff>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
@@ -55,48 +52,28 @@ partial class CollisionKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.ICollision.</summary>
-	public sealed class ICollision_Interceptorors
-	{
-		/// <summary>Interceptor for ICollision.</summary>
-		public ICollision__ICollisionInterceptor ICollision { get; } = new();
-		/// <summary>Interceptor for DoWork.</summary>
-		public ICollision__DoWorkInterceptor DoWork { get; } = new();
-	}
+	/// <summary>Interceptor for ICollision.</summary>
+	public ICollisionInterceptor ICollision { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.ICollision.</summary>
-	public ICollision_Interceptorors ICollision_ { get; } = new();
+	/// <summary>Interceptor for DoWork.</summary>
+	public DoWorkInterceptor DoWork { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.ICollision.</summary>
 	public KnockOff.Tests.ICollision AsCollision() => this;
 
-	/// <summary>Backing field for ICollision_.ICollision.</summary>
-	protected string ICollision__ICollisionBacking { get; set; } = "";
+	/// <summary>Backing storage for ICollision.</summary>
+	protected string ICollisionBacking { get; set; } = "";
 
 	string KnockOff.Tests.ICollision.ICollision
 	{
-		get
-		{
-			ICollision_.ICollision.RecordGet();
-			if (ICollision_.ICollision.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return ICollision__ICollisionBacking;
-		}
-		set
-		{
-			ICollision_.ICollision.RecordSet(value);
-			if (ICollision_.ICollision.OnSet is { } onSetCallback)
-				onSetCallback(this, value);
-			else
-				ICollision__ICollisionBacking = value;
-		}
+		get { ICollision.RecordGet(); return ICollision.OnGet?.Invoke(this) ?? ICollisionBacking; }
+		set { ICollision.RecordSet(value); if (ICollision.OnSet != null) ICollision.OnSet(this, value); else ICollisionBacking = value; }
 	}
 
 	void KnockOff.Tests.ICollision.DoWork()
 	{
-		ICollision_.DoWork.RecordCall();
-		if (ICollision_.DoWork.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		DoWork.RecordCall();
+		DoWork.OnCall?.Invoke(this);
 	}
 
 }

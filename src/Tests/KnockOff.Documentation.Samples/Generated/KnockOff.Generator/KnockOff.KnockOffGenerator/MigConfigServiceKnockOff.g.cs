@@ -5,19 +5,19 @@ namespace KnockOff.Documentation.Samples.Comparison;
 
 partial class MigConfigServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for IMigConfigService.GetConfig.</summary>
-	public sealed class IMigConfigService_GetConfigInterceptor
+	/// <summary>Tracks and configures behavior for GetConfig.</summary>
+	public sealed class GetConfig2Interceptor
 	{
-		/// <summary>Delegate for GetConfig().</summary>
+		/// <summary>Delegate for GetConfig.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Comparison.MigConfig GetConfigDelegate(MigConfigServiceKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetConfigDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -27,24 +27,16 @@ partial class MigConfigServiceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigConfigService.</summary>
-	public sealed class IMigConfigServiceInterceptorors
-	{
-		/// <summary>Interceptor for GetConfig.</summary>
-		public IMigConfigService_GetConfigInterceptor GetConfig { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigConfigService.</summary>
-	public IMigConfigServiceInterceptorors IMigConfigService { get; } = new();
+	/// <summary>Interceptor for GetConfig.</summary>
+	public GetConfig2Interceptor GetConfig2 { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IMigConfigService.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IMigConfigService AsMigConfigService() => this;
 
 	global::KnockOff.Documentation.Samples.Comparison.MigConfig KnockOff.Documentation.Samples.Comparison.IMigConfigService.GetConfig()
 	{
-		IMigConfigService.GetConfig.RecordCall();
-		if (IMigConfigService.GetConfig.OnCall is { } onCallCallback)
-			return onCallCallback(this);
+		GetConfig2.RecordCall();
+		if (GetConfig2.OnCall != null) return GetConfig2.OnCall(this);
 		return GetConfig();
 	}
 

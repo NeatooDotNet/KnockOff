@@ -5,120 +5,115 @@ namespace KnockOff.Sandbox;
 
 partial class OverloadedServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for IOverloadedService.Format1.</summary>
-	public sealed class IOverloadedService_Format1Interceptor
+	/// <summary>Tracks and configures behavior for Format.</summary>
+	public sealed class Format1Interceptor
 	{
-		/// <summary>Delegate for Format(string input).</summary>
+		/// <summary>Delegate for Format.</summary>
 		public delegate string FormatDelegate(OverloadedServiceKnockOff ko, string input);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'input' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public string? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public FormatDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string input) { CallCount++; LastCallArg = input; }
+		public void RecordCall(string? input) { CallCount++; LastCallArg = input; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IOverloadedService.Format2.</summary>
-	public sealed class IOverloadedService_Format2Interceptor
+	/// <summary>Tracks and configures behavior for Format.</summary>
+	public sealed class Format2Interceptor
 	{
-		/// <summary>Delegate for Format(string input, bool uppercase).</summary>
+		/// <summary>Delegate for Format.</summary>
 		public delegate string FormatDelegate(OverloadedServiceKnockOff ko, string input, bool uppercase);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Arguments from the most recent call.</summary>
-		public (string input, bool uppercase)? LastCallArgs { get; private set; }
+		/// <summary>The arguments from the most recent call.</summary>
+		public (string? input, bool? uppercase)? LastCallArgs { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public FormatDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string input, bool uppercase) { CallCount++; LastCallArgs = (input, uppercase); }
+		public void RecordCall(string? input, bool? uppercase) { CallCount++; LastCallArgs = (input, uppercase); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IOverloadedService.Format3.</summary>
-	public sealed class IOverloadedService_Format3Interceptor
+	/// <summary>Tracks and configures behavior for Format.</summary>
+	public sealed class Format3Interceptor
 	{
-		/// <summary>Delegate for Format(string input, int maxLength).</summary>
+		/// <summary>Delegate for Format.</summary>
 		public delegate string FormatDelegate(OverloadedServiceKnockOff ko, string input, int maxLength);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Arguments from the most recent call.</summary>
-		public (string input, int maxLength)? LastCallArgs { get; private set; }
+		/// <summary>The arguments from the most recent call.</summary>
+		public (string? input, int? maxLength)? LastCallArgs { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public FormatDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string input, int maxLength) { CallCount++; LastCallArgs = (input, maxLength); }
+		public void RecordCall(string? input, int? maxLength) { CallCount++; LastCallArgs = (input, maxLength); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Sandbox.IOverloadedService.</summary>
-	public sealed class IOverloadedServiceInterceptorors
-	{
-		/// <summary>Interceptor for Format overload 1.</summary>
-		public IOverloadedService_Format1Interceptor Format1 { get; } = new();
-		/// <summary>Interceptor for Format overload 2.</summary>
-		public IOverloadedService_Format2Interceptor Format2 { get; } = new();
-		/// <summary>Interceptor for Format overload 3.</summary>
-		public IOverloadedService_Format3Interceptor Format3 { get; } = new();
-	}
+	/// <summary>Interceptor for Format.</summary>
+	public Format1Interceptor Format1 { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Sandbox.IOverloadedService.</summary>
-	public IOverloadedServiceInterceptorors IOverloadedService { get; } = new();
+	/// <summary>Interceptor for Format.</summary>
+	public Format2Interceptor Format2 { get; } = new();
+
+	/// <summary>Interceptor for Format.</summary>
+	public Format3Interceptor Format3 { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Sandbox.IOverloadedService.</summary>
 	public KnockOff.Sandbox.IOverloadedService AsOverloadedService() => this;
 
 	string KnockOff.Sandbox.IOverloadedService.Format(string input)
 	{
-		IOverloadedService.Format1.RecordCall(input);
-		if (IOverloadedService.Format1.OnCall is { } onCallCallback)
-			return onCallCallback(this, input);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'Format' in your partial class, or set IOverloadedService.Format1.OnCall.");
+		Format1.RecordCall(input);
+		if (Format1.OnCall is { } callback)
+			return callback(this, input);
+		throw new global::System.InvalidOperationException("No implementation provided for Format. Set Format1.OnCall or define a protected method 'Format' in your partial class.");
 	}
 
 	string KnockOff.Sandbox.IOverloadedService.Format(string input, bool uppercase)
 	{
-		IOverloadedService.Format2.RecordCall(input, uppercase);
-		if (IOverloadedService.Format2.OnCall is { } onCallCallback)
-			return onCallCallback(this, input, uppercase);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'Format' in your partial class, or set IOverloadedService.Format2.OnCall.");
+		Format2.RecordCall(input, uppercase);
+		if (Format2.OnCall is { } callback)
+			return callback(this, input, uppercase);
+		throw new global::System.InvalidOperationException("No implementation provided for Format. Set Format2.OnCall or define a protected method 'Format' in your partial class.");
 	}
 
 	string KnockOff.Sandbox.IOverloadedService.Format(string input, int maxLength)
 	{
-		IOverloadedService.Format3.RecordCall(input, maxLength);
-		if (IOverloadedService.Format3.OnCall is { } onCallCallback)
-			return onCallCallback(this, input, maxLength);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'Format' in your partial class, or set IOverloadedService.Format3.OnCall.");
+		Format3.RecordCall(input, maxLength);
+		if (Format3.OnCall is { } callback)
+			return callback(this, input, maxLength);
+		throw new global::System.InvalidOperationException("No implementation provided for Format. Set Format3.OnCall or define a protected method 'Format' in your partial class.");
 	}
 
 }

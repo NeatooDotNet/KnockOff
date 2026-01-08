@@ -107,3 +107,158 @@ public interface IIdxList
 [KnockOff]
 public partial class IdxListKnockOff : IIdxList { }
 #endregion
+
+// ============================================================================
+// Usage Examples
+// ============================================================================
+
+/// <summary>
+/// Usage examples demonstrating indexer patterns.
+/// Each method is compilable; snippets extract key portions.
+/// </summary>
+public static class IndexersUsageExamples
+{
+    public static void GetTracking()
+    {
+        var knockOff = new IdxReadWriteStoreKnockOff();
+        IIdxReadWriteStore store = knockOff;
+
+        #region docs:indexers:get-tracking
+        _ = store["Name"];
+        _ = store["Age"];
+
+        var getCount = knockOff.StringIndexer.GetCount;       // 2
+        var lastKey = knockOff.StringIndexer.LastGetKey;      // "Age"
+        #endregion
+
+        _ = (getCount, lastKey);
+    }
+
+    public static void SetTracking()
+    {
+        var knockOff = new IdxReadWriteStoreKnockOff();
+        IIdxReadWriteStore store = knockOff;
+        var value1 = new IdxPropertyInfo { Name = "Test", Value = 123 };
+
+        #region docs:indexers:set-tracking
+        store["Key"] = value1;
+
+        var setCount = knockOff.StringIndexer.SetCount;         // 1
+        var lastEntry = knockOff.StringIndexer.LastSetEntry;
+        var lastSetKey = lastEntry?.Key;                        // "Key"
+        var lastSetValue = lastEntry?.Value;                    // value1
+        #endregion
+
+        _ = (setCount, lastSetKey, lastSetValue);
+    }
+
+    public static void BackingDictionary()
+    {
+        var knockOff = new IdxReadWriteStoreKnockOff();
+        IIdxReadWriteStore store = knockOff;
+
+        #region docs:indexers:backing-dictionary
+        // Pre-populate backing dictionary
+        knockOff.StringIndexerBacking["Config"] = new IdxPropertyInfo { Value = "Value1" };
+        knockOff.StringIndexerBacking["Setting"] = new IdxPropertyInfo { Value = "Value2" };
+
+        // Access returns backing values
+        var config = store["Config"];   // Returns the pre-populated value
+        var setting = store["Setting"]; // Returns the pre-populated value
+        #endregion
+
+        _ = (config, setting);
+    }
+
+    public static void OnGetCallback()
+    {
+        var knockOff = new IdxReadWriteStoreKnockOff();
+        IIdxReadWriteStore store = knockOff;
+
+        #region docs:indexers:onget-callback
+        knockOff.StringIndexer.OnGet = (ko, key) =>
+        {
+            // Compute or fetch value dynamically
+            return new IdxPropertyInfo { Name = key, Value = key.Length };
+        };
+
+        var result = store["Hello"];  // Returns IdxPropertyInfo with Value = 5
+        #endregion
+
+        _ = result;
+    }
+
+    public static void OnSetCallback()
+    {
+        var knockOff = new IdxReadWriteStoreKnockOff();
+        IIdxReadWriteStore store = knockOff;
+        var changes = new List<(string key, IdxPropertyInfo? value)>();
+
+        #region docs:indexers:onset-callback
+        knockOff.StringIndexer.OnSet = (ko, key, value) =>
+        {
+            changes.Add((key, value));
+        };
+
+        store["Key1"] = new IdxPropertyInfo { Value = "A" };
+        store["Key2"] = new IdxPropertyInfo { Value = "B" };
+
+        // changes contains [("Key1", ...), ("Key2", ...)]
+        #endregion
+
+        _ = changes;
+    }
+
+    public static void FallbackToBacking()
+    {
+        var knockOff = new IdxReadWriteStoreKnockOff();
+        IIdxReadWriteStore store = knockOff;
+
+        #region docs:indexers:fallback-to-backing
+        // No OnGet callback - falls back to backing dictionary
+        knockOff.StringIndexerBacking["Existing"] = new IdxPropertyInfo { Value = "Found" };
+
+        var existing = store["Existing"];  // Returns backing value
+        var missing = store["Missing"];    // Returns null (not in backing)
+        #endregion
+
+        _ = (existing, missing);
+    }
+
+    public static void ResetBehavior()
+    {
+        var knockOff = new IdxReadWriteStoreKnockOff();
+        IIdxReadWriteStore store = knockOff;
+
+        _ = store["Test"];
+        knockOff.StringIndexer.OnGet = (ko, key) => new IdxPropertyInfo();
+
+        #region docs:indexers:reset
+        knockOff.StringIndexer.Reset();
+
+        var getCount = knockOff.StringIndexer.GetCount;    // 0
+        var onGet = knockOff.StringIndexer.OnGet;          // null
+        // Note: Backing dictionary is NOT cleared
+        #endregion
+
+        _ = (getCount, onGet);
+    }
+
+    public static void IntegerIndexer()
+    {
+        var knockOff = new IdxListKnockOff();
+        IIdxList list = knockOff;
+
+        #region docs:indexers:integer-indexer-usage
+        knockOff.Int32IndexerBacking[0] = "First";
+        knockOff.Int32IndexerBacking[1] = "Second";
+
+        var first = list[0];   // "First"
+        var second = list[1];  // "Second"
+
+        var lastGetIndex = knockOff.Int32Indexer.LastGetKey;  // 1
+        #endregion
+
+        _ = (first, second, lastGetIndex);
+    }
+}

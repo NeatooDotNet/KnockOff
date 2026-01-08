@@ -5,84 +5,76 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class CpCalculatorKnockOff
 {
-	/// <summary>Tracks and configures behavior for ICpCalculator.Add.</summary>
-	public sealed class ICpCalculator_AddInterceptor
+	/// <summary>Tracks and configures behavior for Add.</summary>
+	public sealed class Add2Interceptor
 	{
-		/// <summary>Delegate for Add(int a, int b).</summary>
+		/// <summary>Delegate for Add.</summary>
 		public delegate int AddDelegate(CpCalculatorKnockOff ko, int a, int b);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Arguments from the most recent call.</summary>
-		public (int a, int b)? LastCallArgs { get; private set; }
+		/// <summary>The arguments from the most recent call.</summary>
+		public (int? a, int? b)? LastCallArgs { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public AddDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int a, int b) { CallCount++; LastCallArgs = (a, b); }
+		public void RecordCall(int? a, int? b) { CallCount++; LastCallArgs = (a, b); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ICpCalculator.Divide.</summary>
-	public sealed class ICpCalculator_DivideInterceptor
+	/// <summary>Tracks and configures behavior for Divide.</summary>
+	public sealed class Divide2Interceptor
 	{
-		/// <summary>Delegate for Divide(int numerator, int denominator).</summary>
+		/// <summary>Delegate for Divide.</summary>
 		public delegate double DivideDelegate(CpCalculatorKnockOff ko, int numerator, int denominator);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Arguments from the most recent call.</summary>
-		public (int numerator, int denominator)? LastCallArgs { get; private set; }
+		/// <summary>The arguments from the most recent call.</summary>
+		public (int? numerator, int? denominator)? LastCallArgs { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public DivideDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int numerator, int denominator) { CallCount++; LastCallArgs = (numerator, denominator); }
+		public void RecordCall(int? numerator, int? denominator) { CallCount++; LastCallArgs = (numerator, denominator); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpCalculator.</summary>
-	public sealed class ICpCalculatorInterceptorors
-	{
-		/// <summary>Interceptor for Add.</summary>
-		public ICpCalculator_AddInterceptor Add { get; } = new();
-		/// <summary>Interceptor for Divide.</summary>
-		public ICpCalculator_DivideInterceptor Divide { get; } = new();
-	}
+	/// <summary>Interceptor for Add.</summary>
+	public Add2Interceptor Add2 { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpCalculator.</summary>
-	public ICpCalculatorInterceptorors ICpCalculator { get; } = new();
+	/// <summary>Interceptor for Divide.</summary>
+	public Divide2Interceptor Divide2 { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpCalculator.</summary>
 	public KnockOff.Documentation.Samples.Skills.ICpCalculator AsCpCalculator() => this;
 
 	int KnockOff.Documentation.Samples.Skills.ICpCalculator.Add(int a, int b)
 	{
-		ICpCalculator.Add.RecordCall(a, b);
-		if (ICpCalculator.Add.OnCall is { } onCallCallback)
-			return onCallCallback(this, a, b);
+		Add2.RecordCall(a, b);
+		if (Add2.OnCall != null) return Add2.OnCall(this, a, b);
 		return Add(a, b);
 	}
 
 	double KnockOff.Documentation.Samples.Skills.ICpCalculator.Divide(int numerator, int denominator)
 	{
-		ICpCalculator.Divide.RecordCall(numerator, denominator);
-		if (ICpCalculator.Divide.OnCall is { } onCallCallback)
-			return onCallCallback(this, numerator, denominator);
+		Divide2.RecordCall(numerator, denominator);
+		if (Divide2.OnCall != null) return Divide2.OnCall(this, numerator, denominator);
 		return Divide(numerator, denominator);
 	}
 

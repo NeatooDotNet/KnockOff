@@ -5,20 +5,17 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class MethodCallOrderKnockOff
 {
-	/// <summary>Tracks and configures behavior for IMethodCallOrder.Initialize.</summary>
-	public sealed class IMethodCallOrder_InitializeInterceptor
+	/// <summary>Tracks and configures behavior for Initialize.</summary>
+	public sealed class InitializeInterceptor
 	{
-		/// <summary>Delegate for Initialize().</summary>
-		public delegate void InitializeDelegate(MethodCallOrderKnockOff ko);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public InitializeDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<MethodCallOrderKnockOff>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
@@ -27,20 +24,17 @@ partial class MethodCallOrderKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IMethodCallOrder.Process.</summary>
-	public sealed class IMethodCallOrder_ProcessInterceptor
+	/// <summary>Tracks and configures behavior for Process.</summary>
+	public sealed class ProcessInterceptor
 	{
-		/// <summary>Delegate for Process().</summary>
-		public delegate void ProcessDelegate(MethodCallOrderKnockOff ko);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public ProcessDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<MethodCallOrderKnockOff>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
@@ -49,20 +43,17 @@ partial class MethodCallOrderKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IMethodCallOrder.Cleanup.</summary>
-	public sealed class IMethodCallOrder_CleanupInterceptor
+	/// <summary>Tracks and configures behavior for Cleanup.</summary>
+	public sealed class CleanupInterceptor
 	{
-		/// <summary>Delegate for Cleanup().</summary>
-		public delegate void CleanupDelegate(MethodCallOrderKnockOff ko);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public CleanupDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<MethodCallOrderKnockOff>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
@@ -71,42 +62,34 @@ partial class MethodCallOrderKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodCallOrder.</summary>
-	public sealed class IMethodCallOrderInterceptorors
-	{
-		/// <summary>Interceptor for Initialize.</summary>
-		public IMethodCallOrder_InitializeInterceptor Initialize { get; } = new();
-		/// <summary>Interceptor for Process.</summary>
-		public IMethodCallOrder_ProcessInterceptor Process { get; } = new();
-		/// <summary>Interceptor for Cleanup.</summary>
-		public IMethodCallOrder_CleanupInterceptor Cleanup { get; } = new();
-	}
+	/// <summary>Interceptor for Initialize.</summary>
+	public InitializeInterceptor Initialize { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodCallOrder.</summary>
-	public IMethodCallOrderInterceptorors IMethodCallOrder { get; } = new();
+	/// <summary>Interceptor for Process.</summary>
+	public ProcessInterceptor Process { get; } = new();
+
+	/// <summary>Interceptor for Cleanup.</summary>
+	public CleanupInterceptor Cleanup { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodCallOrder.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMethodCallOrder AsMethodCallOrder() => this;
 
 	void KnockOff.Documentation.Samples.Guides.IMethodCallOrder.Initialize()
 	{
-		IMethodCallOrder.Initialize.RecordCall();
-		if (IMethodCallOrder.Initialize.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		Initialize.RecordCall();
+		Initialize.OnCall?.Invoke(this);
 	}
 
 	void KnockOff.Documentation.Samples.Guides.IMethodCallOrder.Process()
 	{
-		IMethodCallOrder.Process.RecordCall();
-		if (IMethodCallOrder.Process.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		Process.RecordCall();
+		Process.OnCall?.Invoke(this);
 	}
 
 	void KnockOff.Documentation.Samples.Guides.IMethodCallOrder.Cleanup()
 	{
-		IMethodCallOrder.Cleanup.RecordCall();
-		if (IMethodCallOrder.Cleanup.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		Cleanup.RecordCall();
+		Cleanup.OnCall?.Invoke(this);
 	}
 
 }

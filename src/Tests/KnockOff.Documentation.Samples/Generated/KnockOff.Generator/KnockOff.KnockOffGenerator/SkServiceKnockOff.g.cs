@@ -5,49 +5,41 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class SkServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for ISkService.GetValue.</summary>
-	public sealed class ISkService_GetValueInterceptor
+	/// <summary>Tracks and configures behavior for GetValue.</summary>
+	public sealed class GetValue2Interceptor
 	{
-		/// <summary>Delegate for GetValue(int id).</summary>
+		/// <summary>Delegate for GetValue.</summary>
 		public delegate int GetValueDelegate(SkServiceKnockOff ko, int id);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetValueDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkService.</summary>
-	public sealed class ISkServiceInterceptorors
-	{
-		/// <summary>Interceptor for GetValue.</summary>
-		public ISkService_GetValueInterceptor GetValue { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkService.</summary>
-	public ISkServiceInterceptorors ISkService { get; } = new();
+	/// <summary>Interceptor for GetValue.</summary>
+	public GetValue2Interceptor GetValue2 { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkService AsSkService() => this;
 
 	int KnockOff.Documentation.Samples.Skills.ISkService.GetValue(int id)
 	{
-		ISkService.GetValue.RecordCall(id);
-		if (ISkService.GetValue.OnCall is { } onCallCallback)
-			return onCallCallback(this, id);
+		GetValue2.RecordCall(id);
+		if (GetValue2.OnCall != null) return GetValue2.OnCall(this, id);
 		return GetValue(id);
 	}
 

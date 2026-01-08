@@ -5,8 +5,8 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class CpPropertyServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for ICpPropertyService.CurrentUser.</summary>
-	public sealed class ICpPropertyService_CurrentUserInterceptor
+	/// <summary>Tracks and configures behavior for CurrentUser.</summary>
+	public sealed class CurrentUserInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -33,39 +33,19 @@ partial class CpPropertyServiceKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpPropertyService.</summary>
-	public sealed class ICpPropertyServiceInterceptorors
-	{
-		/// <summary>Interceptor for CurrentUser.</summary>
-		public ICpPropertyService_CurrentUserInterceptor CurrentUser { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpPropertyService.</summary>
-	public ICpPropertyServiceInterceptorors ICpPropertyService { get; } = new();
+	/// <summary>Interceptor for CurrentUser.</summary>
+	public CurrentUserInterceptor CurrentUser { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpPropertyService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ICpPropertyService AsCpPropertyService() => this;
 
-	/// <summary>Backing field for ICpPropertyService.CurrentUser.</summary>
-	protected global::KnockOff.Documentation.Samples.Skills.CpUser? ICpPropertyService_CurrentUserBacking { get; set; }
+	/// <summary>Backing storage for CurrentUser.</summary>
+	protected global::KnockOff.Documentation.Samples.Skills.CpUser? CurrentUserBacking { get; set; } = default!;
 
 	global::KnockOff.Documentation.Samples.Skills.CpUser? KnockOff.Documentation.Samples.Skills.ICpPropertyService.CurrentUser
 	{
-		get
-		{
-			ICpPropertyService.CurrentUser.RecordGet();
-			if (ICpPropertyService.CurrentUser.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return ICpPropertyService_CurrentUserBacking;
-		}
-		set
-		{
-			ICpPropertyService.CurrentUser.RecordSet(value);
-			if (ICpPropertyService.CurrentUser.OnSet is { } onSetCallback)
-				onSetCallback(this, value);
-			else
-				ICpPropertyService_CurrentUserBacking = value;
-		}
+		get { CurrentUser.RecordGet(); return CurrentUser.OnGet?.Invoke(this) ?? CurrentUserBacking; }
+		set { CurrentUser.RecordSet(value); if (CurrentUser.OnSet != null) CurrentUser.OnSet(this, value); else CurrentUserBacking = value; }
 	}
 
 }

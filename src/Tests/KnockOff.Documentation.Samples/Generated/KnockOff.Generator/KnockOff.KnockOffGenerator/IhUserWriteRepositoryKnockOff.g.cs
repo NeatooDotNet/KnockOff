@@ -5,103 +5,88 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class IhUserWriteRepositoryKnockOff
 {
-	/// <summary>Tracks and configures behavior for IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUser.Add.</summary>
-	public sealed class IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUser_AddInterceptor
+	/// <summary>Tracks and configures behavior for Add.</summary>
+	public sealed class AddInterceptor
 	{
-		/// <summary>Delegate for Add(global::KnockOff.Documentation.Samples.Guides.IhUser entity).</summary>
-		public delegate void AddDelegate(IhUserWriteRepositoryKnockOff ko, global::KnockOff.Documentation.Samples.Guides.IhUser entity);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'entity' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public global::KnockOff.Documentation.Samples.Guides.IhUser? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public AddDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<IhUserWriteRepositoryKnockOff, global::KnockOff.Documentation.Samples.Guides.IhUser>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::KnockOff.Documentation.Samples.Guides.IhUser entity) { CallCount++; LastCallArg = entity; }
+		public void RecordCall(global::KnockOff.Documentation.Samples.Guides.IhUser? entity) { CallCount++; LastCallArg = entity; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUser.Delete.</summary>
-	public sealed class IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUser_DeleteInterceptor
+	/// <summary>Tracks and configures behavior for Delete.</summary>
+	public sealed class DeleteInterceptor
 	{
-		/// <summary>Delegate for Delete(int id).</summary>
-		public delegate void DeleteDelegate(IhUserWriteRepositoryKnockOff ko, int id);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public DeleteDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<IhUserWriteRepositoryKnockOff, int>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhWriteRepository<KnockOff.Documentation.Samples.Guides.IhUser>.</summary>
-	public sealed class IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUserInterceptorors
+	/// <summary>Tracks and configures behavior for GetById.</summary>
+	public sealed class GetByIdInterceptor
 	{
-		/// <summary>Interceptor for Add.</summary>
-		public IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUser_AddInterceptor Add { get; } = new();
-		/// <summary>Interceptor for Delete.</summary>
-		public IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUser_DeleteInterceptor Delete { get; } = new();
-	}
-
-	/// <summary>Tracks and configures behavior for IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUser.GetById.</summary>
-	public sealed class IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUser_GetByIdInterceptor
-	{
-		/// <summary>Delegate for GetById(int id).</summary>
+		/// <summary>Delegate for GetById.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Guides.IhUser? GetByIdDelegate(IhUserWriteRepositoryKnockOff ko, int id);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetByIdDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUser.GetAll.</summary>
-	public sealed class IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUser_GetAllInterceptor
+	/// <summary>Tracks and configures behavior for GetAll.</summary>
+	public sealed class GetAllInterceptor
 	{
-		/// <summary>Delegate for GetAll().</summary>
+		/// <summary>Delegate for GetAll.</summary>
 		public delegate global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Guides.IhUser> GetAllDelegate(IhUserWriteRepositoryKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetAllDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -111,20 +96,17 @@ partial class IhUserWriteRepositoryKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhReadRepository<KnockOff.Documentation.Samples.Guides.IhUser>.</summary>
-	public sealed class IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUserInterceptorors
-	{
-		/// <summary>Interceptor for GetById.</summary>
-		public IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUser_GetByIdInterceptor GetById { get; } = new();
-		/// <summary>Interceptor for GetAll.</summary>
-		public IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUser_GetAllInterceptor GetAll { get; } = new();
-	}
+	/// <summary>Interceptor for Add.</summary>
+	public AddInterceptor Add { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhWriteRepository<KnockOff.Documentation.Samples.Guides.IhUser>.</summary>
-	public IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUserInterceptorors IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUser { get; } = new();
+	/// <summary>Interceptor for Delete.</summary>
+	public DeleteInterceptor Delete { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhReadRepository<KnockOff.Documentation.Samples.Guides.IhUser>.</summary>
-	public IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUserInterceptorors IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUser { get; } = new();
+	/// <summary>Interceptor for GetById.</summary>
+	public GetByIdInterceptor GetById { get; } = new();
+
+	/// <summary>Interceptor for GetAll.</summary>
+	public GetAllInterceptor GetAll { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIhWriteRepository<KnockOff.Documentation.Samples.Guides.IhUser>.</summary>
 	public KnockOff.Documentation.Samples.Guides.IIhWriteRepository<KnockOff.Documentation.Samples.Guides.IhUser> AsIhWriteRepository() => this;
@@ -134,32 +116,26 @@ partial class IhUserWriteRepositoryKnockOff
 
 	void KnockOff.Documentation.Samples.Guides.IIhWriteRepository<KnockOff.Documentation.Samples.Guides.IhUser>.Add(global::KnockOff.Documentation.Samples.Guides.IhUser entity)
 	{
-		IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUser.Add.RecordCall(entity);
-		if (IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUser.Add.OnCall is { } onCallCallback)
-		{ onCallCallback(this, entity); return; }
+		Add.RecordCall(entity);
+		Add.OnCall?.Invoke(this, entity);
 	}
 
 	void KnockOff.Documentation.Samples.Guides.IIhWriteRepository<KnockOff.Documentation.Samples.Guides.IhUser>.Delete(int id)
 	{
-		IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUser.Delete.RecordCall(id);
-		if (IIhWriteRepository_KnockOff_Documentation_Samples_Guides_IhUser.Delete.OnCall is { } onCallCallback)
-		{ onCallCallback(this, id); return; }
+		Delete.RecordCall(id);
+		Delete.OnCall?.Invoke(this, id);
 	}
 
 	global::KnockOff.Documentation.Samples.Guides.IhUser? KnockOff.Documentation.Samples.Guides.IIhReadRepository<KnockOff.Documentation.Samples.Guides.IhUser>.GetById(int id)
 	{
-		IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUser.GetById.RecordCall(id);
-		if (IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUser.GetById.OnCall is { } onCallCallback)
-			return onCallCallback(this, id);
-		return default!;
+		GetById.RecordCall(id);
+		return GetById.OnCall?.Invoke(this, id) ?? default!;
 	}
 
 	global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Guides.IhUser> KnockOff.Documentation.Samples.Guides.IIhReadRepository<KnockOff.Documentation.Samples.Guides.IhUser>.GetAll()
 	{
-		IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUser.GetAll.RecordCall();
-		if (IIhReadRepository_KnockOff_Documentation_Samples_Guides_IhUser.GetAll.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Guides.IhUser>();
+		GetAll.RecordCall();
+		return GetAll.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Guides.IhUser>();
 	}
 
 }

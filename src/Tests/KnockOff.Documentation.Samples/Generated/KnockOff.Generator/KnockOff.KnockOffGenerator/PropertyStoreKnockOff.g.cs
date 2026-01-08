@@ -5,8 +5,8 @@ namespace KnockOff.Documentation.Samples.Guides.InlineStubs;
 
 partial class PropertyStoreKnockOff
 {
-	/// <summary>Tracks and configures behavior for IInPropertyStore.Int32Indexer.</summary>
-	public sealed class IInPropertyStore_Int32IndexerInterceptor
+	/// <summary>Tracks and configures behavior for Int32Indexer.</summary>
+	public sealed class Int32IndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -14,18 +14,18 @@ partial class PropertyStoreKnockOff
 		/// <summary>The key from the most recent getter access.</summary>
 		public int? LastGetKey { get; private set; }
 
-		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when the getter is accessed.</summary>
 		public global::System.Func<PropertyStoreKnockOff, int, global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo>? OnGet { get; set; }
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet(int index) { GetCount++; LastGetKey = index; }
+		public void RecordGet(int? index) { GetCount++; LastGetKey = index; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IInPropertyStore.Count.</summary>
-	public sealed class IInPropertyStore_CountInterceptor
+	/// <summary>Tracks and configures behavior for Count.</summary>
+	public sealed class CountInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -40,49 +40,29 @@ partial class PropertyStoreKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore.</summary>
-	public sealed class IInPropertyStoreInterceptorors
-	{
-		/// <summary>Interceptor for Int32Indexer.</summary>
-		public IInPropertyStore_Int32IndexerInterceptor Int32Indexer { get; } = new();
-		/// <summary>Interceptor for Count.</summary>
-		public IInPropertyStore_CountInterceptor Count { get; } = new();
-	}
+	/// <summary>Interceptor for Int32Indexer.</summary>
+	public Int32IndexerInterceptor Int32Indexer { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore.</summary>
-	public IInPropertyStoreInterceptorors IInPropertyStore { get; } = new();
+	/// <summary>Interceptor for Count.</summary>
+	public CountInterceptor Count { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore.</summary>
 	public KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore AsInPropertyStore() => this;
 
-	/// <summary>Backing dictionary for IInPropertyStore.Int32Indexer. Pre-populate with values or use OnGet callback.</summary>
-	public global::System.Collections.Generic.Dictionary<int, global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo> IInPropertyStore_Int32IndexerBacking { get; } = new();
+	/// <summary>Backing storage for Int32Indexer indexer.</summary>
+	public global::System.Collections.Generic.Dictionary<int, global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo> Int32IndexerBacking { get; } = new();
 
-	/// <summary>Backing field for IInPropertyStore.Count.</summary>
-	protected int IInPropertyStore_CountBacking { get; set; }
+	/// <summary>Backing storage for Count.</summary>
+	protected int CountBacking { get; set; } = default!;
 
 	global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore.this[int index]
 	{
-		get
-		{
-			IInPropertyStore.Int32Indexer.RecordGet(index);
-			if (IInPropertyStore.Int32Indexer.OnGet is { } onGetCallback)
-				return onGetCallback(this, index);
-			if (IInPropertyStore_Int32IndexerBacking.TryGetValue(index, out var value))
-				return value;
-			throw new global::System.Collections.Generic.KeyNotFoundException($"Key '{index}' not found. Set IInPropertyStore.Int32Indexer.OnGet or add to IInPropertyStore_Int32IndexerBacking dictionary.");
-		}
+		get { Int32Indexer.RecordGet(index); if (Int32Indexer.OnGet != null) return Int32Indexer.OnGet(this, index); return Int32IndexerBacking.TryGetValue(index, out var v) ? v : default!; }
 	}
 
 	int KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore.Count
 	{
-		get
-		{
-			IInPropertyStore.Count.RecordGet();
-			if (IInPropertyStore.Count.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IInPropertyStore_CountBacking;
-		}
+		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? CountBacking; }
 	}
 
 }

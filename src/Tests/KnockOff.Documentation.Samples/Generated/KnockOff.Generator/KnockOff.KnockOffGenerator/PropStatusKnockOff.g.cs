@@ -5,8 +5,8 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class PropStatusKnockOff
 {
-	/// <summary>Tracks and configures behavior for IPropStatus.Status.</summary>
-	public sealed class IPropStatus_StatusInterceptor
+	/// <summary>Tracks and configures behavior for Status.</summary>
+	public sealed class StatusInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -33,39 +33,19 @@ partial class PropStatusKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropStatus.</summary>
-	public sealed class IPropStatusInterceptorors
-	{
-		/// <summary>Interceptor for Status.</summary>
-		public IPropStatus_StatusInterceptor Status { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropStatus.</summary>
-	public IPropStatusInterceptorors IPropStatus { get; } = new();
+	/// <summary>Interceptor for Status.</summary>
+	public StatusInterceptor Status { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IPropStatus.</summary>
 	public KnockOff.Documentation.Samples.Guides.IPropStatus AsPropStatus() => this;
 
-	/// <summary>Backing field for IPropStatus.Status.</summary>
-	protected string IPropStatus_StatusBacking { get; set; } = "";
+	/// <summary>Backing storage for Status.</summary>
+	protected string StatusBacking { get; set; } = "";
 
 	string KnockOff.Documentation.Samples.Guides.IPropStatus.Status
 	{
-		get
-		{
-			IPropStatus.Status.RecordGet();
-			if (IPropStatus.Status.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IPropStatus_StatusBacking;
-		}
-		set
-		{
-			IPropStatus.Status.RecordSet(value);
-			if (IPropStatus.Status.OnSet is { } onSetCallback)
-				onSetCallback(this, value);
-			else
-				IPropStatus_StatusBacking = value;
-		}
+		get { Status.RecordGet(); return Status.OnGet?.Invoke(this) ?? StatusBacking; }
+		set { Status.RecordSet(value); if (Status.OnSet != null) Status.OnSet(this, value); else StatusBacking = value; }
 	}
 
 }

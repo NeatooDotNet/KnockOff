@@ -5,19 +5,19 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class GenUserFactoryKnockOff
 {
-	/// <summary>Tracks and configures behavior for IGenFactory_KnockOff_Documentation_Samples_Guides_GenUser.Create.</summary>
-	public sealed class IGenFactory_KnockOff_Documentation_Samples_Guides_GenUser_CreateInterceptor
+	/// <summary>Tracks and configures behavior for Create.</summary>
+	public sealed class CreateInterceptor
 	{
-		/// <summary>Delegate for Create().</summary>
+		/// <summary>Delegate for Create.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Guides.GenUser CreateDelegate(GenUserFactoryKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public CreateDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -27,25 +27,16 @@ partial class GenUserFactoryKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenFactory<KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
-	public sealed class IGenFactory_KnockOff_Documentation_Samples_Guides_GenUserInterceptorors
-	{
-		/// <summary>Interceptor for Create.</summary>
-		public IGenFactory_KnockOff_Documentation_Samples_Guides_GenUser_CreateInterceptor Create { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenFactory<KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
-	public IGenFactory_KnockOff_Documentation_Samples_Guides_GenUserInterceptorors IGenFactory_KnockOff_Documentation_Samples_Guides_GenUser { get; } = new();
+	/// <summary>Interceptor for Create.</summary>
+	public CreateInterceptor Create { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IGenFactory<KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
 	public KnockOff.Documentation.Samples.Guides.IGenFactory<KnockOff.Documentation.Samples.Guides.GenUser> AsGenFactory() => this;
 
 	global::KnockOff.Documentation.Samples.Guides.GenUser KnockOff.Documentation.Samples.Guides.IGenFactory<KnockOff.Documentation.Samples.Guides.GenUser>.Create()
 	{
-		IGenFactory_KnockOff_Documentation_Samples_Guides_GenUser.Create.RecordCall();
-		if (IGenFactory_KnockOff_Documentation_Samples_Guides_GenUser.Create.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return new global::KnockOff.Documentation.Samples.Guides.GenUser();
+		Create.RecordCall();
+		return Create.OnCall?.Invoke(this) ?? new global::KnockOff.Documentation.Samples.Guides.GenUser();
 	}
 
 }

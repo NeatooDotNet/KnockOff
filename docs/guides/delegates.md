@@ -179,37 +179,45 @@ public partial class ValidationPatternTests
 
 ### Factory Callbacks
 
+<!-- snippet: docs:delegates:factory-callback -->
 ```csharp
-var factoryStub = new Tests.Stubs.UserFactory();
-factoryStub.Interceptor.OnCall = (ko, id) => new User
-{
-    Id = id,
-    Name = $"User{id}",
-    CreatedAt = DateTime.UtcNow
-};
+var factoryStub = new DelegateTests.Stubs.UserFactory();
+        factoryStub.Interceptor.OnCall = (ko, id) => new DelUser
+        {
+            Id = id,
+            Name = $"User{id}"
+        };
 
-// Inject into system under test
-var service = new UserService(factoryStub);
-var user = service.CreateUser(42);
+        // Implicit conversion to delegate
+        UserFactory factory = factoryStub;
+        var user = factory(42);
 
-Assert.Equal(42, user.Id);
-Assert.True(factoryStub.Interceptor.WasCalled);
+        var userId = user.Id;                            // 42
+        var userName = user.Name;                        // "User42"
+        var wasCalled = factoryStub.Interceptor.WasCalled;  // true
 ```
+<!-- /snippet -->
 
 ### Capturing Multiple Calls
 
+<!-- snippet: docs:delegates:capturing-calls -->
 ```csharp
-var logStub = new Tests.Stubs.LogAction();
-var capturedMessages = new List<string>();
+var logStub = new VoidDelegateTests.Stubs.LogAction();
+        var capturedMessages = new List<string>();
 
-logStub.Interceptor.OnCall = (ko, msg) => capturedMessages.Add(msg);
+        logStub.Interceptor.OnCall = (ko, msg) => capturedMessages.Add(msg);
 
-// Run code that logs multiple times
-service.Process();
+        // Invoke the delegate multiple times
+        LogAction logger = logStub;
+        logger("Starting");
+        logger("Processing");
+        logger("Complete");
 
-Assert.Equal(["Starting", "Processing", "Complete"], capturedMessages);
-Assert.Equal(3, logStub.Interceptor.CallCount);
+        var messageCount = capturedMessages.Count;           // 3
+        var callCount = logStub.Interceptor.CallCount;       // 3
+        var lastMessage = logStub.Interceptor.LastCallArg;   // "Complete"
 ```
+<!-- /snippet -->
 
 ## Limitations
 

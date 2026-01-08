@@ -53,57 +53,65 @@ partial class MixedStubTestClass
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Container for all MixedService interceptors.</summary>
-		public sealed class MixedServiceInterceptors
+		/// <summary>Stub for KnockOff.Tests.MixedService via composition.</summary>
+		public class MixedService
 		{
 			/// <summary>Interceptor for VirtualProperty.</summary>
 			public MixedService_VirtualPropertyInterceptor VirtualProperty { get; } = new();
 			/// <summary>Interceptor for VirtualMethod.</summary>
 			public MixedService_VirtualMethodInterceptor VirtualMethod { get; } = new();
 
-			/// <summary>Resets all interceptors.</summary>
-			public void Reset()
+			/// <summary>The KnockOff.Tests.MixedService instance. Pass this to code expecting the target class.</summary>
+			public KnockOff.Tests.MixedService Object { get; }
+
+			public MixedService()
+			{
+				Object = new Impl(this);
+			}
+
+			/// <summary>Resets all interceptor state.</summary>
+			public void ResetInterceptors()
 			{
 				VirtualProperty.Reset();
 				VirtualMethod.Reset();
 			}
-		}
 
-		/// <summary>Stub for KnockOff.Tests.MixedService via inheritance.</summary>
-		public class MixedService : KnockOff.Tests.MixedService
-		{
-			/// <summary>Interceptors for tracking and configuring member behavior.</summary>
-			public MixedServiceInterceptors Interceptor { get; } = new();
-
-			public MixedService() : base() { }
-
-			/// <inheritdoc />
-			public override string VirtualProperty
+			/// <summary>Internal implementation that inherits from KnockOff.Tests.MixedService.</summary>
+			private sealed class Impl : KnockOff.Tests.MixedService
 			{
-				get
-				{
-					Interceptor.VirtualProperty.RecordGet();
-					if (Interceptor.VirtualProperty.OnGet is { } onGet) return onGet(this);
-					return base.VirtualProperty;
-				}
-				set
-				{
-					Interceptor.VirtualProperty.RecordSet(value);
-					if (Interceptor.VirtualProperty.OnSet is { } onSet) onSet(this, value);
-					else base.VirtualProperty = value;
-				}
-			}
+				private readonly MixedService _stub;
 
-			/// <inheritdoc />
-			public override void VirtualMethod()
-			{
-				Interceptor.VirtualMethod.RecordCall();
-				if (Interceptor.VirtualMethod.OnCall is { } onCall) { onCall(this); return; }
-				base.VirtualMethod();
-			}
+				public Impl(MixedService stub) : base()
+				{
+					_stub = stub;
+				}
 
-			/// <summary>Resets all interceptor state.</summary>
-			public void ResetInterceptors() => Interceptor.Reset();
+				/// <inheritdoc />
+				public override string VirtualProperty
+				{
+					get
+					{
+						_stub?.VirtualProperty.RecordGet();
+						if (_stub?.VirtualProperty.OnGet is { } onGet) return onGet(_stub);
+						return base.VirtualProperty;
+					}
+					set
+					{
+						_stub?.VirtualProperty.RecordSet(value);
+						if (_stub?.VirtualProperty.OnSet is { } onSet) onSet(_stub, value);
+						else base.VirtualProperty = value;
+					}
+				}
+
+				/// <inheritdoc />
+				public override void VirtualMethod()
+				{
+					_stub?.VirtualMethod.RecordCall();
+					if (_stub?.VirtualMethod.OnCall is { } onCall) { onCall(_stub); return; }
+					base.VirtualMethod();
+				}
+
+			}
 		}
 
 	}

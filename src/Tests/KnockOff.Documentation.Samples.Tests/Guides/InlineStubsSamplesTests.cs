@@ -129,7 +129,7 @@ public class InlineStubsSamplesTests : SamplesTestBase
 		propStub.Value.Value = 42;
 
 		// Wire nested stub to indexer (indexer named by parameter type: Int32Indexer)
-		store.IInPropertyStore.Int32Indexer.OnGet = (ko, index) => propStub;
+		store.Int32Indexer.OnGet = (ko, index) => propStub;
 
 		// Verify wiring works
 		IInPropertyStore service = store;

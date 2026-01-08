@@ -5,84 +5,76 @@ namespace KnockOff.Documentation.Samples.Concepts;
 
 partial class PatternUserServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for IPatternUserService.GetUser.</summary>
-	public sealed class IPatternUserService_GetUserInterceptor
+	/// <summary>Tracks and configures behavior for GetUser.</summary>
+	public sealed class GetUser2Interceptor
 	{
-		/// <summary>Delegate for GetUser(int id).</summary>
+		/// <summary>Delegate for GetUser.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Concepts.PatternUser GetUserDelegate(PatternUserServiceKnockOff ko, int id);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetUserDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IPatternUserService.CalculateScore.</summary>
-	public sealed class IPatternUserService_CalculateScoreInterceptor
+	/// <summary>Tracks and configures behavior for CalculateScore.</summary>
+	public sealed class CalculateScore2Interceptor
 	{
-		/// <summary>Delegate for CalculateScore(string name, int baseScore).</summary>
+		/// <summary>Delegate for CalculateScore.</summary>
 		public delegate int CalculateScoreDelegate(PatternUserServiceKnockOff ko, string name, int baseScore);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Arguments from the most recent call.</summary>
-		public (string name, int baseScore)? LastCallArgs { get; private set; }
+		/// <summary>The arguments from the most recent call.</summary>
+		public (string? name, int? baseScore)? LastCallArgs { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public CalculateScoreDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string name, int baseScore) { CallCount++; LastCallArgs = (name, baseScore); }
+		public void RecordCall(string? name, int? baseScore) { CallCount++; LastCallArgs = (name, baseScore); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternUserService.</summary>
-	public sealed class IPatternUserServiceInterceptorors
-	{
-		/// <summary>Interceptor for GetUser.</summary>
-		public IPatternUserService_GetUserInterceptor GetUser { get; } = new();
-		/// <summary>Interceptor for CalculateScore.</summary>
-		public IPatternUserService_CalculateScoreInterceptor CalculateScore { get; } = new();
-	}
+	/// <summary>Interceptor for GetUser.</summary>
+	public GetUser2Interceptor GetUser2 { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Concepts.IPatternUserService.</summary>
-	public IPatternUserServiceInterceptorors IPatternUserService { get; } = new();
+	/// <summary>Interceptor for CalculateScore.</summary>
+	public CalculateScore2Interceptor CalculateScore2 { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Concepts.IPatternUserService.</summary>
 	public KnockOff.Documentation.Samples.Concepts.IPatternUserService AsPatternUserService() => this;
 
 	global::KnockOff.Documentation.Samples.Concepts.PatternUser KnockOff.Documentation.Samples.Concepts.IPatternUserService.GetUser(int id)
 	{
-		IPatternUserService.GetUser.RecordCall(id);
-		if (IPatternUserService.GetUser.OnCall is { } onCallCallback)
-			return onCallCallback(this, id);
+		GetUser2.RecordCall(id);
+		if (GetUser2.OnCall != null) return GetUser2.OnCall(this, id);
 		return GetUser(id);
 	}
 
 	int KnockOff.Documentation.Samples.Concepts.IPatternUserService.CalculateScore(string name, int baseScore)
 	{
-		IPatternUserService.CalculateScore.RecordCall(name, baseScore);
-		if (IPatternUserService.CalculateScore.OnCall is { } onCallCallback)
-			return onCallCallback(this, name, baseScore);
+		CalculateScore2.RecordCall(name, baseScore);
+		if (CalculateScore2.OnCall != null) return CalculateScore2.OnCall(this, name, baseScore);
 		return CalculateScore(name, baseScore);
 	}
 

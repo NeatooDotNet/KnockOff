@@ -5,85 +5,75 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class HaAsyncRepositoryKnockOff
 {
-	/// <summary>Tracks and configures behavior for IHaAsyncRepository.GetByIdAsync.</summary>
-	public sealed class IHaAsyncRepository_GetByIdAsyncInterceptor
+	/// <summary>Tracks and configures behavior for GetByIdAsync.</summary>
+	public sealed class GetByIdAsyncInterceptor
 	{
-		/// <summary>Delegate for GetByIdAsync(int id).</summary>
+		/// <summary>Delegate for GetByIdAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.HaUser?> GetByIdAsyncDelegate(HaAsyncRepositoryKnockOff ko, int id);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetByIdAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IHaAsyncRepository.SaveAsync.</summary>
-	public sealed class IHaAsyncRepository_SaveAsyncInterceptor
+	/// <summary>Tracks and configures behavior for SaveAsync.</summary>
+	public sealed class SaveAsyncInterceptor
 	{
-		/// <summary>Delegate for SaveAsync(object entity).</summary>
+		/// <summary>Delegate for SaveAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<int> SaveAsyncDelegate(HaAsyncRepositoryKnockOff ko, object entity);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'entity' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public object? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public SaveAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(object entity) { CallCount++; LastCallArg = entity; }
+		public void RecordCall(object? entity) { CallCount++; LastCallArg = entity; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaAsyncRepository.</summary>
-	public sealed class IHaAsyncRepositoryInterceptorors
-	{
-		/// <summary>Interceptor for GetByIdAsync.</summary>
-		public IHaAsyncRepository_GetByIdAsyncInterceptor GetByIdAsync { get; } = new();
-		/// <summary>Interceptor for SaveAsync.</summary>
-		public IHaAsyncRepository_SaveAsyncInterceptor SaveAsync { get; } = new();
-	}
+	/// <summary>Interceptor for GetByIdAsync.</summary>
+	public GetByIdAsyncInterceptor GetByIdAsync { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaAsyncRepository.</summary>
-	public IHaAsyncRepositoryInterceptorors IHaAsyncRepository { get; } = new();
+	/// <summary>Interceptor for SaveAsync.</summary>
+	public SaveAsyncInterceptor SaveAsync { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IHaAsyncRepository.</summary>
 	public KnockOff.Documentation.Samples.Skills.IHaAsyncRepository AsHaAsyncRepository() => this;
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.HaUser?> KnockOff.Documentation.Samples.Skills.IHaAsyncRepository.GetByIdAsync(int id)
 	{
-		IHaAsyncRepository.GetByIdAsync.RecordCall(id);
-		if (IHaAsyncRepository.GetByIdAsync.OnCall is { } onCallCallback)
-			return onCallCallback(this, id);
-		return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Skills.HaUser?>(default!);
+		GetByIdAsync.RecordCall(id);
+		return GetByIdAsync.OnCall?.Invoke(this, id) ?? global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Skills.HaUser?>(default!);
 	}
 
 	global::System.Threading.Tasks.Task<int> KnockOff.Documentation.Samples.Skills.IHaAsyncRepository.SaveAsync(object entity)
 	{
-		IHaAsyncRepository.SaveAsync.RecordCall(entity);
-		if (IHaAsyncRepository.SaveAsync.OnCall is { } onCallCallback)
-			return onCallCallback(this, entity);
-		return global::System.Threading.Tasks.Task.FromResult<int>(default!);
+		SaveAsync.RecordCall(entity);
+		return SaveAsync.OnCall?.Invoke(this, entity) ?? global::System.Threading.Tasks.Task.FromResult<int>(default!);
 	}
 
 }

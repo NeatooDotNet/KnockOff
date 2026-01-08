@@ -14,28 +14,28 @@ IUserService service = knockOff;
 Console.WriteLine("Property Tracking:");
 service.Name = "Test User";
 Console.WriteLine($"  Set Name to: {service.Name}");
-Console.WriteLine($"  SetCount: {knockOff.IUserService.Name.SetCount}");
-Console.WriteLine($"  GetCount: {knockOff.IUserService.Name.GetCount}");
+Console.WriteLine($"  SetCount: {knockOff.Name.SetCount}");
+Console.WriteLine($"  GetCount: {knockOff.Name.GetCount}");
 // Strongly typed - no cast!
-string? lastSetValue = knockOff.IUserService.Name.LastSetValue;
+string? lastSetValue = knockOff.Name.LastSetValue;
 Console.WriteLine($"  LastSetValue (typed): {lastSetValue}");
 Console.WriteLine();
 
 // Test void method with no params
 Console.WriteLine("Void Method (no params):");
 service.DoWork();
-Console.WriteLine($"  DoWork.WasCalled: {knockOff.IUserService.DoWork.WasCalled}");
-Console.WriteLine($"  DoWork.CallCount: {knockOff.IUserService.DoWork.CallCount}");
+Console.WriteLine($"  DoWork.WasCalled: {knockOff.DoWork.WasCalled}");
+Console.WriteLine($"  DoWork.CallCount: {knockOff.DoWork.CallCount}");
 Console.WriteLine();
 
 // Test method with single param
 Console.WriteLine("Method with single param (typed access):");
 var greeting = service.GetGreeting("World");
 Console.WriteLine($"  Result: {greeting}");
-Console.WriteLine($"  CallCount: {knockOff.IUserService.GetGreeting.CallCount}");
+Console.WriteLine($"  CallCount: {knockOff.GetGreeting2.CallCount}");
 
 // Single param uses LastCallArg (not tuple)
-string? lastArg = knockOff.IUserService.GetGreeting.LastCallArg;
+string? lastArg = knockOff.GetGreeting2.LastCallArg;
 Console.WriteLine($"  LastCallArg: {lastArg}");
 Console.WriteLine();
 
@@ -44,8 +44,8 @@ Console.WriteLine("Method with multiple params:");
 service.Process("item1", 100, true);
 service.Process("item2", 200, false);
 
-var processArgs = knockOff.IUserService.Process.LastCallArgs;
-Console.WriteLine($"  Call count: {knockOff.IUserService.Process.CallCount}");
+var processArgs = knockOff.Process.LastCallArgs;
+Console.WriteLine($"  Call count: {knockOff.Process.CallCount}");
 Console.WriteLine($"  Last call: ({processArgs?.id}, {processArgs?.count}, {processArgs?.urgent})");
 Console.WriteLine();
 
@@ -53,14 +53,14 @@ Console.WriteLine();
 Console.WriteLine("AsInterface() accessor:");
 var svc = knockOff.AsUserService();
 svc.Name = "Via AsUserService()";
-Console.WriteLine($"  Name set via AsUserService(): {knockOff.IUserService.Name.LastSetValue}");
+Console.WriteLine($"  Name set via AsUserService(): {knockOff.Name.LastSetValue}");
 Console.WriteLine();
 
 // Test Reset
 Console.WriteLine("Reset tracking:");
-Console.WriteLine($"  Before reset - Name.SetCount: {knockOff.IUserService.Name.SetCount}");
-knockOff.IUserService.Name.Reset();
-Console.WriteLine($"  After reset - Name.SetCount: {knockOff.IUserService.Name.SetCount}");
+Console.WriteLine($"  Before reset - Name.SetCount: {knockOff.Name.SetCount}");
+knockOff.Name.Reset();
+Console.WriteLine($"  After reset - Name.SetCount: {knockOff.Name.SetCount}");
 
 Console.WriteLine();
 Console.WriteLine("Done!");

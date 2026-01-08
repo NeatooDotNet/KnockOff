@@ -5,8 +5,8 @@ namespace KnockOff.Documentation.Samples.Comparison;
 
 partial class MigUserServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for IMigUserService.Name.</summary>
-	public sealed class IMigUserService_NameInterceptor
+	/// <summary>Tracks and configures behavior for Name.</summary>
+	public sealed class NameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -33,119 +33,113 @@ partial class MigUserServiceKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IMigUserService.GetUser.</summary>
-	public sealed class IMigUserService_GetUserInterceptor
+	/// <summary>Tracks and configures behavior for GetUser.</summary>
+	public sealed class GetUserInterceptor
 	{
-		/// <summary>Delegate for GetUser(int id).</summary>
+		/// <summary>Delegate for GetUser.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Comparison.MigUser GetUserDelegate(MigUserServiceKnockOff ko, int id);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetUserDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IMigUserService.GetUserAsync.</summary>
-	public sealed class IMigUserService_GetUserAsyncInterceptor
+	/// <summary>Tracks and configures behavior for GetUserAsync.</summary>
+	public sealed class GetUserAsyncInterceptor
 	{
-		/// <summary>Delegate for GetUserAsync(int id).</summary>
+		/// <summary>Delegate for GetUserAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Comparison.MigUser?> GetUserAsyncDelegate(MigUserServiceKnockOff ko, int id);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetUserAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IMigUserService.Save.</summary>
-	public sealed class IMigUserService_SaveInterceptor
+	/// <summary>Tracks and configures behavior for Save.</summary>
+	public sealed class SaveInterceptor
 	{
-		/// <summary>Delegate for Save(global::KnockOff.Documentation.Samples.Comparison.MigUser user).</summary>
-		public delegate void SaveDelegate(MigUserServiceKnockOff ko, global::KnockOff.Documentation.Samples.Comparison.MigUser user);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'user' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public global::KnockOff.Documentation.Samples.Comparison.MigUser? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public SaveDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<MigUserServiceKnockOff, global::KnockOff.Documentation.Samples.Comparison.MigUser>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::KnockOff.Documentation.Samples.Comparison.MigUser user) { CallCount++; LastCallArg = user; }
+		public void RecordCall(global::KnockOff.Documentation.Samples.Comparison.MigUser? user) { CallCount++; LastCallArg = user; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IMigUserService.Delete.</summary>
-	public sealed class IMigUserService_DeleteInterceptor
+	/// <summary>Tracks and configures behavior for Delete.</summary>
+	public sealed class DeleteInterceptor
 	{
-		/// <summary>Delegate for Delete(int id).</summary>
-		public delegate void DeleteDelegate(MigUserServiceKnockOff ko, int id);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public DeleteDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<MigUserServiceKnockOff, int>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IMigUserService.GetAll.</summary>
-	public sealed class IMigUserService_GetAllInterceptor
+	/// <summary>Tracks and configures behavior for GetAll.</summary>
+	public sealed class GetAllInterceptor
 	{
-		/// <summary>Delegate for GetAll().</summary>
+		/// <summary>Delegate for GetAll.</summary>
 		public delegate global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Comparison.MigUser> GetAllDelegate(MigUserServiceKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetAllDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -155,121 +149,95 @@ partial class MigUserServiceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IMigUserService.Update.</summary>
-	public sealed class IMigUserService_UpdateInterceptor
+	/// <summary>Tracks and configures behavior for Update.</summary>
+	public sealed class UpdateInterceptor
 	{
-		/// <summary>Delegate for Update(global::KnockOff.Documentation.Samples.Comparison.MigUser user).</summary>
-		public delegate void UpdateDelegate(MigUserServiceKnockOff ko, global::KnockOff.Documentation.Samples.Comparison.MigUser user);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'user' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public global::KnockOff.Documentation.Samples.Comparison.MigUser? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public UpdateDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<MigUserServiceKnockOff, global::KnockOff.Documentation.Samples.Comparison.MigUser>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::KnockOff.Documentation.Samples.Comparison.MigUser user) { CallCount++; LastCallArg = user; }
+		public void RecordCall(global::KnockOff.Documentation.Samples.Comparison.MigUser? user) { CallCount++; LastCallArg = user; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigUserService.</summary>
-	public sealed class IMigUserServiceInterceptorors
-	{
-		/// <summary>Interceptor for Name.</summary>
-		public IMigUserService_NameInterceptor Name { get; } = new();
-		/// <summary>Interceptor for GetUser.</summary>
-		public IMigUserService_GetUserInterceptor GetUser { get; } = new();
-		/// <summary>Interceptor for GetUserAsync.</summary>
-		public IMigUserService_GetUserAsyncInterceptor GetUserAsync { get; } = new();
-		/// <summary>Interceptor for Save.</summary>
-		public IMigUserService_SaveInterceptor Save { get; } = new();
-		/// <summary>Interceptor for Delete.</summary>
-		public IMigUserService_DeleteInterceptor Delete { get; } = new();
-		/// <summary>Interceptor for GetAll.</summary>
-		public IMigUserService_GetAllInterceptor GetAll { get; } = new();
-		/// <summary>Interceptor for Update.</summary>
-		public IMigUserService_UpdateInterceptor Update { get; } = new();
-	}
+	/// <summary>Interceptor for Name.</summary>
+	public NameInterceptor Name { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigUserService.</summary>
-	public IMigUserServiceInterceptorors IMigUserService { get; } = new();
+	/// <summary>Interceptor for GetUser.</summary>
+	public GetUserInterceptor GetUser { get; } = new();
+
+	/// <summary>Interceptor for GetUserAsync.</summary>
+	public GetUserAsyncInterceptor GetUserAsync { get; } = new();
+
+	/// <summary>Interceptor for Save.</summary>
+	public SaveInterceptor Save { get; } = new();
+
+	/// <summary>Interceptor for Delete.</summary>
+	public DeleteInterceptor Delete { get; } = new();
+
+	/// <summary>Interceptor for GetAll.</summary>
+	public GetAllInterceptor GetAll { get; } = new();
+
+	/// <summary>Interceptor for Update.</summary>
+	public UpdateInterceptor Update { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IMigUserService.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IMigUserService AsMigUserService() => this;
 
-	/// <summary>Backing field for IMigUserService.Name.</summary>
-	protected string IMigUserService_NameBacking { get; set; } = "";
+	/// <summary>Backing storage for Name.</summary>
+	protected string NameBacking { get; set; } = "";
 
 	global::KnockOff.Documentation.Samples.Comparison.MigUser KnockOff.Documentation.Samples.Comparison.IMigUserService.GetUser(int id)
 	{
-		IMigUserService.GetUser.RecordCall(id);
-		if (IMigUserService.GetUser.OnCall is { } onCallCallback)
-			return onCallCallback(this, id);
-		return new global::KnockOff.Documentation.Samples.Comparison.MigUser();
+		GetUser.RecordCall(id);
+		return GetUser.OnCall?.Invoke(this, id) ?? new global::KnockOff.Documentation.Samples.Comparison.MigUser();
 	}
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Comparison.MigUser?> KnockOff.Documentation.Samples.Comparison.IMigUserService.GetUserAsync(int id)
 	{
-		IMigUserService.GetUserAsync.RecordCall(id);
-		if (IMigUserService.GetUserAsync.OnCall is { } onCallCallback)
-			return onCallCallback(this, id);
-		return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Comparison.MigUser?>(default!);
+		GetUserAsync.RecordCall(id);
+		return GetUserAsync.OnCall?.Invoke(this, id) ?? global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Comparison.MigUser?>(default!);
 	}
 
 	void KnockOff.Documentation.Samples.Comparison.IMigUserService.Save(global::KnockOff.Documentation.Samples.Comparison.MigUser user)
 	{
-		IMigUserService.Save.RecordCall(user);
-		if (IMigUserService.Save.OnCall is { } onCallCallback)
-		{ onCallCallback(this, user); return; }
+		Save.RecordCall(user);
+		Save.OnCall?.Invoke(this, user);
 	}
 
 	void KnockOff.Documentation.Samples.Comparison.IMigUserService.Delete(int id)
 	{
-		IMigUserService.Delete.RecordCall(id);
-		if (IMigUserService.Delete.OnCall is { } onCallCallback)
-		{ onCallCallback(this, id); return; }
+		Delete.RecordCall(id);
+		Delete.OnCall?.Invoke(this, id);
 	}
 
 	global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Comparison.MigUser> KnockOff.Documentation.Samples.Comparison.IMigUserService.GetAll()
 	{
-		IMigUserService.GetAll.RecordCall();
-		if (IMigUserService.GetAll.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Comparison.MigUser>();
+		GetAll.RecordCall();
+		return GetAll.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Comparison.MigUser>();
 	}
 
 	void KnockOff.Documentation.Samples.Comparison.IMigUserService.Update(global::KnockOff.Documentation.Samples.Comparison.MigUser user)
 	{
-		IMigUserService.Update.RecordCall(user);
-		if (IMigUserService.Update.OnCall is { } onCallCallback)
-		{ onCallCallback(this, user); return; }
+		Update.RecordCall(user);
+		Update.OnCall?.Invoke(this, user);
 	}
 
 	string KnockOff.Documentation.Samples.Comparison.IMigUserService.Name
 	{
-		get
-		{
-			IMigUserService.Name.RecordGet();
-			if (IMigUserService.Name.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IMigUserService_NameBacking;
-		}
-		set
-		{
-			IMigUserService.Name.RecordSet(value);
-			if (IMigUserService.Name.OnSet is { } onSetCallback)
-				onSetCallback(this, value);
-			else
-				IMigUserService_NameBacking = value;
-		}
+		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
+		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else NameBacking = value; }
 	}
 
 }

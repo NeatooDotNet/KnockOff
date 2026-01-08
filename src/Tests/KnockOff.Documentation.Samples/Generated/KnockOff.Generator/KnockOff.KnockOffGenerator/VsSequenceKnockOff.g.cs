@@ -5,19 +5,19 @@ namespace KnockOff.Documentation.Samples.Comparison;
 
 partial class VsSequenceKnockOff
 {
-	/// <summary>Tracks and configures behavior for IVsSequence.GetNext.</summary>
-	public sealed class IVsSequence_GetNextInterceptor
+	/// <summary>Tracks and configures behavior for GetNext.</summary>
+	public sealed class GetNextInterceptor
 	{
-		/// <summary>Delegate for GetNext().</summary>
+		/// <summary>Delegate for GetNext.</summary>
 		public delegate int GetNextDelegate(VsSequenceKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetNextDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -27,25 +27,16 @@ partial class VsSequenceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsSequence.</summary>
-	public sealed class IVsSequenceInterceptorors
-	{
-		/// <summary>Interceptor for GetNext.</summary>
-		public IVsSequence_GetNextInterceptor GetNext { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsSequence.</summary>
-	public IVsSequenceInterceptorors IVsSequence { get; } = new();
+	/// <summary>Interceptor for GetNext.</summary>
+	public GetNextInterceptor GetNext { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IVsSequence.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IVsSequence AsVsSequence() => this;
 
 	int KnockOff.Documentation.Samples.Comparison.IVsSequence.GetNext()
 	{
-		IVsSequence.GetNext.RecordCall();
-		if (IVsSequence.GetNext.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return default!;
+		GetNext.RecordCall();
+		return GetNext.OnCall?.Invoke(this) ?? default!;
 	}
 
 }

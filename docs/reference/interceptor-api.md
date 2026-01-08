@@ -1,16 +1,18 @@
 # Interceptor API Reference
 
-Every interface member gets a dedicated Interceptor class in its interface Interceptors property. This reference covers the complete API for each intercept type.
+Every interface member gets a dedicated Interceptor class directly on the stub class. This reference covers the complete API for each interceptor type.
 
 ## Interceptor Types
 
 | Interface Member | Interceptor Type | Access Pattern |
 |------------------|--------------|----------------|
-| Method | `{InterfaceName}_{MethodName}Interceptor` | `IInterface.MethodName` |
-| Property | `{InterfaceName}_{PropertyName}Interceptor` | `IInterface.PropertyName` |
-| Indexer | `{InterfaceName}_{KeyType}IndexerInterceptor` | `IInterface.StringIndexer`, `IInterface.IntIndexer`, etc. |
-| Event | `{InterfaceName}_{EventName}Interceptor` | `IInterface.EventName` |
-| Generic Method | `{InterfaceName}_{MethodName}Interceptor` | `IInterface.MethodName.Of<T>()` |
+| Method | `{MethodName}Interceptor` | `stub.MethodName` |
+| Property | `{PropertyName}Interceptor` | `stub.PropertyName` |
+| Indexer | `{KeyType}IndexerInterceptor` | `stub.StringIndexer`, `stub.IntIndexer`, etc. |
+| Event | `{EventName}Interceptor` | `stub.EventName` |
+| Generic Method | `{MethodName}Interceptor` | `stub.MethodName.Of<T>()` |
+
+**Note:** When a user method with the same name exists in the stub class, the interceptor gets a `2` suffix (e.g., `GetValue2Interceptor`).
 
 ## Method Interceptor
 
@@ -53,19 +55,19 @@ For interface methods: `void M()`, `T M()`, `void M(args)`, `T M(args)`
 
 ```csharp
 // Void method, no params
-Assert.True(knockOff.IService.Initialize.WasCalled);
-knockOff.IService.Initialize.OnCall = (ko) => { /* custom */ };
+Assert.True(knockOff.Initialize.WasCalled);
+knockOff.Initialize.OnCall = (ko) => { /* custom */ };
 
 // Return method, single param
-Assert.Equal(42, knockOff.IService.GetById.LastCallArg);
-knockOff.IService.GetById.OnCall = (ko, id) => new User { Id = id };
+Assert.Equal(42, knockOff.GetById.LastCallArg);
+knockOff.GetById.OnCall = (ko, id) => new User { Id = id };
 
 // Void method, multiple params
-var args = knockOff.IService.Log.LastCallArgs;
+var args = knockOff.Log.LastCallArgs;
 Assert.Equal("error", args?.level);
 Assert.Equal("Failed", args?.message);
 
-knockOff.IService.Log.OnCall = (ko, level, message) =>
+knockOff.Log.OnCall = (ko, level, message) =>
 {
     Console.WriteLine($"[{level}] {message}");
 };
@@ -108,23 +110,23 @@ For interface properties: `T Prop { get; }`, `T Prop { set; }`, `T Prop { get; s
 
 ```csharp
 // Track property access
-Assert.Equal(3, knockOff.IService.Name.GetCount);
-Assert.Equal(2, knockOff.IService.Name.SetCount);
-Assert.Equal("LastValue", knockOff.IService.Name.LastSetValue);
+Assert.Equal(3, knockOff.Name.GetCount);
+Assert.Equal(2, knockOff.Name.SetCount);
+Assert.Equal("LastValue", knockOff.Name.LastSetValue);
 
 // Override getter
-knockOff.IService.Name.OnGet = (ko) => "Always this";
+knockOff.Name.OnGet = (ko) => "Always this";
 
 // Override setter (capture without storing)
-knockOff.IService.Name.OnSet = (ko, value) =>
+knockOff.Name.OnSet = (ko, value) =>
 {
     capturedValues.Add(value);
     // Value does NOT go to backing field
 };
 
 // Reset
-knockOff.IService.Name.Reset();
-Assert.Equal(0, knockOff.IService.Name.GetCount);
+knockOff.Name.Reset();
+Assert.Equal(0, knockOff.Name.GetCount);
 ```
 
 ## Indexer Interceptor
@@ -162,7 +164,7 @@ Interceptor naming: `{KeyTypeName}IndexerInterceptor`
 ### Backing Dictionary
 
 Each indexer has a backing dictionary:
-- `{InterfaceName}_{KeyType}IndexerBacking` — e.g., `IPropertyStore_StringIndexerBacking`, `IList_IntIndexerBacking`
+- `{KeyType}IndexerBacking` — e.g., `StringIndexerBacking`, `IntIndexerBacking`
 - Type: `Dictionary<TKey, TValue>`
 
 ### Getter Behavior
@@ -184,28 +186,28 @@ When **`OnGet` is set**:
 
 ```csharp
 // Pre-populate backing
-knockOff.IPropertyStore_StringIndexerBacking["Key1"] = value1;
-knockOff.IPropertyStore_StringIndexerBacking["Key2"] = value2;
+knockOff.StringIndexerBacking["Key1"] = value1;
+knockOff.StringIndexerBacking["Key2"] = value2;
 
 // Track access
 _ = store["Key1"];
 _ = store["Key2"];
-Assert.Equal(2, knockOff.IPropertyStore.StringIndexer.GetCount);
-Assert.Equal("Key2", knockOff.IPropertyStore.StringIndexer.LastGetKey);
+Assert.Equal(2, knockOff.StringIndexer.GetCount);
+Assert.Equal("Key2", knockOff.StringIndexer.LastGetKey);
 
 // Dynamic getter
-knockOff.IPropertyStore.StringIndexer.OnGet = (ko, key) =>
+knockOff.StringIndexer.OnGet = (ko, key) =>
 {
     if (key == "special") return specialValue;
-    return ko.IPropertyStore_StringIndexerBacking.GetValueOrDefault(key);
+    return ko.StringIndexerBacking.GetValueOrDefault(key);
 };
 
 // Track setter
 store["NewKey"] = newValue;
-Assert.Equal("NewKey", knockOff.IPropertyStore.StringIndexer.LastSetEntry?.key);
+Assert.Equal("NewKey", knockOff.StringIndexer.LastSetEntry?.Key);
 
 // Interceptor setter
-knockOff.IPropertyStore.StringIndexer.OnSet = (ko, key, value) =>
+knockOff.StringIndexer.OnSet = (ko, key, value) =>
 {
     // Custom logic
     // Value does NOT go to backing dictionary
@@ -220,77 +222,61 @@ For interface events: `event EventHandler E`, `event EventHandler<T> E`, `event 
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `SubscribeCount` | `int` | Number of times handlers were added |
-| `UnsubscribeCount` | `int` | Number of times handlers were removed |
+| `AddCount` | `int` | Number of times handlers were added |
+| `RemoveCount` | `int` | Number of times handlers were removed |
 | `HasSubscribers` | `bool` | `true` if at least one handler is attached |
-| `RaiseCount` | `int` | Number of times event was raised |
-| `WasRaised` | `bool` | `true` if `RaiseCount > 0` |
-| `LastRaiseArgs` | `T?` | Arguments from most recent raise |
-| `AllRaises` | `IReadOnlyList<T>` | All raise arguments in order |
-
-### Args Type by Delegate
-
-| Delegate Type | Args Tracking Type |
-|--------------|-------------------|
-| `EventHandler` | `(object? sender, EventArgs e)` |
-| `EventHandler<T>` | `(object? sender, T e)` |
-| `Action` | None (no args) |
-| `Action<T>` | `T` |
-| `Action<T1, T2>` | `(T1 arg1, T2 arg2)` |
-| `Action<T1, T2, T3>` | `(T1 arg1, T2 arg2, T3 arg3)` |
 
 ### Methods
 
 | Method | Description |
 |--------|-------------|
-| `Raise(...)` | Raises the event and records arguments |
-| `Reset()` | Clears counts and `AllRaises`, keeps handlers attached |
-| `Clear()` | Clears counts, `AllRaises`, AND removes all handlers |
+| `Raise(...)` | Raises the event to all subscribers |
+| `Reset()` | Clears counts AND removes all handlers |
+| `RecordAdd(handler)` | Internal - records subscription |
+| `RecordRemove(handler)` | Internal - records unsubscription |
 
 ### Raise Signatures
 
-| Delegate Type | Raise Overloads |
+| Delegate Type | Raise Signature |
 |--------------|----------------|
-| `EventHandler` | `Raise()`, `Raise(sender, e)` |
-| `EventHandler<T>` | `Raise(e)`, `Raise(sender, e)` |
+| `EventHandler` | `Raise(object? sender, EventArgs e)` |
+| `EventHandler<T>` | `Raise(object? sender, T e)` |
 | `Action` | `Raise()` |
-| `Action<T>` | `Raise(arg)` |
-| `Action<T1, T2>` | `Raise(arg1, arg2)` |
+| `Action<T>` | `Raise(T arg)` |
+| `Action<T1, T2>` | `Raise(T1 arg1, T2 arg2)` |
 
 ### Behavior Notes
 
 - `Raise()` works even with no subscribers (no exception)
-- `Reset()` clears tracking but keeps handlers attached
-- `Clear()` clears both tracking and handlers
-- All raises are tracked in `AllRaises` regardless of subscriber count
+- `Reset()` clears tracking AND removes all handlers
 
 ### Examples
 
 ```csharp
 // Subscribe tracking
 source.DataReceived += handler;
-Assert.Equal(1, knockOff.IEventSource.DataReceived.SubscribeCount);
-Assert.True(knockOff.IEventSource.DataReceived.HasSubscribers);
+Assert.Equal(1, knockOff.DataReceived.AddCount);
+Assert.True(knockOff.DataReceived.HasSubscribers);
 
-// Raise event
-knockOff.IEventSource.DataReceived.Raise("test data");
-Assert.True(knockOff.IEventSource.DataReceived.WasRaised);
-Assert.Equal("test data", knockOff.IEventSource.DataReceived.LastRaiseArgs?.e);
+// Raise event (EventHandler<T> requires sender)
+knockOff.DataReceived.Raise(null, "test data");
 
 // EventHandler (non-generic)
-knockOff.IEventSource.Completed.Raise(); // null sender, EventArgs.Empty
+knockOff.Completed.Raise(null, EventArgs.Empty);
 
 // Action with params
-knockOff.IEventSource.ProgressChanged.Raise(75);
-knockOff.IEventSource.DataUpdated.Raise("key", 42);
+knockOff.ProgressChanged.Raise(75);
+knockOff.DataUpdated.Raise("key", 42);
 
-// All raises
-var allRaises = knockOff.IEventSource.DataReceived.AllRaises;
-Assert.Equal(3, allRaises.Count);
+// Unsubscribe tracking
+source.DataReceived -= handler;
+Assert.Equal(1, knockOff.DataReceived.RemoveCount);
+Assert.False(knockOff.DataReceived.HasSubscribers);
 
-// Reset vs Clear
-knockOff.IEventSource.DataReceived.Reset();  // Clears tracking, keeps handlers
-knockOff.IEventSource.DataReceived.Clear();  // Clears tracking AND handlers
+// Reset clears counts AND handlers
+knockOff.DataReceived.Reset();
+Assert.Equal(0, knockOff.DataReceived.AddCount);
+Assert.Equal(0, knockOff.DataReceived.RemoveCount);
 ```
 
 ## Reset Behavior Summary
@@ -300,13 +286,13 @@ knockOff.IEventSource.DataReceived.Clear();  // Clears tracking AND handlers
 | Method | `CallCount`, `LastCallArg`/`LastCallArgs`, `OnCall` | — |
 | Property | `GetCount`, `SetCount`, `LastSetValue`, `OnGet`, `OnSet` | Backing field |
 | Indexer | `GetCount`, `SetCount`, `LastGetKey`, `LastSetEntry`, `OnGet`, `OnSet` | Backing dictionary |
-| Event | `SubscribeCount`, `UnsubscribeCount`, `RaiseCount`, `AllRaises` | Event handlers (use `Clear()` to remove) |
+| Event | `AddCount`, `RemoveCount`, handlers | — |
 | Generic Method | All typed intercepts, `CalledTypeArguments` | — |
 | Generic Method `.Of<T>()` | `CallCount`, `LastCallArg`, `OnCall` | — |
 
 ## Async Method Interceptors
 
-Async methods use the same intercept structure as sync methods. The `OnCall` callback returns the async type:
+Async methods use the same interceptor structure as sync methods. The `OnCall` callback returns the async type:
 
 | Return Type | OnCall Return Type |
 |-------------|-------------------|
@@ -316,10 +302,10 @@ Async methods use the same intercept structure as sync methods. The `OnCall` cal
 | `ValueTask<T>` | `ValueTask<T>` |
 
 ```csharp
-knockOff.IRepository.GetByIdAsync.OnCall = (ko, id) =>
+knockOff.GetByIdAsync.OnCall = (ko, id) =>
     Task.FromResult<User?>(new User { Id = id });
 
-knockOff.IRepository.SaveAsync.OnCall = (ko, entity) =>
+knockOff.SaveAsync.OnCall = (ko, entity) =>
     Task.FromException<int>(new DbException("Failed"));
 ```
 
@@ -377,29 +363,29 @@ Accessed via `.Of<T>()`:
 
 ```csharp
 // Configure per type
-knockOff.ISerializer.Deserialize.Of<User>().OnCall = (ko, json) =>
+knockOff.Deserialize.Of<User>().OnCall = (ko, json) =>
     JsonSerializer.Deserialize<User>(json)!;
 
 // Per-type tracking
-Assert.Equal(2, knockOff.ISerializer.Deserialize.Of<User>().CallCount);
-Assert.Equal("{...}", knockOff.ISerializer.Deserialize.Of<User>().LastCallArg);
+Assert.Equal(2, knockOff.Deserialize.Of<User>().CallCount);
+Assert.Equal("{...}", knockOff.Deserialize.Of<User>().LastCallArg);
 
 // Aggregate tracking
-Assert.Equal(5, knockOff.ISerializer.Deserialize.TotalCallCount);
-Assert.True(knockOff.ISerializer.Deserialize.WasCalled);
+Assert.Equal(5, knockOff.Deserialize.TotalCallCount);
+Assert.True(knockOff.Deserialize.WasCalled);
 
 // See which types were called
-var types = knockOff.ISerializer.Deserialize.CalledTypeArguments;
+var types = knockOff.Deserialize.CalledTypeArguments;
 // [typeof(User), typeof(Order)]
 
 // Multiple type parameters
-knockOff.IConverter.Convert.Of<string, int>().OnCall = (ko, s) => s.Length;
+knockOff.Convert.Of<string, int>().OnCall = (ko, s) => s.Length;
 
 // Reset single type
-knockOff.ISerializer.Deserialize.Of<User>().Reset();
+knockOff.Deserialize.Of<User>().Reset();
 
 // Reset all types
-knockOff.ISerializer.Deserialize.Reset();
+knockOff.Deserialize.Reset();
 ```
 
 ### Smart Defaults

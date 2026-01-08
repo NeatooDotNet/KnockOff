@@ -5,20 +5,17 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class MethodHandlerStateKnockOff
 {
-	/// <summary>Tracks and configures behavior for IMethodHandlerState.Initialize.</summary>
-	public sealed class IMethodHandlerState_InitializeInterceptor
+	/// <summary>Tracks and configures behavior for Initialize.</summary>
+	public sealed class InitializeInterceptor
 	{
-		/// <summary>Delegate for Initialize().</summary>
-		public delegate void InitializeDelegate(MethodHandlerStateKnockOff ko);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public InitializeDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<MethodHandlerStateKnockOff>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
@@ -27,20 +24,17 @@ partial class MethodHandlerStateKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IMethodHandlerState.Process.</summary>
-	public sealed class IMethodHandlerState_ProcessInterceptor
+	/// <summary>Tracks and configures behavior for Process.</summary>
+	public sealed class ProcessInterceptor
 	{
-		/// <summary>Delegate for Process().</summary>
-		public delegate void ProcessDelegate(MethodHandlerStateKnockOff ko);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public ProcessDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<MethodHandlerStateKnockOff>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
@@ -49,33 +43,25 @@ partial class MethodHandlerStateKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodHandlerState.</summary>
-	public sealed class IMethodHandlerStateInterceptorors
-	{
-		/// <summary>Interceptor for Initialize.</summary>
-		public IMethodHandlerState_InitializeInterceptor Initialize { get; } = new();
-		/// <summary>Interceptor for Process.</summary>
-		public IMethodHandlerState_ProcessInterceptor Process { get; } = new();
-	}
+	/// <summary>Interceptor for Initialize.</summary>
+	public InitializeInterceptor Initialize { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodHandlerState.</summary>
-	public IMethodHandlerStateInterceptorors IMethodHandlerState { get; } = new();
+	/// <summary>Interceptor for Process.</summary>
+	public ProcessInterceptor Process { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodHandlerState.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMethodHandlerState AsMethodHandlerState() => this;
 
 	void KnockOff.Documentation.Samples.Guides.IMethodHandlerState.Initialize()
 	{
-		IMethodHandlerState.Initialize.RecordCall();
-		if (IMethodHandlerState.Initialize.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		Initialize.RecordCall();
+		Initialize.OnCall?.Invoke(this);
 	}
 
 	void KnockOff.Documentation.Samples.Guides.IMethodHandlerState.Process()
 	{
-		IMethodHandlerState.Process.RecordCall();
-		if (IMethodHandlerState.Process.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		Process.RecordCall();
+		Process.OnCall?.Invoke(this);
 	}
 
 }

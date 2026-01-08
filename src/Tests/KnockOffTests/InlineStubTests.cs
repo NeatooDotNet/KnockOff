@@ -507,12 +507,12 @@ public class ClassStubTests
 	[Fact]
 	public void ClassStub_Exists()
 	{
-		// The Stubs.SimpleService class should be generated and inherit from SimpleService
+		// The Stubs.SimpleService class should be generated (wrapper with composition)
 		var stub = new ClassStubTestClass.Stubs.SimpleService();
 		Assert.NotNull(stub);
 
-		// Verify it's actually a SimpleService (substitutability)
-		SimpleService service = stub;
+		// Verify .Object is substitutable for SimpleService
+		SimpleService service = stub.Object;
 		Assert.NotNull(service);
 	}
 
@@ -523,18 +523,18 @@ public class ClassStubTests
 		var stub = new ClassStubTestClass.Stubs.SimpleService("TestName");
 
 		// The name should be set via base constructor
-		Assert.Equal("TestName", stub.Name);
+		Assert.Equal("TestName", stub.Object.Name);
 	}
 
 	[Fact]
 	public void ClassStub_Property_TracksGetter()
 	{
 		var stub = new ClassStubTestClass.Stubs.SimpleService();
-		stub.Interceptor.Name.OnGet = (ko) => "Intercepted";
+		stub.Name.OnGet = (ko) => "Intercepted";
 
-		var name = stub.Name;
+		var name = stub.Object.Name;
 
-		Assert.Equal(1, stub.Interceptor.Name.GetCount);
+		Assert.Equal(1, stub.Name.GetCount);
 		Assert.Equal("Intercepted", name);
 	}
 
@@ -543,10 +543,10 @@ public class ClassStubTests
 	{
 		var stub = new ClassStubTestClass.Stubs.SimpleService();
 
-		stub.Name = "NewValue";
+		stub.Object.Name = "NewValue";
 
-		Assert.Equal(1, stub.Interceptor.Name.SetCount);
-		Assert.Equal("NewValue", stub.Interceptor.Name.LastSetValue);
+		Assert.Equal(1, stub.Name.SetCount);
+		Assert.Equal("NewValue", stub.Name.LastSetValue);
 	}
 
 	[Fact]
@@ -555,10 +555,10 @@ public class ClassStubTests
 		var stub = new ClassStubTestClass.Stubs.SimpleService();
 
 		// Set through stub
-		stub.Name = "BaseValue";
+		stub.Object.Name = "BaseValue";
 
 		// Get should read from base
-		var name = stub.Name;
+		var name = stub.Object.Name;
 
 		Assert.Equal("BaseValue", name);
 	}
@@ -568,11 +568,11 @@ public class ClassStubTests
 	{
 		var stub = new ClassStubTestClass.Stubs.SimpleService();
 
-		stub.DoWork();
-		stub.DoWork();
+		stub.Object.DoWork();
+		stub.Object.DoWork();
 
-		Assert.Equal(2, stub.Interceptor.DoWork.CallCount);
-		Assert.True(stub.Interceptor.DoWork.WasCalled);
+		Assert.Equal(2, stub.DoWork.CallCount);
+		Assert.True(stub.DoWork.WasCalled);
 	}
 
 	[Fact]
@@ -580,18 +580,18 @@ public class ClassStubTests
 	{
 		var stub = new ClassStubTestClass.Stubs.SimpleService();
 
-		stub.Calculate(42);
+		stub.Object.Calculate(42);
 
-		Assert.Equal(42, stub.Interceptor.Calculate.LastCallArg);
+		Assert.Equal(42, stub.Calculate.LastCallArg);
 	}
 
 	[Fact]
 	public void ClassStub_Method_OnCall_ReturnsCustomValue()
 	{
 		var stub = new ClassStubTestClass.Stubs.SimpleService();
-		stub.Interceptor.Calculate.OnCall = (ko, x) => x * 10;
+		stub.Calculate.OnCall = (ko, x) => x * 10;
 
-		var result = stub.Calculate(5);
+		var result = stub.Object.Calculate(5);
 
 		Assert.Equal(50, result);
 	}
@@ -602,7 +602,7 @@ public class ClassStubTests
 		var stub = new ClassStubTestClass.Stubs.SimpleService();
 
 		// Base implementation: x * 2
-		var result = stub.Calculate(5);
+		var result = stub.Object.Calculate(5);
 
 		Assert.Equal(10, result);
 	}
@@ -612,28 +612,28 @@ public class ClassStubTests
 	{
 		var stub = new ClassStubTestClass.Stubs.SimpleService();
 
-		stub.Format("Test", 123);
+		stub.Object.Format("Test", 123);
 
-		Assert.NotNull(stub.Interceptor.Format.LastCallArgs);
-		Assert.Equal("Test", stub.Interceptor.Format.LastCallArgs.Value.input);
-		Assert.Equal(123, stub.Interceptor.Format.LastCallArgs.Value.count);
+		Assert.NotNull(stub.Format.LastCallArgs);
+		Assert.Equal("Test", stub.Format.LastCallArgs.Value.input);
+		Assert.Equal(123, stub.Format.LastCallArgs.Value.count);
 	}
 
 	[Fact]
 	public void ClassStub_Reset_ClearsState()
 	{
 		var stub = new ClassStubTestClass.Stubs.SimpleService();
-		stub.Interceptor.Calculate.OnCall = (ko, x) => 100;
+		stub.Calculate.OnCall = (ko, x) => 100;
 
-		stub.Calculate(1);
-		stub.Calculate(2);
+		stub.Object.Calculate(1);
+		stub.Object.Calculate(2);
 
-		stub.Interceptor.Calculate.Reset();
+		stub.Calculate.Reset();
 
-		Assert.Equal(0, stub.Interceptor.Calculate.CallCount);
-		Assert.False(stub.Interceptor.Calculate.WasCalled);
-		Assert.Null(stub.Interceptor.Calculate.OnCall);
-		Assert.Null(stub.Interceptor.Calculate.LastCallArg);
+		Assert.Equal(0, stub.Calculate.CallCount);
+		Assert.False(stub.Calculate.WasCalled);
+		Assert.Null(stub.Calculate.OnCall);
+		Assert.Null(stub.Calculate.LastCallArg);
 	}
 
 	[Fact]
@@ -641,25 +641,25 @@ public class ClassStubTests
 	{
 		var stub = new ClassStubTestClass.Stubs.SimpleService();
 
-		stub.Calculate(1);
-		stub.DoWork();
-		stub.Name = "Test";
+		stub.Object.Calculate(1);
+		stub.Object.DoWork();
+		stub.Object.Name = "Test";
 
 		stub.ResetInterceptors();
 
-		Assert.Equal(0, stub.Interceptor.Calculate.CallCount);
-		Assert.Equal(0, stub.Interceptor.DoWork.CallCount);
-		Assert.Equal(0, stub.Interceptor.Name.SetCount);
+		Assert.Equal(0, stub.Calculate.CallCount);
+		Assert.Equal(0, stub.DoWork.CallCount);
+		Assert.Equal(0, stub.Name.SetCount);
 	}
 
 	[Fact]
 	public void ClassStub_Substitutability_PassToMethod()
 	{
 		var stub = new ClassStubTestClass.Stubs.SimpleService("SubstitutedName");
-		stub.Interceptor.Calculate.OnCall = (ko, x) => x * 100;
+		stub.Calculate.OnCall = (ko, x) => x * 100;
 
-		// Pass the stub to a method expecting SimpleService
-		var result = ProcessService(stub);
+		// Pass the stub.Object to a method expecting SimpleService
+		var result = ProcessService(stub.Object);
 
 		Assert.Equal("SubstitutedName: 500", result);
 	}
@@ -679,8 +679,8 @@ public class AbstractClassStubTests
 		var stub = new AbstractStubTestClass.Stubs.AbstractRepository();
 		Assert.NotNull(stub);
 
-		// Verify substitutability
-		AbstractRepository repo = stub;
+		// Verify substitutability via .Object
+		AbstractRepository repo = stub.Object;
 		Assert.NotNull(repo);
 	}
 
@@ -690,7 +690,7 @@ public class AbstractClassStubTests
 		var stub = new AbstractStubTestClass.Stubs.AbstractRepository();
 
 		// Abstract property should return default when no callback
-		var connectionString = stub.ConnectionString;
+		var connectionString = stub.Object.ConnectionString;
 
 		Assert.Null(connectionString);
 	}
@@ -699,9 +699,9 @@ public class AbstractClassStubTests
 	public void AbstractStub_Property_ReturnsCallback_WhenSet()
 	{
 		var stub = new AbstractStubTestClass.Stubs.AbstractRepository();
-		stub.Interceptor.ConnectionString.OnGet = (ko) => "Server=test";
+		stub.ConnectionString.OnGet = (ko) => "Server=test";
 
-		var connectionString = stub.ConnectionString;
+		var connectionString = stub.Object.ConnectionString;
 
 		Assert.Equal("Server=test", connectionString);
 	}
@@ -712,9 +712,9 @@ public class AbstractClassStubTests
 		var stub = new AbstractStubTestClass.Stubs.AbstractRepository();
 
 		// Should not throw - abstract void methods just record the call
-		stub.Connect();
+		stub.Object.Connect();
 
-		Assert.True(stub.Interceptor.Connect.WasCalled);
+		Assert.True(stub.Connect.WasCalled);
 	}
 
 	[Fact]
@@ -722,19 +722,19 @@ public class AbstractClassStubTests
 	{
 		var stub = new AbstractStubTestClass.Stubs.AbstractRepository();
 
-		var result = stub.Execute("SELECT 1");
+		var result = stub.Object.Execute("SELECT 1");
 
 		Assert.Equal(0, result); // default(int)
-		Assert.Equal("SELECT 1", stub.Interceptor.Execute.LastCallArg);
+		Assert.Equal("SELECT 1", stub.Execute.LastCallArg);
 	}
 
 	[Fact]
 	public void AbstractStub_ReturningMethod_ReturnsCallback_WhenSet()
 	{
 		var stub = new AbstractStubTestClass.Stubs.AbstractRepository();
-		stub.Interceptor.Execute.OnCall = (ko, cmd) => cmd.Length;
+		stub.Execute.OnCall = (ko, cmd) => cmd.Length;
 
-		var result = stub.Execute("SELECT 1");
+		var result = stub.Object.Execute("SELECT 1");
 
 		Assert.Equal(8, result);
 	}
@@ -747,14 +747,13 @@ public class MixedClassStubTests
 	{
 		var stub = new MixedStubTestClass.Stubs.MixedService();
 
-		// Virtual property should have interceptor
-		Assert.NotNull(stub.Interceptor.VirtualProperty);
+		// Virtual property should have interceptor on wrapper
+		Assert.NotNull(stub.VirtualProperty);
 
-		// Virtual method should have interceptor
-		Assert.NotNull(stub.Interceptor.VirtualMethod);
+		// Virtual method should have interceptor on wrapper
+		Assert.NotNull(stub.VirtualMethod);
 
-		// Non-virtual members don't have interceptors - they use base behavior
-		// (This is verified by the fact that we can access them but they're not tracked)
+		// Non-virtual members don't have interceptors - access through .Object
 	}
 
 	[Fact]
@@ -762,9 +761,9 @@ public class MixedClassStubTests
 	{
 		var stub = new MixedStubTestClass.Stubs.MixedService();
 
-		stub.VirtualProperty = "Test";
+		stub.Object.VirtualProperty = "Test";
 
-		Assert.Equal(1, stub.Interceptor.VirtualProperty.SetCount);
+		Assert.Equal(1, stub.VirtualProperty.SetCount);
 	}
 
 	[Fact]
@@ -772,22 +771,22 @@ public class MixedClassStubTests
 	{
 		var stub = new MixedStubTestClass.Stubs.MixedService();
 
-		stub.VirtualMethod();
+		stub.Object.VirtualMethod();
 
-		Assert.True(stub.Interceptor.VirtualMethod.WasCalled);
+		Assert.True(stub.VirtualMethod.WasCalled);
 	}
 
 	[Fact]
-	public void MixedStub_NonVirtualMembers_WorkThroughBase()
+	public void MixedStub_NonVirtualMembers_WorkThroughObject()
 	{
 		var stub = new MixedStubTestClass.Stubs.MixedService();
 
-		// Non-virtual property still works (through base)
-		stub.NonVirtualProperty = "BaseValue";
-		Assert.Equal("BaseValue", stub.NonVirtualProperty);
+		// Non-virtual property works through .Object
+		stub.Object.NonVirtualProperty = "BaseValue";
+		Assert.Equal("BaseValue", stub.Object.NonVirtualProperty);
 
-		// Non-virtual method still works (through base)
-		stub.NonVirtualMethod(); // Should not throw
+		// Non-virtual method works through .Object
+		stub.Object.NonVirtualMethod(); // Should not throw
 	}
 }
 

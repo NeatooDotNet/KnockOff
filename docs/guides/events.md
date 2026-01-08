@@ -21,198 +21,145 @@ public partial class GuideEventSourceKnockOff : IGuideEventSource { }
 
 ## Supported Delegate Types
 
-| Delegate Type | Raise Signature | Args Tracking |
-|--------------|-----------------|---------------|
-| `EventHandler` | `Raise()` | `(object? sender, EventArgs e)` |
-| `EventHandler<T>` | `Raise(T e)` or `Raise(sender, e)` | `(object? sender, T e)` |
-| `Action` | `Raise()` | None |
-| `Action<T>` | `Raise(T)` | `T` |
-| `Action<T1, T2>` | `Raise(T1, T2)` | `(T1 arg1, T2 arg2)` |
-| `Func<TResult>` | `RaiseAndReturn()` | None, returns `TResult` |
+| Delegate Type | Raise Signature |
+|--------------|-----------------|
+| `EventHandler` | `Raise(object? sender, EventArgs e)` |
+| `EventHandler<T>` | `Raise(object? sender, T e)` |
+| `Action` | `Raise()` |
+| `Action<T>` | `Raise(T arg)` |
+| `Action<T1, T2>` | `Raise(T1 arg1, T2 arg2)` |
 
 ## Subscription Tracking
 
+<!-- snippet: docs:events:subscription-tracking -->
 ```csharp
-var knockOff = new EventSourceKnockOff();
-IEventSource source = knockOff;
-
 // Initially no subscribers
-Assert.False(knockOff.IEventSource.MessageReceived.HasSubscribers);
-Assert.Equal(0, knockOff.IEventSource.MessageReceived.SubscribeCount);
+        var hasSubscribers = knockOff.MessageReceived.HasSubscribers;  // false
+        var addCount = knockOff.MessageReceived.AddCount;              // 0
 
-// Subscribe
-EventHandler<string> handler = (sender, e) => Console.WriteLine(e);
-source.MessageReceived += handler;
+        // Subscribe
+        EventHandler<string> handler = (sender, e) => Console.WriteLine(e);
+        source.MessageReceived += handler;
 
-Assert.True(knockOff.IEventSource.MessageReceived.HasSubscribers);
-Assert.Equal(1, knockOff.IEventSource.MessageReceived.SubscribeCount);
+        hasSubscribers = knockOff.MessageReceived.HasSubscribers;  // true
+        addCount = knockOff.MessageReceived.AddCount;              // 1
 
-// Unsubscribe
-source.MessageReceived -= handler;
+        // Unsubscribe
+        source.MessageReceived -= handler;
 
-Assert.Equal(1, knockOff.IEventSource.MessageReceived.UnsubscribeCount);
+        var removeCount = knockOff.MessageReceived.RemoveCount;    // 1
 ```
+<!-- /snippet -->
 
 ## Raising Events
 
 ### EventHandler<T>
 
+<!-- snippet: docs:events:eventhandler-raise -->
 ```csharp
-var knockOff = new EventSourceKnockOff();
-IEventSource source = knockOff;
-
 string? received = null;
-source.MessageReceived += (sender, e) => received = e;
+        source.MessageReceived += (sender, e) => received = e;
 
-// Raise with sender
-knockOff.IEventSource.MessageReceived.Raise(knockOff, "Hello");
+        // Raise always requires sender parameter
+        knockOff.MessageReceived.Raise(null, "Hello");
 
-// Or raise with null sender (convenience)
-knockOff.IEventSource.MessageReceived.Raise("World");
-
-Assert.Equal("World", received);
+        // received is now "Hello"
 ```
+<!-- /snippet -->
 
 ### EventHandler (no type parameter)
 
+<!-- snippet: docs:events:eventhandler-noargs -->
 ```csharp
 var invoked = false;
-source.OnCompleted += (sender, e) => invoked = true;
+        source.OnCompleted += (sender, e) => invoked = true;
 
-// Raise with no arguments (uses null sender, EventArgs.Empty)
-knockOff.IEventSource.OnCompleted.Raise();
+        // Raise requires sender and EventArgs
+        knockOff.OnCompleted.Raise(null, EventArgs.Empty);
 
-Assert.True(invoked);
+        // invoked is now true
 ```
+<!-- /snippet -->
 
 ### Action<T>
 
+<!-- snippet: docs:events:action-raise -->
 ```csharp
 int? progress = null;
-source.OnProgress += (value) => progress = value;
+        source.OnProgress += (value) => progress = value;
 
-knockOff.IEventSource.OnProgress.Raise(75);
+        knockOff.OnProgress.Raise(75);
 
-Assert.Equal(75, progress);
+        // progress is now 75
 ```
+<!-- /snippet -->
 
 ### Action<T1, T2>
 
+<!-- snippet: docs:events:action-multi -->
 ```csharp
 string? name = null;
-int? value = null;
-source.OnData += (n, v) => { name = n; value = v; };
+        int? value = null;
+        source.OnData += (n, v) => { name = n; value = v; };
 
-knockOff.IEventSource.OnData.Raise("Temperature", 72);
+        knockOff.OnData.Raise("Temperature", 72);
 
-Assert.Equal("Temperature", name);
-Assert.Equal(72, value);
+        // name is "Temperature", value is 72
 ```
+<!-- /snippet -->
 
-## Raise Tracking
+## Tracking Properties
 
-Every raise is tracked with arguments:
+Event interceptors track subscription counts:
 
+<!-- snippet: docs:events:tracking-properties -->
 ```csharp
-knockOff.IEventSource.MessageReceived.Raise("First");
-knockOff.IEventSource.MessageReceived.Raise("Second");
-knockOff.IEventSource.MessageReceived.Raise("Third");
-
-// Count and boolean
-Assert.Equal(3, knockOff.IEventSource.MessageReceived.RaiseCount);
-Assert.True(knockOff.IEventSource.MessageReceived.WasRaised);
-
-// Last raise arguments (tuple for EventHandler<T>)
-var lastArgs = knockOff.IEventSource.MessageReceived.LastRaiseArgs;
-Assert.Null(lastArgs?.sender);  // null sender from Raise(string) overload
-Assert.Equal("Third", lastArgs?.e);
-
-// All raises
-var allRaises = knockOff.IEventSource.MessageReceived.AllRaises;
-Assert.Equal("First", allRaises[0].e);
-Assert.Equal("Second", allRaises[1].e);
-Assert.Equal("Third", allRaises[2].e);
+// Subscription tracking
+        var addCount = knockOff.MessageReceived.AddCount;        // Times += was called
+        var removeCount = knockOff.MessageReceived.RemoveCount;  // Times -= was called
+        var hasSubs = knockOff.MessageReceived.HasSubscribers;   // At least one handler attached
 ```
+<!-- /snippet -->
 
-### Multi-Parameter Action Tracking
+## Reset
 
-```csharp
-knockOff.IEventSource.OnData.Raise("Temp", 72);
-knockOff.IEventSource.OnData.Raise("Humidity", 45);
+`Reset()` clears **both tracking counts and removes all handlers**:
 
-// Named tuple access
-var last = knockOff.IEventSource.OnData.LastRaiseArgs;
-Assert.Equal("Humidity", last?.arg1);
-Assert.Equal(45, last?.arg2);
-
-// All raises as tuples
-var all = knockOff.IEventSource.OnData.AllRaises;
-Assert.Equal(("Temp", 72), all[0]);
-Assert.Equal(("Humidity", 45), all[1]);
-```
-
-## Reset vs Clear
-
-### Reset
-
-Clears tracking counters but **keeps handlers attached**:
-
+<!-- snippet: docs:events:reset -->
 ```csharp
 var invoked = false;
-source.MessageReceived += (s, e) => invoked = true;
+        source.MessageReceived += (s, e) => invoked = true;
 
-knockOff.IEventSource.MessageReceived.Raise("Before");
-Assert.Equal(1, knockOff.IEventSource.MessageReceived.RaiseCount);
+        // Before reset
+        var addCountBefore = knockOff.MessageReceived.AddCount;        // 1
+        var hasSubsBefore = knockOff.MessageReceived.HasSubscribers;   // true
 
-knockOff.IEventSource.MessageReceived.Reset();
+        knockOff.MessageReceived.Reset();
 
-// Tracking cleared
-Assert.Equal(0, knockOff.IEventSource.MessageReceived.SubscribeCount);
-Assert.Equal(0, knockOff.IEventSource.MessageReceived.RaiseCount);
-Assert.Empty(knockOff.IEventSource.MessageReceived.AllRaises);
+        // After reset - tracking cleared
+        var addCountAfter = knockOff.MessageReceived.AddCount;         // 0
+        var removeCountAfter = knockOff.MessageReceived.RemoveCount;   // 0
+        var hasSubsAfter = knockOff.MessageReceived.HasSubscribers;    // false
 
-// But handlers still work!
-invoked = false;
-knockOff.IEventSource.MessageReceived.Raise("After");
-Assert.True(invoked);
+        // Handlers also cleared - raise does nothing
+        invoked = false;
+        knockOff.MessageReceived.Raise(null, "After");
+        // invoked is still false - handler was removed by Reset
 ```
-
-### Clear
-
-Clears **both tracking and handlers**:
-
-```csharp
-var invoked = false;
-source.MessageReceived += (s, e) => invoked = true;
-
-knockOff.IEventSource.MessageReceived.Raise("Before");
-Assert.True(invoked);
-
-knockOff.IEventSource.MessageReceived.Clear();
-
-// Tracking cleared
-Assert.Equal(0, knockOff.IEventSource.MessageReceived.RaiseCount);
-Assert.False(knockOff.IEventSource.MessageReceived.HasSubscribers);
-
-// Handlers also cleared - raise does nothing
-invoked = false;
-knockOff.IEventSource.MessageReceived.Raise("After");
-Assert.False(invoked);  // Handler was cleared
-```
+<!-- /snippet -->
 
 ## No Subscribers Safe
 
 Raising an event with no subscribers does not throw:
 
+<!-- snippet: docs:events:no-subscribers -->
 ```csharp
-var knockOff = new EventSourceKnockOff();
+var knockOff = new GuideEventSourceKnockOff();
 
-// No exception, just tracked
-knockOff.IEventSource.MessageReceived.Raise("No one listening");
-
-Assert.True(knockOff.IEventSource.MessageReceived.WasRaised);
-Assert.Equal(1, knockOff.IEventSource.MessageReceived.RaiseCount);
+        // No exception - safe to raise with no handlers
+        knockOff.MessageReceived.Raise(null, "No one listening");
 ```
+<!-- /snippet -->
 
 ## Common Patterns
 
@@ -233,8 +180,8 @@ public void ViewModel_SubscribesToDataService_Events()
     var viewModel = new MyViewModel(knockOff.AsGuideDataService());
 
     // ViewModel should have subscribed
-    Assert.True(knockOff.IGuideDataService.DataChanged.HasSubscribers);
-    Assert.Equal(1, knockOff.IGuideDataService.DataChanged.SubscribeCount);
+    Assert.True(knockOff.DataChanged.HasSubscribers);
+    Assert.Equal(1, knockOff.DataChanged.AddCount);
 }
 
 [Fact]
@@ -244,7 +191,7 @@ public void ViewModel_UpdatesOnDataChanged()
     var viewModel = new MyViewModel(knockOff.AsGuideDataService());
 
     // Simulate data change
-    knockOff.IGuideDataService.DataChanged.Raise(new DataChangedEventArgs { NewValue = 42 });
+    knockOff.DataChanged.Raise(null, new DataChangedEventArgs { NewValue = 42 });
 
     Assert.Equal(42, viewModel.CurrentValue);
 }
@@ -256,14 +203,14 @@ public void ViewModel_UpdatesOnDataChanged()
 [Fact]
 public void ViewModel_Dispose_UnsubscribesFromEvents()
 {
-    var knockOff = new DataServiceKnockOff();
-    var viewModel = new MyViewModel(knockOff.AsDataService());
+    var knockOff = new GuideDataServiceKnockOff();
+    var viewModel = new MyViewModel(knockOff.AsGuideDataService());
 
-    Assert.Equal(1, knockOff.IDataService.DataChanged.SubscribeCount);
+    Assert.Equal(1, knockOff.DataChanged.AddCount);
 
     viewModel.Dispose();
 
-    Assert.Equal(1, knockOff.IDataService.DataChanged.UnsubscribeCount);
+    Assert.Equal(1, knockOff.DataChanged.RemoveCount);
 }
 ```
 
@@ -276,63 +223,45 @@ public partial class GuideDownloaderKnockOff : IGuideDownloader { }
 ```
 <!-- /snippet -->
 
+<!-- snippet: docs:events:progress-example -->
 ```csharp
-[Fact]
-public async Task Downloader_ReportsProgress()
-{
-    var knockOff = new GuideDownloaderKnockOff();
-    var progressValues = new List<int>();
+var progressValues = new List<int>();
+        knockOff.AsGuideDownloader().ProgressChanged += (p) => progressValues.Add(p);
 
-    knockOff.AsGuideDownloader().ProgressChanged += (p) => progressValues.Add(p);
+        // Simulate download progress
+        knockOff.ProgressChanged.Raise(0);
+        knockOff.ProgressChanged.Raise(25);
+        knockOff.ProgressChanged.Raise(50);
+        knockOff.ProgressChanged.Raise(75);
+        knockOff.ProgressChanged.Raise(100);
 
-    // Simulate download progress
-    knockOff.IGuideDownloader.ProgressChanged.Raise(0);
-    knockOff.IGuideDownloader.ProgressChanged.Raise(25);
-    knockOff.IGuideDownloader.ProgressChanged.Raise(50);
-    knockOff.IGuideDownloader.ProgressChanged.Raise(75);
-    knockOff.IGuideDownloader.ProgressChanged.Raise(100);
-
-    Assert.Equal([0, 25, 50, 75, 100], progressValues);
-    Assert.Equal(5, knockOff.IGuideDownloader.ProgressChanged.RaiseCount);
-}
+        // progressValues is [0, 25, 50, 75, 100]
 ```
+<!-- /snippet -->
 
 ### Multiple Subscribers
 
+<!-- snippet: docs:events:multiple-subscribers -->
 ```csharp
-[Fact]
-public void Event_MultipleSubscribers_AllReceiveEvent()
-{
-    var knockOff = new EventSourceKnockOff();
-    IEventSource source = knockOff;
+var received = new List<string>();
+        source.MessageReceived += (s, e) => received.Add($"Handler1: {e}");
+        source.MessageReceived += (s, e) => received.Add($"Handler2: {e}");
+        source.MessageReceived += (s, e) => received.Add($"Handler3: {e}");
 
-    var received = new List<string>();
-    source.MessageReceived += (s, e) => received.Add($"Handler1: {e}");
-    source.MessageReceived += (s, e) => received.Add($"Handler2: {e}");
-    source.MessageReceived += (s, e) => received.Add($"Handler3: {e}");
+        var addCount = knockOff.MessageReceived.AddCount;  // 3
 
-    Assert.Equal(3, knockOff.IEventSource.MessageReceived.SubscribeCount);
+        knockOff.MessageReceived.Raise(null, "Test");
 
-    knockOff.IEventSource.MessageReceived.Raise("Test");
-
-    Assert.Equal(3, received.Count);
-    Assert.Contains("Handler1: Test", received);
-    Assert.Contains("Handler2: Test", received);
-    Assert.Contains("Handler3: Test", received);
-}
+        // received contains ["Handler1: Test", "Handler2: Test", "Handler3: Test"]
 ```
+<!-- /snippet -->
 
-## Handler API Reference
+## Interceptor API Reference
 
 | Property/Method | Type | Description |
 |----------------|------|-------------|
-| `SubscribeCount` | `int` | Times handlers were added |
-| `UnsubscribeCount` | `int` | Times handlers were removed |
-| `HasSubscribers` | `bool` | True if any handler attached |
-| `RaiseCount` | `int` | Times event was raised |
-| `WasRaised` | `bool` | True if raised at least once |
-| `LastRaiseArgs` | `T?` | Arguments from most recent raise |
-| `AllRaises` | `IReadOnlyList<T>` | All recorded raise arguments |
-| `Raise(...)` | `void` | Raises event and records args |
-| `Reset()` | `void` | Clears tracking, keeps handlers |
-| `Clear()` | `void` | Clears tracking and handlers |
+| `AddCount` | `int` | Times handlers were added (+=) |
+| `RemoveCount` | `int` | Times handlers were removed (-=) |
+| `HasSubscribers` | `bool` | True if any handler is attached |
+| `Raise(...)` | `void` | Raises the event to all handlers |
+| `Reset()` | `void` | Clears counts AND removes all handlers |

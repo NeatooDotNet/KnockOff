@@ -36,13 +36,13 @@ public class RealisticBenchmarks
         // Arrange
         var stub = new SimpleServiceStub();
         var callCount = 0;
-        stub.ISimpleService.DoWork.OnCall = ko => callCount++;
+        stub.DoWork.OnCall = ko => callCount++;
 
         // Act
         ((ISimpleService)stub).DoWork();
 
         // Assert
-        _ = stub.ISimpleService.DoWork.CallCount == 1;
+        _ = stub.DoWork.CallCount == 1;
     }
 
     // Typical unit test with business logic
@@ -74,18 +74,18 @@ public class RealisticBenchmarks
     {
         // Arrange
         var stub = new OrderServiceStub();
-        stub.IOrderService.GetOrder.OnCall = (ko, id) => new Order { Id = id, CustomerId = 1 };
-        stub.IOrderService.ValidateOrder.OnCall = (ko, _) => true;
-        stub.IOrderService.CalculateTotal.OnCall = (ko, _) => 100m;
+        stub.GetOrder.OnCall = (ko, id) => new Order { Id = id, CustomerId = 1 };
+        stub.ValidateOrder.OnCall = (ko, _) => true;
+        stub.CalculateTotal.OnCall = (ko, _) => 100m;
 
         // Act
         var sut = new OrderProcessor(stub);
         sut.Process(1);
 
         // Assert
-        _ = stub.IOrderService.GetOrder.CallCount == 1;
-        _ = stub.IOrderService.ValidateOrder.CallCount == 1;
-        _ = stub.IOrderService.SaveOrder.CallCount == 1;
+        _ = stub.GetOrder.CallCount == 1;
+        _ = stub.ValidateOrder.CallCount == 1;
+        _ = stub.SaveOrder.CallCount == 1;
     }
 }
 
@@ -127,14 +127,14 @@ public class TestSuiteBenchmarks
             // Simulate a typical test
             var stub = new OrderServiceStub();
             var capturedI = i;
-            stub.IOrderService.GetOrder.OnCall = (ko, _) => new Order { Id = capturedI };
-            stub.IOrderService.ValidateOrder.OnCall = (ko, _) => true;
+            stub.GetOrder.OnCall = (ko, _) => new Order { Id = capturedI };
+            stub.ValidateOrder.OnCall = (ko, _) => true;
 
             _ = ((IOrderService)stub).GetOrder(i);
             _ = ((IOrderService)stub).ValidateOrder(new Order());
 
-            _ = stub.IOrderService.GetOrder.CallCount == 1;
-            _ = stub.IOrderService.ValidateOrder.CallCount == 1;
+            _ = stub.GetOrder.CallCount == 1;
+            _ = stub.ValidateOrder.CallCount == 1;
         }
     }
 }

@@ -5,20 +5,17 @@ namespace KnockOff.Benchmarks.Stubs;
 
 partial class MediumServiceStub
 {
-	/// <summary>Tracks and configures behavior for IMediumService.Method1.</summary>
-	public sealed class IMediumService_Method1Interceptor
+	/// <summary>Tracks and configures behavior for Method1.</summary>
+	public sealed class Method1Interceptor
 	{
-		/// <summary>Delegate for Method1().</summary>
-		public delegate void Method1Delegate(MediumServiceStub ko);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public Method1Delegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<MediumServiceStub>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
@@ -27,119 +24,107 @@ partial class MediumServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IMediumService.Method2.</summary>
-	public sealed class IMediumService_Method2Interceptor
+	/// <summary>Tracks and configures behavior for Method2.</summary>
+	public sealed class Method2Interceptor
 	{
-		/// <summary>Delegate for Method2(int param).</summary>
-		public delegate void Method2Delegate(MediumServiceStub ko, int param);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'param' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public Method2Delegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<MediumServiceStub, int>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int param) { CallCount++; LastCallArg = param; }
+		public void RecordCall(int? param) { CallCount++; LastCallArg = param; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IMediumService.Method3.</summary>
-	public sealed class IMediumService_Method3Interceptor
+	/// <summary>Tracks and configures behavior for Method3.</summary>
+	public sealed class Method3Interceptor
 	{
-		/// <summary>Delegate for Method3(string param).</summary>
-		public delegate void Method3Delegate(MediumServiceStub ko, string param);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'param' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public string? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public Method3Delegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<MediumServiceStub, string>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string param) { CallCount++; LastCallArg = param; }
+		public void RecordCall(string? param) { CallCount++; LastCallArg = param; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IMediumService.Method4.</summary>
-	public sealed class IMediumService_Method4Interceptor
+	/// <summary>Tracks and configures behavior for Method4.</summary>
+	public sealed class Method4Interceptor
 	{
-		/// <summary>Delegate for Method4(int a, string b).</summary>
-		public delegate void Method4Delegate(MediumServiceStub ko, int a, string b);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Arguments from the most recent call.</summary>
-		public (int a, string b)? LastCallArgs { get; private set; }
+		/// <summary>The arguments from the most recent call.</summary>
+		public (int? a, string? b)? LastCallArgs { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public Method4Delegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<MediumServiceStub, int, string>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int a, string b) { CallCount++; LastCallArgs = (a, b); }
+		public void RecordCall(int? a, string? b) { CallCount++; LastCallArgs = (a, b); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IMediumService.Method5.</summary>
-	public sealed class IMediumService_Method5Interceptor
+	/// <summary>Tracks and configures behavior for Method5.</summary>
+	public sealed class Method5Interceptor
 	{
-		/// <summary>Delegate for Method5(int a, int b, int c).</summary>
-		public delegate void Method5Delegate(MediumServiceStub ko, int a, int b, int c);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Arguments from the most recent call.</summary>
-		public (int a, int b, int c)? LastCallArgs { get; private set; }
+		/// <summary>The arguments from the most recent call.</summary>
+		public (int? a, int? b, int? c)? LastCallArgs { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public Method5Delegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<MediumServiceStub, int, int, int>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int a, int b, int c) { CallCount++; LastCallArgs = (a, b, c); }
+		public void RecordCall(int? a, int? b, int? c) { CallCount++; LastCallArgs = (a, b, c); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IMediumService.Method6.</summary>
-	public sealed class IMediumService_Method6Interceptor
+	/// <summary>Tracks and configures behavior for Method6.</summary>
+	public sealed class Method6Interceptor
 	{
-		/// <summary>Delegate for Method6().</summary>
+		/// <summary>Delegate for Method6.</summary>
 		public delegate int Method6Delegate(MediumServiceStub ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public Method6Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -149,19 +134,19 @@ partial class MediumServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IMediumService.Method7.</summary>
-	public sealed class IMediumService_Method7Interceptor
+	/// <summary>Tracks and configures behavior for Method7.</summary>
+	public sealed class Method7Interceptor
 	{
-		/// <summary>Delegate for Method7().</summary>
+		/// <summary>Delegate for Method7.</summary>
 		public delegate string Method7Delegate(MediumServiceStub ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public Method7Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -171,185 +156,176 @@ partial class MediumServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IMediumService.Method8.</summary>
-	public sealed class IMediumService_Method8Interceptor
+	/// <summary>Tracks and configures behavior for Method8.</summary>
+	public sealed class Method8Interceptor
 	{
-		/// <summary>Delegate for Method8(int param).</summary>
+		/// <summary>Delegate for Method8.</summary>
 		public delegate int Method8Delegate(MediumServiceStub ko, int param);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'param' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public Method8Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int param) { CallCount++; LastCallArg = param; }
+		public void RecordCall(int? param) { CallCount++; LastCallArg = param; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IMediumService.Method9.</summary>
-	public sealed class IMediumService_Method9Interceptor
+	/// <summary>Tracks and configures behavior for Method9.</summary>
+	public sealed class Method9Interceptor
 	{
-		/// <summary>Delegate for Method9(string param).</summary>
+		/// <summary>Delegate for Method9.</summary>
 		public delegate string Method9Delegate(MediumServiceStub ko, string param);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'param' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public string? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public Method9Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string param) { CallCount++; LastCallArg = param; }
+		public void RecordCall(string? param) { CallCount++; LastCallArg = param; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IMediumService.Method10.</summary>
-	public sealed class IMediumService_Method10Interceptor
+	/// <summary>Tracks and configures behavior for Method10.</summary>
+	public sealed class Method10Interceptor
 	{
-		/// <summary>Delegate for Method10(int a, string b).</summary>
+		/// <summary>Delegate for Method10.</summary>
 		public delegate bool Method10Delegate(MediumServiceStub ko, int a, string b);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Arguments from the most recent call.</summary>
-		public (int a, string b)? LastCallArgs { get; private set; }
+		/// <summary>The arguments from the most recent call.</summary>
+		public (int? a, string? b)? LastCallArgs { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public Method10Delegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int a, string b) { CallCount++; LastCallArgs = (a, b); }
+		public void RecordCall(int? a, string? b) { CallCount++; LastCallArgs = (a, b); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Benchmarks.Interfaces.IMediumService.</summary>
-	public sealed class IMediumServiceInterceptorors
-	{
-		/// <summary>Interceptor for Method1.</summary>
-		public IMediumService_Method1Interceptor Method1 { get; } = new();
-		/// <summary>Interceptor for Method2.</summary>
-		public IMediumService_Method2Interceptor Method2 { get; } = new();
-		/// <summary>Interceptor for Method3.</summary>
-		public IMediumService_Method3Interceptor Method3 { get; } = new();
-		/// <summary>Interceptor for Method4.</summary>
-		public IMediumService_Method4Interceptor Method4 { get; } = new();
-		/// <summary>Interceptor for Method5.</summary>
-		public IMediumService_Method5Interceptor Method5 { get; } = new();
-		/// <summary>Interceptor for Method6.</summary>
-		public IMediumService_Method6Interceptor Method6 { get; } = new();
-		/// <summary>Interceptor for Method7.</summary>
-		public IMediumService_Method7Interceptor Method7 { get; } = new();
-		/// <summary>Interceptor for Method8.</summary>
-		public IMediumService_Method8Interceptor Method8 { get; } = new();
-		/// <summary>Interceptor for Method9.</summary>
-		public IMediumService_Method9Interceptor Method9 { get; } = new();
-		/// <summary>Interceptor for Method10.</summary>
-		public IMediumService_Method10Interceptor Method10 { get; } = new();
-	}
+	/// <summary>Interceptor for Method1.</summary>
+	public Method1Interceptor Method1 { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Benchmarks.Interfaces.IMediumService.</summary>
-	public IMediumServiceInterceptorors IMediumService { get; } = new();
+	/// <summary>Interceptor for Method2.</summary>
+	public Method2Interceptor Method2 { get; } = new();
+
+	/// <summary>Interceptor for Method3.</summary>
+	public Method3Interceptor Method3 { get; } = new();
+
+	/// <summary>Interceptor for Method4.</summary>
+	public Method4Interceptor Method4 { get; } = new();
+
+	/// <summary>Interceptor for Method5.</summary>
+	public Method5Interceptor Method5 { get; } = new();
+
+	/// <summary>Interceptor for Method6.</summary>
+	public Method6Interceptor Method6 { get; } = new();
+
+	/// <summary>Interceptor for Method7.</summary>
+	public Method7Interceptor Method7 { get; } = new();
+
+	/// <summary>Interceptor for Method8.</summary>
+	public Method8Interceptor Method8 { get; } = new();
+
+	/// <summary>Interceptor for Method9.</summary>
+	public Method9Interceptor Method9 { get; } = new();
+
+	/// <summary>Interceptor for Method10.</summary>
+	public Method10Interceptor Method10 { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Benchmarks.Interfaces.IMediumService.</summary>
 	public KnockOff.Benchmarks.Interfaces.IMediumService AsMediumService() => this;
 
 	void KnockOff.Benchmarks.Interfaces.IMediumService.Method1()
 	{
-		IMediumService.Method1.RecordCall();
-		if (IMediumService.Method1.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		Method1.RecordCall();
+		Method1.OnCall?.Invoke(this);
 	}
 
 	void KnockOff.Benchmarks.Interfaces.IMediumService.Method2(int param)
 	{
-		IMediumService.Method2.RecordCall(param);
-		if (IMediumService.Method2.OnCall is { } onCallCallback)
-		{ onCallCallback(this, param); return; }
+		Method2.RecordCall(param);
+		Method2.OnCall?.Invoke(this, param);
 	}
 
 	void KnockOff.Benchmarks.Interfaces.IMediumService.Method3(string param)
 	{
-		IMediumService.Method3.RecordCall(param);
-		if (IMediumService.Method3.OnCall is { } onCallCallback)
-		{ onCallCallback(this, param); return; }
+		Method3.RecordCall(param);
+		Method3.OnCall?.Invoke(this, param);
 	}
 
 	void KnockOff.Benchmarks.Interfaces.IMediumService.Method4(int a, string b)
 	{
-		IMediumService.Method4.RecordCall(a, b);
-		if (IMediumService.Method4.OnCall is { } onCallCallback)
-		{ onCallCallback(this, a, b); return; }
+		Method4.RecordCall(a, b);
+		Method4.OnCall?.Invoke(this, a, b);
 	}
 
 	void KnockOff.Benchmarks.Interfaces.IMediumService.Method5(int a, int b, int c)
 	{
-		IMediumService.Method5.RecordCall(a, b, c);
-		if (IMediumService.Method5.OnCall is { } onCallCallback)
-		{ onCallCallback(this, a, b, c); return; }
+		Method5.RecordCall(a, b, c);
+		Method5.OnCall?.Invoke(this, a, b, c);
 	}
 
 	int KnockOff.Benchmarks.Interfaces.IMediumService.Method6()
 	{
-		IMediumService.Method6.RecordCall();
-		if (IMediumService.Method6.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return default!;
+		Method6.RecordCall();
+		return Method6.OnCall?.Invoke(this) ?? default!;
 	}
 
 	string KnockOff.Benchmarks.Interfaces.IMediumService.Method7()
 	{
-		IMediumService.Method7.RecordCall();
-		if (IMediumService.Method7.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'Method7' in your partial class, or set IMediumService.Method7.OnCall.");
+		Method7.RecordCall();
+		if (Method7.OnCall is { } callback)
+			return callback(this);
+		throw new global::System.InvalidOperationException("No implementation provided for Method7. Set Method7.OnCall or define a protected method 'Method7' in your partial class.");
 	}
 
 	int KnockOff.Benchmarks.Interfaces.IMediumService.Method8(int param)
 	{
-		IMediumService.Method8.RecordCall(param);
-		if (IMediumService.Method8.OnCall is { } onCallCallback)
-			return onCallCallback(this, param);
-		return default!;
+		Method8.RecordCall(param);
+		return Method8.OnCall?.Invoke(this, param) ?? default!;
 	}
 
 	string KnockOff.Benchmarks.Interfaces.IMediumService.Method9(string param)
 	{
-		IMediumService.Method9.RecordCall(param);
-		if (IMediumService.Method9.OnCall is { } onCallCallback)
-			return onCallCallback(this, param);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'Method9' in your partial class, or set IMediumService.Method9.OnCall.");
+		Method9.RecordCall(param);
+		if (Method9.OnCall is { } callback)
+			return callback(this, param);
+		throw new global::System.InvalidOperationException("No implementation provided for Method9. Set Method9.OnCall or define a protected method 'Method9' in your partial class.");
 	}
 
 	bool KnockOff.Benchmarks.Interfaces.IMediumService.Method10(int a, string b)
 	{
-		IMediumService.Method10.RecordCall(a, b);
-		if (IMediumService.Method10.OnCall is { } onCallCallback)
-			return onCallCallback(this, a, b);
-		return default!;
+		Method10.RecordCall(a, b);
+		return Method10.OnCall?.Invoke(this, a, b) ?? default!;
 	}
 
 }

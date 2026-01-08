@@ -19,12 +19,12 @@ public partial class PropUserServiceKnockOff : IPropUserService { }
 <!-- /snippet -->
 
 Generated:
-- `IUserService_NameBacking` — protected backing field (interface-prefixed)
-- `IUserService.Name.GetCount` — number of getter calls
-- `IUserService.Name.SetCount` — number of setter calls
-- `IUserService.Name.LastSetValue` — last value set
-- `IUserService.Name.OnGet` — getter callback
-- `IUserService.Name.OnSet` — setter callback
+- `NameBacking` — protected backing field
+- `knockOff.Name.GetCount` — number of getter calls
+- `knockOff.Name.SetCount` — number of setter calls
+- `knockOff.Name.LastSetValue` — last value set
+- `knockOff.Name.OnGet` — getter callback
+- `knockOff.Name.OnSet` — setter callback
 
 ### Get-Only Properties
 
@@ -43,15 +43,13 @@ public partial class PropConfigKnockOff : IPropConfig { }
 For get-only properties:
 - Backing field is still generated
 - Only `OnGet` callback is available
-- Set the backing field directly for default values
 
+<!-- snippet: docs:properties:get-only-usage -->
 ```csharp
-var knockOff = new PropConfigKnockOff();
-knockOff.IPropConfig_ConnectionStringBacking = "Server=localhost";
-
-// Or use callback
-knockOff.IPropConfig.ConnectionString.OnGet = (ko) => "Server=test";
+// Use callback to provide value
+        knockOff.ConnectionString.OnGet = (ko) => "Server=test";
 ```
+<!-- /snippet -->
 
 ### Set-Only Properties
 
@@ -70,26 +68,28 @@ For set-only properties:
 
 ### Get Tracking
 
+<!-- snippet: docs:properties:get-tracking -->
 ```csharp
-IUserService service = knockOff;
+_ = service.Name;
+        _ = service.Name;
+        _ = service.Name;
 
-_ = service.Name;
-_ = service.Name;
-_ = service.Name;
-
-Assert.Equal(3, knockOff.IUserService.Name.GetCount);
+        var getCount = knockOff.Name.GetCount;  // 3
 ```
+<!-- /snippet -->
 
 ### Set Tracking
 
+<!-- snippet: docs:properties:set-tracking -->
 ```csharp
 service.Name = "First";
-service.Name = "Second";
-service.Name = "Third";
+        service.Name = "Second";
+        service.Name = "Third";
 
-Assert.Equal(3, knockOff.IUserService.Name.SetCount);
-Assert.Equal("Third", knockOff.IUserService.Name.LastSetValue);
+        var setCount = knockOff.Name.SetCount;          // 3
+        var lastValue = knockOff.Name.LastSetValue;     // "Third"
 ```
+<!-- /snippet -->
 
 ## Customization
 
@@ -97,54 +97,56 @@ Assert.Equal("Third", knockOff.IUserService.Name.LastSetValue);
 
 Without callbacks, properties use a backing field:
 
+<!-- snippet: docs:properties:default-behavior -->
 ```csharp
-var knockOff = new UserServiceKnockOff();
-IUserService service = knockOff;
-
 service.Name = "Test";
-var value = service.Name;
-
-Assert.Equal("Test", value);  // Read from backing
+        var value = service.Name;  // "Test" - read from backing
 ```
+<!-- /snippet -->
 
 ### OnGet Callback
 
 Override getter behavior:
 
+<!-- snippet: docs:properties:onget-callback -->
 ```csharp
-knockOff.IUserService.Name.OnGet = (ko) => "Always This Value";
+knockOff.Name.OnGet = (ko) => "Always This Value";
 
-var value = service.Name;
-Assert.Equal("Always This Value", value);
+        var value = service.Name;  // "Always This Value"
 ```
+<!-- /snippet -->
 
 Dynamic values:
 
+<!-- snippet: docs:properties:dynamic-values -->
 ```csharp
 var counter = 0;
-knockOff.IUserService.Name.OnGet = (ko) => $"Call-{++counter}";
+        knockOff.Name.OnGet = (ko) => $"Call-{++counter}";
 
-Assert.Equal("Call-1", service.Name);
-Assert.Equal("Call-2", service.Name);
+        var first = service.Name;   // "Call-1"
+        var second = service.Name;  // "Call-2"
 ```
+<!-- /snippet -->
 
 ### OnSet Callback
 
 Override setter behavior:
 
+<!-- snippet: docs:properties:onset-callback -->
 ```csharp
 string? captured = null;
-knockOff.IUserService.Name.OnSet = (ko, value) =>
-{
-    captured = value;
-    // Value does NOT go to backing field when OnSet is set
-};
+        knockOff.Name.OnSet = (ko, value) =>
+        {
+            captured = value;
+            // Value does NOT go to backing field when OnSet is set
+        };
 
-service.Name = "Test";
-Assert.Equal("Test", captured);
+        service.Name = "Test";
+        // captured is now "Test"
 ```
+<!-- /snippet -->
 
-**Important**: When `OnSet` is set, the value is NOT stored in the backing field. The callback completely replaces the setter.
+**Important**: When `OnSet` is set, the value is NOT stored in the backing field.
 
 ### Conditional Logic
 
@@ -161,42 +163,31 @@ public partial class PropConnectionKnockOff : IPropConnection { }
 ```
 <!-- /snippet -->
 
+<!-- snippet: docs:properties:conditional-usage -->
 ```csharp
-knockOff.IPropConnection.IsConnected.OnGet = (ko) =>
-{
-    // Check other handler state
-    return ko.IPropConnection.Connect.WasCalled;
-};
+knockOff.IsConnected.OnGet = (ko) =>
+        {
+            // Check other interceptor state
+            return ko.Connect.WasCalled;
+        };
 ```
+<!-- /snippet -->
 
 ## Reset
 
+<!-- snippet: docs:properties:reset -->
 ```csharp
-service.Name = "Value";
-_ = service.Name;
+knockOff.Name.Reset();
 
-knockOff.IUserService.Name.Reset();
-
-Assert.Equal(0, knockOff.IUserService.Name.GetCount);
-Assert.Equal(0, knockOff.IUserService.Name.SetCount);
-Assert.Null(knockOff.IUserService.Name.OnGet);
-Assert.Null(knockOff.IUserService.Name.OnSet);
-
-// Backing field is NOT cleared by Reset
-Assert.Equal("Value", knockOff.IUserService_NameBacking);
+        var getCount = knockOff.Name.GetCount;    // 0
+        var setCount = knockOff.Name.SetCount;    // 0
+        var onGet = knockOff.Name.OnGet;          // null
+        var onSet = knockOff.Name.OnSet;          // null
+        // Note: Backing field is NOT cleared by Reset
 ```
+<!-- /snippet -->
 
 ## Common Patterns
-
-### Pre-Populating Values
-
-```csharp
-var knockOff = new ConfigKnockOff();
-knockOff.IConfig_ConnectionStringBacking = "Server=localhost;Database=test";
-
-IConfig config = knockOff;
-Assert.Equal("Server=localhost;Database=test", config.ConnectionString);
-```
 
 ### Simulating Read-Only Computed Properties
 
@@ -214,10 +205,19 @@ public partial class PropPersonKnockOff : IPropPerson { }
 ```
 <!-- /snippet -->
 
+<!-- snippet: docs:properties:computed-usage -->
 ```csharp
-knockOff.IPropPerson.FullName.OnGet = (ko) =>
-    $"{ko.IPropPerson_FirstNameBacking} {ko.IPropPerson_LastNameBacking}";
+// Set up first/last names
+        person.FirstName = "John";
+        person.LastName = "Doe";
+
+        // Computed property uses backing values
+        knockOff.FullName.OnGet = (ko) =>
+            $"{person.FirstName} {person.LastName}";
+
+        var fullName = person.FullName;  // "John Doe"
 ```
+<!-- /snippet -->
 
 ### Tracking Property Changes
 
@@ -233,14 +233,16 @@ public partial class PropStatusKnockOff : IPropStatus { }
 ```
 <!-- /snippet -->
 
+<!-- snippet: docs:properties:tracking-usage -->
 ```csharp
 var changes = new List<string>();
-knockOff.IPropStatus.Status.OnSet = (ko, value) =>
-{
-    changes.Add(value);
-    ko.IPropStatus_StatusBacking = value;  // Still store it
-};
+        knockOff.Status.OnSet = (ko, value) =>
+        {
+            changes.Add(value);
+            // Value still goes to backing when not using OnSet
+        };
 ```
+<!-- /snippet -->
 
 ### Throwing on Access
 
@@ -256,7 +258,9 @@ public partial class PropSecureKnockOff : IPropSecure { }
 ```
 <!-- /snippet -->
 
+<!-- snippet: docs:properties:throwing-usage -->
 ```csharp
-knockOff.IPropSecure.SecretKey.OnGet = (ko) =>
-    throw new UnauthorizedAccessException("Access denied");
+knockOff.SecretKey.OnGet = (ko) =>
+            throw new UnauthorizedAccessException("Access denied");
 ```
+<!-- /snippet -->

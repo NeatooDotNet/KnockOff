@@ -5,49 +5,42 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class MmRefProcessorKnockOff
 {
-	/// <summary>Tracks and configures behavior for IMmRefProcessor.Increment.</summary>
-	public sealed class IMmRefProcessor_IncrementInterceptor
+	/// <summary>Tracks and configures behavior for Increment.</summary>
+	public sealed class IncrementInterceptor
 	{
-		/// <summary>Delegate for Increment(ref int value).</summary>
-		public delegate void IncrementDelegate(MmRefProcessorKnockOff ko, ref int value);
+		/// <summary>Delegate for Increment.</summary>
+		public delegate void IncrementDelegate(MmRefProcessorKnockOff ko, ref int @value);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'value' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public IncrementDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int value) { CallCount++; LastCallArg = value; }
+		public void RecordCall(int? @value) { CallCount++; LastCallArg = @value; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmRefProcessor.</summary>
-	public sealed class IMmRefProcessorInterceptorors
-	{
-		/// <summary>Interceptor for Increment.</summary>
-		public IMmRefProcessor_IncrementInterceptor Increment { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmRefProcessor.</summary>
-	public IMmRefProcessorInterceptorors IMmRefProcessor { get; } = new();
+	/// <summary>Interceptor for Increment.</summary>
+	public IncrementInterceptor Increment { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmRefProcessor.</summary>
 	public KnockOff.Documentation.Samples.Skills.IMmRefProcessor AsMmRefProcessor() => this;
 
-	void KnockOff.Documentation.Samples.Skills.IMmRefProcessor.Increment(ref int value)
+	void KnockOff.Documentation.Samples.Skills.IMmRefProcessor.Increment(ref int @value)
 	{
-		IMmRefProcessor.Increment.RecordCall(value);
-		if (IMmRefProcessor.Increment.OnCall is { } onCallCallback)
-		{ onCallCallback(this, ref value); return; }
+		Increment.RecordCall(@value);
+		if (Increment.OnCall is { } onCallCallback)
+		{ onCallCallback(this, ref @value); return; }
 	}
 
 }

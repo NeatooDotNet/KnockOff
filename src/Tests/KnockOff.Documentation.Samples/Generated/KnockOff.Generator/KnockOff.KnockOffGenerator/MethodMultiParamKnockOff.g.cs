@@ -5,49 +5,38 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class MethodMultiParamKnockOff
 {
-	/// <summary>Tracks and configures behavior for IMethodMultiParam.Process.</summary>
-	public sealed class IMethodMultiParam_ProcessInterceptor
+	/// <summary>Tracks and configures behavior for Process.</summary>
+	public sealed class ProcessInterceptor
 	{
-		/// <summary>Delegate for Process(string name, int value, bool flag).</summary>
-		public delegate void ProcessDelegate(MethodMultiParamKnockOff ko, string name, int value, bool flag);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Arguments from the most recent call.</summary>
-		public (string name, int value, bool flag)? LastCallArgs { get; private set; }
+		/// <summary>The arguments from the most recent call.</summary>
+		public (string? name, int? @value, bool? flag)? LastCallArgs { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public ProcessDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<MethodMultiParamKnockOff, string, int, bool>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string name, int value, bool flag) { CallCount++; LastCallArgs = (name, value, flag); }
+		public void RecordCall(string? name, int? @value, bool? flag) { CallCount++; LastCallArgs = (name, @value, flag); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodMultiParam.</summary>
-	public sealed class IMethodMultiParamInterceptorors
-	{
-		/// <summary>Interceptor for Process.</summary>
-		public IMethodMultiParam_ProcessInterceptor Process { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodMultiParam.</summary>
-	public IMethodMultiParamInterceptorors IMethodMultiParam { get; } = new();
+	/// <summary>Interceptor for Process.</summary>
+	public ProcessInterceptor Process { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodMultiParam.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMethodMultiParam AsMethodMultiParam() => this;
 
-	void KnockOff.Documentation.Samples.Guides.IMethodMultiParam.Process(string name, int value, bool flag)
+	void KnockOff.Documentation.Samples.Guides.IMethodMultiParam.Process(string name, int @value, bool flag)
 	{
-		IMethodMultiParam.Process.RecordCall(name, value, flag);
-		if (IMethodMultiParam.Process.OnCall is { } onCallCallback)
-		{ onCallCallback(this, name, value, flag); return; }
+		Process.RecordCall(name, @value, flag);
+		Process.OnCall?.Invoke(this, name, @value, flag);
 	}
 
 }

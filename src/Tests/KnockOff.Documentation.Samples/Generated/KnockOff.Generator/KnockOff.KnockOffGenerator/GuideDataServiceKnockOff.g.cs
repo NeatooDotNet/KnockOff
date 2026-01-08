@@ -5,79 +5,43 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class GuideDataServiceKnockOff
 {
-	/// <summary>Tracks and raises IGuideDataService.DataChanged.</summary>
-	public sealed class IGuideDataService_DataChangedInterceptor
+	/// <summary>Interceptor for DataChanged event.</summary>
+	public sealed class DataChangedInterceptor
 	{
 		private global::System.EventHandler<global::KnockOff.Documentation.Samples.Guides.DataChangedEventArgs>? _handler;
-		private readonly global::System.Collections.Generic.List<(object? sender, global::KnockOff.Documentation.Samples.Guides.DataChangedEventArgs e)> _raises = new();
 
-		/// <summary>Number of times handlers were added.</summary>
-		public int SubscribeCount { get; private set; }
+		/// <summary>Number of times event was subscribed to.</summary>
+		public int AddCount { get; private set; }
 
-		/// <summary>Number of times handlers were removed.</summary>
-		public int UnsubscribeCount { get; private set; }
+		/// <summary>Number of times event subscription was removed.</summary>
+		public int RemoveCount { get; private set; }
 
-		/// <summary>True if at least one handler is subscribed.</summary>
+		/// <summary>Whether any handlers are subscribed.</summary>
 		public bool HasSubscribers => _handler != null;
 
-		/// <summary>Number of times the event was raised.</summary>
-		public int RaiseCount => _raises.Count;
+		/// <summary>Records an event subscription.</summary>
+		public void RecordAdd(global::System.EventHandler<global::KnockOff.Documentation.Samples.Guides.DataChangedEventArgs>? value) { AddCount++; _handler = (global::System.EventHandler<global::KnockOff.Documentation.Samples.Guides.DataChangedEventArgs>?)global::System.Delegate.Combine(_handler, value); }
 
-		/// <summary>True if the event was raised at least once.</summary>
-		public bool WasRaised => RaiseCount > 0;
+		/// <summary>Records an event unsubscription.</summary>
+		public void RecordRemove(global::System.EventHandler<global::KnockOff.Documentation.Samples.Guides.DataChangedEventArgs>? value) { RemoveCount++; _handler = (global::System.EventHandler<global::KnockOff.Documentation.Samples.Guides.DataChangedEventArgs>?)global::System.Delegate.Remove(_handler, value); }
 
-		/// <summary>Arguments from the most recent raise.</summary>
-		public (object? sender, global::KnockOff.Documentation.Samples.Guides.DataChangedEventArgs e)? LastRaiseArgs => _raises.Count > 0 ? _raises[_raises.Count - 1] : null;
+		/// <summary>Raises the event with the specified arguments.</summary>
+		public void Raise(object? sender, global::KnockOff.Documentation.Samples.Guides.DataChangedEventArgs e) => _handler?.Invoke(sender, e);
 
-		/// <summary>All recorded raise invocations.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(object? sender, global::KnockOff.Documentation.Samples.Guides.DataChangedEventArgs e)> AllRaises => _raises;
-
-		internal void Add(global::System.EventHandler<global::KnockOff.Documentation.Samples.Guides.DataChangedEventArgs>? handler)
-		{
-			_handler += handler;
-			SubscribeCount++;
-		}
-
-		internal void Remove(global::System.EventHandler<global::KnockOff.Documentation.Samples.Guides.DataChangedEventArgs>? handler)
-		{
-			_handler -= handler;
-			UnsubscribeCount++;
-		}
-
-		/// <summary>Raises the event.</summary>
-		public void Raise(object? sender, global::KnockOff.Documentation.Samples.Guides.DataChangedEventArgs e)
-		{
-			_raises.Add((sender, e));
-			_handler?.Invoke(sender, e);
-		}
-
-		/// <summary>Raises the event with null sender.</summary>
-		public void Raise(global::KnockOff.Documentation.Samples.Guides.DataChangedEventArgs e) => Raise(null, e);
-
-		/// <summary>Resets all tracking counters.</summary>
-		public void Reset() { SubscribeCount = 0; UnsubscribeCount = 0; _raises.Clear(); }
-
-		/// <summary>Clears all handlers and resets tracking.</summary>
-		public void Clear() { _handler = null; Reset(); }
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGuideDataService.</summary>
-	public sealed class IGuideDataServiceInterceptorors
-	{
-		/// <summary>Interceptor for DataChanged event.</summary>
-		public IGuideDataService_DataChangedInterceptor DataChanged { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGuideDataService.</summary>
-	public IGuideDataServiceInterceptorors IGuideDataService { get; } = new();
+	/// <summary>Interceptor for DataChanged event.</summary>
+	public DataChangedInterceptor DataChanged { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IGuideDataService.</summary>
 	public KnockOff.Documentation.Samples.Guides.IGuideDataService AsGuideDataService() => this;
 
 	event global::System.EventHandler<global::KnockOff.Documentation.Samples.Guides.DataChangedEventArgs>? KnockOff.Documentation.Samples.Guides.IGuideDataService.DataChanged
 	{
-		add => IGuideDataService.DataChanged.Add(value);
-		remove => IGuideDataService.DataChanged.Remove(value);
+		add => DataChanged.RecordAdd(value);
+		remove => DataChanged.RecordRemove(value);
 	}
 
 }

@@ -5,20 +5,17 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class MmConnectionKnockOff
 {
-	/// <summary>Tracks and configures behavior for IMmConnectionService.Connect.</summary>
-	public sealed class IMmConnectionService_ConnectInterceptor
+	/// <summary>Tracks and configures behavior for Connect.</summary>
+	public sealed class ConnectInterceptor
 	{
-		/// <summary>Delegate for Connect().</summary>
-		public delegate void ConnectDelegate(MmConnectionKnockOff ko);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public ConnectDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<MmConnectionKnockOff>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
@@ -27,24 +24,16 @@ partial class MmConnectionKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmConnectionService.</summary>
-	public sealed class IMmConnectionServiceInterceptorors
-	{
-		/// <summary>Interceptor for Connect.</summary>
-		public IMmConnectionService_ConnectInterceptor Connect { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmConnectionService.</summary>
-	public IMmConnectionServiceInterceptorors IMmConnectionService { get; } = new();
+	/// <summary>Interceptor for Connect.</summary>
+	public ConnectInterceptor Connect { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmConnectionService.</summary>
 	public KnockOff.Documentation.Samples.Skills.IMmConnectionService AsMmConnectionService() => this;
 
 	void KnockOff.Documentation.Samples.Skills.IMmConnectionService.Connect()
 	{
-		IMmConnectionService.Connect.RecordCall();
-		if (IMmConnectionService.Connect.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		Connect.RecordCall();
+		Connect.OnCall?.Invoke(this);
 	}
 
 }

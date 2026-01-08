@@ -5,8 +5,8 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class SkVerificationKnockOff
 {
-	/// <summary>Tracks and configures behavior for ISkVerificationService.Name.</summary>
-	public sealed class ISkVerificationService_NameInterceptor
+	/// <summary>Tracks and configures behavior for Name.</summary>
+	public sealed class NameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -33,108 +33,84 @@ partial class SkVerificationKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ISkVerificationService.GetUser.</summary>
-	public sealed class ISkVerificationService_GetUserInterceptor
+	/// <summary>Tracks and configures behavior for GetUser.</summary>
+	public sealed class GetUserInterceptor
 	{
-		/// <summary>Delegate for GetUser(int id).</summary>
+		/// <summary>Delegate for GetUser.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.SkUser GetUserDelegate(SkVerificationKnockOff ko, int id);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetUserDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ISkVerificationService.Create.</summary>
-	public sealed class ISkVerificationService_CreateInterceptor
+	/// <summary>Tracks and configures behavior for Create.</summary>
+	public sealed class CreateInterceptor
 	{
-		/// <summary>Delegate for Create(string name, int value).</summary>
-		public delegate void CreateDelegate(SkVerificationKnockOff ko, string name, int value);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Arguments from the most recent call.</summary>
-		public (string name, int value)? LastCallArgs { get; private set; }
+		/// <summary>The arguments from the most recent call.</summary>
+		public (string? name, int? @value)? LastCallArgs { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public CreateDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<SkVerificationKnockOff, string, int>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string name, int value) { CallCount++; LastCallArgs = (name, value); }
+		public void RecordCall(string? name, int? @value) { CallCount++; LastCallArgs = (name, @value); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkVerificationService.</summary>
-	public sealed class ISkVerificationServiceInterceptorors
-	{
-		/// <summary>Interceptor for Name.</summary>
-		public ISkVerificationService_NameInterceptor Name { get; } = new();
-		/// <summary>Interceptor for GetUser.</summary>
-		public ISkVerificationService_GetUserInterceptor GetUser { get; } = new();
-		/// <summary>Interceptor for Create.</summary>
-		public ISkVerificationService_CreateInterceptor Create { get; } = new();
-	}
+	/// <summary>Interceptor for Name.</summary>
+	public NameInterceptor Name { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkVerificationService.</summary>
-	public ISkVerificationServiceInterceptorors ISkVerificationService { get; } = new();
+	/// <summary>Interceptor for GetUser.</summary>
+	public GetUserInterceptor GetUser { get; } = new();
+
+	/// <summary>Interceptor for Create.</summary>
+	public CreateInterceptor Create { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkVerificationService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkVerificationService AsSkVerificationService() => this;
 
-	/// <summary>Backing field for ISkVerificationService.Name.</summary>
-	protected string ISkVerificationService_NameBacking { get; set; } = "";
+	/// <summary>Backing storage for Name.</summary>
+	protected string NameBacking { get; set; } = "";
 
 	global::KnockOff.Documentation.Samples.Skills.SkUser KnockOff.Documentation.Samples.Skills.ISkVerificationService.GetUser(int id)
 	{
-		ISkVerificationService.GetUser.RecordCall(id);
-		if (ISkVerificationService.GetUser.OnCall is { } onCallCallback)
-			return onCallCallback(this, id);
-		return new global::KnockOff.Documentation.Samples.Skills.SkUser();
+		GetUser.RecordCall(id);
+		return GetUser.OnCall?.Invoke(this, id) ?? new global::KnockOff.Documentation.Samples.Skills.SkUser();
 	}
 
-	void KnockOff.Documentation.Samples.Skills.ISkVerificationService.Create(string name, int value)
+	void KnockOff.Documentation.Samples.Skills.ISkVerificationService.Create(string name, int @value)
 	{
-		ISkVerificationService.Create.RecordCall(name, value);
-		if (ISkVerificationService.Create.OnCall is { } onCallCallback)
-		{ onCallCallback(this, name, value); return; }
+		Create.RecordCall(name, @value);
+		Create.OnCall?.Invoke(this, name, @value);
 	}
 
 	string KnockOff.Documentation.Samples.Skills.ISkVerificationService.Name
 	{
-		get
-		{
-			ISkVerificationService.Name.RecordGet();
-			if (ISkVerificationService.Name.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return ISkVerificationService_NameBacking;
-		}
-		set
-		{
-			ISkVerificationService.Name.RecordSet(value);
-			if (ISkVerificationService.Name.OnSet is { } onSetCallback)
-				onSetCallback(this, value);
-			else
-				ISkVerificationService_NameBacking = value;
-		}
+		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
+		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else NameBacking = value; }
 	}
 
 }

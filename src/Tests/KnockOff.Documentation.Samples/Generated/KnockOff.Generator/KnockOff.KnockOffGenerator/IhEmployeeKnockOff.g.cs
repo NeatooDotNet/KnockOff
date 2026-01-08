@@ -5,8 +5,8 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class IhEmployeeKnockOff
 {
-	/// <summary>Tracks and configures behavior for IIhEmployee.Name.</summary>
-	public sealed class IIhEmployee_NameInterceptor
+	/// <summary>Tracks and configures behavior for Name.</summary>
+	public sealed class NameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -33,8 +33,8 @@ partial class IhEmployeeKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IIhEmployee.Department.</summary>
-	public sealed class IIhEmployee_DepartmentInterceptor
+	/// <summary>Tracks and configures behavior for Department.</summary>
+	public sealed class DepartmentInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -61,17 +61,8 @@ partial class IhEmployeeKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhEmployee.</summary>
-	public sealed class IIhEmployeeInterceptorors
-	{
-		/// <summary>Interceptor for Name.</summary>
-		public IIhEmployee_NameInterceptor Name { get; } = new();
-		/// <summary>Interceptor for Department.</summary>
-		public IIhEmployee_DepartmentInterceptor Department { get; } = new();
-	}
-
-	/// <summary>Tracks and configures behavior for IIhEntityBase.Id.</summary>
-	public sealed class IIhEntityBase_IdInterceptor
+	/// <summary>Tracks and configures behavior for Id.</summary>
+	public sealed class IdInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -86,18 +77,14 @@ partial class IhEmployeeKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhEntityBase.</summary>
-	public sealed class IIhEntityBaseInterceptorors
-	{
-		/// <summary>Interceptor for Id.</summary>
-		public IIhEntityBase_IdInterceptor Id { get; } = new();
-	}
+	/// <summary>Interceptor for Name.</summary>
+	public NameInterceptor Name { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhEmployee.</summary>
-	public IIhEmployeeInterceptorors IIhEmployee { get; } = new();
+	/// <summary>Interceptor for Department.</summary>
+	public DepartmentInterceptor Department { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhEntityBase.</summary>
-	public IIhEntityBaseInterceptorors IIhEntityBase { get; } = new();
+	/// <summary>Interceptor for Id.</summary>
+	public IdInterceptor Id { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIhEmployee.</summary>
 	public KnockOff.Documentation.Samples.Guides.IIhEmployee AsIhEmployee() => this;
@@ -105,62 +92,30 @@ partial class IhEmployeeKnockOff
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIhEntityBase.</summary>
 	public KnockOff.Documentation.Samples.Guides.IIhEntityBase AsIhEntityBase() => this;
 
-	/// <summary>Backing field for IIhEmployee.Name.</summary>
-	protected string IIhEmployee_NameBacking { get; set; } = "";
+	/// <summary>Backing storage for Name.</summary>
+	protected string NameBacking { get; set; } = "";
 
-	/// <summary>Backing field for IIhEmployee.Department.</summary>
-	protected string IIhEmployee_DepartmentBacking { get; set; } = "";
+	/// <summary>Backing storage for Department.</summary>
+	protected string DepartmentBacking { get; set; } = "";
 
-	/// <summary>Backing field for IIhEntityBase.Id.</summary>
-	protected int IIhEntityBase_IdBacking { get; set; }
+	/// <summary>Backing storage for Id.</summary>
+	protected int IdBacking { get; set; } = default!;
 
 	string KnockOff.Documentation.Samples.Guides.IIhEmployee.Name
 	{
-		get
-		{
-			IIhEmployee.Name.RecordGet();
-			if (IIhEmployee.Name.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IIhEmployee_NameBacking;
-		}
-		set
-		{
-			IIhEmployee.Name.RecordSet(value);
-			if (IIhEmployee.Name.OnSet is { } onSetCallback)
-				onSetCallback(this, value);
-			else
-				IIhEmployee_NameBacking = value;
-		}
+		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
+		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else NameBacking = value; }
 	}
 
 	string KnockOff.Documentation.Samples.Guides.IIhEmployee.Department
 	{
-		get
-		{
-			IIhEmployee.Department.RecordGet();
-			if (IIhEmployee.Department.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IIhEmployee_DepartmentBacking;
-		}
-		set
-		{
-			IIhEmployee.Department.RecordSet(value);
-			if (IIhEmployee.Department.OnSet is { } onSetCallback)
-				onSetCallback(this, value);
-			else
-				IIhEmployee_DepartmentBacking = value;
-		}
+		get { Department.RecordGet(); return Department.OnGet?.Invoke(this) ?? DepartmentBacking; }
+		set { Department.RecordSet(value); if (Department.OnSet != null) Department.OnSet(this, value); else DepartmentBacking = value; }
 	}
 
 	int KnockOff.Documentation.Samples.Guides.IIhEntityBase.Id
 	{
-		get
-		{
-			IIhEntityBase.Id.RecordGet();
-			if (IIhEntityBase.Id.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IIhEntityBase_IdBacking;
-		}
+		get { Id.RecordGet(); return Id.OnGet?.Invoke(this) ?? IdBacking; }
 	}
 
 }

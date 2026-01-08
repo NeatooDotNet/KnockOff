@@ -17,7 +17,7 @@ public class BasicTests
 	{
 		var knockOff = new SampleKnockOff();
 		Assert.NotNull(knockOff);
-		Assert.NotNull(knockOff.ISampleService);
+		Assert.NotNull(knockOff.Name);
 	}
 
 	[Fact]
@@ -28,8 +28,8 @@ public class BasicTests
 
 		service.Name = "Test";
 
-		Assert.Equal(1, knockOff.ISampleService.Name.SetCount);
-		string? lastValue = knockOff.ISampleService.Name.LastSetValue;
+		Assert.Equal(1, knockOff.Name.SetCount);
+		string? lastValue = knockOff.Name.LastSetValue;
 		Assert.Equal("Test", lastValue);
 	}
 
@@ -42,7 +42,7 @@ public class BasicTests
 		service.Name = "Test";
 		var _ = service.Name;
 
-		Assert.Equal(1, knockOff.ISampleService.Name.GetCount);
+		Assert.Equal(1, knockOff.Name.GetCount);
 	}
 
 	[Fact]
@@ -53,8 +53,8 @@ public class BasicTests
 
 		service.DoSomething();
 
-		Assert.True(knockOff.ISampleService.DoSomething.WasCalled);
-		Assert.Equal(1, knockOff.ISampleService.DoSomething.CallCount);
+		Assert.True(knockOff.DoSomething.WasCalled);
+		Assert.Equal(1, knockOff.DoSomething.CallCount);
 	}
 
 	[Fact]
@@ -66,9 +66,9 @@ public class BasicTests
 		var result = service.GetValue(42);
 
 		Assert.Equal(84, result);
-		Assert.Equal(1, knockOff.ISampleService.GetValue.CallCount);
+		Assert.Equal(1, knockOff.GetValue2.CallCount);
 
-		int? lastArg = knockOff.ISampleService.GetValue.LastCallArg;
+		int? lastArg = knockOff.GetValue2.LastCallArg;
 		Assert.Equal(42, lastArg);
 	}
 
@@ -80,7 +80,7 @@ public class BasicTests
 
 		service.Calculate("test", 100, true);
 
-		var args = knockOff.ISampleService.Calculate.LastCallArgs;
+		var args = knockOff.Calculate.LastCallArgs;
 		Assert.NotNull(args);
 		Assert.Equal("test", args.Value.name);
 		Assert.Equal(100, args.Value.value);
@@ -97,8 +97,8 @@ public class BasicTests
 		service.GetValue(2);
 		service.GetValue(3);
 
-		Assert.Equal(3, knockOff.ISampleService.GetValue.CallCount);
-		Assert.Equal(3, knockOff.ISampleService.GetValue.LastCallArg); // Last call was GetValue(3)
+		Assert.Equal(3, knockOff.GetValue2.CallCount);
+		Assert.Equal(3, knockOff.GetValue2.LastCallArg); // Last call was GetValue(3)
 	}
 
 	[Fact]
@@ -110,7 +110,7 @@ public class BasicTests
 		var result = service.GetOptional();
 
 		Assert.Null(result);
-		Assert.True(knockOff.ISampleService.GetOptional.WasCalled);
+		Assert.True(knockOff.GetOptional.WasCalled);
 	}
 
 	[Fact]
@@ -121,7 +121,7 @@ public class BasicTests
 		ISampleService service = knockOff.AsSampleService();
 
 		service.Name = "Test";
-		Assert.Equal(1, knockOff.ISampleService.Name.SetCount);
+		Assert.Equal(1, knockOff.Name.SetCount);
 	}
 
 	[Fact]
@@ -134,14 +134,14 @@ public class BasicTests
 		service.GetValue(42);
 		service.DoSomething();
 
-		knockOff.ISampleService.Name.Reset();
-		knockOff.ISampleService.GetValue.Reset();
-		knockOff.ISampleService.DoSomething.Reset();
+		knockOff.Name.Reset();
+		knockOff.GetValue2.Reset();
+		knockOff.DoSomething.Reset();
 
-		Assert.Equal(0, knockOff.ISampleService.Name.SetCount);
-		Assert.Equal(0, knockOff.ISampleService.GetValue.CallCount);
-		Assert.Equal(0, knockOff.ISampleService.DoSomething.CallCount);
-		Assert.False(knockOff.ISampleService.DoSomething.WasCalled);
+		Assert.Equal(0, knockOff.Name.SetCount);
+		Assert.Equal(0, knockOff.GetValue2.CallCount);
+		Assert.Equal(0, knockOff.DoSomething.CallCount);
+		Assert.False(knockOff.DoSomething.WasCalled);
 	}
 
 	[Fact]
@@ -152,7 +152,7 @@ public class BasicTests
 
 		service.Calculate("test", 42, true);
 
-		if (knockOff.ISampleService.Calculate.LastCallArgs is var (name, value, flag))
+		if (knockOff.Calculate.LastCallArgs is var (name, value, flag))
 		{
 			Assert.Equal("test", name);
 			Assert.Equal(42, value);

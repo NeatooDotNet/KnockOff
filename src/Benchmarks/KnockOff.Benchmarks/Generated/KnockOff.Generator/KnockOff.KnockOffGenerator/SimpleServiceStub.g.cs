@@ -5,20 +5,17 @@ namespace KnockOff.Benchmarks.Stubs;
 
 partial class SimpleServiceStub
 {
-	/// <summary>Tracks and configures behavior for ISimpleService.DoWork.</summary>
-	public sealed class ISimpleService_DoWorkInterceptor
+	/// <summary>Tracks and configures behavior for DoWork.</summary>
+	public sealed class DoWorkInterceptor
 	{
-		/// <summary>Delegate for DoWork().</summary>
-		public delegate void DoWorkDelegate(SimpleServiceStub ko);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public DoWorkDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<SimpleServiceStub>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
@@ -27,24 +24,16 @@ partial class SimpleServiceStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Benchmarks.Interfaces.ISimpleService.</summary>
-	public sealed class ISimpleServiceInterceptorors
-	{
-		/// <summary>Interceptor for DoWork.</summary>
-		public ISimpleService_DoWorkInterceptor DoWork { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Benchmarks.Interfaces.ISimpleService.</summary>
-	public ISimpleServiceInterceptorors ISimpleService { get; } = new();
+	/// <summary>Interceptor for DoWork.</summary>
+	public DoWorkInterceptor DoWork { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Benchmarks.Interfaces.ISimpleService.</summary>
 	public KnockOff.Benchmarks.Interfaces.ISimpleService AsSimpleService() => this;
 
 	void KnockOff.Benchmarks.Interfaces.ISimpleService.DoWork()
 	{
-		ISimpleService.DoWork.RecordCall();
-		if (ISimpleService.DoWork.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		DoWork.RecordCall();
+		DoWork.OnCall?.Invoke(this);
 	}
 
 }

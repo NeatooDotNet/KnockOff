@@ -5,8 +5,8 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class IdxEntityBaseKnockOff
 {
-	/// <summary>Tracks and configures behavior for IIdxEntityBase.StringIndexer.</summary>
-	public sealed class IIdxEntityBase_StringIndexerInterceptor
+	/// <summary>Tracks and configures behavior for StringIndexer.</summary>
+	public sealed class StringIndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -14,18 +14,18 @@ partial class IdxEntityBaseKnockOff
 		/// <summary>The key from the most recent getter access.</summary>
 		public string? LastGetKey { get; private set; }
 
-		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when the getter is accessed.</summary>
 		public global::System.Func<IdxEntityBaseKnockOff, string, global::KnockOff.Documentation.Samples.Guides.IIdxEntityProperty?>? OnGet { get; set; }
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet(string propertyName) { GetCount++; LastGetKey = propertyName; }
+		public void RecordGet(string? propertyName) { GetCount++; LastGetKey = propertyName; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IIdxEntityBase.IsNew.</summary>
-	public sealed class IIdxEntityBase_IsNewInterceptor
+	/// <summary>Tracks and configures behavior for IsNew.</summary>
+	public sealed class IsNewInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -40,49 +40,29 @@ partial class IdxEntityBaseKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIdxEntityBase.</summary>
-	public sealed class IIdxEntityBaseInterceptorors
-	{
-		/// <summary>Interceptor for StringIndexer.</summary>
-		public IIdxEntityBase_StringIndexerInterceptor StringIndexer { get; } = new();
-		/// <summary>Interceptor for IsNew.</summary>
-		public IIdxEntityBase_IsNewInterceptor IsNew { get; } = new();
-	}
+	/// <summary>Interceptor for StringIndexer.</summary>
+	public StringIndexerInterceptor StringIndexer { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIdxEntityBase.</summary>
-	public IIdxEntityBaseInterceptorors IIdxEntityBase { get; } = new();
+	/// <summary>Interceptor for IsNew.</summary>
+	public IsNewInterceptor IsNew { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIdxEntityBase.</summary>
 	public KnockOff.Documentation.Samples.Guides.IIdxEntityBase AsIdxEntityBase() => this;
 
-	/// <summary>Backing dictionary for IIdxEntityBase.StringIndexer. Pre-populate with values or use OnGet callback.</summary>
-	public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Documentation.Samples.Guides.IIdxEntityProperty?> IIdxEntityBase_StringIndexerBacking { get; } = new();
+	/// <summary>Backing storage for StringIndexer indexer.</summary>
+	public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Documentation.Samples.Guides.IIdxEntityProperty?> StringIndexerBacking { get; } = new();
 
-	/// <summary>Backing field for IIdxEntityBase.IsNew.</summary>
-	protected bool IIdxEntityBase_IsNewBacking { get; set; }
+	/// <summary>Backing storage for IsNew.</summary>
+	protected bool IsNewBacking { get; set; } = default!;
 
 	global::KnockOff.Documentation.Samples.Guides.IIdxEntityProperty? KnockOff.Documentation.Samples.Guides.IIdxEntityBase.this[string propertyName]
 	{
-		get
-		{
-			IIdxEntityBase.StringIndexer.RecordGet(propertyName);
-			if (IIdxEntityBase.StringIndexer.OnGet is { } onGetCallback)
-				return onGetCallback(this, propertyName);
-			if (IIdxEntityBase_StringIndexerBacking.TryGetValue(propertyName, out var value))
-				return value;
-			return default!;
-		}
+		get { StringIndexer.RecordGet(propertyName); if (StringIndexer.OnGet != null) return StringIndexer.OnGet(this, propertyName); return StringIndexerBacking.TryGetValue(propertyName, out var v) ? v : default; }
 	}
 
 	bool KnockOff.Documentation.Samples.Guides.IIdxEntityBase.IsNew
 	{
-		get
-		{
-			IIdxEntityBase.IsNew.RecordGet();
-			if (IIdxEntityBase.IsNew.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IIdxEntityBase_IsNewBacking;
-		}
+		get { IsNew.RecordGet(); return IsNew.OnGet?.Invoke(this) ?? IsNewBacking; }
 	}
 
 }

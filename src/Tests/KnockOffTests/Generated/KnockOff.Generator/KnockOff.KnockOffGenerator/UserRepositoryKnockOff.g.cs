@@ -5,119 +5,106 @@ namespace KnockOff.Tests;
 
 partial class UserRepositoryKnockOff
 {
-	/// <summary>Tracks and configures behavior for IRepository_KnockOff_Tests_User.GetById.</summary>
-	public sealed class IRepository_KnockOff_Tests_User_GetByIdInterceptor
+	/// <summary>Tracks and configures behavior for GetById.</summary>
+	public sealed class GetByIdInterceptor
 	{
-		/// <summary>Delegate for GetById(int id).</summary>
+		/// <summary>Delegate for GetById.</summary>
 		public delegate global::KnockOff.Tests.User? GetByIdDelegate(UserRepositoryKnockOff ko, int id);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetByIdDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IRepository_KnockOff_Tests_User.Save.</summary>
-	public sealed class IRepository_KnockOff_Tests_User_SaveInterceptor
+	/// <summary>Tracks and configures behavior for Save.</summary>
+	public sealed class SaveInterceptor
 	{
-		/// <summary>Delegate for Save(global::KnockOff.Tests.User entity).</summary>
-		public delegate void SaveDelegate(UserRepositoryKnockOff ko, global::KnockOff.Tests.User entity);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'entity' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public global::KnockOff.Tests.User? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public SaveDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<UserRepositoryKnockOff, global::KnockOff.Tests.User>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::KnockOff.Tests.User entity) { CallCount++; LastCallArg = entity; }
+		public void RecordCall(global::KnockOff.Tests.User? entity) { CallCount++; LastCallArg = entity; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IRepository_KnockOff_Tests_User.GetByIdAsync.</summary>
-	public sealed class IRepository_KnockOff_Tests_User_GetByIdAsyncInterceptor
+	/// <summary>Tracks and configures behavior for GetByIdAsync.</summary>
+	public sealed class GetByIdAsyncInterceptor
 	{
-		/// <summary>Delegate for GetByIdAsync(int id).</summary>
+		/// <summary>Delegate for GetByIdAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> GetByIdAsyncDelegate(UserRepositoryKnockOff ko, int id);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetByIdAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IRepository<KnockOff.Tests.User>.</summary>
-	public sealed class IRepository_KnockOff_Tests_UserInterceptorors
-	{
-		/// <summary>Interceptor for GetById.</summary>
-		public IRepository_KnockOff_Tests_User_GetByIdInterceptor GetById { get; } = new();
-		/// <summary>Interceptor for Save.</summary>
-		public IRepository_KnockOff_Tests_User_SaveInterceptor Save { get; } = new();
-		/// <summary>Interceptor for GetByIdAsync.</summary>
-		public IRepository_KnockOff_Tests_User_GetByIdAsyncInterceptor GetByIdAsync { get; } = new();
-	}
+	/// <summary>Interceptor for GetById.</summary>
+	public GetByIdInterceptor GetById { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IRepository<KnockOff.Tests.User>.</summary>
-	public IRepository_KnockOff_Tests_UserInterceptorors IRepository_KnockOff_Tests_User { get; } = new();
+	/// <summary>Interceptor for Save.</summary>
+	public SaveInterceptor Save { get; } = new();
+
+	/// <summary>Interceptor for GetByIdAsync.</summary>
+	public GetByIdAsyncInterceptor GetByIdAsync { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IRepository<KnockOff.Tests.User>.</summary>
 	public KnockOff.Tests.IRepository<KnockOff.Tests.User> AsRepository() => this;
 
 	global::KnockOff.Tests.User? KnockOff.Tests.IRepository<KnockOff.Tests.User>.GetById(int id)
 	{
-		IRepository_KnockOff_Tests_User.GetById.RecordCall(id);
-		if (IRepository_KnockOff_Tests_User.GetById.OnCall is { } onCallCallback)
-			return onCallCallback(this, id);
-		return default!;
+		GetById.RecordCall(id);
+		return GetById.OnCall?.Invoke(this, id) ?? default!;
 	}
 
 	void KnockOff.Tests.IRepository<KnockOff.Tests.User>.Save(global::KnockOff.Tests.User entity)
 	{
-		IRepository_KnockOff_Tests_User.Save.RecordCall(entity);
-		if (IRepository_KnockOff_Tests_User.Save.OnCall is { } onCallCallback)
-		{ onCallCallback(this, entity); return; }
+		Save.RecordCall(entity);
+		Save.OnCall?.Invoke(this, entity);
 	}
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> KnockOff.Tests.IRepository<KnockOff.Tests.User>.GetByIdAsync(int id)
 	{
-		IRepository_KnockOff_Tests_User.GetByIdAsync.RecordCall(id);
-		if (IRepository_KnockOff_Tests_User.GetByIdAsync.OnCall is { } onCallCallback)
-			return onCallCallback(this, id);
-		return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.User?>(default!);
+		GetByIdAsync.RecordCall(id);
+		return GetByIdAsync.OnCall?.Invoke(this, id) ?? global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.User?>(default!);
 	}
 
 }

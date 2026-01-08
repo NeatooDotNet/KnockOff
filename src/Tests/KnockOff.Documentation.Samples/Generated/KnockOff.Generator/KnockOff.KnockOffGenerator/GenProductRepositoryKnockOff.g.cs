@@ -5,19 +5,19 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class GenProductRepositoryKnockOff
 {
-	/// <summary>Tracks and configures behavior for IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProduct.GetAll.</summary>
-	public sealed class IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProduct_GetAllInterceptor
+	/// <summary>Tracks and configures behavior for GetAll.</summary>
+	public sealed class GetAllInterceptor
 	{
-		/// <summary>Delegate for GetAll().</summary>
+		/// <summary>Delegate for GetAll.</summary>
 		public delegate global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Guides.GenProduct> GetAllDelegate(GenProductRepositoryKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetAllDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -27,60 +27,50 @@ partial class GenProductRepositoryKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProduct.FindFirst.</summary>
-	public sealed class IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProduct_FindFirstInterceptor
+	/// <summary>Tracks and configures behavior for FindFirst.</summary>
+	public sealed class FindFirstInterceptor
 	{
-		/// <summary>Delegate for FindFirst(global::System.Func<global::KnockOff.Documentation.Samples.Guides.GenProduct, bool> predicate).</summary>
+		/// <summary>Delegate for FindFirst.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Guides.GenProduct? FindFirstDelegate(GenProductRepositoryKnockOff ko, global::System.Func<global::KnockOff.Documentation.Samples.Guides.GenProduct, bool> predicate);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'predicate' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public global::System.Func<global::KnockOff.Documentation.Samples.Guides.GenProduct, bool>? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public FindFirstDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::System.Func<global::KnockOff.Documentation.Samples.Guides.GenProduct, bool> predicate) { CallCount++; LastCallArg = predicate; }
+		public void RecordCall(global::System.Func<global::KnockOff.Documentation.Samples.Guides.GenProduct, bool>? predicate) { CallCount++; LastCallArg = predicate; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<KnockOff.Documentation.Samples.Guides.GenProduct>.</summary>
-	public sealed class IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProductInterceptorors
-	{
-		/// <summary>Interceptor for GetAll.</summary>
-		public IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProduct_GetAllInterceptor GetAll { get; } = new();
-		/// <summary>Interceptor for FindFirst.</summary>
-		public IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProduct_FindFirstInterceptor FindFirst { get; } = new();
-	}
+	/// <summary>Interceptor for GetAll.</summary>
+	public GetAllInterceptor GetAll { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<KnockOff.Documentation.Samples.Guides.GenProduct>.</summary>
-	public IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProductInterceptorors IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProduct { get; } = new();
+	/// <summary>Interceptor for FindFirst.</summary>
+	public FindFirstInterceptor FindFirst { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<KnockOff.Documentation.Samples.Guides.GenProduct>.</summary>
 	public KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<KnockOff.Documentation.Samples.Guides.GenProduct> AsGenReadOnlyRepository() => this;
 
 	global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Guides.GenProduct> KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<KnockOff.Documentation.Samples.Guides.GenProduct>.GetAll()
 	{
-		IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProduct.GetAll.RecordCall();
-		if (IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProduct.GetAll.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Guides.GenProduct>();
+		GetAll.RecordCall();
+		return GetAll.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Guides.GenProduct>();
 	}
 
 	global::KnockOff.Documentation.Samples.Guides.GenProduct? KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<KnockOff.Documentation.Samples.Guides.GenProduct>.FindFirst(global::System.Func<global::KnockOff.Documentation.Samples.Guides.GenProduct, bool> predicate)
 	{
-		IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProduct.FindFirst.RecordCall(predicate);
-		if (IGenReadOnlyRepository_KnockOff_Documentation_Samples_Guides_GenProduct.FindFirst.OnCall is { } onCallCallback)
-			return onCallCallback(this, predicate);
-		return default!;
+		FindFirst.RecordCall(predicate);
+		return FindFirst.OnCall?.Invoke(this, predicate) ?? default!;
 	}
 
 }

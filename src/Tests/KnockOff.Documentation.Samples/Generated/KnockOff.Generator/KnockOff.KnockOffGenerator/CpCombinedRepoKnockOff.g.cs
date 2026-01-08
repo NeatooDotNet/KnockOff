@@ -5,49 +5,41 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class CpCombinedRepoKnockOff
 {
-	/// <summary>Tracks and configures behavior for ICpCombinedRepository.GetById.</summary>
-	public sealed class ICpCombinedRepository_GetByIdInterceptor
+	/// <summary>Tracks and configures behavior for GetById.</summary>
+	public sealed class GetById2Interceptor
 	{
-		/// <summary>Delegate for GetById(int id).</summary>
+		/// <summary>Delegate for GetById.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.CpUser? GetByIdDelegate(CpCombinedRepoKnockOff ko, int id);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetByIdDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpCombinedRepository.</summary>
-	public sealed class ICpCombinedRepositoryInterceptorors
-	{
-		/// <summary>Interceptor for GetById.</summary>
-		public ICpCombinedRepository_GetByIdInterceptor GetById { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpCombinedRepository.</summary>
-	public ICpCombinedRepositoryInterceptorors ICpCombinedRepository { get; } = new();
+	/// <summary>Interceptor for GetById.</summary>
+	public GetById2Interceptor GetById2 { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpCombinedRepository.</summary>
 	public KnockOff.Documentation.Samples.Skills.ICpCombinedRepository AsCpCombinedRepository() => this;
 
 	global::KnockOff.Documentation.Samples.Skills.CpUser? KnockOff.Documentation.Samples.Skills.ICpCombinedRepository.GetById(int id)
 	{
-		ICpCombinedRepository.GetById.RecordCall(id);
-		if (ICpCombinedRepository.GetById.OnCall is { } onCallCallback)
-			return onCallCallback(this, id);
+		GetById2.RecordCall(id);
+		if (GetById2.OnCall != null) return GetById2.OnCall(this, id);
 		return GetById(id);
 	}
 

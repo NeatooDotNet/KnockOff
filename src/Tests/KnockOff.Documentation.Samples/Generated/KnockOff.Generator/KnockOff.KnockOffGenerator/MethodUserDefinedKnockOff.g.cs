@@ -5,44 +5,44 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class MethodUserDefinedKnockOff
 {
-	/// <summary>Tracks and configures behavior for IMethodUserDefined.GetById.</summary>
-	public sealed class IMethodUserDefined_GetByIdInterceptor
+	/// <summary>Tracks and configures behavior for GetById.</summary>
+	public sealed class GetById2Interceptor
 	{
-		/// <summary>Delegate for GetById(int id).</summary>
+		/// <summary>Delegate for GetById.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Guides.MethodUser? GetByIdDelegate(MethodUserDefinedKnockOff ko, int id);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetByIdDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IMethodUserDefined.Count.</summary>
-	public sealed class IMethodUserDefined_CountInterceptor
+	/// <summary>Tracks and configures behavior for Count.</summary>
+	public sealed class Count2Interceptor
 	{
-		/// <summary>Delegate for Count().</summary>
+		/// <summary>Delegate for Count.</summary>
 		public delegate int CountDelegate(MethodUserDefinedKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public CountDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -52,34 +52,26 @@ partial class MethodUserDefinedKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodUserDefined.</summary>
-	public sealed class IMethodUserDefinedInterceptorors
-	{
-		/// <summary>Interceptor for GetById.</summary>
-		public IMethodUserDefined_GetByIdInterceptor GetById { get; } = new();
-		/// <summary>Interceptor for Count.</summary>
-		public IMethodUserDefined_CountInterceptor Count { get; } = new();
-	}
+	/// <summary>Interceptor for GetById.</summary>
+	public GetById2Interceptor GetById2 { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodUserDefined.</summary>
-	public IMethodUserDefinedInterceptorors IMethodUserDefined { get; } = new();
+	/// <summary>Interceptor for Count.</summary>
+	public Count2Interceptor Count2 { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodUserDefined.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMethodUserDefined AsMethodUserDefined() => this;
 
 	global::KnockOff.Documentation.Samples.Guides.MethodUser? KnockOff.Documentation.Samples.Guides.IMethodUserDefined.GetById(int id)
 	{
-		IMethodUserDefined.GetById.RecordCall(id);
-		if (IMethodUserDefined.GetById.OnCall is { } onCallCallback)
-			return onCallCallback(this, id);
+		GetById2.RecordCall(id);
+		if (GetById2.OnCall != null) return GetById2.OnCall(this, id);
 		return GetById(id);
 	}
 
 	int KnockOff.Documentation.Samples.Guides.IMethodUserDefined.Count()
 	{
-		IMethodUserDefined.Count.RecordCall();
-		if (IMethodUserDefined.Count.OnCall is { } onCallCallback)
-			return onCallCallback(this);
+		Count2.RecordCall();
+		if (Count2.OnCall != null) return Count2.OnCall(this);
 		return Count();
 	}
 

@@ -5,83 +5,69 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class MethodLoggerKnockOff
 {
-	/// <summary>Tracks and configures behavior for IMethodLogger.Log.</summary>
-	public sealed class IMethodLogger_LogInterceptor
+	/// <summary>Tracks and configures behavior for Log.</summary>
+	public sealed class LogInterceptor
 	{
-		/// <summary>Delegate for Log(string message).</summary>
-		public delegate void LogDelegate(MethodLoggerKnockOff ko, string message);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'message' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public string? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public LogDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<MethodLoggerKnockOff, string>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string message) { CallCount++; LastCallArg = message; }
+		public void RecordCall(string? message) { CallCount++; LastCallArg = message; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IMethodLogger.LogError.</summary>
-	public sealed class IMethodLogger_LogErrorInterceptor
+	/// <summary>Tracks and configures behavior for LogError.</summary>
+	public sealed class LogErrorInterceptor
 	{
-		/// <summary>Delegate for LogError(string message, global::System.Exception ex).</summary>
-		public delegate void LogErrorDelegate(MethodLoggerKnockOff ko, string message, global::System.Exception ex);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Arguments from the most recent call.</summary>
-		public (string message, global::System.Exception ex)? LastCallArgs { get; private set; }
+		/// <summary>The arguments from the most recent call.</summary>
+		public (string? message, global::System.Exception? ex)? LastCallArgs { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public LogErrorDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<MethodLoggerKnockOff, string, global::System.Exception>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string message, global::System.Exception ex) { CallCount++; LastCallArgs = (message, ex); }
+		public void RecordCall(string? message, global::System.Exception? ex) { CallCount++; LastCallArgs = (message, ex); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodLogger.</summary>
-	public sealed class IMethodLoggerInterceptorors
-	{
-		/// <summary>Interceptor for Log.</summary>
-		public IMethodLogger_LogInterceptor Log { get; } = new();
-		/// <summary>Interceptor for LogError.</summary>
-		public IMethodLogger_LogErrorInterceptor LogError { get; } = new();
-	}
+	/// <summary>Interceptor for Log.</summary>
+	public LogInterceptor Log { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodLogger.</summary>
-	public IMethodLoggerInterceptorors IMethodLogger { get; } = new();
+	/// <summary>Interceptor for LogError.</summary>
+	public LogErrorInterceptor LogError { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodLogger.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMethodLogger AsMethodLogger() => this;
 
 	void KnockOff.Documentation.Samples.Guides.IMethodLogger.Log(string message)
 	{
-		IMethodLogger.Log.RecordCall(message);
-		if (IMethodLogger.Log.OnCall is { } onCallCallback)
-		{ onCallCallback(this, message); return; }
+		Log.RecordCall(message);
+		Log.OnCall?.Invoke(this, message);
 	}
 
 	void KnockOff.Documentation.Samples.Guides.IMethodLogger.LogError(string message, global::System.Exception ex)
 	{
-		IMethodLogger.LogError.RecordCall(message, ex);
-		if (IMethodLogger.LogError.OnCall is { } onCallCallback)
-		{ onCallCallback(this, message, ex); return; }
+		LogError.RecordCall(message, ex);
+		LogError.OnCall?.Invoke(this, message, ex);
 	}
 
 }

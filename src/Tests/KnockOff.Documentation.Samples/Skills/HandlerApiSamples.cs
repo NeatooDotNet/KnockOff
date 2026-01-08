@@ -50,17 +50,17 @@ public interface IHaService
 public partial class HaServiceKnockOff : IHaService { }
 
 // Void method, no params
-// Assert.True(knockOff.IHaService.Initialize.WasCalled);
-// knockOff.IHaService.Initialize.OnCall = (ko) => { };
+// Assert.True(knockOff.Initialize.WasCalled);
+// knockOff.Initialize.OnCall = (ko) => { };
 
 // Return method, single param
-// Assert.Equal(42, knockOff.IHaService.GetById.LastCallArg);
-// knockOff.IHaService.GetById.OnCall = (ko, id) => new HaUser { Id = id };
+// Assert.Equal(42, knockOff.GetById2.LastCallArg);
+// knockOff.GetById2.OnCall = (ko, id) => new HaUser { Id = id };
 
 // Multiple params
-// var args = knockOff.IHaService.Create.LastCallArgs;
+// var args = knockOff.Create.LastCallArgs;
 // Assert.Equal("Test", args?.name);
-// knockOff.IHaService.Create.OnCall = (ko, name, value) =>
+// knockOff.Create.OnCall = (ko, name, value) =>
 //     new HaEntity { Name = name };
 #endregion
 
@@ -78,16 +78,16 @@ public interface IHaPropertyService
 public partial class HaPropertyServiceKnockOff : IHaPropertyService { }
 
 // Tracking
-// Assert.Equal(3, knockOff.IHaPropertyService.Name.GetCount);
-// Assert.Equal(2, knockOff.IHaPropertyService.Name.SetCount);
-// Assert.Equal("Last", knockOff.IHaPropertyService.Name.LastSetValue);
+// Assert.Equal(3, knockOff.Name.GetCount);
+// Assert.Equal(2, knockOff.Name.SetCount);
+// Assert.Equal("Last", knockOff.Name.LastSetValue);
 
 // Callbacks
-// knockOff.IHaPropertyService.Name.OnGet = (ko) => "Always This";
-// knockOff.IHaPropertyService.Name.OnSet = (ko, value) => capturedValue = value;
+// knockOff.Name.OnGet = (ko) => "Always This";
+// knockOff.Name.OnSet = (ko, value) => capturedValue = value;
 
 // Backing field (direct access)
-// knockOff.IHaPropertyService_NameBacking = "Pre-populated";
+// knockOff.NameBacking = "Pre-populated";
 #endregion
 
 // ============================================================================
@@ -104,28 +104,28 @@ public interface IHaPropertyStore
 public partial class HaPropertyStoreKnockOff : IHaPropertyStore { }
 
 // Pre-populate backing
-// knockOff.IHaPropertyStore_StringIndexerBacking["Key1"] = value1;
-// knockOff.IHaPropertyStore_StringIndexerBacking["Key2"] = value2;
+// knockOff.StringIndexerBacking["Key1"] = value1;
+// knockOff.StringIndexerBacking["Key2"] = value2;
 
 // Track access
 // _ = store["Key1"];
 // _ = store["Key2"];
-// Assert.Equal(2, knockOff.IHaPropertyStore.StringIndexer.GetCount);
-// Assert.Equal("Key2", knockOff.IHaPropertyStore.StringIndexer.LastGetKey);
+// Assert.Equal(2, knockOff.StringIndexer.GetCount);
+// Assert.Equal("Key2", knockOff.StringIndexer.LastGetKey);
 
 // Dynamic getter
-// knockOff.IHaPropertyStore.StringIndexer.OnGet = (ko, key) =>
+// knockOff.StringIndexer.OnGet = (ko, key) =>
 // {
 //     if (key == "special") return specialValue;
-//     return ko.IHaPropertyStore_StringIndexerBacking.GetValueOrDefault(key);
+//     return ko.StringIndexerBacking.GetValueOrDefault(key);
 // };
 
 // Track setter
 // store["NewKey"] = newValue;
-// Assert.Equal("NewKey", knockOff.IHaPropertyStore.StringIndexer.LastSetEntry?.key);
+// Assert.Equal("NewKey", knockOff.StringIndexer.LastSetEntry?.key);
 
 // Intercept setter
-// knockOff.IHaPropertyStore.StringIndexer.OnSet = (ko, key, value) =>
+// knockOff.StringIndexer.OnSet = (ko, key, value) =>
 // {
 //     // Custom logic
 //     // Value does NOT go to backing dictionary
@@ -150,28 +150,28 @@ public partial class HaEventSourceKnockOff : IHaEventSource { }
 
 // Subscribe tracking
 // source.DataReceived += handler;
-// Assert.Equal(1, knockOff.IHaEventSource.DataReceived.SubscribeCount);
-// Assert.True(knockOff.IHaEventSource.DataReceived.HasSubscribers);
+// Assert.Equal(1, knockOff.DataReceived.SubscribeCount);
+// Assert.True(knockOff.DataReceived.HasSubscribers);
 
 // Raise event
-// knockOff.IHaEventSource.DataReceived.Raise("test data");
-// Assert.True(knockOff.IHaEventSource.DataReceived.WasRaised);
-// Assert.Equal("test data", knockOff.IHaEventSource.DataReceived.LastRaiseArgs?.e);
+// knockOff.DataReceived.Raise("test data");
+// Assert.True(knockOff.DataReceived.WasRaised);
+// Assert.Equal("test data", knockOff.DataReceived.LastRaiseArgs?.e);
 
 // EventHandler (non-generic)
-// knockOff.IHaEventSource.Completed.Raise(); // null sender, EventArgs.Empty
+// knockOff.Completed.Raise(); // null sender, EventArgs.Empty
 
 // Action with params
-// knockOff.IHaEventSource.ProgressChanged.Raise(75);
-// knockOff.IHaEventSource.DataUpdated.Raise("key", 42);
+// knockOff.ProgressChanged.Raise(75);
+// knockOff.DataUpdated.Raise("key", 42);
 
 // All raises
-// var allRaises = knockOff.IHaEventSource.DataReceived.AllRaises;
+// var allRaises = knockOff.DataReceived.AllRaises;
 // Assert.Equal(3, allRaises.Count);
 
 // Reset vs Clear
-// knockOff.IHaEventSource.DataReceived.Reset();  // Clears tracking, keeps handlers
-// knockOff.IHaEventSource.DataReceived.Clear();  // Clears tracking AND handlers
+// knockOff.DataReceived.Reset();  // Clears tracking, keeps handlers
+// knockOff.DataReceived.Clear();  // Clears tracking AND handlers
 #endregion
 
 // ============================================================================
@@ -196,16 +196,16 @@ public partial class HaOverloadServiceKnockOff : IHaOverloadService { }
 // Each overload tracked separately
 // service.Process("a");
 // service.Process("b", 1);
-// Assert.Equal(1, knockOff.IHaOverloadService.Process1.CallCount);  // Process(string)
-// Assert.Equal(1, knockOff.IHaOverloadService.Process2.CallCount);  // Process(string, int)
+// Assert.Equal(1, knockOff.Process1.CallCount);  // Process(string)
+// Assert.Equal(1, knockOff.Process2.CallCount);  // Process(string, int)
 
 // Each overload has its own callback
-// knockOff.IHaOverloadService.Process1.OnCall = (ko, data) => { };
-// knockOff.IHaOverloadService.Process2.OnCall = (ko, data, priority) => { };
+// knockOff.Process1.OnCall = (ko, data) => { };
+// knockOff.Process2.OnCall = (ko, data, priority) => { };
 
 // Return methods
-// knockOff.IHaOverloadService.Calculate1.OnCall = (ko, value) => value * 2;
-// knockOff.IHaOverloadService.Calculate2.OnCall = (ko, a, b) => a + b;
+// knockOff.Calculate1.OnCall = (ko, value) => value * 2;
+// knockOff.Calculate2.OnCall = (ko, a, b) => a + b;
 
 // Assert.Equal(10, service.Calculate(5));    // Calculate1
 // Assert.Equal(8, service.Calculate(3, 5));  // Calculate2
@@ -226,16 +226,16 @@ public interface IHaParser
 public partial class HaParserKnockOff : IHaParser { }
 
 // Explicit delegate type required
-// knockOff.IHaParser.TryParse.OnCall =
-//     (IHaParser_TryParseInterceptor.TryParseDelegate)((ko, string input, out int result) =>
+// knockOff.TryParse.OnCall =
+//     (TryParseInterceptor.TryParseDelegate)((ko, string input, out int result) =>
 //     {
 //         result = int.Parse(input);
 //         return true;
 //     });
 
 // Void with multiple out params
-// knockOff.IHaParser.GetData.OnCall =
-//     (IHaParser_GetDataInterceptor.GetDataDelegate)((ko, out string name, out int count) =>
+// knockOff.GetData.OnCall =
+//     (GetDataInterceptor.GetDataDelegate)((ko, out string name, out int count) =>
 //     {
 //         name = "Test";
 //         count = 42;
@@ -257,15 +257,15 @@ public interface IHaProcessor
 public partial class HaProcessorKnockOff : IHaProcessor { }
 
 // Explicit delegate type required
-// knockOff.IHaProcessor.Increment.OnCall =
-//     (IHaProcessor_IncrementInterceptor.IncrementDelegate)((ko, ref int value) =>
+// knockOff.Increment.OnCall =
+//     (IncrementInterceptor.IncrementDelegate)((ko, ref int value) =>
 //     {
 //         value = value * 2;  // Modify the ref param
 //     });
 
 // Mixed regular + ref params
-// knockOff.IHaProcessor.TryUpdate.OnCall =
-//     (IHaProcessor_TryUpdateInterceptor.TryUpdateDelegate)((ko, string key, ref string value) =>
+// knockOff.TryUpdate.OnCall =
+//     (TryUpdateInterceptor.TryUpdateDelegate)((ko, string key, ref string value) =>
 //     {
 //         value = value.ToUpper();
 //         return true;
@@ -277,7 +277,7 @@ public partial class HaProcessorKnockOff : IHaProcessor { }
 // processor.Increment(ref x);
 
 // Assert.Equal(10, x);  // Modified
-// Assert.Equal(5, knockOff.IHaProcessor.Increment.LastCallArg);  // Original input value
+// Assert.Equal(5, knockOff.Increment.LastCallArg);  // Original input value
 #endregion
 
 // ============================================================================
@@ -294,10 +294,10 @@ public interface IHaAsyncRepository
 [KnockOff]
 public partial class HaAsyncRepositoryKnockOff : IHaAsyncRepository { }
 
-// knockOff.IHaAsyncRepository.GetByIdAsync.OnCall = (ko, id) =>
+// knockOff.GetByIdAsync2.OnCall = (ko, id) =>
 //     Task.FromResult<HaUser?>(new HaUser { Id = id });
 
-// knockOff.IHaAsyncRepository.SaveAsync.OnCall = (ko, entity) =>
+// knockOff.SaveAsync.OnCall = (ko, entity) =>
 //     Task.FromException<int>(new DbException("Failed"));
 #endregion
 
@@ -316,23 +316,23 @@ public interface IHaSerializer
 public partial class HaSerializerKnockOff : IHaSerializer { }
 
 // Configure per type
-// knockOff.IHaSerializer.Deserialize.Of<HaUser>().OnCall = (ko, json) =>
+// knockOff.Deserialize.Of<HaUser>().OnCall = (ko, json) =>
 //     JsonSerializer.Deserialize<HaUser>(json)!;
 
 // Per-type tracking
-// Assert.Equal(2, knockOff.IHaSerializer.Deserialize.Of<HaUser>().CallCount);
-// Assert.Equal("{...}", knockOff.IHaSerializer.Deserialize.Of<HaUser>().LastCallArg);
+// Assert.Equal(2, knockOff.Deserialize.Of<HaUser>().CallCount);
+// Assert.Equal("{...}", knockOff.Deserialize.Of<HaUser>().LastCallArg);
 
 // Aggregate tracking
-// Assert.Equal(5, knockOff.IHaSerializer.Deserialize.TotalCallCount);
-// var types = knockOff.IHaSerializer.Deserialize.CalledTypeArguments;
+// Assert.Equal(5, knockOff.Deserialize.TotalCallCount);
+// var types = knockOff.Deserialize.CalledTypeArguments;
 
 // Multiple type parameters
-// knockOff.IHaSerializer.Convert.Of<string, int>().OnCall = (ko, s) => s.Length;
+// knockOff.Convert.Of<string, int>().OnCall = (ko, s) => s.Length;
 
 // Reset single type vs all types
-// knockOff.IHaSerializer.Deserialize.Of<HaUser>().Reset();  // Single type
-// knockOff.IHaSerializer.Deserialize.Reset();              // All types
+// knockOff.Deserialize.Of<HaUser>().Reset();  // Single type
+// knockOff.Deserialize.Reset();              // All types
 #endregion
 
 // ============================================================================

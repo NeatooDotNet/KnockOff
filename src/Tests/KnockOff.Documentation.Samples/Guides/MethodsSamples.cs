@@ -11,12 +11,17 @@
 /// - docs:methods:void-callbacks
 /// - docs:methods:return-callbacks
 /// - docs:methods:priority-order
+/// - docs:methods:priority-order-usage
 /// - docs:methods:simulating-failures
+/// - docs:methods:simulating-failures-usage
 /// - docs:methods:conditional-returns
 /// - docs:methods:capturing-arguments
 /// - docs:methods:verifying-call-order
+/// - docs:methods:verifying-call-order-usage
 /// - docs:methods:sequential-returns
+/// - docs:methods:sequential-returns-usage
 /// - docs:methods:accessing-handler-state
+/// - docs:methods:accessing-handler-state-usage
 ///
 /// Corresponding tests: MethodsSamplesTests.cs
 /// </summary>
@@ -201,3 +206,199 @@ public interface IMethodHandlerState
 [KnockOff]
 public partial class MethodHandlerStateKnockOff : IMethodHandlerState { }
 #endregion
+
+// ============================================================================
+// Usage Examples (Compilable methods with snippet regions)
+// ============================================================================
+
+/// <summary>
+/// Usage examples demonstrating method patterns.
+/// Each method is a compilable example; snippets extract the key portions.
+/// </summary>
+public static class MethodsUsageExamples
+{
+    public static void SingleParamTracking()
+    {
+        var knockOff = new MethodSingleParamKnockOff();
+        IMethodSingleParam service = knockOff;
+
+        #region docs:methods:single-param
+        service.GetUser(42);
+
+        // Tracking - single parameter uses raw type (not a tuple)
+        int? lastId = knockOff.GetUser.LastCallArg;  // 42, not (42,)
+        #endregion
+
+        _ = lastId; // Use variable
+    }
+
+    public static void MultipleParamsTracking()
+    {
+        var knockOff = new MethodMultiParamKnockOff();
+        IMethodMultiParam service = knockOff;
+
+        #region docs:methods:multiple-params
+        service.Process("test", 42, true);
+
+        // Tracking - named tuple with original parameter names
+        var args = knockOff.Process.LastCallArgs;
+        var name = args?.name;   // "test"
+        var value = args?.value; // 42
+        var flag = args?.flag;   // true
+        #endregion
+
+        _ = (name, value, flag); // Use variables
+    }
+
+    public static void VoidCallbacks()
+    {
+        var serviceKnockOff = new MethodServiceKnockOff();
+        var loggerKnockOff = new MethodLoggerKnockOff();
+
+        #region docs:methods:void-callbacks
+        // No parameters
+        serviceKnockOff.Initialize.OnCall = (ko) =>
+        {
+            // Custom initialization logic
+        };
+
+        // Single parameter
+        loggerKnockOff.Log.OnCall = (ko, message) =>
+        {
+            Console.WriteLine($"Logged: {message}");
+        };
+
+        // Multiple parameters
+        loggerKnockOff.LogError.OnCall = (ko, message, ex) =>
+        {
+            Console.WriteLine($"Error: {message} - {ex.Message}");
+        };
+        #endregion
+    }
+
+    public static void ReturnCallbacks()
+    {
+        var knockOff = new MethodRepositoryKnockOff();
+
+        #region docs:methods:return-callbacks
+        // No parameters
+        knockOff.Count.OnCall = (ko) => 42;
+
+        // Single parameter
+        knockOff.GetById.OnCall = (ko, id) => new MethodUser { Id = id };
+        #endregion
+    }
+
+    public static void PriorityOrder()
+    {
+        var knockOff = new MethodPriorityKnockOff();
+        IMethodPriority service = knockOff;
+
+        #region docs:methods:priority-order-usage
+        // No callback → uses user method
+        var result1 = service.Calculate(5);  // 10 (5 * 2)
+
+        // Callback → overrides user method
+        knockOff.Calculate2.OnCall = (ko, x) => x * 100;
+        var result2 = service.Calculate(5);  // 500 (callback)
+
+        // Reset → back to user method
+        knockOff.Calculate2.Reset();
+        var result3 = service.Calculate(5);  // 10 (user method again)
+        #endregion
+
+        _ = (result1, result2, result3); // Use variables
+    }
+
+    public static void SimulatingFailures()
+    {
+        var knockOff = new MethodFailureKnockOff();
+
+        #region docs:methods:simulating-failures-usage
+        knockOff.Save.OnCall = (ko, entity) =>
+        {
+            throw new InvalidOperationException("Connection failed");
+        };
+        #endregion
+    }
+
+    public static void ConditionalReturns()
+    {
+        var knockOff = new MethodRepositoryKnockOff();
+
+        #region docs:methods:conditional-returns
+        knockOff.GetById.OnCall = (ko, id) => id switch
+        {
+            1 => new MethodUser { Id = 1, Name = "Admin" },
+            2 => new MethodUser { Id = 2, Name = "Guest" },
+            _ => null
+        };
+        #endregion
+    }
+
+    public static void CapturingArguments()
+    {
+        var knockOff = new MethodRepositoryKnockOff();
+
+        #region docs:methods:capturing-arguments
+        var capturedIds = new List<int>();
+        knockOff.GetById.OnCall = (ko, id) =>
+        {
+            capturedIds.Add(id);
+            return new MethodUser { Id = id };
+        };
+        #endregion
+    }
+
+    public static void VerifyingCallOrder()
+    {
+        var knockOff = new MethodCallOrderKnockOff();
+        IMethodCallOrder service = knockOff;
+
+        #region docs:methods:verifying-call-order-usage
+        var callOrder = new List<string>();
+
+        knockOff.Initialize.OnCall = (ko) => callOrder.Add("Initialize");
+        knockOff.Process.OnCall = (ko) => callOrder.Add("Process");
+        knockOff.Cleanup.OnCall = (ko) => callOrder.Add("Cleanup");
+
+        service.Initialize();
+        service.Process();
+        service.Cleanup();
+
+        // callOrder is ["Initialize", "Process", "Cleanup"]
+        #endregion
+
+        _ = callOrder; // Use variable
+    }
+
+    public static void SequentialReturns()
+    {
+        var knockOff = new MethodSequentialKnockOff();
+        IMethodSequential service = knockOff;
+
+        #region docs:methods:sequential-returns-usage
+        var results = new Queue<int>([1, 2, 3]);
+        knockOff.GetNext.OnCall = (ko) => results.Dequeue();
+
+        var first = service.GetNext();   // 1
+        var second = service.GetNext();  // 2
+        var third = service.GetNext();   // 3
+        #endregion
+
+        _ = (first, second, third); // Use variables
+    }
+
+    public static void AccessingHandlerState()
+    {
+        var knockOff = new MethodHandlerStateKnockOff();
+
+        #region docs:methods:accessing-handler-state-usage
+        knockOff.Process.OnCall = (ko) =>
+        {
+            if (!ko.Initialize.WasCalled)
+                throw new InvalidOperationException("Not initialized");
+        };
+        #endregion
+    }
+}

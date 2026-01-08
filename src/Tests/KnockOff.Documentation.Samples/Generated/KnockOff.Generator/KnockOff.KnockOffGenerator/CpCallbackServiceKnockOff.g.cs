@@ -5,20 +5,17 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class CpCallbackServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for ICpCallbackService.Initialize.</summary>
-	public sealed class ICpCallbackService_InitializeInterceptor
+	/// <summary>Tracks and configures behavior for Initialize.</summary>
+	public sealed class InitializeInterceptor
 	{
-		/// <summary>Delegate for Initialize().</summary>
-		public delegate void InitializeDelegate(CpCallbackServiceKnockOff ko);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public InitializeDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<CpCallbackServiceKnockOff>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
@@ -27,94 +24,84 @@ partial class CpCallbackServiceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ICpCallbackService.GetById.</summary>
-	public sealed class ICpCallbackService_GetByIdInterceptor
+	/// <summary>Tracks and configures behavior for GetById.</summary>
+	public sealed class GetByIdInterceptor
 	{
-		/// <summary>Delegate for GetById(int id).</summary>
+		/// <summary>Delegate for GetById.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.CpUser GetByIdDelegate(CpCallbackServiceKnockOff ko, int id);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetByIdDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ICpCallbackService.Search.</summary>
-	public sealed class ICpCallbackService_SearchInterceptor
+	/// <summary>Tracks and configures behavior for Search.</summary>
+	public sealed class SearchInterceptor
 	{
-		/// <summary>Delegate for Search(string query, int limit, int offset).</summary>
+		/// <summary>Delegate for Search.</summary>
 		public delegate global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.CpUser> SearchDelegate(CpCallbackServiceKnockOff ko, string query, int limit, int offset);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Arguments from the most recent call.</summary>
-		public (string query, int limit, int offset)? LastCallArgs { get; private set; }
+		/// <summary>The arguments from the most recent call.</summary>
+		public (string? query, int? limit, int? offset)? LastCallArgs { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public SearchDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string query, int limit, int offset) { CallCount++; LastCallArgs = (query, limit, offset); }
+		public void RecordCall(string? query, int? limit, int? offset) { CallCount++; LastCallArgs = (query, limit, offset); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpCallbackService.</summary>
-	public sealed class ICpCallbackServiceInterceptorors
-	{
-		/// <summary>Interceptor for Initialize.</summary>
-		public ICpCallbackService_InitializeInterceptor Initialize { get; } = new();
-		/// <summary>Interceptor for GetById.</summary>
-		public ICpCallbackService_GetByIdInterceptor GetById { get; } = new();
-		/// <summary>Interceptor for Search.</summary>
-		public ICpCallbackService_SearchInterceptor Search { get; } = new();
-	}
+	/// <summary>Interceptor for Initialize.</summary>
+	public InitializeInterceptor Initialize { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpCallbackService.</summary>
-	public ICpCallbackServiceInterceptorors ICpCallbackService { get; } = new();
+	/// <summary>Interceptor for GetById.</summary>
+	public GetByIdInterceptor GetById { get; } = new();
+
+	/// <summary>Interceptor for Search.</summary>
+	public SearchInterceptor Search { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpCallbackService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ICpCallbackService AsCpCallbackService() => this;
 
 	void KnockOff.Documentation.Samples.Skills.ICpCallbackService.Initialize()
 	{
-		ICpCallbackService.Initialize.RecordCall();
-		if (ICpCallbackService.Initialize.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		Initialize.RecordCall();
+		Initialize.OnCall?.Invoke(this);
 	}
 
 	global::KnockOff.Documentation.Samples.Skills.CpUser KnockOff.Documentation.Samples.Skills.ICpCallbackService.GetById(int id)
 	{
-		ICpCallbackService.GetById.RecordCall(id);
-		if (ICpCallbackService.GetById.OnCall is { } onCallCallback)
-			return onCallCallback(this, id);
-		return new global::KnockOff.Documentation.Samples.Skills.CpUser();
+		GetById.RecordCall(id);
+		return GetById.OnCall?.Invoke(this, id) ?? new global::KnockOff.Documentation.Samples.Skills.CpUser();
 	}
 
 	global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.CpUser> KnockOff.Documentation.Samples.Skills.ICpCallbackService.Search(string query, int limit, int offset)
 	{
-		ICpCallbackService.Search.RecordCall(query, limit, offset);
-		if (ICpCallbackService.Search.OnCall is { } onCallCallback)
-			return onCallCallback(this, query, limit, offset);
-		return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.CpUser>();
+		Search.RecordCall(query, limit, offset);
+		return Search.OnCall?.Invoke(this, query, limit, offset) ?? new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.CpUser>();
 	}
 
 }

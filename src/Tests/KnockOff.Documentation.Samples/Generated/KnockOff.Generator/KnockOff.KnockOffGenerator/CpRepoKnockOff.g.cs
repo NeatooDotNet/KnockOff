@@ -5,44 +5,44 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class CpRepoKnockOff
 {
-	/// <summary>Tracks and configures behavior for ICpRepository.GetByIdAsync.</summary>
-	public sealed class ICpRepository_GetByIdAsyncInterceptor
+	/// <summary>Tracks and configures behavior for GetByIdAsync.</summary>
+	public sealed class GetByIdAsync2Interceptor
 	{
-		/// <summary>Delegate for GetByIdAsync(int id).</summary>
+		/// <summary>Delegate for GetByIdAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.CpUser?> GetByIdAsyncDelegate(CpRepoKnockOff ko, int id);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetByIdAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ICpRepository.CountAsync.</summary>
-	public sealed class ICpRepository_CountAsyncInterceptor
+	/// <summary>Tracks and configures behavior for CountAsync.</summary>
+	public sealed class CountAsync2Interceptor
 	{
-		/// <summary>Delegate for CountAsync().</summary>
+		/// <summary>Delegate for CountAsync.</summary>
 		public delegate global::System.Threading.Tasks.ValueTask<int> CountAsyncDelegate(CpRepoKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public CountAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -52,34 +52,26 @@ partial class CpRepoKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpRepository.</summary>
-	public sealed class ICpRepositoryInterceptorors
-	{
-		/// <summary>Interceptor for GetByIdAsync.</summary>
-		public ICpRepository_GetByIdAsyncInterceptor GetByIdAsync { get; } = new();
-		/// <summary>Interceptor for CountAsync.</summary>
-		public ICpRepository_CountAsyncInterceptor CountAsync { get; } = new();
-	}
+	/// <summary>Interceptor for GetByIdAsync.</summary>
+	public GetByIdAsync2Interceptor GetByIdAsync2 { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpRepository.</summary>
-	public ICpRepositoryInterceptorors ICpRepository { get; } = new();
+	/// <summary>Interceptor for CountAsync.</summary>
+	public CountAsync2Interceptor CountAsync2 { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpRepository.</summary>
 	public KnockOff.Documentation.Samples.Skills.ICpRepository AsCpRepository() => this;
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.CpUser?> KnockOff.Documentation.Samples.Skills.ICpRepository.GetByIdAsync(int id)
 	{
-		ICpRepository.GetByIdAsync.RecordCall(id);
-		if (ICpRepository.GetByIdAsync.OnCall is { } onCallCallback)
-			return onCallCallback(this, id);
+		GetByIdAsync2.RecordCall(id);
+		if (GetByIdAsync2.OnCall != null) return GetByIdAsync2.OnCall(this, id);
 		return GetByIdAsync(id);
 	}
 
 	global::System.Threading.Tasks.ValueTask<int> KnockOff.Documentation.Samples.Skills.ICpRepository.CountAsync()
 	{
-		ICpRepository.CountAsync.RecordCall();
-		if (ICpRepository.CountAsync.OnCall is { } onCallCallback)
-			return onCallCallback(this);
+		CountAsync2.RecordCall();
+		if (CountAsync2.OnCall != null) return CountAsync2.OnCall(this);
 		return CountAsync();
 	}
 

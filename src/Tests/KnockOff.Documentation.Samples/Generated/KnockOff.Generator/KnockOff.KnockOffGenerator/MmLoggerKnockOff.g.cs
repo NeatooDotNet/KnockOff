@@ -5,49 +5,38 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class MmLoggerKnockOff
 {
-	/// <summary>Tracks and configures behavior for IMmLogger.Log.</summary>
-	public sealed class IMmLogger_LogInterceptor
+	/// <summary>Tracks and configures behavior for Log.</summary>
+	public sealed class LogInterceptor
 	{
-		/// <summary>Delegate for Log(string message).</summary>
-		public delegate void LogDelegate(MmLoggerKnockOff ko, string message);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'message' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public string? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public LogDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<MmLoggerKnockOff, string>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string message) { CallCount++; LastCallArg = message; }
+		public void RecordCall(string? message) { CallCount++; LastCallArg = message; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmLogger.</summary>
-	public sealed class IMmLoggerInterceptorors
-	{
-		/// <summary>Interceptor for Log.</summary>
-		public IMmLogger_LogInterceptor Log { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmLogger.</summary>
-	public IMmLoggerInterceptorors IMmLogger { get; } = new();
+	/// <summary>Interceptor for Log.</summary>
+	public LogInterceptor Log { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmLogger.</summary>
 	public KnockOff.Documentation.Samples.Skills.IMmLogger AsMmLogger() => this;
 
 	void KnockOff.Documentation.Samples.Skills.IMmLogger.Log(string message)
 	{
-		IMmLogger.Log.RecordCall(message);
-		if (IMmLogger.Log.OnCall is { } onCallCallback)
-		{ onCallCallback(this, message); return; }
+		Log.RecordCall(message);
+		Log.OnCall?.Invoke(this, message);
 	}
 
 }

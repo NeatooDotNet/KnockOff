@@ -5,40 +5,33 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class MmParserKnockOff
 {
-	/// <summary>Tracks and configures behavior for IMmParser.TryParse.</summary>
-	public sealed class IMmParser_TryParseInterceptor
+	/// <summary>Tracks and configures behavior for TryParse.</summary>
+	public sealed class TryParseInterceptor
 	{
-		/// <summary>Delegate for TryParse(string input, out int result).</summary>
+		/// <summary>Delegate for TryParse.</summary>
 		public delegate bool TryParseDelegate(MmParserKnockOff ko, string input, out int result);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'input' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public string? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public TryParseDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string input) { CallCount++; LastCallArg = input; }
+		public void RecordCall(string? input) { CallCount++; LastCallArg = input; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmParser.</summary>
-	public sealed class IMmParserInterceptorors
-	{
-		/// <summary>Interceptor for TryParse.</summary>
-		public IMmParser_TryParseInterceptor TryParse { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmParser.</summary>
-	public IMmParserInterceptorors IMmParser { get; } = new();
+	/// <summary>Interceptor for TryParse.</summary>
+	public TryParseInterceptor TryParse { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmParser.</summary>
 	public KnockOff.Documentation.Samples.Skills.IMmParser AsMmParser() => this;
@@ -46,8 +39,8 @@ partial class MmParserKnockOff
 	bool KnockOff.Documentation.Samples.Skills.IMmParser.TryParse(string input, out int result)
 	{
 		result = default!;
-		IMmParser.TryParse.RecordCall(input);
-		if (IMmParser.TryParse.OnCall is { } onCallCallback)
+		TryParse.RecordCall(input);
+		if (TryParse.OnCall is { } onCallCallback)
 			return onCallCallback(this, input, out result);
 		return default!;
 	}

@@ -5,19 +5,19 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class HaDefaultsServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for IHaDefaultsService.GetCount.</summary>
-	public sealed class IHaDefaultsService_GetCountInterceptor
+	/// <summary>Tracks and configures behavior for GetCount.</summary>
+	public sealed class GetCountInterceptor
 	{
-		/// <summary>Delegate for GetCount().</summary>
+		/// <summary>Delegate for GetCount.</summary>
 		public delegate int GetCountDelegate(HaDefaultsServiceKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetCountDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -27,19 +27,19 @@ partial class HaDefaultsServiceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IHaDefaultsService.GetItems.</summary>
-	public sealed class IHaDefaultsService_GetItemsInterceptor
+	/// <summary>Tracks and configures behavior for GetItems.</summary>
+	public sealed class GetItemsInterceptor
 	{
-		/// <summary>Delegate for GetItems().</summary>
+		/// <summary>Delegate for GetItems.</summary>
 		public delegate global::System.Collections.Generic.List<string> GetItemsDelegate(HaDefaultsServiceKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetItemsDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -49,19 +49,19 @@ partial class HaDefaultsServiceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IHaDefaultsService.GetIList.</summary>
-	public sealed class IHaDefaultsService_GetIListInterceptor
+	/// <summary>Tracks and configures behavior for GetIList.</summary>
+	public sealed class GetIListInterceptor
 	{
-		/// <summary>Delegate for GetIList().</summary>
+		/// <summary>Delegate for GetIList.</summary>
 		public delegate global::System.Collections.Generic.IList<string> GetIListDelegate(HaDefaultsServiceKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetIListDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -71,19 +71,19 @@ partial class HaDefaultsServiceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IHaDefaultsService.GetOptional.</summary>
-	public sealed class IHaDefaultsService_GetOptionalInterceptor
+	/// <summary>Tracks and configures behavior for GetOptional.</summary>
+	public sealed class GetOptionalInterceptor
 	{
-		/// <summary>Delegate for GetOptional().</summary>
+		/// <summary>Delegate for GetOptional.</summary>
 		public delegate string? GetOptionalDelegate(HaDefaultsServiceKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetOptionalDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -93,19 +93,19 @@ partial class HaDefaultsServiceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IHaDefaultsService.GetDisposable.</summary>
-	public sealed class IHaDefaultsService_GetDisposableInterceptor
+	/// <summary>Tracks and configures behavior for GetDisposable.</summary>
+	public sealed class GetDisposableInterceptor
 	{
-		/// <summary>Delegate for GetDisposable().</summary>
+		/// <summary>Delegate for GetDisposable.</summary>
 		public delegate global::System.IDisposable GetDisposableDelegate(HaDefaultsServiceKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetDisposableDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -115,65 +115,54 @@ partial class HaDefaultsServiceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaDefaultsService.</summary>
-	public sealed class IHaDefaultsServiceInterceptorors
-	{
-		/// <summary>Interceptor for GetCount.</summary>
-		public IHaDefaultsService_GetCountInterceptor GetCount { get; } = new();
-		/// <summary>Interceptor for GetItems.</summary>
-		public IHaDefaultsService_GetItemsInterceptor GetItems { get; } = new();
-		/// <summary>Interceptor for GetIList.</summary>
-		public IHaDefaultsService_GetIListInterceptor GetIList { get; } = new();
-		/// <summary>Interceptor for GetOptional.</summary>
-		public IHaDefaultsService_GetOptionalInterceptor GetOptional { get; } = new();
-		/// <summary>Interceptor for GetDisposable.</summary>
-		public IHaDefaultsService_GetDisposableInterceptor GetDisposable { get; } = new();
-	}
+	/// <summary>Interceptor for GetCount.</summary>
+	public GetCountInterceptor GetCount { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaDefaultsService.</summary>
-	public IHaDefaultsServiceInterceptorors IHaDefaultsService { get; } = new();
+	/// <summary>Interceptor for GetItems.</summary>
+	public GetItemsInterceptor GetItems { get; } = new();
+
+	/// <summary>Interceptor for GetIList.</summary>
+	public GetIListInterceptor GetIList { get; } = new();
+
+	/// <summary>Interceptor for GetOptional.</summary>
+	public GetOptionalInterceptor GetOptional { get; } = new();
+
+	/// <summary>Interceptor for GetDisposable.</summary>
+	public GetDisposableInterceptor GetDisposable { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IHaDefaultsService.</summary>
 	public KnockOff.Documentation.Samples.Skills.IHaDefaultsService AsHaDefaultsService() => this;
 
 	int KnockOff.Documentation.Samples.Skills.IHaDefaultsService.GetCount()
 	{
-		IHaDefaultsService.GetCount.RecordCall();
-		if (IHaDefaultsService.GetCount.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return default!;
+		GetCount.RecordCall();
+		return GetCount.OnCall?.Invoke(this) ?? default!;
 	}
 
 	global::System.Collections.Generic.List<string> KnockOff.Documentation.Samples.Skills.IHaDefaultsService.GetItems()
 	{
-		IHaDefaultsService.GetItems.RecordCall();
-		if (IHaDefaultsService.GetItems.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return new global::System.Collections.Generic.List<string>();
+		GetItems.RecordCall();
+		return GetItems.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<string>();
 	}
 
 	global::System.Collections.Generic.IList<string> KnockOff.Documentation.Samples.Skills.IHaDefaultsService.GetIList()
 	{
-		IHaDefaultsService.GetIList.RecordCall();
-		if (IHaDefaultsService.GetIList.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return new global::System.Collections.Generic.List<string>();
+		GetIList.RecordCall();
+		return GetIList.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<string>();
 	}
 
 	string? KnockOff.Documentation.Samples.Skills.IHaDefaultsService.GetOptional()
 	{
-		IHaDefaultsService.GetOptional.RecordCall();
-		if (IHaDefaultsService.GetOptional.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return default!;
+		GetOptional.RecordCall();
+		return GetOptional.OnCall?.Invoke(this) ?? default!;
 	}
 
 	global::System.IDisposable KnockOff.Documentation.Samples.Skills.IHaDefaultsService.GetDisposable()
 	{
-		IHaDefaultsService.GetDisposable.RecordCall();
-		if (IHaDefaultsService.GetDisposable.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'GetDisposable' in your partial class, or set IHaDefaultsService.GetDisposable.OnCall.");
+		GetDisposable.RecordCall();
+		if (GetDisposable.OnCall is { } callback)
+			return callback(this);
+		throw new global::System.InvalidOperationException("No implementation provided for GetDisposable. Set GetDisposable.OnCall or define a protected method 'GetDisposable' in your partial class.");
 	}
 
 }

@@ -5,119 +5,106 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class GenOrderRepositoryKnockOff
 {
-	/// <summary>Tracks and configures behavior for IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder.GetById.</summary>
-	public sealed class IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder_GetByIdInterceptor
+	/// <summary>Tracks and configures behavior for GetById.</summary>
+	public sealed class GetByIdInterceptor
 	{
-		/// <summary>Delegate for GetById(int id).</summary>
+		/// <summary>Delegate for GetById.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Guides.GenOrder? GetByIdDelegate(GenOrderRepositoryKnockOff ko, int id);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetByIdDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder.Save.</summary>
-	public sealed class IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder_SaveInterceptor
+	/// <summary>Tracks and configures behavior for Save.</summary>
+	public sealed class SaveInterceptor
 	{
-		/// <summary>Delegate for Save(global::KnockOff.Documentation.Samples.Guides.GenOrder entity).</summary>
-		public delegate void SaveDelegate(GenOrderRepositoryKnockOff ko, global::KnockOff.Documentation.Samples.Guides.GenOrder entity);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'entity' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public global::KnockOff.Documentation.Samples.Guides.GenOrder? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public SaveDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<GenOrderRepositoryKnockOff, global::KnockOff.Documentation.Samples.Guides.GenOrder>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::KnockOff.Documentation.Samples.Guides.GenOrder entity) { CallCount++; LastCallArg = entity; }
+		public void RecordCall(global::KnockOff.Documentation.Samples.Guides.GenOrder? entity) { CallCount++; LastCallArg = entity; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder.GetByIdAsync.</summary>
-	public sealed class IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder_GetByIdAsyncInterceptor
+	/// <summary>Tracks and configures behavior for GetByIdAsync.</summary>
+	public sealed class GetByIdAsyncInterceptor
 	{
-		/// <summary>Delegate for GetByIdAsync(int id).</summary>
+		/// <summary>Delegate for GetByIdAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.GenOrder?> GetByIdAsyncDelegate(GenOrderRepositoryKnockOff ko, int id);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetByIdAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenRepository<KnockOff.Documentation.Samples.Guides.GenOrder>.</summary>
-	public sealed class IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrderInterceptorors
-	{
-		/// <summary>Interceptor for GetById.</summary>
-		public IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder_GetByIdInterceptor GetById { get; } = new();
-		/// <summary>Interceptor for Save.</summary>
-		public IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder_SaveInterceptor Save { get; } = new();
-		/// <summary>Interceptor for GetByIdAsync.</summary>
-		public IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder_GetByIdAsyncInterceptor GetByIdAsync { get; } = new();
-	}
+	/// <summary>Interceptor for GetById.</summary>
+	public GetByIdInterceptor GetById { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IGenRepository<KnockOff.Documentation.Samples.Guides.GenOrder>.</summary>
-	public IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrderInterceptorors IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder { get; } = new();
+	/// <summary>Interceptor for Save.</summary>
+	public SaveInterceptor Save { get; } = new();
+
+	/// <summary>Interceptor for GetByIdAsync.</summary>
+	public GetByIdAsyncInterceptor GetByIdAsync { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IGenRepository<KnockOff.Documentation.Samples.Guides.GenOrder>.</summary>
 	public KnockOff.Documentation.Samples.Guides.IGenRepository<KnockOff.Documentation.Samples.Guides.GenOrder> AsGenRepository() => this;
 
 	global::KnockOff.Documentation.Samples.Guides.GenOrder? KnockOff.Documentation.Samples.Guides.IGenRepository<KnockOff.Documentation.Samples.Guides.GenOrder>.GetById(int id)
 	{
-		IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder.GetById.RecordCall(id);
-		if (IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder.GetById.OnCall is { } onCallCallback)
-			return onCallCallback(this, id);
-		return default!;
+		GetById.RecordCall(id);
+		return GetById.OnCall?.Invoke(this, id) ?? default!;
 	}
 
 	void KnockOff.Documentation.Samples.Guides.IGenRepository<KnockOff.Documentation.Samples.Guides.GenOrder>.Save(global::KnockOff.Documentation.Samples.Guides.GenOrder entity)
 	{
-		IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder.Save.RecordCall(entity);
-		if (IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder.Save.OnCall is { } onCallCallback)
-		{ onCallCallback(this, entity); return; }
+		Save.RecordCall(entity);
+		Save.OnCall?.Invoke(this, entity);
 	}
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.GenOrder?> KnockOff.Documentation.Samples.Guides.IGenRepository<KnockOff.Documentation.Samples.Guides.GenOrder>.GetByIdAsync(int id)
 	{
-		IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder.GetByIdAsync.RecordCall(id);
-		if (IGenRepository_KnockOff_Documentation_Samples_Guides_GenOrder.GetByIdAsync.OnCall is { } onCallCallback)
-			return onCallCallback(this, id);
-		return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Guides.GenOrder?>(default!);
+		GetByIdAsync.RecordCall(id);
+		return GetByIdAsync.OnCall?.Invoke(this, id) ?? global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Guides.GenOrder?>(default!);
 	}
 
 }

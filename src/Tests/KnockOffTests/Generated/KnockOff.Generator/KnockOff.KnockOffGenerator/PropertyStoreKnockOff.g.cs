@@ -5,8 +5,8 @@ namespace KnockOff.Tests;
 
 partial class PropertyStoreKnockOff
 {
-	/// <summary>Tracks and configures behavior for IPropertyStore.StringIndexer.</summary>
-	public sealed class IPropertyStore_StringIndexerInterceptor
+	/// <summary>Tracks and configures behavior for StringIndexer.</summary>
+	public sealed class StringIndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -14,43 +14,28 @@ partial class PropertyStoreKnockOff
 		/// <summary>The key from the most recent getter access.</summary>
 		public string? LastGetKey { get; private set; }
 
-		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when the getter is accessed.</summary>
 		public global::System.Func<PropertyStoreKnockOff, string, global::KnockOff.Tests.PropertyInfo?>? OnGet { get; set; }
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet(string key) { GetCount++; LastGetKey = key; }
+		public void RecordGet(string? key) { GetCount++; LastGetKey = key; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IPropertyStore.</summary>
-	public sealed class IPropertyStoreInterceptorors
-	{
-		/// <summary>Interceptor for StringIndexer.</summary>
-		public IPropertyStore_StringIndexerInterceptor StringIndexer { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IPropertyStore.</summary>
-	public IPropertyStoreInterceptorors IPropertyStore { get; } = new();
+	/// <summary>Interceptor for StringIndexer.</summary>
+	public StringIndexerInterceptor StringIndexer { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IPropertyStore.</summary>
 	public KnockOff.Tests.IPropertyStore AsPropertyStore() => this;
 
-	/// <summary>Backing dictionary for IPropertyStore.StringIndexer. Pre-populate with values or use OnGet callback.</summary>
-	public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Tests.PropertyInfo?> IPropertyStore_StringIndexerBacking { get; } = new();
+	/// <summary>Backing storage for StringIndexer indexer.</summary>
+	public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Tests.PropertyInfo?> StringIndexerBacking { get; } = new();
 
 	global::KnockOff.Tests.PropertyInfo? KnockOff.Tests.IPropertyStore.this[string key]
 	{
-		get
-		{
-			IPropertyStore.StringIndexer.RecordGet(key);
-			if (IPropertyStore.StringIndexer.OnGet is { } onGetCallback)
-				return onGetCallback(this, key);
-			if (IPropertyStore_StringIndexerBacking.TryGetValue(key, out var value))
-				return value;
-			return default!;
-		}
+		get { StringIndexer.RecordGet(key); if (StringIndexer.OnGet != null) return StringIndexer.OnGet(this, key); return StringIndexerBacking.TryGetValue(key, out var v) ? v : default; }
 	}
 
 }

@@ -61,8 +61,8 @@ partial class AbstractStubTestClass
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Container for all AbstractRepository interceptors.</summary>
-		public sealed class AbstractRepositoryInterceptors
+		/// <summary>Stub for KnockOff.Tests.AbstractRepository via composition.</summary>
+		public class AbstractRepository
 		{
 			/// <summary>Interceptor for ConnectionString.</summary>
 			public AbstractRepository_ConnectionStringInterceptor ConnectionString { get; } = new();
@@ -71,51 +71,59 @@ partial class AbstractStubTestClass
 			/// <summary>Interceptor for Execute.</summary>
 			public AbstractRepository_ExecuteInterceptor Execute { get; } = new();
 
-			/// <summary>Resets all interceptors.</summary>
-			public void Reset()
+			/// <summary>The KnockOff.Tests.AbstractRepository instance. Pass this to code expecting the target class.</summary>
+			public KnockOff.Tests.AbstractRepository Object { get; }
+
+			public AbstractRepository()
+			{
+				Object = new Impl(this);
+			}
+
+			/// <summary>Resets all interceptor state.</summary>
+			public void ResetInterceptors()
 			{
 				ConnectionString.Reset();
 				Connect.Reset();
 				Execute.Reset();
 			}
-		}
 
-		/// <summary>Stub for KnockOff.Tests.AbstractRepository via inheritance.</summary>
-		public class AbstractRepository : KnockOff.Tests.AbstractRepository
-		{
-			/// <summary>Interceptors for tracking and configuring member behavior.</summary>
-			public AbstractRepositoryInterceptors Interceptor { get; } = new();
-
-			public AbstractRepository() : base() { }
-
-			/// <inheritdoc />
-			public override string ConnectionString
+			/// <summary>Internal implementation that inherits from KnockOff.Tests.AbstractRepository.</summary>
+			private sealed class Impl : KnockOff.Tests.AbstractRepository
 			{
-				get
+				private readonly AbstractRepository _stub;
+
+				public Impl(AbstractRepository stub) : base()
 				{
-					Interceptor.ConnectionString.RecordGet();
-					if (Interceptor.ConnectionString.OnGet is { } onGet) return onGet(this);
+					_stub = stub;
+				}
+
+				/// <inheritdoc />
+				public override string ConnectionString
+				{
+					get
+					{
+						_stub?.ConnectionString.RecordGet();
+						if (_stub?.ConnectionString.OnGet is { } onGet) return onGet(_stub);
+						return default!;
+					}
+				}
+
+				/// <inheritdoc />
+				public override void Connect()
+				{
+					_stub?.Connect.RecordCall();
+					if (_stub?.Connect.OnCall is { } onCall) { onCall(_stub); return; }
+				}
+
+				/// <inheritdoc />
+				public override int Execute(string command)
+				{
+					_stub?.Execute.RecordCall(command);
+					if (_stub?.Execute.OnCall is { } onCall) return onCall(_stub, command);
 					return default!;
 				}
-			}
 
-			/// <inheritdoc />
-			public override void Connect()
-			{
-				Interceptor.Connect.RecordCall();
-				if (Interceptor.Connect.OnCall is { } onCall) { onCall(this); return; }
 			}
-
-			/// <inheritdoc />
-			public override int Execute(string command)
-			{
-				Interceptor.Execute.RecordCall(command);
-				if (Interceptor.Execute.OnCall is { } onCall) return onCall(this, command);
-				return default!;
-			}
-
-			/// <summary>Resets all interceptor state.</summary>
-			public void ResetInterceptors() => Interceptor.Reset();
 		}
 
 	}

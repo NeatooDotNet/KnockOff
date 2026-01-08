@@ -5,8 +5,8 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class SkCallbackMethodKnockOff
 {
-	/// <summary>Tracks and configures behavior for ISkCallbackService.Name.</summary>
-	public sealed class ISkCallbackService_NameInterceptor
+	/// <summary>Tracks and configures behavior for Name.</summary>
+	public sealed class NameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -33,8 +33,8 @@ partial class SkCallbackMethodKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ISkCallbackService.CurrentUser.</summary>
-	public sealed class ISkCallbackService_CurrentUserInterceptor
+	/// <summary>Tracks and configures behavior for CurrentUser.</summary>
+	public sealed class CurrentUserInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -61,20 +61,17 @@ partial class SkCallbackMethodKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ISkCallbackService.DoWork.</summary>
-	public sealed class ISkCallbackService_DoWorkInterceptor
+	/// <summary>Tracks and configures behavior for DoWork.</summary>
+	public sealed class DoWorkInterceptor
 	{
-		/// <summary>Delegate for DoWork().</summary>
-		public delegate void DoWorkDelegate(SkCallbackMethodKnockOff ko);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public DoWorkDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<SkCallbackMethodKnockOff>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
@@ -83,142 +80,108 @@ partial class SkCallbackMethodKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ISkCallbackService.GetById.</summary>
-	public sealed class ISkCallbackService_GetByIdInterceptor
+	/// <summary>Tracks and configures behavior for GetById.</summary>
+	public sealed class GetByIdInterceptor
 	{
-		/// <summary>Delegate for GetById(int id).</summary>
+		/// <summary>Delegate for GetById.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.SkUser GetByIdDelegate(SkCallbackMethodKnockOff ko, int id);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetByIdDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ISkCallbackService.Search.</summary>
-	public sealed class ISkCallbackService_SearchInterceptor
+	/// <summary>Tracks and configures behavior for Search.</summary>
+	public sealed class SearchInterceptor
 	{
-		/// <summary>Delegate for Search(string query, int limit, int offset).</summary>
+		/// <summary>Delegate for Search.</summary>
 		public delegate global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser> SearchDelegate(SkCallbackMethodKnockOff ko, string query, int limit, int offset);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Arguments from the most recent call.</summary>
-		public (string query, int limit, int offset)? LastCallArgs { get; private set; }
+		/// <summary>The arguments from the most recent call.</summary>
+		public (string? query, int? limit, int? offset)? LastCallArgs { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public SearchDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string query, int limit, int offset) { CallCount++; LastCallArgs = (query, limit, offset); }
+		public void RecordCall(string? query, int? limit, int? offset) { CallCount++; LastCallArgs = (query, limit, offset); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkCallbackService.</summary>
-	public sealed class ISkCallbackServiceInterceptorors
-	{
-		/// <summary>Interceptor for Name.</summary>
-		public ISkCallbackService_NameInterceptor Name { get; } = new();
-		/// <summary>Interceptor for CurrentUser.</summary>
-		public ISkCallbackService_CurrentUserInterceptor CurrentUser { get; } = new();
-		/// <summary>Interceptor for DoWork.</summary>
-		public ISkCallbackService_DoWorkInterceptor DoWork { get; } = new();
-		/// <summary>Interceptor for GetById.</summary>
-		public ISkCallbackService_GetByIdInterceptor GetById { get; } = new();
-		/// <summary>Interceptor for Search.</summary>
-		public ISkCallbackService_SearchInterceptor Search { get; } = new();
-	}
+	/// <summary>Interceptor for Name.</summary>
+	public NameInterceptor Name { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkCallbackService.</summary>
-	public ISkCallbackServiceInterceptorors ISkCallbackService { get; } = new();
+	/// <summary>Interceptor for CurrentUser.</summary>
+	public CurrentUserInterceptor CurrentUser { get; } = new();
+
+	/// <summary>Interceptor for DoWork.</summary>
+	public DoWorkInterceptor DoWork { get; } = new();
+
+	/// <summary>Interceptor for GetById.</summary>
+	public GetByIdInterceptor GetById { get; } = new();
+
+	/// <summary>Interceptor for Search.</summary>
+	public SearchInterceptor Search { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkCallbackService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkCallbackService AsSkCallbackService() => this;
 
-	/// <summary>Backing field for ISkCallbackService.Name.</summary>
-	protected string ISkCallbackService_NameBacking { get; set; } = "";
+	/// <summary>Backing storage for Name.</summary>
+	protected string NameBacking { get; set; } = "";
 
-	/// <summary>Backing field for ISkCallbackService.CurrentUser.</summary>
-	protected global::KnockOff.Documentation.Samples.Skills.SkUser? ISkCallbackService_CurrentUserBacking { get; set; }
+	/// <summary>Backing storage for CurrentUser.</summary>
+	protected global::KnockOff.Documentation.Samples.Skills.SkUser? CurrentUserBacking { get; set; } = default!;
 
 	void KnockOff.Documentation.Samples.Skills.ISkCallbackService.DoWork()
 	{
-		ISkCallbackService.DoWork.RecordCall();
-		if (ISkCallbackService.DoWork.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		DoWork.RecordCall();
+		DoWork.OnCall?.Invoke(this);
 	}
 
 	global::KnockOff.Documentation.Samples.Skills.SkUser KnockOff.Documentation.Samples.Skills.ISkCallbackService.GetById(int id)
 	{
-		ISkCallbackService.GetById.RecordCall(id);
-		if (ISkCallbackService.GetById.OnCall is { } onCallCallback)
-			return onCallCallback(this, id);
-		return new global::KnockOff.Documentation.Samples.Skills.SkUser();
+		GetById.RecordCall(id);
+		return GetById.OnCall?.Invoke(this, id) ?? new global::KnockOff.Documentation.Samples.Skills.SkUser();
 	}
 
 	global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser> KnockOff.Documentation.Samples.Skills.ISkCallbackService.Search(string query, int limit, int offset)
 	{
-		ISkCallbackService.Search.RecordCall(query, limit, offset);
-		if (ISkCallbackService.Search.OnCall is { } onCallCallback)
-			return onCallCallback(this, query, limit, offset);
-		return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser>();
+		Search.RecordCall(query, limit, offset);
+		return Search.OnCall?.Invoke(this, query, limit, offset) ?? new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser>();
 	}
 
 	string KnockOff.Documentation.Samples.Skills.ISkCallbackService.Name
 	{
-		get
-		{
-			ISkCallbackService.Name.RecordGet();
-			if (ISkCallbackService.Name.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return ISkCallbackService_NameBacking;
-		}
-		set
-		{
-			ISkCallbackService.Name.RecordSet(value);
-			if (ISkCallbackService.Name.OnSet is { } onSetCallback)
-				onSetCallback(this, value);
-			else
-				ISkCallbackService_NameBacking = value;
-		}
+		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
+		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else NameBacking = value; }
 	}
 
 	global::KnockOff.Documentation.Samples.Skills.SkUser? KnockOff.Documentation.Samples.Skills.ISkCallbackService.CurrentUser
 	{
-		get
-		{
-			ISkCallbackService.CurrentUser.RecordGet();
-			if (ISkCallbackService.CurrentUser.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return ISkCallbackService_CurrentUserBacking;
-		}
-		set
-		{
-			ISkCallbackService.CurrentUser.RecordSet(value);
-			if (ISkCallbackService.CurrentUser.OnSet is { } onSetCallback)
-				onSetCallback(this, value);
-			else
-				ISkCallbackService_CurrentUserBacking = value;
-		}
+		get { CurrentUser.RecordGet(); return CurrentUser.OnGet?.Invoke(this) ?? CurrentUserBacking; }
+		set { CurrentUser.RecordSet(value); if (CurrentUser.OnSet != null) CurrentUser.OnSet(this, value); else CurrentUserBacking = value; }
 	}
 
 }

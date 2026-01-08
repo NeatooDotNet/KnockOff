@@ -5,50 +5,41 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class AsyncFetchKnockOff
 {
-	/// <summary>Tracks and configures behavior for IAsyncFetch.FetchAsync.</summary>
-	public sealed class IAsyncFetch_FetchAsyncInterceptor
+	/// <summary>Tracks and configures behavior for FetchAsync.</summary>
+	public sealed class FetchAsyncInterceptor
 	{
-		/// <summary>Delegate for FetchAsync(int id, global::System.Threading.CancellationToken ct).</summary>
+		/// <summary>Delegate for FetchAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.AsyncData> FetchAsyncDelegate(AsyncFetchKnockOff ko, int id, global::System.Threading.CancellationToken ct);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Arguments from the most recent call.</summary>
-		public (int id, global::System.Threading.CancellationToken ct)? LastCallArgs { get; private set; }
+		/// <summary>The arguments from the most recent call.</summary>
+		public (int? id, global::System.Threading.CancellationToken? ct)? LastCallArgs { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public FetchAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id, global::System.Threading.CancellationToken ct) { CallCount++; LastCallArgs = (id, ct); }
+		public void RecordCall(int? id, global::System.Threading.CancellationToken? ct) { CallCount++; LastCallArgs = (id, ct); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IAsyncFetch.</summary>
-	public sealed class IAsyncFetchInterceptorors
-	{
-		/// <summary>Interceptor for FetchAsync.</summary>
-		public IAsyncFetch_FetchAsyncInterceptor FetchAsync { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IAsyncFetch.</summary>
-	public IAsyncFetchInterceptorors IAsyncFetch { get; } = new();
+	/// <summary>Interceptor for FetchAsync.</summary>
+	public FetchAsyncInterceptor FetchAsync { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IAsyncFetch.</summary>
 	public KnockOff.Documentation.Samples.Guides.IAsyncFetch AsAsyncFetch() => this;
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.AsyncData> KnockOff.Documentation.Samples.Guides.IAsyncFetch.FetchAsync(int id, global::System.Threading.CancellationToken ct)
 	{
-		IAsyncFetch.FetchAsync.RecordCall(id, ct);
-		if (IAsyncFetch.FetchAsync.OnCall is { } onCallCallback)
-			return onCallCallback(this, id, ct);
-		return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Guides.AsyncData>(new global::KnockOff.Documentation.Samples.Guides.AsyncData());
+		FetchAsync.RecordCall(id, ct);
+		return FetchAsync.OnCall?.Invoke(this, id, ct) ?? global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Guides.AsyncData>(new global::KnockOff.Documentation.Samples.Guides.AsyncData());
 	}
 
 }

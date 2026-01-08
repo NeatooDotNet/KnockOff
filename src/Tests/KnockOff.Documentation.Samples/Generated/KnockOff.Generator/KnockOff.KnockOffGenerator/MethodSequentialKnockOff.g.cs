@@ -5,19 +5,19 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class MethodSequentialKnockOff
 {
-	/// <summary>Tracks and configures behavior for IMethodSequential.GetNext.</summary>
-	public sealed class IMethodSequential_GetNextInterceptor
+	/// <summary>Tracks and configures behavior for GetNext.</summary>
+	public sealed class GetNextInterceptor
 	{
-		/// <summary>Delegate for GetNext().</summary>
+		/// <summary>Delegate for GetNext.</summary>
 		public delegate int GetNextDelegate(MethodSequentialKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetNextDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -27,25 +27,16 @@ partial class MethodSequentialKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodSequential.</summary>
-	public sealed class IMethodSequentialInterceptorors
-	{
-		/// <summary>Interceptor for GetNext.</summary>
-		public IMethodSequential_GetNextInterceptor GetNext { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodSequential.</summary>
-	public IMethodSequentialInterceptorors IMethodSequential { get; } = new();
+	/// <summary>Interceptor for GetNext.</summary>
+	public GetNextInterceptor GetNext { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodSequential.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMethodSequential AsMethodSequential() => this;
 
 	int KnockOff.Documentation.Samples.Guides.IMethodSequential.GetNext()
 	{
-		IMethodSequential.GetNext.RecordCall();
-		if (IMethodSequential.GetNext.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return default!;
+		GetNext.RecordCall();
+		return GetNext.OnCall?.Invoke(this) ?? default!;
 	}
 
 }

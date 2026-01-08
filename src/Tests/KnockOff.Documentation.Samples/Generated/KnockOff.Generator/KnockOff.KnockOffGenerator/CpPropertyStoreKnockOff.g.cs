@@ -5,8 +5,8 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class CpPropertyStoreKnockOff
 {
-	/// <summary>Tracks and configures behavior for ICpPropertyStore.StringIndexer.</summary>
-	public sealed class ICpPropertyStore_StringIndexerInterceptor
+	/// <summary>Tracks and configures behavior for StringIndexer.</summary>
+	public sealed class StringIndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -14,63 +14,41 @@ partial class CpPropertyStoreKnockOff
 		/// <summary>The key from the most recent getter access.</summary>
 		public string? LastGetKey { get; private set; }
 
-		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when the getter is accessed.</summary>
 		public global::System.Func<CpPropertyStoreKnockOff, string, object?>? OnGet { get; set; }
-
-		/// <summary>Records a getter access.</summary>
-		public void RecordGet(string key) { GetCount++; LastGetKey = key; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
 
-		/// <summary>The key-value pair from the most recent setter access.</summary>
-		public (string key, object? value)? LastSetEntry { get; private set; }
+		/// <summary>The key and value from the most recent setter call.</summary>
+		public (string? Key, object? Value)? LastSetEntry { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
 		public global::System.Action<CpPropertyStoreKnockOff, string, object?>? OnSet { get; set; }
 
+		/// <summary>Records a getter access.</summary>
+		public void RecordGet(string? key) { GetCount++; LastGetKey = key; }
+
 		/// <summary>Records a setter access.</summary>
-		public void RecordSet(string key, object? value) { SetCount++; LastSetEntry = (key, value); }
+		public void RecordSet(string? key, object? value) { SetCount++; LastSetEntry = (key, value); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
+		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpPropertyStore.</summary>
-	public sealed class ICpPropertyStoreInterceptorors
-	{
-		/// <summary>Interceptor for StringIndexer.</summary>
-		public ICpPropertyStore_StringIndexerInterceptor StringIndexer { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpPropertyStore.</summary>
-	public ICpPropertyStoreInterceptorors ICpPropertyStore { get; } = new();
+	/// <summary>Interceptor for StringIndexer.</summary>
+	public StringIndexerInterceptor StringIndexer { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpPropertyStore.</summary>
 	public KnockOff.Documentation.Samples.Skills.ICpPropertyStore AsCpPropertyStore() => this;
 
-	/// <summary>Backing dictionary for ICpPropertyStore.StringIndexer. Pre-populate with values or use OnGet callback.</summary>
-	public global::System.Collections.Generic.Dictionary<string, object?> ICpPropertyStore_StringIndexerBacking { get; } = new();
+	/// <summary>Backing storage for StringIndexer indexer.</summary>
+	public global::System.Collections.Generic.Dictionary<string, object?> StringIndexerBacking { get; } = new();
 
 	object? KnockOff.Documentation.Samples.Skills.ICpPropertyStore.this[string key]
 	{
-		get
-		{
-			ICpPropertyStore.StringIndexer.RecordGet(key);
-			if (ICpPropertyStore.StringIndexer.OnGet is { } onGetCallback)
-				return onGetCallback(this, key);
-			if (ICpPropertyStore_StringIndexerBacking.TryGetValue(key, out var value))
-				return value;
-			return default!;
-		}
-		set
-		{
-			ICpPropertyStore.StringIndexer.RecordSet(key, value);
-			if (ICpPropertyStore.StringIndexer.OnSet is { } onSetCallback)
-				onSetCallback(this, key, value);
-			else
-				ICpPropertyStore_StringIndexerBacking[key] = value;
-		}
+		get { StringIndexer.RecordGet(key); if (StringIndexer.OnGet != null) return StringIndexer.OnGet(this, key); return StringIndexerBacking.TryGetValue(key, out var v) ? v : default; }
+		set { StringIndexer.RecordSet(key, value); if (StringIndexer.OnSet != null) StringIndexer.OnSet(this, key, value); else StringIndexerBacking[key] = value; }
 	}
 
 }

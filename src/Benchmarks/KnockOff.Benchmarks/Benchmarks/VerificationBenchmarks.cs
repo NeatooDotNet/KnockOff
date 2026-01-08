@@ -53,7 +53,7 @@ public class VerificationBenchmarks
     [Benchmark]
     public void KnockOff_VerifyCalled()
     {
-        _ = _knockOffSimple.ISimpleService.DoWork.WasCalled;
+        _ = _knockOffSimple.DoWork.WasCalled;
     }
 
     // Verify call count
@@ -67,7 +67,7 @@ public class VerificationBenchmarks
     [Benchmark]
     public void KnockOff_VerifyCallCount()
     {
-        _ = _knockOffSimple.ISimpleService.DoWork.CallCount == 3;
+        _ = _knockOffSimple.DoWork.CallCount == 3;
     }
 
     // Verify with argument inspection
@@ -81,7 +81,7 @@ public class VerificationBenchmarks
     [Benchmark]
     public void KnockOff_VerifyWithArgs()
     {
-        var args = _knockOffCalculator.ICalculator.Add.LastCallArgs;
+        var args = _knockOffCalculator.Add.LastCallArgs;
         _ = args?.a == 1 && args?.b == 2;
     }
 
@@ -98,8 +98,8 @@ public class VerificationBenchmarks
     [Benchmark]
     public void KnockOff_VerifyMultiple()
     {
-        _ = _knockOffSimple.ISimpleService.DoWork.WasCalled;
-        _ = _knockOffSimple.ISimpleService.DoWork.CallCount == 3;
-        _ = _knockOffCalculator.ICalculator.Add.CallCount == 2;
+        _ = _knockOffSimple.DoWork.WasCalled;
+        _ = _knockOffSimple.DoWork.CallCount == 3;
+        _ = _knockOffCalculator.Add.CallCount == 2;
     }
 }

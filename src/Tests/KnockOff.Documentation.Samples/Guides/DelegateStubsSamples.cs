@@ -191,3 +191,58 @@ public partial class ValidationPatternTests
 // entity.Name = "duplicate";  // Triggers validation error
 // Assert.True(entity.HasErrors);
 #endregion
+
+// ============================================================================
+// Usage Examples
+// ============================================================================
+
+/// <summary>
+/// Usage examples demonstrating delegate stub patterns.
+/// Each method is compilable; snippets extract key portions.
+/// </summary>
+public static class DelegateStubsUsageExamples
+{
+    public static void FactoryCallbackExample()
+    {
+        #region docs:delegates:factory-callback
+        var factoryStub = new DelegateTests.Stubs.UserFactory();
+        factoryStub.Interceptor.OnCall = (ko, id) => new DelUser
+        {
+            Id = id,
+            Name = $"User{id}"
+        };
+
+        // Implicit conversion to delegate
+        UserFactory factory = factoryStub;
+        var user = factory(42);
+
+        var userId = user.Id;                            // 42
+        var userName = user.Name;                        // "User42"
+        var wasCalled = factoryStub.Interceptor.WasCalled;  // true
+        #endregion
+
+        _ = (userId, userName, wasCalled);
+    }
+
+    public static void CapturingMultipleCallsExample()
+    {
+        #region docs:delegates:capturing-calls
+        var logStub = new VoidDelegateTests.Stubs.LogAction();
+        var capturedMessages = new List<string>();
+
+        logStub.Interceptor.OnCall = (ko, msg) => capturedMessages.Add(msg);
+
+        // Invoke the delegate multiple times
+        LogAction logger = logStub;
+        logger("Starting");
+        logger("Processing");
+        logger("Complete");
+
+        var messageCount = capturedMessages.Count;           // 3
+        var callCount = logStub.Interceptor.CallCount;       // 3
+        var lastMessage = logStub.Interceptor.LastCallArg;   // "Complete"
+        #endregion
+
+        _ = (messageCount, callCount, lastMessage);
+    }
+}

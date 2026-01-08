@@ -4,13 +4,14 @@
 		<PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
 
 		<!-- Neatoo (for testing KnockOff against real interfaces) -->
-		<PackageVersion Include="Neatoo" Version="10.2.0" />
+		<PackageVersion Include="Neatoo" Version="10.6.0" />
 
 		<!-- Testing -->
 		<PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.0" />
 		<PackageVersion Include="Moq" Version="4.20.72" />
 		<PackageVersion Include="xunit.runner.visualstudio" Version="3.1.0" />
 		<PackageVersion Include="xunit.v3" Version="2.0.2" />
+		<PackageVersion Include="xunit.v3.extensibility.core" Version="2.0.2" />
 
 		<!-- Benchmarking -->
 		<PackageVersion Include="BenchmarkDotNet" Version="0.14.0" />

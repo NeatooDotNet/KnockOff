@@ -5,8 +5,8 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class IhOrderKnockOff
 {
-	/// <summary>Tracks and configures behavior for IIhOrder.Total.</summary>
-	public sealed class IIhOrder_TotalInterceptor
+	/// <summary>Tracks and configures behavior for Total.</summary>
+	public sealed class TotalInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -21,39 +21,8 @@ partial class IhOrderKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IIhOrder.Submit.</summary>
-	public sealed class IIhOrder_SubmitInterceptor
-	{
-		/// <summary>Delegate for Submit().</summary>
-		public delegate void SubmitDelegate(IhOrderKnockOff ko);
-
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
-
-		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
-
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public SubmitDelegate? OnCall { get; set; }
-
-		/// <summary>Records a method call.</summary>
-		public void RecordCall() => CallCount++;
-
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; OnCall = null; }
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhOrder.</summary>
-	public sealed class IIhOrderInterceptorors
-	{
-		/// <summary>Interceptor for Total.</summary>
-		public IIhOrder_TotalInterceptor Total { get; } = new();
-		/// <summary>Interceptor for Submit.</summary>
-		public IIhOrder_SubmitInterceptor Submit { get; } = new();
-	}
-
-	/// <summary>Tracks and configures behavior for IIhValidatable.IsValid.</summary>
-	public sealed class IIhValidatable_IsValidInterceptor
+	/// <summary>Tracks and configures behavior for IsValid.</summary>
+	public sealed class IsValidInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -68,19 +37,38 @@ partial class IhOrderKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IIhValidatable.GetErrors.</summary>
-	public sealed class IIhValidatable_GetErrorsInterceptor
+	/// <summary>Tracks and configures behavior for Submit.</summary>
+	public sealed class SubmitInterceptor
 	{
-		/// <summary>Delegate for GetErrors().</summary>
+		/// <summary>Number of times this method was called.</summary>
+		public int CallCount { get; private set; }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<IhOrderKnockOff>? OnCall { get; set; }
+
+		/// <summary>Records a method call.</summary>
+		public void RecordCall() => CallCount++;
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { CallCount = 0; OnCall = null; }
+	}
+
+	/// <summary>Tracks and configures behavior for GetErrors.</summary>
+	public sealed class GetErrorsInterceptor
+	{
+		/// <summary>Delegate for GetErrors.</summary>
 		public delegate global::System.Collections.Generic.IEnumerable<string> GetErrorsDelegate(IhOrderKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetErrorsDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -90,20 +78,17 @@ partial class IhOrderKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhValidatable.</summary>
-	public sealed class IIhValidatableInterceptorors
-	{
-		/// <summary>Interceptor for IsValid.</summary>
-		public IIhValidatable_IsValidInterceptor IsValid { get; } = new();
-		/// <summary>Interceptor for GetErrors.</summary>
-		public IIhValidatable_GetErrorsInterceptor GetErrors { get; } = new();
-	}
+	/// <summary>Interceptor for Total.</summary>
+	public TotalInterceptor Total { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhOrder.</summary>
-	public IIhOrderInterceptorors IIhOrder { get; } = new();
+	/// <summary>Interceptor for IsValid.</summary>
+	public IsValidInterceptor IsValid { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhValidatable.</summary>
-	public IIhValidatableInterceptorors IIhValidatable { get; } = new();
+	/// <summary>Interceptor for Submit.</summary>
+	public SubmitInterceptor Submit { get; } = new();
+
+	/// <summary>Interceptor for GetErrors.</summary>
+	public GetErrorsInterceptor GetErrors { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIhOrder.</summary>
 	public KnockOff.Documentation.Samples.Guides.IIhOrder AsIhOrder() => this;
@@ -111,47 +96,32 @@ partial class IhOrderKnockOff
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIhValidatable.</summary>
 	public KnockOff.Documentation.Samples.Guides.IIhValidatable AsIhValidatable() => this;
 
-	/// <summary>Backing field for IIhOrder.Total.</summary>
-	protected decimal IIhOrder_TotalBacking { get; set; }
+	/// <summary>Backing storage for Total.</summary>
+	protected decimal TotalBacking { get; set; } = default!;
 
-	/// <summary>Backing field for IIhValidatable.IsValid.</summary>
-	protected bool IIhValidatable_IsValidBacking { get; set; }
+	/// <summary>Backing storage for IsValid.</summary>
+	protected bool IsValidBacking { get; set; } = default!;
 
 	decimal KnockOff.Documentation.Samples.Guides.IIhOrder.Total
 	{
-		get
-		{
-			IIhOrder.Total.RecordGet();
-			if (IIhOrder.Total.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IIhOrder_TotalBacking;
-		}
+		get { Total.RecordGet(); return Total.OnGet?.Invoke(this) ?? TotalBacking; }
 	}
 
 	void KnockOff.Documentation.Samples.Guides.IIhOrder.Submit()
 	{
-		IIhOrder.Submit.RecordCall();
-		if (IIhOrder.Submit.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		Submit.RecordCall();
+		Submit.OnCall?.Invoke(this);
 	}
 
 	bool KnockOff.Documentation.Samples.Guides.IIhValidatable.IsValid
 	{
-		get
-		{
-			IIhValidatable.IsValid.RecordGet();
-			if (IIhValidatable.IsValid.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IIhValidatable_IsValidBacking;
-		}
+		get { IsValid.RecordGet(); return IsValid.OnGet?.Invoke(this) ?? IsValidBacking; }
 	}
 
 	global::System.Collections.Generic.IEnumerable<string> KnockOff.Documentation.Samples.Guides.IIhValidatable.GetErrors()
 	{
-		IIhValidatable.GetErrors.RecordCall();
-		if (IIhValidatable.GetErrors.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return new global::System.Collections.Generic.List<string>();
+		GetErrors.RecordCall();
+		return GetErrors.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<string>();
 	}
 
 }

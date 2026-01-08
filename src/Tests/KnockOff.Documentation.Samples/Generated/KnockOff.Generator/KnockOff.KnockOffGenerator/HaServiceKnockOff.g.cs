@@ -5,20 +5,17 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class HaServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for IHaService.Initialize.</summary>
-	public sealed class IHaService_InitializeInterceptor
+	/// <summary>Tracks and configures behavior for Initialize.</summary>
+	public sealed class InitializeInterceptor
 	{
-		/// <summary>Delegate for Initialize().</summary>
-		public delegate void InitializeDelegate(HaServiceKnockOff ko);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public InitializeDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<HaServiceKnockOff>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
@@ -27,94 +24,84 @@ partial class HaServiceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IHaService.GetById.</summary>
-	public sealed class IHaService_GetByIdInterceptor
+	/// <summary>Tracks and configures behavior for GetById.</summary>
+	public sealed class GetByIdInterceptor
 	{
-		/// <summary>Delegate for GetById(int id).</summary>
+		/// <summary>Delegate for GetById.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.HaUser GetByIdDelegate(HaServiceKnockOff ko, int id);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetByIdDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IHaService.Create.</summary>
-	public sealed class IHaService_CreateInterceptor
+	/// <summary>Tracks and configures behavior for Create.</summary>
+	public sealed class CreateInterceptor
 	{
-		/// <summary>Delegate for Create(string name, int value).</summary>
-		public delegate global::KnockOff.Documentation.Samples.Skills.HaEntity CreateDelegate(HaServiceKnockOff ko, string name, int value);
+		/// <summary>Delegate for Create.</summary>
+		public delegate global::KnockOff.Documentation.Samples.Skills.HaEntity CreateDelegate(HaServiceKnockOff ko, string name, int @value);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Arguments from the most recent call.</summary>
-		public (string name, int value)? LastCallArgs { get; private set; }
+		/// <summary>The arguments from the most recent call.</summary>
+		public (string? name, int? @value)? LastCallArgs { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public CreateDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string name, int value) { CallCount++; LastCallArgs = (name, value); }
+		public void RecordCall(string? name, int? @value) { CallCount++; LastCallArgs = (name, @value); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaService.</summary>
-	public sealed class IHaServiceInterceptorors
-	{
-		/// <summary>Interceptor for Initialize.</summary>
-		public IHaService_InitializeInterceptor Initialize { get; } = new();
-		/// <summary>Interceptor for GetById.</summary>
-		public IHaService_GetByIdInterceptor GetById { get; } = new();
-		/// <summary>Interceptor for Create.</summary>
-		public IHaService_CreateInterceptor Create { get; } = new();
-	}
+	/// <summary>Interceptor for Initialize.</summary>
+	public InitializeInterceptor Initialize { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaService.</summary>
-	public IHaServiceInterceptorors IHaService { get; } = new();
+	/// <summary>Interceptor for GetById.</summary>
+	public GetByIdInterceptor GetById { get; } = new();
+
+	/// <summary>Interceptor for Create.</summary>
+	public CreateInterceptor Create { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IHaService.</summary>
 	public KnockOff.Documentation.Samples.Skills.IHaService AsHaService() => this;
 
 	void KnockOff.Documentation.Samples.Skills.IHaService.Initialize()
 	{
-		IHaService.Initialize.RecordCall();
-		if (IHaService.Initialize.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		Initialize.RecordCall();
+		Initialize.OnCall?.Invoke(this);
 	}
 
 	global::KnockOff.Documentation.Samples.Skills.HaUser KnockOff.Documentation.Samples.Skills.IHaService.GetById(int id)
 	{
-		IHaService.GetById.RecordCall(id);
-		if (IHaService.GetById.OnCall is { } onCallCallback)
-			return onCallCallback(this, id);
-		return new global::KnockOff.Documentation.Samples.Skills.HaUser();
+		GetById.RecordCall(id);
+		return GetById.OnCall?.Invoke(this, id) ?? new global::KnockOff.Documentation.Samples.Skills.HaUser();
 	}
 
-	global::KnockOff.Documentation.Samples.Skills.HaEntity KnockOff.Documentation.Samples.Skills.IHaService.Create(string name, int value)
+	global::KnockOff.Documentation.Samples.Skills.HaEntity KnockOff.Documentation.Samples.Skills.IHaService.Create(string name, int @value)
 	{
-		IHaService.Create.RecordCall(name, value);
-		if (IHaService.Create.OnCall is { } onCallCallback)
-			return onCallCallback(this, name, value);
-		return new global::KnockOff.Documentation.Samples.Skills.HaEntity();
+		Create.RecordCall(name, @value);
+		return Create.OnCall?.Invoke(this, name, @value) ?? new global::KnockOff.Documentation.Samples.Skills.HaEntity();
 	}
 
 }

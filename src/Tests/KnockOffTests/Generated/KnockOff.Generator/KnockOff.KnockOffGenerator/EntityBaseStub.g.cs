@@ -5,8 +5,24 @@ namespace KnockOff.Tests;
 
 partial class EntityBaseStub
 {
-	/// <summary>Tracks and configures behavior for IEntityBase.ModifiedProperties.</summary>
-	public sealed class IEntityBase_ModifiedPropertiesInterceptor
+	/// <summary>Tracks and configures behavior for Root.</summary>
+	public sealed class RootInterceptor
+	{
+		/// <summary>Number of times the getter was accessed.</summary>
+		public int GetCount { get; private set; }
+
+		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
+		public global::System.Func<EntityBaseStub, global::Neatoo.IValidateBase?>? OnGet { get; set; }
+
+		/// <summary>Records a getter access.</summary>
+		public void RecordGet() => GetCount++;
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { GetCount = 0; OnGet = null; }
+	}
+
+	/// <summary>Tracks and configures behavior for ModifiedProperties.</summary>
+	public sealed class ModifiedPropertiesInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -21,8 +37,8 @@ partial class EntityBaseStub
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IEntityBase.StringIndexer.</summary>
-	public sealed class IEntityBase_StringIndexerInterceptor
+	/// <summary>Tracks and configures behavior for StringIndexer.</summary>
+	public sealed class StringIndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -30,99 +46,34 @@ partial class EntityBaseStub
 		/// <summary>The key from the most recent getter access.</summary>
 		public string? LastGetKey { get; private set; }
 
-		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when the getter is accessed.</summary>
 		public global::System.Func<EntityBaseStub, string, global::Neatoo.IEntityProperty>? OnGet { get; set; }
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet(string propertyName) { GetCount++; LastGetKey = propertyName; }
+		public void RecordGet(string? propertyName) { GetCount++; LastGetKey = propertyName; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IEntityBase.Delete.</summary>
-	public sealed class IEntityBase_DeleteInterceptor
+	/// <summary>Tracks and configures behavior for Parent.</summary>
+	public sealed class ParentInterceptor
 	{
-		/// <summary>Delegate for Delete().</summary>
-		public delegate void DeleteDelegate(EntityBaseStub ko);
+		/// <summary>Number of times the getter was accessed.</summary>
+		public int GetCount { get; private set; }
 
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
+		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
+		public global::System.Func<EntityBaseStub, global::Neatoo.IValidateBase?>? OnGet { get; set; }
 
-		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
-
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public DeleteDelegate? OnCall { get; set; }
-
-		/// <summary>Records a method call.</summary>
-		public void RecordCall() => CallCount++;
+		/// <summary>Records a getter access.</summary>
+		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; OnCall = null; }
+		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IEntityBase.UnDelete.</summary>
-	public sealed class IEntityBase_UnDeleteInterceptor
-	{
-		/// <summary>Delegate for UnDelete().</summary>
-		public delegate void UnDeleteDelegate(EntityBaseStub ko);
-
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
-
-		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
-
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public UnDeleteDelegate? OnCall { get; set; }
-
-		/// <summary>Records a method call.</summary>
-		public void RecordCall() => CallCount++;
-
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; OnCall = null; }
-	}
-
-	/// <summary>Tracks and configures behavior for IEntityBase.Save.</summary>
-	public sealed class IEntityBase_SaveInterceptor
-	{
-		/// <summary>Delegate for Save().</summary>
-		public delegate global::System.Threading.Tasks.Task<global::Neatoo.IEntityBase> SaveDelegate(EntityBaseStub ko);
-
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
-
-		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
-
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public SaveDelegate? OnCall { get; set; }
-
-		/// <summary>Records a method call.</summary>
-		public void RecordCall() => CallCount++;
-
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; OnCall = null; }
-	}
-
-	/// <summary>Tracks invocations and configures behavior for Neatoo.IEntityBase.</summary>
-	public sealed class IEntityBaseInterceptorors
-	{
-		/// <summary>Interceptor for ModifiedProperties.</summary>
-		public IEntityBase_ModifiedPropertiesInterceptor ModifiedProperties { get; } = new();
-		/// <summary>Interceptor for StringIndexer.</summary>
-		public IEntityBase_StringIndexerInterceptor StringIndexer { get; } = new();
-		/// <summary>Interceptor for Delete.</summary>
-		public IEntityBase_DeleteInterceptor Delete { get; } = new();
-		/// <summary>Interceptor for UnDelete.</summary>
-		public IEntityBase_UnDeleteInterceptor UnDelete { get; } = new();
-		/// <summary>Interceptor for Save.</summary>
-		public IEntityBase_SaveInterceptor Save { get; } = new();
-	}
-
-	/// <summary>Tracks and configures behavior for IValidateBase.IsPaused.</summary>
-	public sealed class IValidateBase_IsPausedInterceptor
+	/// <summary>Tracks and configures behavior for IsPaused.</summary>
+	public sealed class IsPausedInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -137,235 +88,8 @@ partial class EntityBaseStub
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IValidateBase.StringIndexer.</summary>
-	public sealed class IValidateBase_StringIndexerInterceptor
-	{
-		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
-
-		/// <summary>The key from the most recent getter access.</summary>
-		public string? LastGetKey { get; private set; }
-
-		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityBaseStub, string, global::Neatoo.IValidateProperty>? OnGet { get; set; }
-
-		/// <summary>Records a getter access.</summary>
-		public void RecordGet(string propertyName) { GetCount++; LastGetKey = propertyName; }
-
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
-	}
-
-	/// <summary>Tracks and configures behavior for IValidateBase.GetProperty.</summary>
-	public sealed class IValidateBase_GetPropertyInterceptor
-	{
-		/// <summary>Delegate for GetProperty(string propertyName).</summary>
-		public delegate global::Neatoo.IValidateProperty GetPropertyDelegate(EntityBaseStub ko, string propertyName);
-
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
-
-		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
-
-		/// <summary>The 'propertyName' argument from the most recent call.</summary>
-		public string? LastCallArg { get; private set; }
-
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public GetPropertyDelegate? OnCall { get; set; }
-
-		/// <summary>Records a method call.</summary>
-		public void RecordCall(string propertyName) { CallCount++; LastCallArg = propertyName; }
-
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
-	}
-
-	/// <summary>Tracks and configures behavior for IValidateBase.TryGetProperty.</summary>
-	public sealed class IValidateBase_TryGetPropertyInterceptor
-	{
-		/// <summary>Delegate for TryGetProperty(string propertyName, out global::Neatoo.IValidateProperty validateProperty).</summary>
-		public delegate bool TryGetPropertyDelegate(EntityBaseStub ko, string propertyName, out global::Neatoo.IValidateProperty validateProperty);
-
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
-
-		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
-
-		/// <summary>The 'propertyName' argument from the most recent call.</summary>
-		public string? LastCallArg { get; private set; }
-
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public TryGetPropertyDelegate? OnCall { get; set; }
-
-		/// <summary>Records a method call.</summary>
-		public void RecordCall(string propertyName) { CallCount++; LastCallArg = propertyName; }
-
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
-	}
-
-	/// <summary>Tracks invocations and configures behavior for Neatoo.IValidateBase.</summary>
-	public sealed class IValidateBaseInterceptorors
-	{
-		/// <summary>Interceptor for IsPaused.</summary>
-		public IValidateBase_IsPausedInterceptor IsPaused { get; } = new();
-		/// <summary>Interceptor for StringIndexer.</summary>
-		public IValidateBase_StringIndexerInterceptor StringIndexer { get; } = new();
-		/// <summary>Interceptor for GetProperty.</summary>
-		public IValidateBase_GetPropertyInterceptor GetProperty { get; } = new();
-		/// <summary>Interceptor for TryGetProperty.</summary>
-		public IValidateBase_TryGetPropertyInterceptor TryGetProperty { get; } = new();
-	}
-
-	/// <summary>Tracks and configures behavior for IBase.Parent.</summary>
-	public sealed class IBase_ParentInterceptor
-	{
-		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
-
-		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityBaseStub, global::Neatoo.IBase?>? OnGet { get; set; }
-
-		/// <summary>Records a getter access.</summary>
-		public void RecordGet() => GetCount++;
-
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
-	}
-
-	/// <summary>Tracks invocations and configures behavior for Neatoo.IBase.</summary>
-	public sealed class IBaseInterceptorors
-	{
-		/// <summary>Interceptor for Parent.</summary>
-		public IBase_ParentInterceptor Parent { get; } = new();
-	}
-
-	/// <summary>Tracks and raises INotifyPropertyChanged.PropertyChanged.</summary>
-	public sealed class INotifyPropertyChanged_PropertyChangedInterceptor
-	{
-		private global::System.ComponentModel.PropertyChangedEventHandler? _handler;
-		private readonly global::System.Collections.Generic.List<(object? sender, global::System.ComponentModel.PropertyChangedEventArgs e)> _raises = new();
-
-		/// <summary>Number of times handlers were added.</summary>
-		public int SubscribeCount { get; private set; }
-
-		/// <summary>Number of times handlers were removed.</summary>
-		public int UnsubscribeCount { get; private set; }
-
-		/// <summary>True if at least one handler is subscribed.</summary>
-		public bool HasSubscribers => _handler != null;
-
-		/// <summary>Number of times the event was raised.</summary>
-		public int RaiseCount => _raises.Count;
-
-		/// <summary>True if the event was raised at least once.</summary>
-		public bool WasRaised => RaiseCount > 0;
-
-		/// <summary>Arguments from the most recent raise.</summary>
-		public (object? sender, global::System.ComponentModel.PropertyChangedEventArgs e)? LastRaiseArgs => _raises.Count > 0 ? _raises[_raises.Count - 1] : null;
-
-		/// <summary>All recorded raise invocations.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(object? sender, global::System.ComponentModel.PropertyChangedEventArgs e)> AllRaises => _raises;
-
-		internal void Add(global::System.ComponentModel.PropertyChangedEventHandler? handler)
-		{
-			_handler += handler;
-			SubscribeCount++;
-		}
-
-		internal void Remove(global::System.ComponentModel.PropertyChangedEventHandler? handler)
-		{
-			_handler -= handler;
-			UnsubscribeCount++;
-		}
-
-		/// <summary>Raises the event.</summary>
-		public void Raise(object? sender, global::System.ComponentModel.PropertyChangedEventArgs e)
-		{
-			_raises.Add((sender, e));
-			_handler?.Invoke(sender, e);
-		}
-
-		/// <summary>Resets all tracking counters.</summary>
-		public void Reset() { SubscribeCount = 0; UnsubscribeCount = 0; _raises.Clear(); }
-
-		/// <summary>Clears all handlers and resets tracking.</summary>
-		public void Clear() { _handler = null; Reset(); }
-	}
-
-	/// <summary>Tracks invocations and configures behavior for System.ComponentModel.INotifyPropertyChanged.</summary>
-	public sealed class INotifyPropertyChangedInterceptorors
-	{
-		/// <summary>Interceptor for PropertyChanged event.</summary>
-		public INotifyPropertyChanged_PropertyChangedInterceptor PropertyChanged { get; } = new();
-	}
-
-	/// <summary>Tracks and raises INotifyNeatooPropertyChanged.NeatooPropertyChanged.</summary>
-	public sealed class INotifyNeatooPropertyChanged_NeatooPropertyChangedInterceptor
-	{
-		private global::Neatoo.NeatooPropertyChanged? _handler;
-		private readonly global::System.Collections.Generic.List<global::Neatoo.NeatooPropertyChangedEventArgs> _raises = new();
-
-		/// <summary>Number of times handlers were added.</summary>
-		public int SubscribeCount { get; private set; }
-
-		/// <summary>Number of times handlers were removed.</summary>
-		public int UnsubscribeCount { get; private set; }
-
-		/// <summary>True if at least one handler is subscribed.</summary>
-		public bool HasSubscribers => _handler != null;
-
-		/// <summary>Number of times the event was raised.</summary>
-		public int RaiseCount => _raises.Count;
-
-		/// <summary>True if the event was raised at least once.</summary>
-		public bool WasRaised => RaiseCount > 0;
-
-		/// <summary>Arguments from the most recent raise.</summary>
-		public global::Neatoo.NeatooPropertyChangedEventArgs? LastRaiseArgs => _raises.Count > 0 ? _raises[_raises.Count - 1] : default;
-
-		/// <summary>All recorded raise invocations.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<global::Neatoo.NeatooPropertyChangedEventArgs> AllRaises => _raises;
-
-		internal void Add(global::Neatoo.NeatooPropertyChanged handler)
-		{
-			_handler += handler;
-			SubscribeCount++;
-		}
-
-		internal void Remove(global::Neatoo.NeatooPropertyChanged handler)
-		{
-			_handler -= handler;
-			UnsubscribeCount++;
-		}
-
-		/// <summary>Raises the event and awaits all handlers sequentially.</summary>
-		public async global::System.Threading.Tasks.Task RaiseAsync(global::Neatoo.NeatooPropertyChangedEventArgs propertyNameBreadCrumbs)
-		{
-			_raises.Add(propertyNameBreadCrumbs);
-			if (_handler == null) return;
-			foreach (var h in _handler.GetInvocationList())
-				await ((global::Neatoo.NeatooPropertyChanged)h)(propertyNameBreadCrumbs);
-		}
-
-		/// <summary>Resets all tracking counters.</summary>
-		public void Reset() { SubscribeCount = 0; UnsubscribeCount = 0; _raises.Clear(); }
-
-		/// <summary>Clears all handlers and resets tracking.</summary>
-		public void Clear() { _handler = null; Reset(); }
-	}
-
-	/// <summary>Tracks invocations and configures behavior for Neatoo.INotifyNeatooPropertyChanged.</summary>
-	public sealed class INotifyNeatooPropertyChangedInterceptorors
-	{
-		/// <summary>Interceptor for NeatooPropertyChanged event.</summary>
-		public INotifyNeatooPropertyChanged_NeatooPropertyChangedInterceptor NeatooPropertyChanged { get; } = new();
-	}
-
-	/// <summary>Tracks and configures behavior for IValidateMetaProperties.IsValid.</summary>
-	public sealed class IValidateMetaProperties_IsValidInterceptor
+	/// <summary>Tracks and configures behavior for IsBusy.</summary>
+	public sealed class IsBusyInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -380,8 +104,8 @@ partial class EntityBaseStub
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IValidateMetaProperties.IsSelfValid.</summary>
-	public sealed class IValidateMetaProperties_IsSelfValidInterceptor
+	/// <summary>Tracks and configures behavior for IsValid.</summary>
+	public sealed class IsValidInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -396,8 +120,24 @@ partial class EntityBaseStub
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IValidateMetaProperties.PropertyMessages.</summary>
-	public sealed class IValidateMetaProperties_PropertyMessagesInterceptor
+	/// <summary>Tracks and configures behavior for IsSelfValid.</summary>
+	public sealed class IsSelfValidInterceptor
+	{
+		/// <summary>Number of times the getter was accessed.</summary>
+		public int GetCount { get; private set; }
+
+		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
+		public global::System.Func<EntityBaseStub, bool>? OnGet { get; set; }
+
+		/// <summary>Records a getter access.</summary>
+		public void RecordGet() => GetCount++;
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { GetCount = 0; OnGet = null; }
+	}
+
+	/// <summary>Tracks and configures behavior for PropertyMessages.</summary>
+	public sealed class PropertyMessagesInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -412,121 +152,8 @@ partial class EntityBaseStub
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IValidateMetaProperties.RunRules1.</summary>
-	public sealed class IValidateMetaProperties_RunRules1Interceptor
-	{
-		/// <summary>Delegate for RunRules(string propertyName, global::System.Threading.CancellationToken? token).</summary>
-		public delegate global::System.Threading.Tasks.Task RunRulesDelegate(EntityBaseStub ko, string propertyName, global::System.Threading.CancellationToken? token);
-
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
-
-		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
-
-		/// <summary>Arguments from the most recent call.</summary>
-		public (string propertyName, global::System.Threading.CancellationToken? token)? LastCallArgs { get; private set; }
-
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public RunRulesDelegate? OnCall { get; set; }
-
-		/// <summary>Records a method call.</summary>
-		public void RecordCall(string propertyName, global::System.Threading.CancellationToken? token) { CallCount++; LastCallArgs = (propertyName, token); }
-
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
-	}
-
-	/// <summary>Tracks and configures behavior for IValidateMetaProperties.RunRules2.</summary>
-	public sealed class IValidateMetaProperties_RunRules2Interceptor
-	{
-		/// <summary>Delegate for RunRules(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token).</summary>
-		public delegate global::System.Threading.Tasks.Task RunRulesDelegate(EntityBaseStub ko, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token);
-
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
-
-		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
-
-		/// <summary>Arguments from the most recent call.</summary>
-		public (global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)? LastCallArgs { get; private set; }
-
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public RunRulesDelegate? OnCall { get; set; }
-
-		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token) { CallCount++; LastCallArgs = (runRules, token); }
-
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
-	}
-
-	/// <summary>Tracks and configures behavior for IValidateMetaProperties.ClearAllMessages.</summary>
-	public sealed class IValidateMetaProperties_ClearAllMessagesInterceptor
-	{
-		/// <summary>Delegate for ClearAllMessages().</summary>
-		public delegate void ClearAllMessagesDelegate(EntityBaseStub ko);
-
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
-
-		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
-
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public ClearAllMessagesDelegate? OnCall { get; set; }
-
-		/// <summary>Records a method call.</summary>
-		public void RecordCall() => CallCount++;
-
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; OnCall = null; }
-	}
-
-	/// <summary>Tracks and configures behavior for IValidateMetaProperties.ClearSelfMessages.</summary>
-	public sealed class IValidateMetaProperties_ClearSelfMessagesInterceptor
-	{
-		/// <summary>Delegate for ClearSelfMessages().</summary>
-		public delegate void ClearSelfMessagesDelegate(EntityBaseStub ko);
-
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
-
-		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
-
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public ClearSelfMessagesDelegate? OnCall { get; set; }
-
-		/// <summary>Records a method call.</summary>
-		public void RecordCall() => CallCount++;
-
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; OnCall = null; }
-	}
-
-	/// <summary>Tracks invocations and configures behavior for Neatoo.IValidateMetaProperties.</summary>
-	public sealed class IValidateMetaPropertiesInterceptorors
-	{
-		/// <summary>Interceptor for IsValid.</summary>
-		public IValidateMetaProperties_IsValidInterceptor IsValid { get; } = new();
-		/// <summary>Interceptor for IsSelfValid.</summary>
-		public IValidateMetaProperties_IsSelfValidInterceptor IsSelfValid { get; } = new();
-		/// <summary>Interceptor for PropertyMessages.</summary>
-		public IValidateMetaProperties_PropertyMessagesInterceptor PropertyMessages { get; } = new();
-		/// <summary>Interceptor for RunRules overload 1.</summary>
-		public IValidateMetaProperties_RunRules1Interceptor RunRules1 { get; } = new();
-		/// <summary>Interceptor for RunRules overload 2.</summary>
-		public IValidateMetaProperties_RunRules2Interceptor RunRules2 { get; } = new();
-		/// <summary>Interceptor for ClearAllMessages.</summary>
-		public IValidateMetaProperties_ClearAllMessagesInterceptor ClearAllMessages { get; } = new();
-		/// <summary>Interceptor for ClearSelfMessages.</summary>
-		public IValidateMetaProperties_ClearSelfMessagesInterceptor ClearSelfMessages { get; } = new();
-	}
-
-	/// <summary>Tracks and configures behavior for IBaseMetaProperties.IsBusy.</summary>
-	public sealed class IBaseMetaProperties_IsBusyInterceptor
+	/// <summary>Tracks and configures behavior for IsChild.</summary>
+	public sealed class IsChildInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -541,19 +168,225 @@ partial class EntityBaseStub
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IBaseMetaProperties.WaitForTasks.</summary>
-	public sealed class IBaseMetaProperties_WaitForTasksInterceptor
+	/// <summary>Tracks and configures behavior for IsModified.</summary>
+	public sealed class IsModifiedInterceptor
 	{
-		/// <summary>Delegate for WaitForTasks().</summary>
+		/// <summary>Number of times the getter was accessed.</summary>
+		public int GetCount { get; private set; }
+
+		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
+		public global::System.Func<EntityBaseStub, bool>? OnGet { get; set; }
+
+		/// <summary>Records a getter access.</summary>
+		public void RecordGet() => GetCount++;
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { GetCount = 0; OnGet = null; }
+	}
+
+	/// <summary>Tracks and configures behavior for IsSelfModified.</summary>
+	public sealed class IsSelfModifiedInterceptor
+	{
+		/// <summary>Number of times the getter was accessed.</summary>
+		public int GetCount { get; private set; }
+
+		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
+		public global::System.Func<EntityBaseStub, bool>? OnGet { get; set; }
+
+		/// <summary>Records a getter access.</summary>
+		public void RecordGet() => GetCount++;
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { GetCount = 0; OnGet = null; }
+	}
+
+	/// <summary>Tracks and configures behavior for IsMarkedModified.</summary>
+	public sealed class IsMarkedModifiedInterceptor
+	{
+		/// <summary>Number of times the getter was accessed.</summary>
+		public int GetCount { get; private set; }
+
+		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
+		public global::System.Func<EntityBaseStub, bool>? OnGet { get; set; }
+
+		/// <summary>Records a getter access.</summary>
+		public void RecordGet() => GetCount++;
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { GetCount = 0; OnGet = null; }
+	}
+
+	/// <summary>Tracks and configures behavior for IsSavable.</summary>
+	public sealed class IsSavableInterceptor
+	{
+		/// <summary>Number of times the getter was accessed.</summary>
+		public int GetCount { get; private set; }
+
+		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
+		public global::System.Func<EntityBaseStub, bool>? OnGet { get; set; }
+
+		/// <summary>Records a getter access.</summary>
+		public void RecordGet() => GetCount++;
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { GetCount = 0; OnGet = null; }
+	}
+
+	/// <summary>Tracks and configures behavior for IsDeleted.</summary>
+	public sealed class IsDeletedInterceptor
+	{
+		/// <summary>Number of times the getter was accessed.</summary>
+		public int GetCount { get; private set; }
+
+		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
+		public global::System.Func<EntityBaseStub, bool>? OnGet { get; set; }
+
+		/// <summary>Records a getter access.</summary>
+		public void RecordGet() => GetCount++;
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { GetCount = 0; OnGet = null; }
+	}
+
+	/// <summary>Tracks and configures behavior for IsNew.</summary>
+	public sealed class IsNewInterceptor
+	{
+		/// <summary>Number of times the getter was accessed.</summary>
+		public int GetCount { get; private set; }
+
+		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
+		public global::System.Func<EntityBaseStub, bool>? OnGet { get; set; }
+
+		/// <summary>Records a getter access.</summary>
+		public void RecordGet() => GetCount++;
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { GetCount = 0; OnGet = null; }
+	}
+
+	/// <summary>Tracks and configures behavior for Delete.</summary>
+	public sealed class DeleteInterceptor
+	{
+		/// <summary>Number of times this method was called.</summary>
+		public int CallCount { get; private set; }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<EntityBaseStub>? OnCall { get; set; }
+
+		/// <summary>Records a method call.</summary>
+		public void RecordCall() => CallCount++;
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { CallCount = 0; OnCall = null; }
+	}
+
+	/// <summary>Tracks and configures behavior for UnDelete.</summary>
+	public sealed class UnDeleteInterceptor
+	{
+		/// <summary>Number of times this method was called.</summary>
+		public int CallCount { get; private set; }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<EntityBaseStub>? OnCall { get; set; }
+
+		/// <summary>Records a method call.</summary>
+		public void RecordCall() => CallCount++;
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { CallCount = 0; OnCall = null; }
+	}
+
+	/// <summary>Tracks and configures behavior for Save.</summary>
+	public sealed class SaveInterceptor
+	{
+		/// <summary>Delegate for Save.</summary>
+		public delegate global::System.Threading.Tasks.Task<global::Neatoo.IEntityBase> SaveDelegate(EntityBaseStub ko);
+
+		/// <summary>Number of times this method was called.</summary>
+		public int CallCount { get; private set; }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>Callback invoked when this method is called.</summary>
+		public SaveDelegate? OnCall { get; set; }
+
+		/// <summary>Records a method call.</summary>
+		public void RecordCall() => CallCount++;
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { CallCount = 0; OnCall = null; }
+	}
+
+	/// <summary>Tracks and configures behavior for GetProperty.</summary>
+	public sealed class GetPropertyInterceptor
+	{
+		/// <summary>Delegate for GetProperty.</summary>
+		public delegate global::Neatoo.IValidateProperty GetPropertyDelegate(EntityBaseStub ko, string propertyName);
+
+		/// <summary>Number of times this method was called.</summary>
+		public int CallCount { get; private set; }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the most recent call.</summary>
+		public string? LastCallArg { get; private set; }
+
+		/// <summary>Callback invoked when this method is called.</summary>
+		public GetPropertyDelegate? OnCall { get; set; }
+
+		/// <summary>Records a method call.</summary>
+		public void RecordCall(string? propertyName) { CallCount++; LastCallArg = propertyName; }
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+	}
+
+	/// <summary>Tracks and configures behavior for TryGetProperty.</summary>
+	public sealed class TryGetPropertyInterceptor
+	{
+		/// <summary>Delegate for TryGetProperty.</summary>
+		public delegate bool TryGetPropertyDelegate(EntityBaseStub ko, string propertyName, out global::Neatoo.IValidateProperty validateProperty);
+
+		/// <summary>Number of times this method was called.</summary>
+		public int CallCount { get; private set; }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the most recent call.</summary>
+		public string? LastCallArg { get; private set; }
+
+		/// <summary>Callback invoked when this method is called.</summary>
+		public TryGetPropertyDelegate? OnCall { get; set; }
+
+		/// <summary>Records a method call.</summary>
+		public void RecordCall(string? propertyName) { CallCount++; LastCallArg = propertyName; }
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+	}
+
+	/// <summary>Tracks and configures behavior for WaitForTasks.</summary>
+	public sealed class WaitForTasks1Interceptor
+	{
+		/// <summary>Delegate for WaitForTasks.</summary>
 		public delegate global::System.Threading.Tasks.Task WaitForTasksDelegate(EntityBaseStub ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public WaitForTasksDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -563,186 +396,265 @@ partial class EntityBaseStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for Neatoo.IBaseMetaProperties.</summary>
-	public sealed class IBaseMetaPropertiesInterceptorors
+	/// <summary>Tracks and configures behavior for WaitForTasks.</summary>
+	public sealed class WaitForTasks2Interceptor
 	{
-		/// <summary>Interceptor for IsBusy.</summary>
-		public IBaseMetaProperties_IsBusyInterceptor IsBusy { get; } = new();
-		/// <summary>Interceptor for WaitForTasks.</summary>
-		public IBaseMetaProperties_WaitForTasksInterceptor WaitForTasks { get; } = new();
-	}
+		/// <summary>Delegate for WaitForTasks.</summary>
+		public delegate global::System.Threading.Tasks.Task WaitForTasksDelegate(EntityBaseStub ko, global::System.Threading.CancellationToken token);
 
-	/// <summary>Tracks and configures behavior for IEntityMetaProperties.IsChild.</summary>
-	public sealed class IEntityMetaProperties_IsChildInterceptor
-	{
-		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		/// <summary>Number of times this method was called.</summary>
+		public int CallCount { get; private set; }
 
-		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityBaseStub, bool>? OnGet { get; set; }
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Records a getter access.</summary>
-		public void RecordGet() => GetCount++;
+		/// <summary>The argument from the most recent call.</summary>
+		public global::System.Threading.CancellationToken? LastCallArg { get; private set; }
+
+		/// <summary>Callback invoked when this method is called.</summary>
+		public WaitForTasksDelegate? OnCall { get; set; }
+
+		/// <summary>Records a method call.</summary>
+		public void RecordCall(global::System.Threading.CancellationToken? token) { CallCount++; LastCallArg = token; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IEntityMetaProperties.IsModified.</summary>
-	public sealed class IEntityMetaProperties_IsModifiedInterceptor
+	/// <summary>Tracks and configures behavior for RunRules.</summary>
+	public sealed class RunRules1Interceptor
 	{
-		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		/// <summary>Delegate for RunRules.</summary>
+		public delegate global::System.Threading.Tasks.Task RunRulesDelegate(EntityBaseStub ko, string propertyName, global::System.Threading.CancellationToken? token);
 
-		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityBaseStub, bool>? OnGet { get; set; }
+		/// <summary>Number of times this method was called.</summary>
+		public int CallCount { get; private set; }
 
-		/// <summary>Records a getter access.</summary>
-		public void RecordGet() => GetCount++;
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The arguments from the most recent call.</summary>
+		public (string? propertyName, global::System.Threading.CancellationToken? token)? LastCallArgs { get; private set; }
+
+		/// <summary>Callback invoked when this method is called.</summary>
+		public RunRulesDelegate? OnCall { get; set; }
+
+		/// <summary>Records a method call.</summary>
+		public void RecordCall(string? propertyName, global::System.Threading.CancellationToken? token) { CallCount++; LastCallArgs = (propertyName, token); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IEntityMetaProperties.IsSelfModified.</summary>
-	public sealed class IEntityMetaProperties_IsSelfModifiedInterceptor
+	/// <summary>Tracks and configures behavior for RunRules.</summary>
+	public sealed class RunRules2Interceptor
 	{
-		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		/// <summary>Delegate for RunRules.</summary>
+		public delegate global::System.Threading.Tasks.Task RunRulesDelegate(EntityBaseStub ko, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token);
 
-		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityBaseStub, bool>? OnGet { get; set; }
+		/// <summary>Number of times this method was called.</summary>
+		public int CallCount { get; private set; }
 
-		/// <summary>Records a getter access.</summary>
-		public void RecordGet() => GetCount++;
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The arguments from the most recent call.</summary>
+		public (global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token)? LastCallArgs { get; private set; }
+
+		/// <summary>Callback invoked when this method is called.</summary>
+		public RunRulesDelegate? OnCall { get; set; }
+
+		/// <summary>Records a method call.</summary>
+		public void RecordCall(global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token) { CallCount++; LastCallArgs = (runRules, token); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IEntityMetaProperties.IsMarkedModified.</summary>
-	public sealed class IEntityMetaProperties_IsMarkedModifiedInterceptor
+	/// <summary>Tracks and configures behavior for ClearAllMessages.</summary>
+	public sealed class ClearAllMessagesInterceptor
 	{
-		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		/// <summary>Number of times this method was called.</summary>
+		public int CallCount { get; private set; }
 
-		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityBaseStub, bool>? OnGet { get; set; }
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Records a getter access.</summary>
-		public void RecordGet() => GetCount++;
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<EntityBaseStub>? OnCall { get; set; }
+
+		/// <summary>Records a method call.</summary>
+		public void RecordCall() => CallCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IEntityMetaProperties.IsSavable.</summary>
-	public sealed class IEntityMetaProperties_IsSavableInterceptor
+	/// <summary>Tracks and configures behavior for ClearSelfMessages.</summary>
+	public sealed class ClearSelfMessagesInterceptor
 	{
-		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		/// <summary>Number of times this method was called.</summary>
+		public int CallCount { get; private set; }
 
-		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityBaseStub, bool>? OnGet { get; set; }
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Records a getter access.</summary>
-		public void RecordGet() => GetCount++;
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<EntityBaseStub>? OnCall { get; set; }
+
+		/// <summary>Records a method call.</summary>
+		public void RecordCall() => CallCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for Neatoo.IEntityMetaProperties.</summary>
-	public sealed class IEntityMetaPropertiesInterceptorors
+	/// <summary>Interceptor for PropertyChanged event.</summary>
+	public sealed class PropertyChangedInterceptor
 	{
-		/// <summary>Interceptor for IsChild.</summary>
-		public IEntityMetaProperties_IsChildInterceptor IsChild { get; } = new();
-		/// <summary>Interceptor for IsModified.</summary>
-		public IEntityMetaProperties_IsModifiedInterceptor IsModified { get; } = new();
-		/// <summary>Interceptor for IsSelfModified.</summary>
-		public IEntityMetaProperties_IsSelfModifiedInterceptor IsSelfModified { get; } = new();
-		/// <summary>Interceptor for IsMarkedModified.</summary>
-		public IEntityMetaProperties_IsMarkedModifiedInterceptor IsMarkedModified { get; } = new();
-		/// <summary>Interceptor for IsSavable.</summary>
-		public IEntityMetaProperties_IsSavableInterceptor IsSavable { get; } = new();
-	}
+		private global::System.ComponentModel.PropertyChangedEventHandler? _handler;
 
-	/// <summary>Tracks and configures behavior for IFactorySaveMeta.IsDeleted.</summary>
-	public sealed class IFactorySaveMeta_IsDeletedInterceptor
-	{
-		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		/// <summary>Number of times event was subscribed to.</summary>
+		public int AddCount { get; private set; }
 
-		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityBaseStub, bool>? OnGet { get; set; }
+		/// <summary>Number of times event subscription was removed.</summary>
+		public int RemoveCount { get; private set; }
 
-		/// <summary>Records a getter access.</summary>
-		public void RecordGet() => GetCount++;
+		/// <summary>Whether any handlers are subscribed.</summary>
+		public bool HasSubscribers => _handler != null;
+
+		/// <summary>Records an event subscription.</summary>
+		public void RecordAdd(global::System.ComponentModel.PropertyChangedEventHandler? value) { AddCount++; _handler = (global::System.ComponentModel.PropertyChangedEventHandler?)global::System.Delegate.Combine(_handler, value); }
+
+		/// <summary>Records an event unsubscription.</summary>
+		public void RecordRemove(global::System.ComponentModel.PropertyChangedEventHandler? value) { RemoveCount++; _handler = (global::System.ComponentModel.PropertyChangedEventHandler?)global::System.Delegate.Remove(_handler, value); }
+
+		/// <summary>Invokes the handler if subscribed.</summary>
+		public void Raise(object? sender, global::System.ComponentModel.PropertyChangedEventArgs e) => _handler?.DynamicInvoke(sender, e);
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IFactorySaveMeta.IsNew.</summary>
-	public sealed class IFactorySaveMeta_IsNewInterceptor
+	/// <summary>Interceptor for NeatooPropertyChanged event.</summary>
+	public sealed class NeatooPropertyChangedInterceptor
 	{
-		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		private global::Neatoo.NeatooPropertyChanged? _handler;
 
-		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityBaseStub, bool>? OnGet { get; set; }
+		/// <summary>Number of times event was subscribed to.</summary>
+		public int AddCount { get; private set; }
 
-		/// <summary>Records a getter access.</summary>
-		public void RecordGet() => GetCount++;
+		/// <summary>Number of times event subscription was removed.</summary>
+		public int RemoveCount { get; private set; }
+
+		/// <summary>Whether any handlers are subscribed.</summary>
+		public bool HasSubscribers => _handler != null;
+
+		/// <summary>Records an event subscription.</summary>
+		public void RecordAdd(global::Neatoo.NeatooPropertyChanged? value) { AddCount++; _handler = (global::Neatoo.NeatooPropertyChanged?)global::System.Delegate.Combine(_handler, value); }
+
+		/// <summary>Records an event unsubscription.</summary>
+		public void RecordRemove(global::Neatoo.NeatooPropertyChanged? value) { RemoveCount++; _handler = (global::Neatoo.NeatooPropertyChanged?)global::System.Delegate.Remove(_handler, value); }
+
+		/// <summary>Invokes the handler if subscribed.</summary>
+		public void Raise(global::Neatoo.NeatooPropertyChangedEventArgs propertyNameBreadCrumbs) => _handler?.DynamicInvoke(propertyNameBreadCrumbs);
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for Neatoo.RemoteFactory.IFactorySaveMeta.</summary>
-	public sealed class IFactorySaveMetaInterceptorors
-	{
-		/// <summary>Interceptor for IsDeleted.</summary>
-		public IFactorySaveMeta_IsDeletedInterceptor IsDeleted { get; } = new();
-		/// <summary>Interceptor for IsNew.</summary>
-		public IFactorySaveMeta_IsNewInterceptor IsNew { get; } = new();
-	}
+	/// <summary>Interceptor for Root.</summary>
+	public RootInterceptor Root { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for Neatoo.IEntityBase.</summary>
-	public IEntityBaseInterceptorors IEntityBase { get; } = new();
+	/// <summary>Interceptor for ModifiedProperties.</summary>
+	public ModifiedPropertiesInterceptor ModifiedProperties { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for Neatoo.IValidateBase.</summary>
-	public IValidateBaseInterceptorors IValidateBase { get; } = new();
+	/// <summary>Interceptor for StringIndexer.</summary>
+	public StringIndexerInterceptor StringIndexer { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for Neatoo.IBase.</summary>
-	public IBaseInterceptorors IBase { get; } = new();
+	/// <summary>Interceptor for Parent.</summary>
+	public ParentInterceptor Parent { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for System.ComponentModel.INotifyPropertyChanged.</summary>
-	public INotifyPropertyChangedInterceptorors INotifyPropertyChanged { get; } = new();
+	/// <summary>Interceptor for IsPaused.</summary>
+	public IsPausedInterceptor IsPaused { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for Neatoo.INotifyNeatooPropertyChanged.</summary>
-	public INotifyNeatooPropertyChangedInterceptorors INotifyNeatooPropertyChanged { get; } = new();
+	/// <summary>Interceptor for IsBusy.</summary>
+	public IsBusyInterceptor IsBusy { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for Neatoo.IValidateMetaProperties.</summary>
-	public IValidateMetaPropertiesInterceptorors IValidateMetaProperties { get; } = new();
+	/// <summary>Interceptor for IsValid.</summary>
+	public IsValidInterceptor IsValid { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for Neatoo.IBaseMetaProperties.</summary>
-	public IBaseMetaPropertiesInterceptorors IBaseMetaProperties { get; } = new();
+	/// <summary>Interceptor for IsSelfValid.</summary>
+	public IsSelfValidInterceptor IsSelfValid { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for Neatoo.IEntityMetaProperties.</summary>
-	public IEntityMetaPropertiesInterceptorors IEntityMetaProperties { get; } = new();
+	/// <summary>Interceptor for PropertyMessages.</summary>
+	public PropertyMessagesInterceptor PropertyMessages { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for Neatoo.RemoteFactory.IFactorySaveMeta.</summary>
-	public IFactorySaveMetaInterceptorors IFactorySaveMeta { get; } = new();
+	/// <summary>Interceptor for IsChild.</summary>
+	public IsChildInterceptor IsChild { get; } = new();
+
+	/// <summary>Interceptor for IsModified.</summary>
+	public IsModifiedInterceptor IsModified { get; } = new();
+
+	/// <summary>Interceptor for IsSelfModified.</summary>
+	public IsSelfModifiedInterceptor IsSelfModified { get; } = new();
+
+	/// <summary>Interceptor for IsMarkedModified.</summary>
+	public IsMarkedModifiedInterceptor IsMarkedModified { get; } = new();
+
+	/// <summary>Interceptor for IsSavable.</summary>
+	public IsSavableInterceptor IsSavable { get; } = new();
+
+	/// <summary>Interceptor for IsDeleted.</summary>
+	public IsDeletedInterceptor IsDeleted { get; } = new();
+
+	/// <summary>Interceptor for IsNew.</summary>
+	public IsNewInterceptor IsNew { get; } = new();
+
+	/// <summary>Interceptor for Delete.</summary>
+	public DeleteInterceptor Delete { get; } = new();
+
+	/// <summary>Interceptor for UnDelete.</summary>
+	public UnDeleteInterceptor UnDelete { get; } = new();
+
+	/// <summary>Interceptor for Save.</summary>
+	public SaveInterceptor Save { get; } = new();
+
+	/// <summary>Interceptor for GetProperty.</summary>
+	public GetPropertyInterceptor GetProperty { get; } = new();
+
+	/// <summary>Interceptor for TryGetProperty.</summary>
+	public TryGetPropertyInterceptor TryGetProperty { get; } = new();
+
+	/// <summary>Interceptor for WaitForTasks.</summary>
+	public WaitForTasks1Interceptor WaitForTasks1 { get; } = new();
+
+	/// <summary>Interceptor for WaitForTasks.</summary>
+	public WaitForTasks2Interceptor WaitForTasks2 { get; } = new();
+
+	/// <summary>Interceptor for RunRules.</summary>
+	public RunRules1Interceptor RunRules1 { get; } = new();
+
+	/// <summary>Interceptor for RunRules.</summary>
+	public RunRules2Interceptor RunRules2 { get; } = new();
+
+	/// <summary>Interceptor for ClearAllMessages.</summary>
+	public ClearAllMessagesInterceptor ClearAllMessages { get; } = new();
+
+	/// <summary>Interceptor for ClearSelfMessages.</summary>
+	public ClearSelfMessagesInterceptor ClearSelfMessages { get; } = new();
+
+	/// <summary>Interceptor for PropertyChanged event.</summary>
+	public PropertyChangedInterceptor PropertyChanged { get; } = new();
+
+	/// <summary>Interceptor for NeatooPropertyChanged event.</summary>
+	public NeatooPropertyChangedInterceptor NeatooPropertyChanged { get; } = new();
 
 	/// <summary>Returns this instance as Neatoo.IEntityBase.</summary>
 	public Neatoo.IEntityBase AsEntityBase() => this;
 
 	/// <summary>Returns this instance as Neatoo.IValidateBase.</summary>
 	public Neatoo.IValidateBase AsValidateBase() => this;
-
-	/// <summary>Returns this instance as Neatoo.IBase.</summary>
-	public Neatoo.IBase AsBase() => this;
 
 	/// <summary>Returns this instance as System.ComponentModel.INotifyPropertyChanged.</summary>
 	public System.ComponentModel.INotifyPropertyChanged AsNotifyPropertyChanged() => this;
@@ -753,330 +665,223 @@ partial class EntityBaseStub
 	/// <summary>Returns this instance as Neatoo.IValidateMetaProperties.</summary>
 	public Neatoo.IValidateMetaProperties AsValidateMetaProperties() => this;
 
-	/// <summary>Returns this instance as Neatoo.IBaseMetaProperties.</summary>
-	public Neatoo.IBaseMetaProperties AsBaseMetaProperties() => this;
-
 	/// <summary>Returns this instance as Neatoo.IEntityMetaProperties.</summary>
 	public Neatoo.IEntityMetaProperties AsEntityMetaProperties() => this;
 
 	/// <summary>Returns this instance as Neatoo.RemoteFactory.IFactorySaveMeta.</summary>
 	public Neatoo.RemoteFactory.IFactorySaveMeta AsFactorySaveMeta() => this;
 
-	/// <summary>Backing field for IEntityBase.ModifiedProperties.</summary>
-	protected global::System.Collections.Generic.IEnumerable<string> IEntityBase_ModifiedPropertiesBacking { get; set; } = new global::System.Collections.Generic.List<string>();
+	/// <summary>Backing storage for Root.</summary>
+	protected global::Neatoo.IValidateBase? RootBacking { get; set; } = default!;
 
-	/// <summary>Backing dictionary for IEntityBase.StringIndexer. Pre-populate with values or use OnGet callback.</summary>
-	public global::System.Collections.Generic.Dictionary<string, global::Neatoo.IEntityProperty> IEntityBase_StringIndexerBacking { get; } = new();
+	/// <summary>Backing storage for ModifiedProperties.</summary>
+	protected global::System.Collections.Generic.IEnumerable<string> ModifiedPropertiesBacking { get; set; } = new global::System.Collections.Generic.List<string>();
 
-	/// <summary>Backing field for IValidateBase.IsPaused.</summary>
-	protected bool IValidateBase_IsPausedBacking { get; set; }
+	/// <summary>Backing storage for StringIndexer indexer.</summary>
+	public global::System.Collections.Generic.Dictionary<string, global::Neatoo.IEntityProperty> StringIndexerBacking { get; } = new();
 
-	/// <summary>Backing dictionary for IValidateBase.StringIndexer. Pre-populate with values or use OnGet callback.</summary>
-	public global::System.Collections.Generic.Dictionary<string, global::Neatoo.IValidateProperty> IValidateBase_StringIndexerBacking { get; } = new();
+	/// <summary>Backing storage for Parent.</summary>
+	protected global::Neatoo.IValidateBase? ParentBacking { get; set; } = default!;
 
-	/// <summary>Backing field for IBase.Parent.</summary>
-	protected global::Neatoo.IBase? IBase_ParentBacking { get; set; }
+	/// <summary>Backing storage for IsPaused.</summary>
+	protected bool IsPausedBacking { get; set; } = default!;
 
-	/// <summary>Backing field for IValidateMetaProperties.IsValid.</summary>
-	protected bool IValidateMetaProperties_IsValidBacking { get; set; }
+	/// <summary>Backing storage for IsBusy.</summary>
+	protected bool IsBusyBacking { get; set; } = default!;
 
-	/// <summary>Backing field for IValidateMetaProperties.IsSelfValid.</summary>
-	protected bool IValidateMetaProperties_IsSelfValidBacking { get; set; }
+	/// <summary>Backing storage for IsValid.</summary>
+	protected bool IsValidBacking { get; set; } = default!;
 
-	/// <summary>Backing field for IValidateMetaProperties.PropertyMessages.</summary>
-	protected global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> IValidateMetaProperties_PropertyMessagesBacking { get; set; } = new global::System.Collections.Generic.List<global::Neatoo.IPropertyMessage>();
+	/// <summary>Backing storage for IsSelfValid.</summary>
+	protected bool IsSelfValidBacking { get; set; } = default!;
 
-	/// <summary>Backing field for IBaseMetaProperties.IsBusy.</summary>
-	protected bool IBaseMetaProperties_IsBusyBacking { get; set; }
+	/// <summary>Backing storage for PropertyMessages.</summary>
+	protected global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> PropertyMessagesBacking { get; set; } = new global::System.Collections.Generic.List<global::Neatoo.IPropertyMessage>();
 
-	/// <summary>Backing field for IEntityMetaProperties.IsChild.</summary>
-	protected bool IEntityMetaProperties_IsChildBacking { get; set; }
+	/// <summary>Backing storage for IsChild.</summary>
+	protected bool IsChildBacking { get; set; } = default!;
 
-	/// <summary>Backing field for IEntityMetaProperties.IsModified.</summary>
-	protected bool IEntityMetaProperties_IsModifiedBacking { get; set; }
+	/// <summary>Backing storage for IsModified.</summary>
+	protected bool IsModifiedBacking { get; set; } = default!;
 
-	/// <summary>Backing field for IEntityMetaProperties.IsSelfModified.</summary>
-	protected bool IEntityMetaProperties_IsSelfModifiedBacking { get; set; }
+	/// <summary>Backing storage for IsSelfModified.</summary>
+	protected bool IsSelfModifiedBacking { get; set; } = default!;
 
-	/// <summary>Backing field for IEntityMetaProperties.IsMarkedModified.</summary>
-	protected bool IEntityMetaProperties_IsMarkedModifiedBacking { get; set; }
+	/// <summary>Backing storage for IsMarkedModified.</summary>
+	protected bool IsMarkedModifiedBacking { get; set; } = default!;
 
-	/// <summary>Backing field for IEntityMetaProperties.IsSavable.</summary>
-	protected bool IEntityMetaProperties_IsSavableBacking { get; set; }
+	/// <summary>Backing storage for IsSavable.</summary>
+	protected bool IsSavableBacking { get; set; } = default!;
 
-	/// <summary>Backing field for IFactorySaveMeta.IsDeleted.</summary>
-	protected bool IFactorySaveMeta_IsDeletedBacking { get; set; }
+	/// <summary>Backing storage for IsDeleted.</summary>
+	protected bool IsDeletedBacking { get; set; } = default!;
 
-	/// <summary>Backing field for IFactorySaveMeta.IsNew.</summary>
-	protected bool IFactorySaveMeta_IsNewBacking { get; set; }
+	/// <summary>Backing storage for IsNew.</summary>
+	protected bool IsNewBacking { get; set; } = default!;
 
 	void Neatoo.IEntityBase.Delete()
 	{
-		IEntityBase.Delete.RecordCall();
-		if (IEntityBase.Delete.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		Delete.RecordCall();
+		Delete.OnCall?.Invoke(this);
 	}
 
 	void Neatoo.IEntityBase.UnDelete()
 	{
-		IEntityBase.UnDelete.RecordCall();
-		if (IEntityBase.UnDelete.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		UnDelete.RecordCall();
+		UnDelete.OnCall?.Invoke(this);
 	}
 
 	global::System.Threading.Tasks.Task<global::Neatoo.IEntityBase> Neatoo.IEntityBase.Save()
 	{
-		IEntityBase.Save.RecordCall();
-		if (IEntityBase.Save.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'Save' in your partial class, or set IEntityBase.Save.OnCall.");
+		Save.RecordCall();
+		if (Save.OnCall is { } callback)
+			return callback(this);
+		throw new global::System.InvalidOperationException("No implementation provided for Save. Set Save.OnCall or define a protected method 'Save' in your partial class.");
+	}
+
+	global::Neatoo.IValidateBase? Neatoo.IEntityBase.Root
+	{
+		get { Root.RecordGet(); return Root.OnGet?.Invoke(this) ?? RootBacking; }
 	}
 
 	global::System.Collections.Generic.IEnumerable<string> Neatoo.IEntityBase.ModifiedProperties
 	{
-		get
-		{
-			IEntityBase.ModifiedProperties.RecordGet();
-			if (IEntityBase.ModifiedProperties.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IEntityBase_ModifiedPropertiesBacking;
-		}
+		get { ModifiedProperties.RecordGet(); return ModifiedProperties.OnGet?.Invoke(this) ?? ModifiedPropertiesBacking; }
 	}
 
 	global::Neatoo.IEntityProperty Neatoo.IEntityBase.this[string propertyName]
 	{
-		get
-		{
-			IEntityBase.StringIndexer.RecordGet(propertyName);
-			if (IEntityBase.StringIndexer.OnGet is { } onGetCallback)
-				return onGetCallback(this, propertyName);
-			if (IEntityBase_StringIndexerBacking.TryGetValue(propertyName, out var value))
-				return value;
-			throw new global::System.Collections.Generic.KeyNotFoundException($"Key '{propertyName}' not found. Set IEntityBase.StringIndexer.OnGet or add to IEntityBase_StringIndexerBacking dictionary.");
-		}
+		get { StringIndexer.RecordGet(propertyName); if (StringIndexer.OnGet != null) return StringIndexer.OnGet(this, propertyName); return StringIndexerBacking.TryGetValue(propertyName, out var v) ? v : default!; }
 	}
 
 	global::Neatoo.IValidateProperty Neatoo.IValidateBase.GetProperty(string propertyName)
 	{
-		IValidateBase.GetProperty.RecordCall(propertyName);
-		if (IValidateBase.GetProperty.OnCall is { } onCallCallback)
-			return onCallCallback(this, propertyName);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'GetProperty' in your partial class, or set IValidateBase.GetProperty.OnCall.");
+		GetProperty.RecordCall(propertyName);
+		if (GetProperty.OnCall is { } callback)
+			return callback(this, propertyName);
+		throw new global::System.InvalidOperationException("No implementation provided for GetProperty. Set GetProperty.OnCall or define a protected method 'GetProperty' in your partial class.");
 	}
 
 	bool Neatoo.IValidateBase.TryGetProperty(string propertyName, out global::Neatoo.IValidateProperty validateProperty)
 	{
 		validateProperty = default!;
-		IValidateBase.TryGetProperty.RecordCall(propertyName);
-		if (IValidateBase.TryGetProperty.OnCall is { } onCallCallback)
+		TryGetProperty.RecordCall(propertyName);
+		if (TryGetProperty.OnCall is { } onCallCallback)
 			return onCallCallback(this, propertyName, out validateProperty);
 		return default!;
 	}
 
+	global::Neatoo.IValidateBase? Neatoo.IValidateBase.Parent
+	{
+		get { Parent.RecordGet(); return Parent.OnGet?.Invoke(this) ?? ParentBacking; }
+	}
+
 	bool Neatoo.IValidateBase.IsPaused
 	{
-		get
-		{
-			IValidateBase.IsPaused.RecordGet();
-			if (IValidateBase.IsPaused.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IValidateBase_IsPausedBacking;
-		}
+		get { IsPaused.RecordGet(); return IsPaused.OnGet?.Invoke(this) ?? IsPausedBacking; }
 	}
 
-	global::Neatoo.IValidateProperty Neatoo.IValidateBase.this[string propertyName]
+	global::System.Threading.Tasks.Task Neatoo.IValidateMetaProperties.WaitForTasks()
 	{
-		get
-		{
-			IValidateBase.StringIndexer.RecordGet(propertyName);
-			if (IValidateBase.StringIndexer.OnGet is { } onGetCallback)
-				return onGetCallback(this, propertyName);
-			if (IValidateBase_StringIndexerBacking.TryGetValue(propertyName, out var value))
-				return value;
-			throw new global::System.Collections.Generic.KeyNotFoundException($"Key '{propertyName}' not found. Set IValidateBase.StringIndexer.OnGet or add to IValidateBase_StringIndexerBacking dictionary.");
-		}
+		WaitForTasks1.RecordCall();
+		return WaitForTasks1.OnCall?.Invoke(this) ?? global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
-	global::Neatoo.IBase? Neatoo.IBase.Parent
+	global::System.Threading.Tasks.Task Neatoo.IValidateMetaProperties.WaitForTasks(global::System.Threading.CancellationToken token)
 	{
-		get
-		{
-			IBase.Parent.RecordGet();
-			if (IBase.Parent.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IBase_ParentBacking;
-		}
-	}
-
-	event global::System.ComponentModel.PropertyChangedEventHandler? System.ComponentModel.INotifyPropertyChanged.PropertyChanged
-	{
-		add => INotifyPropertyChanged.PropertyChanged.Add(value);
-		remove => INotifyPropertyChanged.PropertyChanged.Remove(value);
-	}
-
-	event global::Neatoo.NeatooPropertyChanged Neatoo.INotifyNeatooPropertyChanged.NeatooPropertyChanged
-	{
-		add => INotifyNeatooPropertyChanged.NeatooPropertyChanged.Add(value);
-		remove => INotifyNeatooPropertyChanged.NeatooPropertyChanged.Remove(value);
+		WaitForTasks2.RecordCall(token);
+		return WaitForTasks2.OnCall?.Invoke(this, token) ?? global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
 	global::System.Threading.Tasks.Task Neatoo.IValidateMetaProperties.RunRules(string propertyName, global::System.Threading.CancellationToken? token)
 	{
-		IValidateMetaProperties.RunRules1.RecordCall(propertyName, token);
-		if (IValidateMetaProperties.RunRules1.OnCall is { } onCallCallback)
-			return onCallCallback(this, propertyName, token);
-		return global::System.Threading.Tasks.Task.CompletedTask;
+		RunRules1.RecordCall(propertyName, token);
+		return RunRules1.OnCall?.Invoke(this, propertyName, token) ?? global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
 	global::System.Threading.Tasks.Task Neatoo.IValidateMetaProperties.RunRules(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
 	{
-		IValidateMetaProperties.RunRules2.RecordCall(runRules, token);
-		if (IValidateMetaProperties.RunRules2.OnCall is { } onCallCallback)
-			return onCallCallback(this, runRules, token);
-		return global::System.Threading.Tasks.Task.CompletedTask;
+		RunRules2.RecordCall(runRules, token);
+		return RunRules2.OnCall?.Invoke(this, runRules, token) ?? global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
 	void Neatoo.IValidateMetaProperties.ClearAllMessages()
 	{
-		IValidateMetaProperties.ClearAllMessages.RecordCall();
-		if (IValidateMetaProperties.ClearAllMessages.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		ClearAllMessages.RecordCall();
+		ClearAllMessages.OnCall?.Invoke(this);
 	}
 
 	void Neatoo.IValidateMetaProperties.ClearSelfMessages()
 	{
-		IValidateMetaProperties.ClearSelfMessages.RecordCall();
-		if (IValidateMetaProperties.ClearSelfMessages.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		ClearSelfMessages.RecordCall();
+		ClearSelfMessages.OnCall?.Invoke(this);
+	}
+
+	bool Neatoo.IValidateMetaProperties.IsBusy
+	{
+		get { IsBusy.RecordGet(); return IsBusy.OnGet?.Invoke(this) ?? IsBusyBacking; }
 	}
 
 	bool Neatoo.IValidateMetaProperties.IsValid
 	{
-		get
-		{
-			IValidateMetaProperties.IsValid.RecordGet();
-			if (IValidateMetaProperties.IsValid.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IValidateMetaProperties_IsValidBacking;
-		}
+		get { IsValid.RecordGet(); return IsValid.OnGet?.Invoke(this) ?? IsValidBacking; }
 	}
 
 	bool Neatoo.IValidateMetaProperties.IsSelfValid
 	{
-		get
-		{
-			IValidateMetaProperties.IsSelfValid.RecordGet();
-			if (IValidateMetaProperties.IsSelfValid.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IValidateMetaProperties_IsSelfValidBacking;
-		}
+		get { IsSelfValid.RecordGet(); return IsSelfValid.OnGet?.Invoke(this) ?? IsSelfValidBacking; }
 	}
 
 	global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> Neatoo.IValidateMetaProperties.PropertyMessages
 	{
-		get
-		{
-			IValidateMetaProperties.PropertyMessages.RecordGet();
-			if (IValidateMetaProperties.PropertyMessages.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IValidateMetaProperties_PropertyMessagesBacking;
-		}
-	}
-
-	global::System.Threading.Tasks.Task Neatoo.IBaseMetaProperties.WaitForTasks()
-	{
-		IBaseMetaProperties.WaitForTasks.RecordCall();
-		if (IBaseMetaProperties.WaitForTasks.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return global::System.Threading.Tasks.Task.CompletedTask;
-	}
-
-	bool Neatoo.IBaseMetaProperties.IsBusy
-	{
-		get
-		{
-			IBaseMetaProperties.IsBusy.RecordGet();
-			if (IBaseMetaProperties.IsBusy.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IBaseMetaProperties_IsBusyBacking;
-		}
+		get { PropertyMessages.RecordGet(); return PropertyMessages.OnGet?.Invoke(this) ?? PropertyMessagesBacking; }
 	}
 
 	bool Neatoo.IEntityMetaProperties.IsChild
 	{
-		get
-		{
-			IEntityMetaProperties.IsChild.RecordGet();
-			if (IEntityMetaProperties.IsChild.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IEntityMetaProperties_IsChildBacking;
-		}
+		get { IsChild.RecordGet(); return IsChild.OnGet?.Invoke(this) ?? IsChildBacking; }
 	}
 
 	bool Neatoo.IEntityMetaProperties.IsModified
 	{
-		get
-		{
-			IEntityMetaProperties.IsModified.RecordGet();
-			if (IEntityMetaProperties.IsModified.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IEntityMetaProperties_IsModifiedBacking;
-		}
+		get { IsModified.RecordGet(); return IsModified.OnGet?.Invoke(this) ?? IsModifiedBacking; }
 	}
 
 	bool Neatoo.IEntityMetaProperties.IsSelfModified
 	{
-		get
-		{
-			IEntityMetaProperties.IsSelfModified.RecordGet();
-			if (IEntityMetaProperties.IsSelfModified.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IEntityMetaProperties_IsSelfModifiedBacking;
-		}
+		get { IsSelfModified.RecordGet(); return IsSelfModified.OnGet?.Invoke(this) ?? IsSelfModifiedBacking; }
 	}
 
 	bool Neatoo.IEntityMetaProperties.IsMarkedModified
 	{
-		get
-		{
-			IEntityMetaProperties.IsMarkedModified.RecordGet();
-			if (IEntityMetaProperties.IsMarkedModified.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IEntityMetaProperties_IsMarkedModifiedBacking;
-		}
+		get { IsMarkedModified.RecordGet(); return IsMarkedModified.OnGet?.Invoke(this) ?? IsMarkedModifiedBacking; }
 	}
 
 	bool Neatoo.IEntityMetaProperties.IsSavable
 	{
-		get
-		{
-			IEntityMetaProperties.IsSavable.RecordGet();
-			if (IEntityMetaProperties.IsSavable.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IEntityMetaProperties_IsSavableBacking;
-		}
+		get { IsSavable.RecordGet(); return IsSavable.OnGet?.Invoke(this) ?? IsSavableBacking; }
 	}
 
 	bool Neatoo.RemoteFactory.IFactorySaveMeta.IsDeleted
 	{
-		get
-		{
-			IFactorySaveMeta.IsDeleted.RecordGet();
-			if (IFactorySaveMeta.IsDeleted.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IFactorySaveMeta_IsDeletedBacking;
-		}
+		get { IsDeleted.RecordGet(); return IsDeleted.OnGet?.Invoke(this) ?? IsDeletedBacking; }
 	}
 
 	bool Neatoo.RemoteFactory.IFactorySaveMeta.IsNew
 	{
-		get
-		{
-			IFactorySaveMeta.IsNew.RecordGet();
-			if (IFactorySaveMeta.IsNew.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IFactorySaveMeta_IsNewBacking;
-		}
+		get { IsNew.RecordGet(); return IsNew.OnGet?.Invoke(this) ?? IsNewBacking; }
+	}
+
+	event global::System.ComponentModel.PropertyChangedEventHandler? System.ComponentModel.INotifyPropertyChanged.PropertyChanged
+	{
+		add => PropertyChanged.RecordAdd(value);
+		remove => PropertyChanged.RecordRemove(value);
+	}
+
+	event global::Neatoo.NeatooPropertyChanged? Neatoo.INotifyNeatooPropertyChanged.NeatooPropertyChanged
+	{
+		add => NeatooPropertyChanged.RecordAdd(value);
+		remove => NeatooPropertyChanged.RecordRemove(value);
 	}
 
 }

@@ -5,8 +5,8 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class HaPropertyServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for IHaPropertyService.Name.</summary>
-	public sealed class IHaPropertyService_NameInterceptor
+	/// <summary>Tracks and configures behavior for Name.</summary>
+	public sealed class NameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -33,39 +33,19 @@ partial class HaPropertyServiceKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaPropertyService.</summary>
-	public sealed class IHaPropertyServiceInterceptorors
-	{
-		/// <summary>Interceptor for Name.</summary>
-		public IHaPropertyService_NameInterceptor Name { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaPropertyService.</summary>
-	public IHaPropertyServiceInterceptorors IHaPropertyService { get; } = new();
+	/// <summary>Interceptor for Name.</summary>
+	public NameInterceptor Name { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IHaPropertyService.</summary>
 	public KnockOff.Documentation.Samples.Skills.IHaPropertyService AsHaPropertyService() => this;
 
-	/// <summary>Backing field for IHaPropertyService.Name.</summary>
-	protected string IHaPropertyService_NameBacking { get; set; } = "";
+	/// <summary>Backing storage for Name.</summary>
+	protected string NameBacking { get; set; } = "";
 
 	string KnockOff.Documentation.Samples.Skills.IHaPropertyService.Name
 	{
-		get
-		{
-			IHaPropertyService.Name.RecordGet();
-			if (IHaPropertyService.Name.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IHaPropertyService_NameBacking;
-		}
-		set
-		{
-			IHaPropertyService.Name.RecordSet(value);
-			if (IHaPropertyService.Name.OnSet is { } onSetCallback)
-				onSetCallback(this, value);
-			else
-				IHaPropertyService_NameBacking = value;
-		}
+		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
+		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else NameBacking = value; }
 	}
 
 }

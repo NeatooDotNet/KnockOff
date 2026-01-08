@@ -74,7 +74,7 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         IPatternCallbackService service = knockOff;
         var callbackExecuted = false;
 
-        knockOff.IPatternCallbackService.DoSomething.OnCall = (ko) =>
+        knockOff.DoSomething.OnCall = (ko) =>
         {
             callbackExecuted = true;
         };
@@ -90,7 +90,7 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new PatternCallbackServiceKnockOff();
         IPatternCallbackService service = knockOff;
 
-        knockOff.IPatternCallbackService.GetUser.OnCall = (ko, id) => new PatternUser { Id = id, Name = "Mocked" };
+        knockOff.GetUser.OnCall = (ko, id) => new PatternUser { Id = id, Name = "Mocked" };
 
         var user = service.GetUser(42);
 
@@ -104,7 +104,7 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new PatternCallbackServiceKnockOff();
         IPatternCallbackService service = knockOff;
 
-        knockOff.IPatternCallbackService.Calculate.OnCall = (ko, name, value, flag) =>
+        knockOff.Calculate.OnCall = (ko, name, value, flag) =>
         {
             return flag ? value * 2 : value;
         };
@@ -123,7 +123,7 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new PatternPropertyServiceKnockOff();
         IPatternPropertyService service = knockOff;
 
-        knockOff.IPatternPropertyService.Name.OnGet = (ko) => "Dynamic Value";
+        knockOff.Name.OnGet = (ko) => "Dynamic Value";
 
         Assert.Equal("Dynamic Value", service.Name);
     }
@@ -135,7 +135,7 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         IPatternPropertyService service = knockOff;
         string? capturedValue = null;
 
-        knockOff.IPatternPropertyService.Name.OnSet = (ko, value) =>
+        knockOff.Name.OnSet = (ko, value) =>
         {
             capturedValue = value;
         };
@@ -155,7 +155,7 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new PatternIndexerServiceKnockOff();
         IPatternIndexerService service = knockOff;
 
-        knockOff.IPatternIndexerService.StringIndexer.OnGet = (ko, key) => key switch
+        knockOff.StringIndexer.OnGet = (ko, key) => key switch
         {
             "Name" => new PatternPropertyInfo { Value = "Test" },
             "Age" => new PatternPropertyInfo { Value = "25" },
@@ -174,7 +174,7 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         IPatternIndexerService service = knockOff;
         (string key, PatternPropertyInfo? value)? captured = null;
 
-        knockOff.IPatternIndexerService.StringIndexer.OnSet = (ko, key, value) =>
+        knockOff.StringIndexer.OnSet = (ko, key, value) =>
         {
             captured = (key, value);
         };
@@ -209,7 +209,7 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         IPatternService service = knockOff;
 
         // Set callback → overrides user method
-        knockOff.IPatternService.Calculate.OnCall = (ko, input) => input * 100;
+        knockOff.Calculate2.OnCall = (ko, input) => input * 100;
 
         var result = service.Calculate(5);
 
@@ -222,11 +222,11 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new PatternServiceKnockOff();
         IPatternService service = knockOff;
 
-        knockOff.IPatternService.Calculate.OnCall = (ko, input) => input * 100;
+        knockOff.Calculate2.OnCall = (ko, input) => input * 100;
         Assert.Equal(500, service.Calculate(5)); // callback
 
         // Reset clears callback → back to user method
-        knockOff.IPatternService.Calculate.Reset();
+        knockOff.Calculate2.Reset();
 
         Assert.Equal(10, service.Calculate(5)); // user method
     }
@@ -241,16 +241,16 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new PatternUserServiceKnockOff();
         IPatternUserService service = knockOff;
 
-        knockOff.IPatternUserService.GetUser.OnCall = (ko, id) => new PatternUser { Name = "Callback" };
+        knockOff.GetUser2.OnCall = (ko, id) => new PatternUser { Name = "Callback" };
         service.GetUser(1);
         service.GetUser(2);
 
-        Assert.Equal(2, knockOff.IPatternUserService.GetUser.CallCount);
+        Assert.Equal(2, knockOff.GetUser2.CallCount);
 
         // Reset
-        knockOff.IPatternUserService.GetUser.Reset();
+        knockOff.GetUser2.Reset();
 
-        Assert.Equal(0, knockOff.IPatternUserService.GetUser.CallCount);  // Tracking cleared
+        Assert.Equal(0, knockOff.GetUser2.CallCount);  // Tracking cleared
 
         // Now uses user method
         var user = service.GetUser(3);
@@ -276,7 +276,7 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new PatternCombinedRepositoryKnockOff();
 
         // Override for specific IDs
-        knockOff.IPatternCombinedRepository.GetById.OnCall = (ko, id) => id switch
+        knockOff.GetById2.OnCall = (ko, id) => id switch
         {
             1 => new PatternUser { Id = 1, Name = "Admin" },
             2 => new PatternUser { Id = 2, Name = "Guest" },
@@ -292,12 +292,12 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
     {
         var knockOff = new PatternCombinedRepositoryKnockOff();
 
-        knockOff.IPatternCombinedRepository.GetById.OnCall = (ko, id) => new PatternUser { Id = id, Name = "First" };
+        knockOff.GetById2.OnCall = (ko, id) => new PatternUser { Id = id, Name = "First" };
         Assert.Equal("First", knockOff.AsPatternCombinedRepository().GetById(1)?.Name);
 
         // Reset and use different callback
-        knockOff.IPatternCombinedRepository.GetById.Reset();
-        knockOff.IPatternCombinedRepository.GetById.OnCall = (ko, id) =>
+        knockOff.GetById2.Reset();
+        knockOff.GetById2.OnCall = (ko, id) =>
             new PatternUser { Id = id, Name = $"User-{id}" };
 
         Assert.Equal("User-999", knockOff.AsPatternCombinedRepository().GetById(999)?.Name);

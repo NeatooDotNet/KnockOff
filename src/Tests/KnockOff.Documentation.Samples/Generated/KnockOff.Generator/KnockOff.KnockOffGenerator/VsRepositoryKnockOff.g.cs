@@ -5,84 +5,73 @@ namespace KnockOff.Documentation.Samples.Comparison;
 
 partial class VsRepositoryKnockOff
 {
-	/// <summary>Tracks and configures behavior for IVsRepository.GetByIdAsync.</summary>
-	public sealed class IVsRepository_GetByIdAsyncInterceptor
+	/// <summary>Tracks and configures behavior for GetByIdAsync.</summary>
+	public sealed class GetByIdAsync2Interceptor
 	{
-		/// <summary>Delegate for GetByIdAsync(int id).</summary>
+		/// <summary>Delegate for GetByIdAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Comparison.VsEntity?> GetByIdAsyncDelegate(VsRepositoryKnockOff ko, int id);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetByIdAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IVsRepository.Save.</summary>
-	public sealed class IVsRepository_SaveInterceptor
+	/// <summary>Tracks and configures behavior for Save.</summary>
+	public sealed class SaveInterceptor
 	{
-		/// <summary>Delegate for Save(global::KnockOff.Documentation.Samples.Comparison.VsEntity entity).</summary>
-		public delegate void SaveDelegate(VsRepositoryKnockOff ko, global::KnockOff.Documentation.Samples.Comparison.VsEntity entity);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'entity' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public global::KnockOff.Documentation.Samples.Comparison.VsEntity? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public SaveDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<VsRepositoryKnockOff, global::KnockOff.Documentation.Samples.Comparison.VsEntity>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::KnockOff.Documentation.Samples.Comparison.VsEntity entity) { CallCount++; LastCallArg = entity; }
+		public void RecordCall(global::KnockOff.Documentation.Samples.Comparison.VsEntity? entity) { CallCount++; LastCallArg = entity; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsRepository.</summary>
-	public sealed class IVsRepositoryInterceptorors
-	{
-		/// <summary>Interceptor for GetByIdAsync.</summary>
-		public IVsRepository_GetByIdAsyncInterceptor GetByIdAsync { get; } = new();
-		/// <summary>Interceptor for Save.</summary>
-		public IVsRepository_SaveInterceptor Save { get; } = new();
-	}
+	/// <summary>Interceptor for GetByIdAsync.</summary>
+	public GetByIdAsync2Interceptor GetByIdAsync2 { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsRepository.</summary>
-	public IVsRepositoryInterceptorors IVsRepository { get; } = new();
+	/// <summary>Interceptor for Save.</summary>
+	public SaveInterceptor Save { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IVsRepository.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IVsRepository AsVsRepository() => this;
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Comparison.VsEntity?> KnockOff.Documentation.Samples.Comparison.IVsRepository.GetByIdAsync(int id)
 	{
-		IVsRepository.GetByIdAsync.RecordCall(id);
-		if (IVsRepository.GetByIdAsync.OnCall is { } onCallCallback)
-			return onCallCallback(this, id);
+		GetByIdAsync2.RecordCall(id);
+		if (GetByIdAsync2.OnCall != null) return GetByIdAsync2.OnCall(this, id);
 		return GetByIdAsync(id);
 	}
 
 	void KnockOff.Documentation.Samples.Comparison.IVsRepository.Save(global::KnockOff.Documentation.Samples.Comparison.VsEntity entity)
 	{
-		IVsRepository.Save.RecordCall(entity);
-		if (IVsRepository.Save.OnCall is { } onCallCallback)
-		{ onCallCallback(this, entity); return; }
+		Save.RecordCall(entity);
+		Save.OnCall?.Invoke(this, entity);
 	}
 
 }

@@ -46,6 +46,21 @@ public class KnockOffGenerator : IIncrementalGenerator
 		defaultSeverity: DiagnosticSeverity.Error,
 		isEnabledByDefault: true);
 
+	#region Standalone Stub Diagnostics (KO0xxx)
+
+	/// <summary>
+	/// KO0010: Standalone stubs should implement a single interface.
+	/// </summary>
+	private static readonly DiagnosticDescriptor KO0010_MultipleInterfaces = new(
+		id: "KO0010",
+		title: "Multiple interfaces on standalone stub",
+		messageFormat: "KnockOff stubs should implement a single interface. Create separate stubs for {0}.",
+		category: "KnockOff",
+		defaultSeverity: DiagnosticSeverity.Error,
+		isEnabledByDefault: true);
+
+	#endregion
+
 	#region Class Stub Diagnostics (KO2xxx)
 
 	/// <summary>
@@ -431,6 +446,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 		var members = new List<InterfaceMemberInfo>();
 		var events = new List<EventMemberInfo>();
 
+		var ifaceFullName = iface.ToDisplayString();
 		foreach (var member in iface.GetMembers())
 		{
 			// Skip internal members from external assemblies
@@ -439,21 +455,22 @@ public class KnockOffGenerator : IIncrementalGenerator
 
 			if (member is IPropertySymbol property)
 			{
-				members.Add(CreatePropertyInfo(property));
+				members.Add(CreatePropertyInfo(property, ifaceFullName));
 			}
 			else if (member is IMethodSymbol method && method.MethodKind == MethodKind.Ordinary)
 			{
-				members.Add(CreateMethodInfo(method));
+				members.Add(CreateMethodInfo(method, ifaceFullName));
 			}
 			else if (member is IEventSymbol eventSymbol)
 			{
-				events.Add(CreateEventInfo(eventSymbol));
+				events.Add(CreateEventInfo(eventSymbol, ifaceFullName));
 			}
 		}
 
 		// Also get inherited interface members
 		foreach (var baseInterface in iface.AllInterfaces)
 		{
+			var baseIfaceFullName = baseInterface.ToDisplayString();
 			foreach (var member in baseInterface.GetMembers())
 			{
 				if (!IsMemberAccessible(member, knockOffAssembly))
@@ -461,15 +478,15 @@ public class KnockOffGenerator : IIncrementalGenerator
 
 				if (member is IPropertySymbol property)
 				{
-					members.Add(CreatePropertyInfo(property));
+					members.Add(CreatePropertyInfo(property, baseIfaceFullName));
 				}
 				else if (member is IMethodSymbol method && method.MethodKind == MethodKind.Ordinary)
 				{
-					members.Add(CreateMethodInfo(method));
+					members.Add(CreateMethodInfo(method, baseIfaceFullName));
 				}
 				else if (member is IEventSymbol eventSymbol)
 				{
-					events.Add(CreateEventInfo(eventSymbol));
+					events.Add(CreateEventInfo(eventSymbol, baseIfaceFullName));
 				}
 			}
 		}
@@ -645,7 +662,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 				// Only include virtual/abstract/override events that aren't sealed
 				if ((eventSymbol.IsVirtual || eventSymbol.IsAbstract || eventSymbol.IsOverride) && !eventSymbol.IsSealed)
 				{
-					events.Add(CreateEventInfo(eventSymbol));
+					events.Add(CreateEventInfo(eventSymbol, classFullName));
 				}
 			}
 		}
@@ -879,21 +896,55 @@ public class KnockOffGenerator : IIncrementalGenerator
 		// Get containing types chain (for nested class support)
 		var containingTypes = GetContainingTypes(classSymbol);
 
-		// Get all implemented interfaces
-		var interfaces = classSymbol.AllInterfaces;
-		if (interfaces.Length == 0)
+		var diagnostics = new List<DiagnosticInfo>();
+		var filePath = classDeclaration.SyntaxTree.FilePath;
+
+		// Get directly implemented interfaces (what user declared in base list)
+		var directInterfaces = classSymbol.Interfaces;
+		if (directInterfaces.Length == 0)
 			return null;
+
+		// Check for multiple unrelated interfaces (KO0010)
+		// Find root interfaces - those not inherited by any other declared interface
+		var rootInterfaces = FindRootInterfaces(directInterfaces);
+		if (rootInterfaces.Count > 1)
+		{
+			var location = classDeclaration.Identifier.GetLocation();
+			var lineSpan = location.GetLineSpan();
+			var interfaceNames = string.Join(" and ", rootInterfaces.Select(i => i.Name));
+			diagnostics.Add(new DiagnosticInfo(
+				"KO0010",
+				filePath,
+				lineSpan.StartLinePosition.Line,
+				lineSpan.StartLinePosition.Character,
+				new[] { interfaceNames }));
+
+			// Return with diagnostics but no generation
+			return new KnockOffTypeInfo(
+				Namespace: namespaceName,
+				ClassName: classSymbol.Name,
+				ContainingTypes: containingTypes,
+				Interfaces: new EquatableArray<InterfaceInfo>(Array.Empty<InterfaceInfo>()),
+				UserMethods: new EquatableArray<UserMethodInfo>(Array.Empty<UserMethodInfo>()),
+				Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
+				FlatMembers: new EquatableArray<InterfaceMemberInfo>(Array.Empty<InterfaceMemberInfo>()),
+				FlatEvents: new EquatableArray<EventMemberInfo>(Array.Empty<EventMemberInfo>()));
+		}
+
+		// Get all implemented interfaces (includes inheritance chain)
+		var allInterfaces = classSymbol.AllInterfaces;
 
 		// Get the KnockOff class's assembly for accessibility checks
 		var knockOffAssembly = classSymbol.ContainingAssembly;
 
 		var interfaceInfos = new List<InterfaceInfo>();
 
-		foreach (var iface in interfaces)
+		foreach (var iface in allInterfaces)
 		{
 			var members = new List<InterfaceMemberInfo>();
 			var events = new List<EventMemberInfo>();
 
+			var ifaceFullName = iface.ToDisplayString();
 			foreach (var member in iface.GetMembers())
 			{
 				// Skip internal members from external assemblies
@@ -902,15 +953,15 @@ public class KnockOffGenerator : IIncrementalGenerator
 
 				if (member is IPropertySymbol property)
 				{
-					members.Add(CreatePropertyInfo(property));
+					members.Add(CreatePropertyInfo(property, ifaceFullName));
 				}
 				else if (member is IMethodSymbol method && method.MethodKind == MethodKind.Ordinary)
 				{
-					members.Add(CreateMethodInfo(method));
+					members.Add(CreateMethodInfo(method, ifaceFullName));
 				}
 				else if (member is IEventSymbol eventSymbol)
 				{
-					events.Add(CreateEventInfo(eventSymbol));
+					events.Add(CreateEventInfo(eventSymbol, ifaceFullName));
 				}
 			}
 
@@ -931,12 +982,152 @@ public class KnockOffGenerator : IIncrementalGenerator
 		// Get user-defined methods that could override interface methods
 		var userMethods = GetUserDefinedMethods(classSymbol, interfaceInfos);
 
+		// Create flat, deduplicated collections for the new v10.9+ API
+		var (flatMembers, flatEvents) = FlattenAndDeduplicateMembers(interfaceInfos, allInterfaces);
+
 		return new KnockOffTypeInfo(
 			Namespace: namespaceName,
 			ClassName: classSymbol.Name,
 			ContainingTypes: containingTypes,
 			Interfaces: new EquatableArray<InterfaceInfo>(interfaceInfos.ToArray()),
-			UserMethods: userMethods);
+			UserMethods: userMethods,
+			Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
+			FlatMembers: new EquatableArray<InterfaceMemberInfo>(flatMembers),
+			FlatEvents: new EquatableArray<EventMemberInfo>(flatEvents));
+	}
+
+	/// <summary>
+	/// Flattens all members from all interfaces into a single collection with deduplication.
+	/// - Diamond inheritance: same member via multiple paths = one entry
+	/// - `new` keyword hiding: keep only the most-derived member
+	/// </summary>
+	private static (InterfaceMemberInfo[] members, EventMemberInfo[] events) FlattenAndDeduplicateMembers(
+		List<InterfaceInfo> interfaceInfos,
+		ImmutableArray<INamedTypeSymbol> allInterfaces)
+	{
+		// Build interface inheritance lookup for determining "most derived"
+		var interfaceInheritance = new Dictionary<string, HashSet<string>>();
+		foreach (var iface in allInterfaces)
+		{
+			var fullName = iface.ToDisplayString();
+			interfaceInheritance[fullName] = new HashSet<string>(
+				iface.AllInterfaces.Select(i => i.ToDisplayString()));
+		}
+
+		// Deduplicate members by name + signature
+		var memberMap = new Dictionary<string, InterfaceMemberInfo>();
+		foreach (var iface in interfaceInfos)
+		{
+			foreach (var member in iface.Members)
+			{
+				var key = GetMemberKey(member);
+				if (memberMap.TryGetValue(key, out var existing))
+				{
+					// Keep the most-derived version
+					if (IsDerivedFrom(member.DeclaringInterfaceFullName, existing.DeclaringInterfaceFullName, interfaceInheritance))
+					{
+						memberMap[key] = member; // member's interface derives from existing's interface
+					}
+					// If existing derives from member's interface, keep existing (already in map)
+				}
+				else
+				{
+					memberMap[key] = member;
+				}
+			}
+		}
+
+		// Deduplicate events by name
+		var eventMap = new Dictionary<string, EventMemberInfo>();
+		foreach (var iface in interfaceInfos)
+		{
+			foreach (var evt in iface.Events)
+			{
+				var key = evt.Name;
+				if (eventMap.TryGetValue(key, out var existing))
+				{
+					if (IsDerivedFrom(evt.DeclaringInterfaceFullName, existing.DeclaringInterfaceFullName, interfaceInheritance))
+					{
+						eventMap[key] = evt;
+					}
+				}
+				else
+				{
+					eventMap[key] = evt;
+				}
+			}
+		}
+
+		return (memberMap.Values.ToArray(), eventMap.Values.ToArray());
+	}
+
+	/// <summary>
+	/// Generates a unique key for a member based on name and signature.
+	/// </summary>
+	private static string GetMemberKey(InterfaceMemberInfo member)
+	{
+		if (member.IsProperty || member.IsIndexer)
+		{
+			// For properties/indexers, key is name + indexer params
+			var indexerParams = member.IndexerParameters.Count > 0
+				? $"[{string.Join(",", member.IndexerParameters.Select(p => p.Type))}]"
+				: "";
+			return $"prop:{member.Name}{indexerParams}";
+		}
+		else
+		{
+			// For methods, key is name + parameter types
+			var paramTypes = string.Join(",", member.Parameters.Select(p => p.Type));
+			return $"method:{member.Name}({paramTypes})";
+		}
+	}
+
+	/// <summary>
+	/// Returns true if interfaceA derives from interfaceB.
+	/// </summary>
+	private static bool IsDerivedFrom(string interfaceA, string interfaceB, Dictionary<string, HashSet<string>> inheritanceLookup)
+	{
+		if (inheritanceLookup.TryGetValue(interfaceA, out var baseInterfaces))
+		{
+			return baseInterfaces.Contains(interfaceB);
+		}
+		return false;
+	}
+
+	/// <summary>
+	/// Finds root interfaces - those not inherited by any other interface in the collection.
+	/// For example, if someone declares ": IEntityBase, IValidateBase" and IValidateBase is
+	/// in IEntityBase's hierarchy, only IEntityBase is a root.
+	/// </summary>
+	private static List<INamedTypeSymbol> FindRootInterfaces(ImmutableArray<INamedTypeSymbol> interfaces)
+	{
+		var roots = new List<INamedTypeSymbol>();
+
+		foreach (var iface in interfaces)
+		{
+			var isInheritedByAnother = false;
+
+			// Check if any other interface in the list inherits from this one
+			foreach (var other in interfaces)
+			{
+				if (SymbolEqualityComparer.Default.Equals(iface, other))
+					continue;
+
+				// Does 'other' inherit from 'iface'?
+				if (other.AllInterfaces.Any(i => SymbolEqualityComparer.Default.Equals(i, iface)))
+				{
+					isInheritedByAnother = true;
+					break;
+				}
+			}
+
+			if (!isInheritedByAnother)
+			{
+				roots.Add(iface);
+			}
+		}
+
+		return roots;
 	}
 
 	/// <summary>
@@ -1062,7 +1253,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 	private static string FormatRecordCallParameter(ParameterInfo p) =>
 		$"{p.Type} {p.Name}";
 
-	private static InterfaceMemberInfo CreatePropertyInfo(IPropertySymbol property)
+	private static InterfaceMemberInfo CreatePropertyInfo(IPropertySymbol property, string declaringInterfaceFullName)
 	{
 		var returnType = property.Type.ToDisplayString(FullyQualifiedWithNullability);
 		var isNullable = property.Type.NullableAnnotation == NullableAnnotation.Annotated
@@ -1102,7 +1293,8 @@ public class KnockOffGenerator : IIncrementalGenerator
 			Parameters: EquatableArray<ParameterInfo>.Empty,
 			IndexerParameters: indexerParameters,
 			IsGenericMethod: false,
-			TypeParameters: EquatableArray<TypeParameterInfo>.Empty);
+			TypeParameters: EquatableArray<TypeParameterInfo>.Empty,
+			DeclaringInterfaceFullName: declaringInterfaceFullName);
 	}
 
 	/// <summary>
@@ -1205,7 +1397,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 		};
 	}
 
-	private static InterfaceMemberInfo CreateMethodInfo(IMethodSymbol method)
+	private static InterfaceMemberInfo CreateMethodInfo(IMethodSymbol method, string declaringInterfaceFullName)
 	{
 		var returnType = method.ReturnType.ToDisplayString(FullyQualifiedWithNullability);
 		var isNullable = method.ReturnType.NullableAnnotation == NullableAnnotation.Annotated
@@ -1279,7 +1471,8 @@ public class KnockOffGenerator : IIncrementalGenerator
 			Parameters: new EquatableArray<ParameterInfo>(parameters),
 			IndexerParameters: EquatableArray<ParameterInfo>.Empty,
 			IsGenericMethod: isGenericMethod,
-			TypeParameters: typeParameters);
+			TypeParameters: typeParameters,
+			DeclaringInterfaceFullName: declaringInterfaceFullName);
 	}
 
 	/// <summary>
@@ -1304,7 +1497,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 	/// <summary>
 	/// Create event info from an IEventSymbol
 	/// </summary>
-	private static EventMemberInfo CreateEventInfo(IEventSymbol eventSymbol)
+	private static EventMemberInfo CreateEventInfo(IEventSymbol eventSymbol, string declaringInterfaceFullName)
 	{
 		var delegateType = (INamedTypeSymbol)eventSymbol.Type;
 		var invokeMethod = delegateType.DelegateInvokeMethod;
@@ -1318,7 +1511,8 @@ public class KnockOffGenerator : IIncrementalGenerator
 				DelegateKind: EventDelegateKind.Custom,
 				DelegateParameters: EquatableArray<ParameterInfo>.Empty,
 				ReturnTypeName: null,
-				IsAsync: false);
+				IsAsync: false,
+				DeclaringInterfaceFullName: declaringInterfaceFullName);
 		}
 
 		var delegateKind = ClassifyDelegateKind(delegateType);
@@ -1337,7 +1531,8 @@ public class KnockOffGenerator : IIncrementalGenerator
 			DelegateKind: delegateKind,
 			DelegateParameters: new EquatableArray<ParameterInfo>(parameters),
 			ReturnTypeName: returnType,
-			IsAsync: isAsync);
+			IsAsync: isAsync,
+			DeclaringInterfaceFullName: declaringInterfaceFullName);
 	}
 
 	/// <summary>
@@ -1529,6 +1724,13 @@ public class KnockOffGenerator : IIncrementalGenerator
 	/// </summary>
 	private static void GenerateKnockOff(SourceProductionContext context, KnockOffTypeInfo typeInfo)
 	{
+		// Report diagnostics first
+		ReportDiagnostics(context, typeInfo.Diagnostics);
+
+		// Skip generation if there are no interfaces (e.g., due to KO0010 error)
+		if (typeInfo.Interfaces.Count == 0)
+			return;
+
 		var sb = new System.Text.StringBuilder();
 
 		sb.AppendLine("// <auto-generated/>");
@@ -1598,57 +1800,84 @@ public class KnockOffGenerator : IIncrementalGenerator
 			sb.AppendLine();
 		}
 
-		// Build KO property names for each interface (with collision detection)
-		var interfaceKONames = new Dictionary<InterfaceInfo, string>();
-		foreach (var iface in typeInfo.Interfaces)
+		// ===== FLAT API GENERATION (v10.9+) =====
+		// Build flat name map with collision handling (also avoids user method names)
+		var flatNameMap = BuildFlatNameMap(typeInfo.FlatMembers, typeInfo.FlatEvents, typeInfo.UserMethods);
+		var flatMethodGroups = GroupMethodsByName(typeInfo.FlatMembers.Where(m => !m.IsProperty && !m.IsIndexer));
+
+		// 1. Generate flat handler classes for properties/indexers
+		foreach (var member in typeInfo.FlatMembers)
 		{
-			interfaceKONames[iface] = GetKOPropertyName(iface);
+			if (member.IsProperty || member.IsIndexer)
+			{
+				var interceptorName = flatNameMap[GetMemberKey(member)];
+				GenerateFlatMemberInterceptorClass(sb, member, typeInfo.ClassName, interceptorName);
+			}
 		}
 
-		// For each interface, generate handlers and KO class
-		foreach (var iface in typeInfo.Interfaces)
+		// 2. Generate flat handler classes for method groups (non-generic only)
+		foreach (var group in flatMethodGroups.Values)
 		{
-			var koPropertyName = interfaceKONames[iface];
-
-			// Group methods by name for this interface only
-			var interfaceMethods = iface.Members.Where(m => !m.IsProperty && !m.IsIndexer);
-			var methodGroups = GroupMethodsByName(interfaceMethods);
-
-			// 1. Generate handler classes for this interface's members
-			foreach (var member in iface.Members)
+			// Skip groups that have generic methods - they need special handling
+			var groupHasGenericMethods = group.Overloads.Any(o => o.IsGenericMethod);
+			if (groupHasGenericMethods)
 			{
-				if (member.IsProperty || member.IsIndexer)
-				{
-					GenerateInterfaceMemberHandlerClass(sb, member, typeInfo.ClassName, koPropertyName);
-				}
+				// Generic methods use the Of<T>() pattern - generate base handler class
+				GenerateFlatGenericMethodHandler(sb, group, typeInfo.ClassName, flatNameMap);
 			}
-
-			// 1b. Generate method group handlers for this interface
-			foreach (var group in methodGroups.Values)
+			else
 			{
-				GenerateInterfaceMethodGroupHandlerClass(sb, group, typeInfo.ClassName, koPropertyName);
+				GenerateFlatMethodGroupInterceptorClassWithNames(sb, group, typeInfo.ClassName, flatNameMap);
 			}
-
-			// 1c. Generate event handlers for this interface
-			foreach (var evt in iface.Events)
-			{
-				GenerateInterfaceEventHandlerClass(sb, evt, typeInfo.ClassName, koPropertyName);
-			}
-
-			// 2. Generate KO class for this interface
-			GenerateInterfaceKOClass(sb, typeInfo.ClassName, iface, koPropertyName, methodGroups);
 		}
 
-		// 3. Generate interface KO properties
-		foreach (var iface in typeInfo.Interfaces)
+		// 3. Generate flat handler classes for events
+		foreach (var evt in typeInfo.FlatEvents)
 		{
-			var koPropertyName = interfaceKONames[iface];
-			sb.AppendLine($"\t/// <summary>Tracks invocations and configures behavior for {iface.FullName}.</summary>");
-			sb.AppendLine($"\tpublic {koPropertyName}Interceptorors {koPropertyName} {{ get; }} = new();");
+			var interceptorName = flatNameMap[$"event:{evt.Name}"];
+			GenerateFlatEventInterceptorClassWithName(sb, evt, typeInfo.ClassName, interceptorName);
+		}
+
+		// 4. Generate flat interceptor properties directly on stub
+		foreach (var member in typeInfo.FlatMembers)
+		{
+			if (member.IsProperty || member.IsIndexer)
+			{
+				var interceptorName = flatNameMap[GetMemberKey(member)];
+				sb.AppendLine($"\t/// <summary>Interceptor for {member.Name}.</summary>");
+				sb.AppendLine($"\tpublic {interceptorName}Interceptor {interceptorName} {{ get; }} = new();");
+				sb.AppendLine();
+			}
+		}
+
+		// 4b. Generate flat interceptor properties for method groups
+		foreach (var group in flatMethodGroups.Values)
+		{
+			var groupHasGenerics = group.Overloads.Any(o => o.IsGenericMethod);
+			if (groupHasGenerics)
+			{
+				// Generic methods get a single property with Of<T>() access
+				var interceptorName = flatNameMap[$"method:{group.Name}()_generic"];
+				sb.AppendLine($"\t/// <summary>Interceptor for {group.Name} (use .Of&lt;T&gt;() to access typed handler).</summary>");
+				sb.AppendLine($"\tpublic {interceptorName}Interceptor {interceptorName} {{ get; }} = new();");
+				sb.AppendLine();
+			}
+			else
+			{
+				GenerateFlatMethodGroupInterceptorProperties(sb, group, flatNameMap);
+			}
+		}
+
+		// 4c. Generate flat interceptor properties for events
+		foreach (var evt in typeInfo.FlatEvents)
+		{
+			var interceptorName = flatNameMap[$"event:{evt.Name}"];
+			sb.AppendLine($"\t/// <summary>Interceptor for {evt.Name} event.</summary>");
+			sb.AppendLine($"\tpublic {interceptorName}Interceptor {interceptorName} {{ get; }} = new();");
 			sb.AppendLine();
 		}
 
-		// 4. Generate AsXYZ() methods for each interface
+		// 5. Generate AsXYZ() methods for each interface
 		var generatedAsMethodNames = new HashSet<string>();
 		foreach (var iface in typeInfo.Interfaces)
 		{
@@ -1662,55 +1891,45 @@ public class KnockOffGenerator : IIncrementalGenerator
 			}
 		}
 
-		// 5. Generate backing properties/dictionaries PER INTERFACE (separate backing per interface)
-		foreach (var iface in typeInfo.Interfaces)
+		// 6. Generate flat backing properties/dictionaries
+		foreach (var member in typeInfo.FlatMembers)
 		{
-			var koPropertyName = interfaceKONames[iface];
-			foreach (var member in iface.Members)
+			var interceptorName = flatNameMap[GetMemberKey(member)];
+			if (member.IsIndexer)
 			{
-				if (member.IsIndexer)
-				{
-					GenerateInterfaceIndexerBackingDictionary(sb, member, koPropertyName);
-				}
-				else if (member.IsProperty)
-				{
-					GenerateInterfaceBackingProperty(sb, member, koPropertyName);
-				}
+				GenerateFlatIndexerBackingDictionary(sb, member, interceptorName);
+			}
+			else if (member.IsProperty)
+			{
+				GenerateFlatBackingProperty(sb, member, interceptorName);
 			}
 		}
 
-		// 6. Generate explicit interface implementations for EACH interface member
-		foreach (var iface in typeInfo.Interfaces)
+		// 7. Generate explicit interface implementations for each flat member
+		foreach (var member in typeInfo.FlatMembers)
 		{
-			var koPropertyName = interfaceKONames[iface];
-
-			// Build method groups for this interface for callback lookup
-			var interfaceMethods = iface.Members.Where(m => !m.IsProperty && !m.IsIndexer);
-			var methodGroups = GroupMethodsByName(interfaceMethods);
-
-			foreach (var member in iface.Members)
+			var interceptorName = flatNameMap[GetMemberKey(member)];
+			if (member.IsIndexer)
 			{
-				if (member.IsIndexer)
-				{
-					GenerateInterfaceIndexerImplementation(sb, iface.FullName, member, koPropertyName);
-				}
-				else if (member.IsProperty)
-				{
-					GenerateInterfacePropertyImplementation(sb, iface.FullName, member, koPropertyName);
-				}
-				else
-				{
-					// All methods use delegate-based handler
-					var group = methodGroups[member.Name];
-					GenerateInterfaceMethod(sb, iface.FullName, member, typeInfo, group, koPropertyName);
-				}
+				GenerateFlatIndexerImplementationWithName(sb, member, interceptorName);
 			}
-
-			// 6b. Generate explicit interface implementations for events
-			foreach (var evt in iface.Events)
+			else if (member.IsProperty)
 			{
-				GenerateInterfaceEventImplementation(sb, iface.FullName, evt, koPropertyName);
+				GenerateFlatPropertyImplementationWithName(sb, member, interceptorName);
 			}
+			else
+			{
+				// Method - find its group for overload handling
+				var group = flatMethodGroups[member.Name];
+				GenerateFlatMethodImplementationWithName(sb, member, typeInfo, group, flatNameMap);
+			}
+		}
+
+		// 7b. Generate explicit interface implementations for events
+		foreach (var evt in typeInfo.FlatEvents)
+		{
+			var interceptorName = flatNameMap[$"event:{evt.Name}"];
+			GenerateFlatEventImplementationWithName(sb, evt, interceptorName);
 		}
 
 		sb.AppendLine("}");
@@ -2645,7 +2864,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 		Dictionary<string, MethodGroupInfo> methodGroups)
 	{
 		sb.AppendLine($"\t/// <summary>Tracks invocations and configures behavior for {iface.FullName}.</summary>");
-		sb.AppendLine($"\tpublic sealed class {koPropertyName}Interceptorors");
+		sb.AppendLine($"\tpublic sealed class {koPropertyName}Interceptors");
 		sb.AppendLine("\t{");
 
 		// Property/indexer handlers
@@ -3869,18 +4088,1636 @@ public class KnockOffGenerator : IIncrementalGenerator
 		return "";
 	}
 
+	/// <summary>
+	/// Escapes C# reserved keywords by prefixing with @.
+	/// </summary>
+	private static string EscapeIdentifier(string name)
+	{
+		// Common C# keywords that might appear as parameter names
+		var keywords = new HashSet<string>
+		{
+			"abstract", "as", "base", "bool", "break", "byte", "case", "catch", "char", "checked",
+			"class", "const", "continue", "decimal", "default", "delegate", "do", "double", "else",
+			"enum", "event", "explicit", "extern", "false", "finally", "fixed", "float", "for",
+			"foreach", "goto", "if", "implicit", "in", "int", "interface", "internal", "is", "lock",
+			"long", "namespace", "new", "null", "object", "operator", "out", "override", "params",
+			"private", "protected", "public", "readonly", "ref", "return", "sbyte", "sealed", "short",
+			"sizeof", "stackalloc", "static", "string", "struct", "switch", "this", "throw", "true",
+			"try", "typeof", "uint", "ulong", "unchecked", "unsafe", "ushort", "using", "virtual",
+			"void", "volatile", "while", "value"
+		};
+
+		return keywords.Contains(name) ? $"@{name}" : name;
+	}
+
+	/// <summary>
+	/// Gets a default value initializer for a property member.
+	/// </summary>
+	private static string GetDefaultValueForProperty(InterfaceMemberInfo member)
+	{
+		// Use the member's DefaultStrategy to determine proper initialization
+		var typeToNew = member.ConcreteTypeForNew ?? member.ReturnType;
+		return member.DefaultStrategy switch
+		{
+			DefaultValueStrategy.NewInstance => $" = new {typeToNew}();",
+			DefaultValueStrategy.Default => " = default!;", // Value types/nullable get default
+			DefaultValueStrategy.ThrowException => GetBackingPropertyInitializer(member.ReturnType),
+			_ => " = default!;"
+		};
+	}
+
+	/// <summary>
+	/// Gets a default expression for a type based on the strategy.
+	/// </summary>
+	private static string GetDefaultForType(string typeName, DefaultValueStrategy strategy, string? concreteType)
+	{
+		// Handle non-generic ValueTask FIRST (struct, default is completed)
+		if (typeName == "global::System.Threading.Tasks.ValueTask" || typeName == "ValueTask")
+		{
+			return "default";
+		}
+
+		// Handle non-generic Task - must return Task.CompletedTask, not null
+		if (typeName == "global::System.Threading.Tasks.Task" || typeName == "Task")
+		{
+			return "global::System.Threading.Tasks.Task.CompletedTask";
+		}
+
+		// Handle ValueTask<T> - must check before Task<T> because "ValueTask<" contains "Task<"
+		if (typeName.Contains("ValueTask<") || typeName.Contains("global::System.Threading.Tasks.ValueTask<"))
+		{
+			var innerType = ExtractGenericArg(typeName);
+			if (!string.IsNullOrEmpty(innerType))
+			{
+				// Use strategy to determine inner value
+				// For Default strategy, use `default` which creates a completed ValueTask with default(T)
+				// For NewInstance, create the ValueTask with a new instance
+				if (strategy == DefaultValueStrategy.NewInstance)
+				{
+					var innerTypeToNew = concreteType ?? innerType;
+					return $"new global::System.Threading.Tasks.ValueTask<{innerType}>(new {innerTypeToNew}())";
+				}
+				return "default";
+			}
+			return "default";
+		}
+
+		// Handle Task<T> - cannot use new Task<T>(), must use Task.FromResult
+		if (typeName.Contains("Task<") || typeName.Contains("global::System.Threading.Tasks.Task<"))
+		{
+			var innerType = ExtractGenericArg(typeName);
+			if (!string.IsNullOrEmpty(innerType))
+			{
+				// Use strategy to determine inner value
+				var innerTypeToNew = concreteType ?? innerType;
+				var innerValue = strategy switch
+				{
+					DefaultValueStrategy.NewInstance => $"new {innerTypeToNew}()",
+					DefaultValueStrategy.Default => "default!",
+					_ => "default!"
+				};
+				return $"global::System.Threading.Tasks.Task.FromResult<{innerType}>({innerValue})";
+			}
+			return "global::System.Threading.Tasks.Task.CompletedTask";
+		}
+
+		var typeToNew = concreteType ?? typeName;
+		return strategy switch
+		{
+			DefaultValueStrategy.NewInstance => $"new {typeToNew}()",
+			DefaultValueStrategy.Default => "default!",
+			_ => "default!"
+		};
+	}
+
+	/// <summary>
+	/// Finds a user-defined method that matches the interface member.
+	/// </summary>
+	private static UserMethodInfo? FindUserMethod(EquatableArray<UserMethodInfo> userMethods, InterfaceMemberInfo member)
+	{
+		var methods = userMethods.GetArray();
+		if (methods == null || methods.Length == 0) return null;
+
+		var memberParams = member.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+
+		foreach (var userMethod in methods)
+		{
+			if (userMethod.Name != member.Name) continue;
+			if (userMethod.ReturnType != member.ReturnType) continue;
+
+			var userParams = userMethod.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+			if (userParams.Length != memberParams.Length) continue;
+
+			var match = true;
+			for (int i = 0; i < userParams.Length; i++)
+			{
+				if (userParams[i].Type != memberParams[i].Type)
+				{
+					match = false;
+					break;
+				}
+			}
+
+			if (match) return userMethod;
+		}
+
+		return null;
+	}
+
+	#region Flat API Generation (v10.9+)
+
+	/// <summary>
+	/// Builds a map from member keys to collision-safe interceptor names.
+	/// For example, if two interfaces both have "Value" property, they map to "Value" and "Value2".
+	/// Also avoids conflicts with user-defined methods.
+	/// </summary>
+	private static Dictionary<string, string> BuildFlatNameMap(
+		EquatableArray<InterfaceMemberInfo> flatMembers,
+		EquatableArray<EventMemberInfo> flatEvents,
+		EquatableArray<UserMethodInfo> userMethods)
+	{
+		var nameMap = new Dictionary<string, string>();
+		var usedNames = new HashSet<string>();
+
+		// Reserve names used by user methods to avoid conflicts
+		foreach (var userMethod in userMethods)
+		{
+			usedNames.Add(userMethod.Name);
+		}
+
+		// Process properties and indexers
+		foreach (var member in flatMembers)
+		{
+			if (member.IsProperty || member.IsIndexer)
+			{
+				var key = GetMemberKey(member);
+				var baseName = member.Name;
+				var finalName = GetUniqueInterceptorName(baseName, usedNames);
+				nameMap[key] = finalName;
+				usedNames.Add(finalName);
+			}
+		}
+
+		// Process methods - group by name first
+		var methodGroups = flatMembers
+			.Where(m => !m.IsProperty && !m.IsIndexer)
+			.GroupBy(m => m.Name)
+			.ToDictionary(g => g.Key, g => g.ToList());
+
+		foreach (var group in methodGroups)
+		{
+			var methodName = group.Key;
+			var overloads = group.Value;
+
+			// Check if any overload is generic
+			var hasGenericMethods = overloads.Any(m => m.IsGenericMethod);
+
+			if (hasGenericMethods)
+			{
+				// Generic methods use a single base handler with Of<T>() pattern
+				var genericKey = $"method:{methodName}()_generic";
+				var finalName = GetUniqueInterceptorName(methodName, usedNames);
+				nameMap[genericKey] = finalName;
+				usedNames.Add(finalName);
+
+				// Also add entries for each overload (for implementation lookup)
+				foreach (var overload in overloads)
+				{
+					var key = GetMemberKey(overload);
+					nameMap[key] = finalName; // All overloads use same base interceptor name
+				}
+			}
+			else if (overloads.Count == 1)
+			{
+				// Single method - no overload suffix
+				var key = GetMemberKey(overloads[0]);
+				var finalName = GetUniqueInterceptorName(methodName, usedNames);
+				nameMap[key] = finalName;
+				usedNames.Add(finalName);
+			}
+			else
+			{
+				// Multiple overloads - use numbered suffixes
+				for (int i = 0; i < overloads.Count; i++)
+				{
+					var key = GetMemberKey(overloads[i]);
+					var suffix = (i + 1).ToString();
+					var baseName = $"{methodName}{suffix}";
+					var finalName = GetUniqueInterceptorName(baseName, usedNames);
+					nameMap[key] = finalName;
+					usedNames.Add(finalName);
+				}
+			}
+		}
+
+		// Process events
+		foreach (var evt in flatEvents)
+		{
+			var key = $"event:{evt.Name}";
+			var finalName = GetUniqueInterceptorName(evt.Name, usedNames);
+			nameMap[key] = finalName;
+			usedNames.Add(finalName);
+		}
+
+		return nameMap;
+	}
+
+	/// <summary>
+	/// Gets a unique name that doesn't conflict with already used names.
+	/// </summary>
+	private static string GetUniqueInterceptorName(string baseName, HashSet<string> usedNames)
+	{
+		if (!usedNames.Contains(baseName))
+			return baseName;
+
+		int suffix = 2;
+		while (usedNames.Contains($"{baseName}{suffix}"))
+			suffix++;
+
+		return $"{baseName}{suffix}";
+	}
+
+	/// <summary>
+	/// Generate a flat interceptor class for property/indexer with custom name
+	/// </summary>
+	private static void GenerateFlatMemberInterceptorClass(
+		System.Text.StringBuilder sb,
+		InterfaceMemberInfo member,
+		string knockOffClassName,
+		string interceptorName)
+	{
+		var interceptClassName = $"{interceptorName}Interceptor";
+
+		sb.AppendLine($"\t/// <summary>Tracks and configures behavior for {member.Name}.</summary>");
+		sb.AppendLine($"\tpublic sealed class {interceptClassName}");
+		sb.AppendLine("\t{");
+
+		if (member.IsIndexer)
+		{
+			GenerateFlatIndexerInterceptorContent(sb, member, knockOffClassName);
+		}
+		else if (member.IsProperty)
+		{
+			if (member.HasGetter)
+			{
+				sb.AppendLine("\t\t/// <summary>Number of times the getter was accessed.</summary>");
+				sb.AppendLine("\t\tpublic int GetCount { get; private set; }");
+				sb.AppendLine();
+
+				sb.AppendLine("\t\t/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>");
+				sb.AppendLine($"\t\tpublic global::System.Func<{knockOffClassName}, {member.ReturnType}>? OnGet {{ get; set; }}");
+				sb.AppendLine();
+			}
+
+			if (member.HasSetter)
+			{
+				sb.AppendLine("\t\t/// <summary>Number of times the setter was accessed.</summary>");
+				sb.AppendLine("\t\tpublic int SetCount { get; private set; }");
+				sb.AppendLine();
+
+				var nullableType = MakeNullable(member.ReturnType);
+				sb.AppendLine("\t\t/// <summary>The value from the most recent setter call.</summary>");
+				sb.AppendLine($"\t\tpublic {nullableType} LastSetValue {{ get; private set; }}");
+				sb.AppendLine();
+
+				sb.AppendLine("\t\t/// <summary>Callback invoked when the setter is accessed.</summary>");
+				sb.AppendLine($"\t\tpublic global::System.Action<{knockOffClassName}, {member.ReturnType}>? OnSet {{ get; set; }}");
+				sb.AppendLine();
+			}
+
+			if (member.HasGetter)
+			{
+				sb.AppendLine("\t\t/// <summary>Records a getter access.</summary>");
+				sb.AppendLine("\t\tpublic void RecordGet() => GetCount++;");
+				sb.AppendLine();
+			}
+
+			if (member.HasSetter)
+			{
+				var nullableType = MakeNullable(member.ReturnType);
+				sb.AppendLine("\t\t/// <summary>Records a setter access.</summary>");
+				sb.AppendLine($"\t\tpublic void RecordSet({nullableType} value) {{ SetCount++; LastSetValue = value; }}");
+				sb.AppendLine();
+			}
+
+			sb.AppendLine("\t\t/// <summary>Resets all tracking state.</summary>");
+			sb.Append("\t\tpublic void Reset() { ");
+			if (member.HasGetter) sb.Append("GetCount = 0; OnGet = null; ");
+			if (member.HasSetter) sb.Append("SetCount = 0; LastSetValue = default; OnSet = null; ");
+			sb.AppendLine("}");
+		}
+
+		sb.AppendLine("\t}");
+		sb.AppendLine();
+	}
+
+	/// <summary>
+	/// Generate flat indexer interceptor content
+	/// </summary>
+	private static void GenerateFlatIndexerInterceptorContent(
+		System.Text.StringBuilder sb,
+		InterfaceMemberInfo member,
+		string knockOffClassName)
+	{
+		var keyType = member.IndexerParameters.Count > 0
+			? member.IndexerParameters.GetArray()![0].Type
+			: "object";
+		var keyParamName = member.IndexerParameters.Count > 0
+			? member.IndexerParameters.GetArray()![0].Name
+			: "key";
+
+		if (member.HasGetter)
+		{
+			var nullableKeyType = MakeNullable(keyType);
+
+			sb.AppendLine("\t\t/// <summary>Number of times the getter was accessed.</summary>");
+			sb.AppendLine("\t\tpublic int GetCount { get; private set; }");
+			sb.AppendLine();
+
+			sb.AppendLine("\t\t/// <summary>The key from the most recent getter access.</summary>");
+			sb.AppendLine($"\t\tpublic {nullableKeyType} LastGetKey {{ get; private set; }}");
+			sb.AppendLine();
+
+			sb.AppendLine("\t\t/// <summary>Callback invoked when the getter is accessed.</summary>");
+			sb.AppendLine($"\t\tpublic global::System.Func<{knockOffClassName}, {keyType}, {member.ReturnType}>? OnGet {{ get; set; }}");
+			sb.AppendLine();
+		}
+
+		if (member.HasSetter)
+		{
+			var nullableKeyType = MakeNullable(keyType);
+			var nullableValueType = MakeNullable(member.ReturnType);
+
+			sb.AppendLine("\t\t/// <summary>Number of times the setter was accessed.</summary>");
+			sb.AppendLine("\t\tpublic int SetCount { get; private set; }");
+			sb.AppendLine();
+
+			sb.AppendLine("\t\t/// <summary>The key and value from the most recent setter call.</summary>");
+			sb.AppendLine($"\t\tpublic ({nullableKeyType} Key, {nullableValueType} Value)? LastSetEntry {{ get; private set; }}");
+			sb.AppendLine();
+
+			sb.AppendLine("\t\t/// <summary>Callback invoked when the setter is accessed.</summary>");
+			sb.AppendLine($"\t\tpublic global::System.Action<{knockOffClassName}, {keyType}, {member.ReturnType}>? OnSet {{ get; set; }}");
+			sb.AppendLine();
+		}
+
+		if (member.HasGetter)
+		{
+			var nullableKeyType = MakeNullable(keyType);
+			sb.AppendLine("\t\t/// <summary>Records a getter access.</summary>");
+			sb.AppendLine($"\t\tpublic void RecordGet({nullableKeyType} {keyParamName}) {{ GetCount++; LastGetKey = {keyParamName}; }}");
+			sb.AppendLine();
+		}
+
+		if (member.HasSetter)
+		{
+			var nullableKeyType = MakeNullable(keyType);
+			var nullableValueType = MakeNullable(member.ReturnType);
+			sb.AppendLine("\t\t/// <summary>Records a setter access.</summary>");
+			sb.AppendLine($"\t\tpublic void RecordSet({nullableKeyType} {keyParamName}, {nullableValueType} value) {{ SetCount++; LastSetEntry = ({keyParamName}, value); }}");
+			sb.AppendLine();
+		}
+
+		sb.AppendLine("\t\t/// <summary>Resets all tracking state.</summary>");
+		sb.Append("\t\tpublic void Reset() { ");
+		if (member.HasGetter) sb.Append("GetCount = 0; LastGetKey = default; OnGet = null; ");
+		if (member.HasSetter) sb.Append("SetCount = 0; LastSetEntry = null; OnSet = null; ");
+		sb.AppendLine("}");
+	}
+
+	/// <summary>
+	/// Generate flat method group interceptor class (no interface prefix)
+	/// </summary>
+	private static void GenerateFlatMethodGroupInterceptorClass(
+		System.Text.StringBuilder sb,
+		MethodGroupInfo group,
+		string knockOffClassName)
+	{
+		var hasOverloads = group.Overloads.Count > 1;
+
+		if (hasOverloads)
+		{
+			// Generate separate interceptor for each overload
+			for (int i = 0; i < group.Overloads.Count; i++)
+			{
+				var overloadNumber = i + 1;
+				var overload = group.Overloads.GetArray()![i];
+				GenerateFlatSingleMethodInterceptorClass(sb, group.Name, overload, group, knockOffClassName, overloadNumber);
+			}
+		}
+		else
+		{
+			// Single method - no suffix
+			var overload = group.Overloads.GetArray()![0];
+			GenerateFlatSingleMethodInterceptorClass(sb, group.Name, overload, group, knockOffClassName, null);
+		}
+	}
+
+	/// <summary>
+	/// Generate a single method interceptor class
+	/// </summary>
+	private static void GenerateFlatSingleMethodInterceptorClass(
+		System.Text.StringBuilder sb,
+		string methodName,
+		MethodOverloadInfo overload,
+		MethodGroupInfo group,
+		string knockOffClassName,
+		int? overloadNumber)
+	{
+		var suffix = overloadNumber.HasValue ? overloadNumber.Value.ToString() : "";
+		var interceptClassName = $"{methodName}{suffix}Interceptor";
+
+		var isGeneric = overload.IsGenericMethod;
+		var typeParams = overload.TypeParameters;
+
+		sb.AppendLine($"\t/// <summary>Tracks and configures behavior for {methodName}.</summary>");
+
+		if (isGeneric)
+		{
+			var typeParamList = string.Join(", ", typeParams.Select(tp => tp.Name));
+			sb.AppendLine($"\tpublic sealed class {interceptClassName}<{typeParamList}> : IGenericMethodCallTracker, IResettable");
+		}
+		else
+		{
+			sb.AppendLine($"\tpublic sealed class {interceptClassName}");
+		}
+
+		sb.AppendLine("\t{");
+
+		// CallCount
+		sb.AppendLine("\t\t/// <summary>Number of times this method was called.</summary>");
+		sb.AppendLine("\t\tpublic int CallCount { get; private set; }");
+		sb.AppendLine();
+
+		// WasCalled
+		sb.AppendLine("\t\t/// <summary>Whether this method was called at least once.</summary>");
+		sb.AppendLine("\t\tpublic bool WasCalled => CallCount > 0;");
+		sb.AppendLine();
+
+		// LastCallArg/LastCallArgs
+		var paramArray = overload.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+		if (paramArray.Length == 1)
+		{
+			var param = paramArray[0];
+			var nullableType = MakeNullable(param.Type);
+			sb.AppendLine($"\t\t/// <summary>The argument from the most recent call.</summary>");
+			sb.AppendLine($"\t\tpublic {nullableType} LastCallArg {{ get; private set; }}");
+			sb.AppendLine();
+		}
+		else if (paramArray.Length > 1)
+		{
+			var tupleTypes = string.Join(", ", paramArray.Select(p => $"{MakeNullable(p.Type)} {EscapeIdentifier(p.Name)}"));
+			sb.AppendLine($"\t\t/// <summary>The arguments from the most recent call.</summary>");
+			sb.AppendLine($"\t\tpublic ({tupleTypes})? LastCallArgs {{ get; private set; }}");
+			sb.AppendLine();
+		}
+
+		// OnCall delegate
+		GenerateFlatOnCallDelegate(sb, knockOffClassName, overload, group);
+
+		// RecordCall method
+		GenerateFlatRecordCallMethod(sb, overload);
+
+		// Reset method
+		GenerateFlatResetMethod(sb, overload);
+
+		sb.AppendLine("\t}");
+		sb.AppendLine();
+	}
+
+	private static void GenerateFlatOnCallDelegate(
+		System.Text.StringBuilder sb,
+		string knockOffClassName,
+		MethodOverloadInfo overload,
+		MethodGroupInfo group)
+	{
+		var paramArray = overload.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+		var paramTypes = string.Join(", ", paramArray.Select(p => p.Type));
+		var fullParamTypes = paramArray.Length > 0 ? $"{knockOffClassName}, {paramTypes}" : knockOffClassName;
+
+		sb.AppendLine("\t\t/// <summary>Callback invoked when this method is called.</summary>");
+		if (group.IsVoid)
+		{
+			sb.AppendLine($"\t\tpublic global::System.Action<{fullParamTypes}>? OnCall {{ get; set; }}");
+		}
+		else
+		{
+			sb.AppendLine($"\t\tpublic global::System.Func<{fullParamTypes}, {group.ReturnType}>? OnCall {{ get; set; }}");
+		}
+		sb.AppendLine();
+	}
+
+	private static void GenerateFlatRecordCallMethod(System.Text.StringBuilder sb, MethodOverloadInfo overload)
+	{
+		var paramArray = overload.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+
+		sb.AppendLine("\t\t/// <summary>Records a method call.</summary>");
+		if (paramArray.Length == 0)
+		{
+			sb.AppendLine("\t\tpublic void RecordCall() => CallCount++;");
+		}
+		else if (paramArray.Length == 1)
+		{
+			var param = paramArray[0];
+			var nullableType = MakeNullable(param.Type);
+			sb.AppendLine($"\t\tpublic void RecordCall({nullableType} {EscapeIdentifier(param.Name)}) {{ CallCount++; LastCallArg = {EscapeIdentifier(param.Name)}; }}");
+		}
+		else
+		{
+			var paramDecls = string.Join(", ", paramArray.Select(p => $"{MakeNullable(p.Type)} {EscapeIdentifier(p.Name)}"));
+			var tupleAssign = string.Join(", ", paramArray.Select(p => EscapeIdentifier(p.Name)));
+			sb.AppendLine($"\t\tpublic void RecordCall({paramDecls}) {{ CallCount++; LastCallArgs = ({tupleAssign}); }}");
+		}
+		sb.AppendLine();
+	}
+
+	private static void GenerateFlatResetMethod(System.Text.StringBuilder sb, MethodOverloadInfo overload)
+	{
+		var paramArray = overload.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+
+		sb.AppendLine("\t\t/// <summary>Resets all tracking state.</summary>");
+		sb.Append("\t\tpublic void Reset() { CallCount = 0; ");
+		if (paramArray.Length == 1)
+			sb.Append("LastCallArg = default; ");
+		else if (paramArray.Length > 1)
+			sb.Append("LastCallArgs = null; ");
+		sb.AppendLine("OnCall = null; }");
+	}
+
+	/// <summary>
+	/// Generate flat event interceptor class (no interface prefix)
+	/// </summary>
+	private static void GenerateFlatEventInterceptorClass(
+		System.Text.StringBuilder sb,
+		EventMemberInfo evt,
+		string knockOffClassName)
+	{
+		var interceptClassName = $"{evt.Name}Interceptor";
+		// Strip trailing ? from delegate type since we add our own nullable marker
+		var delegateType = evt.FullDelegateTypeName.TrimEnd('?');
+
+		sb.AppendLine($"\t/// <summary>Interceptor for {evt.Name} event.</summary>");
+		sb.AppendLine($"\tpublic sealed class {interceptClassName}");
+		sb.AppendLine("\t{");
+
+		// Backing field for subscribers
+		sb.AppendLine($"\t\tprivate {delegateType}? _handler;");
+		sb.AppendLine();
+
+		// Add/Remove tracking
+		sb.AppendLine("\t\t/// <summary>Number of times event was subscribed to.</summary>");
+		sb.AppendLine("\t\tpublic int AddCount { get; private set; }");
+		sb.AppendLine();
+
+		sb.AppendLine("\t\t/// <summary>Number of times event subscription was removed.</summary>");
+		sb.AppendLine("\t\tpublic int RemoveCount { get; private set; }");
+		sb.AppendLine();
+
+		sb.AppendLine("\t\t/// <summary>Whether any handlers are subscribed.</summary>");
+		sb.AppendLine("\t\tpublic bool HasSubscribers => _handler != null;");
+		sb.AppendLine();
+
+		// RecordAdd/RecordRemove methods
+		sb.AppendLine($"\t\t/// <summary>Records an event subscription.</summary>");
+		sb.AppendLine($"\t\tpublic void RecordAdd({delegateType}? value) {{ AddCount++; _handler = ({delegateType}?)global::System.Delegate.Combine(_handler, value); }}");
+		sb.AppendLine();
+
+		sb.AppendLine($"\t\t/// <summary>Records an event unsubscription.</summary>");
+		sb.AppendLine($"\t\tpublic void RecordRemove({delegateType}? value) {{ RemoveCount++; _handler = ({delegateType}?)global::System.Delegate.Remove(_handler, value); }}");
+		sb.AppendLine();
+
+		// Raise method based on delegate kind
+		GenerateFlatEventRaiseMethod(sb, evt);
+
+		// Reset method
+		sb.AppendLine("\t\t/// <summary>Resets all tracking state.</summary>");
+		sb.AppendLine("\t\tpublic void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }");
+
+		sb.AppendLine("\t}");
+		sb.AppendLine();
+	}
+
+	private static void GenerateFlatEventRaiseMethod(System.Text.StringBuilder sb, EventMemberInfo evt)
+	{
+		var paramArray = evt.DelegateParameters.GetArray() ?? Array.Empty<ParameterInfo>();
+
+		switch (evt.DelegateKind)
+		{
+			case EventDelegateKind.EventHandler:
+				sb.AppendLine("\t\t/// <summary>Raises the event with the specified arguments.</summary>");
+				sb.AppendLine("\t\tpublic void Raise(object? sender, global::System.EventArgs e) => _handler?.Invoke(sender, e);");
+				sb.AppendLine();
+				break;
+
+			case EventDelegateKind.EventHandlerOfT:
+				var eventArgsType = paramArray.Length > 1 ? paramArray[1].Type : "global::System.EventArgs";
+				sb.AppendLine("\t\t/// <summary>Raises the event with the specified arguments.</summary>");
+				sb.AppendLine($"\t\tpublic void Raise(object? sender, {eventArgsType} e) => _handler?.Invoke(sender, e);");
+				sb.AppendLine();
+				break;
+
+			case EventDelegateKind.Action:
+				if (paramArray.Length == 0)
+				{
+					sb.AppendLine("\t\t/// <summary>Raises the event.</summary>");
+					sb.AppendLine("\t\tpublic void Raise() => _handler?.Invoke();");
+				}
+				else
+				{
+					var paramDecls = string.Join(", ", paramArray.Select(p => $"{p.Type} {EscapeIdentifier(p.Name)}"));
+					var paramNames = string.Join(", ", paramArray.Select(p => EscapeIdentifier(p.Name)));
+					sb.AppendLine("\t\t/// <summary>Raises the event with the specified arguments.</summary>");
+					sb.AppendLine($"\t\tpublic void Raise({paramDecls}) => _handler?.Invoke({paramNames});");
+				}
+				sb.AppendLine();
+				break;
+
+			case EventDelegateKind.Func:
+				var funcParamDecls = string.Join(", ", paramArray.Select(p => $"{p.Type} {EscapeIdentifier(p.Name)}"));
+				var funcParamNames = string.Join(", ", paramArray.Select(p => EscapeIdentifier(p.Name)));
+				var returnType = evt.ReturnTypeName ?? "object";
+				sb.AppendLine("\t\t/// <summary>Raises the event with the specified arguments and returns the result.</summary>");
+				sb.AppendLine($"\t\tpublic {returnType} Raise({funcParamDecls}) => _handler != null ? _handler.Invoke({funcParamNames}) : default!;");
+				sb.AppendLine();
+				break;
+
+			case EventDelegateKind.Custom:
+			default:
+				// For custom delegates, generate a generic Raise
+				if (paramArray.Length == 0)
+				{
+					sb.AppendLine("\t\t/// <summary>Raises the event.</summary>");
+					sb.AppendLine("\t\tpublic void Raise() => (_handler as global::System.Action)?.Invoke();");
+				}
+				else
+				{
+					var customParamDecls = string.Join(", ", paramArray.Select(p => $"{p.Type} {EscapeIdentifier(p.Name)}"));
+					var customParamNames = string.Join(", ", paramArray.Select(p => EscapeIdentifier(p.Name)));
+					sb.AppendLine("\t\t/// <summary>Invokes the handler if subscribed.</summary>");
+					sb.AppendLine($"\t\tpublic void Raise({customParamDecls}) => _handler?.DynamicInvoke({customParamNames});");
+				}
+				sb.AppendLine();
+				break;
+		}
+	}
+
+	/// <summary>
+	/// Generate flat backing property (no interface prefix)
+	/// </summary>
+	private static void GenerateFlatBackingProperty(System.Text.StringBuilder sb, InterfaceMemberInfo member)
+	{
+		var backingName = $"{member.Name}Backing";
+		var defaultValue = GetDefaultValueForProperty(member);
+
+		sb.AppendLine($"\t/// <summary>Backing storage for {member.Name}.</summary>");
+		sb.AppendLine($"\tprotected {member.ReturnType} {backingName} {{ get; set; }}{defaultValue}");
+		sb.AppendLine();
+	}
+
+	/// <summary>
+	/// Generate flat indexer backing dictionary (no interface prefix)
+	/// </summary>
+	private static void GenerateFlatIndexerBackingDictionary(System.Text.StringBuilder sb, InterfaceMemberInfo member)
+	{
+		var keyType = member.IndexerParameters.Count > 0
+			? member.IndexerParameters.GetArray()![0].Type
+			: "object";
+		var backingName = $"{member.Name}Backing";
+
+		sb.AppendLine($"\t/// <summary>Backing storage for {member.Name} indexer.</summary>");
+		sb.AppendLine($"\tpublic global::System.Collections.Generic.Dictionary<{keyType}, {member.ReturnType}> {backingName} {{ get; }} = new();");
+		sb.AppendLine();
+	}
+
+	/// <summary>
+	/// Generate flat property explicit interface implementation
+	/// </summary>
+	private static void GenerateFlatPropertyImplementation(System.Text.StringBuilder sb, InterfaceMemberInfo member)
+	{
+		var ifaceName = member.DeclaringInterfaceFullName;
+		var backingName = $"{member.Name}Backing";
+		var interceptorName = member.Name;
+
+		sb.AppendLine($"\t{member.ReturnType} {ifaceName}.{member.Name}");
+		sb.AppendLine("\t{");
+
+		if (member.HasGetter)
+		{
+			sb.AppendLine($"\t\tget {{ {interceptorName}.RecordGet(); return {interceptorName}.OnGet?.Invoke(this) ?? {backingName}; }}");
+		}
+
+		if (member.HasSetter)
+		{
+			sb.AppendLine($"\t\tset {{ {interceptorName}.RecordSet(value); if ({interceptorName}.OnSet != null) {interceptorName}.OnSet(this, value); else {backingName} = value; }}");
+		}
+
+		sb.AppendLine("\t}");
+		sb.AppendLine();
+	}
+
+	/// <summary>
+	/// Generate flat indexer explicit interface implementation
+	/// </summary>
+	private static void GenerateFlatIndexerImplementation(System.Text.StringBuilder sb, InterfaceMemberInfo member)
+	{
+		var ifaceName = member.DeclaringInterfaceFullName;
+		var backingName = $"{member.Name}Backing";
+		var interceptorName = member.Name;
+
+		var keyType = member.IndexerParameters.Count > 0
+			? member.IndexerParameters.GetArray()![0].Type
+			: "object";
+		var keyParam = member.IndexerParameters.Count > 0
+			? member.IndexerParameters.GetArray()![0].Name
+			: "key";
+
+		sb.AppendLine($"\t{member.ReturnType} {ifaceName}.this[{keyType} {keyParam}]");
+		sb.AppendLine("\t{");
+
+		if (member.HasGetter)
+		{
+			var defaultExpr = member.IsNullable ? "default" : GetDefaultForType(member.ReturnType, member.DefaultStrategy, member.ConcreteTypeForNew);
+			sb.AppendLine($"\t\tget {{ {interceptorName}.RecordGet({keyParam}); if ({interceptorName}.OnGet != null) return {interceptorName}.OnGet(this, {keyParam}); return {backingName}.TryGetValue({keyParam}, out var v) ? v : {defaultExpr}; }}");
+		}
+
+		if (member.HasSetter)
+		{
+			sb.AppendLine($"\t\tset {{ {interceptorName}.RecordSet({keyParam}, value); if ({interceptorName}.OnSet != null) {interceptorName}.OnSet(this, {keyParam}, value); else {backingName}[{keyParam}] = value; }}");
+		}
+
+		sb.AppendLine("\t}");
+		sb.AppendLine();
+	}
+
+	/// <summary>
+	/// Generate flat method explicit interface implementation
+	/// </summary>
+	private static void GenerateFlatMethodImplementation(
+		System.Text.StringBuilder sb,
+		InterfaceMemberInfo member,
+		KnockOffTypeInfo typeInfo,
+		MethodGroupInfo group)
+	{
+		var ifaceName = member.DeclaringInterfaceFullName;
+		var hasOverloads = group.Overloads.Count > 1;
+
+		// Find which overload this member corresponds to
+		int overloadIndex = FindOverloadIndex(member, group);
+		var suffix = hasOverloads ? (overloadIndex + 1).ToString() : "";
+		var interceptorName = $"{member.Name}{suffix}";
+
+		var paramArray = member.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+		var paramDecls = string.Join(", ", paramArray.Select(p => $"{p.Type} {EscapeIdentifier(p.Name)}"));
+		var paramNames = string.Join(", ", paramArray.Select(p => EscapeIdentifier(p.Name)));
+
+		// Handle generic methods
+		var typeParamDecl = "";
+		var typeParamList = "";
+		if (member.IsGenericMethod && member.TypeParameters.Count > 0)
+		{
+			var tpArray = member.TypeParameters.GetArray() ?? Array.Empty<TypeParameterInfo>();
+			typeParamDecl = $"<{string.Join(", ", tpArray.Select(tp => tp.Name))}>";
+			typeParamList = typeParamDecl;
+		}
+
+		var returnType = member.ReturnType;
+		var isVoid = returnType == "void";
+
+		sb.AppendLine($"\t{returnType} {ifaceName}.{member.Name}{typeParamDecl}({paramDecls})");
+		sb.AppendLine("\t{");
+
+		// Record the call
+		var recordArgs = paramNames.Length > 0 ? paramNames : "";
+		sb.AppendLine($"\t\t{interceptorName}{typeParamList}.RecordCall({recordArgs});");
+
+		// Check for user-defined method
+		var userMethod = FindUserMethod(typeInfo.UserMethods, member);
+		var onCallArgs = paramNames.Length > 0 ? $"this, {paramNames}" : "this";
+
+		if (userMethod != null)
+		{
+			// OnCall callback takes priority, then user method
+			var userMethodCall = $"{member.Name}({paramNames})";
+			if (isVoid)
+			{
+				sb.AppendLine($"\t\tif ({interceptorName}{typeParamList}.OnCall != null) {{ {interceptorName}{typeParamList}.OnCall({onCallArgs}); return; }}");
+				sb.AppendLine($"\t\t{userMethodCall};");
+			}
+			else
+			{
+				sb.AppendLine($"\t\tif ({interceptorName}{typeParamList}.OnCall != null) return {interceptorName}{typeParamList}.OnCall({onCallArgs});");
+				sb.AppendLine($"\t\treturn {userMethodCall};");
+			}
+		}
+		else
+		{
+			// Use OnCall callback or default
+			if (isVoid)
+			{
+				sb.AppendLine($"\t\t{interceptorName}{typeParamList}.OnCall?.Invoke({onCallArgs});");
+			}
+			else if (member.DefaultStrategy == DefaultValueStrategy.ThrowException)
+			{
+				// Non-nullable type without parameterless constructor - must throw
+				sb.AppendLine($"\t\tif ({interceptorName}{typeParamList}.OnCall is {{ }} callback)");
+				sb.AppendLine($"\t\t\treturn callback({onCallArgs});");
+				sb.AppendLine($"\t\tthrow new global::System.InvalidOperationException(\"No implementation provided for {member.Name}. Set {interceptorName}.OnCall or define a protected method '{member.Name}' in your partial class.\");");
+			}
+			else
+			{
+				var defaultExpr = GetDefaultForType(returnType, member.DefaultStrategy, member.ConcreteTypeForNew);
+				sb.AppendLine($"\t\treturn {interceptorName}{typeParamList}.OnCall?.Invoke({onCallArgs}) ?? {defaultExpr};");
+			}
+		}
+
+		sb.AppendLine("\t}");
+		sb.AppendLine();
+	}
+
+	/// <summary>
+	/// Generate flat event explicit interface implementation
+	/// </summary>
+	private static void GenerateFlatEventImplementation(System.Text.StringBuilder sb, EventMemberInfo evt)
+	{
+		var ifaceName = evt.DeclaringInterfaceFullName;
+		// Property name is the event name (matches property generation above)
+		var propertyName = evt.Name;
+		// Strip trailing ? from delegate type since we add our own nullable marker
+		var delegateType = evt.FullDelegateTypeName.TrimEnd('?');
+
+		sb.AppendLine($"\tevent {delegateType}? {ifaceName}.{evt.Name}");
+		sb.AppendLine("\t{");
+		sb.AppendLine($"\t\tadd => {propertyName}.RecordAdd(value);");
+		sb.AppendLine($"\t\tremove => {propertyName}.RecordRemove(value);");
+		sb.AppendLine("\t}");
+		sb.AppendLine();
+	}
+
+	// ===== WithName versions for flat API =====
+
+	/// <summary>
+	/// Generate flat backing property with custom name
+	/// </summary>
+	private static void GenerateFlatBackingProperty(System.Text.StringBuilder sb, InterfaceMemberInfo member, string interceptorName)
+	{
+		var backingName = $"{interceptorName}Backing";
+		var defaultValue = GetDefaultValueForProperty(member);
+
+		sb.AppendLine($"\t/// <summary>Backing storage for {member.Name}.</summary>");
+		sb.AppendLine($"\tprotected {member.ReturnType} {backingName} {{ get; set; }}{defaultValue}");
+		sb.AppendLine();
+	}
+
+	/// <summary>
+	/// Generate flat indexer backing dictionary with custom name
+	/// </summary>
+	private static void GenerateFlatIndexerBackingDictionary(System.Text.StringBuilder sb, InterfaceMemberInfo member, string interceptorName)
+	{
+		var keyType = member.IndexerParameters.Count > 0
+			? member.IndexerParameters.GetArray()![0].Type
+			: "object";
+		var backingName = $"{interceptorName}Backing";
+
+		sb.AppendLine($"\t/// <summary>Backing storage for {member.Name} indexer.</summary>");
+		sb.AppendLine($"\tpublic global::System.Collections.Generic.Dictionary<{keyType}, {member.ReturnType}> {backingName} {{ get; }} = new();");
+		sb.AppendLine();
+	}
+
+	/// <summary>
+	/// Generate flat property explicit interface implementation with custom name
+	/// </summary>
+	private static void GenerateFlatPropertyImplementationWithName(System.Text.StringBuilder sb, InterfaceMemberInfo member, string interceptorName)
+	{
+		var ifaceName = member.DeclaringInterfaceFullName;
+		var backingName = $"{interceptorName}Backing";
+
+		sb.AppendLine($"\t{member.ReturnType} {ifaceName}.{member.Name}");
+		sb.AppendLine("\t{");
+
+		if (member.HasGetter)
+		{
+			sb.AppendLine($"\t\tget {{ {interceptorName}.RecordGet(); return {interceptorName}.OnGet?.Invoke(this) ?? {backingName}; }}");
+		}
+
+		if (member.HasSetter)
+		{
+			sb.AppendLine($"\t\tset {{ {interceptorName}.RecordSet(value); if ({interceptorName}.OnSet != null) {interceptorName}.OnSet(this, value); else {backingName} = value; }}");
+		}
+
+		sb.AppendLine("\t}");
+		sb.AppendLine();
+	}
+
+	/// <summary>
+	/// Generate flat indexer explicit interface implementation with custom name
+	/// </summary>
+	private static void GenerateFlatIndexerImplementationWithName(System.Text.StringBuilder sb, InterfaceMemberInfo member, string interceptorName)
+	{
+		var ifaceName = member.DeclaringInterfaceFullName;
+		var backingName = $"{interceptorName}Backing";
+
+		var keyType = member.IndexerParameters.Count > 0
+			? member.IndexerParameters.GetArray()![0].Type
+			: "object";
+		var keyParam = member.IndexerParameters.Count > 0
+			? member.IndexerParameters.GetArray()![0].Name
+			: "key";
+
+		sb.AppendLine($"\t{member.ReturnType} {ifaceName}.this[{keyType} {keyParam}]");
+		sb.AppendLine("\t{");
+
+		if (member.HasGetter)
+		{
+			var defaultExpr = member.IsNullable ? "default" : GetDefaultForType(member.ReturnType, member.DefaultStrategy, member.ConcreteTypeForNew);
+			sb.AppendLine($"\t\tget {{ {interceptorName}.RecordGet({keyParam}); if ({interceptorName}.OnGet != null) return {interceptorName}.OnGet(this, {keyParam}); return {backingName}.TryGetValue({keyParam}, out var v) ? v : {defaultExpr}; }}");
+		}
+
+		if (member.HasSetter)
+		{
+			sb.AppendLine($"\t\tset {{ {interceptorName}.RecordSet({keyParam}, value); if ({interceptorName}.OnSet != null) {interceptorName}.OnSet(this, {keyParam}, value); else {backingName}[{keyParam}] = value; }}");
+		}
+
+		sb.AppendLine("\t}");
+		sb.AppendLine();
+	}
+
+	/// <summary>
+	/// Generate flat method explicit interface implementation with name from map
+	/// </summary>
+	private static void GenerateFlatMethodImplementationWithName(
+		System.Text.StringBuilder sb,
+		InterfaceMemberInfo member,
+		KnockOffTypeInfo typeInfo,
+		MethodGroupInfo group,
+		Dictionary<string, string> flatNameMap)
+	{
+		var ifaceName = member.DeclaringInterfaceFullName;
+		var key = GetMemberKey(member);
+		var interceptorName = flatNameMap[key];
+
+		var paramArray = member.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+		var paramDecls = string.Join(", ", paramArray.Select(p => FormatParameterWithRefKind(p)));
+		var paramNames = string.Join(", ", paramArray.Select(p => FormatParameterNameWithRefKind(p)));
+
+		// Handle generic methods
+		var typeParamDecl = "";
+		var ofTypeAccess = "";
+		if (member.IsGenericMethod && member.TypeParameters.Count > 0)
+		{
+			var tpArray = member.TypeParameters.GetArray() ?? Array.Empty<TypeParameterInfo>();
+			var typeParamNames = string.Join(", ", tpArray.Select(tp => tp.Name));
+			typeParamDecl = $"<{typeParamNames}>";
+			// Generic methods use .Of<T>() pattern
+			ofTypeAccess = $".Of<{typeParamNames}>()";
+		}
+
+		var returnType = member.ReturnType;
+		var isVoid = returnType == "void";
+
+		// NOTE: Constraints are NOT allowed on explicit interface implementations (CS0460)
+		// Constraints are inherited from the interface declaration
+
+		// For T? return types with class constraints, we must use [return: MaybeNull] T instead of T?
+		// because C# doesn't properly infer class constraints for nullable type parameters in explicit implementations
+		var maybeNullAttr = "";
+		var effectiveReturnType = returnType;
+		if (member.IsGenericMethod && returnType.EndsWith("?"))
+		{
+			var tpArray = member.TypeParameters.GetArray() ?? Array.Empty<TypeParameterInfo>();
+			var baseReturnType = returnType.TrimEnd('?');
+			var matchingTp = tpArray.FirstOrDefault(tp => tp.Name == baseReturnType);
+			if (matchingTp != null)
+			{
+				var constraints = matchingTp.Constraints.GetArray() ?? Array.Empty<string>();
+				if (constraints.Contains("class"))
+				{
+					// Use [return: MaybeNull] attribute instead of T?
+					maybeNullAttr = "[return: global::System.Diagnostics.CodeAnalysis.MaybeNull] ";
+					effectiveReturnType = baseReturnType;
+				}
+			}
+		}
+
+		sb.AppendLine($"\t{maybeNullAttr}{effectiveReturnType} {ifaceName}.{member.Name}{typeParamDecl}({paramDecls})");
+		sb.AppendLine("\t{");
+
+		// Initialize out parameters
+		foreach (var p in paramArray.Where(p => p.RefKind == RefKind.Out))
+		{
+			sb.AppendLine($"\t\t{EscapeIdentifier(p.Name)} = default!;");
+		}
+
+		// Build the interceptor access expression (with .Of<T>() for generic methods)
+		var interceptorAccess = $"{interceptorName}{ofTypeAccess}";
+
+		// For generic methods, only record non-generic parameters
+		ParameterInfo[] recordParams;
+		if (member.IsGenericMethod && member.TypeParameters.Count > 0)
+		{
+			var tpArray = member.TypeParameters.GetArray() ?? Array.Empty<TypeParameterInfo>();
+			recordParams = paramArray
+				.Where(p => p.RefKind != RefKind.Out)
+				.Where(p => !tpArray.Any(tp => p.Type.Contains(tp.Name)))
+				.ToArray();
+		}
+		else
+		{
+			recordParams = paramArray.Where(p => p.RefKind != RefKind.Out).ToArray();
+		}
+
+		var recordArgs = recordParams.Length > 0
+			? string.Join(", ", recordParams.Select(p => EscapeIdentifier(p.Name)))
+			: "";
+		sb.AppendLine($"\t\t{interceptorAccess}.RecordCall({recordArgs});");
+
+		// Check for user-defined method
+		var userMethod = FindUserMethod(typeInfo.UserMethods, member);
+		var hasRefOrOut = paramArray.Any(p => p.RefKind == RefKind.Ref || p.RefKind == RefKind.Out);
+		var onCallArgs = hasRefOrOut
+			? "this, " + string.Join(", ", paramArray.Select(p => FormatParameterNameWithRefKind(p)))
+			: (paramArray.Length > 0 ? $"this, {string.Join(", ", paramArray.Select(p => EscapeIdentifier(p.Name)))}" : "this");
+
+		if (userMethod != null)
+		{
+			// OnCall callback takes priority, then user method
+			var userMethodCall = $"{member.Name}({paramNames})";
+			if (isVoid)
+			{
+				sb.AppendLine($"\t\tif ({interceptorAccess}.OnCall != null) {{ {interceptorAccess}.OnCall({onCallArgs}); return; }}");
+				sb.AppendLine($"\t\t{userMethodCall};");
+			}
+			else
+			{
+				sb.AppendLine($"\t\tif ({interceptorAccess}.OnCall != null) return {interceptorAccess}.OnCall({onCallArgs});");
+				sb.AppendLine($"\t\treturn {userMethodCall};");
+			}
+		}
+		else
+		{
+			// Check for OnCall callback
+			if (hasRefOrOut)
+			{
+				// For ref/out methods, we need to call the delegate and then return
+				if (isVoid)
+				{
+					sb.AppendLine($"\t\tif ({interceptorAccess}.OnCall is {{ }} onCallCallback)");
+					sb.AppendLine($"\t\t{{ onCallCallback({onCallArgs}); return; }}");
+				}
+				else
+				{
+					sb.AppendLine($"\t\tif ({interceptorAccess}.OnCall is {{ }} onCallCallback)");
+					sb.AppendLine($"\t\t\treturn onCallCallback({onCallArgs});");
+					if (member.IsGenericMethod && member.IsNullable)
+					{
+						sb.AppendLine($"\t\treturn default!;");
+					}
+					else if (member.IsGenericMethod)
+					{
+						var defaultExpr = "SmartDefault<" + returnType.TrimEnd('?') + $">(\"{member.Name}\")";
+						sb.AppendLine($"\t\treturn {defaultExpr};");
+					}
+					else if (member.DefaultStrategy == DefaultValueStrategy.ThrowException)
+					{
+						sb.AppendLine($"\t\tthrow new global::System.InvalidOperationException(\"No implementation provided for {member.Name}. Set {interceptorAccess}.OnCall or define a protected method '{member.Name}' in your partial class.\");");
+					}
+					else
+					{
+						var defaultExpr = GetDefaultForType(returnType, member.DefaultStrategy, member.ConcreteTypeForNew);
+						sb.AppendLine($"\t\treturn {defaultExpr};");
+					}
+				}
+			}
+			else
+			{
+				// Standard invocation
+				if (isVoid)
+				{
+					sb.AppendLine($"\t\t{interceptorAccess}.OnCall?.Invoke({onCallArgs});");
+				}
+				else if (member.IsGenericMethod)
+				{
+					// For generic methods, check nullability first, then use SmartDefault
+					sb.AppendLine($"\t\tif ({interceptorAccess}.OnCall is {{ }} callback)");
+					sb.AppendLine($"\t\t\treturn callback({onCallArgs});");
+					if (member.IsNullable)
+					{
+						// Nullable generic return - return default (null)
+						sb.AppendLine($"\t\treturn default!;");
+					}
+					else
+					{
+						var defaultExpr = "SmartDefault<" + returnType.TrimEnd('?') + $">(\"{member.Name}\")";
+						sb.AppendLine($"\t\treturn {defaultExpr};");
+					}
+				}
+				else if (member.DefaultStrategy == DefaultValueStrategy.ThrowException)
+				{
+					// Non-nullable type without parameterless constructor - must throw
+					sb.AppendLine($"\t\tif ({interceptorAccess}.OnCall is {{ }} callback)");
+					sb.AppendLine($"\t\t\treturn callback({onCallArgs});");
+					sb.AppendLine($"\t\tthrow new global::System.InvalidOperationException(\"No implementation provided for {member.Name}. Set {interceptorAccess}.OnCall or define a protected method '{member.Name}' in your partial class.\");");
+				}
+				else
+				{
+					var defaultExpr = GetDefaultForType(returnType, member.DefaultStrategy, member.ConcreteTypeForNew);
+					sb.AppendLine($"\t\treturn {interceptorAccess}.OnCall?.Invoke({onCallArgs}) ?? {defaultExpr};");
+				}
+			}
+		}
+
+		sb.AppendLine("\t}");
+		sb.AppendLine();
+	}
+
+	/// <summary>
+	/// Generate flat event explicit interface implementation with custom name
+	/// </summary>
+	private static void GenerateFlatEventImplementationWithName(System.Text.StringBuilder sb, EventMemberInfo evt, string interceptorName)
+	{
+		var ifaceName = evt.DeclaringInterfaceFullName;
+		// Strip trailing ? from delegate type since we add our own nullable marker
+		var delegateType = evt.FullDelegateTypeName.TrimEnd('?');
+
+		sb.AppendLine($"\tevent {delegateType}? {ifaceName}.{evt.Name}");
+		sb.AppendLine("\t{");
+		sb.AppendLine($"\t\tadd => {interceptorName}.RecordAdd(value);");
+		sb.AppendLine($"\t\tremove => {interceptorName}.RecordRemove(value);");
+		sb.AppendLine("\t}");
+		sb.AppendLine();
+	}
+
+	/// <summary>
+	/// Generate flat method group interceptor classes using name map
+	/// </summary>
+	private static void GenerateFlatMethodGroupInterceptorClassWithNames(
+		System.Text.StringBuilder sb,
+		MethodGroupInfo group,
+		string knockOffClassName,
+		Dictionary<string, string> flatNameMap)
+	{
+		var overloads = group.Overloads.GetArray() ?? Array.Empty<MethodOverloadInfo>();
+
+		foreach (var overload in overloads)
+		{
+			// Build a key from this overload to find its name in the map
+			var paramTypes = string.Join(",", overload.Parameters.Select(p => p.Type));
+			var key = $"method:{group.Name}({paramTypes})";
+			var interceptorName = flatNameMap[key];
+
+			GenerateFlatSingleMethodInterceptorClassWithName(sb, group.Name, overload, group, knockOffClassName, interceptorName);
+		}
+	}
+
+	/// <summary>
+	/// Generate a single method interceptor class with custom name
+	/// </summary>
+	private static void GenerateFlatSingleMethodInterceptorClassWithName(
+		System.Text.StringBuilder sb,
+		string methodName,
+		MethodOverloadInfo overload,
+		MethodGroupInfo group,
+		string knockOffClassName,
+		string interceptorName)
+	{
+		var interceptClassName = $"{interceptorName}Interceptor";
+
+		var isGeneric = overload.IsGenericMethod;
+		var typeParams = overload.TypeParameters;
+
+		sb.AppendLine($"\t/// <summary>Tracks and configures behavior for {methodName}.</summary>");
+
+		if (isGeneric)
+		{
+			var typeParamList = string.Join(", ", typeParams.Select(tp => tp.Name));
+			sb.AppendLine($"\tpublic sealed class {interceptClassName}<{typeParamList}> : IGenericMethodCallTracker, IResettable");
+		}
+		else
+		{
+			sb.AppendLine($"\tpublic sealed class {interceptClassName}");
+		}
+
+		sb.AppendLine("\t{");
+
+		// Generate delegate for methods with out/ref parameters
+		var paramArray = overload.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+		var hasRefOrOut = paramArray.Any(p => p.RefKind == RefKind.Ref || p.RefKind == RefKind.Out);
+
+		if (hasRefOrOut || !group.IsVoid)
+		{
+			// Generate delegate type
+			var delegateParams = new List<string> { $"{knockOffClassName} ko" };
+			foreach (var p in paramArray)
+			{
+				delegateParams.Add(FormatParameterWithRefKind(p));
+			}
+			var delegateParamList = string.Join(", ", delegateParams);
+
+			sb.AppendLine($"\t\t/// <summary>Delegate for {methodName}.</summary>");
+			if (group.IsVoid)
+			{
+				sb.AppendLine($"\t\tpublic delegate void {methodName}Delegate({delegateParamList});");
+			}
+			else
+			{
+				sb.AppendLine($"\t\tpublic delegate {group.ReturnType} {methodName}Delegate({delegateParamList});");
+			}
+			sb.AppendLine();
+		}
+
+		// CallCount
+		sb.AppendLine("\t\t/// <summary>Number of times this method was called.</summary>");
+		sb.AppendLine("\t\tpublic int CallCount { get; private set; }");
+		sb.AppendLine();
+
+		// WasCalled
+		sb.AppendLine("\t\t/// <summary>Whether this method was called at least once.</summary>");
+		sb.AppendLine("\t\tpublic bool WasCalled => CallCount > 0;");
+		sb.AppendLine();
+
+		// LastCallArg/LastCallArgs - only track non-out parameters
+		var trackableParams = paramArray.Where(p => p.RefKind != RefKind.Out).ToArray();
+		if (trackableParams.Length == 1)
+		{
+			var param = trackableParams[0];
+			var nullableType = MakeNullable(param.Type);
+			sb.AppendLine($"\t\t/// <summary>The argument from the most recent call.</summary>");
+			sb.AppendLine($"\t\tpublic {nullableType} LastCallArg {{ get; private set; }}");
+			sb.AppendLine();
+		}
+		else if (trackableParams.Length > 1)
+		{
+			var tupleTypes = string.Join(", ", trackableParams.Select(p => $"{MakeNullable(p.Type)} {EscapeIdentifier(p.Name)}"));
+			sb.AppendLine($"\t\t/// <summary>The arguments from the most recent call.</summary>");
+			sb.AppendLine($"\t\tpublic ({tupleTypes})? LastCallArgs {{ get; private set; }}");
+			sb.AppendLine();
+		}
+
+		// OnCall
+		sb.AppendLine("\t\t/// <summary>Callback invoked when this method is called.</summary>");
+		if (hasRefOrOut || !group.IsVoid)
+		{
+			sb.AppendLine($"\t\tpublic {methodName}Delegate? OnCall {{ get; set; }}");
+		}
+		else if (paramArray.Length == 0)
+		{
+			sb.AppendLine($"\t\tpublic global::System.Action<{knockOffClassName}>? OnCall {{ get; set; }}");
+		}
+		else
+		{
+			var paramTypes = string.Join(", ", paramArray.Select(p => p.Type));
+			sb.AppendLine($"\t\tpublic global::System.Action<{knockOffClassName}, {paramTypes}>? OnCall {{ get; set; }}");
+		}
+		sb.AppendLine();
+
+		// RecordCall method - only record non-out parameters
+		sb.AppendLine("\t\t/// <summary>Records a method call.</summary>");
+		if (trackableParams.Length == 0)
+		{
+			sb.AppendLine("\t\tpublic void RecordCall() => CallCount++;");
+		}
+		else if (trackableParams.Length == 1)
+		{
+			var param = trackableParams[0];
+			var nullableType = MakeNullable(param.Type);
+			sb.AppendLine($"\t\tpublic void RecordCall({nullableType} {EscapeIdentifier(param.Name)}) {{ CallCount++; LastCallArg = {EscapeIdentifier(param.Name)}; }}");
+		}
+		else
+		{
+			var paramDecls = string.Join(", ", trackableParams.Select(p => $"{MakeNullable(p.Type)} {EscapeIdentifier(p.Name)}"));
+			var tupleAssign = string.Join(", ", trackableParams.Select(p => EscapeIdentifier(p.Name)));
+			sb.AppendLine($"\t\tpublic void RecordCall({paramDecls}) {{ CallCount++; LastCallArgs = ({tupleAssign}); }}");
+		}
+		sb.AppendLine();
+
+		// Reset method
+		sb.AppendLine("\t\t/// <summary>Resets all tracking state.</summary>");
+		sb.Append("\t\tpublic void Reset() { CallCount = 0; ");
+		if (trackableParams.Length == 1)
+			sb.Append("LastCallArg = default; ");
+		else if (trackableParams.Length > 1)
+			sb.Append("LastCallArgs = null; ");
+		sb.AppendLine("OnCall = null; }");
+
+		sb.AppendLine("\t}");
+		sb.AppendLine();
+	}
+
+	/// <summary>
+	/// Generate flat event interceptor class with custom name
+	/// </summary>
+	private static void GenerateFlatEventInterceptorClassWithName(
+		System.Text.StringBuilder sb,
+		EventMemberInfo evt,
+		string knockOffClassName,
+		string interceptorName)
+	{
+		var interceptClassName = $"{interceptorName}Interceptor";
+		// Strip trailing ? from delegate type since we add our own nullable marker
+		var delegateType = evt.FullDelegateTypeName.TrimEnd('?');
+
+		sb.AppendLine($"\t/// <summary>Interceptor for {evt.Name} event.</summary>");
+		sb.AppendLine($"\tpublic sealed class {interceptClassName}");
+		sb.AppendLine("\t{");
+
+		// Backing field for subscribers
+		sb.AppendLine($"\t\tprivate {delegateType}? _handler;");
+		sb.AppendLine();
+
+		// Add/Remove tracking
+		sb.AppendLine("\t\t/// <summary>Number of times event was subscribed to.</summary>");
+		sb.AppendLine("\t\tpublic int AddCount { get; private set; }");
+		sb.AppendLine();
+
+		sb.AppendLine("\t\t/// <summary>Number of times event subscription was removed.</summary>");
+		sb.AppendLine("\t\tpublic int RemoveCount { get; private set; }");
+		sb.AppendLine();
+
+		sb.AppendLine("\t\t/// <summary>Whether any handlers are subscribed.</summary>");
+		sb.AppendLine("\t\tpublic bool HasSubscribers => _handler != null;");
+		sb.AppendLine();
+
+		// RecordAdd/RecordRemove methods
+		sb.AppendLine($"\t\t/// <summary>Records an event subscription.</summary>");
+		sb.AppendLine($"\t\tpublic void RecordAdd({delegateType}? value) {{ AddCount++; _handler = ({delegateType}?)global::System.Delegate.Combine(_handler, value); }}");
+		sb.AppendLine();
+
+		sb.AppendLine($"\t\t/// <summary>Records an event unsubscription.</summary>");
+		sb.AppendLine($"\t\tpublic void RecordRemove({delegateType}? value) {{ RemoveCount++; _handler = ({delegateType}?)global::System.Delegate.Remove(_handler, value); }}");
+		sb.AppendLine();
+
+		// Raise method based on delegate kind
+		GenerateFlatEventRaiseMethod(sb, evt);
+
+		// Reset method
+		sb.AppendLine("\t\t/// <summary>Resets all tracking state.</summary>");
+		sb.AppendLine("\t\tpublic void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }");
+
+		sb.AppendLine("\t}");
+		sb.AppendLine();
+	}
+
+	/// <summary>
+	/// Generate flat interceptor properties for method groups
+	/// </summary>
+	private static void GenerateFlatMethodGroupInterceptorProperties(
+		System.Text.StringBuilder sb,
+		MethodGroupInfo group,
+		Dictionary<string, string> flatNameMap)
+	{
+		var overloads = group.Overloads.GetArray() ?? Array.Empty<MethodOverloadInfo>();
+
+		foreach (var overload in overloads)
+		{
+			var paramTypes = string.Join(",", overload.Parameters.Select(p => p.Type));
+			var key = $"method:{group.Name}({paramTypes})";
+			var interceptorName = flatNameMap[key];
+
+			sb.AppendLine($"\t/// <summary>Interceptor for {group.Name}.</summary>");
+			sb.AppendLine($"\tpublic {interceptorName}Interceptor {interceptorName} {{ get; }} = new();");
+			sb.AppendLine();
+		}
+	}
+
+	/// <summary>
+	/// Generate flat generic method handler with Of&lt;T&gt;() pattern
+	/// </summary>
+	private static void GenerateFlatGenericMethodHandler(
+		System.Text.StringBuilder sb,
+		MethodGroupInfo group,
+		string knockOffClassName,
+		Dictionary<string, string> flatNameMap)
+	{
+		// Get interceptor name for this generic method group
+		var genericKey = $"method:{group.Name}()_generic";
+		var interceptorName = flatNameMap[genericKey];
+		var interceptClassName = $"{interceptorName}Interceptor";
+
+		// Get type parameters from the first generic overload
+		var genericOverload = group.Overloads.First(o => o.IsGenericMethod);
+		var typeParams = genericOverload.TypeParameters.GetArray() ?? Array.Empty<TypeParameterInfo>();
+		var typeParamNames = string.Join(", ", typeParams.Select(tp => tp.Name));
+		var constraintClauses = GetConstraintClauses(typeParams);
+
+		// Determine key type based on type parameter count
+		var keyType = typeParams.Length == 1
+			? "global::System.Type"
+			: $"({string.Join(", ", typeParams.Select(_ => "global::System.Type"))})";
+
+		var keyConstruction = typeParams.Length == 1
+			? "typeof(T)"
+			: $"({string.Join(", ", typeParams.Select(tp => $"typeof({tp.Name})"))})";
+
+		var methodName = group.Name;
+		var nonGenericParams = (genericOverload.Parameters.GetArray() ?? Array.Empty<ParameterInfo>())
+			.Where(p => !typeParams.Any(tp => p.Type.Contains(tp.Name)))
+			.ToArray();
+
+		sb.AppendLine($"\t/// <summary>Interceptor for {methodName} (generic method with Of&lt;T&gt;() access).</summary>");
+		sb.AppendLine($"\tpublic sealed class {interceptClassName}");
+		sb.AppendLine("\t{");
+
+		// Base Handler: Dictionary + Of<T>() + aggregate tracking
+		sb.AppendLine($"\t\tprivate readonly global::System.Collections.Generic.Dictionary<{keyType}, object> _typedHandlers = new();");
+		sb.AppendLine();
+
+		// Of<T>() method
+		sb.AppendLine($"\t\t/// <summary>Gets the typed handler for the specified type argument(s).</summary>");
+		sb.AppendLine($"\t\tpublic {methodName}TypedHandler<{typeParamNames}> Of<{typeParamNames}>(){constraintClauses}");
+		sb.AppendLine("\t\t{");
+		sb.AppendLine($"\t\t\tvar key = {keyConstruction};");
+		sb.AppendLine($"\t\t\tif (!_typedHandlers.TryGetValue(key, out var handler))");
+		sb.AppendLine("\t\t\t{");
+		sb.AppendLine($"\t\t\t\thandler = new {methodName}TypedHandler<{typeParamNames}>();");
+		sb.AppendLine("\t\t\t\t_typedHandlers[key] = handler;");
+		sb.AppendLine("\t\t\t}");
+		sb.AppendLine($"\t\t\treturn ({methodName}TypedHandler<{typeParamNames}>)handler;");
+		sb.AppendLine("\t\t}");
+		sb.AppendLine();
+
+		// Aggregate tracking
+		sb.AppendLine("\t\t/// <summary>Total number of calls across all type arguments.</summary>");
+		sb.AppendLine("\t\tpublic int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);");
+		sb.AppendLine();
+		sb.AppendLine("\t\t/// <summary>True if this method was called with any type argument.</summary>");
+		sb.AppendLine("\t\tpublic bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);");
+		sb.AppendLine();
+		sb.AppendLine($"\t\t/// <summary>All type argument(s) that were used in calls.</summary>");
+		sb.AppendLine($"\t\tpublic global::System.Collections.Generic.IReadOnlyList<{keyType}> CalledTypeArguments => _typedHandlers.Keys.ToList();");
+		sb.AppendLine();
+
+		// Reset method
+		sb.AppendLine("\t\t/// <summary>Resets all typed handlers.</summary>");
+		sb.AppendLine("\t\tpublic void Reset()");
+		sb.AppendLine("\t\t{");
+		sb.AppendLine("\t\t\tforeach (var handler in _typedHandlers.Values)");
+		sb.AppendLine("\t\t\t\t((IResettable)handler).Reset();");
+		sb.AppendLine("\t\t\t_typedHandlers.Clear();");
+		sb.AppendLine("\t\t}");
+		sb.AppendLine();
+
+		// Nested Typed Handler Class
+		var isVoid = group.IsVoid;
+		var delegateReturnType = isVoid ? "void" : group.ReturnType;
+		var delegateParams = new List<string> { $"{knockOffClassName} ko" };
+		foreach (var p in genericOverload.Parameters)
+		{
+			delegateParams.Add(FormatParameterWithRefKind(p));
+		}
+		var delegateParamList = string.Join(", ", delegateParams);
+
+		sb.AppendLine($"\t\t/// <summary>Typed handler for {methodName} with specific type arguments.</summary>");
+		sb.AppendLine($"\t\tpublic sealed class {methodName}TypedHandler<{typeParamNames}> : IGenericMethodCallTracker, IResettable{constraintClauses}");
+		sb.AppendLine("\t\t{");
+
+		sb.AppendLine($"\t\t\t/// <summary>Delegate for {methodName}.</summary>");
+		if (isVoid)
+		{
+			sb.AppendLine($"\t\t\tpublic delegate void {methodName}Delegate({delegateParamList});");
+		}
+		else
+		{
+			sb.AppendLine($"\t\t\tpublic delegate {delegateReturnType} {methodName}Delegate({delegateParamList});");
+		}
+		sb.AppendLine();
+
+		sb.AppendLine("\t\t\t/// <summary>Number of times this method was called with these type arguments.</summary>");
+		sb.AppendLine("\t\t\tpublic int CallCount { get; private set; }");
+		sb.AppendLine();
+
+		// LastCallArg/LastCallArgs for non-generic params
+		if (nonGenericParams.Length == 1)
+		{
+			var param = nonGenericParams[0];
+			var nullableType = MakeNullable(param.Type);
+			sb.AppendLine($"\t\t\t/// <summary>The '{param.Name}' argument from the most recent call.</summary>");
+			sb.AppendLine($"\t\t\tpublic {nullableType} LastCallArg {{ get; private set; }}");
+			sb.AppendLine();
+		}
+		else if (nonGenericParams.Length > 1)
+		{
+			var tupleType = "(" + string.Join(", ", nonGenericParams.Select(p => $"{MakeNullable(p.Type)} {EscapeIdentifier(p.Name)}")) + ")";
+			sb.AppendLine("\t\t\t/// <summary>The arguments from the most recent call.</summary>");
+			sb.AppendLine($"\t\t\tpublic {tupleType}? LastCallArgs {{ get; private set; }}");
+			sb.AppendLine();
+		}
+
+		sb.AppendLine("\t\t\t/// <summary>True if this method was called at least once with these type arguments.</summary>");
+		sb.AppendLine("\t\t\tpublic bool WasCalled => CallCount > 0;");
+		sb.AppendLine();
+
+		sb.AppendLine("\t\t\t/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>");
+		sb.AppendLine($"\t\t\tpublic {methodName}Delegate? OnCall {{ get; set; }}");
+		sb.AppendLine();
+
+		// RecordCall method
+		sb.AppendLine("\t\t\t/// <summary>Records a method call.</summary>");
+		if (nonGenericParams.Length == 0)
+		{
+			sb.AppendLine("\t\t\tpublic void RecordCall() => CallCount++;");
+		}
+		else if (nonGenericParams.Length == 1)
+		{
+			var param = nonGenericParams[0];
+			var nullableType = MakeNullable(param.Type);
+			sb.AppendLine($"\t\t\tpublic void RecordCall({nullableType} {EscapeIdentifier(param.Name)}) {{ CallCount++; LastCallArg = {EscapeIdentifier(param.Name)}; }}");
+		}
+		else
+		{
+			var paramList = string.Join(", ", nonGenericParams.Select(p => $"{MakeNullable(p.Type)} {EscapeIdentifier(p.Name)}"));
+			var tupleConstruction = "(" + string.Join(", ", nonGenericParams.Select(p => EscapeIdentifier(p.Name))) + ")";
+			sb.AppendLine($"\t\t\tpublic void RecordCall({paramList}) {{ CallCount++; LastCallArgs = {tupleConstruction}; }}");
+		}
+		sb.AppendLine();
+
+		// Reset method
+		sb.AppendLine("\t\t\t/// <summary>Resets all tracking state.</summary>");
+		if (nonGenericParams.Length == 0)
+		{
+			sb.AppendLine("\t\t\tpublic void Reset() { CallCount = 0; OnCall = null; }");
+		}
+		else if (nonGenericParams.Length == 1)
+		{
+			sb.AppendLine("\t\t\tpublic void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }");
+		}
+		else
+		{
+			sb.AppendLine("\t\t\tpublic void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }");
+		}
+
+		sb.AppendLine("\t\t}");
+		sb.AppendLine("\t}");
+		sb.AppendLine();
+	}
+
+	/// <summary>
+	/// Format a parameter declaration with ref/out/in keyword
+	/// </summary>
+	private static string FormatParameterWithRefKind(ParameterInfo p)
+	{
+		var refKindPrefix = p.RefKind switch
+		{
+			RefKind.Ref => "ref ",
+			RefKind.Out => "out ",
+			RefKind.In => "in ",
+			_ => ""
+		};
+		return $"{refKindPrefix}{p.Type} {EscapeIdentifier(p.Name)}";
+	}
+
+	/// <summary>
+	/// Format a parameter name with ref/out/in keyword for passing to another method
+	/// </summary>
+	private static string FormatParameterNameWithRefKind(ParameterInfo p)
+	{
+		var refKindPrefix = p.RefKind switch
+		{
+			RefKind.Ref => "ref ",
+			RefKind.Out => "out ",
+			RefKind.In => "in ",
+			_ => ""
+		};
+		return $"{refKindPrefix}{EscapeIdentifier(p.Name)}";
+	}
+
+	private static int FindOverloadIndex(InterfaceMemberInfo member, MethodGroupInfo group)
+	{
+		var memberParams = member.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+		var overloads = group.Overloads.GetArray() ?? Array.Empty<MethodOverloadInfo>();
+
+		for (int i = 0; i < overloads.Length; i++)
+		{
+			var overloadParams = overloads[i].Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+			if (memberParams.Length == overloadParams.Length)
+			{
+				bool match = true;
+				for (int j = 0; j < memberParams.Length; j++)
+				{
+					if (memberParams[j].Type != overloadParams[j].Type)
+					{
+						match = false;
+						break;
+					}
+				}
+				if (match) return i;
+			}
+		}
+		return 0;
+	}
+
+	#endregion
+
 	#region Inline Stubs Generation
 
 	/// <summary>
-	/// Generates the Stubs nested class for inline stub pattern.
+	/// Reports collected diagnostics to the source production context.
 	/// </summary>
-	private static void GenerateInlineStubs(SourceProductionContext context, InlineStubClassInfo info)
+	private static void ReportDiagnostics(SourceProductionContext context, EquatableArray<DiagnosticInfo> diagnostics)
 	{
-		// Report all collected diagnostics
-		foreach (var diag in info.Diagnostics)
+		foreach (var diag in diagnostics)
 		{
 			var descriptor = diag.Id switch
 			{
+				"KO0010" => KO0010_MultipleInterfaces,
 				"KO1001" => KO1001_TypeMustBeInterfaceClassOrDelegate,
 				"KO1002" => KO1002_NameCollision,
 				"KO1003" => KO1003_StubsTypeConflict,
@@ -3905,6 +5742,15 @@ public class KnockOffGenerator : IIncrementalGenerator
 				context.ReportDiagnostic(Diagnostic.Create(descriptor, location, diag.Args));
 			}
 		}
+	}
+
+	/// <summary>
+	/// Generates the Stubs nested class for inline stub pattern.
+	/// </summary>
+	private static void GenerateInlineStubs(SourceProductionContext context, InlineStubClassInfo info)
+	{
+		// Report all collected diagnostics
+		ReportDiagnostics(context, info.Diagnostics);
 
 		// Check for blocking diagnostics - don't generate code if blocking errors present
 		var hasBlockingDiagnostics = info.Diagnostics.Any(d => d.Id is "KO1002" or "KO1003" or "KO2001" or "KO2002" or "KO2005" or "KO2006");
@@ -4270,6 +6116,8 @@ public class KnockOffGenerator : IIncrementalGenerator
 		string interfaceSimpleName)
 	{
 		var interceptClassName = $"{interfaceSimpleName}_{evt.Name}Interceptor";
+		// Strip trailing ? from delegate type since we add our own nullable marker
+		var delegateType = evt.FullDelegateTypeName.TrimEnd('?');
 
 		sb.AppendLine($"\t\t/// <summary>Interceptor for {interfaceSimpleName}.{evt.Name} event.</summary>");
 		sb.AppendLine($"\t\tpublic sealed class {interceptClassName}");
@@ -4282,13 +6130,13 @@ public class KnockOffGenerator : IIncrementalGenerator
 		sb.AppendLine("\t\t\tpublic int RemoveCount { get; private set; }");
 		sb.AppendLine();
 		sb.AppendLine($"\t\t\t/// <summary>The backing delegate for raising the event.</summary>");
-		sb.AppendLine($"\t\t\tpublic {evt.FullDelegateTypeName}? Handler {{ get; private set; }}");
+		sb.AppendLine($"\t\t\tpublic {delegateType}? Handler {{ get; private set; }}");
 		sb.AppendLine();
 		sb.AppendLine("\t\t\t/// <summary>Records an event subscription.</summary>");
-		sb.AppendLine($"\t\t\tpublic void RecordAdd({evt.FullDelegateTypeName}? handler) {{ AddCount++; Handler = ({evt.FullDelegateTypeName}?)global::System.Delegate.Combine(Handler, handler); }}");
+		sb.AppendLine($"\t\t\tpublic void RecordAdd({delegateType}? handler) {{ AddCount++; Handler = ({delegateType}?)global::System.Delegate.Combine(Handler, handler); }}");
 		sb.AppendLine();
 		sb.AppendLine("\t\t\t/// <summary>Records an event unsubscription.</summary>");
-		sb.AppendLine($"\t\t\tpublic void RecordRemove({evt.FullDelegateTypeName}? handler) {{ RemoveCount++; Handler = ({evt.FullDelegateTypeName}?)global::System.Delegate.Remove(Handler, handler); }}");
+		sb.AppendLine($"\t\t\tpublic void RecordRemove({delegateType}? handler) {{ RemoveCount++; Handler = ({delegateType}?)global::System.Delegate.Remove(Handler, handler); }}");
 		sb.AppendLine();
 		sb.AppendLine("\t\t\t/// <summary>Resets all tracking state.</summary>");
 		sb.AppendLine("\t\t\tpublic void Reset() { AddCount = 0; RemoveCount = 0; Handler = null; }");
@@ -4339,23 +6187,23 @@ public class KnockOffGenerator : IIncrementalGenerator
 		{
 			if (member.IsIndexer)
 			{
-				GenerateInlineStubIndexerImplementation(sb, iface.FullName, member, stubClassName);
+				GenerateInlineStubIndexerImplementation(sb, member.DeclaringInterfaceFullName, member, stubClassName);
 			}
 			else if (member.IsProperty)
 			{
-				GenerateInlineStubPropertyImplementation(sb, iface.FullName, member, stubClassName);
+				GenerateInlineStubPropertyImplementation(sb, member.DeclaringInterfaceFullName, member, stubClassName);
 			}
 			else
 			{
 				var group = methodGroups[member.Name];
-				GenerateInlineStubMethodImplementation(sb, iface.FullName, member, group, stubClassName);
+				GenerateInlineStubMethodImplementation(sb, member.DeclaringInterfaceFullName, member, group, stubClassName);
 			}
 		}
 
 		// Generate event implementations
 		foreach (var evt in iface.Events)
 		{
-			GenerateInlineStubEventImplementation(sb, iface.FullName, evt, stubClassName);
+			GenerateInlineStubEventImplementation(sb, evt.DeclaringInterfaceFullName, evt, stubClassName);
 		}
 
 		sb.AppendLine("\t\t}");
@@ -4503,14 +6351,13 @@ public class KnockOffGenerator : IIncrementalGenerator
 	#region Class Stub Generation
 
 	/// <summary>
-	/// Generates a class stub that inherits from the target class.
+	/// Generates a class stub using composition pattern (wrapper + nested Impl class).
 	/// </summary>
 	private static void GenerateClassStubClass(
 		System.Text.StringBuilder sb,
 		ClassStubInfo cls)
 	{
 		var stubClassName = cls.Name;
-		var interceptorsClassName = $"{cls.Name}Interceptors";
 
 		// Group methods by name for overload handling
 		var methodGroups = GroupClassMethodsByName(cls.Members.Where(m => !m.IsProperty && !m.IsIndexer));
@@ -4536,23 +6383,115 @@ public class KnockOffGenerator : IIncrementalGenerator
 			GenerateInlineStubEventHandlerClass(sb, evt, cls.Name);
 		}
 
-		// Generate the interceptors container class
-		GenerateClassInterceptorsContainer(sb, cls, methodGroups, interceptorsClassName);
-
-		// Generate the stub class
-		sb.AppendLine($"\t\t/// <summary>Stub for {cls.FullName} via inheritance.</summary>");
-		sb.AppendLine($"\t\tpublic class {stubClassName} : {cls.FullName}");
+		// Generate the wrapper stub class (no inheritance from target)
+		sb.AppendLine($"\t\t/// <summary>Stub for {cls.FullName} via composition.</summary>");
+		sb.AppendLine($"\t\tpublic class {stubClassName}");
 		sb.AppendLine("\t\t{");
 
-		// Interceptor container property - using "Interceptor" to avoid name collision with class name
-		sb.AppendLine($"\t\t\t/// <summary>Interceptors for tracking and configuring member behavior.</summary>");
-		sb.AppendLine($"\t\t\tpublic {interceptorsClassName} Interceptor {{ get; }} = new();");
+		// Direct interceptor properties on wrapper (no container)
+		foreach (var member in cls.Members)
+		{
+			if (member.IsProperty || member.IsIndexer)
+			{
+				var interceptorType = $"{cls.Name}_{member.Name}Interceptor";
+				sb.AppendLine($"\t\t\t/// <summary>Interceptor for {member.Name}.</summary>");
+				sb.AppendLine($"\t\t\tpublic {interceptorType} {member.Name} {{ get; }} = new();");
+			}
+		}
+
+		foreach (var group in methodGroups.Values)
+		{
+			var hasOverloads = group.Members.Count > 1;
+			for (int i = 0; i < group.Members.Count; i++)
+			{
+				var handlerName = hasOverloads ? $"{group.Name}{i + 1}" : group.Name;
+				var interceptorType = hasOverloads
+					? $"{cls.Name}_{group.Name}{i + 1}Interceptor"
+					: $"{cls.Name}_{group.Name}Interceptor";
+				sb.AppendLine($"\t\t\t/// <summary>Interceptor for {group.Name}.</summary>");
+				sb.AppendLine($"\t\t\tpublic {interceptorType} {handlerName} {{ get; }} = new();");
+			}
+		}
+
+		foreach (var evt in cls.Events)
+		{
+			var interceptorType = $"{cls.Name}_{evt.Name}Interceptor";
+			sb.AppendLine($"\t\t\t/// <summary>Interceptor for {evt.Name}.</summary>");
+			sb.AppendLine($"\t\t\tpublic {interceptorType} {evt.Name} {{ get; }} = new();");
+		}
+
+		sb.AppendLine();
+
+		// .Object property - returns the Impl instance as target class type
+		sb.AppendLine($"\t\t\t/// <summary>The {cls.FullName} instance. Pass this to code expecting the target class.</summary>");
+		sb.AppendLine($"\t\t\tpublic {cls.FullName} Object {{ get; }}");
+		sb.AppendLine();
+
+		// Generate constructors that create Impl instance
+		foreach (var ctor in cls.Constructors)
+		{
+			GenerateClassWrapperConstructor(sb, ctor, stubClassName, cls.FullName);
+		}
+
+		// ResetInterceptors method
+		sb.AppendLine("\t\t\t/// <summary>Resets all interceptor state.</summary>");
+		sb.AppendLine("\t\t\tpublic void ResetInterceptors()");
+		sb.AppendLine("\t\t\t{");
+
+		foreach (var member in cls.Members)
+		{
+			if (member.IsProperty || member.IsIndexer)
+			{
+				sb.AppendLine($"\t\t\t\t{member.Name}.Reset();");
+			}
+		}
+
+		foreach (var group in methodGroups.Values)
+		{
+			var hasOverloads = group.Members.Count > 1;
+			for (int i = 0; i < group.Members.Count; i++)
+			{
+				var handlerName = hasOverloads ? $"{group.Name}{i + 1}" : group.Name;
+				sb.AppendLine($"\t\t\t\t{handlerName}.Reset();");
+			}
+		}
+
+		foreach (var evt in cls.Events)
+		{
+			sb.AppendLine($"\t\t\t\t{evt.Name}.Reset();");
+		}
+
+		sb.AppendLine("\t\t\t}");
+		sb.AppendLine();
+
+		// Generate nested Impl class that inherits from target
+		GenerateClassImplClass(sb, cls, methodGroups, stubClassName);
+
+		sb.AppendLine("\t\t}");
+		sb.AppendLine();
+	}
+
+	/// <summary>
+	/// Generates the nested Impl class that inherits from the target class.
+	/// </summary>
+	private static void GenerateClassImplClass(
+		System.Text.StringBuilder sb,
+		ClassStubInfo cls,
+		Dictionary<string, ClassMethodGroupInfo> methodGroups,
+		string stubClassName)
+	{
+		sb.AppendLine($"\t\t\t/// <summary>Internal implementation that inherits from {cls.FullName}.</summary>");
+		sb.AppendLine($"\t\t\tprivate sealed class Impl : {cls.FullName}");
+		sb.AppendLine("\t\t\t{");
+
+		// Reference to the wrapper
+		sb.AppendLine($"\t\t\t\tprivate readonly {stubClassName} _stub;");
 		sb.AppendLine();
 
 		// Generate constructors that chain to base
 		foreach (var ctor in cls.Constructors)
 		{
-			GenerateClassConstructor(sb, ctor, stubClassName, cls.FullName);
+			GenerateClassImplConstructor(sb, ctor, stubClassName, cls.FullName);
 		}
 
 		// Generate overrides for properties
@@ -4560,11 +6499,11 @@ public class KnockOffGenerator : IIncrementalGenerator
 		{
 			if (member.IsProperty && !member.IsIndexer)
 			{
-				GenerateClassPropertyOverride(sb, member, cls.Name);
+				GenerateClassImplPropertyOverride(sb, member, cls.Name);
 			}
 			else if (member.IsIndexer)
 			{
-				GenerateClassIndexerOverride(sb, member, cls.Name);
+				GenerateClassImplIndexerOverride(sb, member, cls.Name);
 			}
 		}
 
@@ -4576,22 +6515,17 @@ public class KnockOffGenerator : IIncrementalGenerator
 			{
 				var member = group.Members.GetArray()![i];
 				var handlerName = hasOverloads ? $"{group.Name}{i + 1}" : group.Name;
-				GenerateClassMethodOverride(sb, member, cls.Name, handlerName);
+				GenerateClassImplMethodOverride(sb, member, cls.Name, handlerName);
 			}
 		}
 
 		// Generate overrides for events
 		foreach (var evt in cls.Events)
 		{
-			GenerateClassEventOverride(sb, evt, cls.Name);
+			GenerateClassImplEventOverride(sb, evt, cls.Name);
 		}
 
-		// ResetInterceptors method
-		sb.AppendLine("\t\t\t/// <summary>Resets all interceptor state.</summary>");
-		sb.AppendLine($"\t\t\tpublic void ResetInterceptors() => Interceptor.Reset();");
-
-		sb.AppendLine("\t\t}");
-		sb.AppendLine();
+		sb.AppendLine("\t\t\t}");
 	}
 
 	/// <summary>
@@ -4871,91 +6805,9 @@ public class KnockOffGenerator : IIncrementalGenerator
 	}
 
 	/// <summary>
-	/// Generates the interceptors container class.
+	/// Generates a wrapper constructor that creates the Impl instance.
 	/// </summary>
-	private static void GenerateClassInterceptorsContainer(
-		System.Text.StringBuilder sb,
-		ClassStubInfo cls,
-		Dictionary<string, ClassMethodGroupInfo> methodGroups,
-		string containerClassName)
-	{
-		sb.AppendLine($"\t\t/// <summary>Container for all {cls.Name} interceptors.</summary>");
-		sb.AppendLine($"\t\tpublic sealed class {containerClassName}");
-		sb.AppendLine("\t\t{");
-
-		// Property interceptor instances
-		foreach (var member in cls.Members)
-		{
-			if (member.IsProperty || member.IsIndexer)
-			{
-				var interceptorType = $"{cls.Name}_{member.Name}Interceptor";
-				sb.AppendLine($"\t\t\t/// <summary>Interceptor for {member.Name}.</summary>");
-				sb.AppendLine($"\t\t\tpublic {interceptorType} {member.Name} {{ get; }} = new();");
-			}
-		}
-
-		// Method interceptor instances
-		foreach (var group in methodGroups.Values)
-		{
-			var hasOverloads = group.Members.Count > 1;
-			for (int i = 0; i < group.Members.Count; i++)
-			{
-				var handlerName = hasOverloads ? $"{group.Name}{i + 1}" : group.Name;
-				var interceptorType = hasOverloads
-					? $"{cls.Name}_{group.Name}{i + 1}Interceptor"
-					: $"{cls.Name}_{group.Name}Interceptor";
-				sb.AppendLine($"\t\t\t/// <summary>Interceptor for {group.Name}.</summary>");
-				sb.AppendLine($"\t\t\tpublic {interceptorType} {handlerName} {{ get; }} = new();");
-			}
-		}
-
-		// Event interceptor instances
-		foreach (var evt in cls.Events)
-		{
-			var interceptorType = $"{cls.Name}_{evt.Name}Interceptor";
-			sb.AppendLine($"\t\t\t/// <summary>Interceptor for {evt.Name}.</summary>");
-			sb.AppendLine($"\t\t\tpublic {interceptorType} {evt.Name} {{ get; }} = new();");
-		}
-
-		sb.AppendLine();
-
-		// Reset method
-		sb.AppendLine("\t\t\t/// <summary>Resets all interceptors.</summary>");
-		sb.AppendLine("\t\t\tpublic void Reset()");
-		sb.AppendLine("\t\t\t{");
-
-		foreach (var member in cls.Members)
-		{
-			if (member.IsProperty || member.IsIndexer)
-			{
-				sb.AppendLine($"\t\t\t\t{member.Name}.Reset();");
-			}
-		}
-
-		foreach (var group in methodGroups.Values)
-		{
-			var hasOverloads = group.Members.Count > 1;
-			for (int i = 0; i < group.Members.Count; i++)
-			{
-				var handlerName = hasOverloads ? $"{group.Name}{i + 1}" : group.Name;
-				sb.AppendLine($"\t\t\t\t{handlerName}.Reset();");
-			}
-		}
-
-		foreach (var evt in cls.Events)
-		{
-			sb.AppendLine($"\t\t\t\t{evt.Name}.Reset();");
-		}
-
-		sb.AppendLine("\t\t\t}");
-		sb.AppendLine("\t\t}");
-		sb.AppendLine();
-	}
-
-	/// <summary>
-	/// Generates a constructor that chains to the base class.
-	/// </summary>
-	private static void GenerateClassConstructor(
+	private static void GenerateClassWrapperConstructor(
 		System.Text.StringBuilder sb,
 		ClassConstructorInfo ctor,
 		string stubClassName,
@@ -4964,64 +6816,99 @@ public class KnockOffGenerator : IIncrementalGenerator
 		var paramList = string.Join(", ", ctor.Parameters.Select(p => $"{p.Type} {p.Name}"));
 		var argList = string.Join(", ", ctor.Parameters.Select(p => p.Name));
 
-		sb.AppendLine($"\t\t\tpublic {stubClassName}({paramList}) : base({argList}) {{ }}");
+		sb.AppendLine($"\t\t\tpublic {stubClassName}({paramList})");
+		sb.AppendLine("\t\t\t{");
+		if (argList.Length > 0)
+		{
+			sb.AppendLine($"\t\t\t\tObject = new Impl(this, {argList});");
+		}
+		else
+		{
+			sb.AppendLine($"\t\t\t\tObject = new Impl(this);");
+		}
+		sb.AppendLine("\t\t\t}");
 		sb.AppendLine();
 	}
 
 	/// <summary>
-	/// Generates a property override.
+	/// Generates an Impl constructor that stores the wrapper and chains to base.
 	/// </summary>
-	private static void GenerateClassPropertyOverride(
+	private static void GenerateClassImplConstructor(
+		System.Text.StringBuilder sb,
+		ClassConstructorInfo ctor,
+		string stubClassName,
+		string baseClassName)
+	{
+		var paramList = ctor.Parameters.Count > 0
+			? $"{stubClassName} stub, " + string.Join(", ", ctor.Parameters.Select(p => $"{p.Type} {p.Name}"))
+			: $"{stubClassName} stub";
+		var argList = string.Join(", ", ctor.Parameters.Select(p => p.Name));
+
+		sb.AppendLine($"\t\t\t\tpublic Impl({paramList}) : base({argList})");
+		sb.AppendLine("\t\t\t\t{");
+		sb.AppendLine("\t\t\t\t\t_stub = stub;");
+		sb.AppendLine("\t\t\t\t}");
+		sb.AppendLine();
+	}
+
+	/// <summary>
+	/// Generates a property override for the Impl class.
+	/// Note: _stub may be null during base constructor calls, so we add null checks.
+	/// </summary>
+	private static void GenerateClassImplPropertyOverride(
 		System.Text.StringBuilder sb,
 		ClassMemberInfo member,
 		string className)
 	{
-		sb.AppendLine($"\t\t\t/// <inheritdoc />");
-		sb.AppendLine($"\t\t\t{member.AccessModifier} override {member.ReturnType} {member.Name}");
-		sb.AppendLine("\t\t\t{");
+		sb.AppendLine($"\t\t\t\t/// <inheritdoc />");
+		sb.AppendLine($"\t\t\t\t{member.AccessModifier} override {member.ReturnType} {member.Name}");
+		sb.AppendLine("\t\t\t\t{");
 
 		if (member.HasGetter)
 		{
-			sb.AppendLine("\t\t\t\tget");
-			sb.AppendLine("\t\t\t\t{");
-			sb.AppendLine($"\t\t\t\t\tInterceptor.{member.Name}.RecordGet();");
-			sb.AppendLine($"\t\t\t\t\tif (Interceptor.{member.Name}.OnGet is {{ }} onGet) return onGet(this);");
+			sb.AppendLine("\t\t\t\t\tget");
+			sb.AppendLine("\t\t\t\t\t{");
+			// Handle calls from base constructor when _stub is null
+			sb.AppendLine($"\t\t\t\t\t\t_stub?.{member.Name}.RecordGet();");
+			sb.AppendLine($"\t\t\t\t\t\tif (_stub?.{member.Name}.OnGet is {{ }} onGet) return onGet(_stub);");
 			if (member.IsAbstract)
 			{
-				sb.AppendLine($"\t\t\t\t\treturn default!;");
+				sb.AppendLine($"\t\t\t\t\t\treturn default!;");
 			}
 			else
 			{
-				sb.AppendLine($"\t\t\t\t\treturn base.{member.Name};");
+				sb.AppendLine($"\t\t\t\t\t\treturn base.{member.Name};");
 			}
-			sb.AppendLine("\t\t\t\t}");
+			sb.AppendLine("\t\t\t\t\t}");
 		}
 
 		if (member.HasSetter)
 		{
-			sb.AppendLine("\t\t\t\tset");
-			sb.AppendLine("\t\t\t\t{");
-			sb.AppendLine($"\t\t\t\t\tInterceptor.{member.Name}.RecordSet(value);");
-			sb.AppendLine($"\t\t\t\t\tif (Interceptor.{member.Name}.OnSet is {{ }} onSet) onSet(this, value);");
+			sb.AppendLine("\t\t\t\t\tset");
+			sb.AppendLine("\t\t\t\t\t{");
+			// Handle calls from base constructor when _stub is null
+			sb.AppendLine($"\t\t\t\t\t\t_stub?.{member.Name}.RecordSet(value);");
+			sb.AppendLine($"\t\t\t\t\t\tif (_stub?.{member.Name}.OnSet is {{ }} onSet) onSet(_stub, value);");
 			if (member.IsAbstract)
 			{
 				// Abstract - no base to call
 			}
 			else
 			{
-				sb.AppendLine($"\t\t\t\t\telse base.{member.Name} = value;");
+				sb.AppendLine($"\t\t\t\t\t\telse base.{member.Name} = value;");
 			}
-			sb.AppendLine("\t\t\t\t}");
+			sb.AppendLine("\t\t\t\t\t}");
 		}
 
-		sb.AppendLine("\t\t\t}");
+		sb.AppendLine("\t\t\t\t}");
 		sb.AppendLine();
 	}
 
 	/// <summary>
-	/// Generates an indexer override.
+	/// Generates an indexer override for the Impl class.
+	/// Note: _stub may be null during base constructor calls, so we add null checks.
 	/// </summary>
-	private static void GenerateClassIndexerOverride(
+	private static void GenerateClassImplIndexerOverride(
 		System.Text.StringBuilder sb,
 		ClassMemberInfo member,
 		string className)
@@ -5029,48 +6916,51 @@ public class KnockOffGenerator : IIncrementalGenerator
 		var paramList = string.Join(", ", member.IndexerParameters.Select(p => $"{p.Type} {p.Name}"));
 		var argList = string.Join(", ", member.IndexerParameters.Select(p => p.Name));
 
-		sb.AppendLine($"\t\t\t/// <inheritdoc />");
-		sb.AppendLine($"\t\t\t{member.AccessModifier} override {member.ReturnType} this[{paramList}]");
-		sb.AppendLine("\t\t\t{");
+		sb.AppendLine($"\t\t\t\t/// <inheritdoc />");
+		sb.AppendLine($"\t\t\t\t{member.AccessModifier} override {member.ReturnType} this[{paramList}]");
+		sb.AppendLine("\t\t\t\t{");
 
 		if (member.HasGetter)
 		{
-			sb.AppendLine("\t\t\t\tget");
-			sb.AppendLine("\t\t\t\t{");
-			sb.AppendLine($"\t\t\t\t\tInterceptor.{member.Name}.RecordGet({argList});");
-			sb.AppendLine($"\t\t\t\t\tif (Interceptor.{member.Name}.OnGet is {{ }} onGet) return onGet(this, {argList});");
+			sb.AppendLine("\t\t\t\t\tget");
+			sb.AppendLine("\t\t\t\t\t{");
+			// Handle calls from base constructor when _stub is null
+			sb.AppendLine($"\t\t\t\t\t\t_stub?.{member.Name}.RecordGet({argList});");
+			sb.AppendLine($"\t\t\t\t\t\tif (_stub?.{member.Name}.OnGet is {{ }} onGet) return onGet(_stub, {argList});");
 			if (member.IsAbstract)
 			{
-				sb.AppendLine($"\t\t\t\t\treturn default!;");
+				sb.AppendLine($"\t\t\t\t\t\treturn default!;");
 			}
 			else
 			{
-				sb.AppendLine($"\t\t\t\t\treturn base[{argList}];");
+				sb.AppendLine($"\t\t\t\t\t\treturn base[{argList}];");
 			}
-			sb.AppendLine("\t\t\t\t}");
+			sb.AppendLine("\t\t\t\t\t}");
 		}
 
 		if (member.HasSetter)
 		{
-			sb.AppendLine("\t\t\t\tset");
-			sb.AppendLine("\t\t\t\t{");
-			sb.AppendLine($"\t\t\t\t\tInterceptor.{member.Name}.RecordSet({argList}, value);");
-			sb.AppendLine($"\t\t\t\t\tif (Interceptor.{member.Name}.OnSet is {{ }} onSet) onSet(this, {argList}, value);");
+			sb.AppendLine("\t\t\t\t\tset");
+			sb.AppendLine("\t\t\t\t\t{");
+			// Handle calls from base constructor when _stub is null
+			sb.AppendLine($"\t\t\t\t\t\t_stub?.{member.Name}.RecordSet({argList}, value);");
+			sb.AppendLine($"\t\t\t\t\t\tif (_stub?.{member.Name}.OnSet is {{ }} onSet) onSet(_stub, {argList}, value);");
 			if (!member.IsAbstract)
 			{
-				sb.AppendLine($"\t\t\t\t\telse base[{argList}] = value;");
+				sb.AppendLine($"\t\t\t\t\t\telse base[{argList}] = value;");
 			}
-			sb.AppendLine("\t\t\t\t}");
+			sb.AppendLine("\t\t\t\t\t}");
 		}
 
-		sb.AppendLine("\t\t\t}");
+		sb.AppendLine("\t\t\t\t}");
 		sb.AppendLine();
 	}
 
 	/// <summary>
-	/// Generates a method override.
+	/// Generates a method override for the Impl class.
+	/// Note: _stub may be null during base constructor calls, so we add null checks.
 	/// </summary>
-	private static void GenerateClassMethodOverride(
+	private static void GenerateClassImplMethodOverride(
 		System.Text.StringBuilder sb,
 		ClassMemberInfo member,
 		string className,
@@ -5085,29 +6975,29 @@ public class KnockOffGenerator : IIncrementalGenerator
 		var isTask = member.ReturnType == "global::System.Threading.Tasks.Task";
 		var isValueTask = member.ReturnType == "global::System.Threading.Tasks.ValueTask";
 
-		sb.AppendLine($"\t\t\t/// <inheritdoc />");
-		sb.AppendLine($"\t\t\t{member.AccessModifier} override {member.ReturnType} {member.Name}({paramList})");
-		sb.AppendLine("\t\t\t{");
+		sb.AppendLine($"\t\t\t\t/// <inheritdoc />");
+		sb.AppendLine($"\t\t\t\t{member.AccessModifier} override {member.ReturnType} {member.Name}({paramList})");
+		sb.AppendLine("\t\t\t\t{");
 
-		// Record the call
+		// Record the call (null check for calls during base constructor)
 		if (inputParams.Length > 0)
 		{
-			sb.AppendLine($"\t\t\t\tInterceptor.{handlerName}.RecordCall({inputArgList});");
+			sb.AppendLine($"\t\t\t\t\t_stub?.{handlerName}.RecordCall({inputArgList});");
 		}
 		else
 		{
-			sb.AppendLine($"\t\t\t\tInterceptor.{handlerName}.RecordCall();");
+			sb.AppendLine($"\t\t\t\t\t_stub?.{handlerName}.RecordCall();");
 		}
 
-		// Check for OnCall callback
-		var onCallArgs = inputParams.Length > 0 ? $"this, {inputArgList}" : "this";
+		// Check for OnCall callback (null check for calls during base constructor)
+		var onCallArgs = inputParams.Length > 0 ? $"_stub, {inputArgList}" : "_stub";
 		if (isVoid || isTask || isValueTask)
 		{
-			sb.AppendLine($"\t\t\t\tif (Interceptor.{handlerName}.OnCall is {{ }} onCall) {{ onCall({onCallArgs}); return; }}");
+			sb.AppendLine($"\t\t\t\t\tif (_stub?.{handlerName}.OnCall is {{ }} onCall) {{ onCall({onCallArgs}); return; }}");
 		}
 		else
 		{
-			sb.AppendLine($"\t\t\t\tif (Interceptor.{handlerName}.OnCall is {{ }} onCall) return onCall({onCallArgs});");
+			sb.AppendLine($"\t\t\t\t\tif (_stub?.{handlerName}.OnCall is {{ }} onCall) return onCall({onCallArgs});");
 		}
 
 		// Default behavior - delegate to base or return default for abstract
@@ -5120,15 +7010,15 @@ public class KnockOffGenerator : IIncrementalGenerator
 			}
 			else if (isTask)
 			{
-				sb.AppendLine($"\t\t\t\treturn global::System.Threading.Tasks.Task.CompletedTask;");
+				sb.AppendLine($"\t\t\t\t\treturn global::System.Threading.Tasks.Task.CompletedTask;");
 			}
 			else if (isValueTask)
 			{
-				sb.AppendLine($"\t\t\t\treturn default;");
+				sb.AppendLine($"\t\t\t\t\treturn default;");
 			}
 			else
 			{
-				sb.AppendLine($"\t\t\t\treturn default!;");
+				sb.AppendLine($"\t\t\t\t\treturn default!;");
 			}
 		}
 		else
@@ -5136,32 +7026,34 @@ public class KnockOffGenerator : IIncrementalGenerator
 			// Virtual - delegate to base
 			if (isVoid)
 			{
-				sb.AppendLine($"\t\t\t\tbase.{member.Name}({argList});");
+				sb.AppendLine($"\t\t\t\t\tbase.{member.Name}({argList});");
 			}
 			else
 			{
-				sb.AppendLine($"\t\t\t\treturn base.{member.Name}({argList});");
+				sb.AppendLine($"\t\t\t\t\treturn base.{member.Name}({argList});");
 			}
 		}
 
-		sb.AppendLine("\t\t\t}");
+		sb.AppendLine("\t\t\t\t}");
 		sb.AppendLine();
 	}
 
 	/// <summary>
-	/// Generates an event override.
+	/// Generates an event override for the Impl class.
+	/// Note: _stub may be null during base constructor calls, so we add null checks.
 	/// </summary>
-	private static void GenerateClassEventOverride(
+	private static void GenerateClassImplEventOverride(
 		System.Text.StringBuilder sb,
 		EventMemberInfo evt,
 		string className)
 	{
-		sb.AppendLine($"\t\t\t/// <inheritdoc />");
-		sb.AppendLine($"\t\t\tpublic override event {evt.FullDelegateTypeName}? {evt.Name}");
-		sb.AppendLine("\t\t\t{");
-		sb.AppendLine($"\t\t\t\tadd => Interceptor.{evt.Name}.RecordAdd(value);");
-		sb.AppendLine($"\t\t\t\tremove => Interceptor.{evt.Name}.RecordRemove(value);");
-		sb.AppendLine("\t\t\t}");
+		sb.AppendLine($"\t\t\t\t/// <inheritdoc />");
+		sb.AppendLine($"\t\t\t\tpublic override event {evt.FullDelegateTypeName}? {evt.Name}");
+		sb.AppendLine("\t\t\t\t{");
+		// Null check for calls during base constructor
+		sb.AppendLine($"\t\t\t\t\tadd => _stub?.{evt.Name}.RecordAdd(value);");
+		sb.AppendLine($"\t\t\t\t\tremove => _stub?.{evt.Name}.RecordRemove(value);");
+		sb.AppendLine("\t\t\t\t}");
 		sb.AppendLine();
 	}
 
@@ -5253,7 +7145,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 	{
 		var paramList = string.Join(", ", member.Parameters.Select(p => FormatParameter(p)));
 		var inputParams = GetInputParameters(member.Parameters).ToArray();
-		var argList = string.Join(", ", inputParams.Select(p => p.Name));
+		var outParams = member.Parameters.Where(p => IsOutputParameter(p.RefKind)).ToArray();
 		var isVoid = member.ReturnType == "void";
 
 		// Check for async types
@@ -5261,15 +7153,31 @@ public class KnockOffGenerator : IIncrementalGenerator
 		var isValueTask = member.ReturnType.StartsWith("global::System.Threading.Tasks.ValueTask");
 		var isAsync = isTask || isValueTask;
 
+		// Get combined parameters (input only) for mapping
+		var combinedInputParams = GetInputCombinedParameters(group.CombinedParameters).ToArray();
+
+		// Build a lookup of this overload's parameters by name
+		var memberParamsByName = inputParams.ToDictionary(p => p.Name, p => p.Name);
+
+		// Map combined params to actual args: use member's param if present, else null
+		var mappedArgs = combinedInputParams.Select(cp =>
+			memberParamsByName.ContainsKey(cp.Name) ? cp.Name : "null").ToArray();
+		var recordArgs = string.Join(", ", mappedArgs);
+		var onCallArgs = mappedArgs.Length > 0 ? $"this, {recordArgs}" : "this";
+
 		sb.AppendLine($"\t\t\t{member.ReturnType} {interfaceFullName}.{member.Name}({paramList})");
 		sb.AppendLine("\t\t\t{");
 
-		// Record the call
-		var recordArgs = inputParams.Length > 0 ? argList : "";
+		// Assign default values to out parameters first
+		foreach (var outParam in outParams)
+		{
+			sb.AppendLine($"\t\t\t\t{outParam.Name} = default!;");
+		}
+
+		// Record the call with mapped arguments
 		sb.AppendLine($"\t\t\t\t{group.Name}.RecordCall({recordArgs});");
 
 		// Call OnCall if set
-		var onCallArgs = inputParams.Length > 0 ? $"this, {argList}" : "this";
 		if (isVoid)
 		{
 			sb.AppendLine($"\t\t\t\tif ({group.Name}.OnCall is {{ }} onCall) onCall({onCallArgs});");
@@ -5286,16 +7194,28 @@ public class KnockOffGenerator : IIncrementalGenerator
 			{
 				sb.AppendLine("\t\t\t\treturn default;");
 			}
+			else if (member.DefaultStrategy == DefaultValueStrategy.ThrowException)
+			{
+				// Task<T>/ValueTask<T> where T is non-nullable and non-instantiable
+				sb.AppendLine($"\t\t\t\tthrow new global::System.InvalidOperationException(\"No implementation provided for {member.Name}. Set {group.Name}.OnCall.\");");
+			}
 			else
 			{
-				// Task<T> or ValueTask<T>
-				sb.AppendLine("\t\t\t\treturn default!;");
+				// Task<T> or ValueTask<T> - use strategy to determine value
+				var defaultExpr = GetDefaultForType(member.ReturnType, member.DefaultStrategy, member.ConcreteTypeForNew);
+				sb.AppendLine($"\t\t\t\treturn {defaultExpr};");
 			}
+		}
+		else if (member.DefaultStrategy == DefaultValueStrategy.ThrowException)
+		{
+			sb.AppendLine($"\t\t\t\tif ({group.Name}.OnCall is {{ }} onCall) return onCall({onCallArgs});");
+			sb.AppendLine($"\t\t\t\tthrow new global::System.InvalidOperationException(\"No implementation provided for {member.Name}. Set {group.Name}.OnCall.\");");
 		}
 		else
 		{
 			sb.AppendLine($"\t\t\t\tif ({group.Name}.OnCall is {{ }} onCall) return onCall({onCallArgs});");
-			sb.AppendLine("\t\t\t\treturn default!;");
+			var defaultExpr = GetDefaultForType(member.ReturnType, member.DefaultStrategy, member.ConcreteTypeForNew);
+			sb.AppendLine($"\t\t\t\treturn {defaultExpr};");
 		}
 
 		sb.AppendLine("\t\t\t}");
@@ -5311,7 +7231,9 @@ public class KnockOffGenerator : IIncrementalGenerator
 		EventMemberInfo evt,
 		string stubClassName)
 	{
-		sb.AppendLine($"\t\t\tevent {evt.FullDelegateTypeName}? {interfaceFullName}.{evt.Name}");
+		// Strip trailing ? from delegate type since we add our own nullable marker
+		var delegateType = evt.FullDelegateTypeName.TrimEnd('?');
+		sb.AppendLine($"\t\t\tevent {delegateType}? {interfaceFullName}.{evt.Name}");
 		sb.AppendLine("\t\t\t{");
 		sb.AppendLine($"\t\t\t\tadd => {evt.Name}Interceptor.RecordAdd(value);");
 		sb.AppendLine($"\t\t\t\tremove => {evt.Name}Interceptor.RecordRemove(value);");
@@ -5329,7 +7251,18 @@ internal sealed record KnockOffTypeInfo(
 	string ClassName,
 	EquatableArray<ContainingTypeInfo> ContainingTypes,
 	EquatableArray<InterfaceInfo> Interfaces,
-	EquatableArray<UserMethodInfo> UserMethods) : IEquatable<KnockOffTypeInfo>;
+	EquatableArray<UserMethodInfo> UserMethods,
+	EquatableArray<DiagnosticInfo> Diagnostics,
+	/// <summary>
+	/// Flat collection of all members from all interfaces, deduplicated.
+	/// Used for generating interceptors directly on stub class in v10.9+ flat API.
+	/// </summary>
+	EquatableArray<InterfaceMemberInfo> FlatMembers,
+	/// <summary>
+	/// Flat collection of all events from all interfaces, deduplicated.
+	/// Used for generating event interceptors directly on stub class in v10.9+ flat API.
+	/// </summary>
+	EquatableArray<EventMemberInfo> FlatEvents) : IEquatable<KnockOffTypeInfo>;
 
 /// <summary>
 /// Represents a containing type (for nested class support).
@@ -5359,7 +7292,8 @@ internal sealed record InterfaceMemberInfo(
 	EquatableArray<ParameterInfo> Parameters,
 	EquatableArray<ParameterInfo> IndexerParameters,
 	bool IsGenericMethod,
-	EquatableArray<TypeParameterInfo> TypeParameters) : IEquatable<InterfaceMemberInfo>;
+	EquatableArray<TypeParameterInfo> TypeParameters,
+	string DeclaringInterfaceFullName) : IEquatable<InterfaceMemberInfo>;
 
 internal sealed record ParameterInfo(
 	string Name,
@@ -5384,7 +7318,8 @@ internal sealed record EventMemberInfo(
 	EventDelegateKind DelegateKind,
 	EquatableArray<ParameterInfo> DelegateParameters,
 	string? ReturnTypeName,
-	bool IsAsync) : IEquatable<EventMemberInfo>;
+	bool IsAsync,
+	string DeclaringInterfaceFullName) : IEquatable<EventMemberInfo>;
 
 internal enum EventDelegateKind
 {

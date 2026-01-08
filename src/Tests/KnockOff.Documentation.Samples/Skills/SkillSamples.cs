@@ -76,7 +76,7 @@ public partial class SkServiceKnockOff : ISkService
 }
 
 // Pattern 2: Callback (runtime override)
-// knockOff.ISkService.GetValue.OnCall = (ko, id) => id * 100;  // Override for this test
+// knockOff.GetValue2.OnCall = (ko, id) => id * 100;  // Override for this test
 #endregion
 
 // ============================================================================
@@ -128,14 +128,22 @@ public interface ISkEventSource
     event EventHandler<string> DataReceived;
 }
 
+// Note: Multi-interface standalone stubs are no longer supported (KO0010).
+// Use inline stubs [KnockOff<T>] or separate single-interface stubs.
 #region skill:SKILL:interface-access
 [KnockOff]
-public partial class SkExampleKnockOff : ISkUserService, ISkPropertyStore, ISkEventSource { }
+public partial class SkUserServiceKnockOff : ISkUserService { }
 
-// Access patterns:
-// knockOff.ISkUserService.GetUser       // Method handler
-// knockOff.ISkPropertyStore.StringIndexer // Indexer handler
-// knockOff.ISkEventSource.DataReceived  // Event handler
+[KnockOff]
+public partial class SkPropertyStoreKnockOff : ISkPropertyStore { }
+
+[KnockOff]
+public partial class SkEventSourceKnockOff : ISkEventSource { }
+
+// Access patterns with flat API (v11.x):
+// userKnockOff.GetUser             // Method handler
+// storeKnockOff.StringIndexer      // Indexer handler
+// eventKnockOff.DataReceivedInterceptor // Event handler
 #endregion
 
 // ============================================================================
@@ -152,17 +160,18 @@ public interface ISkUnitOfWork
     void Commit();
 }
 
+// Note: Multi-interface standalone stubs are no longer supported (KO0010).
+// Use inline stubs [KnockOff<T>] or separate single-interface stubs.
 #region skill:SKILL:multiple-interfaces
 [KnockOff]
-public partial class SkDataContextKnockOff : ISkRepository, ISkUnitOfWork { }
+public partial class SkRepositoryKnockOff : ISkRepository { }
 
-// Access via interface properties:
-// knockOff.ISkRepository.Save.WasCalled
-// knockOff.ISkUnitOfWork.Commit.WasCalled
+[KnockOff]
+public partial class SkUnitOfWorkKnockOff : ISkUnitOfWork { }
 
-// Use AsXxx() for explicit casting:
-// ISkRepository repo = knockOff.AsSkRepository();
-// ISkUnitOfWork uow = knockOff.AsSkUnitOfWork();
+// Access patterns with flat API (v11.x):
+// repoKnockOff.Save.WasCalled
+// uowKnockOff.Commit.WasCalled
 #endregion
 
 // ============================================================================
@@ -182,17 +191,17 @@ public interface ISkOnCallService
 public partial class SkOnCallKnockOff : ISkOnCallService { }
 
 // No parameters
-// knockOff.ISkOnCallService.Clear.OnCall = (ko) => { };
+// knockOff.Clear.OnCall = (ko) => { };
 
 // Single parameter
-// knockOff.ISkOnCallService.GetById.OnCall = (ko, id) => new SkUser { Id = id };
+// knockOff.GetById2.OnCall = (ko, id) => new SkUser { Id = id };
 
 // Multiple parameters - individual params, not tuples
-// knockOff.ISkOnCallService.Find.OnCall = (ko, name, active) =>
+// knockOff.Find.OnCall = (ko, name, active) =>
 //     users.Where(u => u.Name == name && u.Active == active).ToList();
 
 // Void method
-// knockOff.ISkOnCallService.Save.OnCall = (ko, entity) => { /* logic */ };
+// knockOff.Save.OnCall = (ko, entity) => { /* logic */ };
 #endregion
 
 // ============================================================================
@@ -209,8 +218,8 @@ public interface ISkParser
 public partial class SkParserKnockOff : ISkParser { }
 
 // Out/Ref parameters - use explicit delegate type:
-// knockOff.ISkParser.TryParse.OnCall =
-//     (ISkParser_TryParseHandler.TryParseDelegate)((ko, string input, out int result) =>
+// knockOff.TryParse.OnCall =
+//     (TryParseHandler.TryParseDelegate)((ko, string input, out int result) =>
 //     {
 //         return int.TryParse(input, out result);
 //     });
@@ -288,22 +297,22 @@ public interface ISkCallbackPropertyStore
 public partial class SkCallbackMethodKnockOff : ISkCallbackService { }
 
 // Void method
-// knockOff.ISkCallbackService.DoWork.OnCall = (ko) => { /* custom logic */ };
+// knockOff.DoWork.OnCall = (ko) => { /* custom logic */ };
 
 // Return method (single param)
-// knockOff.ISkCallbackService.GetById.OnCall = (ko, id) =>
+// knockOff.GetById2.OnCall = (ko, id) =>
 //     new SkUser { Id = id, Name = "Mocked" };
 
 // Return method (multiple params) - individual parameters
-// knockOff.ISkCallbackService.Search.OnCall = (ko, query, limit, offset) =>
+// knockOff.Search.OnCall = (ko, query, limit, offset) =>
 //     results.Skip(offset).Take(limit).ToList();
 #endregion
 
 #region skill:SKILL:customization-callbacks-property
-// knockOff.ISkCallbackService.CurrentUser.OnGet = (ko) =>
+// knockOff.CurrentUser.OnGet = (ko) =>
 //     new SkUser { Name = "TestUser" };
 
-// knockOff.ISkCallbackService.CurrentUser.OnSet = (ko, value) =>
+// knockOff.CurrentUser.OnSet = (ko, value) =>
 // {
 //     capturedUser = value;
 //     // Note: Value does NOT go to backing field
@@ -314,14 +323,14 @@ public partial class SkCallbackMethodKnockOff : ISkCallbackService { }
 [KnockOff]
 public partial class SkCallbackIndexerKnockOff : ISkCallbackPropertyStore { }
 
-// knockOff.ISkCallbackPropertyStore.StringIndexer.OnGet = (ko, key) => key switch
+// knockOff.StringIndexer.OnGet = (ko, key) => key switch
 // {
 //     "admin" => adminConfig,
 //     "guest" => guestConfig,
 //     _ => null
 // };
 
-// knockOff.ISkCallbackPropertyStore.StringIndexer.OnSet = (ko, key, value) =>
+// knockOff.StringIndexer.OnSet = (ko, key, value) =>
 // {
 //     // Custom logic
 //     // Note: Value does NOT go to backing dictionary
@@ -347,8 +356,8 @@ public partial class SkPriorityServiceKnockOff : ISkPriorityService
 // var knockOff = new SkPriorityServiceKnockOff();
 // ISkPriorityService service = knockOff;
 // No callback -> uses user method: service.Calculate(5) returns 10
-// Callback -> overrides: knockOff.ISkPriorityService.Calculate.OnCall = (ko, x) => x * 100;
-// Reset -> back to user method: knockOff.ISkPriorityService.Calculate.Reset();
+// Callback -> overrides: knockOff.Calculate2.OnCall = (ko, x) => x * 100;
+// Reset -> back to user method: knockOff.Calculate2.Reset();
 
 // ============================================================================
 // Verification Patterns
@@ -371,37 +380,37 @@ public interface ISkVerificationPropertyStore
 public partial class SkVerificationKnockOff : ISkVerificationService { }
 
 // Basic
-// Assert.True(knockOff.ISkVerificationService.GetUser.WasCalled);
-// Assert.Equal(3, knockOff.ISkVerificationService.GetUser.CallCount);
+// Assert.True(knockOff.GetUser.WasCalled);
+// Assert.Equal(3, knockOff.GetUser.CallCount);
 
 // Arguments (single param)
-// Assert.Equal(42, knockOff.ISkVerificationService.GetUser.LastCallArg);
+// Assert.Equal(42, knockOff.GetUser.LastCallArg);
 
 // Arguments (multiple params - named tuple)
-// var args = knockOff.ISkVerificationService.Create.LastCallArgs;
+// var args = knockOff.Create.LastCallArgs;
 // Assert.Equal("Test", args?.name);
 // Assert.Equal(100, args?.value);
 
 // Destructuring
-// if (knockOff.ISkVerificationService.Create.LastCallArgs is var (name, value))
+// if (knockOff.Create.LastCallArgs is var (name, value))
 // {
 //     Assert.Equal("Test", name);
 // }
 #endregion
 
 #region skill:SKILL:verification-property-tracking
-// Assert.Equal(2, knockOff.ISkVerificationService.Name.GetCount);
-// Assert.Equal(3, knockOff.ISkVerificationService.Name.SetCount);
-// Assert.Equal("LastValue", knockOff.ISkVerificationService.Name.LastSetValue);
+// Assert.Equal(2, knockOff.Name.GetCount);
+// Assert.Equal(3, knockOff.Name.SetCount);
+// Assert.Equal("LastValue", knockOff.Name.LastSetValue);
 #endregion
 
 #region skill:SKILL:verification-indexer-tracking
 [KnockOff]
 public partial class SkVerificationIndexerKnockOff : ISkVerificationPropertyStore { }
 
-// Assert.Equal("key1", knockOff.ISkVerificationPropertyStore.StringIndexer.LastGetKey);
+// Assert.Equal("key1", knockOff.StringIndexer.LastGetKey);
 
-// var setEntry = knockOff.ISkVerificationPropertyStore.StringIndexer.LastSetEntry;
+// var setEntry = knockOff.StringIndexer.LastSetEntry;
 // Assert.Equal("key", setEntry?.key);
 // Assert.Equal(value, setEntry?.value);
 #endregion
@@ -425,7 +434,7 @@ public interface ISkBackingPropertyStore
 public partial class SkBackingServiceKnockOff : ISkBackingService { }
 
 // Direct access to backing field (interface-prefixed)
-// knockOff.ISkBackingService_NameBacking = "Pre-populated value";
+// knockOff.NameBacking = "Pre-populated value";
 
 // Without OnGet, getter returns backing field
 // Assert.Equal("Pre-populated value", service.Name);
@@ -436,8 +445,8 @@ public partial class SkBackingServiceKnockOff : ISkBackingService { }
 public partial class SkBackingPropertyStoreKnockOff : ISkBackingPropertyStore { }
 
 // Pre-populate backing dictionary (interface-prefixed)
-// knockOff.ISkBackingPropertyStore_StringIndexerBacking["key1"] = value1;
-// knockOff.ISkBackingPropertyStore_StringIndexerBacking["key2"] = value2;
+// knockOff.StringIndexerBacking["key1"] = value1;
+// knockOff.StringIndexerBacking["key2"] = value2;
 
 // Without OnGet, getter checks backing dictionary
 // Assert.Equal(value1, store["key1"]);
@@ -460,7 +469,7 @@ public interface ISkPatternService
 [KnockOff]
 public partial class SkPatternServiceKnockOff : ISkPatternService { }
 
-// knockOff.ISkPatternService.GetUser.OnCall = (ko, id) => id switch
+// knockOff.GetUser.OnCall = (ko, id) => id switch
 // {
 //     1 => new SkUser { Name = "Admin" },
 //     2 => new SkUser { Name = "Guest" },
@@ -470,17 +479,17 @@ public partial class SkPatternServiceKnockOff : ISkPatternService { }
 
 // Throwing Exceptions
 #region skill:SKILL:pattern-exceptions
-// knockOff.ISkPatternService.Connect.OnCall = (ko) =>
+// knockOff.Connect.OnCall = (ko) =>
 //     throw new TimeoutException("Connection failed");
 
-// knockOff.ISkPatternService.SaveAsync.OnCall = (ko, entity) =>
+// knockOff.SaveAsync.OnCall = (ko, entity) =>
 //     Task.FromException<int>(new DbException("Save failed"));
 #endregion
 
 // Sequential Returns
 #region skill:SKILL:pattern-sequential
 // var results = new Queue<int>([1, 2, 3]);
-// knockOff.ISkPatternService.GetNext.OnCall = (ko) => results.Dequeue();
+// knockOff.GetNext.OnCall = (ko) => results.Dequeue();
 #endregion
 
 // Async Methods
@@ -494,10 +503,10 @@ public interface ISkAsyncPatternRepository
 [KnockOff]
 public partial class SkAsyncPatternRepositoryKnockOff : ISkAsyncPatternRepository { }
 
-// knockOff.ISkAsyncPatternRepository.GetUserAsync.OnCall = (ko, id) =>
+// knockOff.GetUserAsync.OnCall = (ko, id) =>
 //     Task.FromResult<SkUser?>(new SkUser { Id = id });
 
-// knockOff.ISkAsyncPatternRepository.SaveAsync.OnCall = (ko, entity) =>
+// knockOff.SaveAsync.OnCall = (ko, entity) =>
 //     Task.FromResult(1);
 #endregion
 
@@ -517,20 +526,20 @@ public partial class SkEventPatternSourceKnockOff : ISkEventPatternSource { }
 
 // Subscribe tracking
 // source.DataReceived += (s, e) => Console.WriteLine(e);
-// Assert.Equal(1, knockOff.ISkEventPatternSource.DataReceived.SubscribeCount);
-// Assert.True(knockOff.ISkEventPatternSource.DataReceived.HasSubscribers);
+// Assert.Equal(1, knockOff.DataReceived.SubscribeCount);
+// Assert.True(knockOff.DataReceived.HasSubscribers);
 
 // Raise events from tests
-// knockOff.ISkEventPatternSource.DataReceived.Raise("test data");
-// Assert.True(knockOff.ISkEventPatternSource.DataReceived.WasRaised);
-// Assert.Equal(1, knockOff.ISkEventPatternSource.DataReceived.RaiseCount);
+// knockOff.DataReceived.Raise("test data");
+// Assert.True(knockOff.DataReceived.WasRaised);
+// Assert.Equal(1, knockOff.DataReceived.RaiseCount);
 
 // Action-style events
-// knockOff.ISkEventPatternSource.ProgressChanged.Raise(75);
+// knockOff.ProgressChanged.Raise(75);
 
 // Reset vs Clear
-// knockOff.ISkEventPatternSource.DataReceived.Reset();  // Clears tracking, keeps handlers
-// knockOff.ISkEventPatternSource.DataReceived.Clear();  // Clears tracking AND handlers
+// knockOff.DataReceived.Reset();  // Clears tracking, keeps handlers
+// knockOff.DataReceived.Clear();  // Clears tracking AND handlers
 #endregion
 
 // Generics
@@ -548,10 +557,10 @@ public partial class SkGenericSerializerKnockOff : ISkGenericSerializer { }
 // ISkGenericSerializer service = knockOff;
 
 // Configure behavior per type argument
-// knockOff.ISkGenericSerializer.Deserialize.Of<SkUser>().OnCall = (ko, json) =>
+// knockOff.Deserialize.Of<SkUser>().OnCall = (ko, json) =>
 //     JsonSerializer.Deserialize<SkUser>(json)!;
 
-// knockOff.ISkGenericSerializer.Deserialize.Of<SkOrder>().OnCall = (ko, json) =>
+// knockOff.Deserialize.Of<SkOrder>().OnCall = (ko, json) =>
 //     new SkOrder { Id = 123 };
 
 // Per-type call tracking
@@ -559,19 +568,19 @@ public partial class SkGenericSerializerKnockOff : ISkGenericSerializer { }
 // service.Deserialize<SkUser>("{...}");
 // service.Deserialize<SkOrder>("{...}");
 
-// Assert.Equal(2, knockOff.ISkGenericSerializer.Deserialize.Of<SkUser>().CallCount);
-// Assert.Equal(1, knockOff.ISkGenericSerializer.Deserialize.Of<SkOrder>().CallCount);
+// Assert.Equal(2, knockOff.Deserialize.Of<SkUser>().CallCount);
+// Assert.Equal(1, knockOff.Deserialize.Of<SkOrder>().CallCount);
 
 // Aggregate tracking across all type arguments
-// Assert.Equal(3, knockOff.ISkGenericSerializer.Deserialize.TotalCallCount);
-// Assert.True(knockOff.ISkGenericSerializer.Deserialize.WasCalled);
+// Assert.Equal(3, knockOff.Deserialize.TotalCallCount);
+// Assert.True(knockOff.Deserialize.WasCalled);
 
 // See which types were called
-// var types = knockOff.ISkGenericSerializer.Deserialize.CalledTypeArguments;
+// var types = knockOff.Deserialize.CalledTypeArguments;
 // // [typeof(SkUser), typeof(SkOrder)]
 
 // Multiple type parameters
-// knockOff.ISkGenericSerializer.Convert.Of<string, int>().OnCall = (ko, s) => s.Length;
+// knockOff.Convert.Of<string, int>().OnCall = (ko, s) => s.Length;
 #endregion
 
 // Overloads
@@ -590,14 +599,14 @@ public partial class SkOverloadedServiceKnockOff : ISkOverloadedService { }
 // ISkOverloadedService service = knockOff;
 
 // Each overload has its own handler (1-based numbering)
-// knockOff.ISkOverloadedService.Process1.CallCount;  // Calls to Process(string)
-// knockOff.ISkOverloadedService.Process2.CallCount;  // Calls to Process(string, int)
-// knockOff.ISkOverloadedService.Process3.CallCount;  // Calls to Process(string, int, bool)
+// knockOff.Process1.CallCount;  // Calls to Process(string)
+// knockOff.Process2.CallCount;  // Calls to Process(string, int)
+// knockOff.Process3.CallCount;  // Calls to Process(string, int, bool)
 
 // Set callbacks for each overload
-// knockOff.ISkOverloadedService.Process1.OnCall = (ko, data) => { /* 1-param */ };
-// knockOff.ISkOverloadedService.Process2.OnCall = (ko, data, priority) => { /* 2-param */ };
-// knockOff.ISkOverloadedService.Process3.OnCall = (ko, data, priority, async) => { /* 3-param */ };
+// knockOff.Process1.OnCall = (ko, data) => { /* 1-param */ };
+// knockOff.Process2.OnCall = (ko, data, priority) => { /* 2-param */ };
+// knockOff.Process3.OnCall = (ko, data, priority, async) => { /* 3-param */ };
 #endregion
 
 // Nested Classes
@@ -628,8 +637,8 @@ public partial class SkOutParamParserKnockOff : ISkOutParamParser { }
 // ISkOutParamParser parser = knockOff;
 
 // Callback requires explicit delegate type for out/ref
-// knockOff.ISkOutParamParser.TryParse.OnCall =
-//     (ISkOutParamParser_TryParseHandler.TryParseDelegate)((ko, string input, out int result) =>
+// knockOff.TryParse.OnCall =
+//     (TryParseHandler.TryParseDelegate)((ko, string input, out int result) =>
 //     {
 //         if (int.TryParse(input, out result))
 //             return true;
@@ -643,8 +652,8 @@ public partial class SkOutParamParserKnockOff : ISkOutParamParser { }
 // Assert.Equal(42, value);
 
 // Tracking only includes INPUT params (not out params)
-// Assert.Equal("42", knockOff.ISkOutParamParser.TryParse.LastCallArg);
-// Assert.Equal(1, knockOff.ISkOutParamParser.TryParse.CallCount);
+// Assert.Equal("42", knockOff.TryParse.LastCallArg);
+// Assert.Equal(1, knockOff.TryParse.CallCount);
 #endregion
 
 // Ref Parameters
@@ -662,8 +671,8 @@ public partial class SkRefProcessorKnockOff : ISkRefProcessor { }
 // ISkRefProcessor processor = knockOff;
 
 // Callback can modify ref params - explicit delegate type required
-// knockOff.ISkRefProcessor.Increment.OnCall =
-//     (ISkRefProcessor_IncrementHandler.IncrementDelegate)((ko, ref int value) =>
+// knockOff.Increment.OnCall =
+//     (IncrementHandler.IncrementDelegate)((ko, ref int value) =>
 //     {
 //         value = value * 2;  // Double it
 //     });
@@ -673,5 +682,5 @@ public partial class SkRefProcessorKnockOff : ISkRefProcessor { }
 // Assert.Equal(10, x);  // Modified by callback
 
 // Tracking captures INPUT value (before modification)
-// Assert.Equal(5, knockOff.ISkRefProcessor.Increment.LastCallArg);
+// Assert.Equal(5, knockOff.Increment.LastCallArg);
 #endregion

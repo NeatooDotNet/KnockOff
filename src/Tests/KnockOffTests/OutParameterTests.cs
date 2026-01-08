@@ -17,9 +17,9 @@ public class OutParameterTests
 
 		// This test verifies that the generated code compiles
 		// The method signature must include 'out' keyword
-		Assert.NotNull(knockOff.IOutParameterService.TryGetValue);
-		Assert.NotNull(knockOff.IOutParameterService.TryParse);
-		Assert.NotNull(knockOff.IOutParameterService.GetData);
+		Assert.NotNull(knockOff.TryGetValue);
+		Assert.NotNull(knockOff.TryParse);
+		Assert.NotNull(knockOff.GetData);
 	}
 
 	[Fact]
@@ -29,7 +29,7 @@ public class OutParameterTests
 		IOutParameterService service = knockOff;
 
 		// Set callback to provide return value
-		knockOff.IOutParameterService.TryGetValue.OnCall = (OutParameterServiceKnockOff ko, string key, out string? value) =>
+		knockOff.TryGetValue.OnCall = (OutParameterServiceKnockOff ko, string key, out string? value) =>
 		{
 			value = "found";
 			return true;
@@ -39,8 +39,8 @@ public class OutParameterTests
 		service.TryGetValue("myKey", out var result);
 
 		// Tracking should only show the input parameter 'key', not the out param 'value'
-		Assert.Equal(1, knockOff.IOutParameterService.TryGetValue.CallCount);
-		Assert.Equal("myKey", knockOff.IOutParameterService.TryGetValue.LastCallArg);
+		Assert.Equal(1, knockOff.TryGetValue.CallCount);
+		Assert.Equal("myKey", knockOff.TryGetValue.LastCallArg);
 	}
 
 	[Fact]
@@ -49,7 +49,7 @@ public class OutParameterTests
 		var knockOff = new OutParameterServiceKnockOff();
 		IOutParameterService service = knockOff;
 
-		knockOff.IOutParameterService.TryGetValue.OnCall = (OutParameterServiceKnockOff ko, string key, out string? value) =>
+		knockOff.TryGetValue.OnCall = (OutParameterServiceKnockOff ko, string key, out string? value) =>
 		{
 			if (key == "exists")
 			{
@@ -77,7 +77,7 @@ public class OutParameterTests
 		var knockOff = new OutParameterServiceKnockOff();
 		IOutParameterService service = knockOff;
 
-		knockOff.IOutParameterService.TryParse.OnCall = (OutParameterServiceKnockOff ko, string input, out int result) =>
+		knockOff.TryParse.OnCall = (OutParameterServiceKnockOff ko, string input, out int result) =>
 		{
 			if (int.TryParse(input, out result))
 				return true;
@@ -96,7 +96,7 @@ public class OutParameterTests
 		Assert.Equal(0, defaultVal);
 
 		// Verify tracking
-		Assert.Equal(2, knockOff.IOutParameterService.TryParse.CallCount);
+		Assert.Equal(2, knockOff.TryParse.CallCount);
 	}
 
 	[Fact]
@@ -105,7 +105,7 @@ public class OutParameterTests
 		var knockOff = new OutParameterServiceKnockOff();
 		IOutParameterService service = knockOff;
 
-		knockOff.IOutParameterService.GetData.OnCall = (OutParameterServiceKnockOff ko, out string name, out int count) =>
+		knockOff.GetData.OnCall = (OutParameterServiceKnockOff ko, out string name, out int count) =>
 		{
 			name = "TestName";
 			count = 100;
@@ -116,8 +116,8 @@ public class OutParameterTests
 
 		Assert.Equal("TestName", name);
 		Assert.Equal(100, count);
-		Assert.Equal(1, knockOff.IOutParameterService.GetData.CallCount);
-		Assert.True(knockOff.IOutParameterService.GetData.WasCalled);
+		Assert.Equal(1, knockOff.GetData.CallCount);
+		Assert.True(knockOff.GetData.WasCalled);
 	}
 
 	[Fact]
@@ -126,7 +126,7 @@ public class OutParameterTests
 		var knockOff = new OutParameterServiceKnockOff();
 		IOutParameterService service = knockOff;
 
-		knockOff.IOutParameterService.GetData.OnCall = (OutParameterServiceKnockOff ko, out string name, out int count) =>
+		knockOff.GetData.OnCall = (OutParameterServiceKnockOff ko, out string name, out int count) =>
 		{
 			name = "Product";
 			count = 42;
@@ -158,18 +158,18 @@ public class OutParameterTests
 		var knockOff = new OutParameterServiceKnockOff();
 		IOutParameterService service = knockOff;
 
-		knockOff.IOutParameterService.TryGetValue.OnCall = (OutParameterServiceKnockOff ko, string key, out string? value) => { value = "x"; return true; };
+		knockOff.TryGetValue.OnCall = (OutParameterServiceKnockOff ko, string key, out string? value) => { value = "x"; return true; };
 
 		service.TryGetValue("key1", out _);
 		service.TryGetValue("key2", out _);
 
-		Assert.Equal(2, knockOff.IOutParameterService.TryGetValue.CallCount);
+		Assert.Equal(2, knockOff.TryGetValue.CallCount);
 
-		knockOff.IOutParameterService.TryGetValue.Reset();
+		knockOff.TryGetValue.Reset();
 
-		Assert.Equal(0, knockOff.IOutParameterService.TryGetValue.CallCount);
-		Assert.False(knockOff.IOutParameterService.TryGetValue.WasCalled);
-		Assert.Null(knockOff.IOutParameterService.TryGetValue.LastCallArg);
+		Assert.Equal(0, knockOff.TryGetValue.CallCount);
+		Assert.False(knockOff.TryGetValue.WasCalled);
+		Assert.Null(knockOff.TryGetValue.LastCallArg);
 	}
 
 	[Fact]
@@ -178,13 +178,13 @@ public class OutParameterTests
 		var knockOff = new OutParameterServiceKnockOff();
 		IOutParameterService service = knockOff;
 
-		knockOff.IOutParameterService.TryParse.OnCall = (OutParameterServiceKnockOff ko, string input, out int result) => { result = 0; return false; };
+		knockOff.TryParse.OnCall = (OutParameterServiceKnockOff ko, string input, out int result) => { result = 0; return false; };
 
 		service.TryParse("first", out _);
 		service.TryParse("second", out _);
 		service.TryParse("third", out _);
 
-		Assert.Equal(3, knockOff.IOutParameterService.TryParse.CallCount);
-		Assert.Equal("third", knockOff.IOutParameterService.TryParse.LastCallArg); // Last call
+		Assert.Equal(3, knockOff.TryParse.CallCount);
+		Assert.Equal("third", knockOff.TryParse.LastCallArg); // Last call
 	}
 }

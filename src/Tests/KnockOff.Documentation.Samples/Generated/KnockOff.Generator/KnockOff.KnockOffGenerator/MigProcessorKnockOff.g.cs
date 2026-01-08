@@ -5,49 +5,38 @@ namespace KnockOff.Documentation.Samples.Comparison;
 
 partial class MigProcessorKnockOff
 {
-	/// <summary>Tracks and configures behavior for IMigProcessor.Process.</summary>
-	public sealed class IMigProcessor_ProcessInterceptor
+	/// <summary>Tracks and configures behavior for Process.</summary>
+	public sealed class ProcessInterceptor
 	{
-		/// <summary>Delegate for Process(string data).</summary>
-		public delegate void ProcessDelegate(MigProcessorKnockOff ko, string data);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'data' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public string? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public ProcessDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<MigProcessorKnockOff, string>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string data) { CallCount++; LastCallArg = data; }
+		public void RecordCall(string? data) { CallCount++; LastCallArg = data; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigProcessor.</summary>
-	public sealed class IMigProcessorInterceptorors
-	{
-		/// <summary>Interceptor for Process.</summary>
-		public IMigProcessor_ProcessInterceptor Process { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigProcessor.</summary>
-	public IMigProcessorInterceptorors IMigProcessor { get; } = new();
+	/// <summary>Interceptor for Process.</summary>
+	public ProcessInterceptor Process { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IMigProcessor.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IMigProcessor AsMigProcessor() => this;
 
 	void KnockOff.Documentation.Samples.Comparison.IMigProcessor.Process(string data)
 	{
-		IMigProcessor.Process.RecordCall(data);
-		if (IMigProcessor.Process.OnCall is { } onCallCallback)
-		{ onCallCallback(this, data); return; }
+		Process.RecordCall(data);
+		Process.OnCall?.Invoke(this, data);
 	}
 
 }

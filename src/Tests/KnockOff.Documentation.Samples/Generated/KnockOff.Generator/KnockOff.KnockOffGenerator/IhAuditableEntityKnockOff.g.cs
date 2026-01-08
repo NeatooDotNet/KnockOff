@@ -5,8 +5,8 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class IhAuditableEntityKnockOff
 {
-	/// <summary>Tracks and configures behavior for IIhAuditableEntity.ModifiedAt.</summary>
-	public sealed class IIhAuditableEntity_ModifiedAtInterceptor
+	/// <summary>Tracks and configures behavior for ModifiedAt.</summary>
+	public sealed class ModifiedAtInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -33,8 +33,8 @@ partial class IhAuditableEntityKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IIhAuditableEntity.ModifiedBy.</summary>
-	public sealed class IIhAuditableEntity_ModifiedByInterceptor
+	/// <summary>Tracks and configures behavior for ModifiedBy.</summary>
+	public sealed class ModifiedByInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -61,17 +61,8 @@ partial class IhAuditableEntityKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhAuditableEntity.</summary>
-	public sealed class IIhAuditableEntityInterceptorors
-	{
-		/// <summary>Interceptor for ModifiedAt.</summary>
-		public IIhAuditableEntity_ModifiedAtInterceptor ModifiedAt { get; } = new();
-		/// <summary>Interceptor for ModifiedBy.</summary>
-		public IIhAuditableEntity_ModifiedByInterceptor ModifiedBy { get; } = new();
-	}
-
-	/// <summary>Tracks and configures behavior for IIhBaseEntity.Id.</summary>
-	public sealed class IIhBaseEntity_IdInterceptor
+	/// <summary>Tracks and configures behavior for Id.</summary>
+	public sealed class IdInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -86,8 +77,8 @@ partial class IhAuditableEntityKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IIhBaseEntity.CreatedAt.</summary>
-	public sealed class IIhBaseEntity_CreatedAtInterceptor
+	/// <summary>Tracks and configures behavior for CreatedAt.</summary>
+	public sealed class CreatedAtInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -102,20 +93,17 @@ partial class IhAuditableEntityKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhBaseEntity.</summary>
-	public sealed class IIhBaseEntityInterceptorors
-	{
-		/// <summary>Interceptor for Id.</summary>
-		public IIhBaseEntity_IdInterceptor Id { get; } = new();
-		/// <summary>Interceptor for CreatedAt.</summary>
-		public IIhBaseEntity_CreatedAtInterceptor CreatedAt { get; } = new();
-	}
+	/// <summary>Interceptor for ModifiedAt.</summary>
+	public ModifiedAtInterceptor ModifiedAt { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhAuditableEntity.</summary>
-	public IIhAuditableEntityInterceptorors IIhAuditableEntity { get; } = new();
+	/// <summary>Interceptor for ModifiedBy.</summary>
+	public ModifiedByInterceptor ModifiedBy { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIhBaseEntity.</summary>
-	public IIhBaseEntityInterceptorors IIhBaseEntity { get; } = new();
+	/// <summary>Interceptor for Id.</summary>
+	public IdInterceptor Id { get; } = new();
+
+	/// <summary>Interceptor for CreatedAt.</summary>
+	public CreatedAtInterceptor CreatedAt { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIhAuditableEntity.</summary>
 	public KnockOff.Documentation.Samples.Guides.IIhAuditableEntity AsIhAuditableEntity() => this;
@@ -123,76 +111,38 @@ partial class IhAuditableEntityKnockOff
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIhBaseEntity.</summary>
 	public KnockOff.Documentation.Samples.Guides.IIhBaseEntity AsIhBaseEntity() => this;
 
-	/// <summary>Backing field for IIhAuditableEntity.ModifiedAt.</summary>
-	protected global::System.DateTime? IIhAuditableEntity_ModifiedAtBacking { get; set; }
+	/// <summary>Backing storage for ModifiedAt.</summary>
+	protected global::System.DateTime? ModifiedAtBacking { get; set; } = default!;
 
-	/// <summary>Backing field for IIhAuditableEntity.ModifiedBy.</summary>
-	protected string IIhAuditableEntity_ModifiedByBacking { get; set; } = "";
+	/// <summary>Backing storage for ModifiedBy.</summary>
+	protected string ModifiedByBacking { get; set; } = "";
 
-	/// <summary>Backing field for IIhBaseEntity.Id.</summary>
-	protected int IIhBaseEntity_IdBacking { get; set; }
+	/// <summary>Backing storage for Id.</summary>
+	protected int IdBacking { get; set; } = default!;
 
-	/// <summary>Backing field for IIhBaseEntity.CreatedAt.</summary>
-	protected global::System.DateTime IIhBaseEntity_CreatedAtBacking { get; set; }
+	/// <summary>Backing storage for CreatedAt.</summary>
+	protected global::System.DateTime CreatedAtBacking { get; set; } = default!;
 
 	global::System.DateTime? KnockOff.Documentation.Samples.Guides.IIhAuditableEntity.ModifiedAt
 	{
-		get
-		{
-			IIhAuditableEntity.ModifiedAt.RecordGet();
-			if (IIhAuditableEntity.ModifiedAt.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IIhAuditableEntity_ModifiedAtBacking;
-		}
-		set
-		{
-			IIhAuditableEntity.ModifiedAt.RecordSet(value);
-			if (IIhAuditableEntity.ModifiedAt.OnSet is { } onSetCallback)
-				onSetCallback(this, value);
-			else
-				IIhAuditableEntity_ModifiedAtBacking = value;
-		}
+		get { ModifiedAt.RecordGet(); return ModifiedAt.OnGet?.Invoke(this) ?? ModifiedAtBacking; }
+		set { ModifiedAt.RecordSet(value); if (ModifiedAt.OnSet != null) ModifiedAt.OnSet(this, value); else ModifiedAtBacking = value; }
 	}
 
 	string KnockOff.Documentation.Samples.Guides.IIhAuditableEntity.ModifiedBy
 	{
-		get
-		{
-			IIhAuditableEntity.ModifiedBy.RecordGet();
-			if (IIhAuditableEntity.ModifiedBy.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IIhAuditableEntity_ModifiedByBacking;
-		}
-		set
-		{
-			IIhAuditableEntity.ModifiedBy.RecordSet(value);
-			if (IIhAuditableEntity.ModifiedBy.OnSet is { } onSetCallback)
-				onSetCallback(this, value);
-			else
-				IIhAuditableEntity_ModifiedByBacking = value;
-		}
+		get { ModifiedBy.RecordGet(); return ModifiedBy.OnGet?.Invoke(this) ?? ModifiedByBacking; }
+		set { ModifiedBy.RecordSet(value); if (ModifiedBy.OnSet != null) ModifiedBy.OnSet(this, value); else ModifiedByBacking = value; }
 	}
 
 	int KnockOff.Documentation.Samples.Guides.IIhBaseEntity.Id
 	{
-		get
-		{
-			IIhBaseEntity.Id.RecordGet();
-			if (IIhBaseEntity.Id.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IIhBaseEntity_IdBacking;
-		}
+		get { Id.RecordGet(); return Id.OnGet?.Invoke(this) ?? IdBacking; }
 	}
 
 	global::System.DateTime KnockOff.Documentation.Samples.Guides.IIhBaseEntity.CreatedAt
 	{
-		get
-		{
-			IIhBaseEntity.CreatedAt.RecordGet();
-			if (IIhBaseEntity.CreatedAt.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IIhBaseEntity_CreatedAtBacking;
-		}
+		get { CreatedAt.RecordGet(); return CreatedAt.OnGet?.Invoke(this) ?? CreatedAtBacking; }
 	}
 
 }

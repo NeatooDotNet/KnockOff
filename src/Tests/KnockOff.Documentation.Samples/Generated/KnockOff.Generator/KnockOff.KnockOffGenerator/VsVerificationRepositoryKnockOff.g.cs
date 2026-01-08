@@ -5,69 +5,63 @@ namespace KnockOff.Documentation.Samples.Comparison;
 
 partial class VsVerificationRepositoryKnockOff
 {
-	/// <summary>Tracks and configures behavior for IVsVerificationRepository.Save.</summary>
-	public sealed class IVsVerificationRepository_SaveInterceptor
+	/// <summary>Tracks and configures behavior for Save.</summary>
+	public sealed class SaveInterceptor
 	{
-		/// <summary>Delegate for Save(global::KnockOff.Documentation.Samples.Comparison.VsEntity entity).</summary>
-		public delegate void SaveDelegate(VsVerificationRepositoryKnockOff ko, global::KnockOff.Documentation.Samples.Comparison.VsEntity entity);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'entity' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public global::KnockOff.Documentation.Samples.Comparison.VsEntity? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public SaveDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<VsVerificationRepositoryKnockOff, global::KnockOff.Documentation.Samples.Comparison.VsEntity>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::KnockOff.Documentation.Samples.Comparison.VsEntity entity) { CallCount++; LastCallArg = entity; }
+		public void RecordCall(global::KnockOff.Documentation.Samples.Comparison.VsEntity? entity) { CallCount++; LastCallArg = entity; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IVsVerificationRepository.Delete.</summary>
-	public sealed class IVsVerificationRepository_DeleteInterceptor
+	/// <summary>Tracks and configures behavior for Delete.</summary>
+	public sealed class DeleteInterceptor
 	{
-		/// <summary>Delegate for Delete(int id).</summary>
-		public delegate void DeleteDelegate(VsVerificationRepositoryKnockOff ko, int id);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public DeleteDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<VsVerificationRepositoryKnockOff, int>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IVsVerificationRepository.GetAll.</summary>
-	public sealed class IVsVerificationRepository_GetAllInterceptor
+	/// <summary>Tracks and configures behavior for GetAll.</summary>
+	public sealed class GetAllInterceptor
 	{
-		/// <summary>Delegate for GetAll().</summary>
+		/// <summary>Delegate for GetAll.</summary>
 		public delegate global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Comparison.VsEntity> GetAllDelegate(VsVerificationRepositoryKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetAllDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -77,77 +71,65 @@ partial class VsVerificationRepositoryKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IVsVerificationRepository.Update.</summary>
-	public sealed class IVsVerificationRepository_UpdateInterceptor
+	/// <summary>Tracks and configures behavior for Update.</summary>
+	public sealed class UpdateInterceptor
 	{
-		/// <summary>Delegate for Update(global::KnockOff.Documentation.Samples.Comparison.VsEntity entity).</summary>
-		public delegate void UpdateDelegate(VsVerificationRepositoryKnockOff ko, global::KnockOff.Documentation.Samples.Comparison.VsEntity entity);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'entity' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public global::KnockOff.Documentation.Samples.Comparison.VsEntity? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public UpdateDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<VsVerificationRepositoryKnockOff, global::KnockOff.Documentation.Samples.Comparison.VsEntity>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::KnockOff.Documentation.Samples.Comparison.VsEntity entity) { CallCount++; LastCallArg = entity; }
+		public void RecordCall(global::KnockOff.Documentation.Samples.Comparison.VsEntity? entity) { CallCount++; LastCallArg = entity; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository.</summary>
-	public sealed class IVsVerificationRepositoryInterceptorors
-	{
-		/// <summary>Interceptor for Save.</summary>
-		public IVsVerificationRepository_SaveInterceptor Save { get; } = new();
-		/// <summary>Interceptor for Delete.</summary>
-		public IVsVerificationRepository_DeleteInterceptor Delete { get; } = new();
-		/// <summary>Interceptor for GetAll.</summary>
-		public IVsVerificationRepository_GetAllInterceptor GetAll { get; } = new();
-		/// <summary>Interceptor for Update.</summary>
-		public IVsVerificationRepository_UpdateInterceptor Update { get; } = new();
-	}
+	/// <summary>Interceptor for Save.</summary>
+	public SaveInterceptor Save { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository.</summary>
-	public IVsVerificationRepositoryInterceptorors IVsVerificationRepository { get; } = new();
+	/// <summary>Interceptor for Delete.</summary>
+	public DeleteInterceptor Delete { get; } = new();
+
+	/// <summary>Interceptor for GetAll.</summary>
+	public GetAllInterceptor GetAll { get; } = new();
+
+	/// <summary>Interceptor for Update.</summary>
+	public UpdateInterceptor Update { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository AsVsVerificationRepository() => this;
 
 	void KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository.Save(global::KnockOff.Documentation.Samples.Comparison.VsEntity entity)
 	{
-		IVsVerificationRepository.Save.RecordCall(entity);
-		if (IVsVerificationRepository.Save.OnCall is { } onCallCallback)
-		{ onCallCallback(this, entity); return; }
+		Save.RecordCall(entity);
+		Save.OnCall?.Invoke(this, entity);
 	}
 
 	void KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository.Delete(int id)
 	{
-		IVsVerificationRepository.Delete.RecordCall(id);
-		if (IVsVerificationRepository.Delete.OnCall is { } onCallCallback)
-		{ onCallCallback(this, id); return; }
+		Delete.RecordCall(id);
+		Delete.OnCall?.Invoke(this, id);
 	}
 
 	global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Comparison.VsEntity> KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository.GetAll()
 	{
-		IVsVerificationRepository.GetAll.RecordCall();
-		if (IVsVerificationRepository.GetAll.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Comparison.VsEntity>();
+		GetAll.RecordCall();
+		return GetAll.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Comparison.VsEntity>();
 	}
 
 	void KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository.Update(global::KnockOff.Documentation.Samples.Comparison.VsEntity entity)
 	{
-		IVsVerificationRepository.Update.RecordCall(entity);
-		if (IVsVerificationRepository.Update.OnCall is { } onCallCallback)
-		{ onCallCallback(this, entity); return; }
+		Update.RecordCall(entity);
+		Update.OnCall?.Invoke(this, entity);
 	}
 
 }

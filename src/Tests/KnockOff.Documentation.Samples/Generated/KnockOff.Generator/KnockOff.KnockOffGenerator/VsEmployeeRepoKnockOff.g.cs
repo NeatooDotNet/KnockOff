@@ -5,96 +5,41 @@ namespace KnockOff.Documentation.Samples.Comparison;
 
 partial class VsEmployeeRepoKnockOff
 {
-	/// <summary>Tracks and configures behavior for IVsEmployeeRepository.GetEmployee.</summary>
-	public sealed class IVsEmployeeRepository_GetEmployeeInterceptor
+	/// <summary>Tracks and configures behavior for GetEmployee.</summary>
+	public sealed class GetEmployeeInterceptor
 	{
-		/// <summary>Delegate for GetEmployee(int id).</summary>
+		/// <summary>Delegate for GetEmployee.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Comparison.VsUser? GetEmployeeDelegate(VsEmployeeRepoKnockOff ko, int id);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetEmployeeDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsEmployeeRepository.</summary>
-	public sealed class IVsEmployeeRepositoryInterceptorors
-	{
-		/// <summary>Interceptor for GetEmployee.</summary>
-		public IVsEmployeeRepository_GetEmployeeInterceptor GetEmployee { get; } = new();
-	}
-
-	/// <summary>Tracks and configures behavior for IVsUnitOfWork.SaveChangesAsync.</summary>
-	public sealed class IVsUnitOfWork_SaveChangesAsyncInterceptor
-	{
-		/// <summary>Delegate for SaveChangesAsync(global::System.Threading.CancellationToken cancellationToken).</summary>
-		public delegate global::System.Threading.Tasks.Task<int> SaveChangesAsyncDelegate(VsEmployeeRepoKnockOff ko, global::System.Threading.CancellationToken cancellationToken);
-
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
-
-		/// <summary>True if this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
-
-		/// <summary>The 'cancellationToken' argument from the most recent call.</summary>
-		public global::System.Threading.CancellationToken? LastCallArg { get; private set; }
-
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public SaveChangesAsyncDelegate? OnCall { get; set; }
-
-		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::System.Threading.CancellationToken cancellationToken) { CallCount++; LastCallArg = cancellationToken; }
-
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsUnitOfWork.</summary>
-	public sealed class IVsUnitOfWorkInterceptorors
-	{
-		/// <summary>Interceptor for SaveChangesAsync.</summary>
-		public IVsUnitOfWork_SaveChangesAsyncInterceptor SaveChangesAsync { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsEmployeeRepository.</summary>
-	public IVsEmployeeRepositoryInterceptorors IVsEmployeeRepository { get; } = new();
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IVsUnitOfWork.</summary>
-	public IVsUnitOfWorkInterceptorors IVsUnitOfWork { get; } = new();
+	/// <summary>Interceptor for GetEmployee.</summary>
+	public GetEmployeeInterceptor GetEmployee { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IVsEmployeeRepository.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IVsEmployeeRepository AsVsEmployeeRepository() => this;
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IVsUnitOfWork.</summary>
-	public KnockOff.Documentation.Samples.Comparison.IVsUnitOfWork AsVsUnitOfWork() => this;
-
 	global::KnockOff.Documentation.Samples.Comparison.VsUser? KnockOff.Documentation.Samples.Comparison.IVsEmployeeRepository.GetEmployee(int id)
 	{
-		IVsEmployeeRepository.GetEmployee.RecordCall(id);
-		if (IVsEmployeeRepository.GetEmployee.OnCall is { } onCallCallback)
-			return onCallCallback(this, id);
-		return default!;
-	}
-
-	global::System.Threading.Tasks.Task<int> KnockOff.Documentation.Samples.Comparison.IVsUnitOfWork.SaveChangesAsync(global::System.Threading.CancellationToken cancellationToken)
-	{
-		IVsUnitOfWork.SaveChangesAsync.RecordCall(cancellationToken);
-		if (IVsUnitOfWork.SaveChangesAsync.OnCall is { } onCallCallback)
-			return onCallCallback(this, cancellationToken);
-		return SaveChangesAsync(cancellationToken);
+		GetEmployee.RecordCall(id);
+		return GetEmployee.OnCall?.Invoke(this, id) ?? default!;
 	}
 
 }

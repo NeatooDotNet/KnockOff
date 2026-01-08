@@ -29,79 +29,60 @@ The generator implements:
 
 ## Tracking
 
-All members from all inherited interfaces are tracked. Each interface gets its own KO class with handlers for the members it defines:
+All members from all inherited interfaces are tracked. With the flat API, all members are accessed directly on the stub regardless of which interface declared them:
 
+<!-- snippet: docs:interface-inheritance:tracking -->
 ```csharp
-var knockOff = new AuditableEntityKnockOff();
-IAuditableEntity entity = knockOff;
-
 // Access base interface properties
-var id = entity.Id;
-var created = entity.CreatedAt;
+        var id = entity.Id;
+        var created = entity.CreatedAt;
 
-// Access derived interface properties
-entity.ModifiedAt = DateTime.Now;
-entity.ModifiedBy = "TestUser";
+        // Access derived interface properties
+        entity.ModifiedAt = DateTime.Now;
+        entity.ModifiedBy = "TestUser";
 
-// Base interface members tracked in IBaseEntity KO class
-Assert.Equal(1, knockOff.IBaseEntity.Id.GetCount);
-Assert.Equal(1, knockOff.IBaseEntity.CreatedAt.GetCount);
-
-// Derived interface members tracked in IAuditableEntity KO class
-Assert.Equal(1, knockOff.IAuditableEntity.ModifiedAt.SetCount);
-Assert.Equal(1, knockOff.IAuditableEntity.ModifiedBy.SetCount);
+        // All members tracked directly on the stub (flat API)
+        var idCount = knockOff.Id.GetCount;           // 1
+        var createdCount = knockOff.CreatedAt.GetCount; // 1
+        var modAtCount = knockOff.ModifiedAt.SetCount;  // 1
+        var modByCount = knockOff.ModifiedBy.SetCount;  // 1
 ```
+<!-- /snippet -->
 
 ## AsXYZ() Methods
 
 Helper methods are generated for both base and derived interfaces:
 
+<!-- snippet: docs:interface-inheritance:as-methods -->
 ```csharp
-var knockOff = new AuditableEntityKnockOff();
-
 // Access as derived interface
-IAuditableEntity auditable = knockOff.AsAuditableEntity();
+        IIhAuditableEntity auditable = knockOff.AsIhAuditableEntity();
 
-// Access as base interface
-IBaseEntity baseEntity = knockOff.AsBaseEntity();
+        // Access as base interface
+        IIhBaseEntity baseEntity = knockOff.AsIhBaseEntity();
 
-// Same underlying instance
-Assert.Same(knockOff, auditable);
-Assert.Same(knockOff, baseEntity);
+        // Same underlying instance
+        var areSame = ReferenceEquals(knockOff, auditable);  // true
 ```
-
-## Accessing Base via Derived
-
-Since the derived interface inherits from the base, you can access base members through the derived reference:
-
-```csharp
-IAuditableEntity entity = knockOff;
-
-// Base interface members accessible through derived
-var id = entity.Id;
-var createdAt = entity.CreatedAt;
-
-// Tracked in the base interface's KO class
-Assert.Equal(1, knockOff.IBaseEntity.Id.GetCount);
-Assert.Equal(1, knockOff.IBaseEntity.CreatedAt.GetCount);
-```
+<!-- /snippet -->
 
 ## Callbacks
 
-Set callbacks for any member using its defining interface's KO class:
+Set callbacks for any member directly on the stub (flat API):
 
+<!-- snippet: docs:interface-inheritance:callbacks -->
 ```csharp
-// Base interface member (via IBaseEntity KO class)
-knockOff.IBaseEntity.Id.OnGet = (ko) => 42;
+// Base interface member
+        knockOff.Id.OnGet = (ko) => 42;
 
-// Derived interface member (via IAuditableEntity KO class)
-knockOff.IAuditableEntity.ModifiedBy.OnGet = (ko) => "System";
-knockOff.IAuditableEntity.ModifiedAt.OnSet = (ko, value) =>
-{
-    // Track modification timestamps
-    Console.WriteLine($"Modified at {value}");
-};
+        // Derived interface member
+        knockOff.ModifiedBy.OnGet = (ko) => "System";
+        knockOff.ModifiedAt.OnSet = (ko, value) =>
+        {
+            Console.WriteLine($"Modified at {value}");
+        };
 ```
+<!-- /snippet -->
 
 ## Deep Inheritance
 
@@ -157,12 +138,6 @@ public partial class IhEmployeeKnockOff : IIhEmployee { }
 ```
 <!-- /snippet -->
 
-```csharp
-// Pre-populate properties using interface-prefixed backing fields
-knockOff.IIhEntityBase_IdBacking = 1;
-knockOff.IIhEmployee_NameBacking = "Test Employee";
-```
-
 ### Validation Pattern
 
 <!-- snippet: docs:interface-inheritance:validation-pattern -->
@@ -184,12 +159,14 @@ public partial class IhOrderKnockOff : IIhOrder { }
 ```
 <!-- /snippet -->
 
+<!-- snippet: docs:interface-inheritance:validation-usage -->
 ```csharp
-// Configure validation (using interface KO classes)
-knockOff.IIhValidatable.IsValid.OnGet = (ko) => ko.IIhOrder.Total.GetCount > 0;
-knockOff.IIhValidatable.GetErrors.OnCall = (ko) =>
-    ko.IIhValidatable.IsValid.OnGet!(ko) ? [] : ["No total calculated"];
+// Configure validation (flat API)
+        knockOff.IsValid.OnGet = (ko) => ko.Total.GetCount > 0;
+        knockOff.GetErrors.OnCall = (ko) =>
+            ko.IsValid.OnGet!(ko) ? [] : ["No total calculated"];
 ```
+<!-- /snippet -->
 
 ### Repository Hierarchy
 
@@ -212,12 +189,12 @@ public partial class IhUserWriteRepositoryKnockOff : IIhWriteRepository<IhUser> 
 ```
 <!-- /snippet -->
 
+<!-- snippet: docs:interface-inheritance:repository-usage -->
 ```csharp
-// Base interface members via IIhReadRepository_IhUser
-knockOff.IIhReadRepository_IhUser.GetById.OnCall = (ko, id) => users.FirstOrDefault(u => u.Id == id);
-knockOff.IIhReadRepository_IhUser.GetAll.OnCall = (ko) => users;
-
-// Derived interface members via IIhWriteRepository_IhUser
-knockOff.IIhWriteRepository_IhUser.Add.OnCall = (ko, user) => users.Add(user);
-knockOff.IIhWriteRepository_IhUser.Delete.OnCall = (ko, id) => users.RemoveAll(u => u.Id == id);
+// All members accessed via flat API regardless of declaring interface
+        knockOff.GetById.OnCall = (ko, id) => users.FirstOrDefault(u => u.Id == id);
+        knockOff.GetAll.OnCall = (ko) => users;
+        knockOff.Add.OnCall = (ko, user) => users.Add(user);
+        knockOff.Delete.OnCall = (ko, id) => users.RemoveAll(u => u.Id == id);
 ```
+<!-- /snippet -->

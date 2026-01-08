@@ -5,50 +5,41 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class CpResetRepositoryKnockOff
 {
-	/// <summary>Tracks and configures behavior for ICpResetRepository.GetUser.</summary>
-	public sealed class ICpResetRepository_GetUserInterceptor
+	/// <summary>Tracks and configures behavior for GetUser.</summary>
+	public sealed class GetUserInterceptor
 	{
-		/// <summary>Delegate for GetUser(int id).</summary>
+		/// <summary>Delegate for GetUser.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.CpUser? GetUserDelegate(CpResetRepositoryKnockOff ko, int id);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetUserDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpResetRepository.</summary>
-	public sealed class ICpResetRepositoryInterceptorors
-	{
-		/// <summary>Interceptor for GetUser.</summary>
-		public ICpResetRepository_GetUserInterceptor GetUser { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ICpResetRepository.</summary>
-	public ICpResetRepositoryInterceptorors ICpResetRepository { get; } = new();
+	/// <summary>Interceptor for GetUser.</summary>
+	public GetUserInterceptor GetUser { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpResetRepository.</summary>
 	public KnockOff.Documentation.Samples.Skills.ICpResetRepository AsCpResetRepository() => this;
 
 	global::KnockOff.Documentation.Samples.Skills.CpUser? KnockOff.Documentation.Samples.Skills.ICpResetRepository.GetUser(int id)
 	{
-		ICpResetRepository.GetUser.RecordCall(id);
-		if (ICpResetRepository.GetUser.OnCall is { } onCallCallback)
-			return onCallCallback(this, id);
-		return default!;
+		GetUser.RecordCall(id);
+		return GetUser.OnCall?.Invoke(this, id) ?? default!;
 	}
 
 }

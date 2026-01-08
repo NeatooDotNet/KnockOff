@@ -174,7 +174,7 @@ public partial class PropertyStoreKnockOff : IInPropertyStore
 // propStub.Value.Value = 42;
 //
 // // Wire nested stub to indexer
-// store.IInPropertyStore.Indexer.OnGet = (ko, index) => propStub;
+// store.Indexer.OnGet = (ko, index) => propStub;
 //
 // // Now store[0].Name returns "TestProp"
 // IInPropertyStore service = store;
@@ -220,3 +220,141 @@ public partial class PropertyStoreKnockOff : IInPropertyStore
 //     UserService.ConnectionString.Reset();
 // }
 #endregion
+
+// ============================================================================
+// Class Stubs Section
+// ============================================================================
+
+// ============================================================================
+// Class Stubs - Type Definitions (supporting code, not extracted)
+// ============================================================================
+
+public class EmailService
+{
+	public virtual void Send(string to, string subject, string body)
+		=> Console.WriteLine($"Sending to {to}: {subject}");
+
+	public virtual string ServerName { get; set; } = "default";
+}
+
+public class MixedService
+{
+	public virtual string VirtualProp { get; set; } = "";
+	public string NonVirtualProp { get; set; } = "";
+}
+
+public class Repository
+{
+	public string ConnectionString { get; }
+	public Repository(string connectionString) => ConnectionString = connectionString;
+	public virtual InUser? GetUser(int id) => null;
+}
+
+public abstract class BaseRepository
+{
+	public abstract string? ConnectionString { get; }
+	public abstract int Execute(string sql);
+}
+
+// ============================================================================
+// Class Stub Declarations
+// ============================================================================
+
+#region docs:inline-stubs:class-stub-example
+public class CsEmailService
+{
+	public virtual void Send(string to, string subject, string body)
+		=> Console.WriteLine($"Sending to {to}: {subject}");
+
+	public virtual string ServerName { get; set; } = "default";
+}
+
+[KnockOff<CsEmailService>]
+public partial class CsEmailServiceTests
+{
+}
+#endregion
+
+[KnockOff<EmailService>]
+public partial class EmailServiceTests { }
+
+[KnockOff<MixedService>]
+public partial class MixedTests { }
+
+[KnockOff<Repository>]
+public partial class RepoTests { }
+
+[KnockOff<BaseRepository>]
+public partial class AbstractTests { }
+
+// ============================================================================
+// Class Stub Usage Examples
+// ============================================================================
+
+public static class ClassStubUsageExamples
+{
+	public static void EmailServiceExample()
+	{
+		#region docs:inline-stubs:class-stub-usage
+		var stub = new CsEmailServiceTests.Stubs.CsEmailService();
+		stub.Send.OnCall = (ko, to, subject, body) =>
+			Console.WriteLine($"STUBBED: {to}");
+
+		// Use .Object to get the class instance
+		CsEmailService service = stub.Object;
+		service.Send("test@example.com", "Hello", "World");
+
+		var wasCalled = stub.Send.WasCalled;                // true
+		var lastTo = stub.Send.LastCallArgs?.to;            // "test@example.com"
+		#endregion
+
+		_ = (wasCalled, lastTo);
+	}
+
+	#region docs:inline-stubs:class-stub-mixed
+	public static void MixedServiceExample()
+	{
+		var stub = new MixedTests.Stubs.MixedService();
+
+		// Virtual member - has interceptor
+		stub.VirtualProp.OnGet = (ko) => "Intercepted";
+		var virtualValue = stub.Object.VirtualProp;  // "Intercepted"
+
+		// Non-virtual member - no interceptor, use .Object
+		stub.Object.NonVirtualProp = "Direct";
+		var nonVirtualValue = stub.Object.NonVirtualProp;  // "Direct"
+
+		_ = (virtualValue, nonVirtualValue);
+	}
+	#endregion
+
+	#region docs:inline-stubs:class-stub-constructor
+	public static void ConstructorChainingExample()
+	{
+		var stub = new RepoTests.Stubs.Repository("Server=test");
+		var connectionString = stub.Object.ConnectionString;  // "Server=test"
+
+		_ = connectionString;
+	}
+	#endregion
+
+	#region docs:inline-stubs:class-stub-abstract
+	public static void AbstractClassExample()
+	{
+		var stub = new AbstractTests.Stubs.BaseRepository();
+
+		// Without callback - returns defaults
+		var defaultConnection = stub.Object.ConnectionString;  // null
+		var defaultExecute = stub.Object.Execute("SELECT 1");  // 0
+
+		// With callback
+		stub.ConnectionString.OnGet = (ko) => "Server=test";
+		stub.Execute.OnCall = (ko, sql) => sql.Length;
+
+		var configuredConnection = stub.Object.ConnectionString;  // "Server=test"
+		var configuredExecute = stub.Object.Execute("SELECT 1");  // 8
+
+		_ = (defaultConnection, defaultExecute, configuredConnection, configuredExecute);
+	}
+	#endregion
+}

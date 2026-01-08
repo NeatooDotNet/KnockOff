@@ -22,10 +22,9 @@ public class KOPropertyCollisionTests
 	{
 		var knockOff = new CollisionKnockOff();
 
-		// The KO accessor is renamed to ICollision_ due to collision
-		Assert.NotNull(knockOff.ICollision_);
-		Assert.NotNull(knockOff.ICollision_.ICollision);
-		Assert.NotNull(knockOff.ICollision_.DoWork);
+		// Flat API: ICollision is the property interceptor, DoWork is the method interceptor
+		Assert.NotNull(knockOff.ICollision);
+		Assert.NotNull(knockOff.DoWork);
 	}
 
 	[Fact]
@@ -38,8 +37,8 @@ public class KOPropertyCollisionTests
 		var value = collision.ICollision;
 
 		Assert.Equal("test", value);
-		Assert.Equal(1, knockOff.ICollision_.ICollision.SetCount);
-		Assert.Equal(1, knockOff.ICollision_.ICollision.GetCount);
+		Assert.Equal(1, knockOff.ICollision.SetCount);
+		Assert.Equal(1, knockOff.ICollision.GetCount);
 	}
 
 	[Fact]
@@ -50,7 +49,7 @@ public class KOPropertyCollisionTests
 
 		collision.DoWork();
 
-		Assert.True(knockOff.ICollision_.DoWork.WasCalled);
+		Assert.True(knockOff.DoWork.WasCalled);
 	}
 
 	[Fact]
@@ -60,7 +59,7 @@ public class KOPropertyCollisionTests
 		ICollision collision = knockOff;
 		var callbackInvoked = false;
 
-		knockOff.ICollision_.DoWork.OnCall = (ko) =>
+		knockOff.DoWork.OnCall = (ko) =>
 		{
 			callbackInvoked = true;
 		};
@@ -76,7 +75,7 @@ public class KOPropertyCollisionTests
 		var knockOff = new CollisionKnockOff();
 		ICollision collision = knockOff;
 
-		knockOff.ICollision_.ICollision.OnGet = (ko) => "from callback";
+		knockOff.ICollision.OnGet = (ko) => "from callback";
 
 		var result = collision.ICollision;
 

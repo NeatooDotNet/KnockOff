@@ -35,8 +35,8 @@ partial class GenericMethodServiceKnockOff
 			$"Define a protected method '{methodName}' in your partial class, or set the handler's OnCall.");
 	}
 
-	/// <summary>Tracks and configures behavior for IGenericMethodService.Create.</summary>
-	public sealed class IGenericMethodService_CreateInterceptor
+	/// <summary>Interceptor for Create (generic method with Of&lt;T&gt;() access).</summary>
+	public sealed class CreateInterceptor
 	{
 		private readonly global::System.Collections.Generic.Dictionary<global::System.Type, object> _typedHandlers = new();
 
@@ -53,10 +53,10 @@ partial class GenericMethodServiceKnockOff
 		}
 
 		/// <summary>Total number of calls across all type arguments.</summary>
-		public int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
+		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>True if this method was called with any type argument.</summary>
-		public bool WasCalled => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Any(h => h.WasCalled);
+		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
 
 		/// <summary>All type argument(s) that were used in calls.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
@@ -64,8 +64,8 @@ partial class GenericMethodServiceKnockOff
 		/// <summary>Resets all typed handlers.</summary>
 		public void Reset()
 		{
-			foreach (var handler in _typedHandlers.Values.Cast<IResettable>())
-				handler.Reset();
+			foreach (var handler in _typedHandlers.Values)
+				((IResettable)handler).Reset();
 			_typedHandlers.Clear();
 		}
 
@@ -92,8 +92,8 @@ partial class GenericMethodServiceKnockOff
 		}
 	}
 
-	/// <summary>Tracks and configures behavior for IGenericMethodService.Process.</summary>
-	public sealed class IGenericMethodService_ProcessInterceptor
+	/// <summary>Interceptor for Process (generic method with Of&lt;T&gt;() access).</summary>
+	public sealed class ProcessInterceptor
 	{
 		private readonly global::System.Collections.Generic.Dictionary<global::System.Type, object> _typedHandlers = new();
 
@@ -110,10 +110,10 @@ partial class GenericMethodServiceKnockOff
 		}
 
 		/// <summary>Total number of calls across all type arguments.</summary>
-		public int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
+		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>True if this method was called with any type argument.</summary>
-		public bool WasCalled => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Any(h => h.WasCalled);
+		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
 
 		/// <summary>All type argument(s) that were used in calls.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
@@ -121,8 +121,8 @@ partial class GenericMethodServiceKnockOff
 		/// <summary>Resets all typed handlers.</summary>
 		public void Reset()
 		{
-			foreach (var handler in _typedHandlers.Values.Cast<IResettable>())
-				handler.Reset();
+			foreach (var handler in _typedHandlers.Values)
+				((IResettable)handler).Reset();
 			_typedHandlers.Clear();
 		}
 
@@ -130,7 +130,7 @@ partial class GenericMethodServiceKnockOff
 		public sealed class ProcessTypedHandler<T> : IGenericMethodCallTracker, IResettable
 		{
 			/// <summary>Delegate for Process.</summary>
-			public delegate void ProcessDelegate(GenericMethodServiceKnockOff ko, T value);
+			public delegate void ProcessDelegate(GenericMethodServiceKnockOff ko, T @value);
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -149,8 +149,8 @@ partial class GenericMethodServiceKnockOff
 		}
 	}
 
-	/// <summary>Tracks and configures behavior for IGenericMethodService.Deserialize.</summary>
-	public sealed class IGenericMethodService_DeserializeInterceptor
+	/// <summary>Interceptor for Deserialize (generic method with Of&lt;T&gt;() access).</summary>
+	public sealed class DeserializeInterceptor
 	{
 		private readonly global::System.Collections.Generic.Dictionary<global::System.Type, object> _typedHandlers = new();
 
@@ -167,10 +167,10 @@ partial class GenericMethodServiceKnockOff
 		}
 
 		/// <summary>Total number of calls across all type arguments.</summary>
-		public int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
+		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>True if this method was called with any type argument.</summary>
-		public bool WasCalled => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Any(h => h.WasCalled);
+		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
 
 		/// <summary>All type argument(s) that were used in calls.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
@@ -178,8 +178,8 @@ partial class GenericMethodServiceKnockOff
 		/// <summary>Resets all typed handlers.</summary>
 		public void Reset()
 		{
-			foreach (var handler in _typedHandlers.Values.Cast<IResettable>())
-				handler.Reset();
+			foreach (var handler in _typedHandlers.Values)
+				((IResettable)handler).Reset();
 			_typedHandlers.Clear();
 		}
 
@@ -202,15 +202,15 @@ partial class GenericMethodServiceKnockOff
 			public DeserializeDelegate? OnCall { get; set; }
 
 			/// <summary>Records a method call.</summary>
-			public void RecordCall(string json) { CallCount++; LastCallArg = json; }
+			public void RecordCall(string? json) { CallCount++; LastCallArg = json; }
 
 			/// <summary>Resets all tracking state.</summary>
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 	}
 
-	/// <summary>Tracks and configures behavior for IGenericMethodService.Convert.</summary>
-	public sealed class IGenericMethodService_ConvertInterceptor
+	/// <summary>Interceptor for Convert (generic method with Of&lt;T&gt;() access).</summary>
+	public sealed class ConvertInterceptor
 	{
 		private readonly global::System.Collections.Generic.Dictionary<(global::System.Type, global::System.Type), object> _typedHandlers = new();
 
@@ -227,10 +227,10 @@ partial class GenericMethodServiceKnockOff
 		}
 
 		/// <summary>Total number of calls across all type arguments.</summary>
-		public int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
+		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>True if this method was called with any type argument.</summary>
-		public bool WasCalled => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Any(h => h.WasCalled);
+		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
 
 		/// <summary>All type argument(s) that were used in calls.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<(global::System.Type, global::System.Type)> CalledTypeArguments => _typedHandlers.Keys.ToList();
@@ -238,8 +238,8 @@ partial class GenericMethodServiceKnockOff
 		/// <summary>Resets all typed handlers.</summary>
 		public void Reset()
 		{
-			foreach (var handler in _typedHandlers.Values.Cast<IResettable>())
-				handler.Reset();
+			foreach (var handler in _typedHandlers.Values)
+				((IResettable)handler).Reset();
 			_typedHandlers.Clear();
 		}
 
@@ -266,8 +266,8 @@ partial class GenericMethodServiceKnockOff
 		}
 	}
 
-	/// <summary>Tracks and configures behavior for IGenericMethodService.Find.</summary>
-	public sealed class IGenericMethodService_FindInterceptor
+	/// <summary>Interceptor for Find (generic method with Of&lt;T&gt;() access).</summary>
+	public sealed class FindInterceptor
 	{
 		private readonly global::System.Collections.Generic.Dictionary<global::System.Type, object> _typedHandlers = new();
 
@@ -284,10 +284,10 @@ partial class GenericMethodServiceKnockOff
 		}
 
 		/// <summary>Total number of calls across all type arguments.</summary>
-		public int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
+		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>True if this method was called with any type argument.</summary>
-		public bool WasCalled => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Any(h => h.WasCalled);
+		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
 
 		/// <summary>All type argument(s) that were used in calls.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
@@ -295,8 +295,8 @@ partial class GenericMethodServiceKnockOff
 		/// <summary>Resets all typed handlers.</summary>
 		public void Reset()
 		{
-			foreach (var handler in _typedHandlers.Values.Cast<IResettable>())
-				handler.Reset();
+			foreach (var handler in _typedHandlers.Values)
+				((IResettable)handler).Reset();
 			_typedHandlers.Clear();
 		}
 
@@ -319,15 +319,15 @@ partial class GenericMethodServiceKnockOff
 			public FindDelegate? OnCall { get; set; }
 
 			/// <summary>Records a method call.</summary>
-			public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+			public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 			/// <summary>Resets all tracking state.</summary>
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 	}
 
-	/// <summary>Tracks and configures behavior for IGenericMethodService.Transfer.</summary>
-	public sealed class IGenericMethodService_TransferInterceptor
+	/// <summary>Interceptor for Transfer (generic method with Of&lt;T&gt;() access).</summary>
+	public sealed class TransferInterceptor
 	{
 		private readonly global::System.Collections.Generic.Dictionary<(global::System.Type, global::System.Type), object> _typedHandlers = new();
 
@@ -344,10 +344,10 @@ partial class GenericMethodServiceKnockOff
 		}
 
 		/// <summary>Total number of calls across all type arguments.</summary>
-		public int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
+		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>True if this method was called with any type argument.</summary>
-		public bool WasCalled => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Any(h => h.WasCalled);
+		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
 
 		/// <summary>All type argument(s) that were used in calls.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<(global::System.Type, global::System.Type)> CalledTypeArguments => _typedHandlers.Keys.ToList();
@@ -355,8 +355,8 @@ partial class GenericMethodServiceKnockOff
 		/// <summary>Resets all typed handlers.</summary>
 		public void Reset()
 		{
-			foreach (var handler in _typedHandlers.Values.Cast<IResettable>())
-				handler.Reset();
+			foreach (var handler in _typedHandlers.Values)
+				((IResettable)handler).Reset();
 			_typedHandlers.Clear();
 		}
 
@@ -383,79 +383,69 @@ partial class GenericMethodServiceKnockOff
 		}
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IGenericMethodService.</summary>
-	public sealed class IGenericMethodServiceInterceptorors
-	{
-		/// <summary>Interceptor for Create.</summary>
-		public IGenericMethodService_CreateInterceptor Create { get; } = new();
-		/// <summary>Interceptor for Process.</summary>
-		public IGenericMethodService_ProcessInterceptor Process { get; } = new();
-		/// <summary>Interceptor for Deserialize.</summary>
-		public IGenericMethodService_DeserializeInterceptor Deserialize { get; } = new();
-		/// <summary>Interceptor for Convert.</summary>
-		public IGenericMethodService_ConvertInterceptor Convert { get; } = new();
-		/// <summary>Interceptor for Find.</summary>
-		public IGenericMethodService_FindInterceptor Find { get; } = new();
-		/// <summary>Interceptor for Transfer.</summary>
-		public IGenericMethodService_TransferInterceptor Transfer { get; } = new();
-	}
+	/// <summary>Interceptor for Create (use .Of&lt;T&gt;() to access typed handler).</summary>
+	public CreateInterceptor Create { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IGenericMethodService.</summary>
-	public IGenericMethodServiceInterceptorors IGenericMethodService { get; } = new();
+	/// <summary>Interceptor for Process (use .Of&lt;T&gt;() to access typed handler).</summary>
+	public ProcessInterceptor Process { get; } = new();
+
+	/// <summary>Interceptor for Deserialize (use .Of&lt;T&gt;() to access typed handler).</summary>
+	public DeserializeInterceptor Deserialize { get; } = new();
+
+	/// <summary>Interceptor for Convert (use .Of&lt;T&gt;() to access typed handler).</summary>
+	public ConvertInterceptor Convert { get; } = new();
+
+	/// <summary>Interceptor for Find (use .Of&lt;T&gt;() to access typed handler).</summary>
+	public FindInterceptor Find { get; } = new();
+
+	/// <summary>Interceptor for Transfer (use .Of&lt;T&gt;() to access typed handler).</summary>
+	public TransferInterceptor Transfer { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IGenericMethodService.</summary>
 	public KnockOff.Tests.IGenericMethodService AsGenericMethodService() => this;
 
 	T KnockOff.Tests.IGenericMethodService.Create<T>()
 	{
-		var typedHandler = IGenericMethodService.Create.Of<T>();
-		typedHandler.RecordCall();
-		if (typedHandler.OnCall is { } onCallCallback)
-			return onCallCallback(this);
+		Create.Of<T>().RecordCall();
+		if (Create.Of<T>().OnCall is { } callback)
+			return callback(this);
 		return SmartDefault<T>("Create");
 	}
 
-	void KnockOff.Tests.IGenericMethodService.Process<T>(T value)
+	void KnockOff.Tests.IGenericMethodService.Process<T>(T @value)
 	{
-		var typedHandler = IGenericMethodService.Process.Of<T>();
-		typedHandler.RecordCall();
-		if (typedHandler.OnCall is { } onCallCallback)
-		{ onCallCallback(this, value); return; }
+		Process.Of<T>().RecordCall();
+		Process.Of<T>().OnCall?.Invoke(this, @value);
 	}
 
 	T KnockOff.Tests.IGenericMethodService.Deserialize<T>(string json)
 	{
-		var typedHandler = IGenericMethodService.Deserialize.Of<T>();
-		typedHandler.RecordCall(json);
-		if (typedHandler.OnCall is { } onCallCallback)
-			return onCallCallback(this, json);
+		Deserialize.Of<T>().RecordCall(json);
+		if (Deserialize.Of<T>().OnCall is { } callback)
+			return callback(this, json);
 		return SmartDefault<T>("Deserialize");
 	}
 
 	TOut KnockOff.Tests.IGenericMethodService.Convert<TIn, TOut>(TIn input)
 	{
-		var typedHandler = IGenericMethodService.Convert.Of<TIn, TOut>();
-		typedHandler.RecordCall();
-		if (typedHandler.OnCall is { } onCallCallback)
-			return onCallCallback(this, input);
+		Convert.Of<TIn, TOut>().RecordCall();
+		if (Convert.Of<TIn, TOut>().OnCall is { } callback)
+			return callback(this, input);
 		return SmartDefault<TOut>("Convert");
 	}
 
-	T? KnockOff.Tests.IGenericMethodService.Find<T>(int id) where T : class
+	[return: global::System.Diagnostics.CodeAnalysis.MaybeNull] T KnockOff.Tests.IGenericMethodService.Find<T>(int id)
 	{
-		var typedHandler = IGenericMethodService.Find.Of<T>();
-		typedHandler.RecordCall(id);
-		if (typedHandler.OnCall is { } onCallCallback)
-			return onCallCallback(this, id);
+		Find.Of<T>().RecordCall(id);
+		if (Find.Of<T>().OnCall is { } callback)
+			return callback(this, id);
 		return default!;
 	}
 
 	void KnockOff.Tests.IGenericMethodService.Transfer<TSource, TDest>(TSource source, TDest destination)
 	{
-		var typedHandler = IGenericMethodService.Transfer.Of<TSource, TDest>();
-		typedHandler.RecordCall();
-		if (typedHandler.OnCall is { } onCallCallback)
-		{ onCallCallback(this, source, destination); return; }
+		Transfer.Of<TSource, TDest>().RecordCall();
+		Transfer.Of<TSource, TDest>().OnCall?.Invoke(this, source, destination);
 	}
 
 }

@@ -5,8 +5,8 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class PropSecureKnockOff
 {
-	/// <summary>Tracks and configures behavior for IPropSecure.SecretKey.</summary>
-	public sealed class IPropSecure_SecretKeyInterceptor
+	/// <summary>Tracks and configures behavior for SecretKey.</summary>
+	public sealed class SecretKeyInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -21,31 +21,18 @@ partial class PropSecureKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropSecure.</summary>
-	public sealed class IPropSecureInterceptorors
-	{
-		/// <summary>Interceptor for SecretKey.</summary>
-		public IPropSecure_SecretKeyInterceptor SecretKey { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropSecure.</summary>
-	public IPropSecureInterceptorors IPropSecure { get; } = new();
+	/// <summary>Interceptor for SecretKey.</summary>
+	public SecretKeyInterceptor SecretKey { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IPropSecure.</summary>
 	public KnockOff.Documentation.Samples.Guides.IPropSecure AsPropSecure() => this;
 
-	/// <summary>Backing field for IPropSecure.SecretKey.</summary>
-	protected string IPropSecure_SecretKeyBacking { get; set; } = "";
+	/// <summary>Backing storage for SecretKey.</summary>
+	protected string SecretKeyBacking { get; set; } = "";
 
 	string KnockOff.Documentation.Samples.Guides.IPropSecure.SecretKey
 	{
-		get
-		{
-			IPropSecure.SecretKey.RecordGet();
-			if (IPropSecure.SecretKey.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IPropSecure_SecretKeyBacking;
-		}
+		get { SecretKey.RecordGet(); return SecretKey.OnGet?.Invoke(this) ?? SecretKeyBacking; }
 	}
 
 }

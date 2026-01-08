@@ -35,8 +35,8 @@ partial class HaSerializerKnockOff
 			$"Define a protected method '{methodName}' in your partial class, or set the handler's OnCall.");
 	}
 
-	/// <summary>Tracks and configures behavior for IHaSerializer.Deserialize.</summary>
-	public sealed class IHaSerializer_DeserializeInterceptor
+	/// <summary>Interceptor for Deserialize (generic method with Of&lt;T&gt;() access).</summary>
+	public sealed class DeserializeInterceptor
 	{
 		private readonly global::System.Collections.Generic.Dictionary<global::System.Type, object> _typedHandlers = new();
 
@@ -53,10 +53,10 @@ partial class HaSerializerKnockOff
 		}
 
 		/// <summary>Total number of calls across all type arguments.</summary>
-		public int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
+		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>True if this method was called with any type argument.</summary>
-		public bool WasCalled => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Any(h => h.WasCalled);
+		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
 
 		/// <summary>All type argument(s) that were used in calls.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
@@ -64,8 +64,8 @@ partial class HaSerializerKnockOff
 		/// <summary>Resets all typed handlers.</summary>
 		public void Reset()
 		{
-			foreach (var handler in _typedHandlers.Values.Cast<IResettable>())
-				handler.Reset();
+			foreach (var handler in _typedHandlers.Values)
+				((IResettable)handler).Reset();
 			_typedHandlers.Clear();
 		}
 
@@ -88,15 +88,15 @@ partial class HaSerializerKnockOff
 			public DeserializeDelegate? OnCall { get; set; }
 
 			/// <summary>Records a method call.</summary>
-			public void RecordCall(string json) { CallCount++; LastCallArg = json; }
+			public void RecordCall(string? json) { CallCount++; LastCallArg = json; }
 
 			/// <summary>Resets all tracking state.</summary>
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 	}
 
-	/// <summary>Tracks and configures behavior for IHaSerializer.Convert.</summary>
-	public sealed class IHaSerializer_ConvertInterceptor
+	/// <summary>Interceptor for Convert (generic method with Of&lt;T&gt;() access).</summary>
+	public sealed class ConvertInterceptor
 	{
 		private readonly global::System.Collections.Generic.Dictionary<(global::System.Type, global::System.Type), object> _typedHandlers = new();
 
@@ -113,10 +113,10 @@ partial class HaSerializerKnockOff
 		}
 
 		/// <summary>Total number of calls across all type arguments.</summary>
-		public int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
+		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>True if this method was called with any type argument.</summary>
-		public bool WasCalled => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Any(h => h.WasCalled);
+		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
 
 		/// <summary>All type argument(s) that were used in calls.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<(global::System.Type, global::System.Type)> CalledTypeArguments => _typedHandlers.Keys.ToList();
@@ -124,8 +124,8 @@ partial class HaSerializerKnockOff
 		/// <summary>Resets all typed handlers.</summary>
 		public void Reset()
 		{
-			foreach (var handler in _typedHandlers.Values.Cast<IResettable>())
-				handler.Reset();
+			foreach (var handler in _typedHandlers.Values)
+				((IResettable)handler).Reset();
 			_typedHandlers.Clear();
 		}
 
@@ -152,36 +152,28 @@ partial class HaSerializerKnockOff
 		}
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaSerializer.</summary>
-	public sealed class IHaSerializerInterceptorors
-	{
-		/// <summary>Interceptor for Deserialize.</summary>
-		public IHaSerializer_DeserializeInterceptor Deserialize { get; } = new();
-		/// <summary>Interceptor for Convert.</summary>
-		public IHaSerializer_ConvertInterceptor Convert { get; } = new();
-	}
+	/// <summary>Interceptor for Deserialize (use .Of&lt;T&gt;() to access typed handler).</summary>
+	public DeserializeInterceptor Deserialize { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IHaSerializer.</summary>
-	public IHaSerializerInterceptorors IHaSerializer { get; } = new();
+	/// <summary>Interceptor for Convert (use .Of&lt;T&gt;() to access typed handler).</summary>
+	public ConvertInterceptor Convert { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IHaSerializer.</summary>
 	public KnockOff.Documentation.Samples.Skills.IHaSerializer AsHaSerializer() => this;
 
 	T KnockOff.Documentation.Samples.Skills.IHaSerializer.Deserialize<T>(string json)
 	{
-		var typedHandler = IHaSerializer.Deserialize.Of<T>();
-		typedHandler.RecordCall(json);
-		if (typedHandler.OnCall is { } onCallCallback)
-			return onCallCallback(this, json);
+		Deserialize.Of<T>().RecordCall(json);
+		if (Deserialize.Of<T>().OnCall is { } callback)
+			return callback(this, json);
 		return SmartDefault<T>("Deserialize");
 	}
 
 	TOut KnockOff.Documentation.Samples.Skills.IHaSerializer.Convert<TIn, TOut>(TIn input)
 	{
-		var typedHandler = IHaSerializer.Convert.Of<TIn, TOut>();
-		typedHandler.RecordCall();
-		if (typedHandler.OnCall is { } onCallCallback)
-			return onCallCallback(this, input);
+		Convert.Of<TIn, TOut>().RecordCall();
+		if (Convert.Of<TIn, TOut>().OnCall is { } callback)
+			return callback(this, input);
 		return SmartDefault<TOut>("Convert");
 	}
 

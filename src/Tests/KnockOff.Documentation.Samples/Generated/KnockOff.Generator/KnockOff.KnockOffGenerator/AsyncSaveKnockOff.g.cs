@@ -5,50 +5,41 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class AsyncSaveKnockOff
 {
-	/// <summary>Tracks and configures behavior for IAsyncSave.SaveAsync.</summary>
-	public sealed class IAsyncSave_SaveAsyncInterceptor
+	/// <summary>Tracks and configures behavior for SaveAsync.</summary>
+	public sealed class SaveAsyncInterceptor
 	{
-		/// <summary>Delegate for SaveAsync(global::KnockOff.Documentation.Samples.Guides.AsyncData entity).</summary>
+		/// <summary>Delegate for SaveAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<int> SaveAsyncDelegate(AsyncSaveKnockOff ko, global::KnockOff.Documentation.Samples.Guides.AsyncData entity);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'entity' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public global::KnockOff.Documentation.Samples.Guides.AsyncData? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public SaveAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::KnockOff.Documentation.Samples.Guides.AsyncData entity) { CallCount++; LastCallArg = entity; }
+		public void RecordCall(global::KnockOff.Documentation.Samples.Guides.AsyncData? entity) { CallCount++; LastCallArg = entity; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IAsyncSave.</summary>
-	public sealed class IAsyncSaveInterceptorors
-	{
-		/// <summary>Interceptor for SaveAsync.</summary>
-		public IAsyncSave_SaveAsyncInterceptor SaveAsync { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IAsyncSave.</summary>
-	public IAsyncSaveInterceptorors IAsyncSave { get; } = new();
+	/// <summary>Interceptor for SaveAsync.</summary>
+	public SaveAsyncInterceptor SaveAsync { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IAsyncSave.</summary>
 	public KnockOff.Documentation.Samples.Guides.IAsyncSave AsAsyncSave() => this;
 
 	global::System.Threading.Tasks.Task<int> KnockOff.Documentation.Samples.Guides.IAsyncSave.SaveAsync(global::KnockOff.Documentation.Samples.Guides.AsyncData entity)
 	{
-		IAsyncSave.SaveAsync.RecordCall(entity);
-		if (IAsyncSave.SaveAsync.OnCall is { } onCallCallback)
-			return onCallCallback(this, entity);
-		return global::System.Threading.Tasks.Task.FromResult<int>(default!);
+		SaveAsync.RecordCall(entity);
+		return SaveAsync.OnCall?.Invoke(this, entity) ?? global::System.Threading.Tasks.Task.FromResult<int>(default!);
 	}
 
 }

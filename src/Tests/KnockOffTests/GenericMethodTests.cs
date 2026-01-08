@@ -16,8 +16,8 @@ public class GenericMethodTests
 		service.Create<TestEntity>();
 		service.Create<TestEntity>();
 
-		Assert.Equal(2, knockOff.IGenericMethodService.Create.Of<TestEntity>().CallCount);
-		Assert.True(knockOff.IGenericMethodService.Create.Of<TestEntity>().WasCalled);
+		Assert.Equal(2, knockOff.Create.Of<TestEntity>().CallCount);
+		Assert.True(knockOff.Create.Of<TestEntity>().WasCalled);
 	}
 
 	[Fact]
@@ -30,8 +30,8 @@ public class GenericMethodTests
 		service.Create<List<int>>();
 		service.Create<List<int>>();
 
-		Assert.Equal(1, knockOff.IGenericMethodService.Create.Of<TestEntity>().CallCount);
-		Assert.Equal(2, knockOff.IGenericMethodService.Create.Of<List<int>>().CallCount);
+		Assert.Equal(1, knockOff.Create.Of<TestEntity>().CallCount);
+		Assert.Equal(2, knockOff.Create.Of<List<int>>().CallCount);
 	}
 
 	[Fact]
@@ -44,8 +44,8 @@ public class GenericMethodTests
 		service.Process(42);
 		service.Process(42);
 
-		Assert.Equal(1, knockOff.IGenericMethodService.Process.Of<string>().CallCount);
-		Assert.Equal(2, knockOff.IGenericMethodService.Process.Of<int>().CallCount);
+		Assert.Equal(1, knockOff.Process.Of<string>().CallCount);
+		Assert.Equal(2, knockOff.Process.Of<int>().CallCount);
 	}
 
 	#endregion
@@ -62,7 +62,7 @@ public class GenericMethodTests
 		service.Create<List<int>>();
 		service.Create<List<string>>();
 
-		Assert.Equal(3, knockOff.IGenericMethodService.Create.TotalCallCount);
+		Assert.Equal(3, knockOff.Create.TotalCallCount);
 	}
 
 	[Fact]
@@ -71,11 +71,11 @@ public class GenericMethodTests
 		var knockOff = new GenericMethodServiceKnockOff();
 		IGenericMethodService service = knockOff;
 
-		Assert.False(knockOff.IGenericMethodService.Create.WasCalled);
+		Assert.False(knockOff.Create.WasCalled);
 
 		service.Create<TestEntity>();
 
-		Assert.True(knockOff.IGenericMethodService.Create.WasCalled);
+		Assert.True(knockOff.Create.WasCalled);
 	}
 
 	[Fact]
@@ -87,7 +87,7 @@ public class GenericMethodTests
 		service.Create<TestEntity>();
 		service.Create<List<int>>();
 
-		var calledTypes = knockOff.IGenericMethodService.Create.CalledTypeArguments;
+		var calledTypes = knockOff.Create.CalledTypeArguments;
 		Assert.Equal(2, calledTypes.Count);
 		Assert.Contains(typeof(TestEntity), calledTypes);
 		Assert.Contains(typeof(List<int>), calledTypes);
@@ -104,7 +104,7 @@ public class GenericMethodTests
 		IGenericMethodService service = knockOff;
 
 		var expected = new TestEntity { Id = 42, Name = "Test" };
-		knockOff.IGenericMethodService.Create.Of<TestEntity>().OnCall = (ko) => expected;
+		knockOff.Create.Of<TestEntity>().OnCall = (ko) => expected;
 
 		var result = service.Create<TestEntity>();
 
@@ -117,8 +117,8 @@ public class GenericMethodTests
 		var knockOff = new GenericMethodServiceKnockOff();
 		IGenericMethodService service = knockOff;
 
-		knockOff.IGenericMethodService.Create.Of<TestEntity>().OnCall = (ko) => new TestEntity { Id = 1 };
-		knockOff.IGenericMethodService.Create.Of<List<int>>().OnCall = (ko) => new List<int> { 100 };
+		knockOff.Create.Of<TestEntity>().OnCall = (ko) => new TestEntity { Id = 1 };
+		knockOff.Create.Of<List<int>>().OnCall = (ko) => new List<int> { 100 };
 
 		var entity = service.Create<TestEntity>();
 		var list = service.Create<List<int>>();
@@ -135,7 +135,7 @@ public class GenericMethodTests
 		IGenericMethodService service = knockOff;
 
 		string? captured = null;
-		knockOff.IGenericMethodService.Process.Of<string>().OnCall = (ko, value) => captured = value;
+		knockOff.Process.Of<string>().OnCall = (ko, value) => captured = value;
 
 		service.Process("hello world");
 
@@ -148,7 +148,7 @@ public class GenericMethodTests
 		var knockOff = new GenericMethodServiceKnockOff();
 		IGenericMethodService service = knockOff;
 
-		knockOff.IGenericMethodService.Deserialize.Of<TestEntity>().OnCall = (ko, json) =>
+		knockOff.Deserialize.Of<TestEntity>().OnCall = (ko, json) =>
 			new TestEntity { Id = 99, Name = json };
 
 		var result = service.Deserialize<TestEntity>("{\"Name\":\"test\"}");
@@ -170,7 +170,7 @@ public class GenericMethodTests
 		service.Deserialize<TestEntity>("{\"first\":1}");
 		service.Deserialize<TestEntity>("{\"second\":2}");
 
-		Assert.Equal("{\"second\":2}", knockOff.IGenericMethodService.Deserialize.Of<TestEntity>().LastCallArg);
+		Assert.Equal("{\"second\":2}", knockOff.Deserialize.Of<TestEntity>().LastCallArg);
 	}
 
 	[Fact]
@@ -183,8 +183,8 @@ public class GenericMethodTests
 		service.Find<User>(2);
 		service.Find<User>(3);
 
-		Assert.Equal(3, knockOff.IGenericMethodService.Find.Of<User>().CallCount);
-		Assert.Equal(3, knockOff.IGenericMethodService.Find.Of<User>().LastCallArg); // Last call was Find<User>(3)
+		Assert.Equal(3, knockOff.Find.Of<User>().CallCount);
+		Assert.Equal(3, knockOff.Find.Of<User>().LastCallArg); // Last call was Find<User>(3)
 	}
 
 	#endregion
@@ -250,13 +250,13 @@ public class GenericMethodTests
 		IGenericMethodService service = knockOff;
 
 		// Need to set OnCall for int->string since string has no parameterless ctor
-		knockOff.IGenericMethodService.Convert.Of<int, string>().OnCall = (ko, i) => i.ToString();
+		knockOff.Convert.Of<int, string>().OnCall = (ko, i) => i.ToString();
 
 		service.Convert<string, int>("hello");
 		service.Convert<int, string>(42);
 
-		Assert.Equal(1, knockOff.IGenericMethodService.Convert.Of<string, int>().CallCount);
-		Assert.Equal(1, knockOff.IGenericMethodService.Convert.Of<int, string>().CallCount);
+		Assert.Equal(1, knockOff.Convert.Of<string, int>().CallCount);
+		Assert.Equal(1, knockOff.Convert.Of<int, string>().CallCount);
 	}
 
 	[Fact]
@@ -265,7 +265,7 @@ public class GenericMethodTests
 		var knockOff = new GenericMethodServiceKnockOff();
 		IGenericMethodService service = knockOff;
 
-		knockOff.IGenericMethodService.Convert.Of<string, int>().OnCall = (ko, input) => input.Length;
+		knockOff.Convert.Of<string, int>().OnCall = (ko, input) => input.Length;
 
 		var result = service.Convert<string, int>("hello");
 
@@ -279,13 +279,13 @@ public class GenericMethodTests
 		IGenericMethodService service = knockOff;
 
 		// Need to set OnCall for int->string since string has no parameterless ctor
-		knockOff.IGenericMethodService.Convert.Of<int, string>().OnCall = (ko, i) => i.ToString();
+		knockOff.Convert.Of<int, string>().OnCall = (ko, i) => i.ToString();
 
 		service.Convert<string, int>("a");
 		service.Convert<string, int>("b");
 		service.Convert<int, string>(1);
 
-		Assert.Equal(3, knockOff.IGenericMethodService.Convert.TotalCallCount);
+		Assert.Equal(3, knockOff.Convert.TotalCallCount);
 	}
 
 	[Fact]
@@ -297,7 +297,7 @@ public class GenericMethodTests
 		service.Convert<string, int>("test");
 		service.Convert<double, bool>(1.5);
 
-		var calledTypes = knockOff.IGenericMethodService.Convert.CalledTypeArguments;
+		var calledTypes = knockOff.Convert.CalledTypeArguments;
 		Assert.Equal(2, calledTypes.Count);
 		Assert.Contains((typeof(string), typeof(int)), calledTypes);
 		Assert.Contains((typeof(double), typeof(bool)), calledTypes);
@@ -311,7 +311,7 @@ public class GenericMethodTests
 
 		string? capturedSource = null;
 		int capturedDest = 0;
-		knockOff.IGenericMethodService.Transfer.Of<string, int>().OnCall = (ko, source, dest) =>
+		knockOff.Transfer.Of<string, int>().OnCall = (ko, source, dest) =>
 		{
 			capturedSource = source;
 			capturedDest = dest;
@@ -335,7 +335,7 @@ public class GenericMethodTests
 
 		service.CreateEntity<TestEntityWithInterface>();
 
-		Assert.Equal(1, knockOff.IConstrainedGenericService.CreateEntity.Of<TestEntityWithInterface>().CallCount);
+		Assert.Equal(1, knockOff.CreateEntity.Of<TestEntityWithInterface>().CallCount);
 	}
 
 	[Fact]
@@ -345,7 +345,7 @@ public class GenericMethodTests
 		IConstrainedGenericService service = knockOff;
 
 		var expected = new TestEntityWithInterface { Id = 123, Name = "Constrained" };
-		knockOff.IConstrainedGenericService.CreateEntity.Of<TestEntityWithInterface>().OnCall = (ko) => expected;
+		knockOff.CreateEntity.Of<TestEntityWithInterface>().OnCall = (ko) => expected;
 
 		var result = service.CreateEntity<TestEntityWithInterface>();
 
@@ -361,7 +361,7 @@ public class GenericMethodTests
 		var entity = new TestEntityWithInterface { Id = 1 };
 		service.SaveEntity(entity);
 
-		Assert.Equal(1, knockOff.IConstrainedGenericService.SaveEntity.Of<TestEntityWithInterface>().CallCount);
+		Assert.Equal(1, knockOff.SaveEntity.Of<TestEntityWithInterface>().CallCount);
 	}
 
 	[Fact]
@@ -371,7 +371,7 @@ public class GenericMethodTests
 		IConstrainedGenericService service = knockOff;
 
 		TestEntityWithInterface? captured = null;
-		knockOff.IConstrainedGenericService.SaveEntity.Of<TestEntityWithInterface>().OnCall = (ko, e) => captured = e;
+		knockOff.SaveEntity.Of<TestEntityWithInterface>().OnCall = (ko, e) => captured = e;
 
 		var entity = new TestEntityWithInterface { Id = 42 };
 		service.SaveEntity(entity);
@@ -404,14 +404,14 @@ public class GenericMethodTests
 		var knockOff = new GenericMethodServiceKnockOff();
 		IGenericMethodService service = knockOff;
 
-		knockOff.IGenericMethodService.Create.Of<TestEntity>().OnCall = (ko) => new TestEntity { Id = 1 };
+		knockOff.Create.Of<TestEntity>().OnCall = (ko) => new TestEntity { Id = 1 };
 		service.Create<TestEntity>();
 
-		knockOff.IGenericMethodService.Create.Of<TestEntity>().Reset();
+		knockOff.Create.Of<TestEntity>().Reset();
 
-		Assert.Equal(0, knockOff.IGenericMethodService.Create.Of<TestEntity>().CallCount);
-		Assert.False(knockOff.IGenericMethodService.Create.Of<TestEntity>().WasCalled);
-		Assert.Null(knockOff.IGenericMethodService.Create.Of<TestEntity>().OnCall);
+		Assert.Equal(0, knockOff.Create.Of<TestEntity>().CallCount);
+		Assert.False(knockOff.Create.Of<TestEntity>().WasCalled);
+		Assert.Null(knockOff.Create.Of<TestEntity>().OnCall);
 	}
 
 	[Fact]
@@ -423,11 +423,11 @@ public class GenericMethodTests
 		service.Create<TestEntity>();
 		service.Create<List<int>>();
 
-		knockOff.IGenericMethodService.Create.Reset();
+		knockOff.Create.Reset();
 
-		Assert.Equal(0, knockOff.IGenericMethodService.Create.TotalCallCount);
-		Assert.False(knockOff.IGenericMethodService.Create.WasCalled);
-		Assert.Empty(knockOff.IGenericMethodService.Create.CalledTypeArguments);
+		Assert.Equal(0, knockOff.Create.TotalCallCount);
+		Assert.False(knockOff.Create.WasCalled);
+		Assert.Empty(knockOff.Create.CalledTypeArguments);
 	}
 
 	[Fact]
@@ -439,10 +439,10 @@ public class GenericMethodTests
 		service.Deserialize<TestEntity>("{\"a\":1}");
 		service.Deserialize<TestEntity>("{\"b\":2}");
 
-		knockOff.IGenericMethodService.Deserialize.Of<TestEntity>().Reset();
+		knockOff.Deserialize.Of<TestEntity>().Reset();
 
-		Assert.Equal(0, knockOff.IGenericMethodService.Deserialize.Of<TestEntity>().CallCount);
-		Assert.Null(knockOff.IGenericMethodService.Deserialize.Of<TestEntity>().LastCallArg);
+		Assert.Equal(0, knockOff.Deserialize.Of<TestEntity>().CallCount);
+		Assert.Null(knockOff.Deserialize.Of<TestEntity>().LastCallArg);
 	}
 
 	#endregion
@@ -455,8 +455,8 @@ public class GenericMethodTests
 		var knockOff = new GenericMethodServiceKnockOff();
 
 		// Accessing Of<T>() without calling should have zero count
-		Assert.Equal(0, knockOff.IGenericMethodService.Create.Of<TestEntity>().CallCount);
-		Assert.False(knockOff.IGenericMethodService.Create.Of<TestEntity>().WasCalled);
+		Assert.Equal(0, knockOff.Create.Of<TestEntity>().CallCount);
+		Assert.False(knockOff.Create.Of<TestEntity>().WasCalled);
 	}
 
 	[Fact]
@@ -464,7 +464,7 @@ public class GenericMethodTests
 	{
 		var knockOff = new GenericMethodServiceKnockOff();
 
-		Assert.Empty(knockOff.IGenericMethodService.Create.CalledTypeArguments);
+		Assert.Empty(knockOff.Create.CalledTypeArguments);
 	}
 
 	[Fact]
@@ -472,8 +472,8 @@ public class GenericMethodTests
 	{
 		var knockOff = new GenericMethodServiceKnockOff();
 
-		Assert.Equal(0, knockOff.IGenericMethodService.Create.TotalCallCount);
-		Assert.False(knockOff.IGenericMethodService.Create.WasCalled);
+		Assert.Equal(0, knockOff.Create.TotalCallCount);
+		Assert.False(knockOff.Create.WasCalled);
 	}
 
 	#endregion

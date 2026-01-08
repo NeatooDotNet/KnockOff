@@ -5,8 +5,8 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class SkBackingServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for ISkBackingService.Name.</summary>
-	public sealed class ISkBackingService_NameInterceptor
+	/// <summary>Tracks and configures behavior for Name.</summary>
+	public sealed class NameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -33,39 +33,19 @@ partial class SkBackingServiceKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkBackingService.</summary>
-	public sealed class ISkBackingServiceInterceptorors
-	{
-		/// <summary>Interceptor for Name.</summary>
-		public ISkBackingService_NameInterceptor Name { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkBackingService.</summary>
-	public ISkBackingServiceInterceptorors ISkBackingService { get; } = new();
+	/// <summary>Interceptor for Name.</summary>
+	public NameInterceptor Name { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkBackingService.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkBackingService AsSkBackingService() => this;
 
-	/// <summary>Backing field for ISkBackingService.Name.</summary>
-	protected string ISkBackingService_NameBacking { get; set; } = "";
+	/// <summary>Backing storage for Name.</summary>
+	protected string NameBacking { get; set; } = "";
 
 	string KnockOff.Documentation.Samples.Skills.ISkBackingService.Name
 	{
-		get
-		{
-			ISkBackingService.Name.RecordGet();
-			if (ISkBackingService.Name.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return ISkBackingService_NameBacking;
-		}
-		set
-		{
-			ISkBackingService.Name.RecordSet(value);
-			if (ISkBackingService.Name.OnSet is { } onSetCallback)
-				onSetCallback(this, value);
-			else
-				ISkBackingService_NameBacking = value;
-		}
+		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
+		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else NameBacking = value; }
 	}
 
 }

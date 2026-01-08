@@ -5,257 +5,236 @@ namespace KnockOff.Tests;
 
 partial class OverloadedServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for IOverloadedService.GetByIdAsync1.</summary>
-	public sealed class IOverloadedService_GetByIdAsync1Interceptor
+	/// <summary>Tracks and configures behavior for GetByIdAsync.</summary>
+	public sealed class GetByIdAsync1Interceptor
 	{
-		/// <summary>Delegate for GetByIdAsync(int id).</summary>
+		/// <summary>Delegate for GetByIdAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> GetByIdAsyncDelegate(OverloadedServiceKnockOff ko, int id);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetByIdAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IOverloadedService.GetByIdAsync2.</summary>
-	public sealed class IOverloadedService_GetByIdAsync2Interceptor
+	/// <summary>Tracks and configures behavior for GetByIdAsync.</summary>
+	public sealed class GetByIdAsync2Interceptor
 	{
-		/// <summary>Delegate for GetByIdAsync(int id, global::System.Threading.CancellationToken cancellationToken).</summary>
+		/// <summary>Delegate for GetByIdAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> GetByIdAsyncDelegate(OverloadedServiceKnockOff ko, int id, global::System.Threading.CancellationToken cancellationToken);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Arguments from the most recent call.</summary>
-		public (int id, global::System.Threading.CancellationToken cancellationToken)? LastCallArgs { get; private set; }
+		/// <summary>The arguments from the most recent call.</summary>
+		public (int? id, global::System.Threading.CancellationToken? cancellationToken)? LastCallArgs { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetByIdAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id, global::System.Threading.CancellationToken cancellationToken) { CallCount++; LastCallArgs = (id, cancellationToken); }
+		public void RecordCall(int? id, global::System.Threading.CancellationToken? cancellationToken) { CallCount++; LastCallArgs = (id, cancellationToken); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IOverloadedService.Process1.</summary>
-	public sealed class IOverloadedService_Process1Interceptor
+	/// <summary>Tracks and configures behavior for Process.</summary>
+	public sealed class Process1Interceptor
 	{
-		/// <summary>Delegate for Process(string data).</summary>
-		public delegate void ProcessDelegate(OverloadedServiceKnockOff ko, string data);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'data' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public string? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public ProcessDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<OverloadedServiceKnockOff, string>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string data) { CallCount++; LastCallArg = data; }
+		public void RecordCall(string? data) { CallCount++; LastCallArg = data; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IOverloadedService.Process2.</summary>
-	public sealed class IOverloadedService_Process2Interceptor
+	/// <summary>Tracks and configures behavior for Process.</summary>
+	public sealed class Process2Interceptor
 	{
-		/// <summary>Delegate for Process(string data, int priority).</summary>
-		public delegate void ProcessDelegate(OverloadedServiceKnockOff ko, string data, int priority);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Arguments from the most recent call.</summary>
-		public (string data, int priority)? LastCallArgs { get; private set; }
+		/// <summary>The arguments from the most recent call.</summary>
+		public (string? data, int? priority)? LastCallArgs { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public ProcessDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<OverloadedServiceKnockOff, string, int>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string data, int priority) { CallCount++; LastCallArgs = (data, priority); }
+		public void RecordCall(string? data, int? priority) { CallCount++; LastCallArgs = (data, priority); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IOverloadedService.Process3.</summary>
-	public sealed class IOverloadedService_Process3Interceptor
+	/// <summary>Tracks and configures behavior for Process.</summary>
+	public sealed class Process3Interceptor
 	{
-		/// <summary>Delegate for Process(string data, int priority, bool async).</summary>
-		public delegate void ProcessDelegate(OverloadedServiceKnockOff ko, string data, int priority, bool async);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Arguments from the most recent call.</summary>
-		public (string data, int priority, bool async)? LastCallArgs { get; private set; }
+		/// <summary>The arguments from the most recent call.</summary>
+		public (string? data, int? priority, bool? async)? LastCallArgs { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public ProcessDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<OverloadedServiceKnockOff, string, int, bool>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string data, int priority, bool async) { CallCount++; LastCallArgs = (data, priority, async); }
+		public void RecordCall(string? data, int? priority, bool? async) { CallCount++; LastCallArgs = (data, priority, async); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IOverloadedService.Calculate1.</summary>
-	public sealed class IOverloadedService_Calculate1Interceptor
+	/// <summary>Tracks and configures behavior for Calculate.</summary>
+	public sealed class Calculate1Interceptor
 	{
-		/// <summary>Delegate for Calculate(int value).</summary>
-		public delegate int CalculateDelegate(OverloadedServiceKnockOff ko, int value);
+		/// <summary>Delegate for Calculate.</summary>
+		public delegate int CalculateDelegate(OverloadedServiceKnockOff ko, int @value);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'value' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public CalculateDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int value) { CallCount++; LastCallArg = value; }
+		public void RecordCall(int? @value) { CallCount++; LastCallArg = @value; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IOverloadedService.Calculate2.</summary>
-	public sealed class IOverloadedService_Calculate2Interceptor
+	/// <summary>Tracks and configures behavior for Calculate.</summary>
+	public sealed class Calculate2Interceptor
 	{
-		/// <summary>Delegate for Calculate(int a, int b).</summary>
+		/// <summary>Delegate for Calculate.</summary>
 		public delegate int CalculateDelegate(OverloadedServiceKnockOff ko, int a, int b);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Arguments from the most recent call.</summary>
-		public (int a, int b)? LastCallArgs { get; private set; }
+		/// <summary>The arguments from the most recent call.</summary>
+		public (int? a, int? b)? LastCallArgs { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public CalculateDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int a, int b) { CallCount++; LastCallArgs = (a, b); }
+		public void RecordCall(int? a, int? b) { CallCount++; LastCallArgs = (a, b); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IOverloadedService.</summary>
-	public sealed class IOverloadedServiceInterceptorors
-	{
-		/// <summary>Interceptor for GetByIdAsync overload 1.</summary>
-		public IOverloadedService_GetByIdAsync1Interceptor GetByIdAsync1 { get; } = new();
-		/// <summary>Interceptor for GetByIdAsync overload 2.</summary>
-		public IOverloadedService_GetByIdAsync2Interceptor GetByIdAsync2 { get; } = new();
-		/// <summary>Interceptor for Process overload 1.</summary>
-		public IOverloadedService_Process1Interceptor Process1 { get; } = new();
-		/// <summary>Interceptor for Process overload 2.</summary>
-		public IOverloadedService_Process2Interceptor Process2 { get; } = new();
-		/// <summary>Interceptor for Process overload 3.</summary>
-		public IOverloadedService_Process3Interceptor Process3 { get; } = new();
-		/// <summary>Interceptor for Calculate overload 1.</summary>
-		public IOverloadedService_Calculate1Interceptor Calculate1 { get; } = new();
-		/// <summary>Interceptor for Calculate overload 2.</summary>
-		public IOverloadedService_Calculate2Interceptor Calculate2 { get; } = new();
-	}
+	/// <summary>Interceptor for GetByIdAsync.</summary>
+	public GetByIdAsync1Interceptor GetByIdAsync1 { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IOverloadedService.</summary>
-	public IOverloadedServiceInterceptorors IOverloadedService { get; } = new();
+	/// <summary>Interceptor for GetByIdAsync.</summary>
+	public GetByIdAsync2Interceptor GetByIdAsync2 { get; } = new();
+
+	/// <summary>Interceptor for Process.</summary>
+	public Process1Interceptor Process1 { get; } = new();
+
+	/// <summary>Interceptor for Process.</summary>
+	public Process2Interceptor Process2 { get; } = new();
+
+	/// <summary>Interceptor for Process.</summary>
+	public Process3Interceptor Process3 { get; } = new();
+
+	/// <summary>Interceptor for Calculate.</summary>
+	public Calculate1Interceptor Calculate1 { get; } = new();
+
+	/// <summary>Interceptor for Calculate.</summary>
+	public Calculate2Interceptor Calculate2 { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IOverloadedService.</summary>
 	public KnockOff.Tests.IOverloadedService AsOverloadedService() => this;
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> KnockOff.Tests.IOverloadedService.GetByIdAsync(int id)
 	{
-		IOverloadedService.GetByIdAsync1.RecordCall(id);
-		if (IOverloadedService.GetByIdAsync1.OnCall is { } onCallCallback)
-			return onCallCallback(this, id);
-		return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.User?>(default!);
+		GetByIdAsync1.RecordCall(id);
+		return GetByIdAsync1.OnCall?.Invoke(this, id) ?? global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.User?>(default!);
 	}
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> KnockOff.Tests.IOverloadedService.GetByIdAsync(int id, global::System.Threading.CancellationToken cancellationToken)
 	{
-		IOverloadedService.GetByIdAsync2.RecordCall(id, cancellationToken);
-		if (IOverloadedService.GetByIdAsync2.OnCall is { } onCallCallback)
-			return onCallCallback(this, id, cancellationToken);
-		return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.User?>(default!);
+		GetByIdAsync2.RecordCall(id, cancellationToken);
+		return GetByIdAsync2.OnCall?.Invoke(this, id, cancellationToken) ?? global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.User?>(default!);
 	}
 
 	void KnockOff.Tests.IOverloadedService.Process(string data)
 	{
-		IOverloadedService.Process1.RecordCall(data);
-		if (IOverloadedService.Process1.OnCall is { } onCallCallback)
-		{ onCallCallback(this, data); return; }
+		Process1.RecordCall(data);
+		Process1.OnCall?.Invoke(this, data);
 	}
 
 	void KnockOff.Tests.IOverloadedService.Process(string data, int priority)
 	{
-		IOverloadedService.Process2.RecordCall(data, priority);
-		if (IOverloadedService.Process2.OnCall is { } onCallCallback)
-		{ onCallCallback(this, data, priority); return; }
+		Process2.RecordCall(data, priority);
+		Process2.OnCall?.Invoke(this, data, priority);
 	}
 
 	void KnockOff.Tests.IOverloadedService.Process(string data, int priority, bool async)
 	{
-		IOverloadedService.Process3.RecordCall(data, priority, async);
-		if (IOverloadedService.Process3.OnCall is { } onCallCallback)
-		{ onCallCallback(this, data, priority, async); return; }
+		Process3.RecordCall(data, priority, async);
+		Process3.OnCall?.Invoke(this, data, priority, async);
 	}
 
-	int KnockOff.Tests.IOverloadedService.Calculate(int value)
+	int KnockOff.Tests.IOverloadedService.Calculate(int @value)
 	{
-		IOverloadedService.Calculate1.RecordCall(value);
-		if (IOverloadedService.Calculate1.OnCall is { } onCallCallback)
-			return onCallCallback(this, value);
-		return default!;
+		Calculate1.RecordCall(@value);
+		return Calculate1.OnCall?.Invoke(this, @value) ?? default!;
 	}
 
 	int KnockOff.Tests.IOverloadedService.Calculate(int a, int b)
 	{
-		IOverloadedService.Calculate2.RecordCall(a, b);
-		if (IOverloadedService.Calculate2.OnCall is { } onCallCallback)
-			return onCallCallback(this, a, b);
-		return default!;
+		Calculate2.RecordCall(a, b);
+		return Calculate2.OnCall?.Invoke(this, a, b) ?? default!;
 	}
 
 }

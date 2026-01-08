@@ -5,8 +5,8 @@ namespace KnockOff.Tests;
 
 partial class SmartDefaultsKnockOff
 {
-	/// <summary>Tracks and configures behavior for ISmartDefaultsService.Count.</summary>
-	public sealed class ISmartDefaultsService_CountInterceptor
+	/// <summary>Tracks and configures behavior for Count.</summary>
+	public sealed class CountInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -21,8 +21,8 @@ partial class SmartDefaultsKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ISmartDefaultsService.Items.</summary>
-	public sealed class ISmartDefaultsService_ItemsInterceptor
+	/// <summary>Tracks and configures behavior for Items.</summary>
+	public sealed class ItemsInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -37,19 +37,19 @@ partial class SmartDefaultsKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ISmartDefaultsService.GetInt.</summary>
-	public sealed class ISmartDefaultsService_GetIntInterceptor
+	/// <summary>Tracks and configures behavior for GetInt.</summary>
+	public sealed class GetIntInterceptor
 	{
-		/// <summary>Delegate for GetInt().</summary>
+		/// <summary>Delegate for GetInt.</summary>
 		public delegate int GetIntDelegate(SmartDefaultsKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetIntDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -59,19 +59,19 @@ partial class SmartDefaultsKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ISmartDefaultsService.GetBool.</summary>
-	public sealed class ISmartDefaultsService_GetBoolInterceptor
+	/// <summary>Tracks and configures behavior for GetBool.</summary>
+	public sealed class GetBoolInterceptor
 	{
-		/// <summary>Delegate for GetBool().</summary>
+		/// <summary>Delegate for GetBool.</summary>
 		public delegate bool GetBoolDelegate(SmartDefaultsKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetBoolDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -81,19 +81,19 @@ partial class SmartDefaultsKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ISmartDefaultsService.GetDateTime.</summary>
-	public sealed class ISmartDefaultsService_GetDateTimeInterceptor
+	/// <summary>Tracks and configures behavior for GetDateTime.</summary>
+	public sealed class GetDateTimeInterceptor
 	{
-		/// <summary>Delegate for GetDateTime().</summary>
+		/// <summary>Delegate for GetDateTime.</summary>
 		public delegate global::System.DateTime GetDateTimeDelegate(SmartDefaultsKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetDateTimeDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -103,19 +103,19 @@ partial class SmartDefaultsKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ISmartDefaultsService.GetNullableString.</summary>
-	public sealed class ISmartDefaultsService_GetNullableStringInterceptor
+	/// <summary>Tracks and configures behavior for GetNullableString.</summary>
+	public sealed class GetNullableStringInterceptor
 	{
-		/// <summary>Delegate for GetNullableString().</summary>
+		/// <summary>Delegate for GetNullableString.</summary>
 		public delegate string? GetNullableStringDelegate(SmartDefaultsKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetNullableStringDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -125,19 +125,19 @@ partial class SmartDefaultsKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ISmartDefaultsService.GetNullableEntity.</summary>
-	public sealed class ISmartDefaultsService_GetNullableEntityInterceptor
+	/// <summary>Tracks and configures behavior for GetNullableEntity.</summary>
+	public sealed class GetNullableEntityInterceptor
 	{
-		/// <summary>Delegate for GetNullableEntity().</summary>
+		/// <summary>Delegate for GetNullableEntity.</summary>
 		public delegate global::KnockOff.Tests.TestEntity? GetNullableEntityDelegate(SmartDefaultsKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetNullableEntityDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -147,19 +147,19 @@ partial class SmartDefaultsKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ISmartDefaultsService.GetList.</summary>
-	public sealed class ISmartDefaultsService_GetListInterceptor
+	/// <summary>Tracks and configures behavior for GetList.</summary>
+	public sealed class GetListInterceptor
 	{
-		/// <summary>Delegate for GetList().</summary>
+		/// <summary>Delegate for GetList.</summary>
 		public delegate global::System.Collections.Generic.List<string> GetListDelegate(SmartDefaultsKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetListDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -169,19 +169,19 @@ partial class SmartDefaultsKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ISmartDefaultsService.GetDictionary.</summary>
-	public sealed class ISmartDefaultsService_GetDictionaryInterceptor
+	/// <summary>Tracks and configures behavior for GetDictionary.</summary>
+	public sealed class GetDictionaryInterceptor
 	{
-		/// <summary>Delegate for GetDictionary().</summary>
+		/// <summary>Delegate for GetDictionary.</summary>
 		public delegate global::System.Collections.Generic.Dictionary<string, int> GetDictionaryDelegate(SmartDefaultsKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetDictionaryDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -191,19 +191,19 @@ partial class SmartDefaultsKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ISmartDefaultsService.GetEntity.</summary>
-	public sealed class ISmartDefaultsService_GetEntityInterceptor
+	/// <summary>Tracks and configures behavior for GetEntity.</summary>
+	public sealed class GetEntityInterceptor
 	{
-		/// <summary>Delegate for GetEntity().</summary>
+		/// <summary>Delegate for GetEntity.</summary>
 		public delegate global::KnockOff.Tests.TestEntity GetEntityDelegate(SmartDefaultsKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetEntityDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -213,19 +213,19 @@ partial class SmartDefaultsKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ISmartDefaultsService.GetIList.</summary>
-	public sealed class ISmartDefaultsService_GetIListInterceptor
+	/// <summary>Tracks and configures behavior for GetIList.</summary>
+	public sealed class GetIListInterceptor
 	{
-		/// <summary>Delegate for GetIList().</summary>
+		/// <summary>Delegate for GetIList.</summary>
 		public delegate global::System.Collections.Generic.IList<string> GetIListDelegate(SmartDefaultsKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetIListDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -235,19 +235,19 @@ partial class SmartDefaultsKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ISmartDefaultsService.GetString.</summary>
-	public sealed class ISmartDefaultsService_GetStringInterceptor
+	/// <summary>Tracks and configures behavior for GetString.</summary>
+	public sealed class GetStringInterceptor
 	{
-		/// <summary>Delegate for GetString().</summary>
+		/// <summary>Delegate for GetString.</summary>
 		public delegate string GetStringDelegate(SmartDefaultsKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetStringDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -257,19 +257,19 @@ partial class SmartDefaultsKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ISmartDefaultsService.GetDisposable.</summary>
-	public sealed class ISmartDefaultsService_GetDisposableInterceptor
+	/// <summary>Tracks and configures behavior for GetDisposable.</summary>
+	public sealed class GetDisposableInterceptor
 	{
-		/// <summary>Delegate for GetDisposable().</summary>
+		/// <summary>Delegate for GetDisposable.</summary>
 		public delegate global::System.IDisposable GetDisposableDelegate(SmartDefaultsKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetDisposableDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -279,19 +279,19 @@ partial class SmartDefaultsKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ISmartDefaultsService.GetIntAsync.</summary>
-	public sealed class ISmartDefaultsService_GetIntAsyncInterceptor
+	/// <summary>Tracks and configures behavior for GetIntAsync.</summary>
+	public sealed class GetIntAsyncInterceptor
 	{
-		/// <summary>Delegate for GetIntAsync().</summary>
+		/// <summary>Delegate for GetIntAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<int> GetIntAsyncDelegate(SmartDefaultsKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetIntAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -301,19 +301,19 @@ partial class SmartDefaultsKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ISmartDefaultsService.GetListAsync.</summary>
-	public sealed class ISmartDefaultsService_GetListAsyncInterceptor
+	/// <summary>Tracks and configures behavior for GetListAsync.</summary>
+	public sealed class GetListAsyncInterceptor
 	{
-		/// <summary>Delegate for GetListAsync().</summary>
+		/// <summary>Delegate for GetListAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<global::System.Collections.Generic.List<string>> GetListAsyncDelegate(SmartDefaultsKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetListAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -323,19 +323,19 @@ partial class SmartDefaultsKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ISmartDefaultsService.GetStringAsync.</summary>
-	public sealed class ISmartDefaultsService_GetStringAsyncInterceptor
+	/// <summary>Tracks and configures behavior for GetStringAsync.</summary>
+	public sealed class GetStringAsyncInterceptor
 	{
-		/// <summary>Delegate for GetStringAsync().</summary>
+		/// <summary>Delegate for GetStringAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<string> GetStringAsyncDelegate(SmartDefaultsKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetStringAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -345,187 +345,161 @@ partial class SmartDefaultsKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.ISmartDefaultsService.</summary>
-	public sealed class ISmartDefaultsServiceInterceptorors
-	{
-		/// <summary>Interceptor for Count.</summary>
-		public ISmartDefaultsService_CountInterceptor Count { get; } = new();
-		/// <summary>Interceptor for Items.</summary>
-		public ISmartDefaultsService_ItemsInterceptor Items { get; } = new();
-		/// <summary>Interceptor for GetInt.</summary>
-		public ISmartDefaultsService_GetIntInterceptor GetInt { get; } = new();
-		/// <summary>Interceptor for GetBool.</summary>
-		public ISmartDefaultsService_GetBoolInterceptor GetBool { get; } = new();
-		/// <summary>Interceptor for GetDateTime.</summary>
-		public ISmartDefaultsService_GetDateTimeInterceptor GetDateTime { get; } = new();
-		/// <summary>Interceptor for GetNullableString.</summary>
-		public ISmartDefaultsService_GetNullableStringInterceptor GetNullableString { get; } = new();
-		/// <summary>Interceptor for GetNullableEntity.</summary>
-		public ISmartDefaultsService_GetNullableEntityInterceptor GetNullableEntity { get; } = new();
-		/// <summary>Interceptor for GetList.</summary>
-		public ISmartDefaultsService_GetListInterceptor GetList { get; } = new();
-		/// <summary>Interceptor for GetDictionary.</summary>
-		public ISmartDefaultsService_GetDictionaryInterceptor GetDictionary { get; } = new();
-		/// <summary>Interceptor for GetEntity.</summary>
-		public ISmartDefaultsService_GetEntityInterceptor GetEntity { get; } = new();
-		/// <summary>Interceptor for GetIList.</summary>
-		public ISmartDefaultsService_GetIListInterceptor GetIList { get; } = new();
-		/// <summary>Interceptor for GetString.</summary>
-		public ISmartDefaultsService_GetStringInterceptor GetString { get; } = new();
-		/// <summary>Interceptor for GetDisposable.</summary>
-		public ISmartDefaultsService_GetDisposableInterceptor GetDisposable { get; } = new();
-		/// <summary>Interceptor for GetIntAsync.</summary>
-		public ISmartDefaultsService_GetIntAsyncInterceptor GetIntAsync { get; } = new();
-		/// <summary>Interceptor for GetListAsync.</summary>
-		public ISmartDefaultsService_GetListAsyncInterceptor GetListAsync { get; } = new();
-		/// <summary>Interceptor for GetStringAsync.</summary>
-		public ISmartDefaultsService_GetStringAsyncInterceptor GetStringAsync { get; } = new();
-	}
+	/// <summary>Interceptor for Count.</summary>
+	public CountInterceptor Count { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.ISmartDefaultsService.</summary>
-	public ISmartDefaultsServiceInterceptorors ISmartDefaultsService { get; } = new();
+	/// <summary>Interceptor for Items.</summary>
+	public ItemsInterceptor Items { get; } = new();
+
+	/// <summary>Interceptor for GetInt.</summary>
+	public GetIntInterceptor GetInt { get; } = new();
+
+	/// <summary>Interceptor for GetBool.</summary>
+	public GetBoolInterceptor GetBool { get; } = new();
+
+	/// <summary>Interceptor for GetDateTime.</summary>
+	public GetDateTimeInterceptor GetDateTime { get; } = new();
+
+	/// <summary>Interceptor for GetNullableString.</summary>
+	public GetNullableStringInterceptor GetNullableString { get; } = new();
+
+	/// <summary>Interceptor for GetNullableEntity.</summary>
+	public GetNullableEntityInterceptor GetNullableEntity { get; } = new();
+
+	/// <summary>Interceptor for GetList.</summary>
+	public GetListInterceptor GetList { get; } = new();
+
+	/// <summary>Interceptor for GetDictionary.</summary>
+	public GetDictionaryInterceptor GetDictionary { get; } = new();
+
+	/// <summary>Interceptor for GetEntity.</summary>
+	public GetEntityInterceptor GetEntity { get; } = new();
+
+	/// <summary>Interceptor for GetIList.</summary>
+	public GetIListInterceptor GetIList { get; } = new();
+
+	/// <summary>Interceptor for GetString.</summary>
+	public GetStringInterceptor GetString { get; } = new();
+
+	/// <summary>Interceptor for GetDisposable.</summary>
+	public GetDisposableInterceptor GetDisposable { get; } = new();
+
+	/// <summary>Interceptor for GetIntAsync.</summary>
+	public GetIntAsyncInterceptor GetIntAsync { get; } = new();
+
+	/// <summary>Interceptor for GetListAsync.</summary>
+	public GetListAsyncInterceptor GetListAsync { get; } = new();
+
+	/// <summary>Interceptor for GetStringAsync.</summary>
+	public GetStringAsyncInterceptor GetStringAsync { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.ISmartDefaultsService.</summary>
 	public KnockOff.Tests.ISmartDefaultsService AsSmartDefaultsService() => this;
 
-	/// <summary>Backing field for ISmartDefaultsService.Count.</summary>
-	protected int ISmartDefaultsService_CountBacking { get; set; }
+	/// <summary>Backing storage for Count.</summary>
+	protected int CountBacking { get; set; } = default!;
 
-	/// <summary>Backing field for ISmartDefaultsService.Items.</summary>
-	protected global::System.Collections.Generic.List<string> ISmartDefaultsService_ItemsBacking { get; set; } = new global::System.Collections.Generic.List<string>();
+	/// <summary>Backing storage for Items.</summary>
+	protected global::System.Collections.Generic.List<string> ItemsBacking { get; set; } = new global::System.Collections.Generic.List<string>();
 
 	int KnockOff.Tests.ISmartDefaultsService.GetInt()
 	{
-		ISmartDefaultsService.GetInt.RecordCall();
-		if (ISmartDefaultsService.GetInt.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return default!;
+		GetInt.RecordCall();
+		return GetInt.OnCall?.Invoke(this) ?? default!;
 	}
 
 	bool KnockOff.Tests.ISmartDefaultsService.GetBool()
 	{
-		ISmartDefaultsService.GetBool.RecordCall();
-		if (ISmartDefaultsService.GetBool.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return default!;
+		GetBool.RecordCall();
+		return GetBool.OnCall?.Invoke(this) ?? default!;
 	}
 
 	global::System.DateTime KnockOff.Tests.ISmartDefaultsService.GetDateTime()
 	{
-		ISmartDefaultsService.GetDateTime.RecordCall();
-		if (ISmartDefaultsService.GetDateTime.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return default!;
+		GetDateTime.RecordCall();
+		return GetDateTime.OnCall?.Invoke(this) ?? default!;
 	}
 
 	string? KnockOff.Tests.ISmartDefaultsService.GetNullableString()
 	{
-		ISmartDefaultsService.GetNullableString.RecordCall();
-		if (ISmartDefaultsService.GetNullableString.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return default!;
+		GetNullableString.RecordCall();
+		return GetNullableString.OnCall?.Invoke(this) ?? default!;
 	}
 
 	global::KnockOff.Tests.TestEntity? KnockOff.Tests.ISmartDefaultsService.GetNullableEntity()
 	{
-		ISmartDefaultsService.GetNullableEntity.RecordCall();
-		if (ISmartDefaultsService.GetNullableEntity.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return default!;
+		GetNullableEntity.RecordCall();
+		return GetNullableEntity.OnCall?.Invoke(this) ?? default!;
 	}
 
 	global::System.Collections.Generic.List<string> KnockOff.Tests.ISmartDefaultsService.GetList()
 	{
-		ISmartDefaultsService.GetList.RecordCall();
-		if (ISmartDefaultsService.GetList.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return new global::System.Collections.Generic.List<string>();
+		GetList.RecordCall();
+		return GetList.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<string>();
 	}
 
 	global::System.Collections.Generic.Dictionary<string, int> KnockOff.Tests.ISmartDefaultsService.GetDictionary()
 	{
-		ISmartDefaultsService.GetDictionary.RecordCall();
-		if (ISmartDefaultsService.GetDictionary.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return new global::System.Collections.Generic.Dictionary<string, int>();
+		GetDictionary.RecordCall();
+		return GetDictionary.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.Dictionary<string, int>();
 	}
 
 	global::KnockOff.Tests.TestEntity KnockOff.Tests.ISmartDefaultsService.GetEntity()
 	{
-		ISmartDefaultsService.GetEntity.RecordCall();
-		if (ISmartDefaultsService.GetEntity.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return new global::KnockOff.Tests.TestEntity();
+		GetEntity.RecordCall();
+		return GetEntity.OnCall?.Invoke(this) ?? new global::KnockOff.Tests.TestEntity();
 	}
 
 	global::System.Collections.Generic.IList<string> KnockOff.Tests.ISmartDefaultsService.GetIList()
 	{
-		ISmartDefaultsService.GetIList.RecordCall();
-		if (ISmartDefaultsService.GetIList.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return new global::System.Collections.Generic.List<string>();
+		GetIList.RecordCall();
+		return GetIList.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<string>();
 	}
 
 	string KnockOff.Tests.ISmartDefaultsService.GetString()
 	{
-		ISmartDefaultsService.GetString.RecordCall();
-		if (ISmartDefaultsService.GetString.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'GetString' in your partial class, or set ISmartDefaultsService.GetString.OnCall.");
+		GetString.RecordCall();
+		if (GetString.OnCall is { } callback)
+			return callback(this);
+		throw new global::System.InvalidOperationException("No implementation provided for GetString. Set GetString.OnCall or define a protected method 'GetString' in your partial class.");
 	}
 
 	global::System.IDisposable KnockOff.Tests.ISmartDefaultsService.GetDisposable()
 	{
-		ISmartDefaultsService.GetDisposable.RecordCall();
-		if (ISmartDefaultsService.GetDisposable.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'GetDisposable' in your partial class, or set ISmartDefaultsService.GetDisposable.OnCall.");
+		GetDisposable.RecordCall();
+		if (GetDisposable.OnCall is { } callback)
+			return callback(this);
+		throw new global::System.InvalidOperationException("No implementation provided for GetDisposable. Set GetDisposable.OnCall or define a protected method 'GetDisposable' in your partial class.");
 	}
 
 	global::System.Threading.Tasks.Task<int> KnockOff.Tests.ISmartDefaultsService.GetIntAsync()
 	{
-		ISmartDefaultsService.GetIntAsync.RecordCall();
-		if (ISmartDefaultsService.GetIntAsync.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return global::System.Threading.Tasks.Task.FromResult<int>(default!);
+		GetIntAsync.RecordCall();
+		return GetIntAsync.OnCall?.Invoke(this) ?? global::System.Threading.Tasks.Task.FromResult<int>(default!);
 	}
 
 	global::System.Threading.Tasks.Task<global::System.Collections.Generic.List<string>> KnockOff.Tests.ISmartDefaultsService.GetListAsync()
 	{
-		ISmartDefaultsService.GetListAsync.RecordCall();
-		if (ISmartDefaultsService.GetListAsync.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return global::System.Threading.Tasks.Task.FromResult<global::System.Collections.Generic.List<string>>(new global::System.Collections.Generic.List<string>());
+		GetListAsync.RecordCall();
+		return GetListAsync.OnCall?.Invoke(this) ?? global::System.Threading.Tasks.Task.FromResult<global::System.Collections.Generic.List<string>>(new global::System.Collections.Generic.List<string>());
 	}
 
 	global::System.Threading.Tasks.Task<string> KnockOff.Tests.ISmartDefaultsService.GetStringAsync()
 	{
-		ISmartDefaultsService.GetStringAsync.RecordCall();
-		if (ISmartDefaultsService.GetStringAsync.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'GetStringAsync' in your partial class, or set ISmartDefaultsService.GetStringAsync.OnCall.");
+		GetStringAsync.RecordCall();
+		if (GetStringAsync.OnCall is { } callback)
+			return callback(this);
+		throw new global::System.InvalidOperationException("No implementation provided for GetStringAsync. Set GetStringAsync.OnCall or define a protected method 'GetStringAsync' in your partial class.");
 	}
 
 	int KnockOff.Tests.ISmartDefaultsService.Count
 	{
-		get
-		{
-			ISmartDefaultsService.Count.RecordGet();
-			if (ISmartDefaultsService.Count.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return ISmartDefaultsService_CountBacking;
-		}
+		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? CountBacking; }
 	}
 
 	global::System.Collections.Generic.List<string> KnockOff.Tests.ISmartDefaultsService.Items
 	{
-		get
-		{
-			ISmartDefaultsService.Items.RecordGet();
-			if (ISmartDefaultsService.Items.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return ISmartDefaultsService_ItemsBacking;
-		}
+		get { Items.RecordGet(); return Items.OnGet?.Invoke(this) ?? ItemsBacking; }
 	}
 
 }

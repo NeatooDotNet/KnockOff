@@ -5,8 +5,8 @@ namespace KnockOff.Documentation.Samples.GettingStarted;
 
 partial class UserServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for IUserServiceSimple.Name.</summary>
-	public sealed class IUserServiceSimple_NameInterceptor
+	/// <summary>Tracks and configures behavior for Name.</summary>
+	public sealed class NameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -33,74 +33,54 @@ partial class UserServiceKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IUserServiceSimple.GetUser.</summary>
-	public sealed class IUserServiceSimple_GetUserInterceptor
+	/// <summary>Tracks and configures behavior for GetUser.</summary>
+	public sealed class GetUser2Interceptor
 	{
-		/// <summary>Delegate for GetUser(int id).</summary>
+		/// <summary>Delegate for GetUser.</summary>
 		public delegate global::KnockOff.Documentation.Samples.GettingStarted.User GetUserDelegate(UserServiceKnockOff ko, int id);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetUserDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple.</summary>
-	public sealed class IUserServiceSimpleInterceptorors
-	{
-		/// <summary>Interceptor for Name.</summary>
-		public IUserServiceSimple_NameInterceptor Name { get; } = new();
-		/// <summary>Interceptor for GetUser.</summary>
-		public IUserServiceSimple_GetUserInterceptor GetUser { get; } = new();
-	}
+	/// <summary>Interceptor for Name.</summary>
+	public NameInterceptor Name { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple.</summary>
-	public IUserServiceSimpleInterceptorors IUserServiceSimple { get; } = new();
+	/// <summary>Interceptor for GetUser.</summary>
+	public GetUser2Interceptor GetUser2 { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple.</summary>
 	public KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple AsUserServiceSimple() => this;
 
-	/// <summary>Backing field for IUserServiceSimple.Name.</summary>
-	protected string IUserServiceSimple_NameBacking { get; set; } = "";
+	/// <summary>Backing storage for Name.</summary>
+	protected string NameBacking { get; set; } = "";
 
 	global::KnockOff.Documentation.Samples.GettingStarted.User KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple.GetUser(int id)
 	{
-		IUserServiceSimple.GetUser.RecordCall(id);
-		if (IUserServiceSimple.GetUser.OnCall is { } onCallCallback)
-			return onCallCallback(this, id);
+		GetUser2.RecordCall(id);
+		if (GetUser2.OnCall != null) return GetUser2.OnCall(this, id);
 		return GetUser(id);
 	}
 
 	string KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple.Name
 	{
-		get
-		{
-			IUserServiceSimple.Name.RecordGet();
-			if (IUserServiceSimple.Name.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IUserServiceSimple_NameBacking;
-		}
-		set
-		{
-			IUserServiceSimple.Name.RecordSet(value);
-			if (IUserServiceSimple.Name.OnSet is { } onSetCallback)
-				onSetCallback(this, value);
-			else
-				IUserServiceSimple_NameBacking = value;
-		}
+		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
+		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else NameBacking = value; }
 	}
 
 }

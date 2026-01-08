@@ -27,35 +27,34 @@ public partial class GenOrderRepositoryKnockOff : IGenRepository<GenOrder> { }
 
 ## Tracking
 
-Tracking uses the concrete types. For generic interfaces, the KO property includes the type arguments in the name:
+Tracking uses the concrete types:
 
+<!-- snippet: docs:generics:tracking -->
 ```csharp
-var knockOff = new UserRepositoryKnockOff();
-IRepository<User> repo = knockOff;
+var user = new GenUser { Id = 1, Name = "Test" };
+        repo.Save(user);
 
-var user = new User { Id = 1, Name = "Test" };
-repo.Save(user);
-
-// KO property is IRepository_User (interface name + type arg)
-// LastCallArg is strongly typed as User
-User? savedUser = knockOff.IRepository_User.Save.LastCallArg;
-Assert.Same(user, savedUser);
+        // LastCallArg is strongly typed as GenUser
+        GenUser? savedUser = knockOff.Save.LastCallArg;  // same as user
 ```
+<!-- /snippet -->
 
 ## Callbacks
 
 Callbacks also use concrete types:
 
+<!-- snippet: docs:generics:callbacks -->
 ```csharp
-knockOff.IRepository_User.GetById.OnCall = (ko, id) =>
-    new User { Id = id, Name = $"User-{id}" };
+knockOff.GetById.OnCall = (ko, id) =>
+            new GenUser { Id = id, Name = $"User-{id}" };
 
-knockOff.IRepository_User.Save.OnCall = (ko, user) =>
-{
-    // user is typed as User, not T
-    Assert.NotNull(user.Name);
-};
+        knockOff.Save.OnCall = (ko, user) =>
+        {
+            // user is typed as GenUser, not T
+            Console.WriteLine($"Saving: {user.Name}");
+        };
 ```
+<!-- /snippet -->
 
 ## Multiple Generic Parameters
 
@@ -74,22 +73,21 @@ public partial class GenStringCacheKnockOff : IGenCache<string, GenUser> { }
 
 Usage:
 
+<!-- snippet: docs:generics:multiple-params-usage -->
 ```csharp
-var knockOff = new StringCacheKnockOff();
+knockOff.Get.OnCall = (ko, key) => key switch
+        {
+            "admin" => new GenUser { Name = "Admin" },
+            _ => null
+        };
 
-// KO property: ICache_string_User (interface + type args)
-knockOff.ICache_string_User.Get.OnCall = (ko, key) => key switch
-{
-    "admin" => new User { Name = "Admin" },
-    _ => null
-};
-
-knockOff.ICache_string_User.Set.OnCall = (ko, key, value) =>
-{
-    // string key, User value
-    Console.WriteLine($"Cached {key}: {value.Name}");
-};
+        knockOff.Set.OnCall = (ko, key, value) =>
+        {
+            // string key, GenUser value
+            Console.WriteLine($"Cached {key}: {value.Name}");
+        };
 ```
+<!-- /snippet -->
 
 ## Constrained Generics
 
@@ -124,10 +122,11 @@ public partial class GenUserFactoryKnockOff : IGenFactory<GenUser> { }
 ```
 <!-- /snippet -->
 
+<!-- snippet: docs:generics:factory-usage -->
 ```csharp
-// Usage
-knockOff.IGenFactory_GenUser.Create.OnCall = (ko) => new GenUser { Name = "Created" };
+knockOff.Create.OnCall = (ko) => new GenUser { Name = "Created" };
 ```
+<!-- /snippet -->
 
 ### Collection Repositories
 
@@ -144,19 +143,20 @@ public partial class GenProductRepositoryKnockOff : IGenReadOnlyRepository<GenPr
 ```
 <!-- /snippet -->
 
+<!-- snippet: docs:generics:collection-usage -->
 ```csharp
-// Usage
 var products = new List<GenProduct>
-{
-    new GenProduct { Id = 1, Name = "Widget" },
-    new GenProduct { Id = 2, Name = "Gadget" }
-};
+        {
+            new GenProduct { Id = 1, Name = "Widget" },
+            new GenProduct { Id = 2, Name = "Gadget" }
+        };
 
-knockOff.IGenReadOnlyRepository_GenProduct.GetAll.OnCall = (ko) => products;
+        knockOff.GetAll.OnCall = (ko) => products;
 
-knockOff.IGenReadOnlyRepository_GenProduct.FindFirst.OnCall = (ko, predicate) =>
-    products.FirstOrDefault(predicate);
+        knockOff.FindFirst.OnCall = (ko, predicate) =>
+            products.FirstOrDefault(predicate);
 ```
+<!-- /snippet -->
 
 ### Async Generic Repositories
 
@@ -174,14 +174,15 @@ public partial class GenAsyncUserRepositoryKnockOff : IGenAsyncRepository<GenUse
 ```
 <!-- /snippet -->
 
+<!-- snippet: docs:generics:async-usage -->
 ```csharp
-// Usage
-knockOff.IGenAsyncRepository_GenUser.GetByIdAsync.OnCall = (ko, id) =>
-    Task.FromResult<GenUser?>(new GenUser { Id = id });
+knockOff.GetByIdAsync.OnCall = (ko, id) =>
+            Task.FromResult<GenUser?>(new GenUser { Id = id });
 
-knockOff.IGenAsyncRepository_GenUser.GetAllAsync.OnCall = (ko) =>
-    Task.FromResult<IEnumerable<GenUser>>(users);
+        knockOff.GetAllAsync.OnCall = (ko) =>
+            Task.FromResult<IEnumerable<GenUser>>(users);
 ```
+<!-- /snippet -->
 
 ## Generic Methods
 
@@ -206,10 +207,10 @@ Configure behavior per type argument:
 var knockOff = new SerializerKnockOff();
 
 // Configure for specific type using Of<T>()
-knockOff.ISerializer.Deserialize.Of<User>().OnCall = (ko, json) =>
+knockOff.Deserialize.Of<User>().OnCall = (ko, json) =>
     JsonSerializer.Deserialize<User>(json)!;
 
-knockOff.ISerializer.Deserialize.Of<Order>().OnCall = (ko, json) =>
+knockOff.Deserialize.Of<Order>().OnCall = (ko, json) =>
     new Order { Id = 123 };
 ```
 
@@ -223,15 +224,15 @@ service.Deserialize<User>("{...}");
 service.Deserialize<Order>("{...}");
 
 // Per-type tracking
-Assert.Equal(2, knockOff.ISerializer.Deserialize.Of<User>().CallCount);
-Assert.Equal(1, knockOff.ISerializer.Deserialize.Of<Order>().CallCount);
+Assert.Equal(2, knockOff.Deserialize.Of<User>().CallCount);
+Assert.Equal(1, knockOff.Deserialize.Of<Order>().CallCount);
 
 // Aggregate tracking across all type arguments
-Assert.Equal(3, knockOff.ISerializer.Deserialize.TotalCallCount);
-Assert.True(knockOff.ISerializer.Deserialize.WasCalled);
+Assert.Equal(3, knockOff.Deserialize.TotalCallCount);
+Assert.True(knockOff.Deserialize.WasCalled);
 
 // See which types were used
-var types = knockOff.ISerializer.Deserialize.CalledTypeArguments;
+var types = knockOff.Deserialize.CalledTypeArguments;
 // Returns: [typeof(User), typeof(Order)]
 ```
 
@@ -248,8 +249,8 @@ public partial class ConverterKnockOff : IConverter { }
 ```
 
 ```csharp
-knockOff.IConverter.Convert.Of<string, int>().OnCall = (ko, s) => s.Length;
-knockOff.IConverter.Convert.Of<int, string>().OnCall = (ko, i) => i.ToString();
+knockOff.Convert.Of<string, int>().OnCall = (ko, s) => s.Length;
+knockOff.Convert.Of<int, string>().OnCall = (ko, i) => i.ToString();
 ```
 
 ### Constrained Generic Methods
@@ -265,7 +266,7 @@ public interface IEntityFactory
 
 ```csharp
 // Constraints enforced at compile time
-knockOff.IEntityFactory.Create.Of<Employee>().OnCall = (ko) => new Employee();
+knockOff.Create.Of<Employee>().OnCall = (ko) => new Employee();
 ```
 
 ### Smart Defaults

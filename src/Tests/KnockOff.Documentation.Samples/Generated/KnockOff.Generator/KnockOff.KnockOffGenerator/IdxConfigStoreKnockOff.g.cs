@@ -5,8 +5,8 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class IdxConfigStoreKnockOff
 {
-	/// <summary>Tracks and configures behavior for IIdxConfigStore.StringIndexer.</summary>
-	public sealed class IIdxConfigStore_StringIndexerInterceptor
+	/// <summary>Tracks and configures behavior for StringIndexer.</summary>
+	public sealed class StringIndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -14,43 +14,28 @@ partial class IdxConfigStoreKnockOff
 		/// <summary>The key from the most recent getter access.</summary>
 		public string? LastGetKey { get; private set; }
 
-		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when the getter is accessed.</summary>
 		public global::System.Func<IdxConfigStoreKnockOff, string, global::KnockOff.Documentation.Samples.Guides.IdxConfigValue?>? OnGet { get; set; }
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet(string key) { GetCount++; LastGetKey = key; }
+		public void RecordGet(string? key) { GetCount++; LastGetKey = key; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIdxConfigStore.</summary>
-	public sealed class IIdxConfigStoreInterceptorors
-	{
-		/// <summary>Interceptor for StringIndexer.</summary>
-		public IIdxConfigStore_StringIndexerInterceptor StringIndexer { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IIdxConfigStore.</summary>
-	public IIdxConfigStoreInterceptorors IIdxConfigStore { get; } = new();
+	/// <summary>Interceptor for StringIndexer.</summary>
+	public StringIndexerInterceptor StringIndexer { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIdxConfigStore.</summary>
 	public KnockOff.Documentation.Samples.Guides.IIdxConfigStore AsIdxConfigStore() => this;
 
-	/// <summary>Backing dictionary for IIdxConfigStore.StringIndexer. Pre-populate with values or use OnGet callback.</summary>
-	public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Documentation.Samples.Guides.IdxConfigValue?> IIdxConfigStore_StringIndexerBacking { get; } = new();
+	/// <summary>Backing storage for StringIndexer indexer.</summary>
+	public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Documentation.Samples.Guides.IdxConfigValue?> StringIndexerBacking { get; } = new();
 
 	global::KnockOff.Documentation.Samples.Guides.IdxConfigValue? KnockOff.Documentation.Samples.Guides.IIdxConfigStore.this[string key]
 	{
-		get
-		{
-			IIdxConfigStore.StringIndexer.RecordGet(key);
-			if (IIdxConfigStore.StringIndexer.OnGet is { } onGetCallback)
-				return onGetCallback(this, key);
-			if (IIdxConfigStore_StringIndexerBacking.TryGetValue(key, out var value))
-				return value;
-			return default!;
-		}
+		get { StringIndexer.RecordGet(key); if (StringIndexer.OnGet != null) return StringIndexer.OnGet(this, key); return StringIndexerBacking.TryGetValue(key, out var v) ? v : default; }
 	}
 
 }

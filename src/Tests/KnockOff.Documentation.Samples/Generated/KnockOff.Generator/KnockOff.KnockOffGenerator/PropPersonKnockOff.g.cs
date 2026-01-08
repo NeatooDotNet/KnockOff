@@ -5,8 +5,8 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class PropPersonKnockOff
 {
-	/// <summary>Tracks and configures behavior for IPropPerson.FirstName.</summary>
-	public sealed class IPropPerson_FirstNameInterceptor
+	/// <summary>Tracks and configures behavior for FirstName.</summary>
+	public sealed class FirstNameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -33,8 +33,8 @@ partial class PropPersonKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IPropPerson.LastName.</summary>
-	public sealed class IPropPerson_LastNameInterceptor
+	/// <summary>Tracks and configures behavior for LastName.</summary>
+	public sealed class LastNameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -61,8 +61,8 @@ partial class PropPersonKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IPropPerson.FullName.</summary>
-	public sealed class IPropPerson_FullNameInterceptor
+	/// <summary>Tracks and configures behavior for FullName.</summary>
+	public sealed class FullNameInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -77,79 +77,42 @@ partial class PropPersonKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropPerson.</summary>
-	public sealed class IPropPersonInterceptorors
-	{
-		/// <summary>Interceptor for FirstName.</summary>
-		public IPropPerson_FirstNameInterceptor FirstName { get; } = new();
-		/// <summary>Interceptor for LastName.</summary>
-		public IPropPerson_LastNameInterceptor LastName { get; } = new();
-		/// <summary>Interceptor for FullName.</summary>
-		public IPropPerson_FullNameInterceptor FullName { get; } = new();
-	}
+	/// <summary>Interceptor for FirstName.</summary>
+	public FirstNameInterceptor FirstName { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IPropPerson.</summary>
-	public IPropPersonInterceptorors IPropPerson { get; } = new();
+	/// <summary>Interceptor for LastName.</summary>
+	public LastNameInterceptor LastName { get; } = new();
+
+	/// <summary>Interceptor for FullName.</summary>
+	public FullNameInterceptor FullName { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IPropPerson.</summary>
 	public KnockOff.Documentation.Samples.Guides.IPropPerson AsPropPerson() => this;
 
-	/// <summary>Backing field for IPropPerson.FirstName.</summary>
-	protected string IPropPerson_FirstNameBacking { get; set; } = "";
+	/// <summary>Backing storage for FirstName.</summary>
+	protected string FirstNameBacking { get; set; } = "";
 
-	/// <summary>Backing field for IPropPerson.LastName.</summary>
-	protected string IPropPerson_LastNameBacking { get; set; } = "";
+	/// <summary>Backing storage for LastName.</summary>
+	protected string LastNameBacking { get; set; } = "";
 
-	/// <summary>Backing field for IPropPerson.FullName.</summary>
-	protected string IPropPerson_FullNameBacking { get; set; } = "";
+	/// <summary>Backing storage for FullName.</summary>
+	protected string FullNameBacking { get; set; } = "";
 
 	string KnockOff.Documentation.Samples.Guides.IPropPerson.FirstName
 	{
-		get
-		{
-			IPropPerson.FirstName.RecordGet();
-			if (IPropPerson.FirstName.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IPropPerson_FirstNameBacking;
-		}
-		set
-		{
-			IPropPerson.FirstName.RecordSet(value);
-			if (IPropPerson.FirstName.OnSet is { } onSetCallback)
-				onSetCallback(this, value);
-			else
-				IPropPerson_FirstNameBacking = value;
-		}
+		get { FirstName.RecordGet(); return FirstName.OnGet?.Invoke(this) ?? FirstNameBacking; }
+		set { FirstName.RecordSet(value); if (FirstName.OnSet != null) FirstName.OnSet(this, value); else FirstNameBacking = value; }
 	}
 
 	string KnockOff.Documentation.Samples.Guides.IPropPerson.LastName
 	{
-		get
-		{
-			IPropPerson.LastName.RecordGet();
-			if (IPropPerson.LastName.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IPropPerson_LastNameBacking;
-		}
-		set
-		{
-			IPropPerson.LastName.RecordSet(value);
-			if (IPropPerson.LastName.OnSet is { } onSetCallback)
-				onSetCallback(this, value);
-			else
-				IPropPerson_LastNameBacking = value;
-		}
+		get { LastName.RecordGet(); return LastName.OnGet?.Invoke(this) ?? LastNameBacking; }
+		set { LastName.RecordSet(value); if (LastName.OnSet != null) LastName.OnSet(this, value); else LastNameBacking = value; }
 	}
 
 	string KnockOff.Documentation.Samples.Guides.IPropPerson.FullName
 	{
-		get
-		{
-			IPropPerson.FullName.RecordGet();
-			if (IPropPerson.FullName.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IPropPerson_FullNameBacking;
-		}
+		get { FullName.RecordGet(); return FullName.OnGet?.Invoke(this) ?? FullNameBacking; }
 	}
 
 }

@@ -5,8 +5,8 @@ namespace KnockOff.Documentation.Samples.GettingStarted;
 
 partial class EmailServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for IEmailService.IsConnected.</summary>
-	public sealed class IEmailService_IsConnectedInterceptor
+	/// <summary>Tracks and configures behavior for IsConnected.</summary>
+	public sealed class IsConnectedInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -21,65 +21,49 @@ partial class EmailServiceKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IEmailService.SendEmail.</summary>
-	public sealed class IEmailService_SendEmailInterceptor
+	/// <summary>Tracks and configures behavior for SendEmail.</summary>
+	public sealed class SendEmailInterceptor
 	{
-		/// <summary>Delegate for SendEmail(string to, string subject, string body).</summary>
-		public delegate void SendEmailDelegate(EmailServiceKnockOff ko, string to, string subject, string body);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Arguments from the most recent call.</summary>
-		public (string to, string subject, string body)? LastCallArgs { get; private set; }
+		/// <summary>The arguments from the most recent call.</summary>
+		public (string? to, string? subject, string? body)? LastCallArgs { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public SendEmailDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<EmailServiceKnockOff, string, string, string>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string to, string subject, string body) { CallCount++; LastCallArgs = (to, subject, body); }
+		public void RecordCall(string? to, string? subject, string? body) { CallCount++; LastCallArgs = (to, subject, body); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.GettingStarted.IEmailService.</summary>
-	public sealed class IEmailServiceInterceptorors
-	{
-		/// <summary>Interceptor for IsConnected.</summary>
-		public IEmailService_IsConnectedInterceptor IsConnected { get; } = new();
-		/// <summary>Interceptor for SendEmail.</summary>
-		public IEmailService_SendEmailInterceptor SendEmail { get; } = new();
-	}
+	/// <summary>Interceptor for IsConnected.</summary>
+	public IsConnectedInterceptor IsConnected { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.GettingStarted.IEmailService.</summary>
-	public IEmailServiceInterceptorors IEmailService { get; } = new();
+	/// <summary>Interceptor for SendEmail.</summary>
+	public SendEmailInterceptor SendEmail { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.GettingStarted.IEmailService.</summary>
 	public KnockOff.Documentation.Samples.GettingStarted.IEmailService AsEmailService() => this;
 
-	/// <summary>Backing field for IEmailService.IsConnected.</summary>
-	protected bool IEmailService_IsConnectedBacking { get; set; }
+	/// <summary>Backing storage for IsConnected.</summary>
+	protected bool IsConnectedBacking { get; set; } = default!;
 
 	void KnockOff.Documentation.Samples.GettingStarted.IEmailService.SendEmail(string to, string subject, string body)
 	{
-		IEmailService.SendEmail.RecordCall(to, subject, body);
-		if (IEmailService.SendEmail.OnCall is { } onCallCallback)
-		{ onCallCallback(this, to, subject, body); return; }
+		SendEmail.RecordCall(to, subject, body);
+		SendEmail.OnCall?.Invoke(this, to, subject, body);
 	}
 
 	bool KnockOff.Documentation.Samples.GettingStarted.IEmailService.IsConnected
 	{
-		get
-		{
-			IEmailService.IsConnected.RecordGet();
-			if (IEmailService.IsConnected.OnGet is { } onGetCallback)
-				return onGetCallback(this);
-			return IEmailService_IsConnectedBacking;
-		}
+		get { IsConnected.RecordGet(); return IsConnected.OnGet?.Invoke(this) ?? IsConnectedBacking; }
 	}
 
 }

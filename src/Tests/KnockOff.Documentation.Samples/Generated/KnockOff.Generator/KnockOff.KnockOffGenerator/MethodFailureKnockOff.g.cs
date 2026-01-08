@@ -5,49 +5,38 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class MethodFailureKnockOff
 {
-	/// <summary>Tracks and configures behavior for IMethodFailure.Save.</summary>
-	public sealed class IMethodFailure_SaveInterceptor
+	/// <summary>Tracks and configures behavior for Save.</summary>
+	public sealed class SaveInterceptor
 	{
-		/// <summary>Delegate for Save(global::KnockOff.Documentation.Samples.Guides.MethodEntity entity).</summary>
-		public delegate void SaveDelegate(MethodFailureKnockOff ko, global::KnockOff.Documentation.Samples.Guides.MethodEntity entity);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'entity' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public global::KnockOff.Documentation.Samples.Guides.MethodEntity? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public SaveDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<MethodFailureKnockOff, global::KnockOff.Documentation.Samples.Guides.MethodEntity>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::KnockOff.Documentation.Samples.Guides.MethodEntity entity) { CallCount++; LastCallArg = entity; }
+		public void RecordCall(global::KnockOff.Documentation.Samples.Guides.MethodEntity? entity) { CallCount++; LastCallArg = entity; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodFailure.</summary>
-	public sealed class IMethodFailureInterceptorors
-	{
-		/// <summary>Interceptor for Save.</summary>
-		public IMethodFailure_SaveInterceptor Save { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IMethodFailure.</summary>
-	public IMethodFailureInterceptorors IMethodFailure { get; } = new();
+	/// <summary>Interceptor for Save.</summary>
+	public SaveInterceptor Save { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodFailure.</summary>
 	public KnockOff.Documentation.Samples.Guides.IMethodFailure AsMethodFailure() => this;
 
 	void KnockOff.Documentation.Samples.Guides.IMethodFailure.Save(global::KnockOff.Documentation.Samples.Guides.MethodEntity entity)
 	{
-		IMethodFailure.Save.RecordCall(entity);
-		if (IMethodFailure.Save.OnCall is { } onCallCallback)
-		{ onCallCallback(this, entity); return; }
+		Save.RecordCall(entity);
+		Save.OnCall?.Invoke(this, entity);
 	}
 
 }

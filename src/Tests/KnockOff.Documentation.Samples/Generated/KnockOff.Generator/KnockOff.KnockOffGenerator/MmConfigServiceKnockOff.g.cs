@@ -5,19 +5,19 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class MmConfigServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for IMmConfigService.GetConfig.</summary>
-	public sealed class IMmConfigService_GetConfigInterceptor
+	/// <summary>Tracks and configures behavior for GetConfig.</summary>
+	public sealed class GetConfig2Interceptor
 	{
-		/// <summary>Delegate for GetConfig().</summary>
+		/// <summary>Delegate for GetConfig.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.MmConfig GetConfigDelegate(MmConfigServiceKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetConfigDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -27,24 +27,16 @@ partial class MmConfigServiceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmConfigService.</summary>
-	public sealed class IMmConfigServiceInterceptorors
-	{
-		/// <summary>Interceptor for GetConfig.</summary>
-		public IMmConfigService_GetConfigInterceptor GetConfig { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmConfigService.</summary>
-	public IMmConfigServiceInterceptorors IMmConfigService { get; } = new();
+	/// <summary>Interceptor for GetConfig.</summary>
+	public GetConfig2Interceptor GetConfig2 { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmConfigService.</summary>
 	public KnockOff.Documentation.Samples.Skills.IMmConfigService AsMmConfigService() => this;
 
 	global::KnockOff.Documentation.Samples.Skills.MmConfig KnockOff.Documentation.Samples.Skills.IMmConfigService.GetConfig()
 	{
-		IMmConfigService.GetConfig.RecordCall();
-		if (IMmConfigService.GetConfig.OnCall is { } onCallCallback)
-			return onCallCallback(this);
+		GetConfig2.RecordCall();
+		if (GetConfig2.OnCall != null) return GetConfig2.OnCall(this);
 		return GetConfig();
 	}
 

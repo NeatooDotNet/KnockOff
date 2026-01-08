@@ -5,19 +5,19 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class AsyncCallOrderKnockOff
 {
-	/// <summary>Tracks and configures behavior for IAsyncCallOrder.StartAsync.</summary>
-	public sealed class IAsyncCallOrder_StartAsyncInterceptor
+	/// <summary>Tracks and configures behavior for StartAsync.</summary>
+	public sealed class StartAsyncInterceptor
 	{
-		/// <summary>Delegate for StartAsync().</summary>
+		/// <summary>Delegate for StartAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task StartAsyncDelegate(AsyncCallOrderKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public StartAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -27,19 +27,19 @@ partial class AsyncCallOrderKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IAsyncCallOrder.ProcessAsync.</summary>
-	public sealed class IAsyncCallOrder_ProcessAsyncInterceptor
+	/// <summary>Tracks and configures behavior for ProcessAsync.</summary>
+	public sealed class ProcessAsyncInterceptor
 	{
-		/// <summary>Delegate for ProcessAsync().</summary>
+		/// <summary>Delegate for ProcessAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task ProcessAsyncDelegate(AsyncCallOrderKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public ProcessAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -49,35 +49,25 @@ partial class AsyncCallOrderKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IAsyncCallOrder.</summary>
-	public sealed class IAsyncCallOrderInterceptorors
-	{
-		/// <summary>Interceptor for StartAsync.</summary>
-		public IAsyncCallOrder_StartAsyncInterceptor StartAsync { get; } = new();
-		/// <summary>Interceptor for ProcessAsync.</summary>
-		public IAsyncCallOrder_ProcessAsyncInterceptor ProcessAsync { get; } = new();
-	}
+	/// <summary>Interceptor for StartAsync.</summary>
+	public StartAsyncInterceptor StartAsync { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IAsyncCallOrder.</summary>
-	public IAsyncCallOrderInterceptorors IAsyncCallOrder { get; } = new();
+	/// <summary>Interceptor for ProcessAsync.</summary>
+	public ProcessAsyncInterceptor ProcessAsync { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IAsyncCallOrder.</summary>
 	public KnockOff.Documentation.Samples.Guides.IAsyncCallOrder AsAsyncCallOrder() => this;
 
 	global::System.Threading.Tasks.Task KnockOff.Documentation.Samples.Guides.IAsyncCallOrder.StartAsync()
 	{
-		IAsyncCallOrder.StartAsync.RecordCall();
-		if (IAsyncCallOrder.StartAsync.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return global::System.Threading.Tasks.Task.CompletedTask;
+		StartAsync.RecordCall();
+		return StartAsync.OnCall?.Invoke(this) ?? global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
 	global::System.Threading.Tasks.Task KnockOff.Documentation.Samples.Guides.IAsyncCallOrder.ProcessAsync()
 	{
-		IAsyncCallOrder.ProcessAsync.RecordCall();
-		if (IAsyncCallOrder.ProcessAsync.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return global::System.Threading.Tasks.Task.CompletedTask;
+		ProcessAsync.RecordCall();
+		return ProcessAsync.OnCall?.Invoke(this) ?? global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
 }

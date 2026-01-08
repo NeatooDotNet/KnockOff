@@ -27,7 +27,7 @@ public class SetupBenchmarks
     public CalculatorStub KnockOff_SetupSingleReturn()
     {
         var stub = new CalculatorStub();
-        stub.ICalculator.Add.OnCall = (ko, a, b) => 42;
+        stub.Add.OnCall = (ko, a, b) => 42;
         return stub;
     }
 
@@ -46,7 +46,7 @@ public class SetupBenchmarks
     public CalculatorStub KnockOff_SetupWithCallback()
     {
         var stub = new CalculatorStub();
-        stub.ICalculator.Add.OnCall = (ko, a, b) => a + b;
+        stub.Add.OnCall = (ko, a, b) => a + b;
         return stub;
     }
 
@@ -68,11 +68,11 @@ public class SetupBenchmarks
     public CalculatorStub KnockOff_SetupMultiple()
     {
         var stub = new CalculatorStub();
-        stub.ICalculator.Add.OnCall = (ko, a, b) => 1;
-        stub.ICalculator.Subtract.OnCall = (ko, a, b) => 2;
-        stub.ICalculator.Multiply.OnCall = (ko, a, b) => 3;
-        stub.ICalculator.Divide.OnCall = (ko, a, b) => 4.0;
-        stub.ICalculator.Square.OnCall = (ko, x) => 5;
+        stub.Add.OnCall = (ko, a, b) => 1;
+        stub.Subtract.OnCall = (ko, a, b) => 2;
+        stub.Multiply.OnCall = (ko, a, b) => 3;
+        stub.Divide.OnCall = (ko, a, b) => 4.0;
+        stub.Square.OnCall = (ko, x) => 5;
         return stub;
     }
 }
@@ -98,7 +98,7 @@ public class VoidSetupBenchmarks
     {
         var callCount = 0;
         var stub = new SimpleServiceStub();
-        stub.ISimpleService.DoWork.OnCall = ko => callCount++;
+        stub.DoWork.OnCall = ko => callCount++;
         return stub;
     }
 }

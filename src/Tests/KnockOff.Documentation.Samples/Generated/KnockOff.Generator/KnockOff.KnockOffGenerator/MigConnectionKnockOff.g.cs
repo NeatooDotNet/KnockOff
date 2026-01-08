@@ -5,20 +5,17 @@ namespace KnockOff.Documentation.Samples.Comparison;
 
 partial class MigConnectionKnockOff
 {
-	/// <summary>Tracks and configures behavior for IMigConnection.Connect.</summary>
-	public sealed class IMigConnection_ConnectInterceptor
+	/// <summary>Tracks and configures behavior for Connect.</summary>
+	public sealed class ConnectInterceptor
 	{
-		/// <summary>Delegate for Connect().</summary>
-		public delegate void ConnectDelegate(MigConnectionKnockOff ko);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public ConnectDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<MigConnectionKnockOff>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall() => CallCount++;
@@ -27,24 +24,16 @@ partial class MigConnectionKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigConnection.</summary>
-	public sealed class IMigConnectionInterceptorors
-	{
-		/// <summary>Interceptor for Connect.</summary>
-		public IMigConnection_ConnectInterceptor Connect { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Comparison.IMigConnection.</summary>
-	public IMigConnectionInterceptorors IMigConnection { get; } = new();
+	/// <summary>Interceptor for Connect.</summary>
+	public ConnectInterceptor Connect { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IMigConnection.</summary>
 	public KnockOff.Documentation.Samples.Comparison.IMigConnection AsMigConnection() => this;
 
 	void KnockOff.Documentation.Samples.Comparison.IMigConnection.Connect()
 	{
-		IMigConnection.Connect.RecordCall();
-		if (IMigConnection.Connect.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
+		Connect.RecordCall();
+		Connect.OnCall?.Invoke(this);
 	}
 
 }

@@ -143,3 +143,108 @@ public interface IGenAsyncRepository<T> where T : class
 [KnockOff]
 public partial class GenAsyncUserRepositoryKnockOff : IGenAsyncRepository<GenUser> { }
 #endregion
+
+// ============================================================================
+// Usage Examples
+// ============================================================================
+
+/// <summary>
+/// Usage examples demonstrating generic interface patterns.
+/// Each method is compilable; snippets extract key portions.
+/// </summary>
+public static class GenericsUsageExamples
+{
+    public static void TrackingExample()
+    {
+        var knockOff = new GenUserRepositoryKnockOff();
+        IGenRepository<GenUser> repo = knockOff;
+
+        #region docs:generics:tracking
+        var user = new GenUser { Id = 1, Name = "Test" };
+        repo.Save(user);
+
+        // LastCallArg is strongly typed as GenUser
+        GenUser? savedUser = knockOff.Save.LastCallArg;  // same as user
+        #endregion
+
+        _ = savedUser;
+    }
+
+    public static void CallbacksExample()
+    {
+        var knockOff = new GenUserRepositoryKnockOff();
+
+        #region docs:generics:callbacks
+        knockOff.GetById.OnCall = (ko, id) =>
+            new GenUser { Id = id, Name = $"User-{id}" };
+
+        knockOff.Save.OnCall = (ko, user) =>
+        {
+            // user is typed as GenUser, not T
+            Console.WriteLine($"Saving: {user.Name}");
+        };
+        #endregion
+    }
+
+    public static void MultipleParamsUsage()
+    {
+        var knockOff = new GenStringCacheKnockOff();
+
+        #region docs:generics:multiple-params-usage
+        knockOff.Get.OnCall = (ko, key) => key switch
+        {
+            "admin" => new GenUser { Name = "Admin" },
+            _ => null
+        };
+
+        knockOff.Set.OnCall = (ko, key, value) =>
+        {
+            // string key, GenUser value
+            Console.WriteLine($"Cached {key}: {value.Name}");
+        };
+        #endregion
+    }
+
+    public static void FactoryUsage()
+    {
+        var knockOff = new GenUserFactoryKnockOff();
+
+        #region docs:generics:factory-usage
+        knockOff.Create.OnCall = (ko) => new GenUser { Name = "Created" };
+        #endregion
+    }
+
+    public static void CollectionRepoUsage()
+    {
+        var knockOff = new GenProductRepositoryKnockOff();
+
+        #region docs:generics:collection-usage
+        var products = new List<GenProduct>
+        {
+            new GenProduct { Id = 1, Name = "Widget" },
+            new GenProduct { Id = 2, Name = "Gadget" }
+        };
+
+        knockOff.GetAll.OnCall = (ko) => products;
+
+        knockOff.FindFirst.OnCall = (ko, predicate) =>
+            products.FirstOrDefault(predicate);
+        #endregion
+    }
+
+    public static void AsyncGenericUsage()
+    {
+        var knockOff = new GenAsyncUserRepositoryKnockOff();
+        var users = new List<GenUser> { new GenUser { Id = 1, Name = "Test" } };
+
+        #region docs:generics:async-usage
+        knockOff.GetByIdAsync.OnCall = (ko, id) =>
+            Task.FromResult<GenUser?>(new GenUser { Id = id });
+
+        knockOff.GetAllAsync.OnCall = (ko) =>
+            Task.FromResult<IEnumerable<GenUser>>(users);
+        #endregion
+
+        _ = users;
+    }
+}

@@ -5,19 +5,19 @@ namespace KnockOff.Tests;
 
 partial class AsyncServiceKnockOff
 {
-	/// <summary>Tracks and configures behavior for IAsyncService.DoWorkAsync.</summary>
-	public sealed class IAsyncService_DoWorkAsyncInterceptor
+	/// <summary>Tracks and configures behavior for DoWorkAsync.</summary>
+	public sealed class DoWorkAsyncInterceptor
 	{
-		/// <summary>Delegate for DoWorkAsync().</summary>
+		/// <summary>Delegate for DoWorkAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task DoWorkAsyncDelegate(AsyncServiceKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public DoWorkAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -27,44 +27,44 @@ partial class AsyncServiceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IAsyncService.GetValueAsync.</summary>
-	public sealed class IAsyncService_GetValueAsyncInterceptor
+	/// <summary>Tracks and configures behavior for GetValueAsync.</summary>
+	public sealed class GetValueAsync2Interceptor
 	{
-		/// <summary>Delegate for GetValueAsync(int input).</summary>
+		/// <summary>Delegate for GetValueAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<int> GetValueAsyncDelegate(AsyncServiceKnockOff ko, int input);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'input' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetValueAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int input) { CallCount++; LastCallArg = input; }
+		public void RecordCall(int? input) { CallCount++; LastCallArg = input; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IAsyncService.GetOptionalAsync.</summary>
-	public sealed class IAsyncService_GetOptionalAsyncInterceptor
+	/// <summary>Tracks and configures behavior for GetOptionalAsync.</summary>
+	public sealed class GetOptionalAsyncInterceptor
 	{
-		/// <summary>Delegate for GetOptionalAsync().</summary>
+		/// <summary>Delegate for GetOptionalAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<string?> GetOptionalAsyncDelegate(AsyncServiceKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetOptionalAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -74,19 +74,19 @@ partial class AsyncServiceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IAsyncService.GetRequiredAsync.</summary>
-	public sealed class IAsyncService_GetRequiredAsyncInterceptor
+	/// <summary>Tracks and configures behavior for GetRequiredAsync.</summary>
+	public sealed class GetRequiredAsyncInterceptor
 	{
-		/// <summary>Delegate for GetRequiredAsync().</summary>
+		/// <summary>Delegate for GetRequiredAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<string> GetRequiredAsyncDelegate(AsyncServiceKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetRequiredAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -96,19 +96,19 @@ partial class AsyncServiceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IAsyncService.DoWorkValueTaskAsync.</summary>
-	public sealed class IAsyncService_DoWorkValueTaskAsyncInterceptor
+	/// <summary>Tracks and configures behavior for DoWorkValueTaskAsync.</summary>
+	public sealed class DoWorkValueTaskAsyncInterceptor
 	{
-		/// <summary>Delegate for DoWorkValueTaskAsync().</summary>
+		/// <summary>Delegate for DoWorkValueTaskAsync.</summary>
 		public delegate global::System.Threading.Tasks.ValueTask DoWorkValueTaskAsyncDelegate(AsyncServiceKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public DoWorkValueTaskAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -118,99 +118,89 @@ partial class AsyncServiceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IAsyncService.GetValueValueTaskAsync.</summary>
-	public sealed class IAsyncService_GetValueValueTaskAsyncInterceptor
+	/// <summary>Tracks and configures behavior for GetValueValueTaskAsync.</summary>
+	public sealed class GetValueValueTaskAsync2Interceptor
 	{
-		/// <summary>Delegate for GetValueValueTaskAsync(int input).</summary>
+		/// <summary>Delegate for GetValueValueTaskAsync.</summary>
 		public delegate global::System.Threading.Tasks.ValueTask<int> GetValueValueTaskAsyncDelegate(AsyncServiceKnockOff ko, int input);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'input' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetValueValueTaskAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int input) { CallCount++; LastCallArg = input; }
+		public void RecordCall(int? input) { CallCount++; LastCallArg = input; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IAsyncService.</summary>
-	public sealed class IAsyncServiceInterceptorors
-	{
-		/// <summary>Interceptor for DoWorkAsync.</summary>
-		public IAsyncService_DoWorkAsyncInterceptor DoWorkAsync { get; } = new();
-		/// <summary>Interceptor for GetValueAsync.</summary>
-		public IAsyncService_GetValueAsyncInterceptor GetValueAsync { get; } = new();
-		/// <summary>Interceptor for GetOptionalAsync.</summary>
-		public IAsyncService_GetOptionalAsyncInterceptor GetOptionalAsync { get; } = new();
-		/// <summary>Interceptor for GetRequiredAsync.</summary>
-		public IAsyncService_GetRequiredAsyncInterceptor GetRequiredAsync { get; } = new();
-		/// <summary>Interceptor for DoWorkValueTaskAsync.</summary>
-		public IAsyncService_DoWorkValueTaskAsyncInterceptor DoWorkValueTaskAsync { get; } = new();
-		/// <summary>Interceptor for GetValueValueTaskAsync.</summary>
-		public IAsyncService_GetValueValueTaskAsyncInterceptor GetValueValueTaskAsync { get; } = new();
-	}
+	/// <summary>Interceptor for DoWorkAsync.</summary>
+	public DoWorkAsyncInterceptor DoWorkAsync { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Tests.IAsyncService.</summary>
-	public IAsyncServiceInterceptorors IAsyncService { get; } = new();
+	/// <summary>Interceptor for GetValueAsync.</summary>
+	public GetValueAsync2Interceptor GetValueAsync2 { get; } = new();
+
+	/// <summary>Interceptor for GetOptionalAsync.</summary>
+	public GetOptionalAsyncInterceptor GetOptionalAsync { get; } = new();
+
+	/// <summary>Interceptor for GetRequiredAsync.</summary>
+	public GetRequiredAsyncInterceptor GetRequiredAsync { get; } = new();
+
+	/// <summary>Interceptor for DoWorkValueTaskAsync.</summary>
+	public DoWorkValueTaskAsyncInterceptor DoWorkValueTaskAsync { get; } = new();
+
+	/// <summary>Interceptor for GetValueValueTaskAsync.</summary>
+	public GetValueValueTaskAsync2Interceptor GetValueValueTaskAsync2 { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Tests.IAsyncService.</summary>
 	public KnockOff.Tests.IAsyncService AsAsyncService() => this;
 
 	global::System.Threading.Tasks.Task KnockOff.Tests.IAsyncService.DoWorkAsync()
 	{
-		IAsyncService.DoWorkAsync.RecordCall();
-		if (IAsyncService.DoWorkAsync.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return global::System.Threading.Tasks.Task.CompletedTask;
+		DoWorkAsync.RecordCall();
+		return DoWorkAsync.OnCall?.Invoke(this) ?? global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
 	global::System.Threading.Tasks.Task<int> KnockOff.Tests.IAsyncService.GetValueAsync(int input)
 	{
-		IAsyncService.GetValueAsync.RecordCall(input);
-		if (IAsyncService.GetValueAsync.OnCall is { } onCallCallback)
-			return onCallCallback(this, input);
+		GetValueAsync2.RecordCall(input);
+		if (GetValueAsync2.OnCall != null) return GetValueAsync2.OnCall(this, input);
 		return GetValueAsync(input);
 	}
 
 	global::System.Threading.Tasks.Task<string?> KnockOff.Tests.IAsyncService.GetOptionalAsync()
 	{
-		IAsyncService.GetOptionalAsync.RecordCall();
-		if (IAsyncService.GetOptionalAsync.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return global::System.Threading.Tasks.Task.FromResult<string?>(default!);
+		GetOptionalAsync.RecordCall();
+		return GetOptionalAsync.OnCall?.Invoke(this) ?? global::System.Threading.Tasks.Task.FromResult<string?>(default!);
 	}
 
 	global::System.Threading.Tasks.Task<string> KnockOff.Tests.IAsyncService.GetRequiredAsync()
 	{
-		IAsyncService.GetRequiredAsync.RecordCall();
-		if (IAsyncService.GetRequiredAsync.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for non-nullable return type. Define a protected method 'GetRequiredAsync' in your partial class, or set IAsyncService.GetRequiredAsync.OnCall.");
+		GetRequiredAsync.RecordCall();
+		if (GetRequiredAsync.OnCall is { } callback)
+			return callback(this);
+		throw new global::System.InvalidOperationException("No implementation provided for GetRequiredAsync. Set GetRequiredAsync.OnCall or define a protected method 'GetRequiredAsync' in your partial class.");
 	}
 
 	global::System.Threading.Tasks.ValueTask KnockOff.Tests.IAsyncService.DoWorkValueTaskAsync()
 	{
-		IAsyncService.DoWorkValueTaskAsync.RecordCall();
-		if (IAsyncService.DoWorkValueTaskAsync.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return default;
+		DoWorkValueTaskAsync.RecordCall();
+		return DoWorkValueTaskAsync.OnCall?.Invoke(this) ?? default;
 	}
 
 	global::System.Threading.Tasks.ValueTask<int> KnockOff.Tests.IAsyncService.GetValueValueTaskAsync(int input)
 	{
-		IAsyncService.GetValueValueTaskAsync.RecordCall(input);
-		if (IAsyncService.GetValueValueTaskAsync.OnCall is { } onCallCallback)
-			return onCallCallback(this, input);
+		GetValueValueTaskAsync2.RecordCall(input);
+		if (GetValueValueTaskAsync2.OnCall != null) return GetValueValueTaskAsync2.OnCall(this, input);
 		return GetValueValueTaskAsync(input);
 	}
 

@@ -22,7 +22,7 @@ public class HandlerApiSamplesTests : SamplesTestBase
 
         service.Initialize();
 
-        Assert.True(knockOff.IHaService.Initialize.WasCalled);
+        Assert.True(knockOff.Initialize.WasCalled);
     }
 
     [Fact]
@@ -32,7 +32,7 @@ public class HandlerApiSamplesTests : SamplesTestBase
         IHaService service = knockOff;
         var called = false;
 
-        knockOff.IHaService.Initialize.OnCall = (ko) => { called = true; };
+        knockOff.Initialize.OnCall = (ko) => { called = true; };
         service.Initialize();
 
         Assert.True(called);
@@ -44,10 +44,10 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaServiceKnockOff();
         IHaService service = knockOff;
 
-        knockOff.IHaService.GetById.OnCall = (ko, id) => new HaUser { Id = id };
+        knockOff.GetById.OnCall = (ko, id) => new HaUser { Id = id };
         service.GetById(42);
 
-        Assert.Equal(42, knockOff.IHaService.GetById.LastCallArg);
+        Assert.Equal(42, knockOff.GetById.LastCallArg);
     }
 
     [Fact]
@@ -56,10 +56,10 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaServiceKnockOff();
         IHaService service = knockOff;
 
-        knockOff.IHaService.Create.OnCall = (ko, name, value) => new HaEntity { Name = name };
+        knockOff.Create.OnCall = (ko, name, value) => new HaEntity { Name = name };
         service.Create("Test", 100);
 
-        var args = knockOff.IHaService.Create.LastCallArgs;
+        var args = knockOff.Create.LastCallArgs;
         Assert.Equal("Test", args?.name);
         Assert.Equal(100, args?.value);
     }
@@ -78,7 +78,7 @@ public class HandlerApiSamplesTests : SamplesTestBase
         _ = service.Name;
         _ = service.Name;
 
-        Assert.Equal(3, knockOff.IHaPropertyService.Name.GetCount);
+        Assert.Equal(3, knockOff.Name.GetCount);
     }
 
     [Fact]
@@ -90,7 +90,7 @@ public class HandlerApiSamplesTests : SamplesTestBase
         service.Name = "First";
         service.Name = "Second";
 
-        Assert.Equal(2, knockOff.IHaPropertyService.Name.SetCount);
+        Assert.Equal(2, knockOff.Name.SetCount);
     }
 
     [Fact]
@@ -101,7 +101,7 @@ public class HandlerApiSamplesTests : SamplesTestBase
 
         service.Name = "Last";
 
-        Assert.Equal("Last", knockOff.IHaPropertyService.Name.LastSetValue);
+        Assert.Equal("Last", knockOff.Name.LastSetValue);
     }
 
     [Fact]
@@ -110,7 +110,7 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaPropertyServiceKnockOff();
         IHaPropertyService service = knockOff;
 
-        knockOff.IHaPropertyService.Name.OnGet = (ko) => "Always This";
+        knockOff.Name.OnGet = (ko) => "Always This";
 
         Assert.Equal("Always This", service.Name);
     }
@@ -122,7 +122,7 @@ public class HandlerApiSamplesTests : SamplesTestBase
         IHaPropertyService service = knockOff;
         string? capturedValue = null;
 
-        knockOff.IHaPropertyService.Name.OnSet = (ko, value) => capturedValue = value;
+        knockOff.Name.OnSet = (ko, value) => capturedValue = value;
         service.Name = "Test";
 
         Assert.Equal("Test", capturedValue);
@@ -150,8 +150,8 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaPropertyStoreKnockOff();
         IHaPropertyStore store = knockOff;
 
-        knockOff.IHaPropertyStore_StringIndexerBacking["Key1"] = "Value1";
-        knockOff.IHaPropertyStore_StringIndexerBacking["Key2"] = "Value2";
+        knockOff.StringIndexerBacking["Key1"] = "Value1";
+        knockOff.StringIndexerBacking["Key2"] = "Value2";
 
         Assert.Equal("Value1", store["Key1"]);
         Assert.Equal("Value2", store["Key2"]);
@@ -166,7 +166,7 @@ public class HandlerApiSamplesTests : SamplesTestBase
         _ = store["Key1"];
         _ = store["Key2"];
 
-        Assert.Equal(2, knockOff.IHaPropertyStore.StringIndexer.GetCount);
+        Assert.Equal(2, knockOff.StringIndexer.GetCount);
     }
 
     [Fact]
@@ -178,7 +178,7 @@ public class HandlerApiSamplesTests : SamplesTestBase
         _ = store["Key1"];
         _ = store["Key2"];
 
-        Assert.Equal("Key2", knockOff.IHaPropertyStore.StringIndexer.LastGetKey);
+        Assert.Equal("Key2", knockOff.StringIndexer.LastGetKey);
     }
 
     [Fact]
@@ -187,10 +187,10 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaPropertyStoreKnockOff();
         IHaPropertyStore store = knockOff;
 
-        knockOff.IHaPropertyStore.StringIndexer.OnGet = (ko, key) =>
+        knockOff.StringIndexer.OnGet = (ko, key) =>
         {
             if (key == "special") return "SpecialValue";
-            return ko.IHaPropertyStore_StringIndexerBacking.GetValueOrDefault(key);
+            return ko.StringIndexerBacking.GetValueOrDefault(key);
         };
 
         Assert.Equal("SpecialValue", store["special"]);
@@ -204,8 +204,8 @@ public class HandlerApiSamplesTests : SamplesTestBase
 
         store["NewKey"] = "NewValue";
 
-        Assert.Equal("NewKey", knockOff.IHaPropertyStore.StringIndexer.LastSetEntry?.key);
-        Assert.Equal("NewValue", knockOff.IHaPropertyStore.StringIndexer.LastSetEntry?.value);
+        Assert.Equal("NewKey", knockOff.StringIndexer.LastSetEntry?.Key);
+        Assert.Equal("NewValue", knockOff.StringIndexer.LastSetEntry?.Value);
     }
 
     // ========================================================================
@@ -220,8 +220,8 @@ public class HandlerApiSamplesTests : SamplesTestBase
 
         source.DataReceived += (s, e) => { };
 
-        Assert.Equal(1, knockOff.IHaEventSource.DataReceived.SubscribeCount);
-        Assert.True(knockOff.IHaEventSource.DataReceived.HasSubscribers);
+        Assert.Equal(1, knockOff.DataReceived.AddCount);
+        Assert.True(knockOff.DataReceived.HasSubscribers);
     }
 
     [Fact]
@@ -232,24 +232,24 @@ public class HandlerApiSamplesTests : SamplesTestBase
         string? received = null;
 
         source.DataReceived += (s, e) => received = e;
-        knockOff.IHaEventSource.DataReceived.Raise("test data");
+        knockOff.DataReceived.Raise(null, "test data");
 
         Assert.Equal("test data", received);
-        Assert.True(knockOff.IHaEventSource.DataReceived.WasRaised);
     }
 
     [Fact]
-    public void EventHandler_RaiseCount()
+    public void EventHandler_MultipleRaises()
     {
         var knockOff = new HaEventSourceKnockOff();
         IHaEventSource source = knockOff;
+        var raiseCount = 0;
 
-        source.DataReceived += (s, e) => { };
-        knockOff.IHaEventSource.DataReceived.Raise("first");
-        knockOff.IHaEventSource.DataReceived.Raise("second");
-        knockOff.IHaEventSource.DataReceived.Raise("third");
+        source.DataReceived += (s, e) => raiseCount++;
+        knockOff.DataReceived.Raise(null, "first");
+        knockOff.DataReceived.Raise(null, "second");
+        knockOff.DataReceived.Raise(null, "third");
 
-        Assert.Equal(3, knockOff.IHaEventSource.DataReceived.RaiseCount);
+        Assert.Equal(3, raiseCount);
     }
 
     [Fact]
@@ -260,7 +260,7 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var raised = false;
 
         source.Completed += (s, e) => raised = true;
-        knockOff.IHaEventSource.Completed.Raise();
+        knockOff.Completed.Raise(null, EventArgs.Empty);
 
         Assert.True(raised);
     }
@@ -276,8 +276,8 @@ public class HandlerApiSamplesTests : SamplesTestBase
         source.ProgressChanged += (v) => progressValue = v;
         source.DataUpdated += (k, v) => dataUpdate = (k, v);
 
-        knockOff.IHaEventSource.ProgressChanged.Raise(75);
-        knockOff.IHaEventSource.DataUpdated.Raise("key", 42);
+        knockOff.ProgressChanged.Raise(75);
+        knockOff.DataUpdated.Raise("key", 42);
 
         Assert.Equal(75, progressValue);
         Assert.Equal("key", dataUpdate.key);
@@ -285,35 +285,21 @@ public class HandlerApiSamplesTests : SamplesTestBase
     }
 
     [Fact]
-    public void EventHandler_Reset_ClearsTrackingKeepsHandlers()
-    {
-        var knockOff = new HaEventSourceKnockOff();
-        IHaEventSource source = knockOff;
-        var raisedCount = 0;
-
-        source.DataReceived += (s, e) => raisedCount++;
-        knockOff.IHaEventSource.DataReceived.Raise("first");
-        knockOff.IHaEventSource.DataReceived.Reset();
-
-        Assert.Equal(0, knockOff.IHaEventSource.DataReceived.RaiseCount);
-        Assert.True(knockOff.IHaEventSource.DataReceived.HasSubscribers); // Handler still attached
-
-        // Can still raise
-        knockOff.IHaEventSource.DataReceived.Raise("second");
-        Assert.Equal(2, raisedCount); // Both raises called handler
-    }
-
-    [Fact]
-    public void EventHandler_Clear_ClearsTrackingAndHandlers()
+    public void EventHandler_Reset_ClearsTrackingAndHandlers()
     {
         var knockOff = new HaEventSourceKnockOff();
         IHaEventSource source = knockOff;
 
         source.DataReceived += (s, e) => { };
-        knockOff.IHaEventSource.DataReceived.Clear();
+        knockOff.DataReceived.Raise(null, "first");
 
-        Assert.Equal(0, knockOff.IHaEventSource.DataReceived.RaiseCount);
-        Assert.False(knockOff.IHaEventSource.DataReceived.HasSubscribers);
+        Assert.Equal(1, knockOff.DataReceived.AddCount);
+        Assert.True(knockOff.DataReceived.HasSubscribers);
+
+        knockOff.DataReceived.Reset();
+
+        Assert.Equal(0, knockOff.DataReceived.AddCount);
+        Assert.False(knockOff.DataReceived.HasSubscribers); // Handler cleared by reset
     }
 
     // ========================================================================
@@ -329,8 +315,8 @@ public class HandlerApiSamplesTests : SamplesTestBase
         service.Process("a");
         service.Process("b", 1);
 
-        Assert.Equal(1, knockOff.IHaOverloadService.Process1.CallCount);
-        Assert.Equal(1, knockOff.IHaOverloadService.Process2.CallCount);
+        Assert.Equal(1, knockOff.Process1.CallCount);
+        Assert.Equal(1, knockOff.Process2.CallCount);
     }
 
     [Fact]
@@ -341,8 +327,8 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var oneParam = false;
         var twoParam = false;
 
-        knockOff.IHaOverloadService.Process1.OnCall = (ko, data) => oneParam = true;
-        knockOff.IHaOverloadService.Process2.OnCall = (ko, data, priority) => twoParam = true;
+        knockOff.Process1.OnCall = (ko, data) => oneParam = true;
+        knockOff.Process2.OnCall = (ko, data, priority) => twoParam = true;
 
         service.Process("a");
         service.Process("b", 1);
@@ -357,8 +343,8 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaOverloadServiceKnockOff();
         IHaOverloadService service = knockOff;
 
-        knockOff.IHaOverloadService.Calculate1.OnCall = (ko, value) => value * 2;
-        knockOff.IHaOverloadService.Calculate2.OnCall = (ko, a, b) => a + b;
+        knockOff.Calculate1.OnCall = (ko, value) => value * 2;
+        knockOff.Calculate2.OnCall = (ko, a, b) => a + b;
 
         Assert.Equal(10, service.Calculate(5));
         Assert.Equal(8, service.Calculate(3, 5));
@@ -374,8 +360,8 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaParserKnockOff();
         IHaParser parser = knockOff;
 
-        knockOff.IHaParser.TryParse.OnCall =
-            (HaParserKnockOff.IHaParser_TryParseInterceptor.TryParseDelegate)((HaParserKnockOff ko, string input, out int result) =>
+        knockOff.TryParse.OnCall =
+            (HaParserKnockOff.TryParseInterceptor.TryParseDelegate)((HaParserKnockOff ko, string input, out int result) =>
             {
                 result = int.Parse(input);
                 return true;
@@ -393,8 +379,8 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaParserKnockOff();
         IHaParser parser = knockOff;
 
-        knockOff.IHaParser.GetData.OnCall =
-            (HaParserKnockOff.IHaParser_GetDataInterceptor.GetDataDelegate)((HaParserKnockOff ko, out string name, out int count) =>
+        knockOff.GetData.OnCall =
+            (HaParserKnockOff.GetDataInterceptor.GetDataDelegate)((HaParserKnockOff ko, out string name, out int count) =>
             {
                 name = "Test";
                 count = 42;
@@ -416,8 +402,8 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaProcessorKnockOff();
         IHaProcessor processor = knockOff;
 
-        knockOff.IHaProcessor.Increment.OnCall =
-            (HaProcessorKnockOff.IHaProcessor_IncrementInterceptor.IncrementDelegate)((HaProcessorKnockOff ko, ref int value) =>
+        knockOff.Increment.OnCall =
+            (HaProcessorKnockOff.IncrementInterceptor.IncrementDelegate)((HaProcessorKnockOff ko, ref int value) =>
             {
                 value = value * 2;
             });
@@ -434,8 +420,8 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaProcessorKnockOff();
         IHaProcessor processor = knockOff;
 
-        knockOff.IHaProcessor.TryUpdate.OnCall =
-            (HaProcessorKnockOff.IHaProcessor_TryUpdateInterceptor.TryUpdateDelegate)((HaProcessorKnockOff ko, string key, ref string value) =>
+        knockOff.TryUpdate.OnCall =
+            (HaProcessorKnockOff.TryUpdateInterceptor.TryUpdateDelegate)((HaProcessorKnockOff ko, string key, ref string value) =>
             {
                 value = value.ToUpper();
                 return true;
@@ -458,8 +444,8 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaProcessorKnockOff();
         IHaProcessor processor = knockOff;
 
-        knockOff.IHaProcessor.Increment.OnCall =
-            (HaProcessorKnockOff.IHaProcessor_IncrementInterceptor.IncrementDelegate)((HaProcessorKnockOff ko, ref int value) =>
+        knockOff.Increment.OnCall =
+            (HaProcessorKnockOff.IncrementInterceptor.IncrementDelegate)((HaProcessorKnockOff ko, ref int value) =>
             {
                 value = value * 2;
             });
@@ -468,7 +454,7 @@ public class HandlerApiSamplesTests : SamplesTestBase
         processor.Increment(ref x);
 
         Assert.Equal(10, x); // Modified
-        Assert.Equal(5, knockOff.IHaProcessor.Increment.LastCallArg); // Original input value
+        Assert.Equal(5, knockOff.Increment.LastCallArg); // Original input value
     }
 
     // ========================================================================
@@ -481,7 +467,7 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaAsyncRepositoryKnockOff();
         IHaAsyncRepository repo = knockOff;
 
-        knockOff.IHaAsyncRepository.GetByIdAsync.OnCall = (ko, id) =>
+        knockOff.GetByIdAsync.OnCall = (ko, id) =>
             Task.FromResult<HaUser?>(new HaUser { Id = id });
 
         var user = await repo.GetByIdAsync(42);
@@ -496,7 +482,7 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaAsyncRepositoryKnockOff();
         IHaAsyncRepository repo = knockOff;
 
-        knockOff.IHaAsyncRepository.SaveAsync.OnCall = (ko, entity) =>
+        knockOff.SaveAsync.OnCall = (ko, entity) =>
             Task.FromException<int>(new InvalidOperationException("Failed"));
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => repo.SaveAsync(new object()));
@@ -512,7 +498,7 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaSerializerKnockOff();
         IHaSerializer service = knockOff;
 
-        knockOff.IHaSerializer.Deserialize.Of<HaUser>().OnCall = (ko, json) =>
+        knockOff.Deserialize.Of<HaUser>().OnCall = (ko, json) =>
             new HaUser { Name = "FromJson" };
 
         var user = service.Deserialize<HaUser>("{}");
@@ -526,15 +512,15 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaSerializerKnockOff();
         IHaSerializer service = knockOff;
 
-        knockOff.IHaSerializer.Deserialize.Of<HaUser>().OnCall = (ko, json) => new HaUser();
-        knockOff.IHaSerializer.Deserialize.Of<HaEntity>().OnCall = (ko, json) => new HaEntity();
+        knockOff.Deserialize.Of<HaUser>().OnCall = (ko, json) => new HaUser();
+        knockOff.Deserialize.Of<HaEntity>().OnCall = (ko, json) => new HaEntity();
 
         service.Deserialize<HaUser>("{}");
         service.Deserialize<HaUser>("{}");
         service.Deserialize<HaEntity>("{}");
 
-        Assert.Equal(2, knockOff.IHaSerializer.Deserialize.Of<HaUser>().CallCount);
-        Assert.Equal("{}", knockOff.IHaSerializer.Deserialize.Of<HaUser>().LastCallArg);
+        Assert.Equal(2, knockOff.Deserialize.Of<HaUser>().CallCount);
+        Assert.Equal("{}", knockOff.Deserialize.Of<HaUser>().LastCallArg);
     }
 
     [Fact]
@@ -543,8 +529,8 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaSerializerKnockOff();
         IHaSerializer service = knockOff;
 
-        knockOff.IHaSerializer.Deserialize.Of<HaUser>().OnCall = (ko, json) => new HaUser();
-        knockOff.IHaSerializer.Deserialize.Of<HaEntity>().OnCall = (ko, json) => new HaEntity();
+        knockOff.Deserialize.Of<HaUser>().OnCall = (ko, json) => new HaUser();
+        knockOff.Deserialize.Of<HaEntity>().OnCall = (ko, json) => new HaEntity();
 
         service.Deserialize<HaUser>("{}");
         service.Deserialize<HaUser>("{}");
@@ -552,9 +538,9 @@ public class HandlerApiSamplesTests : SamplesTestBase
         service.Deserialize<HaEntity>("{}");
         service.Deserialize<HaEntity>("{}");
 
-        Assert.Equal(5, knockOff.IHaSerializer.Deserialize.TotalCallCount);
-        Assert.Contains(typeof(HaUser), knockOff.IHaSerializer.Deserialize.CalledTypeArguments);
-        Assert.Contains(typeof(HaEntity), knockOff.IHaSerializer.Deserialize.CalledTypeArguments);
+        Assert.Equal(5, knockOff.Deserialize.TotalCallCount);
+        Assert.Contains(typeof(HaUser), knockOff.Deserialize.CalledTypeArguments);
+        Assert.Contains(typeof(HaEntity), knockOff.Deserialize.CalledTypeArguments);
     }
 
     [Fact]
@@ -563,7 +549,7 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaSerializerKnockOff();
         IHaSerializer service = knockOff;
 
-        knockOff.IHaSerializer.Convert.Of<string, int>().OnCall = (ko, s) => s.Length;
+        knockOff.Convert.Of<string, int>().OnCall = (ko, s) => s.Length;
 
         var result = service.Convert<string, int>("hello");
 
@@ -576,16 +562,16 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaSerializerKnockOff();
         IHaSerializer service = knockOff;
 
-        knockOff.IHaSerializer.Deserialize.Of<HaUser>().OnCall = (ko, json) => new HaUser();
-        knockOff.IHaSerializer.Deserialize.Of<HaEntity>().OnCall = (ko, json) => new HaEntity();
+        knockOff.Deserialize.Of<HaUser>().OnCall = (ko, json) => new HaUser();
+        knockOff.Deserialize.Of<HaEntity>().OnCall = (ko, json) => new HaEntity();
 
         service.Deserialize<HaUser>("{}");
         service.Deserialize<HaEntity>("{}");
 
-        knockOff.IHaSerializer.Deserialize.Of<HaUser>().Reset();
+        knockOff.Deserialize.Of<HaUser>().Reset();
 
-        Assert.Equal(0, knockOff.IHaSerializer.Deserialize.Of<HaUser>().CallCount);
-        Assert.Equal(1, knockOff.IHaSerializer.Deserialize.Of<HaEntity>().CallCount);
+        Assert.Equal(0, knockOff.Deserialize.Of<HaUser>().CallCount);
+        Assert.Equal(1, knockOff.Deserialize.Of<HaEntity>().CallCount);
     }
 
     [Fact]
@@ -594,15 +580,15 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaSerializerKnockOff();
         IHaSerializer service = knockOff;
 
-        knockOff.IHaSerializer.Deserialize.Of<HaUser>().OnCall = (ko, json) => new HaUser();
-        knockOff.IHaSerializer.Deserialize.Of<HaEntity>().OnCall = (ko, json) => new HaEntity();
+        knockOff.Deserialize.Of<HaUser>().OnCall = (ko, json) => new HaUser();
+        knockOff.Deserialize.Of<HaEntity>().OnCall = (ko, json) => new HaEntity();
 
         service.Deserialize<HaUser>("{}");
         service.Deserialize<HaEntity>("{}");
 
-        knockOff.IHaSerializer.Deserialize.Reset();
+        knockOff.Deserialize.Reset();
 
-        Assert.Equal(0, knockOff.IHaSerializer.Deserialize.TotalCallCount);
+        Assert.Equal(0, knockOff.Deserialize.TotalCallCount);
     }
 
     // ========================================================================

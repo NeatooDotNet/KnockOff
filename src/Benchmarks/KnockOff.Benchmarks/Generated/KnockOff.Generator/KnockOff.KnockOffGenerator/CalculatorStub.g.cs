@@ -5,190 +5,177 @@ namespace KnockOff.Benchmarks.Stubs;
 
 partial class CalculatorStub
 {
-	/// <summary>Tracks and configures behavior for ICalculator.Add.</summary>
-	public sealed class ICalculator_AddInterceptor
+	/// <summary>Tracks and configures behavior for Add.</summary>
+	public sealed class AddInterceptor
 	{
-		/// <summary>Delegate for Add(int a, int b).</summary>
+		/// <summary>Delegate for Add.</summary>
 		public delegate int AddDelegate(CalculatorStub ko, int a, int b);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Arguments from the most recent call.</summary>
-		public (int a, int b)? LastCallArgs { get; private set; }
+		/// <summary>The arguments from the most recent call.</summary>
+		public (int? a, int? b)? LastCallArgs { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public AddDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int a, int b) { CallCount++; LastCallArgs = (a, b); }
+		public void RecordCall(int? a, int? b) { CallCount++; LastCallArgs = (a, b); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ICalculator.Subtract.</summary>
-	public sealed class ICalculator_SubtractInterceptor
+	/// <summary>Tracks and configures behavior for Subtract.</summary>
+	public sealed class SubtractInterceptor
 	{
-		/// <summary>Delegate for Subtract(int a, int b).</summary>
+		/// <summary>Delegate for Subtract.</summary>
 		public delegate int SubtractDelegate(CalculatorStub ko, int a, int b);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Arguments from the most recent call.</summary>
-		public (int a, int b)? LastCallArgs { get; private set; }
+		/// <summary>The arguments from the most recent call.</summary>
+		public (int? a, int? b)? LastCallArgs { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public SubtractDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int a, int b) { CallCount++; LastCallArgs = (a, b); }
+		public void RecordCall(int? a, int? b) { CallCount++; LastCallArgs = (a, b); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ICalculator.Multiply.</summary>
-	public sealed class ICalculator_MultiplyInterceptor
+	/// <summary>Tracks and configures behavior for Multiply.</summary>
+	public sealed class MultiplyInterceptor
 	{
-		/// <summary>Delegate for Multiply(int a, int b).</summary>
+		/// <summary>Delegate for Multiply.</summary>
 		public delegate int MultiplyDelegate(CalculatorStub ko, int a, int b);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Arguments from the most recent call.</summary>
-		public (int a, int b)? LastCallArgs { get; private set; }
+		/// <summary>The arguments from the most recent call.</summary>
+		public (int? a, int? b)? LastCallArgs { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public MultiplyDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int a, int b) { CallCount++; LastCallArgs = (a, b); }
+		public void RecordCall(int? a, int? b) { CallCount++; LastCallArgs = (a, b); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ICalculator.Divide.</summary>
-	public sealed class ICalculator_DivideInterceptor
+	/// <summary>Tracks and configures behavior for Divide.</summary>
+	public sealed class DivideInterceptor
 	{
-		/// <summary>Delegate for Divide(double a, double b).</summary>
+		/// <summary>Delegate for Divide.</summary>
 		public delegate double DivideDelegate(CalculatorStub ko, double a, double b);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Arguments from the most recent call.</summary>
-		public (double a, double b)? LastCallArgs { get; private set; }
+		/// <summary>The arguments from the most recent call.</summary>
+		public (double? a, double? b)? LastCallArgs { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public DivideDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(double a, double b) { CallCount++; LastCallArgs = (a, b); }
+		public void RecordCall(double? a, double? b) { CallCount++; LastCallArgs = (a, b); }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for ICalculator.Square.</summary>
-	public sealed class ICalculator_SquareInterceptor
+	/// <summary>Tracks and configures behavior for Square.</summary>
+	public sealed class SquareInterceptor
 	{
-		/// <summary>Delegate for Square(int x).</summary>
+		/// <summary>Delegate for Square.</summary>
 		public delegate int SquareDelegate(CalculatorStub ko, int x);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'x' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public SquareDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int x) { CallCount++; LastCallArg = x; }
+		public void RecordCall(int? x) { CallCount++; LastCallArg = x; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Benchmarks.Interfaces.ICalculator.</summary>
-	public sealed class ICalculatorInterceptorors
-	{
-		/// <summary>Interceptor for Add.</summary>
-		public ICalculator_AddInterceptor Add { get; } = new();
-		/// <summary>Interceptor for Subtract.</summary>
-		public ICalculator_SubtractInterceptor Subtract { get; } = new();
-		/// <summary>Interceptor for Multiply.</summary>
-		public ICalculator_MultiplyInterceptor Multiply { get; } = new();
-		/// <summary>Interceptor for Divide.</summary>
-		public ICalculator_DivideInterceptor Divide { get; } = new();
-		/// <summary>Interceptor for Square.</summary>
-		public ICalculator_SquareInterceptor Square { get; } = new();
-	}
+	/// <summary>Interceptor for Add.</summary>
+	public AddInterceptor Add { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Benchmarks.Interfaces.ICalculator.</summary>
-	public ICalculatorInterceptorors ICalculator { get; } = new();
+	/// <summary>Interceptor for Subtract.</summary>
+	public SubtractInterceptor Subtract { get; } = new();
+
+	/// <summary>Interceptor for Multiply.</summary>
+	public MultiplyInterceptor Multiply { get; } = new();
+
+	/// <summary>Interceptor for Divide.</summary>
+	public DivideInterceptor Divide { get; } = new();
+
+	/// <summary>Interceptor for Square.</summary>
+	public SquareInterceptor Square { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Benchmarks.Interfaces.ICalculator.</summary>
 	public KnockOff.Benchmarks.Interfaces.ICalculator AsCalculator() => this;
 
 	int KnockOff.Benchmarks.Interfaces.ICalculator.Add(int a, int b)
 	{
-		ICalculator.Add.RecordCall(a, b);
-		if (ICalculator.Add.OnCall is { } onCallCallback)
-			return onCallCallback(this, a, b);
-		return default!;
+		Add.RecordCall(a, b);
+		return Add.OnCall?.Invoke(this, a, b) ?? default!;
 	}
 
 	int KnockOff.Benchmarks.Interfaces.ICalculator.Subtract(int a, int b)
 	{
-		ICalculator.Subtract.RecordCall(a, b);
-		if (ICalculator.Subtract.OnCall is { } onCallCallback)
-			return onCallCallback(this, a, b);
-		return default!;
+		Subtract.RecordCall(a, b);
+		return Subtract.OnCall?.Invoke(this, a, b) ?? default!;
 	}
 
 	int KnockOff.Benchmarks.Interfaces.ICalculator.Multiply(int a, int b)
 	{
-		ICalculator.Multiply.RecordCall(a, b);
-		if (ICalculator.Multiply.OnCall is { } onCallCallback)
-			return onCallCallback(this, a, b);
-		return default!;
+		Multiply.RecordCall(a, b);
+		return Multiply.OnCall?.Invoke(this, a, b) ?? default!;
 	}
 
 	double KnockOff.Benchmarks.Interfaces.ICalculator.Divide(double a, double b)
 	{
-		ICalculator.Divide.RecordCall(a, b);
-		if (ICalculator.Divide.OnCall is { } onCallCallback)
-			return onCallCallback(this, a, b);
-		return default!;
+		Divide.RecordCall(a, b);
+		return Divide.OnCall?.Invoke(this, a, b) ?? default!;
 	}
 
 	int KnockOff.Benchmarks.Interfaces.ICalculator.Square(int x)
 	{
-		ICalculator.Square.RecordCall(x);
-		if (ICalculator.Square.OnCall is { } onCallCallback)
-			return onCallCallback(this, x);
-		return default!;
+		Square.RecordCall(x);
+		return Square.OnCall?.Invoke(this, x) ?? default!;
 	}
 
 }

@@ -19,9 +19,9 @@ public partial class MethodServiceKnockOff : IMethodService { }
 <!-- /snippet -->
 
 Tracking:
-- `IService.Initialize.WasCalled`
-- `IService.Initialize.CallCount`
-- `IService.Initialize.OnCall` — `Action<ServiceKnockOff>`
+- `knockOff.Initialize.WasCalled`
+- `knockOff.Initialize.CallCount`
+- `knockOff.Initialize.OnCall` — `Action<MethodServiceKnockOff>`
 
 ### Void Methods (With Parameters)
 
@@ -39,10 +39,10 @@ public partial class MethodLoggerKnockOff : IMethodLogger { }
 <!-- /snippet -->
 
 Single parameter:
-- `ILogger.Log.LastCallArg` — the argument value (not a tuple)
+- `knockOff.Log.LastCallArg` — the argument value (not a tuple)
 
 Multiple parameters:
-- `ILogger.LogError.LastCallArgs` — named tuple `(string message, Exception ex)`
+- `knockOff.LogError.LastCallArgs` — named tuple `(string message, Exception ex)`
 
 ### Methods with Return Values
 
@@ -68,44 +68,30 @@ Same tracking as void methods, plus:
 
 For methods with one parameter, tracking uses the raw type (not a tuple):
 
+<!-- snippet: docs:methods:single-param -->
 ```csharp
-public interface IService
-{
-    User GetUser(int id);
-}
-
-// Usage
 service.GetUser(42);
 
-// Tracking
-int? lastId = knockOff.IService.GetUser.LastCallArg;  // 42, not (42,)
+        // Tracking - single parameter uses raw type (not a tuple)
+        int? lastId = knockOff.GetUser.LastCallArg;  // 42, not (42,)
 ```
+<!-- /snippet -->
 
 ### Multiple Parameters
 
 For methods with 2+ parameters, tracking uses named tuples:
 
+<!-- snippet: docs:methods:multiple-params -->
 ```csharp
-public interface IService
-{
-    void Process(string name, int value, bool flag);
-}
-
-// Usage
 service.Process("test", 42, true);
 
-// Tracking - named tuple with original parameter names
-var args = knockOff.IService.Process.LastCallArgs;
-Assert.Equal("test", args?.name);
-Assert.Equal(42, args?.value);
-Assert.True(args?.flag);
-
-// Tuple destructuring
-if (knockOff.IService.Process.LastCallArgs is var (name, value, flag))
-{
-    Assert.Equal("test", name);
-}
+        // Tracking - named tuple with original parameter names
+        var args = knockOff.Process.LastCallArgs;
+        var name = args?.name;   // "test"
+        var value = args?.value; // 42
+        var flag = args?.flag;   // true
 ```
+<!-- /snippet -->
 
 ## User-Defined Methods
 
@@ -132,41 +118,39 @@ Rules:
 
 ### Void Method Callbacks
 
+<!-- snippet: docs:methods:void-callbacks -->
 ```csharp
 // No parameters
-knockOff.IService.Initialize.OnCall = (ko) =>
-{
-    // Custom initialization logic
-};
+        serviceKnockOff.Initialize.OnCall = (ko) =>
+        {
+            // Custom initialization logic
+        };
 
-// Single parameter
-knockOff.ILogger.Log.OnCall = (ko, message) =>
-{
-    Console.WriteLine($"Logged: {message}");
-};
+        // Single parameter
+        loggerKnockOff.Log.OnCall = (ko, message) =>
+        {
+            Console.WriteLine($"Logged: {message}");
+        };
 
-// Multiple parameters (individual params)
-knockOff.ILogger.LogError.OnCall = (ko, message, ex) =>
-{
-    Console.WriteLine($"Error: {message} - {ex.Message}");
-};
+        // Multiple parameters
+        loggerKnockOff.LogError.OnCall = (ko, message, ex) =>
+        {
+            Console.WriteLine($"Error: {message} - {ex.Message}");
+        };
 ```
+<!-- /snippet -->
 
 ### Return Method Callbacks
 
+<!-- snippet: docs:methods:return-callbacks -->
 ```csharp
 // No parameters
-knockOff.IRepository.Count.OnCall = (ko) => 42;
+        knockOff.Count.OnCall = (ko) => 42;
 
-// Single parameter
-knockOff.IRepository.GetById.OnCall = (ko, id) => new User { Id = id };
-
-// Multiple parameters
-knockOff.IRepository.Find.OnCall = (ko, name, includeInactive) =>
-{
-    return users.Where(u => u.Name == name).ToList();
-};
+        // Single parameter
+        knockOff.GetById.OnCall = (ko, id) => new MethodUser { Id = id };
 ```
+<!-- /snippet -->
 
 ### Callback Signatures
 
@@ -197,21 +181,20 @@ public partial class MethodPriorityKnockOff : IMethodPriority
 ```
 <!-- /snippet -->
 
+<!-- snippet: docs:methods:priority-order-usage -->
 ```csharp
-var knockOff = new MethodPriorityKnockOff();
-IMethodPriority service = knockOff;
-
 // No callback → uses user method
-Assert.Equal(10, service.Calculate(5));  // 5 * 2
+        var result1 = service.Calculate(5);  // 10 (5 * 2)
 
-// Callback → overrides user method
-knockOff.IMethodPriority.Calculate.OnCall = (ko, x) => x * 100;
-Assert.Equal(500, service.Calculate(5));  // callback
+        // Callback → overrides user method
+        knockOff.Calculate2.OnCall = (ko, x) => x * 100;
+        var result2 = service.Calculate(5);  // 500 (callback)
 
-// Reset → back to user method
-knockOff.IMethodPriority.Calculate.Reset();
-Assert.Equal(10, service.Calculate(5));  // user method again
+        // Reset → back to user method
+        knockOff.Calculate2.Reset();
+        var result3 = service.Calculate(5);  // 10 (user method again)
 ```
+<!-- /snippet -->
 
 ## Common Patterns
 
@@ -224,34 +207,40 @@ public partial class MethodFailureKnockOff : IMethodFailure { }
 ```
 <!-- /snippet -->
 
+<!-- snippet: docs:methods:simulating-failures-usage -->
 ```csharp
-knockOff.IMethodFailure.Save.OnCall = (ko, entity) =>
-{
-    throw new DbException("Connection failed");
-};
+knockOff.Save.OnCall = (ko, entity) =>
+        {
+            throw new InvalidOperationException("Connection failed");
+        };
 ```
+<!-- /snippet -->
 
 ### Conditional Returns
 
+<!-- snippet: docs:methods:conditional-returns -->
 ```csharp
-knockOff.IRepository.GetById.OnCall = (ko, id) => id switch
-{
-    1 => new User { Id = 1, Name = "Admin" },
-    2 => new User { Id = 2, Name = "Guest" },
-    _ => null
-};
+knockOff.GetById.OnCall = (ko, id) => id switch
+        {
+            1 => new MethodUser { Id = 1, Name = "Admin" },
+            2 => new MethodUser { Id = 2, Name = "Guest" },
+            _ => null
+        };
 ```
+<!-- /snippet -->
 
 ### Capturing Arguments
 
+<!-- snippet: docs:methods:capturing-arguments -->
 ```csharp
 var capturedIds = new List<int>();
-knockOff.IRepository.GetById.OnCall = (ko, id) =>
-{
-    capturedIds.Add(id);
-    return new User { Id = id };
-};
+        knockOff.GetById.OnCall = (ko, id) =>
+        {
+            capturedIds.Add(id);
+            return new MethodUser { Id = id };
+        };
 ```
+<!-- /snippet -->
 
 ### Verifying Call Order
 
@@ -262,17 +251,21 @@ public partial class MethodCallOrderKnockOff : IMethodCallOrder { }
 ```
 <!-- /snippet -->
 
+<!-- snippet: docs:methods:verifying-call-order-usage -->
 ```csharp
 var callOrder = new List<string>();
 
-knockOff.IMethodCallOrder.Initialize.OnCall = (ko) => callOrder.Add("Initialize");
-knockOff.IMethodCallOrder.Process.OnCall = (ko) => callOrder.Add("Process");
-knockOff.IMethodCallOrder.Cleanup.OnCall = (ko) => callOrder.Add("Cleanup");
+        knockOff.Initialize.OnCall = (ko) => callOrder.Add("Initialize");
+        knockOff.Process.OnCall = (ko) => callOrder.Add("Process");
+        knockOff.Cleanup.OnCall = (ko) => callOrder.Add("Cleanup");
 
-// ... run code under test ...
+        service.Initialize();
+        service.Process();
+        service.Cleanup();
 
-Assert.Equal(["Initialize", "Process", "Cleanup"], callOrder);
+        // callOrder is ["Initialize", "Process", "Cleanup"]
 ```
+<!-- /snippet -->
 
 ### Sequential Returns
 
@@ -283,14 +276,16 @@ public partial class MethodSequentialKnockOff : IMethodSequential { }
 ```
 <!-- /snippet -->
 
+<!-- snippet: docs:methods:sequential-returns-usage -->
 ```csharp
 var results = new Queue<int>([1, 2, 3]);
-knockOff.IMethodSequential.GetNext.OnCall = (ko) => results.Dequeue();
+        knockOff.GetNext.OnCall = (ko) => results.Dequeue();
 
-Assert.Equal(1, service.GetNext());
-Assert.Equal(2, service.GetNext());
-Assert.Equal(3, service.GetNext());
+        var first = service.GetNext();   // 1
+        var second = service.GetNext();  // 2
+        var third = service.GetNext();   // 3
 ```
+<!-- /snippet -->
 
 ### Accessing Other Interceptor State
 
@@ -301,10 +296,12 @@ public partial class MethodHandlerStateKnockOff : IMethodHandlerState { }
 ```
 <!-- /snippet -->
 
+<!-- snippet: docs:methods:accessing-handler-state-usage -->
 ```csharp
-knockOff.IMethodHandlerState.Process.OnCall = (ko) =>
-{
-    if (!ko.IMethodHandlerState.Initialize.WasCalled)
-        throw new InvalidOperationException("Not initialized");
-};
+knockOff.Process.OnCall = (ko) =>
+        {
+            if (!ko.Initialize.WasCalled)
+                throw new InvalidOperationException("Not initialized");
+        };
 ```
+<!-- /snippet -->

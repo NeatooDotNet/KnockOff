@@ -33,8 +33,8 @@ public class KnockOffVsMoqSamplesTests : SamplesTestBase
 
         service.GetUser(42);
 
-        Assert.Equal(1, knockOff.IVsUserService.GetUser.CallCount);
-        Assert.Equal(42, knockOff.IVsUserService.GetUser.LastCallArg);
+        Assert.Equal(1, knockOff.GetUser2.CallCount);
+        Assert.Equal(42, knockOff.GetUser2.LastCallArg);
     }
 
     // ========================================================================
@@ -47,12 +47,12 @@ public class KnockOffVsMoqSamplesTests : SamplesTestBase
         var knockOff = new VsUserServiceKnockOff();
         IVsUserService service = knockOff;
 
-        knockOff.IVsUserService.CurrentUser.OnGet = (ko) => new VsUser { Name = "Test" };
+        knockOff.CurrentUser.OnGet = (ko) => new VsUser { Name = "Test" };
 
         var user = service.CurrentUser;
 
         Assert.Equal("Test", user?.Name);
-        Assert.Equal(1, knockOff.IVsUserService.CurrentUser.GetCount);
+        Assert.Equal(1, knockOff.CurrentUser.GetCount);
     }
 
     [Fact]
@@ -63,8 +63,8 @@ public class KnockOffVsMoqSamplesTests : SamplesTestBase
 
         service.CurrentUser = new VsUser { Name = "New" };
 
-        Assert.Equal(1, knockOff.IVsUserService.CurrentUser.SetCount);
-        Assert.Equal("New", knockOff.IVsUserService.CurrentUser.LastSetValue?.Name);
+        Assert.Equal(1, knockOff.CurrentUser.SetCount);
+        Assert.Equal("New", knockOff.CurrentUser.LastSetValue?.Name);
     }
 
     // ========================================================================
@@ -95,7 +95,7 @@ public class KnockOffVsMoqSamplesTests : SamplesTestBase
 
         repo.Save(new VsEntity { Id = 1 });
 
-        var captured = knockOff.IVsRepository.Save.LastCallArg;
+        var captured = knockOff.Save.LastCallArg;
         Assert.Equal(1, captured?.Id);
     }
 
@@ -109,25 +109,13 @@ public class KnockOffVsMoqSamplesTests : SamplesTestBase
         repo.Save(new VsEntity { Id = 2 });
         repo.Save(new VsEntity { Id = 3 });
 
-        Assert.Equal(3, knockOff.IVsRepository.Save.CallCount);
-        Assert.Equal(3, knockOff.IVsRepository.Save.LastCallArg?.Id);
+        Assert.Equal(3, knockOff.Save.CallCount);
+        Assert.Equal(3, knockOff.Save.LastCallArg?.Id);
     }
 
     // ========================================================================
-    // docs:knockoff-vs-moq:multiple-interfaces
+    // docs:knockoff-vs-moq:multiple-interfaces - Multi-interface tests removed (KO0010)
     // ========================================================================
-
-    [Fact]
-    public async Task MultipleInterfaces_BothInterfacesWork()
-    {
-        var knockOff = new VsEmployeeRepoKnockOff();
-        IVsEmployeeRepository repo = knockOff.AsVsEmployeeRepository();
-        IVsUnitOfWork unitOfWork = knockOff.AsVsUnitOfWork();
-
-        var result = await unitOfWork.SaveChangesAsync(CancellationToken.None);
-
-        Assert.Equal(1, result);
-    }
 
     // ========================================================================
     // docs:knockoff-vs-moq:indexer-stub
@@ -137,14 +125,14 @@ public class KnockOffVsMoqSamplesTests : SamplesTestBase
     public void IndexerStub_BackingDictionary_Works()
     {
         var knockOff = new VsPropertyStoreKnockOff();
-        knockOff.IVsPropertyStore_StringIndexerBacking["Name"] = new VsPropertyInfo { Value = "Test" };
-        knockOff.IVsPropertyStore_StringIndexerBacking["Age"] = new VsPropertyInfo { Value = "25" };
+        knockOff.StringIndexerBacking["Name"] = new VsPropertyInfo { Value = "Test" };
+        knockOff.StringIndexerBacking["Age"] = new VsPropertyInfo { Value = "25" };
 
         IVsPropertyStore store = knockOff;
         var name = store["Name"];
 
         Assert.Equal("Test", name?.Value);
-        Assert.Equal("Name", knockOff.IVsPropertyStore.StringIndexer.LastGetKey);
+        Assert.Equal("Name", knockOff.StringIndexer.LastGetKey);
     }
 
     // ========================================================================
@@ -159,8 +147,8 @@ public class KnockOffVsMoqSamplesTests : SamplesTestBase
 
         source.DataReceived += (sender, data) => { };
 
-        Assert.True(knockOff.IVsEventSource.DataReceived.HasSubscribers);
-        Assert.Equal(1, knockOff.IVsEventSource.DataReceived.SubscribeCount);
+        Assert.True(knockOff.DataReceived.HasSubscribers);
+        Assert.Equal(1, knockOff.DataReceived.AddCount);
     }
 
     [Fact]
@@ -172,9 +160,8 @@ public class KnockOffVsMoqSamplesTests : SamplesTestBase
 
         source.DataReceived += (sender, data) => receivedData = data;
 
-        knockOff.IVsEventSource.DataReceived.Raise("test data");
+        knockOff.DataReceived.Raise(null, "test data");
 
-        Assert.True(knockOff.IVsEventSource.DataReceived.WasRaised);
         Assert.Equal("test data", receivedData);
     }
 
@@ -189,7 +176,7 @@ public class KnockOffVsMoqSamplesTests : SamplesTestBase
         IVsVerificationRepository repo = knockOff;
 
         // Set up GetAll to return empty collection (required for non-nullable return type)
-        knockOff.IVsVerificationRepository.GetAll.OnCall = (ko) => Enumerable.Empty<VsEntity>();
+        knockOff.GetAll.OnCall = (ko) => Enumerable.Empty<VsEntity>();
 
         repo.Save(new VsEntity());
         repo.Update(new VsEntity());
@@ -197,10 +184,10 @@ public class KnockOffVsMoqSamplesTests : SamplesTestBase
         repo.Update(new VsEntity());
         _ = repo.GetAll();
 
-        Assert.Equal(1, knockOff.IVsVerificationRepository.Save.CallCount);      // Times.Once
-        Assert.Equal(0, knockOff.IVsVerificationRepository.Delete.CallCount);    // Times.Never
-        Assert.True(knockOff.IVsVerificationRepository.GetAll.WasCalled);        // Times.AtLeastOnce
-        Assert.Equal(3, knockOff.IVsVerificationRepository.Update.CallCount);    // Times.Exactly(3)
+        Assert.Equal(1, knockOff.Save.CallCount);      // Times.Once
+        Assert.Equal(0, knockOff.Delete.CallCount);    // Times.Never
+        Assert.True(knockOff.GetAll.WasCalled);        // Times.AtLeastOnce
+        Assert.Equal(3, knockOff.Update.CallCount);    // Times.Exactly(3)
     }
 
     // ========================================================================
@@ -214,7 +201,7 @@ public class KnockOffVsMoqSamplesTests : SamplesTestBase
         IVsSequence sequence = knockOff;
 
         var returnValues = new Queue<int>([1, 2, 3]);
-        knockOff.IVsSequence.GetNext.OnCall = (ko) => returnValues.Dequeue();
+        knockOff.GetNext.OnCall = (ko) => returnValues.Dequeue();
 
         Assert.Equal(1, sequence.GetNext());
         Assert.Equal(2, sequence.GetNext());
@@ -242,7 +229,7 @@ public class KnockOffVsMoqSamplesTests : SamplesTestBase
         var knockOff = new VsOverrideServiceKnockOff();
         IVsOverrideService service = knockOff;
 
-        knockOff.IVsOverrideService.GetUser.OnCall = (ko, id) => new VsUser { Id = id, Name = "Special" };
+        knockOff.GetUser2.OnCall = (ko, id) => new VsUser { Id = id, Name = "Special" };
 
         var user = service.GetUser(42);
 
@@ -259,15 +246,15 @@ public class KnockOffVsMoqSamplesTests : SamplesTestBase
         var knockOff = new VsOverrideServiceKnockOff();
         IVsOverrideService service = knockOff;
 
-        knockOff.IVsOverrideService.GetUser.OnCall = (ko, id) => new VsUser { Name = "First" };
+        knockOff.GetUser2.OnCall = (ko, id) => new VsUser { Name = "First" };
         var user1 = service.GetUser(1);
         Assert.Equal("First", user1.Name);
 
-        knockOff.IVsOverrideService.GetUser.Reset();
+        knockOff.GetUser2.Reset();
 
         // Now falls back to user method
         var user2 = service.GetUser(2);
         Assert.Equal("Default", user2.Name);
-        Assert.Equal(1, knockOff.IVsOverrideService.GetUser.CallCount); // Reset cleared previous count
+        Assert.Equal(1, knockOff.GetUser2.CallCount); // Reset cleared previous count
     }
 }

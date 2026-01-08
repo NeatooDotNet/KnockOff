@@ -96,9 +96,14 @@ public interface IMigUnitOfWork
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
 
+// Note: Multi-interface standalone stubs are no longer supported (KO0010).
+// Use inline stubs [KnockOff<T>] or separate single-interface stubs.
 #region docs:migration-from-moq:multiple-interfaces
 [KnockOff]
-public partial class MigDataContextKnockOff : IMigRepository, IMigUnitOfWork { }
+public partial class MigRepositoryKnockOff : IMigRepository { }
+
+[KnockOff]
+public partial class MigUnitOfWorkKnockOff : IMigUnitOfWork { }
 #endregion
 
 // ============================================================================
@@ -193,4 +198,117 @@ public interface IMigSaveService
 #region docs:migration-from-moq:complex-callbacks
 [KnockOff]
 public partial class MigSaveServiceKnockOff : IMigSaveService { }
+#endregion
+
+// ============================================================================
+// Comment-based usage examples
+// ============================================================================
+
+#region docs:migration-from-moq:instantiate-knockoff
+// var knockOff = new MigUserServiceKnockOff();
+#endregion
+
+#region docs:migration-from-moq:replace-mock-object
+// IMigUserService service = knockOff;
+// // or
+// DoSomething(knockOff.AsIMigUserService());
+#endregion
+
+#region docs:migration-from-moq:convert-setup-returns
+// knockOff.GetUser.OnCall = (ko, id) =>
+//     new User { Id = id, Name = "Test" };
+#endregion
+
+#region docs:migration-from-moq:convert-async-returns
+// knockOff.GetUserAsync.OnCall = (ko, id) =>
+//     Task.FromResult<User?>(new User { Id = id });
+#endregion
+
+#region docs:migration-from-moq:convert-verification
+// Assert.Equal(1, knockOff.Save.CallCount);
+// Assert.Equal(0, knockOff.Delete.CallCount);
+// Assert.True(knockOff.GetAll.WasCalled);
+// Assert.Equal(3, knockOff.Update.CallCount);
+#endregion
+
+#region docs:migration-from-moq:convert-callback
+// // Arguments are captured automatically
+// var captured = knockOff.Save.LastCallArg;
+//
+// // Or use callback for custom logic
+// knockOff.Save.OnCall = (ko, user) =>
+// {
+//     customList.Add(user);
+// };
+#endregion
+
+#region docs:migration-from-moq:convert-property-setup
+// knockOff.Name.OnGet = (ko) => "Test";
+//
+// // Setter tracking is automatic
+// service.Name = "Value";
+// Assert.Equal("Value", knockOff.Name.LastSetValue);
+#endregion
+
+#region docs:migration-from-moq:static-returns-callback
+// knockOff.GetConfig.OnCall = (ko) => new MigConfig { Timeout = 30 };
+#endregion
+
+#region docs:migration-from-moq:conditional-returns
+// knockOff.GetUser.OnCall = (ko, id) => id switch
+// {
+//     1 => new User { Name = "Admin" },
+//     2 => new User { Name = "Guest" },
+//     _ => null
+// };
+#endregion
+
+#region docs:migration-from-moq:throwing-exceptions-usage
+// knockOff.Connect.OnCall = (ko) =>
+//     throw new TimeoutException();
+#endregion
+
+#region docs:migration-from-moq:sequential-returns-usage
+// var values = new Queue<int>([1, 2, 3]);
+// knockOff.GetNext.OnCall = (ko) => values.Dequeue();
+#endregion
+
+#region docs:migration-from-moq:multiple-interfaces-usage
+// // Separate stubs for each interface
+// var repoKnockOff = new MigRepositoryKnockOff();
+// IMigRepository repo = repoKnockOff.AsIMigRepository();
+//
+// var uowKnockOff = new MigUnitOfWorkKnockOff();
+// uowKnockOff.SaveChangesAsync.OnCall = (ko, ct) => Task.FromResult(1);
+// IMigUnitOfWork uow = uowKnockOff.AsIMigUnitOfWork();
+#endregion
+
+#region docs:migration-from-moq:argument-matching-usage
+// knockOff.Log.OnCall = (ko, message) =>
+// {
+//     if (message.Contains("error"))
+//         errors.Add(message);
+// };
+#endregion
+
+#region docs:migration-from-moq:simple-verification
+// // These translate directly
+// Assert.True(knockOff.Method.WasCalled);
+// Assert.Equal(expectedCount, knockOff.Method.CallCount);
+#endregion
+
+#region docs:migration-from-moq:complex-callbacks-usage
+// knockOff.Save.OnCall = (ko, entity) =>
+// {
+//     entity.Id = nextId++;
+//     savedEntities.Add(entity);
+// };
+#endregion
+
+#region docs:migration-from-moq:automatic-tracking-usage
+// // No setup needed - just call the method
+// service.Process("data");
+//
+// // Args are captured
+// Assert.Equal("data", knockOff.Process.LastCallArg);
 #endregion

@@ -5,19 +5,19 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class AsyncRepositoryKnockOff
 {
-	/// <summary>Tracks and configures behavior for IAsyncRepository.InitializeAsync.</summary>
-	public sealed class IAsyncRepository_InitializeAsyncInterceptor
+	/// <summary>Tracks and configures behavior for InitializeAsync.</summary>
+	public sealed class InitializeAsyncInterceptor
 	{
-		/// <summary>Delegate for InitializeAsync().</summary>
+		/// <summary>Delegate for InitializeAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task InitializeAsyncDelegate(AsyncRepositoryKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public InitializeAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -27,44 +27,44 @@ partial class AsyncRepositoryKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IAsyncRepository.GetByIdAsync.</summary>
-	public sealed class IAsyncRepository_GetByIdAsyncInterceptor
+	/// <summary>Tracks and configures behavior for GetByIdAsync.</summary>
+	public sealed class GetByIdAsyncInterceptor
 	{
-		/// <summary>Delegate for GetByIdAsync(int id).</summary>
+		/// <summary>Delegate for GetByIdAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.AsyncUser?> GetByIdAsyncDelegate(AsyncRepositoryKnockOff ko, int id);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'id' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public int? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public GetByIdAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IAsyncRepository.CountAsync.</summary>
-	public sealed class IAsyncRepository_CountAsyncInterceptor
+	/// <summary>Tracks and configures behavior for CountAsync.</summary>
+	public sealed class CountAsyncInterceptor
 	{
-		/// <summary>Delegate for CountAsync().</summary>
+		/// <summary>Delegate for CountAsync.</summary>
 		public delegate global::System.Threading.Tasks.ValueTask<int> CountAsyncDelegate(AsyncRepositoryKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+		/// <summary>Callback invoked when this method is called.</summary>
 		public CountAsyncDelegate? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
@@ -74,45 +74,34 @@ partial class AsyncRepositoryKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IAsyncRepository.</summary>
-	public sealed class IAsyncRepositoryInterceptorors
-	{
-		/// <summary>Interceptor for InitializeAsync.</summary>
-		public IAsyncRepository_InitializeAsyncInterceptor InitializeAsync { get; } = new();
-		/// <summary>Interceptor for GetByIdAsync.</summary>
-		public IAsyncRepository_GetByIdAsyncInterceptor GetByIdAsync { get; } = new();
-		/// <summary>Interceptor for CountAsync.</summary>
-		public IAsyncRepository_CountAsyncInterceptor CountAsync { get; } = new();
-	}
+	/// <summary>Interceptor for InitializeAsync.</summary>
+	public InitializeAsyncInterceptor InitializeAsync { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Guides.IAsyncRepository.</summary>
-	public IAsyncRepositoryInterceptorors IAsyncRepository { get; } = new();
+	/// <summary>Interceptor for GetByIdAsync.</summary>
+	public GetByIdAsyncInterceptor GetByIdAsync { get; } = new();
+
+	/// <summary>Interceptor for CountAsync.</summary>
+	public CountAsyncInterceptor CountAsync { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IAsyncRepository.</summary>
 	public KnockOff.Documentation.Samples.Guides.IAsyncRepository AsAsyncRepository() => this;
 
 	global::System.Threading.Tasks.Task KnockOff.Documentation.Samples.Guides.IAsyncRepository.InitializeAsync()
 	{
-		IAsyncRepository.InitializeAsync.RecordCall();
-		if (IAsyncRepository.InitializeAsync.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return global::System.Threading.Tasks.Task.CompletedTask;
+		InitializeAsync.RecordCall();
+		return InitializeAsync.OnCall?.Invoke(this) ?? global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.AsyncUser?> KnockOff.Documentation.Samples.Guides.IAsyncRepository.GetByIdAsync(int id)
 	{
-		IAsyncRepository.GetByIdAsync.RecordCall(id);
-		if (IAsyncRepository.GetByIdAsync.OnCall is { } onCallCallback)
-			return onCallCallback(this, id);
-		return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Guides.AsyncUser?>(default!);
+		GetByIdAsync.RecordCall(id);
+		return GetByIdAsync.OnCall?.Invoke(this, id) ?? global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Guides.AsyncUser?>(default!);
 	}
 
 	global::System.Threading.Tasks.ValueTask<int> KnockOff.Documentation.Samples.Guides.IAsyncRepository.CountAsync()
 	{
-		IAsyncRepository.CountAsync.RecordCall();
-		if (IAsyncRepository.CountAsync.OnCall is { } onCallCallback)
-			return onCallCallback(this);
-		return default;
+		CountAsync.RecordCall();
+		return CountAsync.OnCall?.Invoke(this) ?? default;
 	}
 
 }

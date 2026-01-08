@@ -5,49 +5,38 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class MmSharedRepositoryKnockOff
 {
-	/// <summary>Tracks and configures behavior for IMmRepository.Save.</summary>
-	public sealed class IMmRepository_SaveInterceptor
+	/// <summary>Tracks and configures behavior for Save.</summary>
+	public sealed class SaveInterceptor
 	{
-		/// <summary>Delegate for Save(object entity).</summary>
-		public delegate void SaveDelegate(MmSharedRepositoryKnockOff ko, object entity);
-
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>True if this method was called at least once.</summary>
+		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The 'entity' argument from the most recent call.</summary>
+		/// <summary>The argument from the most recent call.</summary>
 		public object? LastCallArg { get; private set; }
 
-		/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-		public SaveDelegate? OnCall { get; set; }
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<MmSharedRepositoryKnockOff, object>? OnCall { get; set; }
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(object entity) { CallCount++; LastCallArg = entity; }
+		public void RecordCall(object? entity) { CallCount++; LastCallArg = entity; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmRepository.</summary>
-	public sealed class IMmRepositoryInterceptorors
-	{
-		/// <summary>Interceptor for Save.</summary>
-		public IMmRepository_SaveInterceptor Save { get; } = new();
-	}
-
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.IMmRepository.</summary>
-	public IMmRepositoryInterceptorors IMmRepository { get; } = new();
+	/// <summary>Interceptor for Save.</summary>
+	public SaveInterceptor Save { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmRepository.</summary>
 	public KnockOff.Documentation.Samples.Skills.IMmRepository AsMmRepository() => this;
 
 	void KnockOff.Documentation.Samples.Skills.IMmRepository.Save(object entity)
 	{
-		IMmRepository.Save.RecordCall(entity);
-		if (IMmRepository.Save.OnCall is { } onCallCallback)
-		{ onCallCallback(this, entity); return; }
+		Save.RecordCall(entity);
+		Save.OnCall?.Invoke(this, entity);
 	}
 
 }

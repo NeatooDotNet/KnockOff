@@ -5,140 +5,79 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class SkEventPatternSourceKnockOff
 {
-	/// <summary>Tracks and raises ISkEventPatternSource.DataReceived.</summary>
-	public sealed class ISkEventPatternSource_DataReceivedInterceptor
+	/// <summary>Interceptor for DataReceived event.</summary>
+	public sealed class DataReceivedInterceptor
 	{
 		private global::System.EventHandler<string>? _handler;
-		private readonly global::System.Collections.Generic.List<(object? sender, string e)> _raises = new();
 
-		/// <summary>Number of times handlers were added.</summary>
-		public int SubscribeCount { get; private set; }
+		/// <summary>Number of times event was subscribed to.</summary>
+		public int AddCount { get; private set; }
 
-		/// <summary>Number of times handlers were removed.</summary>
-		public int UnsubscribeCount { get; private set; }
+		/// <summary>Number of times event subscription was removed.</summary>
+		public int RemoveCount { get; private set; }
 
-		/// <summary>True if at least one handler is subscribed.</summary>
+		/// <summary>Whether any handlers are subscribed.</summary>
 		public bool HasSubscribers => _handler != null;
 
-		/// <summary>Number of times the event was raised.</summary>
-		public int RaiseCount => _raises.Count;
+		/// <summary>Records an event subscription.</summary>
+		public void RecordAdd(global::System.EventHandler<string>? value) { AddCount++; _handler = (global::System.EventHandler<string>?)global::System.Delegate.Combine(_handler, value); }
 
-		/// <summary>True if the event was raised at least once.</summary>
-		public bool WasRaised => RaiseCount > 0;
+		/// <summary>Records an event unsubscription.</summary>
+		public void RecordRemove(global::System.EventHandler<string>? value) { RemoveCount++; _handler = (global::System.EventHandler<string>?)global::System.Delegate.Remove(_handler, value); }
 
-		/// <summary>Arguments from the most recent raise.</summary>
-		public (object? sender, string e)? LastRaiseArgs => _raises.Count > 0 ? _raises[_raises.Count - 1] : null;
+		/// <summary>Raises the event with the specified arguments.</summary>
+		public void Raise(object? sender, string e) => _handler?.Invoke(sender, e);
 
-		/// <summary>All recorded raise invocations.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(object? sender, string e)> AllRaises => _raises;
-
-		internal void Add(global::System.EventHandler<string> handler)
-		{
-			_handler += handler;
-			SubscribeCount++;
-		}
-
-		internal void Remove(global::System.EventHandler<string> handler)
-		{
-			_handler -= handler;
-			UnsubscribeCount++;
-		}
-
-		/// <summary>Raises the event.</summary>
-		public void Raise(object? sender, string e)
-		{
-			_raises.Add((sender, e));
-			_handler?.Invoke(sender, e);
-		}
-
-		/// <summary>Raises the event with null sender.</summary>
-		public void Raise(string e) => Raise(null, e);
-
-		/// <summary>Resets all tracking counters.</summary>
-		public void Reset() { SubscribeCount = 0; UnsubscribeCount = 0; _raises.Clear(); }
-
-		/// <summary>Clears all handlers and resets tracking.</summary>
-		public void Clear() { _handler = null; Reset(); }
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
 	}
 
-	/// <summary>Tracks and raises ISkEventPatternSource.ProgressChanged.</summary>
-	public sealed class ISkEventPatternSource_ProgressChangedInterceptor
+	/// <summary>Interceptor for ProgressChanged event.</summary>
+	public sealed class ProgressChangedInterceptor
 	{
 		private global::System.Action<int>? _handler;
-		private readonly global::System.Collections.Generic.List<int> _raises = new();
 
-		/// <summary>Number of times handlers were added.</summary>
-		public int SubscribeCount { get; private set; }
+		/// <summary>Number of times event was subscribed to.</summary>
+		public int AddCount { get; private set; }
 
-		/// <summary>Number of times handlers were removed.</summary>
-		public int UnsubscribeCount { get; private set; }
+		/// <summary>Number of times event subscription was removed.</summary>
+		public int RemoveCount { get; private set; }
 
-		/// <summary>True if at least one handler is subscribed.</summary>
+		/// <summary>Whether any handlers are subscribed.</summary>
 		public bool HasSubscribers => _handler != null;
 
-		/// <summary>Number of times the event was raised.</summary>
-		public int RaiseCount => _raises.Count;
+		/// <summary>Records an event subscription.</summary>
+		public void RecordAdd(global::System.Action<int>? value) { AddCount++; _handler = (global::System.Action<int>?)global::System.Delegate.Combine(_handler, value); }
 
-		/// <summary>True if the event was raised at least once.</summary>
-		public bool WasRaised => RaiseCount > 0;
+		/// <summary>Records an event unsubscription.</summary>
+		public void RecordRemove(global::System.Action<int>? value) { RemoveCount++; _handler = (global::System.Action<int>?)global::System.Delegate.Remove(_handler, value); }
 
-		/// <summary>Arguments from the most recent raise.</summary>
-		public int? LastRaiseArgs => _raises.Count > 0 ? _raises[_raises.Count - 1] : default;
+		/// <summary>Raises the event with the specified arguments.</summary>
+		public void Raise(int obj) => _handler?.Invoke(obj);
 
-		/// <summary>All recorded raise invocations.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<int> AllRaises => _raises;
-
-		internal void Add(global::System.Action<int> handler)
-		{
-			_handler += handler;
-			SubscribeCount++;
-		}
-
-		internal void Remove(global::System.Action<int> handler)
-		{
-			_handler -= handler;
-			UnsubscribeCount++;
-		}
-
-		/// <summary>Raises the event.</summary>
-		public void Raise(int obj)
-		{
-			_raises.Add(obj);
-			_handler?.Invoke(obj);
-		}
-
-		/// <summary>Resets all tracking counters.</summary>
-		public void Reset() { SubscribeCount = 0; UnsubscribeCount = 0; _raises.Clear(); }
-
-		/// <summary>Clears all handlers and resets tracking.</summary>
-		public void Clear() { _handler = null; Reset(); }
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
 	}
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkEventPatternSource.</summary>
-	public sealed class ISkEventPatternSourceInterceptorors
-	{
-		/// <summary>Interceptor for DataReceived event.</summary>
-		public ISkEventPatternSource_DataReceivedInterceptor DataReceived { get; } = new();
-		/// <summary>Interceptor for ProgressChanged event.</summary>
-		public ISkEventPatternSource_ProgressChangedInterceptor ProgressChanged { get; } = new();
-	}
+	/// <summary>Interceptor for DataReceived event.</summary>
+	public DataReceivedInterceptor DataReceived { get; } = new();
 
-	/// <summary>Tracks invocations and configures behavior for KnockOff.Documentation.Samples.Skills.ISkEventPatternSource.</summary>
-	public ISkEventPatternSourceInterceptorors ISkEventPatternSource { get; } = new();
+	/// <summary>Interceptor for ProgressChanged event.</summary>
+	public ProgressChangedInterceptor ProgressChanged { get; } = new();
 
 	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkEventPatternSource.</summary>
 	public KnockOff.Documentation.Samples.Skills.ISkEventPatternSource AsSkEventPatternSource() => this;
 
-	event global::System.EventHandler<string> KnockOff.Documentation.Samples.Skills.ISkEventPatternSource.DataReceived
+	event global::System.EventHandler<string>? KnockOff.Documentation.Samples.Skills.ISkEventPatternSource.DataReceived
 	{
-		add => ISkEventPatternSource.DataReceived.Add(value);
-		remove => ISkEventPatternSource.DataReceived.Remove(value);
+		add => DataReceived.RecordAdd(value);
+		remove => DataReceived.RecordRemove(value);
 	}
 
-	event global::System.Action<int> KnockOff.Documentation.Samples.Skills.ISkEventPatternSource.ProgressChanged
+	event global::System.Action<int>? KnockOff.Documentation.Samples.Skills.ISkEventPatternSource.ProgressChanged
 	{
-		add => ISkEventPatternSource.ProgressChanged.Add(value);
-		remove => ISkEventPatternSource.ProgressChanged.Remove(value);
+		add => ProgressChanged.RecordAdd(value);
+		remove => ProgressChanged.RecordRemove(value);
 	}
 
 }

@@ -11,20 +11,20 @@ ICalculator calc = knockOff;
 // Test property
 calc.LastResult = 42;
 Console.WriteLine($"LastResult set to: {calc.LastResult}");
-Console.WriteLine($"  SetCount: {knockOff.ICalculator.LastResult.SetCount}");
-Console.WriteLine($"  GetCount: {knockOff.ICalculator.LastResult.GetCount}");
-Console.WriteLine($"  LastSetValue: {knockOff.ICalculator.LastResult.LastSetValue}");
+Console.WriteLine($"  SetCount: {knockOff.LastResult.SetCount}");
+Console.WriteLine($"  GetCount: {knockOff.LastResult.GetCount}");
+Console.WriteLine($"  LastSetValue: {knockOff.LastResult.LastSetValue}");
 
 // Test method with user implementation
 var result = calc.Add(10, 20);
 Console.WriteLine($"Add(10, 20) = {result}");
-Console.WriteLine($"  CallCount: {knockOff.ICalculator.Add.CallCount}");
-Console.WriteLine($"  LastCallArgs: {knockOff.ICalculator.Add.LastCallArgs}");
+Console.WriteLine($"  CallCount: {knockOff.Add2.CallCount}");
+Console.WriteLine($"  LastCallArgs: {knockOff.Add2.LastCallArgs}");
 
 // Test void method
 calc.Clear();
 Console.WriteLine($"Clear() called");
-Console.WriteLine($"  WasCalled: {knockOff.ICalculator.Clear.WasCalled}");
+Console.WriteLine($"  WasCalled: {knockOff.Clear.WasCalled}");
 
 Console.WriteLine();
 Console.WriteLine("Package test successful!");
