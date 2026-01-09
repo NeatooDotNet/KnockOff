@@ -684,3 +684,250 @@ public partial class SkRefProcessorKnockOff : ISkRefProcessor { }
 // Tracking captures INPUT value (before modification)
 // Assert.Equal(5, knockOff.Increment.LastCallArg);
 #endregion
+
+// ============================================================================
+// Quick Start - Test Usage
+// ============================================================================
+
+#region skill:SKILL:quick-start-usage
+// [Fact]
+// public void Test_DataService()
+// {
+//     var knockOff = new SkDataServiceKnockOff(count: 100);
+//     ISkDataService service = knockOff;
+//
+//     // Property - uses generated backing field
+//     service.Name = "Test";
+//     Assert.Equal("Test", service.Name);
+//     Assert.Equal(1, knockOff.Name.SetCount);
+//
+//     // Nullable method - returns null, call is still verified
+//     var description = service.GetDescription(5);
+//     Assert.Null(description);
+//     Assert.True(knockOff.GetDescription.WasCalled);
+//     Assert.Equal(5, knockOff.GetDescription.LastCallArg);
+//
+//     // Non-nullable method - returns constructor value
+//     Assert.Equal(100, service.GetCount());
+// }
+#endregion
+
+// ============================================================================
+// Inline Interface Stubs
+// ============================================================================
+
+public interface ISkInlineUserService
+{
+    SkUser? GetUser(int id);
+}
+
+public interface ISkInlineLogger
+{
+    void Log(string message);
+}
+
+#region skill:SKILL:inline-stub-pattern
+[KnockOff<ISkInlineUserService>]
+[KnockOff<ISkInlineLogger>]
+public partial class SkInlineUserServiceTests
+{
+    // Generates: Stubs.ISkInlineUserService, Stubs.ISkInlineLogger
+}
+
+// In test:
+// var stub = new SkInlineUserServiceTests.Stubs.ISkInlineUserService();
+// stub.GetUser.OnCall = (ko, id) => new SkUser { Id = id };
+//
+// ISkInlineUserService service = stub;  // Implicit conversion
+// var user = service.GetUser(42);
+//
+// Assert.True(stub.GetUser.WasCalled);
+#endregion
+
+// ============================================================================
+// Partial Properties (C# 13+)
+// ============================================================================
+
+#region skill:SKILL:partial-properties
+[KnockOff<ISkInlineUserService>]
+public partial class SkPartialPropertyTests
+{
+    public partial Stubs.ISkInlineUserService UserStub { get; }  // Auto-instantiated
+}
+#endregion
+
+// ============================================================================
+// Delegate Stubs
+// ============================================================================
+
+public delegate bool SkIsUniqueRule(string value);
+public delegate SkUser SkUserFactory(int id);
+
+#region skill:SKILL:delegate-stubs
+[KnockOff<SkIsUniqueRule>]
+[KnockOff<SkUserFactory>]
+public partial class SkValidationTests
+{
+    // Generates: Stubs.SkIsUniqueRule, Stubs.SkUserFactory
+}
+
+// In test:
+// var stub = new SkValidationTests.Stubs.SkIsUniqueRule();
+// stub.Interceptor.OnCall = (ko, value) => value != "duplicate";
+//
+// SkIsUniqueRule rule = stub;  // Implicit conversion
+// Assert.True(rule("unique"));
+// Assert.False(rule("duplicate"));
+//
+// Assert.Equal(2, stub.Interceptor.CallCount);
+// Assert.Equal("duplicate", stub.Interceptor.LastCallArg);
+#endregion
+
+// ============================================================================
+// Class Stubs
+// ============================================================================
+
+#region skill:SKILL:class-stubs-class
+public class SkEmailService
+{
+    public virtual void Send(string to, string subject, string body)
+        => Console.WriteLine($"Sending to {to}");
+
+    public virtual string ServerName { get; set; } = "default";
+}
+#endregion
+
+#region skill:SKILL:class-stubs
+[KnockOff<SkEmailService>]
+public partial class SkEmailServiceTests
+{
+    // Generates: Stubs.SkEmailService
+}
+
+// In test:
+// var stub = new SkEmailServiceTests.Stubs.SkEmailService();
+// stub.Send.OnCall = (ko, to, subject, body) => Console.WriteLine($"STUBBED: {to}");
+//
+// // Use .Object to get the EmailService instance
+// SkEmailService service = stub.Object;
+// service.Send("test@example.com", "Hello", "World");
+//
+// Assert.True(stub.Send.WasCalled);
+// Assert.Equal("test@example.com", stub.Send.LastCallArgs?.to);
+#endregion
+
+// ============================================================================
+// Class Constructor Parameters
+// ============================================================================
+
+public class SkRepository
+{
+    public string ConnectionString { get; }
+    public SkRepository(string connectionString) => ConnectionString = connectionString;
+    public virtual void Save(object entity) { }
+}
+
+#region skill:SKILL:class-constructor
+[KnockOff<SkRepository>]
+public partial class SkConstructorTests
+{
+    // Generates: Stubs.SkRepository
+}
+
+// var stub = new SkConstructorTests.Stubs.SkRepository("Server=test");
+// Assert.Equal("Server=test", stub.Object.ConnectionString);
+#endregion
+
+// ============================================================================
+// Abstract Classes
+// ============================================================================
+
+public abstract class SkBaseRepository
+{
+    public abstract string? ConnectionString { get; }
+    public abstract void Save(object entity);
+}
+
+#region skill:SKILL:abstract-classes
+[KnockOff<SkBaseRepository>]
+public partial class SkAbstractTests
+{
+    // Generates: Stubs.SkBaseRepository
+}
+
+// var stub = new SkAbstractTests.Stubs.SkBaseRepository();
+// Assert.Null(stub.Object.ConnectionString);  // default(string)
+// stub.ConnectionString.OnGet = (ko) => "Server=test";
+// Assert.Equal("Server=test", stub.Object.ConnectionString);
+#endregion
+
+// ============================================================================
+// Non-Virtual Members
+// ============================================================================
+
+public class SkNonVirtualService
+{
+    public string NonVirtualProperty { get; set; } = "Original";
+    public void NonVirtualMethod() => Console.WriteLine("Base called");
+    public virtual string VirtualProperty { get; set; } = "Virtual";
+}
+
+#region skill:SKILL:non-virtual-members
+[KnockOff<SkNonVirtualService>]
+public partial class SkNonVirtualTests
+{
+    // Generates: Stubs.SkNonVirtualService
+}
+
+// Non-virtual members are NOT intercepted. Access through .Object:
+// stub.Object.NonVirtualProperty = "Direct";
+// stub.Object.NonVirtualMethod();  // Calls base class directly
+#endregion
+
+// ============================================================================
+// Stub Minimalism
+// ============================================================================
+
+public interface ISkMinimalService
+{
+    SkUser? GetUser(int id);
+    int GetCount();
+    List<SkUser> GetUsers();
+}
+
+#region skill:SKILL:stub-minimalism
+// GOOD - minimal stub, most methods just work with smart defaults
+[KnockOff]
+public partial class SkMinimalServiceKnockOff : ISkMinimalService
+{
+    // Only define methods needing custom behavior
+    protected SkUser? GetUser(int id) => new SkUser { Id = id };
+    // GetCount returns 0, GetUsers() returns new List<SkUser>(), etc.
+}
+#endregion
+
+// ============================================================================
+// Interceptor Reset
+// ============================================================================
+
+#region skill:SKILL:interceptor-reset
+// knockOff.GetUser.Reset();  // Clears tracking AND callbacks
+// After reset: CallCount=0, OnCall=null
+// Falls back to user method or default
+#endregion
+
+// ============================================================================
+// Overload - Single Method (No Suffix)
+// ============================================================================
+
+public interface ISkSingleMethodService
+{
+    void SendEmail(string to, string subject);
+}
+
+#region skill:SKILL:overload-no-suffix
+[KnockOff]
+public partial class SkSingleMethodServiceKnockOff : ISkSingleMethodService { }
+
+// knockOff.SendEmail.CallCount;  // Single method - no suffix
+#endregion

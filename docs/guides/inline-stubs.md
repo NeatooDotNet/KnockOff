@@ -221,7 +221,7 @@ Use `[KnockOff<TClass>]` to stub virtual/abstract class members:
 
 <!-- snippet: docs:inline-stubs:class-stub-example -->
 ```csharp
-public class EmailService
+public class CsEmailService
 {
 	public virtual void Send(string to, string subject, string body)
 		=> Console.WriteLine($"Sending to {to}: {subject}");
@@ -229,20 +229,9 @@ public class EmailService
 	public virtual string ServerName { get; set; } = "default";
 }
 
-[KnockOff<EmailService>]
-public partial class EmailServiceTests
+[KnockOff<CsEmailService>]
+public partial class CsEmailServiceTests
 {
-	// Usage:
-	// var stub = new Stubs.EmailService();
-	// stub.Send.OnCall = (ko, to, subject, body) =>
-	//     Console.WriteLine($"STUBBED: {to}");
-	//
-	// // Use .Object to get the EmailService instance
-	// EmailService service = stub.Object;
-	// service.Send("test@example.com", "Hello", "World");
-	//
-	// Assert.True(stub.Send.WasCalled);
-	// Assert.Equal("test@example.com", stub.Send.LastCallArgs?.to);
 }
 ```
 <!-- /snippet -->
@@ -262,23 +251,20 @@ Non-virtual members are not intercepted. Access them through `.Object`:
 
 <!-- snippet: docs:inline-stubs:class-stub-mixed -->
 ```csharp
-public class MixedService
-{
-	public virtual string VirtualProp { get; set; } = "";
-	public string NonVirtualProp { get; set; } = "";  // Not intercepted
-}
+public static void MixedServiceExample()
+	{
+		var stub = new MixedTests.Stubs.MixedService();
 
-[KnockOff<MixedService>]
-public partial class MixedTests
-{
-	// Virtual member - has interceptor
-	// stub.VirtualProp.OnGet = (ko) => "Intercepted";
-	// Assert.Equal("Intercepted", stub.Object.VirtualProp);
-	//
-	// Non-virtual member - no interceptor, use .Object
-	// stub.Object.NonVirtualProp = "Direct";
-	// Assert.Equal("Direct", stub.Object.NonVirtualProp);
-}
+		// Virtual member - has interceptor
+		stub.VirtualProp.OnGet = (ko) => "Intercepted";
+		var virtualValue = stub.Object.VirtualProp;  // "Intercepted"
+
+		// Non-virtual member - no interceptor, use .Object
+		stub.Object.NonVirtualProp = "Direct";
+		var nonVirtualValue = stub.Object.NonVirtualProp;  // "Direct"
+
+		_ = (virtualValue, nonVirtualValue);
+	}
 ```
 <!-- /snippet -->
 
@@ -288,20 +274,13 @@ Class stubs support constructor parameters:
 
 <!-- snippet: docs:inline-stubs:class-stub-constructor -->
 ```csharp
-public class Repository
-{
-	public string ConnectionString { get; }
-	public Repository(string connectionString) => ConnectionString = connectionString;
-	public virtual InUser? GetUser(int id) => null;
-}
+public static void ConstructorChainingExample()
+	{
+		var stub = new RepoTests.Stubs.Repository("Server=test");
+		var connectionString = stub.Object.ConnectionString;  // "Server=test"
 
-[KnockOff<Repository>]
-public partial class RepoTests
-{
-	// Constructor parameters chain to base:
-	// var stub = new Stubs.Repository("Server=test");
-	// Assert.Equal("Server=test", stub.Object.ConnectionString);
-}
+		_ = connectionString;
+	}
 ```
 <!-- /snippet -->
 
