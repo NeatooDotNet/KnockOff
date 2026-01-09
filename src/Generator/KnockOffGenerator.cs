@@ -1720,6 +1720,114 @@ public class KnockOffGenerator : IIncrementalGenerator
 	}
 
 	/// <summary>
+	/// Suffix added to generic interceptor property names when a method group has both generic and non-generic overloads.
+	/// </summary>
+	private const string GenericSuffix = "Generic";
+
+	/// <summary>
+	/// Determines if a method group has both generic and non-generic overloads (a "mixed" group).
+	/// Mixed groups require two separate interceptor classes and properties.
+	/// </summary>
+	private static bool IsMixedMethodGroup(MethodGroupInfo group)
+	{
+		var overloads = group.Overloads.GetArray() ?? Array.Empty<MethodOverloadInfo>();
+		var hasGeneric = overloads.Any(o => o.IsGenericMethod);
+		var hasNonGeneric = overloads.Any(o => !o.IsGenericMethod);
+		return hasGeneric && hasNonGeneric;
+	}
+
+	/// <summary>
+	/// Splits a mixed method group into separate non-generic and generic sub-groups.
+	/// Returns (nonGenericGroup, genericGroup) where either may be null if the group isn't mixed.
+	/// </summary>
+	private static (MethodGroupInfo? NonGeneric, MethodGroupInfo? Generic) SplitMixedGroup(MethodGroupInfo group)
+	{
+		var overloads = group.Overloads.GetArray() ?? Array.Empty<MethodOverloadInfo>();
+		var nonGenericOverloads = overloads.Where(o => !o.IsGenericMethod).ToArray();
+		var genericOverloads = overloads.Where(o => o.IsGenericMethod).ToArray();
+
+		if (nonGenericOverloads.Length == 0 || genericOverloads.Length == 0)
+			return (null, null);
+
+		// Build combined parameters for non-generic overloads only
+		var nonGenericCombinedParams = BuildCombinedParametersForOverloads(nonGenericOverloads);
+
+		var nonGenericGroup = new MethodGroupInfo(
+			Name: group.Name,
+			ReturnType: group.ReturnType,
+			IsVoid: group.IsVoid,
+			IsNullable: group.IsNullable,
+			Overloads: new EquatableArray<MethodOverloadInfo>(nonGenericOverloads),
+			CombinedParameters: new EquatableArray<CombinedParameterInfo>(nonGenericCombinedParams));
+
+		// Build combined parameters for generic overloads only
+		var genericCombinedParams = BuildCombinedParametersForOverloads(genericOverloads);
+
+		var genericGroup = new MethodGroupInfo(
+			Name: group.Name + GenericSuffix,
+			ReturnType: group.ReturnType,
+			IsVoid: group.IsVoid,
+			IsNullable: group.IsNullable,
+			Overloads: new EquatableArray<MethodOverloadInfo>(genericOverloads),
+			CombinedParameters: new EquatableArray<CombinedParameterInfo>(genericCombinedParams));
+
+		return (nonGenericGroup, genericGroup);
+	}
+
+	/// <summary>
+	/// Builds combined parameter info for a set of method overloads.
+	/// Parameters not present in all overloads become nullable.
+	/// </summary>
+	private static CombinedParameterInfo[] BuildCombinedParametersForOverloads(MethodOverloadInfo[] overloads)
+	{
+		var allParamNames = new Dictionary<string, (string Type, int Count, RefKind RefKind)>();
+		var totalOverloads = overloads.Length;
+
+		foreach (var overload in overloads)
+		{
+			var parameters = overload.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+			foreach (var param in parameters)
+			{
+				if (allParamNames.TryGetValue(param.Name, out var existing))
+				{
+					allParamNames[param.Name] = (existing.Type, existing.Count + 1, existing.RefKind);
+				}
+				else
+				{
+					allParamNames[param.Name] = (param.Type, 1, param.RefKind);
+				}
+			}
+		}
+
+		var combinedParams = new List<CombinedParameterInfo>();
+		foreach (var kvp in allParamNames)
+		{
+			var paramName = kvp.Key;
+			var paramType = kvp.Value.Type;
+			var count = kvp.Value.Count;
+			var refKind = kvp.Value.RefKind;
+			var isNullable = count < totalOverloads;
+			var nullableType = isNullable ? MakeNullable(paramType) : paramType;
+
+			combinedParams.Add(new CombinedParameterInfo(paramName, paramType, nullableType, isNullable, refKind));
+		}
+
+		return combinedParams.ToArray();
+	}
+
+	/// <summary>
+	/// Gets the interceptor property name for a method, accounting for mixed groups.
+	/// For mixed groups: non-generic methods use base name, generic methods use base name + "Generic" suffix.
+	/// </summary>
+	private static string GetInterceptorPropertyName(InterfaceMemberInfo member, MethodGroupInfo group)
+	{
+		if (!IsMixedMethodGroup(group))
+			return group.Name;
+
+		return member.IsGenericMethod ? group.Name + GenericSuffix : group.Name;
+	}
+
+	/// <summary>
 	/// Generate the partial class with explicit interface implementations
 	/// </summary>
 	private static void GenerateKnockOff(SourceProductionContext context, KnockOffTypeInfo typeInfo)
@@ -1815,19 +1923,36 @@ public class KnockOffGenerator : IIncrementalGenerator
 			}
 		}
 
-		// 2. Generate flat handler classes for method groups (non-generic only)
+		// 2. Generate flat handler classes for method groups
 		foreach (var group in flatMethodGroups.Values)
 		{
-			// Skip groups that have generic methods - they need special handling
-			var groupHasGenericMethods = group.Overloads.Any(o => o.IsGenericMethod);
-			if (groupHasGenericMethods)
+			if (IsMixedMethodGroup(group))
 			{
-				// Generic methods use the Of<T>() pattern - generate base handler class
-				GenerateFlatGenericMethodHandler(sb, group, typeInfo.ClassName, flatNameMap);
+				// Mixed group: generate BOTH non-generic and generic handler classes
+				var (nonGenericGroup, genericGroup) = SplitMixedGroup(group);
+
+				if (nonGenericGroup is not null)
+				{
+					GenerateFlatMethodGroupInterceptorClassWithNames(sb, nonGenericGroup, typeInfo.ClassName, flatNameMap);
+				}
+
+				if (genericGroup is not null)
+				{
+					GenerateFlatGenericMethodHandler(sb, genericGroup, typeInfo.ClassName, flatNameMap);
+				}
 			}
 			else
 			{
-				GenerateFlatMethodGroupInterceptorClassWithNames(sb, group, typeInfo.ClassName, flatNameMap);
+				var groupHasGenericMethods = group.Overloads.Any(o => o.IsGenericMethod);
+				if (groupHasGenericMethods)
+				{
+					// Generic methods use the Of<T>() pattern - generate base handler class
+					GenerateFlatGenericMethodHandler(sb, group, typeInfo.ClassName, flatNameMap);
+				}
+				else
+				{
+					GenerateFlatMethodGroupInterceptorClassWithNames(sb, group, typeInfo.ClassName, flatNameMap);
+				}
 			}
 		}
 
@@ -1853,18 +1978,39 @@ public class KnockOffGenerator : IIncrementalGenerator
 		// 4b. Generate flat interceptor properties for method groups
 		foreach (var group in flatMethodGroups.Values)
 		{
-			var groupHasGenerics = group.Overloads.Any(o => o.IsGenericMethod);
-			if (groupHasGenerics)
+			if (IsMixedMethodGroup(group))
 			{
-				// Generic methods get a single property with Of<T>() access
-				var interceptorName = flatNameMap[$"method:{group.Name}()_generic"];
-				sb.AppendLine($"\t/// <summary>Interceptor for {group.Name} (use .Of&lt;T&gt;() to access typed handler).</summary>");
-				sb.AppendLine($"\tpublic {interceptorName}Interceptor {interceptorName} {{ get; }} = new();");
-				sb.AppendLine();
+				// Mixed group: generate BOTH non-generic and generic properties
+				var (nonGenericGroup, genericGroup) = SplitMixedGroup(group);
+
+				if (nonGenericGroup is not null)
+				{
+					GenerateFlatMethodGroupInterceptorProperties(sb, nonGenericGroup, flatNameMap);
+				}
+
+				if (genericGroup is not null)
+				{
+					var interceptorName = flatNameMap[$"method:{group.Name}()_generic"];
+					sb.AppendLine($"\t/// <summary>Interceptor for {group.Name} (generic overloads, use .Of&lt;T&gt;()).</summary>");
+					sb.AppendLine($"\tpublic {interceptorName}Interceptor {interceptorName} {{ get; }} = new();");
+					sb.AppendLine();
+				}
 			}
 			else
 			{
-				GenerateFlatMethodGroupInterceptorProperties(sb, group, flatNameMap);
+				var groupHasGenerics = group.Overloads.Any(o => o.IsGenericMethod);
+				if (groupHasGenerics)
+				{
+					// Generic methods get a single property with Of<T>() access
+					var interceptorName = flatNameMap[$"method:{group.Name}()_generic"];
+					sb.AppendLine($"\t/// <summary>Interceptor for {group.Name} (use .Of&lt;T&gt;() to access typed handler).</summary>");
+					sb.AppendLine($"\tpublic {interceptorName}Interceptor {interceptorName} {{ get; }} = new();");
+					sb.AppendLine();
+				}
+				else
+				{
+					GenerateFlatMethodGroupInterceptorProperties(sb, group, flatNameMap);
+				}
 			}
 		}
 
@@ -3922,8 +4068,9 @@ public class KnockOffGenerator : IIncrementalGenerator
 
 		// Check for OnCall callback
 		sb.AppendLine($"\t\tif (typedHandler.OnCall is {{ }} onCallCallback)");
-		if (isVoid || isTask || isValueTask)
+		if (isVoid)
 		{
+			// Void methods - call callback and return without value
 			if (paramCount == 0)
 			{
 				sb.AppendLine($"\t\t{{ onCallCallback(this); return; }}");
@@ -3931,6 +4078,18 @@ public class KnockOffGenerator : IIncrementalGenerator
 			else
 			{
 				sb.AppendLine($"\t\t{{ onCallCallback(this, {argList}); return; }}");
+			}
+		}
+		else if (isTask || isValueTask)
+		{
+			// Task/ValueTask methods - return the callback result
+			if (paramCount == 0)
+			{
+				sb.AppendLine($"\t\t{{ return onCallCallback(this); }}");
+			}
+			else
+			{
+				sb.AppendLine($"\t\t{{ return onCallCallback(this, {argList}); }}");
 			}
 		}
 		else
@@ -4269,12 +4428,53 @@ public class KnockOffGenerator : IIncrementalGenerator
 			var methodName = group.Key;
 			var overloads = group.Value;
 
-			// Check if any overload is generic
-			var hasGenericMethods = overloads.Any(m => m.IsGenericMethod);
+			// Check for mixed groups (both generic and non-generic overloads)
+			var genericOverloads = overloads.Where(m => m.IsGenericMethod).ToList();
+			var nonGenericOverloads = overloads.Where(m => !m.IsGenericMethod).ToList();
+			var isMixed = genericOverloads.Count > 0 && nonGenericOverloads.Count > 0;
 
-			if (hasGenericMethods)
+			if (isMixed)
 			{
-				// Generic methods use a single base handler with Of<T>() pattern
+				// Mixed group: handle non-generic and generic overloads separately
+
+				// Non-generic overloads get numbered suffixes if multiple, otherwise base name
+				if (nonGenericOverloads.Count == 1)
+				{
+					var key = GetMemberKey(nonGenericOverloads[0]);
+					var finalName = GetUniqueInterceptorName(methodName, usedNames);
+					nameMap[key] = finalName;
+					usedNames.Add(finalName);
+				}
+				else
+				{
+					for (int i = 0; i < nonGenericOverloads.Count; i++)
+					{
+						var key = GetMemberKey(nonGenericOverloads[i]);
+						var suffix = (i + 1).ToString();
+						var baseName = $"{methodName}{suffix}";
+						var finalName = GetUniqueInterceptorName(baseName, usedNames);
+						nameMap[key] = finalName;
+						usedNames.Add(finalName);
+					}
+				}
+
+				// Generic overloads use a handler with Generic suffix
+				var genericName = methodName + GenericSuffix;
+				var genericKey = $"method:{methodName}()_generic";
+				var genericFinalName = GetUniqueInterceptorName(genericName, usedNames);
+				nameMap[genericKey] = genericFinalName;
+				usedNames.Add(genericFinalName);
+
+				// Also map each generic overload to the generic handler
+				foreach (var overload in genericOverloads)
+				{
+					var key = GetMemberKey(overload);
+					nameMap[key] = genericFinalName;
+				}
+			}
+			else if (genericOverloads.Count > 0)
+			{
+				// All generic - use a single base handler with Of<T>() pattern
 				var genericKey = $"method:{methodName}()_generic";
 				var finalName = GetUniqueInterceptorName(methodName, usedNames);
 				nameMap[genericKey] = finalName;
@@ -6040,16 +6240,35 @@ public class KnockOffGenerator : IIncrementalGenerator
 		MethodGroupInfo group,
 		string interfaceSimpleName)
 	{
-		// Check if any overload is generic
-		var hasGenericOverload = group.Overloads.Any(o => o.IsGenericMethod);
-
-		if (hasGenericOverload)
+		// Check if this is a mixed group (has both generic and non-generic overloads)
+		if (IsMixedMethodGroup(group))
 		{
-			GenerateInlineStubGenericMethodHandlerClass(sb, group, interfaceSimpleName);
+			// Split into two sub-groups and generate both interceptor classes
+			var (nonGenericGroup, genericGroup) = SplitMixedGroup(group);
+
+			if (nonGenericGroup is not null)
+			{
+				GenerateInlineStubNonGenericMethodHandlerClass(sb, nonGenericGroup, interfaceSimpleName);
+			}
+
+			if (genericGroup is not null)
+			{
+				GenerateInlineStubGenericMethodHandlerClass(sb, genericGroup, interfaceSimpleName);
+			}
 		}
 		else
 		{
-			GenerateInlineStubNonGenericMethodHandlerClass(sb, group, interfaceSimpleName);
+			// Not mixed - use original either/or logic
+			var hasGenericOverload = group.Overloads.Any(o => o.IsGenericMethod);
+
+			if (hasGenericOverload)
+			{
+				GenerateInlineStubGenericMethodHandlerClass(sb, group, interfaceSimpleName);
+			}
+			else
+			{
+				GenerateInlineStubNonGenericMethodHandlerClass(sb, group, interfaceSimpleName);
+			}
 		}
 	}
 
@@ -6371,9 +6590,24 @@ public class KnockOffGenerator : IIncrementalGenerator
 		}
 		foreach (var group in methodGroups.Values)
 		{
-			sb.AppendLine($"\t\t\t/// <summary>Interceptor for {group.Name}.</summary>");
-			sb.AppendLine($"\t\t\tpublic {stubClassName}_{group.Name}Interceptor {group.Name} {{ get; }} = new();");
-			sb.AppendLine();
+			if (IsMixedMethodGroup(group))
+			{
+				// Mixed group: generate TWO properties (non-generic and generic with suffix)
+				sb.AppendLine($"\t\t\t/// <summary>Interceptor for {group.Name} (non-generic overloads).</summary>");
+				sb.AppendLine($"\t\t\tpublic {stubClassName}_{group.Name}Interceptor {group.Name} {{ get; }} = new();");
+				sb.AppendLine();
+
+				var genericName = group.Name + GenericSuffix;
+				sb.AppendLine($"\t\t\t/// <summary>Interceptor for {group.Name} (generic overloads, use .Of&lt;T&gt;()).</summary>");
+				sb.AppendLine($"\t\t\tpublic {stubClassName}_{genericName}Interceptor {genericName} {{ get; }} = new();");
+				sb.AppendLine();
+			}
+			else
+			{
+				sb.AppendLine($"\t\t\t/// <summary>Interceptor for {group.Name}.</summary>");
+				sb.AppendLine($"\t\t\tpublic {stubClassName}_{group.Name}Interceptor {group.Name} {{ get; }} = new();");
+				sb.AppendLine();
+			}
 		}
 		foreach (var evt in iface.Events)
 		{
@@ -6396,7 +6630,18 @@ public class KnockOffGenerator : IIncrementalGenerator
 			else
 			{
 				var group = methodGroups[member.Name];
-				GenerateInlineStubMethodImplementation(sb, member.DeclaringInterfaceFullName, member, group, stubClassName);
+
+				// For mixed groups, use the appropriate sub-group so that group.Name matches the interceptor property
+				if (IsMixedMethodGroup(group))
+				{
+					var (nonGenericGroup, genericGroup) = SplitMixedGroup(group);
+					var effectiveGroup = member.IsGenericMethod ? genericGroup! : nonGenericGroup!;
+					GenerateInlineStubMethodImplementation(sb, member.DeclaringInterfaceFullName, member, effectiveGroup, stubClassName);
+				}
+				else
+				{
+					GenerateInlineStubMethodImplementation(sb, member.DeclaringInterfaceFullName, member, group, stubClassName);
+				}
 			}
 		}
 
@@ -7515,8 +7760,9 @@ public class KnockOffGenerator : IIncrementalGenerator
 
 		// Check for OnCall callback
 		sb.AppendLine($"\t\t\t\tif (typedHandler.OnCall is {{ }} onCallCallback)");
-		if (isVoid || isTask || isValueTask)
+		if (isVoid)
 		{
+			// Void methods - call callback and return without value
 			if (paramCount == 0)
 			{
 				sb.AppendLine($"\t\t\t\t{{ onCallCallback(this); return; }}");
@@ -7524,6 +7770,18 @@ public class KnockOffGenerator : IIncrementalGenerator
 			else
 			{
 				sb.AppendLine($"\t\t\t\t{{ onCallCallback(this, {argList}); return; }}");
+			}
+		}
+		else if (isTask || isValueTask)
+		{
+			// Task/ValueTask methods - return the callback result
+			if (paramCount == 0)
+			{
+				sb.AppendLine($"\t\t\t\t{{ return onCallCallback(this); }}");
+			}
+			else
+			{
+				sb.AppendLine($"\t\t\t\t{{ return onCallCallback(this, {argList}); }}");
 			}
 		}
 		else

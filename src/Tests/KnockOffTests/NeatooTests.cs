@@ -626,6 +626,93 @@ public partial class InlineValidateBaseTests
 // Use standalone stubs for IEntityBase until this is resolved.
 // See EntityBaseStandaloneTests for IEntityBase testing.
 
+/// <summary>
+/// Tests for inline IRuleManager stubs using [KnockOff&lt;T&gt;] attribute.
+/// IRuleManager has mixed overloads: RunRule(IRule, token) and RunRule&lt;T&gt;(token).
+/// </summary>
+[KnockOff<Neatoo.Rules.IRuleManager>]
+public partial class InlineRuleManagerTests
+{
+    [Fact]
+    public void InlineStub_CanBeInstantiated()
+    {
+        var stub = new Stubs.IRuleManager();
+        Neatoo.Rules.IRuleManager ruleManager = stub;
+
+        Assert.NotNull(ruleManager);
+    }
+
+    [Fact]
+    public async Task InlineStub_RunRule_NonGeneric_TracksCall()
+    {
+        var stub = new Stubs.IRuleManager();
+        Neatoo.Rules.IRuleManager ruleManager = stub;
+
+        // Non-generic RunRule should use the RunRule interceptor (not RunRuleGeneric)
+        await ruleManager.RunRule(null!, null);
+
+        Assert.True(stub.RunRule.WasCalled);
+        Assert.Equal(1, stub.RunRule.CallCount);
+    }
+
+    [Fact]
+    public async Task InlineStub_RunRule_Generic_TracksCall()
+    {
+        var stub = new Stubs.IRuleManager();
+        Neatoo.Rules.IRuleManager ruleManager = stub;
+
+        // Generic RunRule<T> should use the RunRuleGeneric interceptor with Of<T>()
+        await ruleManager.RunRule<TestRule>(null);
+
+        Assert.True(stub.RunRuleGeneric.WasCalled);
+        Assert.True(stub.RunRuleGeneric.Of<TestRule>().WasCalled);
+        Assert.Equal(1, stub.RunRuleGeneric.Of<TestRule>().CallCount);
+    }
+
+    [Fact]
+    public async Task InlineStub_RunRules_TracksCall()
+    {
+        var stub = new Stubs.IRuleManager();
+        Neatoo.Rules.IRuleManager ruleManager = stub;
+
+        await ruleManager.RunRules("PropertyName", null);
+
+        Assert.True(stub.RunRules.WasCalled);
+        Assert.Equal(1, stub.RunRules.CallCount);
+    }
+
+    [Fact]
+    public void InlineStub_AddRule_Generic_TracksCall()
+    {
+        var stub = new Stubs.IRuleManager();
+        Neatoo.Rules.IRuleManager ruleManager = stub;
+
+        ruleManager.AddRule<IValidateBase>(null!);
+
+        Assert.True(stub.AddRule.WasCalled);
+        Assert.True(stub.AddRule.Of<IValidateBase>().WasCalled);
+    }
+
+    [Fact]
+    public void InlineStub_Rules_Property_CanBeConfigured()
+    {
+        var stub = new Stubs.IRuleManager();
+        Neatoo.Rules.IRuleManager ruleManager = stub;
+
+        var rules = new List<Neatoo.Rules.IRule>();
+        stub.Rules.Value = rules;
+
+        Assert.Same(rules, ruleManager.Rules);
+        Assert.Equal(1, stub.Rules.GetCount);
+    }
+
+    // Use KnockOff to stub IRule for the generic method test
+    [KnockOff]
+    private partial class TestRule : Neatoo.Rules.IRule
+    {
+    }
+}
+
 #endregion
 
 #region Inline Delegate Stub Tests
