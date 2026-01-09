@@ -64,6 +64,33 @@ public class SkillSamplesTests : SamplesTestBase
     }
 
     // ========================================================================
+    // skill:SKILL:quick-start-usage
+    // ========================================================================
+
+    [Fact]
+    public void QuickStart_Usage_DemonstratesAllFeatures()
+    {
+        #region skill:SKILL:quick-start-usage
+        var knockOff = new SkDataServiceKnockOff(count: 100);
+        ISkDataService service = knockOff;
+
+        // Property - uses generated backing field
+        service.Name = "Test";
+        Assert.Equal("Test", service.Name);
+        Assert.Equal(1, knockOff.Name.SetCount);
+
+        // Nullable method - returns null, call is still tracked
+        var description = service.GetDescription(5);
+        Assert.Null(description);
+        Assert.True(knockOff.GetDescription.WasCalled);
+        Assert.Equal(5, knockOff.GetDescription.LastCallArg);
+
+        // Non-nullable method - returns constructor value
+        Assert.Equal(100, service.GetCount());
+        #endregion
+    }
+
+    // ========================================================================
     // skill:SKILL:interface-access - Multi-interface tests removed (KO0010)
     // ========================================================================
 
@@ -580,5 +607,72 @@ public class SkillSamplesTests : SamplesTestBase
 
         Assert.Equal(10, x);
         Assert.Equal(5, knockOff.Increment.LastCallArg); // Original input
+    }
+
+    // ========================================================================
+    // skill:SKILL:inline-stub-usage
+    // ========================================================================
+
+    [Fact]
+    public void InlineStub_Usage_DemonstratesPattern()
+    {
+        #region skill:SKILL:inline-stub-usage
+        var stub = new SkInlineUserServiceTests.Stubs.ISkInlineUserService();
+        stub.GetUser.OnCall = (ko, id) => new SkUser { Id = id };
+
+        ISkInlineUserService service = stub;  // Implicit conversion
+        var user = service.GetUser(42);
+
+        Assert.True(stub.GetUser.WasCalled);
+        #endregion
+        Assert.Equal(42, user?.Id);
+    }
+
+    // ========================================================================
+    // skill:SKILL:delegate-stubs-usage
+    // ========================================================================
+
+    [Fact]
+    public void DelegateStub_Usage_DemonstratesPattern()
+    {
+        #region skill:SKILL:delegate-stubs-usage
+        var stub = new SkValidationTests.Stubs.SkIsUniqueRule();
+        stub.Interceptor.OnCall = (ko, value) => value != "duplicate";
+
+        SkIsUniqueRule rule = stub;  // Implicit conversion
+        Assert.True(rule("unique"));
+        Assert.False(rule("duplicate"));
+
+        Assert.Equal(2, stub.Interceptor.CallCount);
+        Assert.Equal("duplicate", stub.Interceptor.LastCallArg);
+        #endregion
+    }
+
+    // ========================================================================
+    // skill:SKILL:smart-defaults-usage
+    // ========================================================================
+
+    [Fact]
+    public void SmartDefaults_Usage_DemonstratesPattern()
+    {
+        #region skill:SKILL:smart-defaults-usage
+        var knockOff = new SkSmartDefaultKnockOff();
+        ISkSmartDefaultService service = knockOff;
+
+        // No configuration needed:
+        var count = service.GetCount();       // 0 (value type)
+        var items = service.GetItems();       // new List<string>() (has new())
+        var list = service.GetIList();        // new List<string>() (IList<T> -> List<T>)
+        var optional = service.GetOptional(); // null (nullable ref)
+        #endregion
+
+        Assert.Equal(0, count);
+        Assert.NotNull(items);
+        Assert.Empty(items);
+        Assert.NotNull(list);
+        Assert.Null(optional);
+
+        // Only throws for types that can't be safely defaulted:
+        Assert.Throws<InvalidOperationException>(() => service.GetDisposable());
     }
 }

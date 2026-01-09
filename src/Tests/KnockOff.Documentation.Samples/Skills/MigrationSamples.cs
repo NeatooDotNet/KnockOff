@@ -41,10 +41,6 @@ public partial class MgClassStubTests
 {
     // Generates: Stubs.MgUserService
 }
-
-// var stub = new MgClassStubTests.Stubs.MgUserService();
-// stub.GetUser.OnCall = (ko, id) => new MgUser { Id = id };  // Direct access!
-// MgUserService service = stub.Object;  // Use .Object for type
 #endregion
 
 // ============================================================================
@@ -65,10 +61,6 @@ public interface IMgParser
 #region skill:migrations:v10-8-works-same
 [KnockOff]
 public partial class MgUserServiceKnockOff : IMgUserService { }
-
-// Works the same
-// knockOff.GetUser.CallCount
-// knockOff.GetUser.OnCall = (ko, id) => new MgUser();
 #endregion
 
 // ============================================================================
@@ -83,10 +75,6 @@ public interface IMgLogger
 #region skill:migrations:v10-7-works-same
 [KnockOff]
 public partial class MgLoggerKnockOff : IMgLogger { }
-
-// Works the same
-// knockOff.Log.CallCount
-// knockOff.Name.OnGet = (ko) => "Test";
 #endregion
 
 // ============================================================================
@@ -101,20 +89,4 @@ public interface IMgService
 #region skill:migrations:v10-7-callback-capture
 [KnockOff]
 public partial class MgServiceKnockOff : IMgService { }
-
-// Before
-// var allCalls = knockOff.GetUser.AllCalls;
-// Assert.Equal(3, allCalls.Count);
-
-// After - use count and last value
-// Assert.Equal(3, knockOff.GetUser.CallCount);
-// Assert.Equal(42, knockOff.GetUser.LastCallArg);
-
-// Or capture in callback if you need full history
-// var allCalls = new List<int>();
-// knockOff.GetUser.OnCall = (ko, id) =>
-// {
-//     allCalls.Add(id);
-//     return new MgUser { Id = id };
-// };
 #endregion
