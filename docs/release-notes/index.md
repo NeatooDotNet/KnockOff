@@ -8,6 +8,7 @@ Releases with notable changes.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| [v10.10.0](v10.10.0.md) | 2026-01-08 | Inline stubs generic methods support |
 | [v10.7.0](v10.7.0.md) | 2026-01-06 | **Breaking:** Spy→KO rename, zero-allocation tracking |
 | [v10.6.0](v10.6.0.md) | 2026-01-04 | Generic methods support with `.Of<T>()` pattern |
 | [v10.5.0](v10.5.0.md) | 2026-01-03 | **Breaking:** Interface-scoped handlers, smart defaults |
@@ -17,6 +18,9 @@ Releases with notable changes.
 
 ## All Releases
 
+- [v10.10.0](v10.10.0.md) - 2026-01-08 - Inline stubs generic methods support
+- [v10.9.0](v10.9.0.md) - 2026-01-07 - **Breaking:** Flat API, single interface constraint, class stub composition
+- [v10.8.0](v10.8.0.md) - 2026-01-07 - Inline stubs, delegate stubs, class stubs
 - [v10.7.0](v10.7.0.md) - 2026-01-06 - **Breaking:** Spy→KO rename, zero-allocation tracking
 - [v10.6.0](v10.6.0.md) - 2026-01-04 - Generic methods support with `.Of<T>()` pattern
 - [v10.5.2](v10.5.2.md) - 2026-01-04 - Nested class support for test organization

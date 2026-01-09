@@ -5791,6 +5791,15 @@ public class KnockOffGenerator : IIncrementalGenerator
 		sb.AppendLine("\tpublic static class Stubs");
 		sb.AppendLine("\t{");
 
+		// Check if any interface has generic methods - if so, generate helper interfaces
+		var hasGenericMethods = info.Interfaces.Any(i => i.Members.Any(m => m.IsGenericMethod));
+		if (hasGenericMethods)
+		{
+			sb.AppendLine("\t\tprivate interface IGenericMethodCallTracker { int CallCount { get; } bool WasCalled { get; } }");
+			sb.AppendLine("\t\tprivate interface IResettable { void Reset(); }");
+			sb.AppendLine();
+		}
+
 		foreach (var iface in info.Interfaces)
 		{
 			// Generate handler classes for this interface's members
@@ -6031,6 +6040,24 @@ public class KnockOffGenerator : IIncrementalGenerator
 		MethodGroupInfo group,
 		string interfaceSimpleName)
 	{
+		// Check if any overload is generic
+		var hasGenericOverload = group.Overloads.Any(o => o.IsGenericMethod);
+
+		if (hasGenericOverload)
+		{
+			GenerateInlineStubGenericMethodHandlerClass(sb, group, interfaceSimpleName);
+		}
+		else
+		{
+			GenerateInlineStubNonGenericMethodHandlerClass(sb, group, interfaceSimpleName);
+		}
+	}
+
+	private static void GenerateInlineStubNonGenericMethodHandlerClass(
+		System.Text.StringBuilder sb,
+		MethodGroupInfo group,
+		string interfaceSimpleName)
+	{
 		var interceptClassName = $"{interfaceSimpleName}_{group.Name}Interceptor";
 		var stubClassName = $"Stubs.{interfaceSimpleName}";
 		var inputParams = GetInputCombinedParameters(group.CombinedParameters).ToArray();
@@ -6104,6 +6131,179 @@ public class KnockOffGenerator : IIncrementalGenerator
 		sb.AppendLine("OnCall = null; }");
 
 		sb.AppendLine("\t\t}");
+		sb.AppendLine();
+	}
+
+	private static void GenerateInlineStubGenericMethodHandlerClass(
+		System.Text.StringBuilder sb,
+		MethodGroupInfo group,
+		string interfaceSimpleName)
+	{
+		var interceptClassName = $"{interfaceSimpleName}_{group.Name}Interceptor";
+		var stubClassName = $"Stubs.{interfaceSimpleName}";
+
+		// Get the first generic overload's type parameters (all generic overloads should have same type param count)
+		var genericOverload = group.Overloads.First(o => o.IsGenericMethod);
+		var typeParams = genericOverload.TypeParameters.GetArray()!;
+		var typeParamNames = string.Join(", ", typeParams.Select(tp => tp.Name));
+		var typeParamCount = typeParams.Length;
+
+		// Build constraint clauses for the type parameters
+		var constraintClauses = GetConstraintClauses(typeParams);
+
+		// Get non-generic parameters (parameters that are not type parameters)
+		var typeParamSet = new HashSet<string>(typeParams.Select(tp => tp.Name));
+		var nonGenericParams = GetInputCombinedParameters(group.CombinedParameters)
+			.Where(p => !IsGenericParameterType(p.Type, typeParamSet))
+			.ToArray();
+
+		var isVoid = group.IsVoid;
+
+		// Build the dictionary key type based on number of type parameters
+		var keyType = typeParamCount == 1
+			? "global::System.Type"
+			: $"({string.Join(", ", typeParams.Select(_ => "global::System.Type"))})";
+
+		var keyConstruction = typeParamCount == 1
+			? $"typeof({typeParams[0].Name})"
+			: $"({string.Join(", ", typeParams.Select(tp => $"typeof({tp.Name})"))})";
+
+		sb.AppendLine($"\t\t/// <summary>Interceptor for {interfaceSimpleName}.{group.Name}.</summary>");
+		sb.AppendLine($"\t\tpublic sealed class {interceptClassName}");
+		sb.AppendLine("\t\t{");
+
+		// --- Base Handler: Dictionary + Of<T>() + aggregate tracking ---
+		sb.AppendLine($"\t\t\tprivate readonly global::System.Collections.Generic.Dictionary<{keyType}, object> _typedHandlers = new();");
+		sb.AppendLine();
+
+		// Of<T>() method
+		sb.AppendLine($"\t\t\t/// <summary>Gets the typed handler for the specified type argument(s).</summary>");
+		sb.AppendLine($"\t\t\tpublic {group.Name}TypedHandler<{typeParamNames}> Of<{typeParamNames}>(){constraintClauses}");
+		sb.AppendLine("\t\t\t{");
+		sb.AppendLine($"\t\t\t\tvar key = {keyConstruction};");
+		sb.AppendLine($"\t\t\t\tif (!_typedHandlers.TryGetValue(key, out var handler))");
+		sb.AppendLine("\t\t\t\t{");
+		sb.AppendLine($"\t\t\t\t\thandler = new {group.Name}TypedHandler<{typeParamNames}>();");
+		sb.AppendLine("\t\t\t\t\t_typedHandlers[key] = handler;");
+		sb.AppendLine("\t\t\t\t}");
+		sb.AppendLine($"\t\t\t\treturn ({group.Name}TypedHandler<{typeParamNames}>)handler;");
+		sb.AppendLine("\t\t\t}");
+		sb.AppendLine();
+
+		// Aggregate tracking
+		sb.AppendLine("\t\t\t/// <summary>Total number of calls across all type arguments.</summary>");
+		sb.AppendLine("\t\t\tpublic int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);");
+		sb.AppendLine();
+		sb.AppendLine("\t\t\t/// <summary>True if this method was called with any type argument.</summary>");
+		sb.AppendLine("\t\t\tpublic bool WasCalled => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Any(h => h.WasCalled);");
+		sb.AppendLine();
+		sb.AppendLine($"\t\t\t/// <summary>All type argument(s) that were used in calls.</summary>");
+		sb.AppendLine($"\t\t\tpublic global::System.Collections.Generic.IReadOnlyList<{keyType}> CalledTypeArguments => _typedHandlers.Keys.ToList();");
+		sb.AppendLine();
+
+		// Reset method
+		sb.AppendLine("\t\t\t/// <summary>Resets all typed handlers.</summary>");
+		sb.AppendLine("\t\t\tpublic void Reset()");
+		sb.AppendLine("\t\t\t{");
+		sb.AppendLine("\t\t\t\tforeach (var handler in _typedHandlers.Values.Cast<IResettable>())");
+		sb.AppendLine("\t\t\t\t\thandler.Reset();");
+		sb.AppendLine("\t\t\t\t_typedHandlers.Clear();");
+		sb.AppendLine("\t\t\t}");
+		sb.AppendLine();
+
+		// --- Nested Typed Handler Class ---
+		sb.AppendLine($"\t\t\t/// <summary>Typed handler for {group.Name} with specific type arguments.</summary>");
+		sb.AppendLine($"\t\t\tpublic sealed class {group.Name}TypedHandler<{typeParamNames}> : IGenericMethodCallTracker, IResettable{constraintClauses}");
+		sb.AppendLine("\t\t\t{");
+
+		// Delegate type - need to use actual return type which may include type parameters
+		var delegateReturnType = isVoid ? "void" : group.ReturnType;
+
+		// Get all parameters from the generic overload for the delegate signature
+		var allParams = genericOverload.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+		var delegateParams = new List<string> { $"{stubClassName} ko" };
+		foreach (var p in allParams)
+		{
+			delegateParams.Add($"{p.Type} {p.Name}");
+		}
+		var delegateParamList = string.Join(", ", delegateParams);
+
+		sb.AppendLine($"\t\t\t\t/// <summary>Delegate for {group.Name}.</summary>");
+		if (isVoid)
+		{
+			sb.AppendLine($"\t\t\t\tpublic delegate void {group.Name}Delegate({delegateParamList});");
+		}
+		else
+		{
+			sb.AppendLine($"\t\t\t\tpublic delegate {delegateReturnType} {group.Name}Delegate({delegateParamList});");
+		}
+		sb.AppendLine();
+
+		// Tracking storage - based on non-generic parameter count (no List for performance)
+		sb.AppendLine("\t\t\t\t/// <summary>Number of times this method was called with these type arguments.</summary>");
+		sb.AppendLine("\t\t\t\tpublic int CallCount { get; private set; }");
+		sb.AppendLine();
+
+		if (nonGenericParams.Length == 1)
+		{
+			var param = nonGenericParams[0];
+			var nullableType = MakeNullable(param.Type);
+			sb.AppendLine($"\t\t\t\t/// <summary>The '{param.Name}' argument from the most recent call.</summary>");
+			sb.AppendLine($"\t\t\t\tpublic {nullableType} LastCallArg {{ get; private set; }}");
+			sb.AppendLine();
+		}
+		else if (nonGenericParams.Length > 1)
+		{
+			var tupleType = "(" + string.Join(", ", nonGenericParams.Select(p => $"{p.Type} {p.Name}")) + ")";
+			sb.AppendLine("\t\t\t\t/// <summary>The arguments from the most recent call.</summary>");
+			sb.AppendLine($"\t\t\t\tpublic {tupleType}? LastCallArgs {{ get; private set; }}");
+			sb.AppendLine();
+		}
+
+		sb.AppendLine("\t\t\t\t/// <summary>True if this method was called at least once with these type arguments.</summary>");
+		sb.AppendLine("\t\t\t\tpublic bool WasCalled => CallCount > 0;");
+		sb.AppendLine();
+
+		sb.AppendLine("\t\t\t\t/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>");
+		sb.AppendLine($"\t\t\t\tpublic {group.Name}Delegate? OnCall {{ get; set; }}");
+		sb.AppendLine();
+
+		// RecordCall method
+		sb.AppendLine("\t\t\t\t/// <summary>Records a method call.</summary>");
+		if (nonGenericParams.Length == 0)
+		{
+			sb.AppendLine("\t\t\t\tpublic void RecordCall() => CallCount++;");
+		}
+		else if (nonGenericParams.Length == 1)
+		{
+			var param = nonGenericParams[0];
+			sb.AppendLine($"\t\t\t\tpublic void RecordCall({param.Type} {param.Name}) {{ CallCount++; LastCallArg = {param.Name}; }}");
+		}
+		else
+		{
+			var paramList = string.Join(", ", nonGenericParams.Select(p => $"{p.Type} {p.Name}"));
+			var tupleConstruction = "(" + string.Join(", ", nonGenericParams.Select(p => p.Name)) + ")";
+			sb.AppendLine($"\t\t\t\tpublic void RecordCall({paramList}) {{ CallCount++; LastCallArgs = {tupleConstruction}; }}");
+		}
+		sb.AppendLine();
+
+		// Reset method
+		sb.AppendLine("\t\t\t\t/// <summary>Resets all tracking state.</summary>");
+		if (nonGenericParams.Length == 0)
+		{
+			sb.AppendLine("\t\t\t\tpublic void Reset() { CallCount = 0; OnCall = null; }");
+		}
+		else if (nonGenericParams.Length == 1)
+		{
+			sb.AppendLine("\t\t\t\tpublic void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }");
+		}
+		else
+		{
+			sb.AppendLine("\t\t\t\tpublic void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }");
+		}
+
+		sb.AppendLine("\t\t\t}"); // Close TypedHandler class
+		sb.AppendLine("\t\t}"); // Close Interceptor class
 		sb.AppendLine();
 	}
 
@@ -6204,6 +6404,34 @@ public class KnockOffGenerator : IIncrementalGenerator
 		foreach (var evt in iface.Events)
 		{
 			GenerateInlineStubEventImplementation(sb, evt.DeclaringInterfaceFullName, evt, stubClassName);
+		}
+
+		// Generate SmartDefault helper if interface has generic methods
+		var hasGenericMethods = iface.Members.Any(m => m.IsGenericMethod);
+		if (hasGenericMethods)
+		{
+			sb.AppendLine("\t\t\t/// <summary>Gets a smart default value for a generic type at runtime.</summary>");
+			sb.AppendLine("\t\t\tprivate static T SmartDefault<T>(string methodName)");
+			sb.AppendLine("\t\t\t{");
+			sb.AppendLine("\t\t\t\tvar type = typeof(T);");
+			sb.AppendLine();
+			sb.AppendLine("\t\t\t\t// Value types -> default(T)");
+			sb.AppendLine("\t\t\t\tif (type.IsValueType)");
+			sb.AppendLine("\t\t\t\t\treturn default!;");
+			sb.AppendLine();
+			sb.AppendLine("\t\t\t\t// Check for parameterless constructor");
+			sb.AppendLine("\t\t\t\tvar ctor = type.GetConstructor(");
+			sb.AppendLine("\t\t\t\t\tSystem.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,");
+			sb.AppendLine("\t\t\t\t\tnull, System.Type.EmptyTypes, null);");
+			sb.AppendLine();
+			sb.AppendLine("\t\t\t\tif (ctor != null)");
+			sb.AppendLine("\t\t\t\t\treturn (T)ctor.Invoke(null);");
+			sb.AppendLine();
+			sb.AppendLine("\t\t\t\tthrow new global::System.InvalidOperationException(");
+			sb.AppendLine("\t\t\t\t\t$\"No implementation provided for {methodName}<{type.Name}>. \" +");
+			sb.AppendLine("\t\t\t\t\t$\"Set the handler's OnCall.\");");
+			sb.AppendLine("\t\t\t}");
+			sb.AppendLine();
 		}
 
 		sb.AppendLine("\t\t}");
@@ -7143,6 +7371,23 @@ public class KnockOffGenerator : IIncrementalGenerator
 		MethodGroupInfo group,
 		string stubClassName)
 	{
+		if (member.IsGenericMethod)
+		{
+			GenerateInlineStubGenericMethodImplementation(sb, interfaceFullName, member, group, stubClassName);
+		}
+		else
+		{
+			GenerateInlineStubNonGenericMethodImplementation(sb, interfaceFullName, member, group, stubClassName);
+		}
+	}
+
+	private static void GenerateInlineStubNonGenericMethodImplementation(
+		System.Text.StringBuilder sb,
+		string interfaceFullName,
+		InterfaceMemberInfo member,
+		MethodGroupInfo group,
+		string stubClassName)
+	{
 		var paramList = string.Join(", ", member.Parameters.Select(p => FormatParameter(p)));
 		var inputParams = GetInputParameters(member.Parameters).ToArray();
 		var outParams = member.Parameters.Where(p => IsOutputParameter(p.RefKind)).ToArray();
@@ -7216,6 +7461,104 @@ public class KnockOffGenerator : IIncrementalGenerator
 			sb.AppendLine($"\t\t\t\tif ({group.Name}.OnCall is {{ }} onCall) return onCall({onCallArgs});");
 			var defaultExpr = GetDefaultForType(member.ReturnType, member.DefaultStrategy, member.ConcreteTypeForNew);
 			sb.AppendLine($"\t\t\t\treturn {defaultExpr};");
+		}
+
+		sb.AppendLine("\t\t\t}");
+		sb.AppendLine();
+	}
+
+	private static void GenerateInlineStubGenericMethodImplementation(
+		System.Text.StringBuilder sb,
+		string interfaceFullName,
+		InterfaceMemberInfo member,
+		MethodGroupInfo group,
+		string stubClassName)
+	{
+		var typeParams = member.TypeParameters.GetArray()!;
+		var typeParamNames = string.Join(", ", typeParams.Select(tp => tp.Name));
+
+		// For nullable reference type returns (T? where T : class), we need to include the class constraint
+		// in the explicit implementation. C# 9+ allows class/struct constraints in explicit implementations.
+		var constraintClauses = GetClassOrStructConstraintsOnly(typeParams);
+
+		var paramList = string.Join(", ", member.Parameters.Select(p => FormatParameter(p)));
+		var argList = string.Join(", ", member.Parameters.Select(p => FormatArgument(p)));
+		var paramCount = member.Parameters.Count;
+
+		// Get non-generic parameters for RecordCall
+		var typeParamSet = new HashSet<string>(typeParams.Select(tp => tp.Name));
+		var nonGenericParams = member.Parameters
+			.Where(p => !IsGenericParameterType(p.Type, typeParamSet))
+			.ToArray();
+		var nonGenericArgList = string.Join(", ", nonGenericParams.Select(p => p.Name));
+
+		var isVoid = member.ReturnType == "void";
+		var isTask = member.ReturnType == "global::System.Threading.Tasks.Task";
+		var isValueTask = member.ReturnType == "global::System.Threading.Tasks.ValueTask";
+
+		// Generate method signature with type parameters (only class/struct constraints allowed in explicit impl)
+		sb.AppendLine($"\t\t\t{member.ReturnType} {interfaceFullName}.{member.Name}<{typeParamNames}>({paramList}){constraintClauses}");
+		sb.AppendLine("\t\t\t{");
+
+		// Get the typed handler via Of<T>()
+		sb.AppendLine($"\t\t\t\tvar typedHandler = {group.Name}.Of<{typeParamNames}>();");
+
+		// Record the call
+		if (nonGenericParams.Length > 0)
+		{
+			sb.AppendLine($"\t\t\t\ttypedHandler.RecordCall({nonGenericArgList});");
+		}
+		else
+		{
+			sb.AppendLine($"\t\t\t\ttypedHandler.RecordCall();");
+		}
+
+		// Check for OnCall callback
+		sb.AppendLine($"\t\t\t\tif (typedHandler.OnCall is {{ }} onCallCallback)");
+		if (isVoid || isTask || isValueTask)
+		{
+			if (paramCount == 0)
+			{
+				sb.AppendLine($"\t\t\t\t{{ onCallCallback(this); return; }}");
+			}
+			else
+			{
+				sb.AppendLine($"\t\t\t\t{{ onCallCallback(this, {argList}); return; }}");
+			}
+		}
+		else
+		{
+			if (paramCount == 0)
+			{
+				sb.AppendLine($"\t\t\t\t\treturn onCallCallback(this);");
+			}
+			else
+			{
+				sb.AppendLine($"\t\t\t\t\treturn onCallCallback(this, {argList});");
+			}
+		}
+
+		// Default behavior
+		if (isVoid)
+		{
+			// void - no return needed
+		}
+		else if (isTask)
+		{
+			sb.AppendLine($"\t\t\t\treturn global::System.Threading.Tasks.Task.CompletedTask;");
+		}
+		else if (isValueTask)
+		{
+			sb.AppendLine($"\t\t\t\treturn default;");
+		}
+		else if (member.IsNullable)
+		{
+			sb.AppendLine($"\t\t\t\treturn default!;");
+		}
+		else
+		{
+			// Non-nullable return - use SmartDefault helper for runtime evaluation
+			sb.AppendLine($"\t\t\t\treturn SmartDefault<{member.ReturnType}>(\"{member.Name}\");");
 		}
 
 		sb.AppendLine("\t\t\t}");

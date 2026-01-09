@@ -141,6 +141,109 @@ public class InlineStubTests
 		Assert.True(stub.DoSomething.WasCalled);
 	}
 #endif
+
+	#region Inline Stub Generic Method Tests
+
+	[Fact]
+	public void InlineStub_GenericMethod_TracksCallCount()
+	{
+		var stub = new InlineGenericMethodTest.Stubs.IGenericMethodService();
+		IGenericMethodService service = stub;
+
+		service.Create<TestEntity>();
+		service.Create<TestEntity>();
+
+		Assert.Equal(2, stub.Create.Of<TestEntity>().CallCount);
+		Assert.True(stub.Create.Of<TestEntity>().WasCalled);
+	}
+
+	[Fact]
+	public void InlineStub_GenericMethod_DifferentTypeArgs_TrackedSeparately()
+	{
+		var stub = new InlineGenericMethodTest.Stubs.IGenericMethodService();
+		IGenericMethodService service = stub;
+
+		service.Create<TestEntity>();
+		service.Create<List<int>>();
+		service.Create<List<int>>();
+
+		Assert.Equal(1, stub.Create.Of<TestEntity>().CallCount);
+		Assert.Equal(2, stub.Create.Of<List<int>>().CallCount);
+	}
+
+	[Fact]
+	public void InlineStub_GenericMethod_TotalCallCount_AcrossTypeArgs()
+	{
+		var stub = new InlineGenericMethodTest.Stubs.IGenericMethodService();
+		IGenericMethodService service = stub;
+
+		service.Create<TestEntity>();
+		service.Create<List<int>>();
+		service.Create<List<string>>();
+
+		Assert.Equal(3, stub.Create.TotalCallCount);
+	}
+
+	[Fact]
+	public void InlineStub_GenericMethod_OnCall_ReturnsConfiguredValue()
+	{
+		var stub = new InlineGenericMethodTest.Stubs.IGenericMethodService();
+		IGenericMethodService service = stub;
+
+		var expected = new TestEntity { Id = 42, Name = "Test" };
+		stub.Create.Of<TestEntity>().OnCall = (ko) => expected;
+
+		var result = service.Create<TestEntity>();
+
+		Assert.Same(expected, result);
+	}
+
+	[Fact]
+	public void InlineStub_GenericMethod_VoidWithParam_TracksCount()
+	{
+		var stub = new InlineGenericMethodTest.Stubs.IGenericMethodService();
+		IGenericMethodService service = stub;
+
+		service.Process("hello");
+		service.Process(42);
+		service.Process(42);
+
+		Assert.Equal(1, stub.Process.Of<string>().CallCount);
+		Assert.Equal(2, stub.Process.Of<int>().CallCount);
+	}
+
+	[Fact]
+	public void InlineStub_GenericMethod_MultipleTypeParams_Works()
+	{
+		var stub = new InlineGenericMethodTest.Stubs.IGenericMethodService();
+		IGenericMethodService service = stub;
+
+		// Set up OnCall for int->string since string has no parameterless ctor
+		stub.Convert.Of<int, string>().OnCall = (ko, i) => i.ToString();
+
+		service.Convert<string, int>("hello");
+		service.Convert<int, string>(42);
+
+		Assert.Equal(1, stub.Convert.Of<string, int>().CallCount);
+		Assert.Equal(1, stub.Convert.Of<int, string>().CallCount);
+	}
+
+	[Fact]
+	public void InlineStub_GenericMethod_Reset_ClearsAll()
+	{
+		var stub = new InlineGenericMethodTest.Stubs.IGenericMethodService();
+		IGenericMethodService service = stub;
+
+		service.Create<TestEntity>();
+		service.Create<List<int>>();
+
+		stub.Create.Reset();
+
+		Assert.Equal(0, stub.Create.TotalCallCount);
+		Assert.False(stub.Create.WasCalled);
+	}
+
+	#endregion
 }
 
 #region Delegate Stub Tests
@@ -414,6 +517,14 @@ public partial class InlineTestClass
 [KnockOff<ISimpleService>]
 [KnockOff<ISimpleLogger>]
 public partial class MultiInterfaceInlineTest
+{
+}
+
+/// <summary>
+/// Test class with generic methods via [KnockOff&lt;T&gt;] attribute.
+/// </summary>
+[KnockOff<IGenericMethodService>]
+public partial class InlineGenericMethodTest
 {
 }
 
