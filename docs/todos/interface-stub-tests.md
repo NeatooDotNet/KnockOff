@@ -11,6 +11,37 @@ Each interface gets:
 2. **Standalone stub** - stub class in a separate file
 3. **Tests** - verify stub behavior and interceptor functionality
 
+## Status: COMPLETED ✅
+
+**Completed 2025-01-09** - Created comprehensive tests for top 30 BCL interfaces:
+- **88 inline stub tests** in `BclInterfaceTests.cs` - ALL PASSING
+- **29 standalone stub tests** in `BclStandaloneTests.cs` - ALL PASSING
+- **Stub definitions** in `BclInterfaceStubs.cs` (inline) and `BclStandaloneStubs.cs` (standalone)
+
+### Generator Bugs Found During Testing
+
+**FIXED (2026-01-09):**
+
+1. ✅ **IEnumerator\<T\> - Duplicate interceptor**
+   - Generator created duplicate `IEnumerator_CurrentInterceptor` from IEnumerator inheritance
+   - **Fix:** Added member deduplication in inline stub generation
+
+2. ✅ **Methods hiding inherited members (CS0108)**
+   - Interceptor properties named `Equals`, `GetHashCode`, `ToString` hide object members
+   - **Fix:** Added `new` keyword for object member names
+
+**OPEN (separate work items):**
+
+3. ⏳ **Nullability mismatch (CS8769)** - Asymmetric properties
+   - `IDbConnection.ConnectionString`: getter returns nullable, setter expects non-null
+   - Requires capturing separate nullability for getter vs setter
+
+4. ⏳ **Standalone stubs don't flatten inherited interfaces**
+   - Collection interfaces (IList, ICollection, IDictionary, ISet) fail with standalone `[KnockOff]`
+   - **Workaround:** Use inline stubs `[KnockOff<T>]` for interfaces with inheritance chains
+
+See `todos/bcl-interface-generator-bugs.md` for full details.
+
 ## Task List
 
 ### Priority 1: Lifecycle (1,177 implementations)

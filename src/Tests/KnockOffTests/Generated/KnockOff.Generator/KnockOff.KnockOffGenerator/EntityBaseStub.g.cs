@@ -781,6 +781,11 @@ partial class EntityBaseStub
 		get { IsPaused.RecordGet(); return IsPaused.OnGet?.Invoke(this) ?? IsPausedBacking; }
 	}
 
+	global::Neatoo.IValidateProperty Neatoo.IValidateBase.this[string propertyName]
+	{
+		get { StringIndexer.RecordGet(propertyName); if (StringIndexer.OnGet != null) return StringIndexer.OnGet(this, propertyName); return StringIndexerBacking.TryGetValue(propertyName, out var v) ? v : default!; }
+	}
+
 	global::System.Threading.Tasks.Task Neatoo.IValidateMetaProperties.WaitForTasks()
 	{
 		WaitForTasks1.RecordCall();

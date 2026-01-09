@@ -11,6 +11,40 @@ Key concept: A class marked with `[KnockOff]` that implements an interface will 
 2. Interface-named properties for test verification (call counts, args, callbacks)
 3. User-defined methods detected and called from generated interceptors
 
+## Stub Patterns
+
+KnockOff supports two patterns for creating stubs. Both are uniformly supported with a few exceptions.
+
+### Inline Stubs (`[KnockOff<T>]`)
+
+Apply to a partial class; generates a nested `Stubs` class:
+```csharp
+[KnockOff<IUserService>]
+[KnockOff<ILogger>]
+public partial class MyTests { }
+
+// Usage:
+var stub = new MyTests.Stubs.IUserService();
+```
+
+### Stand-alone Stubs (`[KnockOff]`)
+
+Apply to a partial class that implements the interface directly:
+```csharp
+[KnockOff]
+public partial class UserServiceStub : IUserService { }
+
+// Usage:
+var stub = new UserServiceStub();
+```
+
+### Exceptions (Inline-only Features)
+
+| Feature | Inline | Stand-alone | Reason |
+|---------|--------|-------------|--------|
+| Class stubbing | Yes | No | Requires inheritance (`Stubs.SomeClass : SomeClass`) |
+| Delegate stubbing | Yes | No | Requires wrapper with implicit conversion |
+
 ## Project Status
 
 This is a new project. Use RemoteFactory (`c:\src\neatoodotnet\RemoteFactory`) as the reference implementation for structure and patterns.

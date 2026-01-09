@@ -133,6 +133,29 @@ public class KnockOffGenerator : IIncrementalGenerator
 
 	#endregion
 
+	#region CS0108 Hiding Prevention
+
+	/// <summary>
+	/// Names of members inherited from object that interceptor properties could hide.
+	/// When an interceptor property has one of these names, we need the 'new' keyword
+	/// to suppress CS0108 warnings (treated as errors with TreatWarningsAsErrors).
+	/// </summary>
+	private static readonly HashSet<string> ObjectMemberNames = new(StringComparer.Ordinal)
+	{
+		"Equals",
+		"GetHashCode",
+		"ToString",
+		"GetType"
+	};
+
+	/// <summary>
+	/// Returns "new " if the interceptor name would hide an inherited object member, empty string otherwise.
+	/// </summary>
+	private static string GetNewKeywordIfNeeded(string interceptorName) =>
+		ObjectMemberNames.Contains(interceptorName) ? "new " : "";
+
+	#endregion
+
 	/// <summary>
 	/// Display format that includes nullability annotations and fully qualified names.
 	/// </summary>
@@ -962,6 +985,31 @@ public class KnockOffGenerator : IIncrementalGenerator
 				else if (member is IEventSymbol eventSymbol)
 				{
 					events.Add(CreateEventInfo(eventSymbol, ifaceFullName));
+				}
+			}
+
+			// Also get inherited interface members (Bug 4 fix)
+			// This ensures IEnumerable<T> stubs also implement IEnumerable.GetEnumerator(), etc.
+			foreach (var baseInterface in iface.AllInterfaces)
+			{
+				var baseIfaceFullName = baseInterface.ToDisplayString();
+				foreach (var member in baseInterface.GetMembers())
+				{
+					if (!IsMemberAccessible(member, knockOffAssembly))
+						continue;
+
+					if (member is IPropertySymbol property)
+					{
+						members.Add(CreatePropertyInfo(property, baseIfaceFullName));
+					}
+					else if (member is IMethodSymbol method && method.MethodKind == MethodKind.Ordinary)
+					{
+						members.Add(CreateMethodInfo(method, baseIfaceFullName));
+					}
+					else if (member is IEventSymbol eventSymbol)
+					{
+						events.Add(CreateEventInfo(eventSymbol, baseIfaceFullName));
+					}
 				}
 			}
 
@@ -1970,7 +2018,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 			{
 				var interceptorName = flatNameMap[GetMemberKey(member)];
 				sb.AppendLine($"\t/// <summary>Interceptor for {member.Name}.</summary>");
-				sb.AppendLine($"\tpublic {interceptorName}Interceptor {interceptorName} {{ get; }} = new();");
+				sb.AppendLine($"\tpublic {GetNewKeywordIfNeeded(interceptorName)}{interceptorName}Interceptor {interceptorName} {{ get; }} = new();");
 				sb.AppendLine();
 			}
 		}
@@ -1992,7 +2040,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 				{
 					var interceptorName = flatNameMap[$"method:{group.Name}()_generic"];
 					sb.AppendLine($"\t/// <summary>Interceptor for {group.Name} (generic overloads, use .Of&lt;T&gt;()).</summary>");
-					sb.AppendLine($"\tpublic {interceptorName}Interceptor {interceptorName} {{ get; }} = new();");
+					sb.AppendLine($"\tpublic {GetNewKeywordIfNeeded(interceptorName)}{interceptorName}Interceptor {interceptorName} {{ get; }} = new();");
 					sb.AppendLine();
 				}
 			}
@@ -2004,7 +2052,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 					// Generic methods get a single property with Of<T>() access
 					var interceptorName = flatNameMap[$"method:{group.Name}()_generic"];
 					sb.AppendLine($"\t/// <summary>Interceptor for {group.Name} (use .Of&lt;T&gt;() to access typed handler).</summary>");
-					sb.AppendLine($"\tpublic {interceptorName}Interceptor {interceptorName} {{ get; }} = new();");
+					sb.AppendLine($"\tpublic {GetNewKeywordIfNeeded(interceptorName)}{interceptorName}Interceptor {interceptorName} {{ get; }} = new();");
 					sb.AppendLine();
 				}
 				else
@@ -2019,7 +2067,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 		{
 			var interceptorName = flatNameMap[$"event:{evt.Name}"];
 			sb.AppendLine($"\t/// <summary>Interceptor for {evt.Name} event.</summary>");
-			sb.AppendLine($"\tpublic {interceptorName}Interceptor {interceptorName} {{ get; }} = new();");
+			sb.AppendLine($"\tpublic {GetNewKeywordIfNeeded(interceptorName)}{interceptorName}Interceptor {interceptorName} {{ get; }} = new();");
 			sb.AppendLine();
 		}
 
@@ -2051,31 +2099,50 @@ public class KnockOffGenerator : IIncrementalGenerator
 			}
 		}
 
-		// 7. Generate explicit interface implementations for each flat member
-		foreach (var member in typeInfo.FlatMembers)
+		// 7. Generate explicit interface implementations for ALL members from ALL interfaces
+		// We iterate over all interfaces (not FlatMembers) to ensure inherited interface members
+		// get their own explicit implementations (e.g., IEnumerable.GetEnumerator() vs IEnumerable<T>.GetEnumerator())
+		// Track generated implementations to avoid duplicates when same member appears in multiple InterfaceInfos
+		var generatedImplementations = new HashSet<string>();
+		foreach (var iface in typeInfo.Interfaces)
 		{
-			var interceptorName = flatNameMap[GetMemberKey(member)];
-			if (member.IsIndexer)
+			foreach (var member in iface.Members)
 			{
-				GenerateFlatIndexerImplementationWithName(sb, member, interceptorName);
-			}
-			else if (member.IsProperty)
-			{
-				GenerateFlatPropertyImplementationWithName(sb, member, interceptorName);
-			}
-			else
-			{
-				// Method - find its group for overload handling
-				var group = flatMethodGroups[member.Name];
-				GenerateFlatMethodImplementationWithName(sb, member, typeInfo, group, flatNameMap);
+				// Create unique key for this specific interface implementation
+				var implKey = $"{member.DeclaringInterfaceFullName}.{member.Name}({string.Join(",", member.Parameters.Select(p => p.Type))})";
+				if (!generatedImplementations.Add(implKey))
+					continue; // Skip duplicates
+
+				var interceptorName = flatNameMap[GetMemberKey(member)];
+				if (member.IsIndexer)
+				{
+					GenerateFlatIndexerImplementationWithName(sb, member, interceptorName);
+				}
+				else if (member.IsProperty)
+				{
+					GenerateFlatPropertyImplementationWithName(sb, member, interceptorName);
+				}
+				else
+				{
+					// Method - find its group for overload handling
+					var group = flatMethodGroups[member.Name];
+					GenerateFlatMethodImplementationWithName(sb, member, typeInfo, group, flatNameMap);
+				}
 			}
 		}
 
 		// 7b. Generate explicit interface implementations for events
-		foreach (var evt in typeInfo.FlatEvents)
+		foreach (var iface in typeInfo.Interfaces)
 		{
-			var interceptorName = flatNameMap[$"event:{evt.Name}"];
-			GenerateFlatEventImplementationWithName(sb, evt, interceptorName);
+			foreach (var evt in iface.Events)
+			{
+				var evtKey = $"{evt.DeclaringInterfaceFullName}.{evt.Name}";
+				if (!generatedImplementations.Add(evtKey))
+					continue;
+
+				var interceptorName = flatNameMap[$"event:{evt.Name}"];
+				GenerateFlatEventImplementationWithName(sb, evt, interceptorName);
+			}
 		}
 
 		sb.AppendLine("}");
@@ -3019,7 +3086,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 			if (member.IsProperty || member.IsIndexer)
 			{
 				sb.AppendLine($"\t\t/// <summary>Interceptor for {member.Name}.</summary>");
-				sb.AppendLine($"\t\tpublic {koPropertyName}_{member.Name}Interceptor {member.Name} {{ get; }} = new();");
+				sb.AppendLine($"\t\tpublic {GetNewKeywordIfNeeded(member.Name)}{koPropertyName}_{member.Name}Interceptor {member.Name} {{ get; }} = new();");
 			}
 		}
 
@@ -3041,7 +3108,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 			{
 				// Single method (no overloads) - generate single property without suffix
 				sb.AppendLine($"\t\t/// <summary>Interceptor for {group.Name}.</summary>");
-				sb.AppendLine($"\t\tpublic {koPropertyName}_{group.Name}Interceptor {group.Name} {{ get; }} = new();");
+				sb.AppendLine($"\t\tpublic {GetNewKeywordIfNeeded(group.Name)}{koPropertyName}_{group.Name}Interceptor {group.Name} {{ get; }} = new();");
 			}
 		}
 
@@ -3049,7 +3116,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 		foreach (var evt in iface.Events)
 		{
 			sb.AppendLine($"\t\t/// <summary>Interceptor for {evt.Name} event.</summary>");
-			sb.AppendLine($"\t\tpublic {koPropertyName}_{evt.Name}Interceptor {evt.Name} {{ get; }} = new();");
+			sb.AppendLine($"\t\tpublic {GetNewKeywordIfNeeded(evt.Name)}{koPropertyName}_{evt.Name}Interceptor {evt.Name} {{ get; }} = new();");
 		}
 
 		sb.AppendLine("\t}");
@@ -5673,7 +5740,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 			var interceptorName = flatNameMap[key];
 
 			sb.AppendLine($"\t/// <summary>Interceptor for {group.Name}.</summary>");
-			sb.AppendLine($"\tpublic {interceptorName}Interceptor {interceptorName} {{ get; }} = new();");
+			sb.AppendLine($"\tpublic {GetNewKeywordIfNeeded(interceptorName)}{interceptorName}Interceptor {interceptorName} {{ get; }} = new();");
 			sb.AppendLine();
 		}
 	}
@@ -6005,13 +6072,36 @@ public class KnockOffGenerator : IIncrementalGenerator
 			// Generate handler classes for this interface's members
 			var methodGroups = GroupMethodsByName(iface.Members.Where(m => !m.IsProperty && !m.IsIndexer));
 
-			// Generate handler classes for properties/indexers
+			// Deduplicate property/indexer members by name for interceptor class generation
+			// (Keep first occurrence, which is from the most-derived interface)
+			var processedPropertyNames = new HashSet<string>();
+			var deduplicatedPropertyMembers = new List<InterfaceMemberInfo>();
 			foreach (var member in iface.Members)
 			{
 				if (member.IsProperty || member.IsIndexer)
 				{
-					GenerateInlineStubMemberHandlerClass(sb, member, iface.Name);
+					if (processedPropertyNames.Add(member.Name))
+					{
+						deduplicatedPropertyMembers.Add(member);
+					}
 				}
+			}
+
+			// Deduplicate events by name
+			var processedEventNames = new HashSet<string>();
+			var deduplicatedEvents = new List<EventMemberInfo>();
+			foreach (var evt in iface.Events)
+			{
+				if (processedEventNames.Add(evt.Name))
+				{
+					deduplicatedEvents.Add(evt);
+				}
+			}
+
+			// Generate handler classes for deduplicated properties/indexers
+			foreach (var member in deduplicatedPropertyMembers)
+			{
+				GenerateInlineStubMemberHandlerClass(sb, member, iface.Name);
 			}
 
 			// Generate handler classes for methods
@@ -6020,14 +6110,15 @@ public class KnockOffGenerator : IIncrementalGenerator
 				GenerateInlineStubMethodGroupHandlerClass(sb, group, iface.Name);
 			}
 
-			// Generate handler classes for events
-			foreach (var evt in iface.Events)
+			// Generate handler classes for deduplicated events
+			foreach (var evt in deduplicatedEvents)
 			{
 				GenerateInlineStubEventHandlerClass(sb, evt, iface.Name);
 			}
 
 			// Generate the stub class implementing the interface
-			GenerateInlineStubClass(sb, iface, methodGroups);
+			// Pass deduplicated members for interceptor properties, but full members for implementations
+			GenerateInlineStubClass(sb, iface, methodGroups, deduplicatedPropertyMembers, deduplicatedEvents);
 		}
 
 		// Generate delegate stub classes
@@ -6570,7 +6661,9 @@ public class KnockOffGenerator : IIncrementalGenerator
 	private static void GenerateInlineStubClass(
 		System.Text.StringBuilder sb,
 		InterfaceInfo iface,
-		Dictionary<string, MethodGroupInfo> methodGroups)
+		Dictionary<string, MethodGroupInfo> methodGroups,
+		List<InterfaceMemberInfo> deduplicatedPropertyMembers,
+		List<EventMemberInfo> deduplicatedEvents)
 	{
 		var stubClassName = iface.Name;
 
@@ -6578,15 +6671,12 @@ public class KnockOffGenerator : IIncrementalGenerator
 		sb.AppendLine($"\t\tpublic class {stubClassName} : {iface.FullName}");
 		sb.AppendLine("\t\t{");
 
-		// Generate intercept properties
-		foreach (var member in iface.Members)
+		// Generate intercept properties (using deduplicated members to avoid duplicates)
+		foreach (var member in deduplicatedPropertyMembers)
 		{
-			if (member.IsProperty || member.IsIndexer)
-			{
-				sb.AppendLine($"\t\t\t/// <summary>Interceptor for {member.Name}.</summary>");
-				sb.AppendLine($"\t\t\tpublic {stubClassName}_{member.Name}Interceptor {member.Name} {{ get; }} = new();");
-				sb.AppendLine();
-			}
+			sb.AppendLine($"\t\t\t/// <summary>Interceptor for {member.Name}.</summary>");
+			sb.AppendLine($"\t\t\tpublic {GetNewKeywordIfNeeded(member.Name)}{stubClassName}_{member.Name}Interceptor {member.Name} {{ get; }} = new();");
+			sb.AppendLine();
 		}
 		foreach (var group in methodGroups.Values)
 		{
@@ -6594,22 +6684,22 @@ public class KnockOffGenerator : IIncrementalGenerator
 			{
 				// Mixed group: generate TWO properties (non-generic and generic with suffix)
 				sb.AppendLine($"\t\t\t/// <summary>Interceptor for {group.Name} (non-generic overloads).</summary>");
-				sb.AppendLine($"\t\t\tpublic {stubClassName}_{group.Name}Interceptor {group.Name} {{ get; }} = new();");
+				sb.AppendLine($"\t\t\tpublic {GetNewKeywordIfNeeded(group.Name)}{stubClassName}_{group.Name}Interceptor {group.Name} {{ get; }} = new();");
 				sb.AppendLine();
 
 				var genericName = group.Name + GenericSuffix;
 				sb.AppendLine($"\t\t\t/// <summary>Interceptor for {group.Name} (generic overloads, use .Of&lt;T&gt;()).</summary>");
-				sb.AppendLine($"\t\t\tpublic {stubClassName}_{genericName}Interceptor {genericName} {{ get; }} = new();");
+				sb.AppendLine($"\t\t\tpublic {GetNewKeywordIfNeeded(genericName)}{stubClassName}_{genericName}Interceptor {genericName} {{ get; }} = new();");
 				sb.AppendLine();
 			}
 			else
 			{
 				sb.AppendLine($"\t\t\t/// <summary>Interceptor for {group.Name}.</summary>");
-				sb.AppendLine($"\t\t\tpublic {stubClassName}_{group.Name}Interceptor {group.Name} {{ get; }} = new();");
+				sb.AppendLine($"\t\t\tpublic {GetNewKeywordIfNeeded(group.Name)}{stubClassName}_{group.Name}Interceptor {group.Name} {{ get; }} = new();");
 				sb.AppendLine();
 			}
 		}
-		foreach (var evt in iface.Events)
+		foreach (var evt in deduplicatedEvents)
 		{
 			sb.AppendLine($"\t\t\t/// <summary>Interceptor for {evt.Name} event.</summary>");
 			sb.AppendLine($"\t\t\tpublic {stubClassName}_{evt.Name}Interceptor {evt.Name}Interceptor {{ get; }} = new();");
