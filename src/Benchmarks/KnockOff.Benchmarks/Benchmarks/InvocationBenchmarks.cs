@@ -3,6 +3,7 @@ using BenchmarkDotNet.Jobs;
 using KnockOff.Benchmarks.Interfaces;
 using KnockOff.Benchmarks.Stubs;
 using Moq;
+using Rocks;
 
 namespace KnockOff.Benchmarks.Benchmarks;
 
@@ -15,16 +16,20 @@ public class InvocationBenchmarks
 {
     private ISimpleService _moqSimple = null!;
     private ISimpleService _knockOffSimple = null!;
+    private ISimpleService _rocksSimple = null!;
     private ICalculator _moqCalculator = null!;
     private ICalculator _knockOffCalculator = null!;
+    private ICalculator _rocksCalculator = null!;
     private IMediumService _moqMedium = null!;
     private IMediumService _knockOffMedium = null!;
+    private IMediumService _rocksMedium = null!;
 
     [GlobalSetup]
     public void Setup()
     {
         _moqSimple = new Mock<ISimpleService>().Object;
         _knockOffSimple = new SimpleServiceStub();
+        _rocksSimple = new ISimpleServiceMakeExpectations().Instance();
 
         var moqCalc = new Mock<ICalculator>();
         moqCalc.Setup(x => x.Add(It.IsAny<int>(), It.IsAny<int>())).Returns(0);
@@ -34,8 +39,13 @@ public class InvocationBenchmarks
         knockOffCalc.Add.OnCall = (ko, a, b) => a + b;
         _knockOffCalculator = knockOffCalc;
 
+        var rocksCalc = new ICalculatorCreateExpectations();
+        rocksCalc.Methods.Add(Arg.Any<int>(), Arg.Any<int>()).ReturnValue(0);
+        _rocksCalculator = rocksCalc.Instance();
+
         _moqMedium = new Mock<IMediumService>().Object;
         _knockOffMedium = new MediumServiceStub();
+        _rocksMedium = new IMediumServiceMakeExpectations().Instance();
     }
 
     // Void method, no args - purest interception overhead
@@ -46,6 +56,9 @@ public class InvocationBenchmarks
     [Benchmark]
     public void KnockOff_InvokeVoid() => _knockOffSimple.DoWork();
 
+    [Benchmark]
+    public void Rocks_InvokeVoid() => _rocksSimple.DoWork();
+
     // Method with return value
 
     [Benchmark]
@@ -53,6 +66,9 @@ public class InvocationBenchmarks
 
     [Benchmark]
     public int KnockOff_InvokeWithReturn() => _knockOffCalculator.Add(1, 2);
+
+    [Benchmark]
+    public int Rocks_InvokeWithReturn() => _rocksCalculator.Add(1, 2);
 
     // Method with primitive args
 
@@ -62,6 +78,9 @@ public class InvocationBenchmarks
     [Benchmark]
     public void KnockOff_InvokeWithArgs() => _knockOffMedium.Method2(42);
 
+    [Benchmark]
+    public void Rocks_InvokeWithArgs() => _rocksMedium.Method2(42);
+
     // Method with string arg
 
     [Benchmark]
@@ -70,6 +89,9 @@ public class InvocationBenchmarks
     [Benchmark]
     public void KnockOff_InvokeWithStringArg() => _knockOffMedium.Method3("test");
 
+    [Benchmark]
+    public void Rocks_InvokeWithStringArg() => _rocksMedium.Method3("test");
+
     // Method with multiple args
 
     [Benchmark]
@@ -77,6 +99,9 @@ public class InvocationBenchmarks
 
     [Benchmark]
     public void KnockOff_InvokeWithMultipleArgs() => _knockOffMedium.Method4(42, "test");
+
+    [Benchmark]
+    public void Rocks_InvokeWithMultipleArgs() => _rocksMedium.Method4(42, "test");
 }
 
 /// <summary>
@@ -88,6 +113,7 @@ public class BulkInvocationBenchmarks
 {
     private ISimpleService _moqSimple = null!;
     private ISimpleService _knockOffSimple = null!;
+    private ISimpleService _rocksSimple = null!;
 
     [Params(1000, 10000)]
     public int Count { get; set; }
@@ -97,6 +123,7 @@ public class BulkInvocationBenchmarks
     {
         _moqSimple = new Mock<ISimpleService>().Object;
         _knockOffSimple = new SimpleServiceStub();
+        _rocksSimple = new ISimpleServiceMakeExpectations().Instance();
     }
 
     [Benchmark(Baseline = true)]
@@ -114,6 +141,15 @@ public class BulkInvocationBenchmarks
         for (int i = 0; i < Count; i++)
         {
             _knockOffSimple.DoWork();
+        }
+    }
+
+    [Benchmark]
+    public void Rocks_InvokeMany()
+    {
+        for (int i = 0; i < Count; i++)
+        {
+            _rocksSimple.DoWork();
         }
     }
 }

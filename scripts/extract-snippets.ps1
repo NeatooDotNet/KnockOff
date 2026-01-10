@@ -35,6 +35,7 @@ param(
     [switch]$Verify,
     [switch]$Update,
     [string]$SamplesPath = "src/Tests/KnockOff.Documentation.Samples",
+    [string]$SamplesTestsPath = "src/Tests/KnockOff.Documentation.Samples.Tests",
     [string]$DocsPath = "docs",
     [string]$SkillsPath = "$env:USERPROFILE\.claude\skills\knockoff"
 )
@@ -44,6 +45,7 @@ $ErrorActionPreference = "Stop"
 # Get the repository root
 $RepoRoot = Split-Path -Parent $PSScriptRoot
 $SamplesFullPath = Join-Path $RepoRoot $SamplesPath
+$SamplesTestsFullPath = Join-Path $RepoRoot $SamplesTestsPath
 $DocsFullPath = Join-Path $RepoRoot $DocsPath
 $SkillsFullPath = $SkillsPath
 
@@ -51,6 +53,7 @@ Write-Host "KnockOff Documentation & Skill Snippet Extractor" -ForegroundColor C
 Write-Host "=================================================" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Samples Path: $SamplesFullPath"
+Write-Host "Samples Tests Path: $SamplesTestsFullPath"
 Write-Host "Docs Path: $DocsFullPath"
 Write-Host "Skills Path: $SkillsFullPath"
 Write-Host ""
@@ -61,9 +64,17 @@ Write-Host ""
 $docsRegionPattern = '#region\s+docs:([^:\s]+):([^\s]+)'
 $skillRegionPattern = '#region\s+skill:([^:\s]+):([^\s]+)'
 
-# Find all C# files in samples (excluding obj, bin, Generated)
-$sourceFiles = Get-ChildItem -Path $SamplesFullPath -Recurse -Include "*.cs" |
+# Find all C# files in samples and samples tests (excluding obj, bin, Generated)
+$samplesFiles = Get-ChildItem -Path $SamplesFullPath -Recurse -Include "*.cs" |
     Where-Object { $_.FullName -notmatch '[\\/](obj|bin|Generated)[\\/]' }
+
+$samplesTestsFiles = @()
+if (Test-Path $SamplesTestsFullPath) {
+    $samplesTestsFiles = Get-ChildItem -Path $SamplesTestsFullPath -Recurse -Include "*.cs" |
+        Where-Object { $_.FullName -notmatch '[\\/](obj|bin|Generated)[\\/]' }
+}
+
+$sourceFiles = @($samplesFiles) + @($samplesTestsFiles)
 
 $docsSnippets = @{}
 $skillSnippets = @{}

@@ -3,6 +3,7 @@ using BenchmarkDotNet.Jobs;
 using KnockOff.Benchmarks.Interfaces;
 using KnockOff.Benchmarks.Stubs;
 using Moq;
+using Rocks;
 
 namespace KnockOff.Benchmarks.Benchmarks;
 
@@ -15,8 +16,10 @@ public class VerificationBenchmarks
 {
     private Mock<ISimpleService> _moqSimple = null!;
     private SimpleServiceStub _knockOffSimple = null!;
+    private ISimpleServiceCreateExpectations _rocksSimple = null!;
     private Mock<ICalculator> _moqCalculator = null!;
     private CalculatorStub _knockOffCalculator = null!;
+    private ICalculatorCreateExpectations _rocksCalculator = null!;
 
     [GlobalSetup]
     public void Setup()
@@ -32,6 +35,13 @@ public class VerificationBenchmarks
         ((ISimpleService)_knockOffSimple).DoWork();
         ((ISimpleService)_knockOffSimple).DoWork();
 
+        _rocksSimple = new ISimpleServiceCreateExpectations();
+        _rocksSimple.Methods.DoWork().ExpectedCallCount(3);
+        var rocksSimpleInstance = _rocksSimple.Instance();
+        rocksSimpleInstance.DoWork();
+        rocksSimpleInstance.DoWork();
+        rocksSimpleInstance.DoWork();
+
         _moqCalculator = new Mock<ICalculator>();
         _moqCalculator.Setup(x => x.Add(It.IsAny<int>(), It.IsAny<int>())).Returns(0);
         _ = _moqCalculator.Object.Add(1, 2);
@@ -40,6 +50,12 @@ public class VerificationBenchmarks
         _knockOffCalculator = new CalculatorStub();
         _ = ((ICalculator)_knockOffCalculator).Add(1, 2);
         _ = ((ICalculator)_knockOffCalculator).Add(3, 4);
+
+        _rocksCalculator = new ICalculatorCreateExpectations();
+        _rocksCalculator.Methods.Add(Arg.Any<int>(), Arg.Any<int>()).ReturnValue(0).ExpectedCallCount(2);
+        var rocksCalcInstance = _rocksCalculator.Instance();
+        _ = rocksCalcInstance.Add(1, 2);
+        _ = rocksCalcInstance.Add(3, 4);
     }
 
     // Verify called (at least once)
@@ -56,6 +72,12 @@ public class VerificationBenchmarks
         _ = _knockOffSimple.DoWork.WasCalled;
     }
 
+    [Benchmark]
+    public void Rocks_VerifyCalled()
+    {
+        _rocksSimple.Verify();
+    }
+
     // Verify call count
 
     [Benchmark]
@@ -68,6 +90,12 @@ public class VerificationBenchmarks
     public void KnockOff_VerifyCallCount()
     {
         _ = _knockOffSimple.DoWork.CallCount == 3;
+    }
+
+    [Benchmark]
+    public void Rocks_VerifyCallCount()
+    {
+        _rocksSimple.Verify();
     }
 
     // Verify with argument inspection
@@ -83,6 +111,12 @@ public class VerificationBenchmarks
     {
         var args = _knockOffCalculator.Add.LastCallArgs;
         _ = args?.a == 1 && args?.b == 2;
+    }
+
+    [Benchmark]
+    public void Rocks_VerifyWithArgs()
+    {
+        _rocksCalculator.Verify();
     }
 
     // Multiple verifications
@@ -101,5 +135,12 @@ public class VerificationBenchmarks
         _ = _knockOffSimple.DoWork.WasCalled;
         _ = _knockOffSimple.DoWork.CallCount == 3;
         _ = _knockOffCalculator.Add.CallCount == 2;
+    }
+
+    [Benchmark]
+    public void Rocks_VerifyMultiple()
+    {
+        _rocksSimple.Verify();
+        _rocksCalculator.Verify();
     }
 }

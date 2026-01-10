@@ -3,6 +3,7 @@ using BenchmarkDotNet.Jobs;
 using KnockOff.Benchmarks.Interfaces;
 using KnockOff.Benchmarks.Stubs;
 using Moq;
+using Rocks;
 
 namespace KnockOff.Benchmarks.Benchmarks;
 
@@ -43,6 +44,22 @@ public class RealisticBenchmarks
 
         // Assert
         _ = stub.DoWork.CallCount == 1;
+    }
+
+    [Benchmark]
+    public void Rocks_SimpleTest()
+    {
+        // Arrange
+        var expectations = new ISimpleServiceCreateExpectations();
+        var callCount = 0;
+        expectations.Methods.DoWork().Callback(() => callCount++).ExpectedCallCount(1);
+        var mock = expectations.Instance();
+
+        // Act
+        mock.DoWork();
+
+        // Assert
+        expectations.Verify();
     }
 
     // Typical unit test with business logic
@@ -86,6 +103,32 @@ public class RealisticBenchmarks
         _ = stub.GetOrder.CallCount == 1;
         _ = stub.ValidateOrder.CallCount == 1;
         _ = stub.SaveOrder.CallCount == 1;
+    }
+
+    [Benchmark]
+    public void Rocks_TypicalUnitTest()
+    {
+        // Arrange
+        var expectations = new IOrderServiceCreateExpectations();
+        expectations.Methods.GetOrder(Arg.Any<int>())
+            .Callback(id => new Order { Id = id, CustomerId = 1 })
+            .ExpectedCallCount(1);
+        expectations.Methods.ValidateOrder(Arg.Any<Order>())
+            .ReturnValue(true)
+            .ExpectedCallCount(1);
+        expectations.Methods.CalculateTotal(Arg.Any<Order>())
+            .ReturnValue(100m)
+            .ExpectedCallCount(1);
+        expectations.Methods.SaveOrder(Arg.Any<Order>())
+            .ExpectedCallCount(1);
+        var mock = expectations.Instance();
+
+        // Act
+        var sut = new OrderProcessor(mock);
+        sut.Process(1);
+
+        // Assert
+        expectations.Verify();
     }
 }
 
@@ -135,6 +178,29 @@ public class TestSuiteBenchmarks
 
             _ = stub.GetOrder.CallCount == 1;
             _ = stub.ValidateOrder.CallCount == 1;
+        }
+    }
+
+    [Benchmark]
+    public void Rocks_TestSuite()
+    {
+        for (int i = 0; i < TestCount; i++)
+        {
+            // Simulate a typical test
+            var expectations = new IOrderServiceCreateExpectations();
+            var capturedI = i;
+            expectations.Methods.GetOrder(Arg.Any<int>())
+                .Callback(_ => new Order { Id = capturedI })
+                .ExpectedCallCount(1);
+            expectations.Methods.ValidateOrder(Arg.Any<Order>())
+                .ReturnValue(true)
+                .ExpectedCallCount(1);
+            var mock = expectations.Instance();
+
+            _ = mock.GetOrder(i);
+            _ = mock.ValidateOrder(new Order());
+
+            expectations.Verify();
         }
     }
 }

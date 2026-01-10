@@ -3,6 +3,7 @@ using BenchmarkDotNet.Jobs;
 using KnockOff.Benchmarks.Interfaces;
 using KnockOff.Benchmarks.Stubs;
 using Moq;
+using Rocks;
 
 namespace KnockOff.Benchmarks.Benchmarks;
 
@@ -31,6 +32,14 @@ public class SetupBenchmarks
         return stub;
     }
 
+    [Benchmark]
+    public object Rocks_SetupSingleReturn()
+    {
+        var expectations = new ICalculatorCreateExpectations();
+        expectations.Methods.Add(Arg.Any<int>(), Arg.Any<int>()).ReturnValue(42);
+        return expectations;
+    }
+
     // Setup with callback
 
     [Benchmark]
@@ -48,6 +57,14 @@ public class SetupBenchmarks
         var stub = new CalculatorStub();
         stub.Add.OnCall = (ko, a, b) => a + b;
         return stub;
+    }
+
+    [Benchmark]
+    public object Rocks_SetupWithCallback()
+    {
+        var expectations = new ICalculatorCreateExpectations();
+        expectations.Methods.Add(Arg.Any<int>(), Arg.Any<int>()).Callback((a, b) => a + b);
+        return expectations;
     }
 
     // Setup multiple methods
@@ -75,6 +92,18 @@ public class SetupBenchmarks
         stub.Square.OnCall = (ko, x) => 5;
         return stub;
     }
+
+    [Benchmark]
+    public object Rocks_SetupMultiple()
+    {
+        var expectations = new ICalculatorCreateExpectations();
+        expectations.Methods.Add(Arg.Any<int>(), Arg.Any<int>()).ReturnValue(1);
+        expectations.Methods.Subtract(Arg.Any<int>(), Arg.Any<int>()).ReturnValue(2);
+        expectations.Methods.Multiply(Arg.Any<int>(), Arg.Any<int>()).ReturnValue(3);
+        expectations.Methods.Divide(Arg.Any<double>(), Arg.Any<double>()).ReturnValue(4.0);
+        expectations.Methods.Square(Arg.Any<int>()).ReturnValue(5);
+        return expectations;
+    }
 }
 
 /// <summary>
@@ -100,5 +129,14 @@ public class VoidSetupBenchmarks
         var stub = new SimpleServiceStub();
         stub.DoWork.OnCall = ko => callCount++;
         return stub;
+    }
+
+    [Benchmark]
+    public object Rocks_SetupVoidCallback()
+    {
+        var callCount = 0;
+        var expectations = new ISimpleServiceCreateExpectations();
+        expectations.Methods.DoWork().Callback(() => callCount++);
+        return expectations;
     }
 }

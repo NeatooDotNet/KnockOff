@@ -21,6 +21,9 @@ public class CreationBenchmarks
     [Benchmark]
     public object KnockOff_CreateSimple() => new SimpleServiceStub();
 
+    [Benchmark]
+    public object Rocks_CreateSimple() => new ISimpleServiceMakeExpectations().Instance();
+
     // Calculator interface (5 methods with return values)
 
     [Benchmark]
@@ -28,6 +31,9 @@ public class CreationBenchmarks
 
     [Benchmark]
     public object KnockOff_CreateCalculator() => new CalculatorStub();
+
+    [Benchmark]
+    public object Rocks_CreateCalculator() => new ICalculatorMakeExpectations().Instance();
 
     // Medium interface (10 methods)
 
@@ -37,6 +43,9 @@ public class CreationBenchmarks
     [Benchmark]
     public object KnockOff_CreateMedium() => new MediumServiceStub();
 
+    [Benchmark]
+    public object Rocks_CreateMedium() => new IMediumServiceMakeExpectations().Instance();
+
     // Large interface (50 methods)
 
     [Benchmark]
@@ -45,6 +54,9 @@ public class CreationBenchmarks
     [Benchmark]
     public object KnockOff_CreateLarge() => new LargeServiceStub();
 
+    [Benchmark]
+    public object Rocks_CreateLarge() => new ILargeServiceMakeExpectations().Instance();
+
     // Realistic order service
 
     [Benchmark]
@@ -52,6 +64,9 @@ public class CreationBenchmarks
 
     [Benchmark]
     public object KnockOff_CreateOrderService() => new OrderServiceStub();
+
+    [Benchmark]
+    public object Rocks_CreateOrderService() => new IOrderServiceMakeExpectations().Instance();
 }
 
 /// <summary>
@@ -79,6 +94,15 @@ public class BulkCreationBenchmarks
         for (int i = 0; i < Count; i++)
         {
             _ = new SimpleServiceStub();
+        }
+    }
+
+    [Benchmark]
+    public void Rocks_CreateMany()
+    {
+        for (int i = 0; i < Count; i++)
+        {
+            _ = new ISimpleServiceMakeExpectations().Instance();
         }
     }
 }

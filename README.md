@@ -66,6 +66,371 @@ public partial class RepositoryKnockOff : IRepository
 
 With Moq, you're stepping through Castle.Core proxy internals.
 
+## Side-by-Side Examples
+
+### Scenario 1: Order Processing
+
+A business scenario with payment processing, inventory management, and notifications.
+
+#### Successful Order
+
+**Moq**
+
+```csharp
+[Fact]
+public void OrderProcessing_Success_Moq()
+{
+    // Arrange
+    var order = new FcOrder
+    {
+        Id = 1,
+        CustomerId = 100,
+        Amount = 99.99m,
+        Items = [new FcOrderItem { ProductId = 1, Quantity = 2, UnitPrice = 49.99m }]
+    };
+
+    var orderRepo = new Mock<IFcOrderRepository>();
+    orderRepo.Setup(x => x.GetById(1)).Returns(order);
+
+    var paymentService = new Mock<IFcPaymentService>();
+    paymentService
+        .Setup(x => x.ProcessPayment(100, 99.99m))
+        .Returns(new FcPaymentResult { Success = true, TransactionId = "TXN-123" });
+
+    var notificationService = new Mock<IFcNotificationService>();
+    var inventoryService = new Mock<IFcInventoryService>();
+    inventoryService
+        .Setup(x => x.ReserveItems(It.IsAny<IEnumerable<FcOrderItem>>()))
+        .Returns(true);
+
+    var processor = new FcOrderProcessor(
+        orderRepo.Object,
+        paymentService.Object,
+        notificationService.Object,
+        inventoryService.Object);
+
+    // Act
+    var result = processor.ProcessOrder(1);
+
+    // Assert
+    Assert.True(result);
+    orderRepo.Verify(x => x.Save(It.Is<FcOrder>(o => o.Status == "Completed")), Times.Once);
+    notificationService.Verify(x => x.SendOrderConfirmation(100, 1), Times.Once);
+    inventoryService.Verify(x => x.ReleaseItems(It.IsAny<IEnumerable<FcOrderItem>>()), Times.Never);
+}
+```
+
+**KnockOff**
+
+```csharp
+[Fact]
+public void OrderProcessing_Success_KnockOff()
+{
+    // Arrange
+    var order = new FcOrder
+    {
+        Id = 1,
+        CustomerId = 100,
+        Amount = 99.99m,
+        Items = [new FcOrderItem { ProductId = 1, Quantity = 2, UnitPrice = 49.99m }]
+    };
+
+    var orderRepo = new FcOrderRepositoryStub();
+    orderRepo.GetById.OnCall = (ko, id) => order;
+
+    var paymentService = new FcPaymentServiceStub();
+    paymentService.ProcessPayment.OnCall = (ko, customerId, amount) =>
+        new FcPaymentResult { Success = true, TransactionId = "TXN-123" };
+
+    var notificationService = new FcNotificationServiceStub();
+
+    var inventoryService = new FcInventoryServiceStub();
+    inventoryService.ReserveItems.OnCall = (ko, items) => true;
+
+    var processor = new FcOrderProcessor(
+        orderRepo,
+        paymentService,
+        notificationService,
+        inventoryService);
+
+    // Act
+    var result = processor.ProcessOrder(1);
+
+    // Assert
+    Assert.True(result);
+    Assert.Equal(1, orderRepo.Save.CallCount);
+    Assert.Equal("Completed", orderRepo.Save.LastCallArg?.Status);
+    Assert.Equal(1, notificationService.SendOrderConfirmation.CallCount);
+    Assert.Equal(0, inventoryService.ReleaseItems.CallCount);
+}
+```
+
+#### Payment Failure Handling
+
+**Moq**
+
+```csharp
+[Fact]
+public void OrderProcessing_PaymentFailure_Moq()
+{
+    // Arrange
+    var order = new FcOrder
+    {
+        Id = 1,
+        CustomerId = 100,
+        Amount = 99.99m,
+        Items = [new FcOrderItem { ProductId = 1, Quantity = 2, UnitPrice = 49.99m }]
+    };
+
+    var orderRepo = new Mock<IFcOrderRepository>();
+    orderRepo.Setup(x => x.GetById(1)).Returns(order);
+
+    var paymentService = new Mock<IFcPaymentService>();
+    paymentService
+        .Setup(x => x.ProcessPayment(It.IsAny<int>(), It.IsAny<decimal>()))
+        .Returns(new FcPaymentResult { Success = false, ErrorMessage = "Insufficient funds" });
+
+    var notificationService = new Mock<IFcNotificationService>();
+    var inventoryService = new Mock<IFcInventoryService>();
+    inventoryService
+        .Setup(x => x.ReserveItems(It.IsAny<IEnumerable<FcOrderItem>>()))
+        .Returns(true);
+
+    var processor = new FcOrderProcessor(
+        orderRepo.Object,
+        paymentService.Object,
+        notificationService.Object,
+        inventoryService.Object);
+
+    // Act
+    var result = processor.ProcessOrder(1);
+
+    // Assert
+    Assert.False(result);
+    notificationService.Verify(
+        x => x.SendPaymentFailure(100, "Insufficient funds"),
+        Times.Once);
+    inventoryService.Verify(
+        x => x.ReleaseItems(It.IsAny<IEnumerable<FcOrderItem>>()),
+        Times.Once);
+    orderRepo.Verify(
+        x => x.Save(It.Is<FcOrder>(o => o.Status == "PaymentFailed")),
+        Times.Once);
+}
+```
+
+**KnockOff**
+
+```csharp
+[Fact]
+public void OrderProcessing_PaymentFailure_KnockOff()
+{
+    // Arrange
+    var order = new FcOrder
+    {
+        Id = 1,
+        CustomerId = 100,
+        Amount = 99.99m,
+        Items = [new FcOrderItem { ProductId = 1, Quantity = 2, UnitPrice = 49.99m }]
+    };
+
+    var orderRepo = new FcOrderRepositoryStub();
+    orderRepo.GetById.OnCall = (ko, id) => order;
+
+    var paymentService = new FcPaymentServiceStub();
+    paymentService.ProcessPayment.OnCall = (ko, customerId, amount) =>
+        new FcPaymentResult { Success = false, ErrorMessage = "Insufficient funds" };
+
+    var notificationService = new FcNotificationServiceStub();
+
+    var inventoryService = new FcInventoryServiceStub();
+    inventoryService.ReserveItems.OnCall = (ko, items) => true;
+
+    var processor = new FcOrderProcessor(
+        orderRepo,
+        paymentService,
+        notificationService,
+        inventoryService);
+
+    // Act
+    var result = processor.ProcessOrder(1);
+
+    // Assert
+    Assert.False(result);
+    Assert.Equal(1, notificationService.SendPaymentFailure.CallCount);
+    Assert.Equal((100, "Insufficient funds"), notificationService.SendPaymentFailure.LastCallArgs);
+    Assert.Equal(1, inventoryService.ReleaseItems.CallCount);
+    Assert.Equal("PaymentFailed", orderRepo.Save.LastCallArg?.Status);
+}
+```
+
+### Scenario 2: Cached Repository
+
+A data access scenario with async operations and caching.
+
+#### Cache Hit
+
+**Moq**
+
+```csharp
+[Fact]
+public async Task CachedRepository_CacheHit_Moq()
+{
+    // Arrange
+    var cachedProduct = new FcProduct { Id = 1, Name = "Widget", Price = 19.99m };
+
+    var repository = new Mock<IFcProductRepository>();
+    var cache = new Mock<IFcCacheService>();
+    cache.Setup(x => x.Get<FcProduct>("product:1")).Returns(cachedProduct);
+
+    var logger = new Mock<IFcLogger>();
+
+    var service = new FcCachedProductService(
+        repository.Object,
+        cache.Object,
+        logger.Object);
+
+    // Act
+    var result = await service.GetProductAsync(1);
+
+    // Assert
+    Assert.Equal("Widget", result?.Name);
+    repository.Verify(x => x.GetByIdAsync(It.IsAny<int>()), Times.Never);
+    logger.Verify(x => x.LogInfo(It.Is<string>(s => s.Contains("Cache hit"))), Times.Once);
+}
+```
+
+**KnockOff**
+
+```csharp
+[Fact]
+public async Task CachedRepository_CacheHit_KnockOff()
+{
+    // Arrange
+    var cachedProduct = new FcProduct { Id = 1, Name = "Widget", Price = 19.99m };
+
+    var repository = new FcProductRepositoryStub();
+
+    var cache = new FcCacheServiceStub();
+    cache.Get.Of<FcProduct>().OnCall = (ko, key) => cachedProduct;
+
+    var logger = new FcLoggerStub();
+
+    var service = new FcCachedProductService(repository, cache, logger);
+
+    // Act
+    var result = await service.GetProductAsync(1);
+
+    // Assert
+    Assert.Equal("Widget", result?.Name);
+    Assert.Equal(0, repository.GetByIdAsync.CallCount);
+    Assert.True(logger.LogInfo.LastCallArg?.Contains("Cache hit"));
+}
+```
+
+#### Cache Miss
+
+**Moq**
+
+```csharp
+[Fact]
+public async Task CachedRepository_CacheMiss_Moq()
+{
+    // Arrange
+    var product = new FcProduct { Id = 1, Name = "Widget", Price = 19.99m };
+
+    var repository = new Mock<IFcProductRepository>();
+    repository.Setup(x => x.GetByIdAsync(1)).ReturnsAsync(product);
+
+    var cache = new Mock<IFcCacheService>();
+    cache.Setup(x => x.Get<FcProduct>("product:1")).Returns((FcProduct?)null);
+
+    var logger = new Mock<IFcLogger>();
+
+    var service = new FcCachedProductService(
+        repository.Object,
+        cache.Object,
+        logger.Object);
+
+    // Act
+    var result = await service.GetProductAsync(1);
+
+    // Assert
+    Assert.Equal("Widget", result?.Name);
+    repository.Verify(x => x.GetByIdAsync(1), Times.Once);
+    cache.Verify(
+        x => x.Set("product:1", product, It.IsAny<TimeSpan>()),
+        Times.Once);
+    logger.Verify(
+        x => x.LogInfo(It.Is<string>(s => s.Contains("Cache miss"))),
+        Times.Once);
+}
+```
+
+**KnockOff**
+
+```csharp
+[Fact]
+public async Task CachedRepository_CacheMiss_KnockOff()
+{
+    // Arrange
+    var product = new FcProduct { Id = 1, Name = "Widget", Price = 19.99m };
+
+    var repository = new FcProductRepositoryStub();
+    repository.GetByIdAsync.OnCall = (ko, id) => Task.FromResult<FcProduct?>(product);
+
+    var cache = new FcCacheServiceStub();
+    cache.Get.Of<FcProduct>().OnCall = (ko, key) => null;
+
+    var logger = new FcLoggerStub();
+
+    var service = new FcCachedProductService(repository, cache, logger);
+
+    // Act
+    var result = await service.GetProductAsync(1);
+
+    // Assert
+    Assert.Equal("Widget", result?.Name);
+    Assert.Equal(1, repository.GetByIdAsync.CallCount);
+    Assert.Equal(1, cache.Set.Of<FcProduct>().CallCount);
+    Assert.Equal("product:1", cache.Set.Of<FcProduct>().LastCallArg);
+    Assert.True(logger.LogInfo.LastCallArg?.Contains("Cache miss"));
+}
+```
+
+## Performance Benchmarks
+
+Benchmarks run on the exact scenarios shown above, measuring realistic multi-dependency test patterns.
+
+```
+BenchmarkDotNet v0.14.0, Ubuntu 24.04.3 LTS (WSL)
+Intel Core i7-11800H 2.30GHz, .NET 9.0.11
+
+| Method                              | Mean         | Allocated |
+|------------------------------------ |-------------:|----------:|
+| OrderProcessing_Success_Moq         | 339,693.0 ns |   44,646 B |
+| OrderProcessing_Success_KnockOff    |     115.3 ns |      736 B |
+| OrderProcessing_Success_Rocks       |     750.2 ns |    3,048 B |
+| CachedRepository_CacheMiss_Moq      | 436,504.9 ns |   45,180 B |
+| CachedRepository_CacheMiss_KnockOff |     385.2 ns |    1,576 B |
+| CachedRepository_CacheMiss_Rocks    |     781.2 ns |    3,112 B |
+```
+
+### Analysis
+
+| Scenario | KnockOff vs Moq | Rocks vs Moq |
+|----------|-----------------|--------------|
+| Order Processing | **2,945x faster**, 60x less memory | 453x faster, 15x less memory |
+| Cached Repository | **1,133x faster**, 29x less memory | 559x faster, 15x less memory |
+
+**Why the difference?**
+
+- **Moq** uses runtime reflection, expression tree compilation, and Castle.Core dynamic proxy generation
+- **Rocks** generates code at compile-time but creates expectation tracking infrastructure per-test
+- **KnockOff** generates minimal stub classes with direct delegate invocation and no verification overhead
+
+For large test suites (1000+ tests), these differences compound significantly. A test suite taking 30 seconds with Moq might complete in under 1 second with KnockOff.
+
 ### No Lambda Ceremony
 
 Define behavior with normal methods, not expression trees:
