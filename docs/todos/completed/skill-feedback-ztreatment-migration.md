@@ -22,13 +22,13 @@ Feedback from evaluating the KnockOff skill while planning a Moq-to-KnockOff mig
 
 Priority order:
 
-1. - [ ] Fix "Generic methods | Not supported" error in moq-migration.md (factually wrong - they ARE supported)
-2. - [ ] Fix Moq migration table (`mock.Object` → implicit conversion for interfaces, `.Object` for classes)
-3. - [ ] Document interface inheritance (flattening behavior, accessing inherited members)
-4. - [ ] Add `SetupProperty` → backing field migration example
-5. - [ ] Rename "Interface Properties" section to "Multiple Interface Support"
-6. - [ ] Document `.As{InterfaceName}()` method - when and why to use it
-7. - [ ] Add backing field naming convention statement (low priority)
+1. - [x] Fix "Generic methods | Not supported" error in moq-migration.md (factually wrong - they ARE supported)
+2. - [x] Fix Moq migration table (`mock.Object` → implicit conversion for interfaces, `.Object` for classes)
+3. - [x] Document interface inheritance (flattening behavior, accessing inherited members)
+4. - [x] Add `SetupProperty` → backing field migration example
+5. - [x] Rename "Interface Properties" section to "Multiple Interface Support"
+6. - [x] Document `.As{InterfaceName}()` method - when and why to use it
+7. - [x] Add backing field naming convention statement (low priority)
 
 Deferred:
 - Complete test class migration example → `future/complete-test-class-migration-example.md`
