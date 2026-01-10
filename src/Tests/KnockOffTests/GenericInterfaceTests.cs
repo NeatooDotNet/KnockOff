@@ -43,13 +43,13 @@ public class GenericInterfaceTests
 	}
 
 	[Fact]
-	public void GenericInterface_AsMethod_Works()
+	public void GenericInterface_ImplicitConversion_Works()
 	{
 		var knockOff = new UserRepositoryKnockOff();
 
-		IRepository<User> repo = knockOff.AsRepository();
+		IRepository<User> repo = knockOff;
 
-		repo.Save(new User { Id = 1, Name = "Via AsRepository" });
+		repo.Save(new User { Id = 1, Name = "Via cast" });
 		Assert.True(knockOff.Save.WasCalled);
 	}
 }

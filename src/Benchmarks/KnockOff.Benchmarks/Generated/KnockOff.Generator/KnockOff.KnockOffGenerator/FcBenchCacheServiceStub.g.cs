@@ -186,9 +186,6 @@ partial class FcBenchCacheServiceStub
 	/// <summary>Interceptor for Remove.</summary>
 	public RemoveInterceptor Remove { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Benchmarks.Benchmarks.IFcBenchCacheService.</summary>
-	public global::KnockOff.Benchmarks.Benchmarks.IFcBenchCacheService AsFcBenchCacheService() => this;
-
 	T? global::KnockOff.Benchmarks.Benchmarks.IFcBenchCacheService.Get<T>(string key) where T : class
 	{
 		Get.Of<T>().RecordCall(key);

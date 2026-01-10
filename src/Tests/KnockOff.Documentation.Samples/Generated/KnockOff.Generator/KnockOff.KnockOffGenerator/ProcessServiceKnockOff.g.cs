@@ -80,9 +80,6 @@ partial class ProcessServiceKnockOff
 	/// <summary>Interceptor for Process.</summary>
 	public Process3Interceptor Process3 { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.GettingStarted.IProcessService.</summary>
-	public global::KnockOff.Documentation.Samples.GettingStarted.IProcessService AsProcessService() => this;
-
 	void global::KnockOff.Documentation.Samples.GettingStarted.IProcessService.Process(string data)
 	{
 		Process1.RecordCall(data);

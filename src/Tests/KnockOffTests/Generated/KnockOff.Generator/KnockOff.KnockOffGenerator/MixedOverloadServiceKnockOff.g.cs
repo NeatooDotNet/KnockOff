@@ -233,9 +233,6 @@ partial class MixedOverloadServiceKnockOff
 	/// <summary>Interceptor for Format (generic overloads, use .Of&lt;T&gt;()).</summary>
 	public FormatGenericInterceptor FormatGeneric { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Tests.IMixedOverloadService.</summary>
-	public global::KnockOff.Tests.IMixedOverloadService AsMixedOverloadService() => this;
-
 	void global::KnockOff.Tests.IMixedOverloadService.Process(string @value)
 	{
 		Process1.RecordCall(@value);

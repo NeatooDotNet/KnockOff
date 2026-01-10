@@ -58,9 +58,6 @@ partial class PatternRepositoryKnockOff
 	/// <summary>Interceptor for CountAsync.</summary>
 	public CountAsync2Interceptor CountAsync2 { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Concepts.IPatternRepository.</summary>
-	public global::KnockOff.Documentation.Samples.Concepts.IPatternRepository AsPatternRepository() => this;
-
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Concepts.PatternUser?> global::KnockOff.Documentation.Samples.Concepts.IPatternRepository.GetByIdAsync(int id)
 	{
 		GetByIdAsync2.RecordCall(id);

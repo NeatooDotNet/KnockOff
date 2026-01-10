@@ -23,6 +23,9 @@ partial class SkBackingServiceKnockOff
 		/// <summary>Callback invoked when the setter is accessed.</summary>
 		public global::System.Action<SkBackingServiceKnockOff, string>? OnSet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public string Value { get; set; } = "";
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
@@ -30,22 +33,16 @@ partial class SkBackingServiceKnockOff
 		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 	}
 
 	/// <summary>Interceptor for Name.</summary>
 	public NameInterceptor Name { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ISkBackingService.</summary>
-	public global::KnockOff.Documentation.Samples.Skills.ISkBackingService AsSkBackingService() => this;
-
-	/// <summary>Backing storage for Name.</summary>
-	protected string NameBacking { get; set; } = "";
-
 	string global::KnockOff.Documentation.Samples.Skills.ISkBackingService.Name
 	{
-		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
-		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else NameBacking = value; }
+		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else Name.Value = value; }
 	}
 
 }

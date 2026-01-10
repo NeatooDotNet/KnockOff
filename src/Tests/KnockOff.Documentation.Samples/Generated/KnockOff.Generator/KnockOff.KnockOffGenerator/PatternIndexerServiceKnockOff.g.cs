@@ -39,9 +39,6 @@ partial class PatternIndexerServiceKnockOff
 	/// <summary>Interceptor for StringIndexer.</summary>
 	public StringIndexerInterceptor StringIndexer { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Concepts.IPatternIndexerService.</summary>
-	public global::KnockOff.Documentation.Samples.Concepts.IPatternIndexerService AsPatternIndexerService() => this;
-
 	/// <summary>Backing storage for StringIndexer indexer.</summary>
 	public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Documentation.Samples.Concepts.PatternPropertyInfo?> StringIndexerBacking { get; } = new();
 

@@ -33,11 +33,14 @@ partial class PropertyStoreKnockOff
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<PropertyStoreKnockOff, int>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public int Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Interceptor for Int32Indexer.</summary>
@@ -46,14 +49,8 @@ partial class PropertyStoreKnockOff
 	/// <summary>Interceptor for Count.</summary>
 	public CountInterceptor Count { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore.</summary>
-	public global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore AsInPropertyStore() => this;
-
 	/// <summary>Backing storage for Int32Indexer indexer.</summary>
 	public global::System.Collections.Generic.Dictionary<int, global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo> Int32IndexerBacking { get; } = new();
-
-	/// <summary>Backing storage for Count.</summary>
-	protected int CountBacking { get; set; } = default!;
 
 	global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore.this[int index]
 	{
@@ -62,7 +59,7 @@ partial class PropertyStoreKnockOff
 
 	int global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore.Count
 	{
-		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? CountBacking; }
+		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? Count.Value; }
 	}
 
 }

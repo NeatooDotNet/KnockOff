@@ -14,11 +14,14 @@ partial class PropConnectionKnockOff
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<PropConnectionKnockOff, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for Connect.</summary>
@@ -46,15 +49,9 @@ partial class PropConnectionKnockOff
 	/// <summary>Interceptor for Connect.</summary>
 	public ConnectInterceptor Connect { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IPropConnection.</summary>
-	public global::KnockOff.Documentation.Samples.Guides.IPropConnection AsPropConnection() => this;
-
-	/// <summary>Backing storage for IsConnected.</summary>
-	protected bool IsConnectedBacking { get; set; } = default!;
-
 	bool global::KnockOff.Documentation.Samples.Guides.IPropConnection.IsConnected
 	{
-		get { IsConnected.RecordGet(); return IsConnected.OnGet?.Invoke(this) ?? IsConnectedBacking; }
+		get { IsConnected.RecordGet(); return IsConnected.OnGet?.Invoke(this) ?? IsConnected.Value; }
 	}
 
 	void global::KnockOff.Documentation.Samples.Guides.IPropConnection.Connect()

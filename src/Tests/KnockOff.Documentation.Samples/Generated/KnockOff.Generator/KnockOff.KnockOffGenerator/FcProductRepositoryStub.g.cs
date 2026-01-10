@@ -114,9 +114,6 @@ partial class FcProductRepositoryStub
 	/// <summary>Interceptor for DeleteAsync.</summary>
 	public DeleteAsyncInterceptor DeleteAsync { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Comparison.IFcProductRepository.</summary>
-	public global::KnockOff.Documentation.Samples.Comparison.IFcProductRepository AsFcProductRepository() => this;
-
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Comparison.FcProduct?> global::KnockOff.Documentation.Samples.Comparison.IFcProductRepository.GetByIdAsync(int id)
 	{
 		GetByIdAsync.RecordCall(id);

@@ -30,9 +30,6 @@ partial class MigSaveServiceKnockOff
 	/// <summary>Interceptor for Save.</summary>
 	public SaveInterceptor Save { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Comparison.IMigSaveService.</summary>
-	public global::KnockOff.Documentation.Samples.Comparison.IMigSaveService AsMigSaveService() => this;
-
 	void global::KnockOff.Documentation.Samples.Comparison.IMigSaveService.Save(global::KnockOff.Documentation.Samples.Comparison.MigEntity entity)
 	{
 		Save.RecordCall(entity);

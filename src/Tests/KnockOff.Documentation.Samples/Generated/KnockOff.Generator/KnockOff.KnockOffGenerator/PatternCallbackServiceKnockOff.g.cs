@@ -83,9 +83,6 @@ partial class PatternCallbackServiceKnockOff
 	/// <summary>Interceptor for Calculate.</summary>
 	public CalculateInterceptor Calculate { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Concepts.IPatternCallbackService.</summary>
-	public global::KnockOff.Documentation.Samples.Concepts.IPatternCallbackService AsPatternCallbackService() => this;
-
 	void global::KnockOff.Documentation.Samples.Concepts.IPatternCallbackService.DoSomething()
 	{
 		DoSomething.RecordCall();

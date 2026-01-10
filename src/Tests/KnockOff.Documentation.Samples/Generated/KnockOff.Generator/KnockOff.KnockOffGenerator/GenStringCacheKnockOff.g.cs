@@ -58,9 +58,6 @@ partial class GenStringCacheKnockOff
 	/// <summary>Interceptor for Set.</summary>
 	public SetInterceptor Set { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IGenCache<string, global::KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
-	public global::KnockOff.Documentation.Samples.Guides.IGenCache<string, global::KnockOff.Documentation.Samples.Guides.GenUser> AsGenCache() => this;
-
 	global::KnockOff.Documentation.Samples.Guides.GenUser? global::KnockOff.Documentation.Samples.Guides.IGenCache<string, global::KnockOff.Documentation.Samples.Guides.GenUser>.Get(string key)
 	{
 		Get.RecordCall(key);

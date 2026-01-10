@@ -45,11 +45,14 @@ partial class DictionaryStringIntKnockOff
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<DictionaryStringIntKnockOff, global::System.Collections.Generic.ICollection<string>>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public global::System.Collections.Generic.ICollection<string> Value { get; set; } = new global::System.Collections.Generic.List<string>();
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for Values.</summary>
@@ -61,11 +64,14 @@ partial class DictionaryStringIntKnockOff
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<DictionaryStringIntKnockOff, global::System.Collections.Generic.ICollection<int>>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public global::System.Collections.Generic.ICollection<int> Value { get; set; } = new global::System.Collections.Generic.List<int>();
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for Count.</summary>
@@ -77,11 +83,14 @@ partial class DictionaryStringIntKnockOff
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<DictionaryStringIntKnockOff, int>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public int Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsReadOnly.</summary>
@@ -93,11 +102,14 @@ partial class DictionaryStringIntKnockOff
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<DictionaryStringIntKnockOff, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for Add.</summary>
@@ -377,29 +389,8 @@ partial class DictionaryStringIntKnockOff
 	/// <summary>Interceptor for GetEnumerator.</summary>
 	public GetEnumeratorInterceptor GetEnumerator { get; } = new();
 
-	/// <summary>Returns this instance as global::System.Collections.Generic.IDictionary<string, int>.</summary>
-	public global::System.Collections.Generic.IDictionary<string, int> AsDictionary() => this;
-
-	/// <summary>Returns this instance as global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, int>>.</summary>
-	public global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, int>> AsCollection() => this;
-
-	/// <summary>Returns this instance as global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.KeyValuePair<string, int>>.</summary>
-	public global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.KeyValuePair<string, int>> AsEnumerable() => this;
-
 	/// <summary>Backing storage for StringIndexer indexer.</summary>
 	public global::System.Collections.Generic.Dictionary<string, int> StringIndexerBacking { get; } = new();
-
-	/// <summary>Backing storage for Keys.</summary>
-	protected global::System.Collections.Generic.ICollection<string> KeysBacking { get; set; } = new global::System.Collections.Generic.List<string>();
-
-	/// <summary>Backing storage for Values.</summary>
-	protected global::System.Collections.Generic.ICollection<int> ValuesBacking { get; set; } = new global::System.Collections.Generic.List<int>();
-
-	/// <summary>Backing storage for Count.</summary>
-	protected int CountBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsReadOnly.</summary>
-	protected bool IsReadOnlyBacking { get; set; } = default!;
 
 	void global::System.Collections.Generic.IDictionary<string, int>.Add(string key, int @value)
 	{
@@ -436,12 +427,12 @@ partial class DictionaryStringIntKnockOff
 
 	global::System.Collections.Generic.ICollection<string> global::System.Collections.Generic.IDictionary<string, int>.Keys
 	{
-		get { Keys.RecordGet(); return Keys.OnGet?.Invoke(this) ?? KeysBacking; }
+		get { Keys.RecordGet(); return Keys.OnGet?.Invoke(this) ?? Keys.Value; }
 	}
 
 	global::System.Collections.Generic.ICollection<int> global::System.Collections.Generic.IDictionary<string, int>.Values
 	{
-		get { Values.RecordGet(); return Values.OnGet?.Invoke(this) ?? ValuesBacking; }
+		get { Values.RecordGet(); return Values.OnGet?.Invoke(this) ?? Values.Value; }
 	}
 
 	void global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, int>>.Add(global::System.Collections.Generic.KeyValuePair<string, int> item)
@@ -476,12 +467,12 @@ partial class DictionaryStringIntKnockOff
 
 	int global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, int>>.Count
 	{
-		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? CountBacking; }
+		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? Count.Value; }
 	}
 
 	bool global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, int>>.IsReadOnly
 	{
-		get { IsReadOnly.RecordGet(); return IsReadOnly.OnGet?.Invoke(this) ?? IsReadOnlyBacking; }
+		get { IsReadOnly.RecordGet(); return IsReadOnly.OnGet?.Invoke(this) ?? IsReadOnly.Value; }
 	}
 
 	global::System.Collections.Generic.IEnumerator<global::System.Collections.Generic.KeyValuePair<string, int>> global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.KeyValuePair<string, int>>.GetEnumerator()

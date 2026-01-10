@@ -27,9 +27,6 @@ partial class IdxPropertyStoreKnockOff
 	/// <summary>Interceptor for StringIndexer.</summary>
 	public StringIndexerInterceptor StringIndexer { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IIdxPropertyStore.</summary>
-	public global::KnockOff.Documentation.Samples.Guides.IIdxPropertyStore AsIdxPropertyStore() => this;
-
 	/// <summary>Backing storage for StringIndexer indexer.</summary>
 	public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Documentation.Samples.Guides.IdxPropertyInfo?> StringIndexerBacking { get; } = new();
 

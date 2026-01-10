@@ -14,11 +14,14 @@ partial class EntityPropertyManagerStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<EntityPropertyManagerStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsSelfModified.</summary>
@@ -30,11 +33,14 @@ partial class EntityPropertyManagerStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<EntityPropertyManagerStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for ModifiedProperties.</summary>
@@ -46,11 +52,14 @@ partial class EntityPropertyManagerStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<EntityPropertyManagerStub, global::System.Collections.Generic.IEnumerable<string>>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public global::System.Collections.Generic.IEnumerable<string> Value { get; set; } = new global::System.Collections.Generic.List<string>();
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsBusy.</summary>
@@ -62,11 +71,14 @@ partial class EntityPropertyManagerStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<EntityPropertyManagerStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for StringIndexer.</summary>
@@ -97,11 +109,14 @@ partial class EntityPropertyManagerStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<EntityPropertyManagerStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsValid.</summary>
@@ -113,11 +128,14 @@ partial class EntityPropertyManagerStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<EntityPropertyManagerStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for PropertyMessages.</summary>
@@ -129,11 +147,14 @@ partial class EntityPropertyManagerStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<EntityPropertyManagerStub, global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> Value { get; set; } = new global::System.Collections.Generic.List<global::Neatoo.IPropertyMessage>();
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsPaused.</summary>
@@ -145,11 +166,14 @@ partial class EntityPropertyManagerStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<EntityPropertyManagerStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for MarkSelfUnmodified.</summary>
@@ -483,44 +507,8 @@ partial class EntityPropertyManagerStub
 	/// <summary>Interceptor for PropertyChanged event.</summary>
 	public PropertyChangedInterceptor PropertyChanged { get; } = new();
 
-	/// <summary>Returns this instance as global::Neatoo.IEntityPropertyManager.</summary>
-	public global::Neatoo.IEntityPropertyManager AsEntityPropertyManager() => this;
-
-	/// <summary>Returns this instance as global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>.</summary>
-	public global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty> AsValidatePropertyManager() => this;
-
-	/// <summary>Returns this instance as global::Neatoo.INotifyNeatooPropertyChanged.</summary>
-	public global::Neatoo.INotifyNeatooPropertyChanged AsNotifyNeatooPropertyChanged() => this;
-
-	/// <summary>Returns this instance as global::System.ComponentModel.INotifyPropertyChanged.</summary>
-	public global::System.ComponentModel.INotifyPropertyChanged AsNotifyPropertyChanged() => this;
-
-	/// <summary>Backing storage for IsModified.</summary>
-	protected bool IsModifiedBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsSelfModified.</summary>
-	protected bool IsSelfModifiedBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for ModifiedProperties.</summary>
-	protected global::System.Collections.Generic.IEnumerable<string> ModifiedPropertiesBacking { get; set; } = new global::System.Collections.Generic.List<string>();
-
-	/// <summary>Backing storage for IsBusy.</summary>
-	protected bool IsBusyBacking { get; set; } = default!;
-
 	/// <summary>Backing storage for StringIndexer indexer.</summary>
 	public global::System.Collections.Generic.Dictionary<string, global::Neatoo.IEntityProperty> StringIndexerBacking { get; } = new();
-
-	/// <summary>Backing storage for IsSelfValid.</summary>
-	protected bool IsSelfValidBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsValid.</summary>
-	protected bool IsValidBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for PropertyMessages.</summary>
-	protected global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> PropertyMessagesBacking { get; set; } = new global::System.Collections.Generic.List<global::Neatoo.IPropertyMessage>();
-
-	/// <summary>Backing storage for IsPaused.</summary>
-	protected bool IsPausedBacking { get; set; } = default!;
 
 	void global::Neatoo.IEntityPropertyManager.MarkSelfUnmodified()
 	{
@@ -530,17 +518,17 @@ partial class EntityPropertyManagerStub
 
 	bool global::Neatoo.IEntityPropertyManager.IsModified
 	{
-		get { IsModified.RecordGet(); return IsModified.OnGet?.Invoke(this) ?? IsModifiedBacking; }
+		get { IsModified.RecordGet(); return IsModified.OnGet?.Invoke(this) ?? IsModified.Value; }
 	}
 
 	bool global::Neatoo.IEntityPropertyManager.IsSelfModified
 	{
-		get { IsSelfModified.RecordGet(); return IsSelfModified.OnGet?.Invoke(this) ?? IsSelfModifiedBacking; }
+		get { IsSelfModified.RecordGet(); return IsSelfModified.OnGet?.Invoke(this) ?? IsSelfModified.Value; }
 	}
 
 	global::System.Collections.Generic.IEnumerable<string> global::Neatoo.IEntityPropertyManager.ModifiedProperties
 	{
-		get { ModifiedProperties.RecordGet(); return ModifiedProperties.OnGet?.Invoke(this) ?? ModifiedPropertiesBacking; }
+		get { ModifiedProperties.RecordGet(); return ModifiedProperties.OnGet?.Invoke(this) ?? ModifiedProperties.Value; }
 	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>.WaitForTasks()
@@ -601,7 +589,7 @@ partial class EntityPropertyManagerStub
 
 	bool global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>.IsBusy
 	{
-		get { IsBusy.RecordGet(); return IsBusy.OnGet?.Invoke(this) ?? IsBusyBacking; }
+		get { IsBusy.RecordGet(); return IsBusy.OnGet?.Invoke(this) ?? IsBusy.Value; }
 	}
 
 	global::Neatoo.IEntityProperty global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>.this[string propertyName]
@@ -611,22 +599,22 @@ partial class EntityPropertyManagerStub
 
 	bool global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>.IsSelfValid
 	{
-		get { IsSelfValid.RecordGet(); return IsSelfValid.OnGet?.Invoke(this) ?? IsSelfValidBacking; }
+		get { IsSelfValid.RecordGet(); return IsSelfValid.OnGet?.Invoke(this) ?? IsSelfValid.Value; }
 	}
 
 	bool global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>.IsValid
 	{
-		get { IsValid.RecordGet(); return IsValid.OnGet?.Invoke(this) ?? IsValidBacking; }
+		get { IsValid.RecordGet(); return IsValid.OnGet?.Invoke(this) ?? IsValid.Value; }
 	}
 
 	global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>.PropertyMessages
 	{
-		get { PropertyMessages.RecordGet(); return PropertyMessages.OnGet?.Invoke(this) ?? PropertyMessagesBacking; }
+		get { PropertyMessages.RecordGet(); return PropertyMessages.OnGet?.Invoke(this) ?? PropertyMessages.Value; }
 	}
 
 	bool global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>.IsPaused
 	{
-		get { IsPaused.RecordGet(); return IsPaused.OnGet?.Invoke(this) ?? IsPausedBacking; }
+		get { IsPaused.RecordGet(); return IsPaused.OnGet?.Invoke(this) ?? IsPaused.Value; }
 	}
 
 	event global::Neatoo.NeatooPropertyChanged? global::Neatoo.INotifyNeatooPropertyChanged.NeatooPropertyChanged

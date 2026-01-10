@@ -111,9 +111,6 @@ partial class MmProcessorKnockOff
 	/// <summary>Interceptor for Calculate.</summary>
 	public Calculate2Interceptor Calculate2 { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.IMmProcessorService.</summary>
-	public global::KnockOff.Documentation.Samples.Skills.IMmProcessorService AsMmProcessorService() => this;
-
 	void global::KnockOff.Documentation.Samples.Skills.IMmProcessorService.Process(string data)
 	{
 		Process1.RecordCall(data);

@@ -49,9 +49,6 @@ partial class MethodHandlerStateKnockOff
 	/// <summary>Interceptor for Process.</summary>
 	public ProcessInterceptor Process { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IMethodHandlerState.</summary>
-	public global::KnockOff.Documentation.Samples.Guides.IMethodHandlerState AsMethodHandlerState() => this;
-
 	void global::KnockOff.Documentation.Samples.Guides.IMethodHandlerState.Initialize()
 	{
 		Initialize.RecordCall();

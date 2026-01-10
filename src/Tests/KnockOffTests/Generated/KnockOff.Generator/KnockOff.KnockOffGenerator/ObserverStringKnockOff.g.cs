@@ -77,9 +77,6 @@ partial class ObserverStringKnockOff
 	/// <summary>Interceptor for OnNext.</summary>
 	public OnNextInterceptor OnNext { get; } = new();
 
-	/// <summary>Returns this instance as global::System.IObserver<string>.</summary>
-	public global::System.IObserver<string> AsObserver() => this;
-
 	void global::System.IObserver<string>.OnCompleted()
 	{
 		OnCompleted.RecordCall();

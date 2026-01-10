@@ -108,9 +108,6 @@ partial class SkOnCallKnockOff
 	/// <summary>Interceptor for Save.</summary>
 	public SaveInterceptor Save { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ISkOnCallService.</summary>
-	public global::KnockOff.Documentation.Samples.Skills.ISkOnCallService AsSkOnCallService() => this;
-
 	void global::KnockOff.Documentation.Samples.Skills.ISkOnCallService.Clear()
 	{
 		Clear.RecordCall();

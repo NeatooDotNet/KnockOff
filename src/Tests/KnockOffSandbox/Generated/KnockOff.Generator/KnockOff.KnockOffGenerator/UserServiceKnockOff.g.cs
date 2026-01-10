@@ -23,6 +23,9 @@ partial class UserServiceKnockOff
 		/// <summary>Callback invoked when the setter is accessed.</summary>
 		public global::System.Action<UserServiceKnockOff, string>? OnSet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public string Value { get; set; } = "";
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
@@ -30,7 +33,7 @@ partial class UserServiceKnockOff
 		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for Count.</summary>
@@ -42,11 +45,14 @@ partial class UserServiceKnockOff
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<UserServiceKnockOff, int>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public int Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for DoWork.</summary>
@@ -130,24 +136,15 @@ partial class UserServiceKnockOff
 	/// <summary>Interceptor for Process.</summary>
 	public ProcessInterceptor Process { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Sandbox.IUserService.</summary>
-	public global::KnockOff.Sandbox.IUserService AsUserService() => this;
-
-	/// <summary>Backing storage for Name.</summary>
-	protected string NameBacking { get; set; } = "";
-
-	/// <summary>Backing storage for Count.</summary>
-	protected int CountBacking { get; set; } = default!;
-
 	string global::KnockOff.Sandbox.IUserService.Name
 	{
-		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
-		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else NameBacking = value; }
+		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else Name.Value = value; }
 	}
 
 	int global::KnockOff.Sandbox.IUserService.Count
 	{
-		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? CountBacking; }
+		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? Count.Value; }
 	}
 
 	void global::KnockOff.Sandbox.IUserService.DoWork()

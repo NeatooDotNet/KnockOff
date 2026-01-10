@@ -23,6 +23,9 @@ partial class IhAuditableEntityKnockOff
 		/// <summary>Callback invoked when the setter is accessed.</summary>
 		public global::System.Action<IhAuditableEntityKnockOff, global::System.DateTime?>? OnSet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public global::System.DateTime? Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
@@ -30,7 +33,7 @@ partial class IhAuditableEntityKnockOff
 		public void RecordSet(global::System.DateTime? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for ModifiedBy.</summary>
@@ -51,6 +54,9 @@ partial class IhAuditableEntityKnockOff
 		/// <summary>Callback invoked when the setter is accessed.</summary>
 		public global::System.Action<IhAuditableEntityKnockOff, string>? OnSet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public string Value { get; set; } = "";
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
@@ -58,7 +64,7 @@ partial class IhAuditableEntityKnockOff
 		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for Id.</summary>
@@ -70,11 +76,14 @@ partial class IhAuditableEntityKnockOff
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<IhAuditableEntityKnockOff, int>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public int Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for CreatedAt.</summary>
@@ -86,11 +95,14 @@ partial class IhAuditableEntityKnockOff
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<IhAuditableEntityKnockOff, global::System.DateTime>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public global::System.DateTime Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Interceptor for ModifiedAt.</summary>
@@ -105,44 +117,26 @@ partial class IhAuditableEntityKnockOff
 	/// <summary>Interceptor for CreatedAt.</summary>
 	public CreatedAtInterceptor CreatedAt { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IIhAuditableEntity.</summary>
-	public global::KnockOff.Documentation.Samples.Guides.IIhAuditableEntity AsIhAuditableEntity() => this;
-
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IIhBaseEntity.</summary>
-	public global::KnockOff.Documentation.Samples.Guides.IIhBaseEntity AsIhBaseEntity() => this;
-
-	/// <summary>Backing storage for ModifiedAt.</summary>
-	protected global::System.DateTime? ModifiedAtBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for ModifiedBy.</summary>
-	protected string ModifiedByBacking { get; set; } = "";
-
-	/// <summary>Backing storage for Id.</summary>
-	protected int IdBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for CreatedAt.</summary>
-	protected global::System.DateTime CreatedAtBacking { get; set; } = default!;
-
 	global::System.DateTime? global::KnockOff.Documentation.Samples.Guides.IIhAuditableEntity.ModifiedAt
 	{
-		get { ModifiedAt.RecordGet(); return ModifiedAt.OnGet?.Invoke(this) ?? ModifiedAtBacking; }
-		set { ModifiedAt.RecordSet(value); if (ModifiedAt.OnSet != null) ModifiedAt.OnSet(this, value); else ModifiedAtBacking = value; }
+		get { ModifiedAt.RecordGet(); return ModifiedAt.OnGet?.Invoke(this) ?? ModifiedAt.Value; }
+		set { ModifiedAt.RecordSet(value); if (ModifiedAt.OnSet != null) ModifiedAt.OnSet(this, value); else ModifiedAt.Value = value; }
 	}
 
 	string global::KnockOff.Documentation.Samples.Guides.IIhAuditableEntity.ModifiedBy
 	{
-		get { ModifiedBy.RecordGet(); return ModifiedBy.OnGet?.Invoke(this) ?? ModifiedByBacking; }
-		set { ModifiedBy.RecordSet(value); if (ModifiedBy.OnSet != null) ModifiedBy.OnSet(this, value); else ModifiedByBacking = value; }
+		get { ModifiedBy.RecordGet(); return ModifiedBy.OnGet?.Invoke(this) ?? ModifiedBy.Value; }
+		set { ModifiedBy.RecordSet(value); if (ModifiedBy.OnSet != null) ModifiedBy.OnSet(this, value); else ModifiedBy.Value = value; }
 	}
 
 	int global::KnockOff.Documentation.Samples.Guides.IIhBaseEntity.Id
 	{
-		get { Id.RecordGet(); return Id.OnGet?.Invoke(this) ?? IdBacking; }
+		get { Id.RecordGet(); return Id.OnGet?.Invoke(this) ?? Id.Value; }
 	}
 
 	global::System.DateTime global::KnockOff.Documentation.Samples.Guides.IIhBaseEntity.CreatedAt
 	{
-		get { CreatedAt.RecordGet(); return CreatedAt.OnGet?.Invoke(this) ?? CreatedAtBacking; }
+		get { CreatedAt.RecordGet(); return CreatedAt.OnGet?.Invoke(this) ?? CreatedAt.Value; }
 	}
 
 }

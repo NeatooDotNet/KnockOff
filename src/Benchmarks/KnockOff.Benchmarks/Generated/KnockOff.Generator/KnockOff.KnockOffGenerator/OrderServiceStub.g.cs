@@ -167,9 +167,6 @@ partial class OrderServiceStub
 	/// <summary>Interceptor for CalculateTotal.</summary>
 	public CalculateTotalInterceptor CalculateTotal { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Benchmarks.Interfaces.IOrderService.</summary>
-	public global::KnockOff.Benchmarks.Interfaces.IOrderService AsOrderService() => this;
-
 	global::KnockOff.Benchmarks.Interfaces.Order? global::KnockOff.Benchmarks.Interfaces.IOrderService.GetOrder(int orderId)
 	{
 		GetOrder.RecordCall(orderId);

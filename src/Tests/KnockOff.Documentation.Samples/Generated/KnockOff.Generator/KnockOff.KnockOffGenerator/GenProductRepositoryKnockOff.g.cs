@@ -58,9 +58,6 @@ partial class GenProductRepositoryKnockOff
 	/// <summary>Interceptor for FindFirst.</summary>
 	public FindFirstInterceptor FindFirst { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<global::KnockOff.Documentation.Samples.Guides.GenProduct>.</summary>
-	public global::KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<global::KnockOff.Documentation.Samples.Guides.GenProduct> AsGenReadOnlyRepository() => this;
-
 	global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Guides.GenProduct> global::KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<global::KnockOff.Documentation.Samples.Guides.GenProduct>.GetAll()
 	{
 		GetAll.RecordCall();

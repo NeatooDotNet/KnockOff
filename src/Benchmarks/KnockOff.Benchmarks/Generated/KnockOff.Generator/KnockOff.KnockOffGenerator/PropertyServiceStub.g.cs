@@ -23,6 +23,9 @@ partial class PropertyServiceStub
 		/// <summary>Callback invoked when the setter is accessed.</summary>
 		public global::System.Action<PropertyServiceStub, string>? OnSet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public string Value { get; set; } = "";
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
@@ -30,7 +33,7 @@ partial class PropertyServiceStub
 		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for ReadOnlyValue.</summary>
@@ -42,11 +45,14 @@ partial class PropertyServiceStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<PropertyServiceStub, int>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public int Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for WriteOnlyValue.</summary>
@@ -61,11 +67,14 @@ partial class PropertyServiceStub
 		/// <summary>Callback invoked when the setter is accessed.</summary>
 		public global::System.Action<PropertyServiceStub, int>? OnSet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public int Value { get; set; } = default!;
+
 		/// <summary>Records a setter access.</summary>
 		public void RecordSet(int? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { SetCount = 0; LastSetValue = default; OnSet = null; }
+		public void Reset() { SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 	}
 
 	/// <summary>Interceptor for Name.</summary>
@@ -77,32 +86,20 @@ partial class PropertyServiceStub
 	/// <summary>Interceptor for WriteOnlyValue.</summary>
 	public WriteOnlyValueInterceptor WriteOnlyValue { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Benchmarks.Interfaces.IPropertyService.</summary>
-	public global::KnockOff.Benchmarks.Interfaces.IPropertyService AsPropertyService() => this;
-
-	/// <summary>Backing storage for Name.</summary>
-	protected string NameBacking { get; set; } = "";
-
-	/// <summary>Backing storage for ReadOnlyValue.</summary>
-	protected int ReadOnlyValueBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for WriteOnlyValue.</summary>
-	protected int WriteOnlyValueBacking { get; set; } = default!;
-
 	string global::KnockOff.Benchmarks.Interfaces.IPropertyService.Name
 	{
-		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
-		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else NameBacking = value; }
+		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else Name.Value = value; }
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.IPropertyService.ReadOnlyValue
 	{
-		get { ReadOnlyValue.RecordGet(); return ReadOnlyValue.OnGet?.Invoke(this) ?? ReadOnlyValueBacking; }
+		get { ReadOnlyValue.RecordGet(); return ReadOnlyValue.OnGet?.Invoke(this) ?? ReadOnlyValue.Value; }
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.IPropertyService.WriteOnlyValue
 	{
-		set { WriteOnlyValue.RecordSet(value); if (WriteOnlyValue.OnSet != null) WriteOnlyValue.OnSet(this, value); else WriteOnlyValueBacking = value; }
+		set { WriteOnlyValue.RecordSet(value); if (WriteOnlyValue.OnSet != null) WriteOnlyValue.OnSet(this, value); else WriteOnlyValue.Value = value; }
 	}
 
 }

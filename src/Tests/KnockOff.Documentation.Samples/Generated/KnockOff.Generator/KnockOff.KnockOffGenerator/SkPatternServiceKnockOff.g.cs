@@ -108,9 +108,6 @@ partial class SkPatternServiceKnockOff
 	/// <summary>Interceptor for GetNext.</summary>
 	public GetNextInterceptor GetNext { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ISkPatternService.</summary>
-	public global::KnockOff.Documentation.Samples.Skills.ISkPatternService AsSkPatternService() => this;
-
 	global::KnockOff.Documentation.Samples.Skills.SkUser? global::KnockOff.Documentation.Samples.Skills.ISkPatternService.GetUser(int id)
 	{
 		GetUser.RecordCall(id);

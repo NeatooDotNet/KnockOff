@@ -80,9 +80,6 @@ partial class AsyncServiceStub
 	/// <summary>Interceptor for GetStringValueAsync.</summary>
 	public GetStringValueAsyncInterceptor GetStringValueAsync { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Benchmarks.Interfaces.IAsyncService.</summary>
-	public global::KnockOff.Benchmarks.Interfaces.IAsyncService AsAsyncService() => this;
-
 	global::System.Threading.Tasks.Task global::KnockOff.Benchmarks.Interfaces.IAsyncService.DoWorkAsync()
 	{
 		DoWorkAsync.RecordCall();

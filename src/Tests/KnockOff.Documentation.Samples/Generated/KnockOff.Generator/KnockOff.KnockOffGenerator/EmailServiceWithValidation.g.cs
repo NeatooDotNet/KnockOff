@@ -14,11 +14,14 @@ partial class EmailServiceWithValidation
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<EmailServiceWithValidation, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for SendEmail.</summary>
@@ -77,12 +80,6 @@ partial class EmailServiceWithValidation
 	/// <summary>Interceptor for IsValidAddress.</summary>
 	public IsValidAddress2Interceptor IsValidAddress2 { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation.</summary>
-	public global::KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation AsEmailServiceWithValidation() => this;
-
-	/// <summary>Backing storage for IsConnected.</summary>
-	protected bool IsConnectedBacking { get; set; } = default!;
-
 	void global::KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation.SendEmail(string to, string subject, string body)
 	{
 		SendEmail.RecordCall(to, subject, body);
@@ -91,7 +88,7 @@ partial class EmailServiceWithValidation
 
 	bool global::KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation.IsConnected
 	{
-		get { IsConnected.RecordGet(); return IsConnected.OnGet?.Invoke(this) ?? IsConnectedBacking; }
+		get { IsConnected.RecordGet(); return IsConnected.OnGet?.Invoke(this) ?? IsConnected.Value; }
 	}
 
 	bool global::KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation.IsValidAddress(string email)

@@ -83,9 +83,6 @@ partial class AsyncRepositoryKnockOff
 	/// <summary>Interceptor for CountAsync.</summary>
 	public CountAsyncInterceptor CountAsync { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IAsyncRepository.</summary>
-	public global::KnockOff.Documentation.Samples.Guides.IAsyncRepository AsAsyncRepository() => this;
-
 	global::System.Threading.Tasks.Task global::KnockOff.Documentation.Samples.Guides.IAsyncRepository.InitializeAsync()
 	{
 		InitializeAsync.RecordCall();

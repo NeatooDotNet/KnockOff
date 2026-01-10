@@ -33,9 +33,6 @@ partial class FcBenchPaymentServiceStub
 	/// <summary>Interceptor for ProcessPayment.</summary>
 	public ProcessPaymentInterceptor ProcessPayment { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Benchmarks.Benchmarks.IFcBenchPaymentService.</summary>
-	public global::KnockOff.Benchmarks.Benchmarks.IFcBenchPaymentService AsFcBenchPaymentService() => this;
-
 	global::KnockOff.Benchmarks.Benchmarks.FcBenchPaymentResult global::KnockOff.Benchmarks.Benchmarks.IFcBenchPaymentService.ProcessPayment(int customerId, decimal amount)
 	{
 		ProcessPayment.RecordCall(customerId, amount);

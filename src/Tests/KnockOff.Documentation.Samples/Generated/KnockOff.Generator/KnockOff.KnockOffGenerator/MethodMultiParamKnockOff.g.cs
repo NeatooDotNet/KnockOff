@@ -30,9 +30,6 @@ partial class MethodMultiParamKnockOff
 	/// <summary>Interceptor for Process.</summary>
 	public ProcessInterceptor Process { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IMethodMultiParam.</summary>
-	public global::KnockOff.Documentation.Samples.Guides.IMethodMultiParam AsMethodMultiParam() => this;
-
 	void global::KnockOff.Documentation.Samples.Guides.IMethodMultiParam.Process(string name, int @value, bool flag)
 	{
 		Process.RecordCall(name, @value, flag);

@@ -61,9 +61,6 @@ partial class CacheStub
 	/// <summary>Interceptor for Int32Indexer.</summary>
 	public Int32IndexerInterceptor Int32Indexer { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Benchmarks.Interfaces.ICache.</summary>
-	public global::KnockOff.Benchmarks.Interfaces.ICache AsCache() => this;
-
 	/// <summary>Backing storage for StringIndexer indexer.</summary>
 	public global::System.Collections.Generic.Dictionary<string, object> StringIndexerBacking { get; } = new();
 

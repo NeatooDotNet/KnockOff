@@ -39,9 +39,6 @@ partial class IdxListKnockOff
 	/// <summary>Interceptor for Int32Indexer.</summary>
 	public Int32IndexerInterceptor Int32Indexer { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IIdxList.</summary>
-	public global::KnockOff.Documentation.Samples.Guides.IIdxList AsIdxList() => this;
-
 	/// <summary>Backing storage for Int32Indexer indexer.</summary>
 	public global::System.Collections.Generic.Dictionary<int, object?> Int32IndexerBacking { get; } = new();
 

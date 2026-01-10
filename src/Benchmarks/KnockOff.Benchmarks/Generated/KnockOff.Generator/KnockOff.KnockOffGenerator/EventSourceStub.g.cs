@@ -65,9 +65,6 @@ partial class EventSourceStub
 	/// <summary>Interceptor for ValueChanged event.</summary>
 	public ValueChangedInterceptor ValueChanged { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Benchmarks.Interfaces.IEventSource.</summary>
-	public global::KnockOff.Benchmarks.Interfaces.IEventSource AsEventSource() => this;
-
 	event global::System.EventHandler<string>? global::KnockOff.Benchmarks.Interfaces.IEventSource.MessageReceived
 	{
 		add => MessageReceived.RecordAdd(value);

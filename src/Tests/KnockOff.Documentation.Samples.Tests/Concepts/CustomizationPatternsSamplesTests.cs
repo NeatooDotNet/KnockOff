@@ -265,15 +265,17 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
     public void CombiningPatterns_DefaultIsNull()
     {
         var knockOff = new PatternCombinedRepositoryKnockOff();
+        IPatternCombinedRepository repo = knockOff;
 
         // Uses default (null)
-        Assert.Null(knockOff.AsPatternCombinedRepository().GetById(999));
+        Assert.Null(repo.GetById(999));
     }
 
     [Fact]
     public void CombiningPatterns_CallbackOverridesDefault()
     {
         var knockOff = new PatternCombinedRepositoryKnockOff();
+        IPatternCombinedRepository repo = knockOff;
 
         // Override for specific IDs
         knockOff.GetById2.OnCall = (ko, id) => id switch
@@ -283,23 +285,24 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
             _ => null  // Fall through to "not found"
         };
 
-        Assert.Equal("Admin", knockOff.AsPatternCombinedRepository().GetById(1)?.Name);
-        Assert.Null(knockOff.AsPatternCombinedRepository().GetById(999));  // Still null
+        Assert.Equal("Admin", repo.GetById(1)?.Name);
+        Assert.Null(repo.GetById(999));  // Still null
     }
 
     [Fact]
     public void CombiningPatterns_ResetAndNewCallback()
     {
         var knockOff = new PatternCombinedRepositoryKnockOff();
+        IPatternCombinedRepository repo = knockOff;
 
         knockOff.GetById2.OnCall = (ko, id) => new PatternUser { Id = id, Name = "First" };
-        Assert.Equal("First", knockOff.AsPatternCombinedRepository().GetById(1)?.Name);
+        Assert.Equal("First", repo.GetById(1)?.Name);
 
         // Reset and use different callback
         knockOff.GetById2.Reset();
         knockOff.GetById2.OnCall = (ko, id) =>
             new PatternUser { Id = id, Name = $"User-{id}" };
 
-        Assert.Equal("User-999", knockOff.AsPatternCombinedRepository().GetById(999)?.Name);
+        Assert.Equal("User-999", repo.GetById(999)?.Name);
     }
 }

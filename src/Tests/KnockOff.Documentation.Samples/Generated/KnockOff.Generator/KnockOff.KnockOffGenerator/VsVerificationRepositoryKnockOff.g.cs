@@ -105,9 +105,6 @@ partial class VsVerificationRepositoryKnockOff
 	/// <summary>Interceptor for Update.</summary>
 	public UpdateInterceptor Update { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository.</summary>
-	public global::KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository AsVsVerificationRepository() => this;
-
 	void global::KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository.Save(global::KnockOff.Documentation.Samples.Comparison.VsEntity entity)
 	{
 		Save.RecordCall(entity);

@@ -23,6 +23,9 @@ partial class UserServiceKnockOff
 		/// <summary>Callback invoked when the setter is accessed.</summary>
 		public global::System.Action<UserServiceKnockOff, string>? OnSet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public string Value { get; set; } = "";
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
@@ -30,7 +33,7 @@ partial class UserServiceKnockOff
 		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for GetUser.</summary>
@@ -64,12 +67,6 @@ partial class UserServiceKnockOff
 	/// <summary>Interceptor for GetUser.</summary>
 	public GetUser2Interceptor GetUser2 { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple.</summary>
-	public global::KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple AsUserServiceSimple() => this;
-
-	/// <summary>Backing storage for Name.</summary>
-	protected string NameBacking { get; set; } = "";
-
 	global::KnockOff.Documentation.Samples.GettingStarted.User global::KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple.GetUser(int id)
 	{
 		GetUser2.RecordCall(id);
@@ -79,8 +76,8 @@ partial class UserServiceKnockOff
 
 	string global::KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple.Name
 	{
-		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
-		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else NameBacking = value; }
+		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else Name.Value = value; }
 	}
 
 }

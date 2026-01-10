@@ -33,9 +33,6 @@ partial class ComparableStringKnockOff
 	/// <summary>Interceptor for CompareTo.</summary>
 	public CompareToInterceptor CompareTo { get; } = new();
 
-	/// <summary>Returns this instance as global::System.IComparable<string>.</summary>
-	public global::System.IComparable<string> AsComparable() => this;
-
 	int global::System.IComparable<string>.CompareTo(string? other)
 	{
 		CompareTo.RecordCall(other);

@@ -60,9 +60,6 @@ partial class UserRepositoryKnockOff
 	/// <summary>Interceptor for SaveUser.</summary>
 	public SaveUserInterceptor SaveUser { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.GettingStarted.IUserRepository.</summary>
-	public global::KnockOff.Documentation.Samples.GettingStarted.IUserRepository AsUserRepository() => this;
-
 	global::KnockOff.Documentation.Samples.GettingStarted.User? global::KnockOff.Documentation.Samples.GettingStarted.IUserRepository.GetUser(int id)
 	{
 		GetUser.RecordCall(id);

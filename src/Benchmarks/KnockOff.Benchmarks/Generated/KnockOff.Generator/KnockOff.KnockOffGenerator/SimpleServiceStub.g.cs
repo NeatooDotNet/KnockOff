@@ -27,9 +27,6 @@ partial class SimpleServiceStub
 	/// <summary>Interceptor for DoWork.</summary>
 	public DoWorkInterceptor DoWork { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Benchmarks.Interfaces.ISimpleService.</summary>
-	public global::KnockOff.Benchmarks.Interfaces.ISimpleService AsSimpleService() => this;
-
 	void global::KnockOff.Benchmarks.Interfaces.ISimpleService.DoWork()
 	{
 		DoWork.RecordCall();

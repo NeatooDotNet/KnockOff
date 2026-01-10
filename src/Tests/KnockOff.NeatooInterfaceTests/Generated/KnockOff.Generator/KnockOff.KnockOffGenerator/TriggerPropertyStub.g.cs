@@ -14,11 +14,14 @@ partial class TriggerPropertyStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<TriggerPropertyStub, string>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public string Value { get; set; } = "";
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsMatch.</summary>
@@ -52,12 +55,6 @@ partial class TriggerPropertyStub
 	/// <summary>Interceptor for IsMatch.</summary>
 	public IsMatchInterceptor IsMatch { get; } = new();
 
-	/// <summary>Returns this instance as global::Neatoo.Rules.ITriggerProperty.</summary>
-	public global::Neatoo.Rules.ITriggerProperty AsTriggerProperty() => this;
-
-	/// <summary>Backing storage for PropertyName.</summary>
-	protected string PropertyNameBacking { get; set; } = "";
-
 	bool global::Neatoo.Rules.ITriggerProperty.IsMatch(string propertyName)
 	{
 		IsMatch.RecordCall(propertyName);
@@ -66,7 +63,7 @@ partial class TriggerPropertyStub
 
 	string global::Neatoo.Rules.ITriggerProperty.PropertyName
 	{
-		get { PropertyName.RecordGet(); return PropertyName.OnGet?.Invoke(this) ?? PropertyNameBacking; }
+		get { PropertyName.RecordGet(); return PropertyName.OnGet?.Invoke(this) ?? PropertyName.Value; }
 	}
 
 }

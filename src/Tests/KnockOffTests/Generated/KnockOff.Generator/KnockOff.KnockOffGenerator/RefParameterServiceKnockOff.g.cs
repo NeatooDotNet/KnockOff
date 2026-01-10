@@ -61,9 +61,6 @@ partial class RefParameterServiceKnockOff
 	/// <summary>Interceptor for TryUpdate.</summary>
 	public TryUpdateInterceptor TryUpdate { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Tests.IRefParameterService.</summary>
-	public global::KnockOff.Tests.IRefParameterService AsRefParameterService() => this;
-
 	void global::KnockOff.Tests.IRefParameterService.Increment(ref int @value)
 	{
 		Increment.RecordCall(@value);

@@ -155,9 +155,6 @@ partial class ConstrainedGenericServiceKnockOff
 	/// <summary>Interceptor for SaveEntity (use .Of&lt;T&gt;() to access typed handler).</summary>
 	public SaveEntityInterceptor SaveEntity { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Tests.IConstrainedGenericService.</summary>
-	public global::KnockOff.Tests.IConstrainedGenericService AsConstrainedGenericService() => this;
-
 	T global::KnockOff.Tests.IConstrainedGenericService.CreateEntity<T>() where T : class
 	{
 		CreateEntity.Of<T>().RecordCall();

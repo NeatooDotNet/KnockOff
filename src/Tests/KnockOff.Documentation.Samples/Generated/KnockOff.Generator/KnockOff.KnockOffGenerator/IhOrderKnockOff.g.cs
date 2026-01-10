@@ -14,11 +14,14 @@ partial class IhOrderKnockOff
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<IhOrderKnockOff, decimal>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public decimal Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsValid.</summary>
@@ -30,11 +33,14 @@ partial class IhOrderKnockOff
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<IhOrderKnockOff, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for Submit.</summary>
@@ -90,21 +96,9 @@ partial class IhOrderKnockOff
 	/// <summary>Interceptor for GetErrors.</summary>
 	public GetErrorsInterceptor GetErrors { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IIhOrder.</summary>
-	public global::KnockOff.Documentation.Samples.Guides.IIhOrder AsIhOrder() => this;
-
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IIhValidatable.</summary>
-	public global::KnockOff.Documentation.Samples.Guides.IIhValidatable AsIhValidatable() => this;
-
-	/// <summary>Backing storage for Total.</summary>
-	protected decimal TotalBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsValid.</summary>
-	protected bool IsValidBacking { get; set; } = default!;
-
 	decimal global::KnockOff.Documentation.Samples.Guides.IIhOrder.Total
 	{
-		get { Total.RecordGet(); return Total.OnGet?.Invoke(this) ?? TotalBacking; }
+		get { Total.RecordGet(); return Total.OnGet?.Invoke(this) ?? Total.Value; }
 	}
 
 	void global::KnockOff.Documentation.Samples.Guides.IIhOrder.Submit()
@@ -115,7 +109,7 @@ partial class IhOrderKnockOff
 
 	bool global::KnockOff.Documentation.Samples.Guides.IIhValidatable.IsValid
 	{
-		get { IsValid.RecordGet(); return IsValid.OnGet?.Invoke(this) ?? IsValidBacking; }
+		get { IsValid.RecordGet(); return IsValid.OnGet?.Invoke(this) ?? IsValid.Value; }
 	}
 
 	global::System.Collections.Generic.IEnumerable<string> global::KnockOff.Documentation.Samples.Guides.IIhValidatable.GetErrors()

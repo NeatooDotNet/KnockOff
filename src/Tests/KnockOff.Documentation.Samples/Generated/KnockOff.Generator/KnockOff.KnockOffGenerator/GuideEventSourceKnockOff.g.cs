@@ -125,9 +125,6 @@ partial class GuideEventSourceKnockOff
 	/// <summary>Interceptor for OnData event.</summary>
 	public OnDataInterceptor OnData { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IGuideEventSource.</summary>
-	public global::KnockOff.Documentation.Samples.Guides.IGuideEventSource AsGuideEventSource() => this;
-
 	event global::System.EventHandler<string>? global::KnockOff.Documentation.Samples.Guides.IGuideEventSource.MessageReceived
 	{
 		add => MessageReceived.RecordAdd(value);

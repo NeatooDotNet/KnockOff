@@ -80,9 +80,6 @@ partial class FcBenchLoggerStub
 	/// <summary>Interceptor for LogError.</summary>
 	public LogErrorInterceptor LogError { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Benchmarks.Benchmarks.IFcBenchLogger.</summary>
-	public global::KnockOff.Benchmarks.Benchmarks.IFcBenchLogger AsFcBenchLogger() => this;
-
 	void global::KnockOff.Benchmarks.Benchmarks.IFcBenchLogger.LogInfo(string message)
 	{
 		LogInfo.RecordCall(message);

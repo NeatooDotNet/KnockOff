@@ -14,11 +14,14 @@ partial class RangeRuleStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<RangeRuleStub, string>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public string Value { get; set; } = "";
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for Minimum.</summary>
@@ -30,11 +33,14 @@ partial class RangeRuleStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<RangeRuleStub, object>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public object Value { get; set; } = new object();
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for Maximum.</summary>
@@ -46,11 +52,14 @@ partial class RangeRuleStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<RangeRuleStub, object>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public object Value { get; set; } = new object();
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for Executed.</summary>
@@ -62,11 +71,14 @@ partial class RangeRuleStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<RangeRuleStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for RuleOrder.</summary>
@@ -78,11 +90,14 @@ partial class RangeRuleStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<RangeRuleStub, int>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public int Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for UniqueIndex.</summary>
@@ -94,11 +109,14 @@ partial class RangeRuleStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<RangeRuleStub, uint>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public uint Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for Messages.</summary>
@@ -110,11 +128,14 @@ partial class RangeRuleStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<RangeRuleStub, global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.IRuleMessage>>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.IRuleMessage> Value { get; set; } = new global::System.Collections.Generic.List<global::Neatoo.Rules.IRuleMessage>();
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for TriggerProperties.</summary>
@@ -126,11 +147,14 @@ partial class RangeRuleStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<RangeRuleStub, global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.ITriggerProperty>>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.ITriggerProperty> Value { get; set; } = new global::System.Collections.Generic.List<global::Neatoo.Rules.ITriggerProperty>();
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for RunRule.</summary>
@@ -210,49 +234,19 @@ partial class RangeRuleStub
 	/// <summary>Interceptor for OnRuleAdded.</summary>
 	public OnRuleAddedInterceptor OnRuleAdded { get; } = new();
 
-	/// <summary>Returns this instance as global::Neatoo.Rules.Rules.IRangeRule.</summary>
-	public global::Neatoo.Rules.Rules.IRangeRule AsRangeRule() => this;
-
-	/// <summary>Returns this instance as global::Neatoo.Rules.IRule.</summary>
-	public global::Neatoo.Rules.IRule AsRule() => this;
-
-	/// <summary>Backing storage for ErrorMessage.</summary>
-	protected string ErrorMessageBacking { get; set; } = "";
-
-	/// <summary>Backing storage for Minimum.</summary>
-	protected object MinimumBacking { get; set; } = new object();
-
-	/// <summary>Backing storage for Maximum.</summary>
-	protected object MaximumBacking { get; set; } = new object();
-
-	/// <summary>Backing storage for Executed.</summary>
-	protected bool ExecutedBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for RuleOrder.</summary>
-	protected int RuleOrderBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for UniqueIndex.</summary>
-	protected uint UniqueIndexBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for Messages.</summary>
-	protected global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.IRuleMessage> MessagesBacking { get; set; } = new global::System.Collections.Generic.List<global::Neatoo.Rules.IRuleMessage>();
-
-	/// <summary>Backing storage for TriggerProperties.</summary>
-	protected global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.ITriggerProperty> TriggerPropertiesBacking { get; set; } = new global::System.Collections.Generic.List<global::Neatoo.Rules.ITriggerProperty>();
-
 	string global::Neatoo.Rules.Rules.IRangeRule.ErrorMessage
 	{
-		get { ErrorMessage.RecordGet(); return ErrorMessage.OnGet?.Invoke(this) ?? ErrorMessageBacking; }
+		get { ErrorMessage.RecordGet(); return ErrorMessage.OnGet?.Invoke(this) ?? ErrorMessage.Value; }
 	}
 
 	object global::Neatoo.Rules.Rules.IRangeRule.Minimum
 	{
-		get { Minimum.RecordGet(); return Minimum.OnGet?.Invoke(this) ?? MinimumBacking; }
+		get { Minimum.RecordGet(); return Minimum.OnGet?.Invoke(this) ?? Minimum.Value; }
 	}
 
 	object global::Neatoo.Rules.Rules.IRangeRule.Maximum
 	{
-		get { Maximum.RecordGet(); return Maximum.OnGet?.Invoke(this) ?? MaximumBacking; }
+		get { Maximum.RecordGet(); return Maximum.OnGet?.Invoke(this) ?? Maximum.Value; }
 	}
 
 	global::System.Threading.Tasks.Task<global::Neatoo.Rules.IRuleMessages> global::Neatoo.Rules.IRule.RunRule(global::Neatoo.IValidateBase target, global::System.Threading.CancellationToken? token)
@@ -271,27 +265,27 @@ partial class RangeRuleStub
 
 	bool global::Neatoo.Rules.IRule.Executed
 	{
-		get { Executed.RecordGet(); return Executed.OnGet?.Invoke(this) ?? ExecutedBacking; }
+		get { Executed.RecordGet(); return Executed.OnGet?.Invoke(this) ?? Executed.Value; }
 	}
 
 	int global::Neatoo.Rules.IRule.RuleOrder
 	{
-		get { RuleOrder.RecordGet(); return RuleOrder.OnGet?.Invoke(this) ?? RuleOrderBacking; }
+		get { RuleOrder.RecordGet(); return RuleOrder.OnGet?.Invoke(this) ?? RuleOrder.Value; }
 	}
 
 	uint global::Neatoo.Rules.IRule.UniqueIndex
 	{
-		get { UniqueIndex.RecordGet(); return UniqueIndex.OnGet?.Invoke(this) ?? UniqueIndexBacking; }
+		get { UniqueIndex.RecordGet(); return UniqueIndex.OnGet?.Invoke(this) ?? UniqueIndex.Value; }
 	}
 
 	global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.IRuleMessage> global::Neatoo.Rules.IRule.Messages
 	{
-		get { Messages.RecordGet(); return Messages.OnGet?.Invoke(this) ?? MessagesBacking; }
+		get { Messages.RecordGet(); return Messages.OnGet?.Invoke(this) ?? Messages.Value; }
 	}
 
 	global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.ITriggerProperty> global::Neatoo.Rules.IRule.TriggerProperties
 	{
-		get { TriggerProperties.RecordGet(); return TriggerProperties.OnGet?.Invoke(this) ?? TriggerPropertiesBacking; }
+		get { TriggerProperties.RecordGet(); return TriggerProperties.OnGet?.Invoke(this) ?? TriggerProperties.Value; }
 	}
 
 }

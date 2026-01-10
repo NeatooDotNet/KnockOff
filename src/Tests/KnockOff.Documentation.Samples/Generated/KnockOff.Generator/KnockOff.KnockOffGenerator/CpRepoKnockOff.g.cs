@@ -58,9 +58,6 @@ partial class CpRepoKnockOff
 	/// <summary>Interceptor for CountAsync.</summary>
 	public CountAsync2Interceptor CountAsync2 { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ICpRepository.</summary>
-	public global::KnockOff.Documentation.Samples.Skills.ICpRepository AsCpRepository() => this;
-
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.CpUser?> global::KnockOff.Documentation.Samples.Skills.ICpRepository.GetByIdAsync(int id)
 	{
 		GetByIdAsync2.RecordCall(id);

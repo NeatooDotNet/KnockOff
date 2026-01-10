@@ -33,9 +33,6 @@ partial class VsOverrideServiceKnockOff
 	/// <summary>Interceptor for GetUser.</summary>
 	public GetUser2Interceptor GetUser2 { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Comparison.IVsOverrideService.</summary>
-	public global::KnockOff.Documentation.Samples.Comparison.IVsOverrideService AsVsOverrideService() => this;
-
 	global::KnockOff.Documentation.Samples.Comparison.VsUser global::KnockOff.Documentation.Samples.Comparison.IVsOverrideService.GetUser(int id)
 	{
 		GetUser2.RecordCall(id);

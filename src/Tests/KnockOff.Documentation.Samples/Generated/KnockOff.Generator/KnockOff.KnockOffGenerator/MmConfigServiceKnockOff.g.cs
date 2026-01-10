@@ -30,9 +30,6 @@ partial class MmConfigServiceKnockOff
 	/// <summary>Interceptor for GetConfig.</summary>
 	public GetConfig2Interceptor GetConfig2 { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.IMmConfigService.</summary>
-	public global::KnockOff.Documentation.Samples.Skills.IMmConfigService AsMmConfigService() => this;
-
 	global::KnockOff.Documentation.Samples.Skills.MmConfig global::KnockOff.Documentation.Samples.Skills.IMmConfigService.GetConfig()
 	{
 		GetConfig2.RecordCall();

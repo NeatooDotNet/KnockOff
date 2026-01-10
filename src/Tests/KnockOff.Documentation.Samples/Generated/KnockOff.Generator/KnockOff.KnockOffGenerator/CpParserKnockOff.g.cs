@@ -58,9 +58,6 @@ partial class CpParserKnockOff
 	/// <summary>Interceptor for GetStats.</summary>
 	public GetStatsInterceptor GetStats { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ICpParser.</summary>
-	public global::KnockOff.Documentation.Samples.Skills.ICpParser AsCpParser() => this;
-
 	bool global::KnockOff.Documentation.Samples.Skills.ICpParser.TryParse(string input, out int result)
 	{
 		result = default!;

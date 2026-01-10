@@ -14,11 +14,14 @@ partial class RuleMessageStubForList
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<RuleMessageStubForList, uint>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public uint Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for PropertyName.</summary>
@@ -30,11 +33,14 @@ partial class RuleMessageStubForList
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<RuleMessageStubForList, string>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public string Value { get; set; } = "";
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for Message.</summary>
@@ -46,11 +52,14 @@ partial class RuleMessageStubForList
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<RuleMessageStubForList, string?>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public string? Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Interceptor for RuleIndex.</summary>
@@ -62,31 +71,19 @@ partial class RuleMessageStubForList
 	/// <summary>Interceptor for Message.</summary>
 	public MessageInterceptor Message { get; } = new();
 
-	/// <summary>Returns this instance as global::Neatoo.Rules.IRuleMessage.</summary>
-	public global::Neatoo.Rules.IRuleMessage AsRuleMessage() => this;
-
-	/// <summary>Backing storage for RuleIndex.</summary>
-	protected uint RuleIndexBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for PropertyName.</summary>
-	protected string PropertyNameBacking { get; set; } = "";
-
-	/// <summary>Backing storage for Message.</summary>
-	protected string? MessageBacking { get; set; } = default!;
-
 	uint global::Neatoo.Rules.IRuleMessage.RuleIndex
 	{
-		get { RuleIndex.RecordGet(); return RuleIndex.OnGet?.Invoke(this) ?? RuleIndexBacking; }
+		get { RuleIndex.RecordGet(); return RuleIndex.OnGet?.Invoke(this) ?? RuleIndex.Value; }
 	}
 
 	string global::Neatoo.Rules.IRuleMessage.PropertyName
 	{
-		get { PropertyName.RecordGet(); return PropertyName.OnGet?.Invoke(this) ?? PropertyNameBacking; }
+		get { PropertyName.RecordGet(); return PropertyName.OnGet?.Invoke(this) ?? PropertyName.Value; }
 	}
 
 	string? global::Neatoo.Rules.IRuleMessage.Message
 	{
-		get { Message.RecordGet(); return Message.OnGet?.Invoke(this) ?? MessageBacking; }
+		get { Message.RecordGet(); return Message.OnGet?.Invoke(this) ?? Message.Value; }
 	}
 
 }

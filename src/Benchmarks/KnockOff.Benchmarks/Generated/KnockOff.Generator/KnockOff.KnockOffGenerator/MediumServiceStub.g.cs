@@ -261,9 +261,6 @@ partial class MediumServiceStub
 	/// <summary>Interceptor for Method10.</summary>
 	public Method10Interceptor Method10 { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Benchmarks.Interfaces.IMediumService.</summary>
-	public global::KnockOff.Benchmarks.Interfaces.IMediumService AsMediumService() => this;
-
 	void global::KnockOff.Benchmarks.Interfaces.IMediumService.Method1()
 	{
 		Method1.RecordCall();

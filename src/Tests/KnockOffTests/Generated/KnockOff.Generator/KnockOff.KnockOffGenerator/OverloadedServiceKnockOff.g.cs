@@ -192,9 +192,6 @@ partial class OverloadedServiceKnockOff
 	/// <summary>Interceptor for Calculate.</summary>
 	public Calculate2Interceptor Calculate2 { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Tests.IOverloadedService.</summary>
-	public global::KnockOff.Tests.IOverloadedService AsOverloadedService() => this;
-
 	global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> global::KnockOff.Tests.IOverloadedService.GetByIdAsync(int id)
 	{
 		GetByIdAsync1.RecordCall(id);

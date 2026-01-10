@@ -30,9 +30,6 @@ partial class SkRepositoryKnockOff
 	/// <summary>Interceptor for Save.</summary>
 	public SaveInterceptor Save { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ISkRepository.</summary>
-	public global::KnockOff.Documentation.Samples.Skills.ISkRepository AsSkRepository() => this;
-
 	void global::KnockOff.Documentation.Samples.Skills.ISkRepository.Save(object entity)
 	{
 		Save.RecordCall(entity);

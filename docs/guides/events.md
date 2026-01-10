@@ -226,7 +226,7 @@ public partial class GuideDownloaderKnockOff : IGuideDownloader { }
 <!-- snippet: docs:events:progress-example -->
 ```csharp
 var progressValues = new List<int>();
-        knockOff.AsGuideDownloader().ProgressChanged += (p) => progressValues.Add(p);
+        ((IGuideDownloader)knockOff).ProgressChanged += (p) => progressValues.Add(p);
 
         // Simulate download progress
         knockOff.ProgressChanged.Raise(0);

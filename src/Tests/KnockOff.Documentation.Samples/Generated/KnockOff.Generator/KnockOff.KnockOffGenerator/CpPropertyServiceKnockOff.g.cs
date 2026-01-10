@@ -23,6 +23,9 @@ partial class CpPropertyServiceKnockOff
 		/// <summary>Callback invoked when the setter is accessed.</summary>
 		public global::System.Action<CpPropertyServiceKnockOff, global::KnockOff.Documentation.Samples.Skills.CpUser?>? OnSet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public global::KnockOff.Documentation.Samples.Skills.CpUser? Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
@@ -30,22 +33,16 @@ partial class CpPropertyServiceKnockOff
 		public void RecordSet(global::KnockOff.Documentation.Samples.Skills.CpUser? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 	}
 
 	/// <summary>Interceptor for CurrentUser.</summary>
 	public CurrentUserInterceptor CurrentUser { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ICpPropertyService.</summary>
-	public global::KnockOff.Documentation.Samples.Skills.ICpPropertyService AsCpPropertyService() => this;
-
-	/// <summary>Backing storage for CurrentUser.</summary>
-	protected global::KnockOff.Documentation.Samples.Skills.CpUser? CurrentUserBacking { get; set; } = default!;
-
 	global::KnockOff.Documentation.Samples.Skills.CpUser? global::KnockOff.Documentation.Samples.Skills.ICpPropertyService.CurrentUser
 	{
-		get { CurrentUser.RecordGet(); return CurrentUser.OnGet?.Invoke(this) ?? CurrentUserBacking; }
-		set { CurrentUser.RecordSet(value); if (CurrentUser.OnSet != null) CurrentUser.OnSet(this, value); else CurrentUserBacking = value; }
+		get { CurrentUser.RecordGet(); return CurrentUser.OnGet?.Invoke(this) ?? CurrentUser.Value; }
+		set { CurrentUser.RecordSet(value); if (CurrentUser.OnSet != null) CurrentUser.OnSet(this, value); else CurrentUser.Value = value; }
 	}
 
 }

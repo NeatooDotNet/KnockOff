@@ -58,9 +58,6 @@ partial class FcBenchOrderRepositoryStub
 	/// <summary>Interceptor for Save.</summary>
 	public SaveInterceptor Save { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Benchmarks.Benchmarks.IFcBenchOrderRepository.</summary>
-	public global::KnockOff.Benchmarks.Benchmarks.IFcBenchOrderRepository AsFcBenchOrderRepository() => this;
-
 	global::KnockOff.Benchmarks.Benchmarks.FcBenchOrder? global::KnockOff.Benchmarks.Benchmarks.IFcBenchOrderRepository.GetById(int id)
 	{
 		GetById.RecordCall(id);

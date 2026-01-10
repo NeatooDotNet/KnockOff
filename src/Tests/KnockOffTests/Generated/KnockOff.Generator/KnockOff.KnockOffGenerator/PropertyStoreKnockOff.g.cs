@@ -27,9 +27,6 @@ partial class PropertyStoreKnockOff
 	/// <summary>Interceptor for StringIndexer.</summary>
 	public StringIndexerInterceptor StringIndexer { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Tests.IPropertyStore.</summary>
-	public global::KnockOff.Tests.IPropertyStore AsPropertyStore() => this;
-
 	/// <summary>Backing storage for StringIndexer indexer.</summary>
 	public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Tests.PropertyInfo?> StringIndexerBacking { get; } = new();
 

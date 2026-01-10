@@ -44,11 +44,14 @@ partial class RuleManagerStubForRule
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<RuleManagerStubForRule, global::System.Collections.Generic.IEnumerable<global::Neatoo.Rules.IRule>>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public global::System.Collections.Generic.IEnumerable<global::Neatoo.Rules.IRule> Value { get; set; } = new global::System.Collections.Generic.List<global::Neatoo.Rules.IRule>();
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for RunRules.</summary>
@@ -318,12 +321,6 @@ partial class RuleManagerStubForRule
 	/// <summary>Interceptor for RunRule (generic overloads, use .Of&lt;T&gt;()).</summary>
 	public RunRuleGenericInterceptor RunRuleGeneric { get; } = new();
 
-	/// <summary>Returns this instance as global::Neatoo.Rules.IRuleManager.</summary>
-	public global::Neatoo.Rules.IRuleManager AsRuleManager() => this;
-
-	/// <summary>Backing storage for Rules.</summary>
-	protected global::System.Collections.Generic.IEnumerable<global::Neatoo.Rules.IRule> RulesBacking { get; set; } = new global::System.Collections.Generic.List<global::Neatoo.Rules.IRule>();
-
 	global::System.Threading.Tasks.Task global::Neatoo.Rules.IRuleManager.RunRules(string propertyName, global::System.Threading.CancellationToken? token)
 	{
 		RunRules1.RecordCall(propertyName, token);
@@ -364,7 +361,7 @@ partial class RuleManagerStubForRule
 
 	global::System.Collections.Generic.IEnumerable<global::Neatoo.Rules.IRule> global::Neatoo.Rules.IRuleManager.Rules
 	{
-		get { Rules.RecordGet(); return Rules.OnGet?.Invoke(this) ?? RulesBacking; }
+		get { Rules.RecordGet(); return Rules.OnGet?.Invoke(this) ?? Rules.Value; }
 	}
 
 }

@@ -71,9 +71,6 @@ partial class MethodCallOrderKnockOff
 	/// <summary>Interceptor for Cleanup.</summary>
 	public CleanupInterceptor Cleanup { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IMethodCallOrder.</summary>
-	public global::KnockOff.Documentation.Samples.Guides.IMethodCallOrder AsMethodCallOrder() => this;
-
 	void global::KnockOff.Documentation.Samples.Guides.IMethodCallOrder.Initialize()
 	{
 		Initialize.RecordCall();

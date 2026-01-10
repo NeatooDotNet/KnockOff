@@ -401,9 +401,6 @@ partial class GenericMethodServiceKnockOff
 	/// <summary>Interceptor for Transfer (use .Of&lt;T&gt;() to access typed handler).</summary>
 	public TransferInterceptor Transfer { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Tests.IGenericMethodService.</summary>
-	public global::KnockOff.Tests.IGenericMethodService AsGenericMethodService() => this;
-
 	T global::KnockOff.Tests.IGenericMethodService.Create<T>()
 	{
 		Create.Of<T>().RecordCall();

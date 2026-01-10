@@ -65,9 +65,6 @@ partial class SkEventPatternSourceKnockOff
 	/// <summary>Interceptor for ProgressChanged event.</summary>
 	public ProgressChangedInterceptor ProgressChanged { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ISkEventPatternSource.</summary>
-	public global::KnockOff.Documentation.Samples.Skills.ISkEventPatternSource AsSkEventPatternSource() => this;
-
 	event global::System.EventHandler<string>? global::KnockOff.Documentation.Samples.Skills.ISkEventPatternSource.DataReceived
 	{
 		add => DataReceived.RecordAdd(value);

@@ -2146,32 +2146,15 @@ public class KnockOffGenerator : IIncrementalGenerator
 			sb.AppendLine();
 		}
 
-		// 5. Generate AsXYZ() methods for each interface
-		var generatedAsMethodNames = new HashSet<string>();
-		foreach (var iface in typeInfo.Interfaces)
-		{
-			var methodName = $"As{iface.SimpleName}";
-			if (!generatedAsMethodNames.Contains(methodName))
-			{
-				generatedAsMethodNames.Add(methodName);
-				sb.AppendLine($"\t/// <summary>Returns this instance as {iface.FullName}.</summary>");
-				sb.AppendLine($"\tpublic {iface.FullName} {methodName}() => this;");
-				sb.AppendLine();
-			}
-		}
-
-		// 6. Generate flat backing properties/dictionaries
+		// 5. Generate flat backing dictionaries for indexers only (properties use interceptor.Value)
 		foreach (var member in typeInfo.FlatMembers)
 		{
-			var interceptorName = flatNameMap[GetMemberKey(member)];
 			if (member.IsIndexer)
 			{
+				var interceptorName = flatNameMap[GetMemberKey(member)];
 				GenerateFlatIndexerBackingDictionary(sb, member, interceptorName);
 			}
-			else if (member.IsProperty)
-			{
-				GenerateFlatBackingProperty(sb, member, interceptorName);
-			}
+			// Properties no longer need backing - they use interceptor.Value
 		}
 
 		// 7. Generate explicit interface implementations for ALL members from ALL interfaces
@@ -4801,6 +4784,11 @@ public class KnockOffGenerator : IIncrementalGenerator
 				sb.AppendLine();
 			}
 
+			// Value property for backing storage (matches inline stub pattern)
+			sb.AppendLine("\t\t/// <summary>Value returned by getter when OnGet is not set.</summary>");
+			sb.AppendLine($"\t\tpublic {member.ReturnType} Value {{ get; set; }}{GetDefaultValueForProperty(member)}");
+			sb.AppendLine();
+
 			if (member.HasGetter)
 			{
 				sb.AppendLine("\t\t/// <summary>Records a getter access.</summary>");
@@ -4820,6 +4808,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 			sb.Append("\t\tpublic void Reset() { ");
 			if (member.HasGetter) sb.Append("GetCount = 0; OnGet = null; ");
 			if (member.HasSetter) sb.Append("SetCount = 0; LastSetValue = default; OnSet = null; ");
+			sb.Append("Value = default!; ");
 			sb.AppendLine("}");
 		}
 
@@ -5178,19 +5167,6 @@ public class KnockOffGenerator : IIncrementalGenerator
 	}
 
 	/// <summary>
-	/// Generate flat backing property (no interface prefix)
-	/// </summary>
-	private static void GenerateFlatBackingProperty(System.Text.StringBuilder sb, InterfaceMemberInfo member)
-	{
-		var backingName = $"{member.Name}Backing";
-		var defaultValue = GetDefaultValueForProperty(member);
-
-		sb.AppendLine($"\t/// <summary>Backing storage for {member.Name}.</summary>");
-		sb.AppendLine($"\tprotected {member.ReturnType} {backingName} {{ get; set; }}{defaultValue}");
-		sb.AppendLine();
-	}
-
-	/// <summary>
 	/// Generate flat indexer backing dictionary (no interface prefix)
 	/// </summary>
 	private static void GenerateFlatIndexerBackingDictionary(System.Text.StringBuilder sb, InterfaceMemberInfo member)
@@ -5386,19 +5362,6 @@ public class KnockOffGenerator : IIncrementalGenerator
 	// ===== WithName versions for flat API =====
 
 	/// <summary>
-	/// Generate flat backing property with custom name
-	/// </summary>
-	private static void GenerateFlatBackingProperty(System.Text.StringBuilder sb, InterfaceMemberInfo member, string interceptorName)
-	{
-		var backingName = $"{interceptorName}Backing";
-		var defaultValue = GetDefaultValueForProperty(member);
-
-		sb.AppendLine($"\t/// <summary>Backing storage for {member.Name}.</summary>");
-		sb.AppendLine($"\tprotected {member.ReturnType} {backingName} {{ get; set; }}{defaultValue}");
-		sb.AppendLine();
-	}
-
-	/// <summary>
 	/// Generate flat indexer backing dictionary with custom name
 	/// </summary>
 	private static void GenerateFlatIndexerBackingDictionary(System.Text.StringBuilder sb, InterfaceMemberInfo member, string interceptorName)
@@ -5419,14 +5382,13 @@ public class KnockOffGenerator : IIncrementalGenerator
 	private static void GenerateFlatPropertyImplementationWithName(System.Text.StringBuilder sb, InterfaceMemberInfo member, string interceptorName)
 	{
 		var ifaceName = member.DeclaringInterfaceFullName;
-		var backingName = $"{interceptorName}Backing";
 
 		sb.AppendLine($"\t{member.ReturnType} {ifaceName}.{member.Name}");
 		sb.AppendLine("\t{");
 
 		if (member.HasGetter)
 		{
-			sb.AppendLine($"\t\tget {{ {interceptorName}.RecordGet(); return {interceptorName}.OnGet?.Invoke(this) ?? {backingName}; }}");
+			sb.AppendLine($"\t\tget {{ {interceptorName}.RecordGet(); return {interceptorName}.OnGet?.Invoke(this) ?? {interceptorName}.Value; }}");
 		}
 
 		if (member.HasSetter)
@@ -5435,7 +5397,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 			var pragmaRestore = GetSetterNullabilityRestore(member);
 			if (!string.IsNullOrEmpty(pragmaDisable))
 				sb.Append(pragmaDisable);
-			sb.AppendLine($"\t\tset {{ {interceptorName}.RecordSet(value); if ({interceptorName}.OnSet != null) {interceptorName}.OnSet(this, value); else {backingName} = value; }}");
+			sb.AppendLine($"\t\tset {{ {interceptorName}.RecordSet(value); if ({interceptorName}.OnSet != null) {interceptorName}.OnSet(this, value); else {interceptorName}.Value = value; }}");
 			if (!string.IsNullOrEmpty(pragmaRestore))
 				sb.AppendLine(pragmaRestore);
 		}

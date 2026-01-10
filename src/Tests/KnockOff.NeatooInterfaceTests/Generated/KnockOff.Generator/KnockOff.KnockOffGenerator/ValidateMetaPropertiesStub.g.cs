@@ -14,11 +14,14 @@ partial class ValidateMetaPropertiesStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<ValidateMetaPropertiesStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsValid.</summary>
@@ -30,11 +33,14 @@ partial class ValidateMetaPropertiesStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<ValidateMetaPropertiesStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsSelfValid.</summary>
@@ -46,11 +52,14 @@ partial class ValidateMetaPropertiesStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<ValidateMetaPropertiesStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for PropertyMessages.</summary>
@@ -62,11 +71,14 @@ partial class ValidateMetaPropertiesStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<ValidateMetaPropertiesStub, global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> Value { get; set; } = new global::System.Collections.Generic.List<global::Neatoo.IPropertyMessage>();
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for WaitForTasks.</summary>
@@ -234,21 +246,6 @@ partial class ValidateMetaPropertiesStub
 	/// <summary>Interceptor for ClearSelfMessages.</summary>
 	public ClearSelfMessagesInterceptor ClearSelfMessages { get; } = new();
 
-	/// <summary>Returns this instance as global::Neatoo.IValidateMetaProperties.</summary>
-	public global::Neatoo.IValidateMetaProperties AsValidateMetaProperties() => this;
-
-	/// <summary>Backing storage for IsBusy.</summary>
-	protected bool IsBusyBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsValid.</summary>
-	protected bool IsValidBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsSelfValid.</summary>
-	protected bool IsSelfValidBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for PropertyMessages.</summary>
-	protected global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> PropertyMessagesBacking { get; set; } = new global::System.Collections.Generic.List<global::Neatoo.IPropertyMessage>();
-
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.WaitForTasks()
 	{
 		WaitForTasks1.RecordCall();
@@ -287,22 +284,22 @@ partial class ValidateMetaPropertiesStub
 
 	bool global::Neatoo.IValidateMetaProperties.IsBusy
 	{
-		get { IsBusy.RecordGet(); return IsBusy.OnGet?.Invoke(this) ?? IsBusyBacking; }
+		get { IsBusy.RecordGet(); return IsBusy.OnGet?.Invoke(this) ?? IsBusy.Value; }
 	}
 
 	bool global::Neatoo.IValidateMetaProperties.IsValid
 	{
-		get { IsValid.RecordGet(); return IsValid.OnGet?.Invoke(this) ?? IsValidBacking; }
+		get { IsValid.RecordGet(); return IsValid.OnGet?.Invoke(this) ?? IsValid.Value; }
 	}
 
 	bool global::Neatoo.IValidateMetaProperties.IsSelfValid
 	{
-		get { IsSelfValid.RecordGet(); return IsSelfValid.OnGet?.Invoke(this) ?? IsSelfValidBacking; }
+		get { IsSelfValid.RecordGet(); return IsSelfValid.OnGet?.Invoke(this) ?? IsSelfValid.Value; }
 	}
 
 	global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> global::Neatoo.IValidateMetaProperties.PropertyMessages
 	{
-		get { PropertyMessages.RecordGet(); return PropertyMessages.OnGet?.Invoke(this) ?? PropertyMessagesBacking; }
+		get { PropertyMessages.RecordGet(); return PropertyMessages.OnGet?.Invoke(this) ?? PropertyMessages.Value; }
 	}
 
 }

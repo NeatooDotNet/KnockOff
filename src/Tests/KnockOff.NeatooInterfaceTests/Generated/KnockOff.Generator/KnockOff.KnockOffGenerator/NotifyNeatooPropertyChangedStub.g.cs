@@ -35,9 +35,6 @@ partial class NotifyNeatooPropertyChangedStub
 	/// <summary>Interceptor for NeatooPropertyChanged event.</summary>
 	public NeatooPropertyChangedInterceptor NeatooPropertyChanged { get; } = new();
 
-	/// <summary>Returns this instance as global::Neatoo.INotifyNeatooPropertyChanged.</summary>
-	public global::Neatoo.INotifyNeatooPropertyChanged AsNotifyNeatooPropertyChanged() => this;
-
 	event global::Neatoo.NeatooPropertyChanged? global::Neatoo.INotifyNeatooPropertyChanged.NeatooPropertyChanged
 	{
 		add => NeatooPropertyChanged.RecordAdd(value);

@@ -61,9 +61,6 @@ partial class PatternUserServiceKnockOff
 	/// <summary>Interceptor for CalculateScore.</summary>
 	public CalculateScore2Interceptor CalculateScore2 { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Concepts.IPatternUserService.</summary>
-	public global::KnockOff.Documentation.Samples.Concepts.IPatternUserService AsPatternUserService() => this;
-
 	global::KnockOff.Documentation.Samples.Concepts.PatternUser global::KnockOff.Documentation.Samples.Concepts.IPatternUserService.GetUser(int id)
 	{
 		GetUser2.RecordCall(id);

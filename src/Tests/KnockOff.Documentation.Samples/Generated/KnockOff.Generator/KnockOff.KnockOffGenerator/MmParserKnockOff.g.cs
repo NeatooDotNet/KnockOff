@@ -33,9 +33,6 @@ partial class MmParserKnockOff
 	/// <summary>Interceptor for TryParse.</summary>
 	public TryParseInterceptor TryParse { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.IMmParser.</summary>
-	public global::KnockOff.Documentation.Samples.Skills.IMmParser AsMmParser() => this;
-
 	bool global::KnockOff.Documentation.Samples.Skills.IMmParser.TryParse(string input, out int result)
 	{
 		result = default!;

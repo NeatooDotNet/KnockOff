@@ -158,9 +158,6 @@ partial class SkGenericSerializerKnockOff
 	/// <summary>Interceptor for Convert (use .Of&lt;T&gt;() to access typed handler).</summary>
 	public ConvertInterceptor Convert { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ISkGenericSerializer.</summary>
-	public global::KnockOff.Documentation.Samples.Skills.ISkGenericSerializer AsSkGenericSerializer() => this;
-
 	T global::KnockOff.Documentation.Samples.Skills.ISkGenericSerializer.Deserialize<T>(string json)
 	{
 		Deserialize.Of<T>().RecordCall(json);

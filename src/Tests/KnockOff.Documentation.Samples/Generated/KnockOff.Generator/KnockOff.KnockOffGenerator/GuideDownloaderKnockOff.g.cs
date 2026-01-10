@@ -35,9 +35,6 @@ partial class GuideDownloaderKnockOff
 	/// <summary>Interceptor for ProgressChanged event.</summary>
 	public ProgressChangedInterceptor ProgressChanged { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IGuideDownloader.</summary>
-	public global::KnockOff.Documentation.Samples.Guides.IGuideDownloader AsGuideDownloader() => this;
-
 	event global::System.Action<int>? global::KnockOff.Documentation.Samples.Guides.IGuideDownloader.ProgressChanged
 	{
 		add => ProgressChanged.RecordAdd(value);

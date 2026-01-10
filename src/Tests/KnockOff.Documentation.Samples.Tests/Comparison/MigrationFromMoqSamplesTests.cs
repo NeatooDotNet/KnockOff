@@ -37,11 +37,11 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
     }
 
     [Fact]
-    public void ReplaceMockObject_AsMethod()
+    public void ReplaceMockObject_ImplicitConversion()
     {
         var knockOff = new MigUserServiceKnockOff();
 
-        IMigUserService service = knockOff.AsMigUserService();
+        IMigUserService service = knockOff;
 
         Assert.NotNull(service);
     }
@@ -58,7 +58,8 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
         knockOff.GetUser.OnCall = (ko, id) =>
             new MigUser { Id = id, Name = "Test" };
 
-        var user = knockOff.AsMigUserService().GetUser(42);
+        IMigUserService service = knockOff;
+        var user = service.GetUser(42);
 
         Assert.Equal(42, user.Id);
         Assert.Equal("Test", user.Name);
@@ -76,7 +77,8 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
         knockOff.GetUserAsync.OnCall = (ko, id) =>
             Task.FromResult<MigUser?>(new MigUser { Id = id });
 
-        var user = await knockOff.AsMigUserService().GetUserAsync(42);
+        IMigUserService service = knockOff;
+        var user = await service.GetUserAsync(42);
 
         Assert.NotNull(user);
         Assert.Equal(42, user.Id);

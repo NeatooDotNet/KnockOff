@@ -33,9 +33,6 @@ partial class MgServiceKnockOff
 	/// <summary>Interceptor for GetUser.</summary>
 	public GetUserInterceptor GetUser { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.IMgService.</summary>
-	public global::KnockOff.Documentation.Samples.Skills.IMgService AsMgService() => this;
-
 	global::KnockOff.Documentation.Samples.Skills.MgUser? global::KnockOff.Documentation.Samples.Skills.IMgService.GetUser(int id)
 	{
 		GetUser.RecordCall(id);

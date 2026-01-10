@@ -357,6 +357,49 @@ public class SkillSamplesTests : SamplesTestBase
     }
 
     // ========================================================================
+    // skill:SKILL:property-value-pattern (recommended for static values)
+    // ========================================================================
+
+    [Fact]
+    public void PropertyValue_StaticValues_Recommended()
+    {
+        var knockOff = new SkBackingServiceKnockOff();
+        ISkBackingService service = knockOff;
+
+        #region skill:SKILL:property-value-pattern
+        // Use Value for static test data (recommended)
+        knockOff.Name.Value = "John Doe";
+
+        // Accessing the property returns the pre-set value
+        var name = service.Name;  // "John Doe"
+        #endregion
+
+        Assert.Equal("John Doe", name);
+    }
+
+    // ========================================================================
+    // skill:SKILL:customization-callbacks-property (for dynamic values)
+    // ========================================================================
+
+    [Fact]
+    public void PropertyCallbacks_DynamicValues()
+    {
+        var knockOff = new SkVerificationKnockOff();
+        ISkVerificationService service = knockOff;
+
+        #region skill:SKILL:customization-callbacks-property
+        // Use OnGet for dynamic/computed values
+        knockOff.Name.OnGet = (ko) => $"Call #{ko.Name.GetCount}";
+
+        // Use OnSet to capture or validate
+        // Note: Value does NOT go to backing field when OnSet is set
+        #endregion
+
+        Assert.Equal("Call #1", service.Name);
+        Assert.Equal("Call #2", service.Name);
+    }
+
+    // ========================================================================
     // skill:SKILL:backing-properties
     // ========================================================================
 
@@ -674,5 +717,26 @@ public class SkillSamplesTests : SamplesTestBase
 
         // Only throws for types that can't be safely defaulted:
         Assert.Throws<InvalidOperationException>(() => service.GetDisposable());
+    }
+
+    // ========================================================================
+    // skill:SKILL:interface-class-access
+    // ========================================================================
+
+    [Fact]
+    public void InterfaceClassAccess_DemonstratesPattern()
+    {
+        #region skill:SKILL:interface-class-access
+        // Interface stubs: implicit conversion
+        var interfaceKnockOff = new SkAccessDemoServiceKnockOff();
+        ISkAccessDemoService service = interfaceKnockOff;
+
+        // Class stubs: use .Object
+        var classStub = new SkAccessDemoTests.Stubs.SkAccessDemoEmailService();
+        SkAccessDemoEmailService emailService = classStub.Object;
+        #endregion
+
+        Assert.NotNull(service);
+        Assert.NotNull(emailService);
     }
 }

@@ -27,9 +27,6 @@ partial class UnitOfWorkKnockOff
 	/// <summary>Interceptor for Commit.</summary>
 	public CommitInterceptor Commit { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork.</summary>
-	public global::KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork AsUnitOfWork() => this;
-
 	void global::KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork.Commit()
 	{
 		Commit.RecordCall();

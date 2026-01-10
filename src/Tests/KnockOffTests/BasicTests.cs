@@ -114,11 +114,11 @@ public class BasicTests
 	}
 
 	[Fact]
-	public void AsInterface_ReturnsTypedInterface()
+	public void ImplicitConversion_ReturnsTypedInterface()
 	{
 		var knockOff = new SampleKnockOff();
 
-		ISampleService service = knockOff.AsSampleService();
+		ISampleService service = knockOff;
 
 		service.Name = "Test";
 		Assert.Equal(1, knockOff.Name.SetCount);

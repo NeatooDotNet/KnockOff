@@ -14,11 +14,14 @@ partial class DataProviderStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<DataProviderStub, int>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public int Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for GetEnumerator.</summary>
@@ -71,21 +74,9 @@ partial class DataProviderStub
 	/// <summary>Interceptor for Dispose.</summary>
 	public DisposeInterceptor Dispose { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Benchmarks.Interfaces.IDataProvider.</summary>
-	public global::KnockOff.Benchmarks.Interfaces.IDataProvider AsDataProvider() => this;
-
-	/// <summary>Returns this instance as global::System.Collections.Generic.IEnumerable<string>.</summary>
-	public global::System.Collections.Generic.IEnumerable<string> AsEnumerable() => this;
-
-	/// <summary>Returns this instance as global::System.IDisposable.</summary>
-	public global::System.IDisposable AsDisposable() => this;
-
-	/// <summary>Backing storage for Count.</summary>
-	protected int CountBacking { get; set; } = default!;
-
 	int global::KnockOff.Benchmarks.Interfaces.IDataProvider.Count
 	{
-		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? CountBacking; }
+		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? Count.Value; }
 	}
 
 	global::System.Collections.Generic.IEnumerator<string> global::System.Collections.Generic.IEnumerable<string>.GetEnumerator()

@@ -23,6 +23,9 @@ partial class CollisionKnockOff
 		/// <summary>Callback invoked when the setter is accessed.</summary>
 		public global::System.Action<CollisionKnockOff, string>? OnSet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public string Value { get; set; } = "";
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
@@ -30,7 +33,7 @@ partial class CollisionKnockOff
 		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for DoWork.</summary>
@@ -58,16 +61,10 @@ partial class CollisionKnockOff
 	/// <summary>Interceptor for DoWork.</summary>
 	public DoWorkInterceptor DoWork { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Tests.ICollision.</summary>
-	public global::KnockOff.Tests.ICollision AsCollision() => this;
-
-	/// <summary>Backing storage for ICollision.</summary>
-	protected string ICollisionBacking { get; set; } = "";
-
 	string global::KnockOff.Tests.ICollision.ICollision
 	{
-		get { ICollision.RecordGet(); return ICollision.OnGet?.Invoke(this) ?? ICollisionBacking; }
-		set { ICollision.RecordSet(value); if (ICollision.OnSet != null) ICollision.OnSet(this, value); else ICollisionBacking = value; }
+		get { ICollision.RecordGet(); return ICollision.OnGet?.Invoke(this) ?? ICollision.Value; }
+		set { ICollision.RecordSet(value); if (ICollision.OnSet != null) ICollision.OnSet(this, value); else ICollision.Value = value; }
 	}
 
 	void global::KnockOff.Tests.ICollision.DoWork()

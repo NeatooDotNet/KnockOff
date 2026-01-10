@@ -14,11 +14,14 @@ partial class NotifierKnockOff
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<NotifierKnockOff, string>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public string Value { get; set; } = "";
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for Notify.</summary>
@@ -49,12 +52,6 @@ partial class NotifierKnockOff
 	/// <summary>Interceptor for Notify.</summary>
 	public NotifyInterceptor Notify { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Tests.INotifier.</summary>
-	public global::KnockOff.Tests.INotifier AsNotifier() => this;
-
-	/// <summary>Backing storage for Name.</summary>
-	protected string NameBacking { get; set; } = "";
-
 	void global::KnockOff.Tests.INotifier.Notify(string recipient)
 	{
 		Notify.RecordCall(recipient);
@@ -63,7 +60,7 @@ partial class NotifierKnockOff
 
 	string global::KnockOff.Tests.INotifier.Name
 	{
-		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
+		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? Name.Value; }
 	}
 
 }

@@ -14,11 +14,14 @@ partial class SmartDefaultsKnockOff
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<SmartDefaultsKnockOff, int>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public int Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for Items.</summary>
@@ -30,11 +33,14 @@ partial class SmartDefaultsKnockOff
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<SmartDefaultsKnockOff, global::System.Collections.Generic.List<string>>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public global::System.Collections.Generic.List<string> Value { get; set; } = new global::System.Collections.Generic.List<string>();
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for GetInt.</summary>
@@ -393,15 +399,6 @@ partial class SmartDefaultsKnockOff
 	/// <summary>Interceptor for GetStringAsync.</summary>
 	public GetStringAsyncInterceptor GetStringAsync { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Tests.ISmartDefaultsService.</summary>
-	public global::KnockOff.Tests.ISmartDefaultsService AsSmartDefaultsService() => this;
-
-	/// <summary>Backing storage for Count.</summary>
-	protected int CountBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for Items.</summary>
-	protected global::System.Collections.Generic.List<string> ItemsBacking { get; set; } = new global::System.Collections.Generic.List<string>();
-
 	int global::KnockOff.Tests.ISmartDefaultsService.GetInt()
 	{
 		GetInt.RecordCall();
@@ -494,12 +491,12 @@ partial class SmartDefaultsKnockOff
 
 	int global::KnockOff.Tests.ISmartDefaultsService.Count
 	{
-		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? CountBacking; }
+		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? Count.Value; }
 	}
 
 	global::System.Collections.Generic.List<string> global::KnockOff.Tests.ISmartDefaultsService.Items
 	{
-		get { Items.RecordGet(); return Items.OnGet?.Invoke(this) ?? ItemsBacking; }
+		get { Items.RecordGet(); return Items.OnGet?.Invoke(this) ?? Items.Value; }
 	}
 
 }

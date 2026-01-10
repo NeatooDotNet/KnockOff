@@ -33,11 +33,14 @@ partial class IdxEntityBaseKnockOff
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<IdxEntityBaseKnockOff, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Interceptor for StringIndexer.</summary>
@@ -46,14 +49,8 @@ partial class IdxEntityBaseKnockOff
 	/// <summary>Interceptor for IsNew.</summary>
 	public IsNewInterceptor IsNew { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IIdxEntityBase.</summary>
-	public global::KnockOff.Documentation.Samples.Guides.IIdxEntityBase AsIdxEntityBase() => this;
-
 	/// <summary>Backing storage for StringIndexer indexer.</summary>
 	public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Documentation.Samples.Guides.IIdxEntityProperty?> StringIndexerBacking { get; } = new();
-
-	/// <summary>Backing storage for IsNew.</summary>
-	protected bool IsNewBacking { get; set; } = default!;
 
 	global::KnockOff.Documentation.Samples.Guides.IIdxEntityProperty? global::KnockOff.Documentation.Samples.Guides.IIdxEntityBase.this[string propertyName]
 	{
@@ -62,7 +59,7 @@ partial class IdxEntityBaseKnockOff
 
 	bool global::KnockOff.Documentation.Samples.Guides.IIdxEntityBase.IsNew
 	{
-		get { IsNew.RecordGet(); return IsNew.OnGet?.Invoke(this) ?? IsNewBacking; }
+		get { IsNew.RecordGet(); return IsNew.OnGet?.Invoke(this) ?? IsNew.Value; }
 	}
 
 }

@@ -16,11 +16,14 @@ partial class NestedEntityStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<NestedEntityStub, global::Neatoo.IValidateBase?>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public global::Neatoo.IValidateBase? Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for ModifiedProperties.</summary>
@@ -32,11 +35,14 @@ partial class NestedEntityStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<NestedEntityStub, global::System.Collections.Generic.IEnumerable<string>>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public global::System.Collections.Generic.IEnumerable<string> Value { get; set; } = new global::System.Collections.Generic.List<string>();
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for StringIndexer.</summary>
@@ -67,11 +73,14 @@ partial class NestedEntityStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<NestedEntityStub, global::Neatoo.IValidateBase?>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public global::Neatoo.IValidateBase? Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsPaused.</summary>
@@ -83,11 +92,14 @@ partial class NestedEntityStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<NestedEntityStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsBusy.</summary>
@@ -99,11 +111,14 @@ partial class NestedEntityStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<NestedEntityStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsValid.</summary>
@@ -115,11 +130,14 @@ partial class NestedEntityStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<NestedEntityStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsSelfValid.</summary>
@@ -131,11 +149,14 @@ partial class NestedEntityStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<NestedEntityStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for PropertyMessages.</summary>
@@ -147,11 +168,14 @@ partial class NestedEntityStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<NestedEntityStub, global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> Value { get; set; } = new global::System.Collections.Generic.List<global::Neatoo.IPropertyMessage>();
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsChild.</summary>
@@ -163,11 +187,14 @@ partial class NestedEntityStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<NestedEntityStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsModified.</summary>
@@ -179,11 +206,14 @@ partial class NestedEntityStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<NestedEntityStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsSelfModified.</summary>
@@ -195,11 +225,14 @@ partial class NestedEntityStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<NestedEntityStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsMarkedModified.</summary>
@@ -211,11 +244,14 @@ partial class NestedEntityStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<NestedEntityStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsSavable.</summary>
@@ -227,11 +263,14 @@ partial class NestedEntityStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<NestedEntityStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsDeleted.</summary>
@@ -243,11 +282,14 @@ partial class NestedEntityStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<NestedEntityStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsNew.</summary>
@@ -259,11 +301,14 @@ partial class NestedEntityStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<NestedEntityStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for Delete.</summary>
@@ -652,74 +697,8 @@ partial class NestedEntityStub
 	/// <summary>Interceptor for NeatooPropertyChanged event.</summary>
 	public NeatooPropertyChangedInterceptor NeatooPropertyChanged { get; } = new();
 
-	/// <summary>Returns this instance as global::Neatoo.IEntityBase.</summary>
-	public global::Neatoo.IEntityBase AsEntityBase() => this;
-
-	/// <summary>Returns this instance as global::Neatoo.IValidateBase.</summary>
-	public global::Neatoo.IValidateBase AsValidateBase() => this;
-
-	/// <summary>Returns this instance as global::System.ComponentModel.INotifyPropertyChanged.</summary>
-	public global::System.ComponentModel.INotifyPropertyChanged AsNotifyPropertyChanged() => this;
-
-	/// <summary>Returns this instance as global::Neatoo.INotifyNeatooPropertyChanged.</summary>
-	public global::Neatoo.INotifyNeatooPropertyChanged AsNotifyNeatooPropertyChanged() => this;
-
-	/// <summary>Returns this instance as global::Neatoo.IValidateMetaProperties.</summary>
-	public global::Neatoo.IValidateMetaProperties AsValidateMetaProperties() => this;
-
-	/// <summary>Returns this instance as global::Neatoo.IEntityMetaProperties.</summary>
-	public global::Neatoo.IEntityMetaProperties AsEntityMetaProperties() => this;
-
-	/// <summary>Returns this instance as global::Neatoo.RemoteFactory.IFactorySaveMeta.</summary>
-	public global::Neatoo.RemoteFactory.IFactorySaveMeta AsFactorySaveMeta() => this;
-
-	/// <summary>Backing storage for Root.</summary>
-	protected global::Neatoo.IValidateBase? RootBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for ModifiedProperties.</summary>
-	protected global::System.Collections.Generic.IEnumerable<string> ModifiedPropertiesBacking { get; set; } = new global::System.Collections.Generic.List<string>();
-
 	/// <summary>Backing storage for StringIndexer indexer.</summary>
 	public global::System.Collections.Generic.Dictionary<string, global::Neatoo.IEntityProperty> StringIndexerBacking { get; } = new();
-
-	/// <summary>Backing storage for Parent.</summary>
-	protected global::Neatoo.IValidateBase? ParentBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsPaused.</summary>
-	protected bool IsPausedBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsBusy.</summary>
-	protected bool IsBusyBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsValid.</summary>
-	protected bool IsValidBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsSelfValid.</summary>
-	protected bool IsSelfValidBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for PropertyMessages.</summary>
-	protected global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> PropertyMessagesBacking { get; set; } = new global::System.Collections.Generic.List<global::Neatoo.IPropertyMessage>();
-
-	/// <summary>Backing storage for IsChild.</summary>
-	protected bool IsChildBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsModified.</summary>
-	protected bool IsModifiedBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsSelfModified.</summary>
-	protected bool IsSelfModifiedBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsMarkedModified.</summary>
-	protected bool IsMarkedModifiedBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsSavable.</summary>
-	protected bool IsSavableBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsDeleted.</summary>
-	protected bool IsDeletedBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsNew.</summary>
-	protected bool IsNewBacking { get; set; } = default!;
 
 	void global::Neatoo.IEntityBase.Delete()
 	{
@@ -743,12 +722,12 @@ partial class NestedEntityStub
 
 	global::Neatoo.IValidateBase? global::Neatoo.IEntityBase.Root
 	{
-		get { Root.RecordGet(); return Root.OnGet?.Invoke(this) ?? RootBacking; }
+		get { Root.RecordGet(); return Root.OnGet?.Invoke(this) ?? Root.Value; }
 	}
 
 	global::System.Collections.Generic.IEnumerable<string> global::Neatoo.IEntityBase.ModifiedProperties
 	{
-		get { ModifiedProperties.RecordGet(); return ModifiedProperties.OnGet?.Invoke(this) ?? ModifiedPropertiesBacking; }
+		get { ModifiedProperties.RecordGet(); return ModifiedProperties.OnGet?.Invoke(this) ?? ModifiedProperties.Value; }
 	}
 
 	global::Neatoo.IEntityProperty global::Neatoo.IEntityBase.this[string propertyName]
@@ -775,12 +754,12 @@ partial class NestedEntityStub
 
 	global::Neatoo.IValidateBase? global::Neatoo.IValidateBase.Parent
 	{
-		get { Parent.RecordGet(); return Parent.OnGet?.Invoke(this) ?? ParentBacking; }
+		get { Parent.RecordGet(); return Parent.OnGet?.Invoke(this) ?? Parent.Value; }
 	}
 
 	bool global::Neatoo.IValidateBase.IsPaused
 	{
-		get { IsPaused.RecordGet(); return IsPaused.OnGet?.Invoke(this) ?? IsPausedBacking; }
+		get { IsPaused.RecordGet(); return IsPaused.OnGet?.Invoke(this) ?? IsPaused.Value; }
 	}
 
 	global::Neatoo.IValidateProperty global::Neatoo.IValidateBase.this[string propertyName]
@@ -826,57 +805,57 @@ partial class NestedEntityStub
 
 	bool global::Neatoo.IValidateMetaProperties.IsBusy
 	{
-		get { IsBusy.RecordGet(); return IsBusy.OnGet?.Invoke(this) ?? IsBusyBacking; }
+		get { IsBusy.RecordGet(); return IsBusy.OnGet?.Invoke(this) ?? IsBusy.Value; }
 	}
 
 	bool global::Neatoo.IValidateMetaProperties.IsValid
 	{
-		get { IsValid.RecordGet(); return IsValid.OnGet?.Invoke(this) ?? IsValidBacking; }
+		get { IsValid.RecordGet(); return IsValid.OnGet?.Invoke(this) ?? IsValid.Value; }
 	}
 
 	bool global::Neatoo.IValidateMetaProperties.IsSelfValid
 	{
-		get { IsSelfValid.RecordGet(); return IsSelfValid.OnGet?.Invoke(this) ?? IsSelfValidBacking; }
+		get { IsSelfValid.RecordGet(); return IsSelfValid.OnGet?.Invoke(this) ?? IsSelfValid.Value; }
 	}
 
 	global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> global::Neatoo.IValidateMetaProperties.PropertyMessages
 	{
-		get { PropertyMessages.RecordGet(); return PropertyMessages.OnGet?.Invoke(this) ?? PropertyMessagesBacking; }
+		get { PropertyMessages.RecordGet(); return PropertyMessages.OnGet?.Invoke(this) ?? PropertyMessages.Value; }
 	}
 
 	bool global::Neatoo.IEntityMetaProperties.IsChild
 	{
-		get { IsChild.RecordGet(); return IsChild.OnGet?.Invoke(this) ?? IsChildBacking; }
+		get { IsChild.RecordGet(); return IsChild.OnGet?.Invoke(this) ?? IsChild.Value; }
 	}
 
 	bool global::Neatoo.IEntityMetaProperties.IsModified
 	{
-		get { IsModified.RecordGet(); return IsModified.OnGet?.Invoke(this) ?? IsModifiedBacking; }
+		get { IsModified.RecordGet(); return IsModified.OnGet?.Invoke(this) ?? IsModified.Value; }
 	}
 
 	bool global::Neatoo.IEntityMetaProperties.IsSelfModified
 	{
-		get { IsSelfModified.RecordGet(); return IsSelfModified.OnGet?.Invoke(this) ?? IsSelfModifiedBacking; }
+		get { IsSelfModified.RecordGet(); return IsSelfModified.OnGet?.Invoke(this) ?? IsSelfModified.Value; }
 	}
 
 	bool global::Neatoo.IEntityMetaProperties.IsMarkedModified
 	{
-		get { IsMarkedModified.RecordGet(); return IsMarkedModified.OnGet?.Invoke(this) ?? IsMarkedModifiedBacking; }
+		get { IsMarkedModified.RecordGet(); return IsMarkedModified.OnGet?.Invoke(this) ?? IsMarkedModified.Value; }
 	}
 
 	bool global::Neatoo.IEntityMetaProperties.IsSavable
 	{
-		get { IsSavable.RecordGet(); return IsSavable.OnGet?.Invoke(this) ?? IsSavableBacking; }
+		get { IsSavable.RecordGet(); return IsSavable.OnGet?.Invoke(this) ?? IsSavable.Value; }
 	}
 
 	bool global::Neatoo.RemoteFactory.IFactorySaveMeta.IsDeleted
 	{
-		get { IsDeleted.RecordGet(); return IsDeleted.OnGet?.Invoke(this) ?? IsDeletedBacking; }
+		get { IsDeleted.RecordGet(); return IsDeleted.OnGet?.Invoke(this) ?? IsDeleted.Value; }
 	}
 
 	bool global::Neatoo.RemoteFactory.IFactorySaveMeta.IsNew
 	{
-		get { IsNew.RecordGet(); return IsNew.OnGet?.Invoke(this) ?? IsNewBacking; }
+		get { IsNew.RecordGet(); return IsNew.OnGet?.Invoke(this) ?? IsNew.Value; }
 	}
 
 	event global::System.ComponentModel.PropertyChangedEventHandler? global::System.ComponentModel.INotifyPropertyChanged.PropertyChanged

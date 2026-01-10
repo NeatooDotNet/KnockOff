@@ -55,9 +55,6 @@ partial class FcNotificationServiceStub
 	/// <summary>Interceptor for SendPaymentFailure.</summary>
 	public SendPaymentFailureInterceptor SendPaymentFailure { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Comparison.IFcNotificationService.</summary>
-	public global::KnockOff.Documentation.Samples.Comparison.IFcNotificationService AsFcNotificationService() => this;
-
 	void global::KnockOff.Documentation.Samples.Comparison.IFcNotificationService.SendOrderConfirmation(int customerId, int orderId)
 	{
 		SendOrderConfirmation.RecordCall(customerId, orderId);

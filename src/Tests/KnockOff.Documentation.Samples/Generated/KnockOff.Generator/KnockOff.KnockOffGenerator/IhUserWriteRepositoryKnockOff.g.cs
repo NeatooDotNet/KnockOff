@@ -108,12 +108,6 @@ partial class IhUserWriteRepositoryKnockOff
 	/// <summary>Interceptor for GetAll.</summary>
 	public GetAllInterceptor GetAll { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IIhWriteRepository<global::KnockOff.Documentation.Samples.Guides.IhUser>.</summary>
-	public global::KnockOff.Documentation.Samples.Guides.IIhWriteRepository<global::KnockOff.Documentation.Samples.Guides.IhUser> AsIhWriteRepository() => this;
-
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IIhReadRepository<global::KnockOff.Documentation.Samples.Guides.IhUser>.</summary>
-	public global::KnockOff.Documentation.Samples.Guides.IIhReadRepository<global::KnockOff.Documentation.Samples.Guides.IhUser> AsIhReadRepository() => this;
-
 	void global::KnockOff.Documentation.Samples.Guides.IIhWriteRepository<global::KnockOff.Documentation.Samples.Guides.IhUser>.Add(global::KnockOff.Documentation.Samples.Guides.IhUser entity)
 	{
 		Add.RecordCall(entity);

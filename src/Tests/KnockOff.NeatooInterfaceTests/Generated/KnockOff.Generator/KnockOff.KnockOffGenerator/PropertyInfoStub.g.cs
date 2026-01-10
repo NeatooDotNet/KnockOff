@@ -44,11 +44,14 @@ partial class PropertyInfoStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<PropertyInfoStub, global::System.Reflection.PropertyInfo>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public global::System.Reflection.PropertyInfo Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for Name.</summary>
@@ -60,11 +63,14 @@ partial class PropertyInfoStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<PropertyInfoStub, string>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public string Value { get; set; } = "";
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for Type.</summary>
@@ -76,11 +82,14 @@ partial class PropertyInfoStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<PropertyInfoStub, global::System.Type>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public global::System.Type Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for Key.</summary>
@@ -92,11 +101,14 @@ partial class PropertyInfoStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<PropertyInfoStub, string>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public string Value { get; set; } = "";
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsPrivateSetter.</summary>
@@ -108,11 +120,14 @@ partial class PropertyInfoStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<PropertyInfoStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Interceptor for GetCustomAttribute (generic method with Of&lt;T&gt;() access).</summary>
@@ -215,24 +230,6 @@ partial class PropertyInfoStub
 	/// <summary>Interceptor for GetCustomAttributes.</summary>
 	public GetCustomAttributesInterceptor GetCustomAttributes { get; } = new();
 
-	/// <summary>Returns this instance as global::Neatoo.IPropertyInfo.</summary>
-	public global::Neatoo.IPropertyInfo AsPropertyInfo() => this;
-
-	/// <summary>Backing storage for PropertyInfo.</summary>
-	protected global::System.Reflection.PropertyInfo PropertyInfoBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for Name.</summary>
-	protected string NameBacking { get; set; } = "";
-
-	/// <summary>Backing storage for Type.</summary>
-	protected global::System.Type TypeBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for Key.</summary>
-	protected string KeyBacking { get; set; } = "";
-
-	/// <summary>Backing storage for IsPrivateSetter.</summary>
-	protected bool IsPrivateSetterBacking { get; set; } = default!;
-
 	T? global::Neatoo.IPropertyInfo.GetCustomAttribute<T>() where T : class
 	{
 		GetCustomAttribute.Of<T>().RecordCall();
@@ -249,27 +246,27 @@ partial class PropertyInfoStub
 
 	global::System.Reflection.PropertyInfo global::Neatoo.IPropertyInfo.PropertyInfo
 	{
-		get { PropertyInfo.RecordGet(); return PropertyInfo.OnGet?.Invoke(this) ?? PropertyInfoBacking; }
+		get { PropertyInfo.RecordGet(); return PropertyInfo.OnGet?.Invoke(this) ?? PropertyInfo.Value; }
 	}
 
 	string global::Neatoo.IPropertyInfo.Name
 	{
-		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
+		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? Name.Value; }
 	}
 
 	global::System.Type global::Neatoo.IPropertyInfo.Type
 	{
-		get { Type.RecordGet(); return Type.OnGet?.Invoke(this) ?? TypeBacking; }
+		get { Type.RecordGet(); return Type.OnGet?.Invoke(this) ?? Type.Value; }
 	}
 
 	string global::Neatoo.IPropertyInfo.Key
 	{
-		get { Key.RecordGet(); return Key.OnGet?.Invoke(this) ?? KeyBacking; }
+		get { Key.RecordGet(); return Key.OnGet?.Invoke(this) ?? Key.Value; }
 	}
 
 	bool global::Neatoo.IPropertyInfo.IsPrivateSetter
 	{
-		get { IsPrivateSetter.RecordGet(); return IsPrivateSetter.OnGet?.Invoke(this) ?? IsPrivateSetterBacking; }
+		get { IsPrivateSetter.RecordGet(); return IsPrivateSetter.OnGet?.Invoke(this) ?? IsPrivateSetter.Value; }
 	}
 
 }

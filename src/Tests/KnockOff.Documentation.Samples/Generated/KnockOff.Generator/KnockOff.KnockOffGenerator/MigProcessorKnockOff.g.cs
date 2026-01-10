@@ -30,9 +30,6 @@ partial class MigProcessorKnockOff
 	/// <summary>Interceptor for Process.</summary>
 	public ProcessInterceptor Process { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Comparison.IMigProcessor.</summary>
-	public global::KnockOff.Documentation.Samples.Comparison.IMigProcessor AsMigProcessor() => this;
-
 	void global::KnockOff.Documentation.Samples.Comparison.IMigProcessor.Process(string data)
 	{
 		Process.RecordCall(data);

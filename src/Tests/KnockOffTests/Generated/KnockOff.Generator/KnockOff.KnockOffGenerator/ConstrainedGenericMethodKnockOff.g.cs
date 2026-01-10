@@ -338,9 +338,6 @@ partial class ConstrainedGenericMethodKnockOff
 	/// <summary>Interceptor for FindService (use .Of&lt;T&gt;() to access typed handler).</summary>
 	public FindServiceInterceptor FindService { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Tests.IConstrainedGenericMethod.</summary>
-	public global::KnockOff.Tests.IConstrainedGenericMethod AsConstrainedGenericMethod() => this;
-
 	T? global::KnockOff.Tests.IConstrainedGenericMethod.GetAttribute<T>() where T : class
 	{
 		GetAttribute.Of<T>().RecordCall();

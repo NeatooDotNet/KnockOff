@@ -83,9 +83,6 @@ partial class HaServiceKnockOff
 	/// <summary>Interceptor for Create.</summary>
 	public CreateInterceptor Create { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.IHaService.</summary>
-	public global::KnockOff.Documentation.Samples.Skills.IHaService AsHaService() => this;
-
 	void global::KnockOff.Documentation.Samples.Skills.IHaService.Initialize()
 	{
 		Initialize.RecordCall();

@@ -14,11 +14,14 @@ partial class DataProviderKnockOff
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<DataProviderKnockOff, int>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public int Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for GetData.</summary>
@@ -52,12 +55,6 @@ partial class DataProviderKnockOff
 	/// <summary>Interceptor for GetData.</summary>
 	public GetData2Interceptor GetData2 { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Tests.IDataProvider.</summary>
-	public global::KnockOff.Tests.IDataProvider AsDataProvider() => this;
-
-	/// <summary>Backing storage for Count.</summary>
-	protected int CountBacking { get; set; } = default!;
-
 	string global::KnockOff.Tests.IDataProvider.GetData(int id)
 	{
 		GetData2.RecordCall(id);
@@ -67,7 +64,7 @@ partial class DataProviderKnockOff
 
 	int global::KnockOff.Tests.IDataProvider.Count
 	{
-		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? CountBacking; }
+		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? Count.Value; }
 	}
 
 }

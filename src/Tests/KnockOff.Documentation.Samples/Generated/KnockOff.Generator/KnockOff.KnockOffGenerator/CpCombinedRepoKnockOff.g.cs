@@ -33,9 +33,6 @@ partial class CpCombinedRepoKnockOff
 	/// <summary>Interceptor for GetById.</summary>
 	public GetById2Interceptor GetById2 { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ICpCombinedRepository.</summary>
-	public global::KnockOff.Documentation.Samples.Skills.ICpCombinedRepository AsCpCombinedRepository() => this;
-
 	global::KnockOff.Documentation.Samples.Skills.CpUser? global::KnockOff.Documentation.Samples.Skills.ICpCombinedRepository.GetById(int id)
 	{
 		GetById2.RecordCall(id);

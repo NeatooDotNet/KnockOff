@@ -130,9 +130,6 @@ partial class SkSmartDefaultKnockOff
 	/// <summary>Interceptor for GetDisposable.</summary>
 	public GetDisposableInterceptor GetDisposable { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.</summary>
-	public global::KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService AsSkSmartDefaultService() => this;
-
 	int global::KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.GetCount()
 	{
 		GetCount.RecordCall();

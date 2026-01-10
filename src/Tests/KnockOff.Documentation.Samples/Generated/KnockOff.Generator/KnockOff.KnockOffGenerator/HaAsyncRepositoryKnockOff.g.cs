@@ -61,9 +61,6 @@ partial class HaAsyncRepositoryKnockOff
 	/// <summary>Interceptor for SaveAsync.</summary>
 	public SaveAsyncInterceptor SaveAsync { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.IHaAsyncRepository.</summary>
-	public global::KnockOff.Documentation.Samples.Skills.IHaAsyncRepository AsHaAsyncRepository() => this;
-
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.HaUser?> global::KnockOff.Documentation.Samples.Skills.IHaAsyncRepository.GetByIdAsync(int id)
 	{
 		GetByIdAsync.RecordCall(id);

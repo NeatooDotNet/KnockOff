@@ -223,3 +223,129 @@ public partial class MmSharedRepositoryKnockOff : IMmRepository { }
 // Use both in same project (gradual migration example)
 // var userKnockOff = new MmUserServiceKnockOff();          // New tests: KnockOff
 // var orderMock = new Mock<IMmOrderService>();              // Legacy tests: Keep Moq
+
+// ============================================================================
+// Class Stubs with .Object
+// ============================================================================
+
+public class MmEmailService
+{
+    public virtual void Send(string to, string body) { }
+}
+
+#region skill:moq-migration:class-stub-object
+[KnockOff<MmEmailService>]
+public partial class MmEmailServiceTests { }
+#endregion
+
+// Usage: skill:moq-migration:class-stub-object-usage - sourced from MoqMigrationSamplesTests.cs
+
+// ============================================================================
+// As{Interface}() Helper Methods
+// ============================================================================
+
+public interface IMmEntityBase
+{
+    int Id { get; }
+}
+
+public interface IMmEmployee : IMmEntityBase
+{
+    string Name { get; set; }
+}
+
+#region skill:moq-migration:as-interface-helpers
+[KnockOff]
+public partial class MmEmployeeKnockOff : IMmEmployee { }
+#endregion
+
+// Usage: skill:moq-migration:as-interface-helpers-usage - sourced from MoqMigrationSamplesTests.cs
+
+// ============================================================================
+// SetupProperty / Tracked Properties (Backing Fields)
+// ============================================================================
+
+public interface IMmTrackedPropService
+{
+    bool Active { get; set; }
+    DateTime NewDate { get; set; }
+    long VisitId { get; set; }
+    string VisitLabel { get; set; }
+    DateTime? PreviousVisitDate { get; set; }
+}
+
+#region skill:moq-migration:setup-property
+[KnockOff]
+public partial class MmTrackedPropServiceKnockOff : IMmTrackedPropService { }
+#endregion
+
+// Usage: skill:moq-migration:setup-property-usage - sourced from MoqMigrationSamplesTests.cs
+
+// ============================================================================
+// Interface Inheritance
+// ============================================================================
+
+public interface IMmInheritedEntityBase
+{
+    int Id { get; }
+}
+
+public interface IMmInheritedEmployee : IMmInheritedEntityBase
+{
+    string Name { get; set; }
+    string Department { get; set; }
+}
+
+#region skill:moq-migration:interface-inheritance
+[KnockOff]
+public partial class MmInheritedEmployeeKnockOff : IMmInheritedEmployee { }
+#endregion
+
+// ============================================================================
+// Usage Examples - containing snippet regions
+// ============================================================================
+
+/// <summary>
+/// Static usage examples for moq-migration skill snippets.
+/// Note: Backing field access (e.g., ActiveBacking) requires protected access,
+/// so those patterns remain as pseudocode in the skill documentation.
+/// </summary>
+public static class MoqMigrationUsageExamples
+{
+    public static void ClassStubObjectUsage()
+    {
+        #region skill:moq-migration:class-stub-object-usage
+        var stub = new MmEmailServiceTests.Stubs.MmEmailService();
+        MmEmailService service = stub.Object;
+        #endregion
+
+        _ = service;
+    }
+
+    public static void InterfaceAccessUsage()
+    {
+        var knockOff = new MmEmployeeKnockOff();
+
+        #region skill:moq-migration:interface-access-usage
+        // Standalone stubs implement interfaces via implicit conversion
+        IMmEmployee employee = knockOff;
+
+        // For inherited interfaces, cast to the base type
+        IMmEntityBase baseEntity = knockOff;
+        #endregion
+
+        _ = (employee, baseEntity);
+    }
+
+    public static void InterfaceInheritanceCallbacksUsage()
+    {
+        #region skill:moq-migration:interface-inheritance-callbacks
+        var knockOff = new MmInheritedEmployeeKnockOff();
+
+        // All members tracked on stub (flat API)
+        knockOff.Id.OnGet = (ko) => 42;
+        knockOff.Name.OnGet = (ko) => "John";
+        knockOff.Department.OnGet = (ko) => "Engineering";
+        #endregion
+    }
+}

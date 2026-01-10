@@ -23,6 +23,9 @@ partial class VsUserServiceKnockOff
 		/// <summary>Callback invoked when the setter is accessed.</summary>
 		public global::System.Action<VsUserServiceKnockOff, global::KnockOff.Documentation.Samples.Comparison.VsUser?>? OnSet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public global::KnockOff.Documentation.Samples.Comparison.VsUser? Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
@@ -30,7 +33,7 @@ partial class VsUserServiceKnockOff
 		public void RecordSet(global::KnockOff.Documentation.Samples.Comparison.VsUser? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for GetUser.</summary>
@@ -167,12 +170,6 @@ partial class VsUserServiceKnockOff
 	/// <summary>Interceptor for Update.</summary>
 	public UpdateInterceptor Update { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Comparison.IVsUserService.</summary>
-	public global::KnockOff.Documentation.Samples.Comparison.IVsUserService AsVsUserService() => this;
-
-	/// <summary>Backing storage for CurrentUser.</summary>
-	protected global::KnockOff.Documentation.Samples.Comparison.VsUser? CurrentUserBacking { get; set; } = default!;
-
 	global::KnockOff.Documentation.Samples.Comparison.VsUser global::KnockOff.Documentation.Samples.Comparison.IVsUserService.GetUser(int id)
 	{
 		GetUser2.RecordCall(id);
@@ -182,8 +179,8 @@ partial class VsUserServiceKnockOff
 
 	global::KnockOff.Documentation.Samples.Comparison.VsUser? global::KnockOff.Documentation.Samples.Comparison.IVsUserService.CurrentUser
 	{
-		get { CurrentUser.RecordGet(); return CurrentUser.OnGet?.Invoke(this) ?? CurrentUserBacking; }
-		set { CurrentUser.RecordSet(value); if (CurrentUser.OnSet != null) CurrentUser.OnSet(this, value); else CurrentUserBacking = value; }
+		get { CurrentUser.RecordGet(); return CurrentUser.OnGet?.Invoke(this) ?? CurrentUser.Value; }
+		set { CurrentUser.RecordSet(value); if (CurrentUser.OnSet != null) CurrentUser.OnSet(this, value); else CurrentUser.Value = value; }
 	}
 
 	global::KnockOff.Documentation.Samples.Comparison.VsUser? global::KnockOff.Documentation.Samples.Comparison.IVsUserService.Save(global::KnockOff.Documentation.Samples.Comparison.VsUser user)

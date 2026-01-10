@@ -27,9 +27,6 @@ partial class MmConnectionKnockOff
 	/// <summary>Interceptor for Connect.</summary>
 	public ConnectInterceptor Connect { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.IMmConnectionService.</summary>
-	public global::KnockOff.Documentation.Samples.Skills.IMmConnectionService AsMmConnectionService() => this;
-
 	void global::KnockOff.Documentation.Samples.Skills.IMmConnectionService.Connect()
 	{
 		Connect.RecordCall();

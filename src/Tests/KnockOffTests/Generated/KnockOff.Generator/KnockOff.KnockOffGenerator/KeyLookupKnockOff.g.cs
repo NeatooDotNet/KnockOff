@@ -23,6 +23,9 @@ partial class KeyLookupKnockOff
 		/// <summary>Callback invoked when the setter is accessed.</summary>
 		public global::System.Action<KeyLookupKnockOff, int>? OnSet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public int Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
@@ -30,7 +33,7 @@ partial class KeyLookupKnockOff
 		public void RecordSet(int? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for GetData.</summary>
@@ -64,12 +67,6 @@ partial class KeyLookupKnockOff
 	/// <summary>Interceptor for GetData.</summary>
 	public GetData2Interceptor GetData2 { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Tests.IKeyLookup.</summary>
-	public global::KnockOff.Tests.IKeyLookup AsKeyLookup() => this;
-
-	/// <summary>Backing storage for Count.</summary>
-	protected int CountBacking { get; set; } = default!;
-
 	int global::KnockOff.Tests.IKeyLookup.GetData(string key)
 	{
 		GetData2.RecordCall(key);
@@ -79,8 +76,8 @@ partial class KeyLookupKnockOff
 
 	int global::KnockOff.Tests.IKeyLookup.Count
 	{
-		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? CountBacking; }
-		set { Count.RecordSet(value); if (Count.OnSet != null) Count.OnSet(this, value); else CountBacking = value; }
+		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? Count.Value; }
+		set { Count.RecordSet(value); if (Count.OnSet != null) Count.OnSet(this, value); else Count.Value = value; }
 	}
 
 }

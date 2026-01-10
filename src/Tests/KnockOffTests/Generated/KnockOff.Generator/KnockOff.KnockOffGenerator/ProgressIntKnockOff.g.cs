@@ -30,9 +30,6 @@ partial class ProgressIntKnockOff
 	/// <summary>Interceptor for Report.</summary>
 	public ReportInterceptor Report { get; } = new();
 
-	/// <summary>Returns this instance as global::System.IProgress<int>.</summary>
-	public global::System.IProgress<int> AsProgress() => this;
-
 	void global::System.IProgress<int>.Report(int @value)
 	{
 		Report.RecordCall(@value);

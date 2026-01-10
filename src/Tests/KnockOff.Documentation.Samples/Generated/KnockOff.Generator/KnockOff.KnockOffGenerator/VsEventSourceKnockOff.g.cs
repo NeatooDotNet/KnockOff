@@ -35,9 +35,6 @@ partial class VsEventSourceKnockOff
 	/// <summary>Interceptor for DataReceived event.</summary>
 	public DataReceivedInterceptor DataReceived { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Comparison.IVsEventSource.</summary>
-	public global::KnockOff.Documentation.Samples.Comparison.IVsEventSource AsVsEventSource() => this;
-
 	event global::System.EventHandler<string>? global::KnockOff.Documentation.Samples.Comparison.IVsEventSource.DataReceived
 	{
 		add => DataReceived.RecordAdd(value);

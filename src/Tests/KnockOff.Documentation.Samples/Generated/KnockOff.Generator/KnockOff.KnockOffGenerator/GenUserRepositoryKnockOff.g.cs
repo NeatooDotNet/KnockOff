@@ -86,9 +86,6 @@ partial class GenUserRepositoryKnockOff
 	/// <summary>Interceptor for GetByIdAsync.</summary>
 	public GetByIdAsyncInterceptor GetByIdAsync { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IGenRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
-	public global::KnockOff.Documentation.Samples.Guides.IGenRepository<global::KnockOff.Documentation.Samples.Guides.GenUser> AsGenRepository() => this;
-
 	global::KnockOff.Documentation.Samples.Guides.GenUser? global::KnockOff.Documentation.Samples.Guides.IGenRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>.GetById(int id)
 	{
 		GetById.RecordCall(id);

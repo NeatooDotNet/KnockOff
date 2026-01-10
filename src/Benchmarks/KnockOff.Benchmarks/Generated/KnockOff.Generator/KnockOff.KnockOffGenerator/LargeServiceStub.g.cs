@@ -1255,9 +1255,6 @@ partial class LargeServiceStub
 	/// <summary>Interceptor for IntMethodWithParam10.</summary>
 	public IntMethodWithParam10Interceptor IntMethodWithParam10 { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Benchmarks.Interfaces.ILargeService.</summary>
-	public global::KnockOff.Benchmarks.Interfaces.ILargeService AsLargeService() => this;
-
 	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod01()
 	{
 		VoidMethod01.RecordCall();

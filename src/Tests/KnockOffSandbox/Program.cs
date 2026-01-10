@@ -49,11 +49,11 @@ Console.WriteLine($"  Call count: {knockOff.Process.CallCount}");
 Console.WriteLine($"  Last call: ({processArgs?.id}, {processArgs?.count}, {processArgs?.urgent})");
 Console.WriteLine();
 
-// Test AsInterface() method
-Console.WriteLine("AsInterface() accessor:");
-var svc = knockOff.AsUserService();
-svc.Name = "Via AsUserService()";
-Console.WriteLine($"  Name set via AsUserService(): {knockOff.Name.LastSetValue}");
+// Test interface access via implicit cast
+Console.WriteLine("Interface access via cast:");
+IUserService svc = knockOff;
+svc.Name = "Via cast";
+Console.WriteLine($"  Name set via cast: {knockOff.Name.LastSetValue}");
 Console.WriteLine();
 
 // Test Reset

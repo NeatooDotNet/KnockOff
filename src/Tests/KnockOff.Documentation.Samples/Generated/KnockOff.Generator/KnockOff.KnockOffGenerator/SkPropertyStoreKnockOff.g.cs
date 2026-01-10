@@ -39,9 +39,6 @@ partial class SkPropertyStoreKnockOff
 	/// <summary>Interceptor for StringIndexer.</summary>
 	public StringIndexerInterceptor StringIndexer { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ISkPropertyStore.</summary>
-	public global::KnockOff.Documentation.Samples.Skills.ISkPropertyStore AsSkPropertyStore() => this;
-
 	/// <summary>Backing storage for StringIndexer indexer.</summary>
 	public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Documentation.Samples.Skills.SkUser?> StringIndexerBacking { get; } = new();
 

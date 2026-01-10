@@ -86,9 +86,6 @@ partial class GenAsyncUserRepositoryKnockOff
 	/// <summary>Interceptor for SaveAsync.</summary>
 	public SaveAsyncInterceptor SaveAsync { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
-	public global::KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<global::KnockOff.Documentation.Samples.Guides.GenUser> AsGenAsyncRepository() => this;
-
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.GenUser?> global::KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>.GetByIdAsync(int id)
 	{
 		GetByIdAsync.RecordCall(id);

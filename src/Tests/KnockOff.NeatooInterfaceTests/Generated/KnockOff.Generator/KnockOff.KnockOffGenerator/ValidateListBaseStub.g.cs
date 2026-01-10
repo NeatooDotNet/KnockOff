@@ -14,11 +14,14 @@ partial class ValidateListBaseStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<ValidateListBaseStub, global::Neatoo.IValidateBase?>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public global::Neatoo.IValidateBase? Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsFixedSize.</summary>
@@ -30,11 +33,14 @@ partial class ValidateListBaseStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<ValidateListBaseStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsReadOnly.</summary>
@@ -46,11 +52,14 @@ partial class ValidateListBaseStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<ValidateListBaseStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for Int32Indexer.</summary>
@@ -93,11 +102,14 @@ partial class ValidateListBaseStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<ValidateListBaseStub, int>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public int Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsSynchronized.</summary>
@@ -109,11 +121,14 @@ partial class ValidateListBaseStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<ValidateListBaseStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for SyncRoot.</summary>
@@ -125,11 +140,14 @@ partial class ValidateListBaseStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<ValidateListBaseStub, object>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public object Value { get; set; } = new object();
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsBusy.</summary>
@@ -141,11 +159,14 @@ partial class ValidateListBaseStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<ValidateListBaseStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsValid.</summary>
@@ -157,11 +178,14 @@ partial class ValidateListBaseStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<ValidateListBaseStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsSelfValid.</summary>
@@ -173,11 +197,14 @@ partial class ValidateListBaseStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<ValidateListBaseStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for PropertyMessages.</summary>
@@ -189,11 +216,14 @@ partial class ValidateListBaseStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<ValidateListBaseStub, global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> Value { get; set; } = new global::System.Collections.Generic.List<global::Neatoo.IPropertyMessage>();
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for Add.</summary>
@@ -703,66 +733,12 @@ partial class ValidateListBaseStub
 	/// <summary>Interceptor for NeatooPropertyChanged event.</summary>
 	public NeatooPropertyChangedInterceptor NeatooPropertyChanged { get; } = new();
 
-	/// <summary>Returns this instance as global::Neatoo.IValidateListBase.</summary>
-	public global::Neatoo.IValidateListBase AsValidateListBase() => this;
-
-	/// <summary>Returns this instance as global::System.Collections.Specialized.INotifyCollectionChanged.</summary>
-	public global::System.Collections.Specialized.INotifyCollectionChanged AsNotifyCollectionChanged() => this;
-
-	/// <summary>Returns this instance as global::System.ComponentModel.INotifyPropertyChanged.</summary>
-	public global::System.ComponentModel.INotifyPropertyChanged AsNotifyPropertyChanged() => this;
-
-	/// <summary>Returns this instance as global::System.Collections.IList.</summary>
-	public global::System.Collections.IList AsList() => this;
-
-	/// <summary>Returns this instance as global::System.Collections.ICollection.</summary>
-	public global::System.Collections.ICollection AsCollection() => this;
-
-	/// <summary>Returns this instance as global::System.Collections.IEnumerable.</summary>
-	public global::System.Collections.IEnumerable AsEnumerable() => this;
-
-	/// <summary>Returns this instance as global::Neatoo.INotifyNeatooPropertyChanged.</summary>
-	public global::Neatoo.INotifyNeatooPropertyChanged AsNotifyNeatooPropertyChanged() => this;
-
-	/// <summary>Returns this instance as global::Neatoo.IValidateMetaProperties.</summary>
-	public global::Neatoo.IValidateMetaProperties AsValidateMetaProperties() => this;
-
-	/// <summary>Backing storage for Parent.</summary>
-	protected global::Neatoo.IValidateBase? ParentBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsFixedSize.</summary>
-	protected bool IsFixedSizeBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsReadOnly.</summary>
-	protected bool IsReadOnlyBacking { get; set; } = default!;
-
 	/// <summary>Backing storage for Int32Indexer indexer.</summary>
 	public global::System.Collections.Generic.Dictionary<int, object?> Int32IndexerBacking { get; } = new();
 
-	/// <summary>Backing storage for Count.</summary>
-	protected int CountBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsSynchronized.</summary>
-	protected bool IsSynchronizedBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for SyncRoot.</summary>
-	protected object SyncRootBacking { get; set; } = new object();
-
-	/// <summary>Backing storage for IsBusy.</summary>
-	protected bool IsBusyBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsValid.</summary>
-	protected bool IsValidBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsSelfValid.</summary>
-	protected bool IsSelfValidBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for PropertyMessages.</summary>
-	protected global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> PropertyMessagesBacking { get; set; } = new global::System.Collections.Generic.List<global::Neatoo.IPropertyMessage>();
-
 	global::Neatoo.IValidateBase? global::Neatoo.IValidateListBase.Parent
 	{
-		get { Parent.RecordGet(); return Parent.OnGet?.Invoke(this) ?? ParentBacking; }
+		get { Parent.RecordGet(); return Parent.OnGet?.Invoke(this) ?? Parent.Value; }
 	}
 
 	int global::System.Collections.IList.Add(object? @value)
@@ -809,12 +785,12 @@ partial class ValidateListBaseStub
 
 	bool global::System.Collections.IList.IsFixedSize
 	{
-		get { IsFixedSize.RecordGet(); return IsFixedSize.OnGet?.Invoke(this) ?? IsFixedSizeBacking; }
+		get { IsFixedSize.RecordGet(); return IsFixedSize.OnGet?.Invoke(this) ?? IsFixedSize.Value; }
 	}
 
 	bool global::System.Collections.IList.IsReadOnly
 	{
-		get { IsReadOnly.RecordGet(); return IsReadOnly.OnGet?.Invoke(this) ?? IsReadOnlyBacking; }
+		get { IsReadOnly.RecordGet(); return IsReadOnly.OnGet?.Invoke(this) ?? IsReadOnly.Value; }
 	}
 
 	object? global::System.Collections.IList.this[int index]
@@ -831,17 +807,17 @@ partial class ValidateListBaseStub
 
 	int global::System.Collections.ICollection.Count
 	{
-		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? CountBacking; }
+		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? Count.Value; }
 	}
 
 	bool global::System.Collections.ICollection.IsSynchronized
 	{
-		get { IsSynchronized.RecordGet(); return IsSynchronized.OnGet?.Invoke(this) ?? IsSynchronizedBacking; }
+		get { IsSynchronized.RecordGet(); return IsSynchronized.OnGet?.Invoke(this) ?? IsSynchronized.Value; }
 	}
 
 	object global::System.Collections.ICollection.SyncRoot
 	{
-		get { SyncRoot.RecordGet(); return SyncRoot.OnGet?.Invoke(this) ?? SyncRootBacking; }
+		get { SyncRoot.RecordGet(); return SyncRoot.OnGet?.Invoke(this) ?? SyncRoot.Value; }
 	}
 
 	global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
@@ -890,22 +866,22 @@ partial class ValidateListBaseStub
 
 	bool global::Neatoo.IValidateMetaProperties.IsBusy
 	{
-		get { IsBusy.RecordGet(); return IsBusy.OnGet?.Invoke(this) ?? IsBusyBacking; }
+		get { IsBusy.RecordGet(); return IsBusy.OnGet?.Invoke(this) ?? IsBusy.Value; }
 	}
 
 	bool global::Neatoo.IValidateMetaProperties.IsValid
 	{
-		get { IsValid.RecordGet(); return IsValid.OnGet?.Invoke(this) ?? IsValidBacking; }
+		get { IsValid.RecordGet(); return IsValid.OnGet?.Invoke(this) ?? IsValid.Value; }
 	}
 
 	bool global::Neatoo.IValidateMetaProperties.IsSelfValid
 	{
-		get { IsSelfValid.RecordGet(); return IsSelfValid.OnGet?.Invoke(this) ?? IsSelfValidBacking; }
+		get { IsSelfValid.RecordGet(); return IsSelfValid.OnGet?.Invoke(this) ?? IsSelfValid.Value; }
 	}
 
 	global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> global::Neatoo.IValidateMetaProperties.PropertyMessages
 	{
-		get { PropertyMessages.RecordGet(); return PropertyMessages.OnGet?.Invoke(this) ?? PropertyMessagesBacking; }
+		get { PropertyMessages.RecordGet(); return PropertyMessages.OnGet?.Invoke(this) ?? PropertyMessages.Value; }
 	}
 
 	event global::System.Collections.Specialized.NotifyCollectionChangedEventHandler? global::System.Collections.Specialized.INotifyCollectionChanged.CollectionChanged

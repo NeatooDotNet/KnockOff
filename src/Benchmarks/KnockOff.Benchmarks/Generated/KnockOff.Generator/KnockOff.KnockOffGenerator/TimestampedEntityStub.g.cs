@@ -14,11 +14,14 @@ partial class TimestampedEntityStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<TimestampedEntityStub, global::System.DateTime>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public global::System.DateTime Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for UpdatedAt.</summary>
@@ -30,11 +33,14 @@ partial class TimestampedEntityStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<TimestampedEntityStub, global::System.DateTime?>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public global::System.DateTime? Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for Id.</summary>
@@ -46,11 +52,14 @@ partial class TimestampedEntityStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<TimestampedEntityStub, int>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public int Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Interceptor for CreatedAt.</summary>
@@ -62,34 +71,19 @@ partial class TimestampedEntityStub
 	/// <summary>Interceptor for Id.</summary>
 	public IdInterceptor Id { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Benchmarks.Interfaces.ITimestampedEntity.</summary>
-	public global::KnockOff.Benchmarks.Interfaces.ITimestampedEntity AsTimestampedEntity() => this;
-
-	/// <summary>Returns this instance as global::KnockOff.Benchmarks.Interfaces.IBaseEntity.</summary>
-	public global::KnockOff.Benchmarks.Interfaces.IBaseEntity AsBaseEntity() => this;
-
-	/// <summary>Backing storage for CreatedAt.</summary>
-	protected global::System.DateTime CreatedAtBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for UpdatedAt.</summary>
-	protected global::System.DateTime? UpdatedAtBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for Id.</summary>
-	protected int IdBacking { get; set; } = default!;
-
 	global::System.DateTime global::KnockOff.Benchmarks.Interfaces.ITimestampedEntity.CreatedAt
 	{
-		get { CreatedAt.RecordGet(); return CreatedAt.OnGet?.Invoke(this) ?? CreatedAtBacking; }
+		get { CreatedAt.RecordGet(); return CreatedAt.OnGet?.Invoke(this) ?? CreatedAt.Value; }
 	}
 
 	global::System.DateTime? global::KnockOff.Benchmarks.Interfaces.ITimestampedEntity.UpdatedAt
 	{
-		get { UpdatedAt.RecordGet(); return UpdatedAt.OnGet?.Invoke(this) ?? UpdatedAtBacking; }
+		get { UpdatedAt.RecordGet(); return UpdatedAt.OnGet?.Invoke(this) ?? UpdatedAt.Value; }
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.IBaseEntity.Id
 	{
-		get { Id.RecordGet(); return Id.OnGet?.Invoke(this) ?? IdBacking; }
+		get { Id.RecordGet(); return Id.OnGet?.Invoke(this) ?? Id.Value; }
 	}
 
 }

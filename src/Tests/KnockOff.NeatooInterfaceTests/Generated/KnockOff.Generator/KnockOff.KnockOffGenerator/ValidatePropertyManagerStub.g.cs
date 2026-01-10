@@ -14,11 +14,14 @@ partial class ValidatePropertyManagerStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<ValidatePropertyManagerStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for StringIndexer.</summary>
@@ -49,11 +52,14 @@ partial class ValidatePropertyManagerStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<ValidatePropertyManagerStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsValid.</summary>
@@ -65,11 +71,14 @@ partial class ValidatePropertyManagerStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<ValidatePropertyManagerStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for PropertyMessages.</summary>
@@ -81,11 +90,14 @@ partial class ValidatePropertyManagerStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<ValidatePropertyManagerStub, global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> Value { get; set; } = new global::System.Collections.Generic.List<global::Neatoo.IPropertyMessage>();
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsPaused.</summary>
@@ -97,11 +109,14 @@ partial class ValidatePropertyManagerStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<ValidatePropertyManagerStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for WaitForTasks.</summary>
@@ -404,32 +419,8 @@ partial class ValidatePropertyManagerStub
 	/// <summary>Interceptor for PropertyChanged event.</summary>
 	public PropertyChangedInterceptor PropertyChanged { get; } = new();
 
-	/// <summary>Returns this instance as global::Neatoo.IValidatePropertyManager<global::Neatoo.IValidateProperty>.</summary>
-	public global::Neatoo.IValidatePropertyManager<global::Neatoo.IValidateProperty> AsValidatePropertyManager() => this;
-
-	/// <summary>Returns this instance as global::Neatoo.INotifyNeatooPropertyChanged.</summary>
-	public global::Neatoo.INotifyNeatooPropertyChanged AsNotifyNeatooPropertyChanged() => this;
-
-	/// <summary>Returns this instance as global::System.ComponentModel.INotifyPropertyChanged.</summary>
-	public global::System.ComponentModel.INotifyPropertyChanged AsNotifyPropertyChanged() => this;
-
-	/// <summary>Backing storage for IsBusy.</summary>
-	protected bool IsBusyBacking { get; set; } = default!;
-
 	/// <summary>Backing storage for StringIndexer indexer.</summary>
 	public global::System.Collections.Generic.Dictionary<string, global::Neatoo.IValidateProperty> StringIndexerBacking { get; } = new();
-
-	/// <summary>Backing storage for IsSelfValid.</summary>
-	protected bool IsSelfValidBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsValid.</summary>
-	protected bool IsValidBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for PropertyMessages.</summary>
-	protected global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> PropertyMessagesBacking { get; set; } = new global::System.Collections.Generic.List<global::Neatoo.IPropertyMessage>();
-
-	/// <summary>Backing storage for IsPaused.</summary>
-	protected bool IsPausedBacking { get; set; } = default!;
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidatePropertyManager<global::Neatoo.IValidateProperty>.WaitForTasks()
 	{
@@ -489,7 +480,7 @@ partial class ValidatePropertyManagerStub
 
 	bool global::Neatoo.IValidatePropertyManager<global::Neatoo.IValidateProperty>.IsBusy
 	{
-		get { IsBusy.RecordGet(); return IsBusy.OnGet?.Invoke(this) ?? IsBusyBacking; }
+		get { IsBusy.RecordGet(); return IsBusy.OnGet?.Invoke(this) ?? IsBusy.Value; }
 	}
 
 	global::Neatoo.IValidateProperty global::Neatoo.IValidatePropertyManager<global::Neatoo.IValidateProperty>.this[string propertyName]
@@ -499,22 +490,22 @@ partial class ValidatePropertyManagerStub
 
 	bool global::Neatoo.IValidatePropertyManager<global::Neatoo.IValidateProperty>.IsSelfValid
 	{
-		get { IsSelfValid.RecordGet(); return IsSelfValid.OnGet?.Invoke(this) ?? IsSelfValidBacking; }
+		get { IsSelfValid.RecordGet(); return IsSelfValid.OnGet?.Invoke(this) ?? IsSelfValid.Value; }
 	}
 
 	bool global::Neatoo.IValidatePropertyManager<global::Neatoo.IValidateProperty>.IsValid
 	{
-		get { IsValid.RecordGet(); return IsValid.OnGet?.Invoke(this) ?? IsValidBacking; }
+		get { IsValid.RecordGet(); return IsValid.OnGet?.Invoke(this) ?? IsValid.Value; }
 	}
 
 	global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> global::Neatoo.IValidatePropertyManager<global::Neatoo.IValidateProperty>.PropertyMessages
 	{
-		get { PropertyMessages.RecordGet(); return PropertyMessages.OnGet?.Invoke(this) ?? PropertyMessagesBacking; }
+		get { PropertyMessages.RecordGet(); return PropertyMessages.OnGet?.Invoke(this) ?? PropertyMessages.Value; }
 	}
 
 	bool global::Neatoo.IValidatePropertyManager<global::Neatoo.IValidateProperty>.IsPaused
 	{
-		get { IsPaused.RecordGet(); return IsPaused.OnGet?.Invoke(this) ?? IsPausedBacking; }
+		get { IsPaused.RecordGet(); return IsPaused.OnGet?.Invoke(this) ?? IsPaused.Value; }
 	}
 
 	event global::Neatoo.NeatooPropertyChanged? global::Neatoo.INotifyNeatooPropertyChanged.NeatooPropertyChanged

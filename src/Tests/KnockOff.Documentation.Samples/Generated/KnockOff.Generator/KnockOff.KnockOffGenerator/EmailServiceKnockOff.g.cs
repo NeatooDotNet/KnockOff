@@ -14,11 +14,14 @@ partial class EmailServiceKnockOff
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<EmailServiceKnockOff, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for SendEmail.</summary>
@@ -49,12 +52,6 @@ partial class EmailServiceKnockOff
 	/// <summary>Interceptor for SendEmail.</summary>
 	public SendEmailInterceptor SendEmail { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.GettingStarted.IEmailService.</summary>
-	public global::KnockOff.Documentation.Samples.GettingStarted.IEmailService AsEmailService() => this;
-
-	/// <summary>Backing storage for IsConnected.</summary>
-	protected bool IsConnectedBacking { get; set; } = default!;
-
 	void global::KnockOff.Documentation.Samples.GettingStarted.IEmailService.SendEmail(string to, string subject, string body)
 	{
 		SendEmail.RecordCall(to, subject, body);
@@ -63,7 +60,7 @@ partial class EmailServiceKnockOff
 
 	bool global::KnockOff.Documentation.Samples.GettingStarted.IEmailService.IsConnected
 	{
-		get { IsConnected.RecordGet(); return IsConnected.OnGet?.Invoke(this) ?? IsConnectedBacking; }
+		get { IsConnected.RecordGet(); return IsConnected.OnGet?.Invoke(this) ?? IsConnected.Value; }
 	}
 
 }

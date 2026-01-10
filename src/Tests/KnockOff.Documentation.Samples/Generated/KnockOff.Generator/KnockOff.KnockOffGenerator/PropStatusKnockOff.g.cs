@@ -23,6 +23,9 @@ partial class PropStatusKnockOff
 		/// <summary>Callback invoked when the setter is accessed.</summary>
 		public global::System.Action<PropStatusKnockOff, string>? OnSet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public string Value { get; set; } = "";
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
@@ -30,22 +33,16 @@ partial class PropStatusKnockOff
 		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 	}
 
 	/// <summary>Interceptor for Status.</summary>
 	public StatusInterceptor Status { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IPropStatus.</summary>
-	public global::KnockOff.Documentation.Samples.Guides.IPropStatus AsPropStatus() => this;
-
-	/// <summary>Backing storage for Status.</summary>
-	protected string StatusBacking { get; set; } = "";
-
 	string global::KnockOff.Documentation.Samples.Guides.IPropStatus.Status
 	{
-		get { Status.RecordGet(); return Status.OnGet?.Invoke(this) ?? StatusBacking; }
-		set { Status.RecordSet(value); if (Status.OnSet != null) Status.OnSet(this, value); else StatusBacking = value; }
+		get { Status.RecordGet(); return Status.OnGet?.Invoke(this) ?? Status.Value; }
+		set { Status.RecordSet(value); if (Status.OnSet != null) Status.OnSet(this, value); else Status.Value = value; }
 	}
 
 }

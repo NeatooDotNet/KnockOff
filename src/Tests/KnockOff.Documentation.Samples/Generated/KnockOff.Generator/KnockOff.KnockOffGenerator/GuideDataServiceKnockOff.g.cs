@@ -35,9 +35,6 @@ partial class GuideDataServiceKnockOff
 	/// <summary>Interceptor for DataChanged event.</summary>
 	public DataChangedInterceptor DataChanged { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IGuideDataService.</summary>
-	public global::KnockOff.Documentation.Samples.Guides.IGuideDataService AsGuideDataService() => this;
-
 	event global::System.EventHandler<global::KnockOff.Documentation.Samples.Guides.DataChangedEventArgs>? global::KnockOff.Documentation.Samples.Guides.IGuideDataService.DataChanged
 	{
 		add => DataChanged.RecordAdd(value);

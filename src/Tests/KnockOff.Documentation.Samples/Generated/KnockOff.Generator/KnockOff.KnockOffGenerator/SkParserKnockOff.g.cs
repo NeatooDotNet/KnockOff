@@ -33,9 +33,6 @@ partial class SkParserKnockOff
 	/// <summary>Interceptor for TryParse.</summary>
 	public TryParseInterceptor TryParse { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ISkParser.</summary>
-	public global::KnockOff.Documentation.Samples.Skills.ISkParser AsSkParser() => this;
-
 	bool global::KnockOff.Documentation.Samples.Skills.ISkParser.TryParse(string input, out int result)
 	{
 		result = default!;

@@ -14,25 +14,22 @@ partial class BaseEntityStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<BaseEntityStub, int>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public int Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Interceptor for Id.</summary>
 	public IdInterceptor Id { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Benchmarks.Interfaces.IBaseEntity.</summary>
-	public global::KnockOff.Benchmarks.Interfaces.IBaseEntity AsBaseEntity() => this;
-
-	/// <summary>Backing storage for Id.</summary>
-	protected int IdBacking { get; set; } = default!;
-
 	int global::KnockOff.Benchmarks.Interfaces.IBaseEntity.Id
 	{
-		get { Id.RecordGet(); return Id.OnGet?.Invoke(this) ?? IdBacking; }
+		get { Id.RecordGet(); return Id.OnGet?.Invoke(this) ?? Id.Value; }
 	}
 
 }

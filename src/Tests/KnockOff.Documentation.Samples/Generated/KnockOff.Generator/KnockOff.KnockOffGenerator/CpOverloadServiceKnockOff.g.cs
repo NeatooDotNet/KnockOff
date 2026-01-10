@@ -111,9 +111,6 @@ partial class CpOverloadServiceKnockOff
 	/// <summary>Interceptor for Calculate.</summary>
 	public Calculate2Interceptor Calculate2 { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ICpOverloadService.</summary>
-	public global::KnockOff.Documentation.Samples.Skills.ICpOverloadService AsCpOverloadService() => this;
-
 	void global::KnockOff.Documentation.Samples.Skills.ICpOverloadService.Process(string data)
 	{
 		Process1.RecordCall(data);

@@ -14,11 +14,14 @@ partial class ValidatePropertyStubForManager
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<ValidatePropertyStubForManager, string>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public string Value { get; set; } = "";
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for Value.</summary>
@@ -39,6 +42,9 @@ partial class ValidatePropertyStubForManager
 		/// <summary>Callback invoked when the setter is accessed.</summary>
 		public global::System.Action<ValidatePropertyStubForManager, object?>? OnSet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public object? Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
@@ -46,7 +52,7 @@ partial class ValidatePropertyStubForManager
 		public void RecordSet(object? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for Task.</summary>
@@ -58,11 +64,14 @@ partial class ValidatePropertyStubForManager
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<ValidatePropertyStubForManager, global::System.Threading.Tasks.Task>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public global::System.Threading.Tasks.Task Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsBusy.</summary>
@@ -74,11 +83,14 @@ partial class ValidatePropertyStubForManager
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<ValidatePropertyStubForManager, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsReadOnly.</summary>
@@ -90,11 +102,14 @@ partial class ValidatePropertyStubForManager
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<ValidatePropertyStubForManager, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for Type.</summary>
@@ -106,11 +121,14 @@ partial class ValidatePropertyStubForManager
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<ValidatePropertyStubForManager, global::System.Type>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public global::System.Type Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for StringValue.</summary>
@@ -122,11 +140,14 @@ partial class ValidatePropertyStubForManager
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<ValidatePropertyStubForManager, string?>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public string? Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsSelfValid.</summary>
@@ -138,11 +159,14 @@ partial class ValidatePropertyStubForManager
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<ValidatePropertyStubForManager, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsValid.</summary>
@@ -154,11 +178,14 @@ partial class ValidatePropertyStubForManager
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<ValidatePropertyStubForManager, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for PropertyMessages.</summary>
@@ -170,11 +197,14 @@ partial class ValidatePropertyStubForManager
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<ValidatePropertyStubForManager, global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> Value { get; set; } = new global::System.Collections.Generic.List<global::Neatoo.IPropertyMessage>();
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for SetValue.</summary>
@@ -448,45 +478,6 @@ partial class ValidatePropertyStubForManager
 	/// <summary>Interceptor for NeatooPropertyChanged event.</summary>
 	public NeatooPropertyChangedInterceptor NeatooPropertyChanged { get; } = new();
 
-	/// <summary>Returns this instance as global::Neatoo.IValidateProperty.</summary>
-	public global::Neatoo.IValidateProperty AsValidateProperty() => this;
-
-	/// <summary>Returns this instance as global::System.ComponentModel.INotifyPropertyChanged.</summary>
-	public global::System.ComponentModel.INotifyPropertyChanged AsNotifyPropertyChanged() => this;
-
-	/// <summary>Returns this instance as global::Neatoo.INotifyNeatooPropertyChanged.</summary>
-	public global::Neatoo.INotifyNeatooPropertyChanged AsNotifyNeatooPropertyChanged() => this;
-
-	/// <summary>Backing storage for Name.</summary>
-	protected string NameBacking { get; set; } = "";
-
-	/// <summary>Backing storage for Value.</summary>
-	protected object? ValueBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for Task.</summary>
-	protected global::System.Threading.Tasks.Task TaskBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsBusy.</summary>
-	protected bool IsBusyBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsReadOnly.</summary>
-	protected bool IsReadOnlyBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for Type.</summary>
-	protected global::System.Type TypeBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for StringValue.</summary>
-	protected string? StringValueBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsSelfValid.</summary>
-	protected bool IsSelfValidBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsValid.</summary>
-	protected bool IsValidBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for PropertyMessages.</summary>
-	protected global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> PropertyMessagesBacking { get; set; } = new global::System.Collections.Generic.List<global::Neatoo.IPropertyMessage>();
-
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateProperty.SetValue(object? newValue)
 	{
 		SetValue.RecordCall(newValue);
@@ -531,53 +522,53 @@ partial class ValidatePropertyStubForManager
 
 	string global::Neatoo.IValidateProperty.Name
 	{
-		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
+		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? Name.Value; }
 	}
 
 	object? global::Neatoo.IValidateProperty.Value
 	{
-		get { Value.RecordGet(); return Value.OnGet?.Invoke(this) ?? ValueBacking; }
-		set { Value.RecordSet(value); if (Value.OnSet != null) Value.OnSet(this, value); else ValueBacking = value; }
+		get { Value.RecordGet(); return Value.OnGet?.Invoke(this) ?? Value.Value; }
+		set { Value.RecordSet(value); if (Value.OnSet != null) Value.OnSet(this, value); else Value.Value = value; }
 	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateProperty.Task
 	{
-		get { Task.RecordGet(); return Task.OnGet?.Invoke(this) ?? TaskBacking; }
+		get { Task.RecordGet(); return Task.OnGet?.Invoke(this) ?? Task.Value; }
 	}
 
 	bool global::Neatoo.IValidateProperty.IsBusy
 	{
-		get { IsBusy.RecordGet(); return IsBusy.OnGet?.Invoke(this) ?? IsBusyBacking; }
+		get { IsBusy.RecordGet(); return IsBusy.OnGet?.Invoke(this) ?? IsBusy.Value; }
 	}
 
 	bool global::Neatoo.IValidateProperty.IsReadOnly
 	{
-		get { IsReadOnly.RecordGet(); return IsReadOnly.OnGet?.Invoke(this) ?? IsReadOnlyBacking; }
+		get { IsReadOnly.RecordGet(); return IsReadOnly.OnGet?.Invoke(this) ?? IsReadOnly.Value; }
 	}
 
 	global::System.Type global::Neatoo.IValidateProperty.Type
 	{
-		get { Type.RecordGet(); return Type.OnGet?.Invoke(this) ?? TypeBacking; }
+		get { Type.RecordGet(); return Type.OnGet?.Invoke(this) ?? Type.Value; }
 	}
 
 	string? global::Neatoo.IValidateProperty.StringValue
 	{
-		get { StringValue.RecordGet(); return StringValue.OnGet?.Invoke(this) ?? StringValueBacking; }
+		get { StringValue.RecordGet(); return StringValue.OnGet?.Invoke(this) ?? StringValue.Value; }
 	}
 
 	bool global::Neatoo.IValidateProperty.IsSelfValid
 	{
-		get { IsSelfValid.RecordGet(); return IsSelfValid.OnGet?.Invoke(this) ?? IsSelfValidBacking; }
+		get { IsSelfValid.RecordGet(); return IsSelfValid.OnGet?.Invoke(this) ?? IsSelfValid.Value; }
 	}
 
 	bool global::Neatoo.IValidateProperty.IsValid
 	{
-		get { IsValid.RecordGet(); return IsValid.OnGet?.Invoke(this) ?? IsValidBacking; }
+		get { IsValid.RecordGet(); return IsValid.OnGet?.Invoke(this) ?? IsValid.Value; }
 	}
 
 	global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> global::Neatoo.IValidateProperty.PropertyMessages
 	{
-		get { PropertyMessages.RecordGet(); return PropertyMessages.OnGet?.Invoke(this) ?? PropertyMessagesBacking; }
+		get { PropertyMessages.RecordGet(); return PropertyMessages.OnGet?.Invoke(this) ?? PropertyMessages.Value; }
 	}
 
 	event global::System.ComponentModel.PropertyChangedEventHandler? global::System.ComponentModel.INotifyPropertyChanged.PropertyChanged

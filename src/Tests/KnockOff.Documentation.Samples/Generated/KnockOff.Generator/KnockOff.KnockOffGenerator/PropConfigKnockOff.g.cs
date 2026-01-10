@@ -14,25 +14,22 @@ partial class PropConfigKnockOff
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<PropConfigKnockOff, string>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public string Value { get; set; } = "";
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Interceptor for ConnectionString.</summary>
 	public ConnectionStringInterceptor ConnectionString { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IPropConfig.</summary>
-	public global::KnockOff.Documentation.Samples.Guides.IPropConfig AsPropConfig() => this;
-
-	/// <summary>Backing storage for ConnectionString.</summary>
-	protected string ConnectionStringBacking { get; set; } = "";
-
 	string global::KnockOff.Documentation.Samples.Guides.IPropConfig.ConnectionString
 	{
-		get { ConnectionString.RecordGet(); return ConnectionString.OnGet?.Invoke(this) ?? ConnectionStringBacking; }
+		get { ConnectionString.RecordGet(); return ConnectionString.OnGet?.Invoke(this) ?? ConnectionString.Value; }
 	}
 
 }

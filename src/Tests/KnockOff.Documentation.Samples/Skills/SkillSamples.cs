@@ -14,7 +14,8 @@
 /// - skill:SKILL:handler-types
 /// - skill:SKILL:customization-user-method
 /// - skill:SKILL:customization-callbacks-method
-/// - skill:SKILL:customization-callbacks-property
+/// - skill:SKILL:property-value-pattern (SkillSamplesTests.cs)
+/// - skill:SKILL:customization-callbacks-property (SkillSamplesTests.cs)
 /// - skill:SKILL:customization-callbacks-indexer
 /// - skill:SKILL:priority-order
 /// - skill:SKILL:verification-call-tracking
@@ -262,6 +263,7 @@ public interface ISkCallbackPropertyStore
 public partial class SkCallbackMethodKnockOff : ISkCallbackService { }
 #endregion
 
+// skill:SKILL:property-value-pattern sourced from SkillSamplesTests.cs
 // skill:SKILL:customization-callbacks-property sourced from SkillSamplesTests.cs
 
 #region skill:SKILL:customization-callbacks-indexer
@@ -618,3 +620,26 @@ public interface ISkSingleMethodService
 [KnockOff]
 public partial class SkSingleMethodServiceKnockOff : ISkSingleMethodService { }
 #endregion
+
+// ============================================================================
+// Interface vs Class Stub Access
+// ============================================================================
+
+// Types for demonstrating access patterns
+public interface ISkAccessDemoService
+{
+    string GetData();
+}
+
+public class SkAccessDemoEmailService
+{
+    public virtual void Send(string to, string body) { }
+}
+
+[KnockOff]
+public partial class SkAccessDemoServiceKnockOff : ISkAccessDemoService { }
+
+[KnockOff<SkAccessDemoEmailService>]
+public partial class SkAccessDemoTests { }
+
+// Usage examples demonstrating access patterns - sourced from SkillSamplesTests.cs

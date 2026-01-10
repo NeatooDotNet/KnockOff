@@ -39,9 +39,6 @@ partial class HaPropertyStoreKnockOff
 	/// <summary>Interceptor for StringIndexer.</summary>
 	public StringIndexerInterceptor StringIndexer { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.IHaPropertyStore.</summary>
-	public global::KnockOff.Documentation.Samples.Skills.IHaPropertyStore AsHaPropertyStore() => this;
-
 	/// <summary>Backing storage for StringIndexer indexer.</summary>
 	public global::System.Collections.Generic.Dictionary<string, object?> StringIndexerBacking { get; } = new();
 

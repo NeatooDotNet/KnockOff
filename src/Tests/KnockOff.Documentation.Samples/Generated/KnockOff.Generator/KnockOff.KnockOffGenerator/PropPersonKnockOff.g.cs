@@ -23,6 +23,9 @@ partial class PropPersonKnockOff
 		/// <summary>Callback invoked when the setter is accessed.</summary>
 		public global::System.Action<PropPersonKnockOff, string>? OnSet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public string Value { get; set; } = "";
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
@@ -30,7 +33,7 @@ partial class PropPersonKnockOff
 		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for LastName.</summary>
@@ -51,6 +54,9 @@ partial class PropPersonKnockOff
 		/// <summary>Callback invoked when the setter is accessed.</summary>
 		public global::System.Action<PropPersonKnockOff, string>? OnSet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public string Value { get; set; } = "";
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
@@ -58,7 +64,7 @@ partial class PropPersonKnockOff
 		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for FullName.</summary>
@@ -70,11 +76,14 @@ partial class PropPersonKnockOff
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<PropPersonKnockOff, string>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public string Value { get; set; } = "";
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Interceptor for FirstName.</summary>
@@ -86,33 +95,21 @@ partial class PropPersonKnockOff
 	/// <summary>Interceptor for FullName.</summary>
 	public FullNameInterceptor FullName { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IPropPerson.</summary>
-	public global::KnockOff.Documentation.Samples.Guides.IPropPerson AsPropPerson() => this;
-
-	/// <summary>Backing storage for FirstName.</summary>
-	protected string FirstNameBacking { get; set; } = "";
-
-	/// <summary>Backing storage for LastName.</summary>
-	protected string LastNameBacking { get; set; } = "";
-
-	/// <summary>Backing storage for FullName.</summary>
-	protected string FullNameBacking { get; set; } = "";
-
 	string global::KnockOff.Documentation.Samples.Guides.IPropPerson.FirstName
 	{
-		get { FirstName.RecordGet(); return FirstName.OnGet?.Invoke(this) ?? FirstNameBacking; }
-		set { FirstName.RecordSet(value); if (FirstName.OnSet != null) FirstName.OnSet(this, value); else FirstNameBacking = value; }
+		get { FirstName.RecordGet(); return FirstName.OnGet?.Invoke(this) ?? FirstName.Value; }
+		set { FirstName.RecordSet(value); if (FirstName.OnSet != null) FirstName.OnSet(this, value); else FirstName.Value = value; }
 	}
 
 	string global::KnockOff.Documentation.Samples.Guides.IPropPerson.LastName
 	{
-		get { LastName.RecordGet(); return LastName.OnGet?.Invoke(this) ?? LastNameBacking; }
-		set { LastName.RecordSet(value); if (LastName.OnSet != null) LastName.OnSet(this, value); else LastNameBacking = value; }
+		get { LastName.RecordGet(); return LastName.OnGet?.Invoke(this) ?? LastName.Value; }
+		set { LastName.RecordSet(value); if (LastName.OnSet != null) LastName.OnSet(this, value); else LastName.Value = value; }
 	}
 
 	string global::KnockOff.Documentation.Samples.Guides.IPropPerson.FullName
 	{
-		get { FullName.RecordGet(); return FullName.OnGet?.Invoke(this) ?? FullNameBacking; }
+		get { FullName.RecordGet(); return FullName.OnGet?.Invoke(this) ?? FullName.Value; }
 	}
 
 }

@@ -111,9 +111,6 @@ partial class HaOverloadServiceKnockOff
 	/// <summary>Interceptor for Calculate.</summary>
 	public Calculate2Interceptor Calculate2 { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.IHaOverloadService.</summary>
-	public global::KnockOff.Documentation.Samples.Skills.IHaOverloadService AsHaOverloadService() => this;
-
 	void global::KnockOff.Documentation.Samples.Skills.IHaOverloadService.Process(string data)
 	{
 		Process1.RecordCall(data);

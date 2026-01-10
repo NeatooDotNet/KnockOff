@@ -4,6 +4,9 @@
 /// Snippets in this file:
 /// - docs:properties:get-set-property
 /// - docs:properties:get-only-property
+/// - docs:properties:get-only-usage (Value - recommended)
+/// - docs:properties:get-only-dynamic (OnGet - for dynamic values)
+/// - docs:properties:value-preset
 /// - docs:properties:conditional-logic
 /// - docs:properties:computed-property
 /// - docs:properties:tracking-changes
@@ -116,9 +119,35 @@ public static class PropertiesUsageExamples
         var knockOff = new PropConfigKnockOff();
 
         #region docs:properties:get-only-usage
-        // Use callback to provide value
-        knockOff.ConnectionString.OnGet = (ko) => "Server=test";
+        // Set value directly (recommended for static values)
+        knockOff.ConnectionString.Value = "Server=test";
         #endregion
+    }
+
+    public static void GetOnlyDynamicUsage()
+    {
+        var knockOff = new PropConfigKnockOff();
+
+        #region docs:properties:get-only-dynamic
+        // Use OnGet callback for dynamic/computed values
+        knockOff.ConnectionString.OnGet = (ko) => Environment.GetEnvironmentVariable("DB_CONN") ?? "Server=fallback";
+        #endregion
+    }
+
+    public static void ValuePreset()
+    {
+        var knockOff = new PropUserServiceKnockOff();
+        IPropUserService service = knockOff;
+
+        #region docs:properties:value-preset
+        // Pre-set a property value before test execution
+        knockOff.Name.Value = "John Doe";
+
+        // Now accessing the property returns the pre-set value
+        var name = service.Name;  // "John Doe"
+        #endregion
+
+        _ = name;
     }
 
     public static void GetTracking()

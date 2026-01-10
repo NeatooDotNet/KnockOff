@@ -83,9 +83,6 @@ partial class EntityRepositoryStub
 	/// <summary>Interceptor for GetAll.</summary>
 	public GetAllInterceptor GetAll { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Benchmarks.Interfaces.IRepository<global::KnockOff.Benchmarks.Interfaces.Entity>.</summary>
-	public global::KnockOff.Benchmarks.Interfaces.IRepository<global::KnockOff.Benchmarks.Interfaces.Entity> AsRepository() => this;
-
 	global::KnockOff.Benchmarks.Interfaces.Entity? global::KnockOff.Benchmarks.Interfaces.IRepository<global::KnockOff.Benchmarks.Interfaces.Entity>.GetById(int id)
 	{
 		GetById.RecordCall(id);

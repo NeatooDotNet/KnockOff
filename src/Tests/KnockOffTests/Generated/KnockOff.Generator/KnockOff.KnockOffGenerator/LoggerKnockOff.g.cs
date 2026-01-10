@@ -23,6 +23,9 @@ partial class LoggerKnockOff
 		/// <summary>Callback invoked when the setter is accessed.</summary>
 		public global::System.Action<LoggerKnockOff, string>? OnSet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public string Value { get; set; } = "";
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
@@ -30,7 +33,7 @@ partial class LoggerKnockOff
 		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for Log.</summary>
@@ -61,12 +64,6 @@ partial class LoggerKnockOff
 	/// <summary>Interceptor for Log.</summary>
 	public LogInterceptor Log { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Tests.ILogger.</summary>
-	public global::KnockOff.Tests.ILogger AsLogger() => this;
-
-	/// <summary>Backing storage for Name.</summary>
-	protected string NameBacking { get; set; } = "";
-
 	void global::KnockOff.Tests.ILogger.Log(string message)
 	{
 		Log.RecordCall(message);
@@ -75,8 +72,8 @@ partial class LoggerKnockOff
 
 	string global::KnockOff.Tests.ILogger.Name
 	{
-		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
-		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else NameBacking = value; }
+		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else Name.Value = value; }
 	}
 
 }

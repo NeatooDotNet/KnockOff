@@ -261,7 +261,7 @@ public static class EventsUsageExamples
 
         #region docs:events:progress-example
         var progressValues = new List<int>();
-        knockOff.AsGuideDownloader().ProgressChanged += (p) => progressValues.Add(p);
+        ((IGuideDownloader)knockOff).ProgressChanged += (p) => progressValues.Add(p);
 
         // Simulate download progress
         knockOff.ProgressChanged.Raise(0);

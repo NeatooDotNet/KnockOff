@@ -19,12 +19,12 @@ public partial class PropUserServiceKnockOff : IPropUserService { }
 <!-- /snippet -->
 
 Generated:
-- `NameBacking` — protected backing field
+- `knockOff.Name.Value` — backing value (read/write)
 - `knockOff.Name.GetCount` — number of getter calls
 - `knockOff.Name.SetCount` — number of setter calls
 - `knockOff.Name.LastSetValue` — last value set
-- `knockOff.Name.OnGet` — getter callback
-- `knockOff.Name.OnSet` — setter callback
+- `knockOff.Name.OnGet` — getter callback (for dynamic values)
+- `knockOff.Name.OnSet` — setter callback (for custom logic)
 
 ### Get-Only Properties
 
@@ -41,13 +41,24 @@ public partial class PropConfigKnockOff : IPropConfig { }
 <!-- /snippet -->
 
 For get-only properties:
-- Backing field is still generated
-- Only `OnGet` callback is available
+- `Value` is available for setting the return value
+- `OnGet` callback is available for dynamic values
+
+**Use `Value` for static values (recommended):**
 
 <!-- snippet: docs:properties:get-only-usage -->
 ```csharp
-// Use callback to provide value
-        knockOff.ConnectionString.OnGet = (ko) => "Server=test";
+// Set value directly (recommended for static values)
+        knockOff.ConnectionString.Value = "Server=test";
+```
+<!-- /snippet -->
+
+**Use `OnGet` for dynamic/computed values:**
+
+<!-- snippet: docs:properties:get-only-dynamic -->
+```csharp
+// Use OnGet callback for dynamic/computed values
+        knockOff.ConnectionString.OnGet = (ko) => Environment.GetEnvironmentVariable("DB_CONN") ?? "Server=fallback";
 ```
 <!-- /snippet -->
 
@@ -93,9 +104,28 @@ service.Name = "First";
 
 ## Customization
 
-### Default Behavior (Backing Field)
+### Using Value (Recommended for Static Values)
 
-Without callbacks, properties use a backing field:
+The simplest way to configure a property is using `Value`:
+
+<!-- snippet: docs:properties:value-preset -->
+```csharp
+// Pre-set a property value before test execution
+        knockOff.Name.Value = "John Doe";
+
+        // Now accessing the property returns the pre-set value
+        var name = service.Name;  // "John Doe"
+```
+<!-- /snippet -->
+
+**When to use `Value`:**
+- Static test data that doesn't change
+- Pre-populating properties before test execution
+- Simple return values
+
+### Default Behavior (Via Interface)
+
+You can also set/get through the interface itself:
 
 <!-- snippet: docs:properties:default-behavior -->
 ```csharp
@@ -104,9 +134,9 @@ service.Name = "Test";
 ```
 <!-- /snippet -->
 
-### OnGet Callback
+### OnGet Callback (For Dynamic Values)
 
-Override getter behavior:
+Use `OnGet` when you need dynamic or computed values:
 
 <!-- snippet: docs:properties:onget-callback -->
 ```csharp
@@ -264,3 +294,16 @@ knockOff.SecretKey.OnGet = (ko) =>
             throw new UnauthorizedAccessException("Access denied");
 ```
 <!-- /snippet -->
+
+## Value vs OnGet: Decision Guide
+
+| Scenario | Use | Example |
+|----------|-----|---------|
+| Static test data | `Value` | `knockOff.Name.Value = "John"` |
+| Pre-populate before test | `Value` | `knockOff.Count.Value = 42` |
+| Different value each call | `OnGet` | `knockOff.Id.OnGet = (ko) => ++counter` |
+| Depends on other stub state | `OnGet` | `knockOff.IsConnected.OnGet = (ko) => ko.Connect.WasCalled` |
+| Computed from test context | `OnGet` | `knockOff.User.OnGet = (ko) => _testFixture.CurrentUser` |
+| Throw on access | `OnGet` | `knockOff.Secret.OnGet = (ko) => throw new Exception()` |
+
+**Rule of thumb:** Start with `Value`. Only use `OnGet` when you need dynamic behavior.

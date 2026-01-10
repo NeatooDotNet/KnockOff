@@ -86,9 +86,6 @@ partial class OutParameterServiceKnockOff
 	/// <summary>Interceptor for GetData.</summary>
 	public GetDataInterceptor GetData { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Sandbox.IOutParameterService.</summary>
-	public global::KnockOff.Sandbox.IOutParameterService AsOutParameterService() => this;
-
 	bool global::KnockOff.Sandbox.IOutParameterService.TryGetValue(string key, out string? @value)
 	{
 		@value = default!;

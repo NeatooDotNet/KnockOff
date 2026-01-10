@@ -89,9 +89,6 @@ partial class OverloadedServiceKnockOff
 	/// <summary>Interceptor for Format.</summary>
 	public Format3Interceptor Format3 { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Sandbox.IOverloadedService.</summary>
-	public global::KnockOff.Sandbox.IOverloadedService AsOverloadedService() => this;
-
 	string global::KnockOff.Sandbox.IOverloadedService.Format(string input)
 	{
 		Format1.RecordCall(input);

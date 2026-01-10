@@ -172,12 +172,12 @@ public static class InterfaceInheritanceUsageExamples
     {
         var knockOff = new IhAuditableEntityKnockOff();
 
-        #region docs:interface-inheritance:as-methods
-        // Access as derived interface
-        IIhAuditableEntity auditable = knockOff.AsIhAuditableEntity();
+        #region docs:interface-inheritance:interface-access
+        // Access as derived interface via implicit conversion
+        IIhAuditableEntity auditable = knockOff;
 
         // Access as base interface
-        IIhBaseEntity baseEntity = knockOff.AsIhBaseEntity();
+        IIhBaseEntity baseEntity = knockOff;
 
         // Same underlying instance
         var areSame = ReferenceEquals(knockOff, auditable);  // true

@@ -80,9 +80,6 @@ partial class FcLoggerStub
 	/// <summary>Interceptor for LogError.</summary>
 	public LogErrorInterceptor LogError { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Comparison.IFcLogger.</summary>
-	public global::KnockOff.Documentation.Samples.Comparison.IFcLogger AsFcLogger() => this;
-
 	void global::KnockOff.Documentation.Samples.Comparison.IFcLogger.LogInfo(string message)
 	{
 		LogInfo.RecordCall(message);

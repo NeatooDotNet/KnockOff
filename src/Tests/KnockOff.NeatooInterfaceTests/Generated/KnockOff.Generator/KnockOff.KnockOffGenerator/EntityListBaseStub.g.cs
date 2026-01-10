@@ -14,11 +14,14 @@ partial class EntityListBaseStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<EntityListBaseStub, global::Neatoo.IValidateBase?>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public global::Neatoo.IValidateBase? Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for Parent.</summary>
@@ -30,11 +33,14 @@ partial class EntityListBaseStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<EntityListBaseStub, global::Neatoo.IValidateBase?>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public global::Neatoo.IValidateBase? Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsFixedSize.</summary>
@@ -46,11 +52,14 @@ partial class EntityListBaseStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<EntityListBaseStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsReadOnly.</summary>
@@ -62,11 +71,14 @@ partial class EntityListBaseStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<EntityListBaseStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for Int32Indexer.</summary>
@@ -109,11 +121,14 @@ partial class EntityListBaseStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<EntityListBaseStub, int>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public int Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsSynchronized.</summary>
@@ -125,11 +140,14 @@ partial class EntityListBaseStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<EntityListBaseStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for SyncRoot.</summary>
@@ -141,11 +159,14 @@ partial class EntityListBaseStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<EntityListBaseStub, object>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public object Value { get; set; } = new object();
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsBusy.</summary>
@@ -157,11 +178,14 @@ partial class EntityListBaseStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<EntityListBaseStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsValid.</summary>
@@ -173,11 +197,14 @@ partial class EntityListBaseStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<EntityListBaseStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsSelfValid.</summary>
@@ -189,11 +216,14 @@ partial class EntityListBaseStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<EntityListBaseStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for PropertyMessages.</summary>
@@ -205,11 +235,14 @@ partial class EntityListBaseStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<EntityListBaseStub, global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> Value { get; set; } = new global::System.Collections.Generic.List<global::Neatoo.IPropertyMessage>();
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsChild.</summary>
@@ -221,11 +254,14 @@ partial class EntityListBaseStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<EntityListBaseStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsModified.</summary>
@@ -237,11 +273,14 @@ partial class EntityListBaseStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<EntityListBaseStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsSelfModified.</summary>
@@ -253,11 +292,14 @@ partial class EntityListBaseStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<EntityListBaseStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsMarkedModified.</summary>
@@ -269,11 +311,14 @@ partial class EntityListBaseStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<EntityListBaseStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsSavable.</summary>
@@ -285,11 +330,14 @@ partial class EntityListBaseStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<EntityListBaseStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsDeleted.</summary>
@@ -301,11 +349,14 @@ partial class EntityListBaseStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<EntityListBaseStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsNew.</summary>
@@ -317,11 +368,14 @@ partial class EntityListBaseStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<EntityListBaseStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for Add.</summary>
@@ -855,104 +909,17 @@ partial class EntityListBaseStub
 	/// <summary>Interceptor for NeatooPropertyChanged event.</summary>
 	public NeatooPropertyChangedInterceptor NeatooPropertyChanged { get; } = new();
 
-	/// <summary>Returns this instance as global::Neatoo.IEntityListBase.</summary>
-	public global::Neatoo.IEntityListBase AsEntityListBase() => this;
-
-	/// <summary>Returns this instance as global::Neatoo.IValidateListBase.</summary>
-	public global::Neatoo.IValidateListBase AsValidateListBase() => this;
-
-	/// <summary>Returns this instance as global::System.Collections.Specialized.INotifyCollectionChanged.</summary>
-	public global::System.Collections.Specialized.INotifyCollectionChanged AsNotifyCollectionChanged() => this;
-
-	/// <summary>Returns this instance as global::System.ComponentModel.INotifyPropertyChanged.</summary>
-	public global::System.ComponentModel.INotifyPropertyChanged AsNotifyPropertyChanged() => this;
-
-	/// <summary>Returns this instance as global::System.Collections.IList.</summary>
-	public global::System.Collections.IList AsList() => this;
-
-	/// <summary>Returns this instance as global::System.Collections.ICollection.</summary>
-	public global::System.Collections.ICollection AsCollection() => this;
-
-	/// <summary>Returns this instance as global::System.Collections.IEnumerable.</summary>
-	public global::System.Collections.IEnumerable AsEnumerable() => this;
-
-	/// <summary>Returns this instance as global::Neatoo.INotifyNeatooPropertyChanged.</summary>
-	public global::Neatoo.INotifyNeatooPropertyChanged AsNotifyNeatooPropertyChanged() => this;
-
-	/// <summary>Returns this instance as global::Neatoo.IValidateMetaProperties.</summary>
-	public global::Neatoo.IValidateMetaProperties AsValidateMetaProperties() => this;
-
-	/// <summary>Returns this instance as global::Neatoo.IEntityMetaProperties.</summary>
-	public global::Neatoo.IEntityMetaProperties AsEntityMetaProperties() => this;
-
-	/// <summary>Returns this instance as global::Neatoo.RemoteFactory.IFactorySaveMeta.</summary>
-	public global::Neatoo.RemoteFactory.IFactorySaveMeta AsFactorySaveMeta() => this;
-
-	/// <summary>Backing storage for Root.</summary>
-	protected global::Neatoo.IValidateBase? RootBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for Parent.</summary>
-	protected global::Neatoo.IValidateBase? ParentBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsFixedSize.</summary>
-	protected bool IsFixedSizeBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsReadOnly.</summary>
-	protected bool IsReadOnlyBacking { get; set; } = default!;
-
 	/// <summary>Backing storage for Int32Indexer indexer.</summary>
 	public global::System.Collections.Generic.Dictionary<int, object?> Int32IndexerBacking { get; } = new();
 
-	/// <summary>Backing storage for Count.</summary>
-	protected int CountBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsSynchronized.</summary>
-	protected bool IsSynchronizedBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for SyncRoot.</summary>
-	protected object SyncRootBacking { get; set; } = new object();
-
-	/// <summary>Backing storage for IsBusy.</summary>
-	protected bool IsBusyBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsValid.</summary>
-	protected bool IsValidBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsSelfValid.</summary>
-	protected bool IsSelfValidBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for PropertyMessages.</summary>
-	protected global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> PropertyMessagesBacking { get; set; } = new global::System.Collections.Generic.List<global::Neatoo.IPropertyMessage>();
-
-	/// <summary>Backing storage for IsChild.</summary>
-	protected bool IsChildBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsModified.</summary>
-	protected bool IsModifiedBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsSelfModified.</summary>
-	protected bool IsSelfModifiedBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsMarkedModified.</summary>
-	protected bool IsMarkedModifiedBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsSavable.</summary>
-	protected bool IsSavableBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsDeleted.</summary>
-	protected bool IsDeletedBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsNew.</summary>
-	protected bool IsNewBacking { get; set; } = default!;
-
 	global::Neatoo.IValidateBase? global::Neatoo.IEntityListBase.Root
 	{
-		get { Root.RecordGet(); return Root.OnGet?.Invoke(this) ?? RootBacking; }
+		get { Root.RecordGet(); return Root.OnGet?.Invoke(this) ?? Root.Value; }
 	}
 
 	global::Neatoo.IValidateBase? global::Neatoo.IValidateListBase.Parent
 	{
-		get { Parent.RecordGet(); return Parent.OnGet?.Invoke(this) ?? ParentBacking; }
+		get { Parent.RecordGet(); return Parent.OnGet?.Invoke(this) ?? Parent.Value; }
 	}
 
 	int global::System.Collections.IList.Add(object? @value)
@@ -999,12 +966,12 @@ partial class EntityListBaseStub
 
 	bool global::System.Collections.IList.IsFixedSize
 	{
-		get { IsFixedSize.RecordGet(); return IsFixedSize.OnGet?.Invoke(this) ?? IsFixedSizeBacking; }
+		get { IsFixedSize.RecordGet(); return IsFixedSize.OnGet?.Invoke(this) ?? IsFixedSize.Value; }
 	}
 
 	bool global::System.Collections.IList.IsReadOnly
 	{
-		get { IsReadOnly.RecordGet(); return IsReadOnly.OnGet?.Invoke(this) ?? IsReadOnlyBacking; }
+		get { IsReadOnly.RecordGet(); return IsReadOnly.OnGet?.Invoke(this) ?? IsReadOnly.Value; }
 	}
 
 	object? global::System.Collections.IList.this[int index]
@@ -1021,17 +988,17 @@ partial class EntityListBaseStub
 
 	int global::System.Collections.ICollection.Count
 	{
-		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? CountBacking; }
+		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? Count.Value; }
 	}
 
 	bool global::System.Collections.ICollection.IsSynchronized
 	{
-		get { IsSynchronized.RecordGet(); return IsSynchronized.OnGet?.Invoke(this) ?? IsSynchronizedBacking; }
+		get { IsSynchronized.RecordGet(); return IsSynchronized.OnGet?.Invoke(this) ?? IsSynchronized.Value; }
 	}
 
 	object global::System.Collections.ICollection.SyncRoot
 	{
-		get { SyncRoot.RecordGet(); return SyncRoot.OnGet?.Invoke(this) ?? SyncRootBacking; }
+		get { SyncRoot.RecordGet(); return SyncRoot.OnGet?.Invoke(this) ?? SyncRoot.Value; }
 	}
 
 	global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
@@ -1080,57 +1047,57 @@ partial class EntityListBaseStub
 
 	bool global::Neatoo.IValidateMetaProperties.IsBusy
 	{
-		get { IsBusy.RecordGet(); return IsBusy.OnGet?.Invoke(this) ?? IsBusyBacking; }
+		get { IsBusy.RecordGet(); return IsBusy.OnGet?.Invoke(this) ?? IsBusy.Value; }
 	}
 
 	bool global::Neatoo.IValidateMetaProperties.IsValid
 	{
-		get { IsValid.RecordGet(); return IsValid.OnGet?.Invoke(this) ?? IsValidBacking; }
+		get { IsValid.RecordGet(); return IsValid.OnGet?.Invoke(this) ?? IsValid.Value; }
 	}
 
 	bool global::Neatoo.IValidateMetaProperties.IsSelfValid
 	{
-		get { IsSelfValid.RecordGet(); return IsSelfValid.OnGet?.Invoke(this) ?? IsSelfValidBacking; }
+		get { IsSelfValid.RecordGet(); return IsSelfValid.OnGet?.Invoke(this) ?? IsSelfValid.Value; }
 	}
 
 	global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> global::Neatoo.IValidateMetaProperties.PropertyMessages
 	{
-		get { PropertyMessages.RecordGet(); return PropertyMessages.OnGet?.Invoke(this) ?? PropertyMessagesBacking; }
+		get { PropertyMessages.RecordGet(); return PropertyMessages.OnGet?.Invoke(this) ?? PropertyMessages.Value; }
 	}
 
 	bool global::Neatoo.IEntityMetaProperties.IsChild
 	{
-		get { IsChild.RecordGet(); return IsChild.OnGet?.Invoke(this) ?? IsChildBacking; }
+		get { IsChild.RecordGet(); return IsChild.OnGet?.Invoke(this) ?? IsChild.Value; }
 	}
 
 	bool global::Neatoo.IEntityMetaProperties.IsModified
 	{
-		get { IsModified.RecordGet(); return IsModified.OnGet?.Invoke(this) ?? IsModifiedBacking; }
+		get { IsModified.RecordGet(); return IsModified.OnGet?.Invoke(this) ?? IsModified.Value; }
 	}
 
 	bool global::Neatoo.IEntityMetaProperties.IsSelfModified
 	{
-		get { IsSelfModified.RecordGet(); return IsSelfModified.OnGet?.Invoke(this) ?? IsSelfModifiedBacking; }
+		get { IsSelfModified.RecordGet(); return IsSelfModified.OnGet?.Invoke(this) ?? IsSelfModified.Value; }
 	}
 
 	bool global::Neatoo.IEntityMetaProperties.IsMarkedModified
 	{
-		get { IsMarkedModified.RecordGet(); return IsMarkedModified.OnGet?.Invoke(this) ?? IsMarkedModifiedBacking; }
+		get { IsMarkedModified.RecordGet(); return IsMarkedModified.OnGet?.Invoke(this) ?? IsMarkedModified.Value; }
 	}
 
 	bool global::Neatoo.IEntityMetaProperties.IsSavable
 	{
-		get { IsSavable.RecordGet(); return IsSavable.OnGet?.Invoke(this) ?? IsSavableBacking; }
+		get { IsSavable.RecordGet(); return IsSavable.OnGet?.Invoke(this) ?? IsSavable.Value; }
 	}
 
 	bool global::Neatoo.RemoteFactory.IFactorySaveMeta.IsDeleted
 	{
-		get { IsDeleted.RecordGet(); return IsDeleted.OnGet?.Invoke(this) ?? IsDeletedBacking; }
+		get { IsDeleted.RecordGet(); return IsDeleted.OnGet?.Invoke(this) ?? IsDeleted.Value; }
 	}
 
 	bool global::Neatoo.RemoteFactory.IFactorySaveMeta.IsNew
 	{
-		get { IsNew.RecordGet(); return IsNew.OnGet?.Invoke(this) ?? IsNewBacking; }
+		get { IsNew.RecordGet(); return IsNew.OnGet?.Invoke(this) ?? IsNew.Value; }
 	}
 
 	event global::System.Collections.Specialized.NotifyCollectionChangedEventHandler? global::System.Collections.Specialized.INotifyCollectionChanged.CollectionChanged

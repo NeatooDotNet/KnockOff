@@ -30,9 +30,6 @@ partial class MethodFailureKnockOff
 	/// <summary>Interceptor for Save.</summary>
 	public SaveInterceptor Save { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IMethodFailure.</summary>
-	public global::KnockOff.Documentation.Samples.Guides.IMethodFailure AsMethodFailure() => this;
-
 	void global::KnockOff.Documentation.Samples.Guides.IMethodFailure.Save(global::KnockOff.Documentation.Samples.Guides.MethodEntity entity)
 	{
 		Save.RecordCall(entity);

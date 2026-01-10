@@ -58,9 +58,6 @@ partial class FcInventoryServiceStub
 	/// <summary>Interceptor for ReleaseItems.</summary>
 	public ReleaseItemsInterceptor ReleaseItems { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Comparison.IFcInventoryService.</summary>
-	public global::KnockOff.Documentation.Samples.Comparison.IFcInventoryService AsFcInventoryService() => this;
-
 	bool global::KnockOff.Documentation.Samples.Comparison.IFcInventoryService.ReserveItems(global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Comparison.FcOrderItem> items)
 	{
 		ReserveItems.RecordCall(items);

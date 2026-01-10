@@ -45,11 +45,14 @@ partial class RuleMessagesStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<RuleMessagesStub, int>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public int Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsReadOnly.</summary>
@@ -61,11 +64,14 @@ partial class RuleMessagesStub
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<RuleMessagesStub, bool>? OnGet { get; set; }
 
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for Add.</summary>
@@ -333,26 +339,8 @@ partial class RuleMessagesStub
 	/// <summary>Interceptor for GetEnumerator.</summary>
 	public GetEnumeratorInterceptor GetEnumerator { get; } = new();
 
-	/// <summary>Returns this instance as global::Neatoo.Rules.IRuleMessages.</summary>
-	public global::Neatoo.Rules.IRuleMessages AsRuleMessages() => this;
-
-	/// <summary>Returns this instance as global::System.Collections.Generic.IList<global::Neatoo.Rules.IRuleMessage>.</summary>
-	public global::System.Collections.Generic.IList<global::Neatoo.Rules.IRuleMessage> AsList() => this;
-
-	/// <summary>Returns this instance as global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>.</summary>
-	public global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage> AsCollection() => this;
-
-	/// <summary>Returns this instance as global::System.Collections.Generic.IEnumerable<global::Neatoo.Rules.IRuleMessage>.</summary>
-	public global::System.Collections.Generic.IEnumerable<global::Neatoo.Rules.IRuleMessage> AsEnumerable() => this;
-
 	/// <summary>Backing storage for Int32Indexer indexer.</summary>
 	public global::System.Collections.Generic.Dictionary<int, global::Neatoo.Rules.IRuleMessage> Int32IndexerBacking { get; } = new();
-
-	/// <summary>Backing storage for Count.</summary>
-	protected int CountBacking { get; set; } = default!;
-
-	/// <summary>Backing storage for IsReadOnly.</summary>
-	protected bool IsReadOnlyBacking { get; set; } = default!;
 
 	void global::Neatoo.Rules.IRuleMessages.Add(string propertyName, string message)
 	{
@@ -416,12 +404,12 @@ partial class RuleMessagesStub
 
 	int global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>.Count
 	{
-		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? CountBacking; }
+		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? Count.Value; }
 	}
 
 	bool global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>.IsReadOnly
 	{
-		get { IsReadOnly.RecordGet(); return IsReadOnly.OnGet?.Invoke(this) ?? IsReadOnlyBacking; }
+		get { IsReadOnly.RecordGet(); return IsReadOnly.OnGet?.Invoke(this) ?? IsReadOnly.Value; }
 	}
 
 	global::System.Collections.Generic.IEnumerator<global::Neatoo.Rules.IRuleMessage> global::System.Collections.Generic.IEnumerable<global::Neatoo.Rules.IRuleMessage>.GetEnumerator()

@@ -33,14 +33,14 @@ public class InterfaceInheritanceTests
 	}
 
 	[Fact]
-	public void InterfaceInheritance_BothAsMethodsWork()
+	public void InterfaceInheritance_ImplicitConversion_Works()
 	{
 		var knockOff = new AuditableEntityKnockOff();
 
-		IAuditableEntity auditable = knockOff.AsAuditableEntity();
-		IBaseEntity baseEntity = knockOff.AsBaseEntity();
+		IAuditableEntity auditable = knockOff;
+		IBaseEntity baseEntity = knockOff;
 
-		auditable.ModifiedBy = "Via AsAuditableEntity";
+		auditable.ModifiedBy = "Via cast";
 		var id = baseEntity.Id;
 
 		Assert.Equal(1, knockOff.ModifiedBy.SetCount);

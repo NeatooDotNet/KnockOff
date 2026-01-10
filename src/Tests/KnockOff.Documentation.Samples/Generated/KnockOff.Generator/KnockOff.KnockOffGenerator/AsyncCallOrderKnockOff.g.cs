@@ -55,9 +55,6 @@ partial class AsyncCallOrderKnockOff
 	/// <summary>Interceptor for ProcessAsync.</summary>
 	public ProcessAsyncInterceptor ProcessAsync { get; } = new();
 
-	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IAsyncCallOrder.</summary>
-	public global::KnockOff.Documentation.Samples.Guides.IAsyncCallOrder AsAsyncCallOrder() => this;
-
 	global::System.Threading.Tasks.Task global::KnockOff.Documentation.Samples.Guides.IAsyncCallOrder.StartAsync()
 	{
 		StartAsync.RecordCall();

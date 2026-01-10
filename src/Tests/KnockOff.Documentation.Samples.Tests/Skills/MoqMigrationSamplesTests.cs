@@ -34,10 +34,11 @@ public class MoqMigrationSamplesTests : SamplesTestBase
     }
 
     [Fact]
-    public void Step2_ExplicitCast()
+    public void Step2_ImplicitConversion()
     {
         var knockOff = new MmUserServiceKnockOff();
-        Assert.NotNull(knockOff.AsMmUserService());
+        IMmUserService service = knockOff;
+        Assert.NotNull(service);
     }
 
     // ========================================================================
@@ -398,5 +399,91 @@ public class MoqMigrationSamplesTests : SamplesTestBase
 
         Assert.Equal(6, x); // Modified
         Assert.Equal(5, knockOff.Increment.LastCallArg); // Original
+    }
+
+    // ========================================================================
+    // skill:moq-migration:class-stub-object-usage
+    // Snippet sourced from MoqMigrationSamples.cs
+    // ========================================================================
+
+    [Fact]
+    public void ClassStubObject_Usage()
+    {
+        // Verify stub can be created and .Object returns instance
+        var stub = new MmEmailServiceTests.Stubs.MmEmailService();
+        Assert.NotNull(stub.Object);
+        Assert.IsAssignableFrom<MmEmailService>(stub.Object);
+    }
+
+    // ========================================================================
+    // skill:moq-migration:as-interface-helpers-usage
+    // Snippet sourced from MoqMigrationSamples.cs
+    // ========================================================================
+
+    [Fact]
+    public void InterfaceAccess_ImplicitConversion()
+    {
+        var knockOff = new MmEmployeeKnockOff();
+
+        // Verify implicit conversion works and returns same instance
+        IMmEmployee employee = knockOff;
+        IMmEntityBase baseEntity = knockOff;
+
+        Assert.Same(knockOff, employee);
+        Assert.Same(knockOff, baseEntity);
+    }
+
+    // ========================================================================
+    // skill:moq-migration:setup-property-usage
+    // Snippet sourced from MoqMigrationSamples.cs (accesses protected members)
+    // ========================================================================
+
+    [Fact]
+    public void SetupProperty_Usage()
+    {
+        // Verify property tracking works through interface
+        var knockOff = new MmTrackedPropServiceKnockOff();
+        IMmTrackedPropService service = knockOff;
+
+        service.Active = false;
+        Assert.Equal(1, knockOff.Active.SetCount);
+        Assert.False(service.Active);
+    }
+
+    [Fact]
+    public void SetupProperty_MultipleProperties()
+    {
+        // Verify multiple property types are supported
+        var knockOff = new MmTrackedPropServiceKnockOff();
+        IMmTrackedPropService service = knockOff;
+
+        service.NewDate = DateTime.Today;
+        service.VisitId = 42L;
+        service.VisitLabel = "Test";
+        service.PreviousVisitDate = null;
+
+        Assert.Equal(DateTime.Today, service.NewDate);
+        Assert.Equal(42L, service.VisitId);
+        Assert.Equal("Test", service.VisitLabel);
+        Assert.Null(service.PreviousVisitDate);
+    }
+
+    // ========================================================================
+    // skill:moq-migration:interface-inheritance-usage
+    // Snippet sourced from MoqMigrationSamples.cs (accesses protected members)
+    // ========================================================================
+
+    [Fact]
+    public void InterfaceInheritance_Usage()
+    {
+        var knockOff = new MmInheritedEmployeeKnockOff();
+
+        // Verify OnGet callbacks work for inherited members
+        knockOff.Id.OnGet = (ko) => 42;
+        knockOff.Name.OnGet = (ko) => "John";
+
+        IMmInheritedEmployee service = knockOff;
+        Assert.Equal(42, service.Id);
+        Assert.Equal("John", service.Name);
     }
 }
