@@ -161,40 +161,40 @@ partial class MmUserServiceKnockOff
 	/// <summary>Interceptor for Update.</summary>
 	public UpdateInterceptor Update { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmUserService.</summary>
-	public KnockOff.Documentation.Samples.Skills.IMmUserService AsMmUserService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.IMmUserService.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.IMmUserService AsMmUserService() => this;
 
-	global::KnockOff.Documentation.Samples.Skills.MmUser? KnockOff.Documentation.Samples.Skills.IMmUserService.GetUser(int id)
+	global::KnockOff.Documentation.Samples.Skills.MmUser? global::KnockOff.Documentation.Samples.Skills.IMmUserService.GetUser(int id)
 	{
 		GetUser.RecordCall(id);
 		return GetUser.OnCall?.Invoke(this, id) ?? default!;
 	}
 
-	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.MmUser?> KnockOff.Documentation.Samples.Skills.IMmUserService.GetUserAsync(int id)
+	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.MmUser?> global::KnockOff.Documentation.Samples.Skills.IMmUserService.GetUserAsync(int id)
 	{
 		GetUserAsync.RecordCall(id);
 		return GetUserAsync.OnCall?.Invoke(this, id) ?? global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Skills.MmUser?>(default!);
 	}
 
-	void KnockOff.Documentation.Samples.Skills.IMmUserService.Save(global::KnockOff.Documentation.Samples.Skills.MmUser user)
+	void global::KnockOff.Documentation.Samples.Skills.IMmUserService.Save(global::KnockOff.Documentation.Samples.Skills.MmUser user)
 	{
 		Save.RecordCall(user);
 		Save.OnCall?.Invoke(this, user);
 	}
 
-	void KnockOff.Documentation.Samples.Skills.IMmUserService.Delete(int id)
+	void global::KnockOff.Documentation.Samples.Skills.IMmUserService.Delete(int id)
 	{
 		Delete.RecordCall(id);
 		Delete.OnCall?.Invoke(this, id);
 	}
 
-	global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Skills.MmUser> KnockOff.Documentation.Samples.Skills.IMmUserService.GetAll()
+	global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Skills.MmUser> global::KnockOff.Documentation.Samples.Skills.IMmUserService.GetAll()
 	{
 		GetAll.RecordCall();
 		return GetAll.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.MmUser>();
 	}
 
-	void KnockOff.Documentation.Samples.Skills.IMmUserService.Update(global::KnockOff.Documentation.Samples.Skills.MmUser user)
+	void global::KnockOff.Documentation.Samples.Skills.IMmUserService.Update(global::KnockOff.Documentation.Samples.Skills.MmUser user)
 	{
 		Update.RecordCall(user);
 		Update.OnCall?.Invoke(this, user);

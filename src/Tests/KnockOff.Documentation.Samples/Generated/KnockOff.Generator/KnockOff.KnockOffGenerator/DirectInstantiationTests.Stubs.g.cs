@@ -79,8 +79,8 @@ partial class DirectInstantiationTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService.</summary>
-		public class IInUserService : KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService
+		/// <summary>Stub implementation of global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService.</summary>
+		public class IInUserService : global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService
 		{
 			/// <summary>Interceptor for ConnectionString.</summary>
 			public IInUserService_ConnectionStringInterceptor ConnectionString { get; } = new();
@@ -91,20 +91,20 @@ partial class DirectInstantiationTests
 			/// <summary>Interceptor for SaveUser.</summary>
 			public IInUserService_SaveUserInterceptor SaveUser { get; } = new();
 
-			global::KnockOff.Documentation.Samples.Guides.InlineStubs.InUser? KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService.GetUser(int id)
+			global::KnockOff.Documentation.Samples.Guides.InlineStubs.InUser? global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService.GetUser(int id)
 			{
 				GetUser.RecordCall(id);
 				if (GetUser.OnCall is { } onCall) return onCall(this, id);
 				return default!;
 			}
 
-			void KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService.SaveUser(global::KnockOff.Documentation.Samples.Guides.InlineStubs.InUser user)
+			void global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService.SaveUser(global::KnockOff.Documentation.Samples.Guides.InlineStubs.InUser user)
 			{
 				SaveUser.RecordCall(user);
 				if (SaveUser.OnCall is { } onCall) onCall(this, user);
 			}
 
-			string KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService.ConnectionString
+			string global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService.ConnectionString
 			{
 				get
 				{

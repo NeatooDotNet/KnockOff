@@ -360,8 +360,8 @@ partial class SetStringStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Collections.Generic.ISet<string>.</summary>
-		public class ISet : System.Collections.Generic.ISet<string>
+		/// <summary>Stub implementation of global::System.Collections.Generic.ISet<string>.</summary>
+		public class ISet : global::System.Collections.Generic.ISet<string>
 		{
 			/// <summary>Interceptor for Count.</summary>
 			public ISet_CountInterceptor Count { get; } = new();
@@ -417,112 +417,111 @@ partial class SetStringStubTests
 			/// <summary>Interceptor for GetEnumerator.</summary>
 			public ISet_GetEnumeratorInterceptor GetEnumerator { get; } = new();
 
-			bool System.Collections.Generic.ISet<string>.Add(string item)
+			bool global::System.Collections.Generic.ISet<string>.Add(string item)
 			{
 				Add.RecordCall(item);
 				if (Add.OnCall is { } onCall) return onCall(this, item);
 				return default!;
 			}
 
-			void System.Collections.Generic.ISet<string>.ExceptWith(global::System.Collections.Generic.IEnumerable<string> other)
+			void global::System.Collections.Generic.ISet<string>.ExceptWith(global::System.Collections.Generic.IEnumerable<string> other)
 			{
 				ExceptWith.RecordCall(other);
 				if (ExceptWith.OnCall is { } onCall) onCall(this, other);
 			}
 
-			void System.Collections.Generic.ISet<string>.IntersectWith(global::System.Collections.Generic.IEnumerable<string> other)
+			void global::System.Collections.Generic.ISet<string>.IntersectWith(global::System.Collections.Generic.IEnumerable<string> other)
 			{
 				IntersectWith.RecordCall(other);
 				if (IntersectWith.OnCall is { } onCall) onCall(this, other);
 			}
 
-			bool System.Collections.Generic.ISet<string>.IsProperSubsetOf(global::System.Collections.Generic.IEnumerable<string> other)
+			bool global::System.Collections.Generic.ISet<string>.IsProperSubsetOf(global::System.Collections.Generic.IEnumerable<string> other)
 			{
 				IsProperSubsetOf.RecordCall(other);
 				if (IsProperSubsetOf.OnCall is { } onCall) return onCall(this, other);
 				return default!;
 			}
 
-			bool System.Collections.Generic.ISet<string>.IsProperSupersetOf(global::System.Collections.Generic.IEnumerable<string> other)
+			bool global::System.Collections.Generic.ISet<string>.IsProperSupersetOf(global::System.Collections.Generic.IEnumerable<string> other)
 			{
 				IsProperSupersetOf.RecordCall(other);
 				if (IsProperSupersetOf.OnCall is { } onCall) return onCall(this, other);
 				return default!;
 			}
 
-			bool System.Collections.Generic.ISet<string>.IsSubsetOf(global::System.Collections.Generic.IEnumerable<string> other)
+			bool global::System.Collections.Generic.ISet<string>.IsSubsetOf(global::System.Collections.Generic.IEnumerable<string> other)
 			{
 				IsSubsetOf.RecordCall(other);
 				if (IsSubsetOf.OnCall is { } onCall) return onCall(this, other);
 				return default!;
 			}
 
-			bool System.Collections.Generic.ISet<string>.IsSupersetOf(global::System.Collections.Generic.IEnumerable<string> other)
+			bool global::System.Collections.Generic.ISet<string>.IsSupersetOf(global::System.Collections.Generic.IEnumerable<string> other)
 			{
 				IsSupersetOf.RecordCall(other);
 				if (IsSupersetOf.OnCall is { } onCall) return onCall(this, other);
 				return default!;
 			}
 
-			bool System.Collections.Generic.ISet<string>.Overlaps(global::System.Collections.Generic.IEnumerable<string> other)
+			bool global::System.Collections.Generic.ISet<string>.Overlaps(global::System.Collections.Generic.IEnumerable<string> other)
 			{
 				Overlaps.RecordCall(other);
 				if (Overlaps.OnCall is { } onCall) return onCall(this, other);
 				return default!;
 			}
 
-			bool System.Collections.Generic.ISet<string>.SetEquals(global::System.Collections.Generic.IEnumerable<string> other)
+			bool global::System.Collections.Generic.ISet<string>.SetEquals(global::System.Collections.Generic.IEnumerable<string> other)
 			{
 				SetEquals.RecordCall(other);
 				if (SetEquals.OnCall is { } onCall) return onCall(this, other);
 				return default!;
 			}
 
-			void System.Collections.Generic.ISet<string>.SymmetricExceptWith(global::System.Collections.Generic.IEnumerable<string> other)
+			void global::System.Collections.Generic.ISet<string>.SymmetricExceptWith(global::System.Collections.Generic.IEnumerable<string> other)
 			{
 				SymmetricExceptWith.RecordCall(other);
 				if (SymmetricExceptWith.OnCall is { } onCall) onCall(this, other);
 			}
 
-			void System.Collections.Generic.ISet<string>.UnionWith(global::System.Collections.Generic.IEnumerable<string> other)
+			void global::System.Collections.Generic.ISet<string>.UnionWith(global::System.Collections.Generic.IEnumerable<string> other)
 			{
 				UnionWith.RecordCall(other);
 				if (UnionWith.OnCall is { } onCall) onCall(this, other);
 			}
 
-			void System.Collections.Generic.ICollection<string>.Add(string item)
+			void global::System.Collections.Generic.ICollection<string>.Add(string item)
 			{
-				Add.RecordCall(item);
-				if (Add.OnCall is { } onCall) onCall(this, item);
+				((global::System.Collections.Generic.ISet<string>)this).Add(item);
 			}
 
-			void System.Collections.Generic.ICollection<string>.Clear()
+			void global::System.Collections.Generic.ICollection<string>.Clear()
 			{
 				Clear.RecordCall();
 				if (Clear.OnCall is { } onCall) onCall(this);
 			}
 
-			bool System.Collections.Generic.ICollection<string>.Contains(string item)
+			bool global::System.Collections.Generic.ICollection<string>.Contains(string item)
 			{
 				Contains.RecordCall(item);
 				if (Contains.OnCall is { } onCall) return onCall(this, item);
 				return default!;
 			}
 
-			void System.Collections.Generic.ICollection<string>.CopyTo(string[] array, int arrayIndex)
+			void global::System.Collections.Generic.ICollection<string>.CopyTo(string[] array, int arrayIndex)
 			{
 				CopyTo.RecordCall(array, arrayIndex);
 				if (CopyTo.OnCall is { } onCall) onCall(this, array, arrayIndex);
 			}
 
-			bool System.Collections.Generic.ICollection<string>.Remove(string item)
+			bool global::System.Collections.Generic.ICollection<string>.Remove(string item)
 			{
 				Remove.RecordCall(item);
 				if (Remove.OnCall is { } onCall) return onCall(this, item);
 				return default!;
 			}
 
-			int System.Collections.Generic.ICollection<string>.Count
+			int global::System.Collections.Generic.ICollection<string>.Count
 			{
 				get
 				{
@@ -532,7 +531,7 @@ partial class SetStringStubTests
 				}
 			}
 
-			bool System.Collections.Generic.ICollection<string>.IsReadOnly
+			bool global::System.Collections.Generic.ICollection<string>.IsReadOnly
 			{
 				get
 				{
@@ -542,14 +541,14 @@ partial class SetStringStubTests
 				}
 			}
 
-			global::System.Collections.Generic.IEnumerator<string> System.Collections.Generic.IEnumerable<string>.GetEnumerator()
+			global::System.Collections.Generic.IEnumerator<string> global::System.Collections.Generic.IEnumerable<string>.GetEnumerator()
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
-			global::System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+			global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);

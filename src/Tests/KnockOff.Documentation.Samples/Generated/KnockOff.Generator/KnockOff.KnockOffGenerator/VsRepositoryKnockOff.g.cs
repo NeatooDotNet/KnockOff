@@ -58,17 +58,17 @@ partial class VsRepositoryKnockOff
 	/// <summary>Interceptor for Save.</summary>
 	public SaveInterceptor Save { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IVsRepository.</summary>
-	public KnockOff.Documentation.Samples.Comparison.IVsRepository AsVsRepository() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Comparison.IVsRepository.</summary>
+	public global::KnockOff.Documentation.Samples.Comparison.IVsRepository AsVsRepository() => this;
 
-	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Comparison.VsEntity?> KnockOff.Documentation.Samples.Comparison.IVsRepository.GetByIdAsync(int id)
+	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Comparison.VsEntity?> global::KnockOff.Documentation.Samples.Comparison.IVsRepository.GetByIdAsync(int id)
 	{
 		GetByIdAsync2.RecordCall(id);
-		if (GetByIdAsync2.OnCall != null) return GetByIdAsync2.OnCall(this, id);
+		if (GetByIdAsync2.OnCall is { } callback) return callback(this, id);
 		return GetByIdAsync(id);
 	}
 
-	void KnockOff.Documentation.Samples.Comparison.IVsRepository.Save(global::KnockOff.Documentation.Samples.Comparison.VsEntity entity)
+	void global::KnockOff.Documentation.Samples.Comparison.IVsRepository.Save(global::KnockOff.Documentation.Samples.Comparison.VsEntity entity)
 	{
 		Save.RecordCall(entity);
 		Save.OnCall?.Invoke(this, entity);

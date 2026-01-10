@@ -28,13 +28,13 @@ partial class FormattableStubTests
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.IFormattable.</summary>
-		public class IFormattable : System.IFormattable
+		/// <summary>Stub implementation of global::System.IFormattable.</summary>
+		public class IFormattable : global::System.IFormattable
 		{
 			/// <summary>Interceptor for ToString.</summary>
 			public new IFormattable_ToStringInterceptor ToString { get; } = new();
 
-			string System.IFormattable.ToString(string? format, global::System.IFormatProvider? formatProvider)
+			string global::System.IFormattable.ToString(string? format, global::System.IFormatProvider? formatProvider)
 			{
 				ToString.RecordCall(format, formatProvider);
 				if (ToString.OnCall is { } onCall) return onCall(this, format, formatProvider);

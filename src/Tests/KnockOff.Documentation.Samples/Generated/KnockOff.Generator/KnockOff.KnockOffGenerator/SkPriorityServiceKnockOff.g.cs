@@ -33,13 +33,13 @@ partial class SkPriorityServiceKnockOff
 	/// <summary>Interceptor for Calculate.</summary>
 	public Calculate2Interceptor Calculate2 { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkPriorityService.</summary>
-	public KnockOff.Documentation.Samples.Skills.ISkPriorityService AsSkPriorityService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ISkPriorityService.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkPriorityService AsSkPriorityService() => this;
 
-	int KnockOff.Documentation.Samples.Skills.ISkPriorityService.Calculate(int x)
+	int global::KnockOff.Documentation.Samples.Skills.ISkPriorityService.Calculate(int x)
 	{
 		Calculate2.RecordCall(x);
-		if (Calculate2.OnCall != null) return Calculate2.OnCall(this, x);
+		if (Calculate2.OnCall is { } callback) return callback(this, x);
 		return Calculate(x);
 	}
 

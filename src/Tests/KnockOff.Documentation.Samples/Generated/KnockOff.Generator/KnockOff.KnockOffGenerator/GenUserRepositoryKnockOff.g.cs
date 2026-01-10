@@ -86,22 +86,22 @@ partial class GenUserRepositoryKnockOff
 	/// <summary>Interceptor for GetByIdAsync.</summary>
 	public GetByIdAsyncInterceptor GetByIdAsync { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IGenRepository<KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
-	public KnockOff.Documentation.Samples.Guides.IGenRepository<KnockOff.Documentation.Samples.Guides.GenUser> AsGenRepository() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IGenRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IGenRepository<global::KnockOff.Documentation.Samples.Guides.GenUser> AsGenRepository() => this;
 
-	global::KnockOff.Documentation.Samples.Guides.GenUser? KnockOff.Documentation.Samples.Guides.IGenRepository<KnockOff.Documentation.Samples.Guides.GenUser>.GetById(int id)
+	global::KnockOff.Documentation.Samples.Guides.GenUser? global::KnockOff.Documentation.Samples.Guides.IGenRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>.GetById(int id)
 	{
 		GetById.RecordCall(id);
 		return GetById.OnCall?.Invoke(this, id) ?? default!;
 	}
 
-	void KnockOff.Documentation.Samples.Guides.IGenRepository<KnockOff.Documentation.Samples.Guides.GenUser>.Save(global::KnockOff.Documentation.Samples.Guides.GenUser entity)
+	void global::KnockOff.Documentation.Samples.Guides.IGenRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>.Save(global::KnockOff.Documentation.Samples.Guides.GenUser entity)
 	{
 		Save.RecordCall(entity);
 		Save.OnCall?.Invoke(this, entity);
 	}
 
-	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.GenUser?> KnockOff.Documentation.Samples.Guides.IGenRepository<KnockOff.Documentation.Samples.Guides.GenUser>.GetByIdAsync(int id)
+	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.GenUser?> global::KnockOff.Documentation.Samples.Guides.IGenRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>.GetByIdAsync(int id)
 	{
 		GetByIdAsync.RecordCall(id);
 		return GetByIdAsync.OnCall?.Invoke(this, id) ?? global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Guides.GenUser?>(default!);

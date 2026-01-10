@@ -58,8 +58,8 @@ partial class PropertyStoreKnockOff
 			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 		}
 
-		/// <summary>Stub implementation of KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo.</summary>
-		public class IInPropertyInfo : KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo
+		/// <summary>Stub implementation of global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo.</summary>
+		public class IInPropertyInfo : global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo
 		{
 			/// <summary>Interceptor for Name.</summary>
 			public IInPropertyInfo_NameInterceptor Name { get; } = new();
@@ -67,7 +67,7 @@ partial class PropertyStoreKnockOff
 			/// <summary>Interceptor for Value.</summary>
 			public IInPropertyInfo_ValueInterceptor Value { get; } = new();
 
-			string KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo.Name
+			string global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo.Name
 			{
 				get
 				{
@@ -77,7 +77,7 @@ partial class PropertyStoreKnockOff
 				}
 			}
 
-			object? KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo.Value
+			object? global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo.Value
 			{
 				get
 				{

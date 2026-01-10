@@ -28,13 +28,13 @@ partial class ObservableStringStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.IObservable<string>.</summary>
-		public class IObservable : System.IObservable<string>
+		/// <summary>Stub implementation of global::System.IObservable<string>.</summary>
+		public class IObservable : global::System.IObservable<string>
 		{
 			/// <summary>Interceptor for Subscribe.</summary>
 			public IObservable_SubscribeInterceptor Subscribe { get; } = new();
 
-			global::System.IDisposable System.IObservable<string>.Subscribe(global::System.IObserver<string> observer)
+			global::System.IDisposable global::System.IObservable<string>.Subscribe(global::System.IObserver<string> observer)
 			{
 				Subscribe.RecordCall(observer);
 				if (Subscribe.OnCall is { } onCall) return onCall(this, observer);

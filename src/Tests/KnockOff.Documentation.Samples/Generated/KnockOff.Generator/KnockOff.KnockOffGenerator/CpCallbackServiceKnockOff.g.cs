@@ -83,22 +83,22 @@ partial class CpCallbackServiceKnockOff
 	/// <summary>Interceptor for Search.</summary>
 	public SearchInterceptor Search { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpCallbackService.</summary>
-	public KnockOff.Documentation.Samples.Skills.ICpCallbackService AsCpCallbackService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ICpCallbackService.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ICpCallbackService AsCpCallbackService() => this;
 
-	void KnockOff.Documentation.Samples.Skills.ICpCallbackService.Initialize()
+	void global::KnockOff.Documentation.Samples.Skills.ICpCallbackService.Initialize()
 	{
 		Initialize.RecordCall();
 		Initialize.OnCall?.Invoke(this);
 	}
 
-	global::KnockOff.Documentation.Samples.Skills.CpUser KnockOff.Documentation.Samples.Skills.ICpCallbackService.GetById(int id)
+	global::KnockOff.Documentation.Samples.Skills.CpUser global::KnockOff.Documentation.Samples.Skills.ICpCallbackService.GetById(int id)
 	{
 		GetById.RecordCall(id);
 		return GetById.OnCall?.Invoke(this, id) ?? new global::KnockOff.Documentation.Samples.Skills.CpUser();
 	}
 
-	global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.CpUser> KnockOff.Documentation.Samples.Skills.ICpCallbackService.Search(string query, int limit, int offset)
+	global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.CpUser> global::KnockOff.Documentation.Samples.Skills.ICpCallbackService.Search(string query, int limit, int offset)
 	{
 		Search.RecordCall(query, limit, offset);
 		return Search.OnCall?.Invoke(this, query, limit, offset) ?? new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.CpUser>();

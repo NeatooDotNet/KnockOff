@@ -24,13 +24,13 @@ partial class EntityKnockOff
 	/// <summary>Interceptor for Id.</summary>
 	public IdInterceptor Id { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.GettingStarted.IEntity.</summary>
-	public KnockOff.Documentation.Samples.GettingStarted.IEntity AsEntity() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.GettingStarted.IEntity.</summary>
+	public global::KnockOff.Documentation.Samples.GettingStarted.IEntity AsEntity() => this;
 
 	/// <summary>Backing storage for Id.</summary>
 	protected int IdBacking { get; set; } = default!;
 
-	int KnockOff.Documentation.Samples.GettingStarted.IEntity.Id
+	int global::KnockOff.Documentation.Samples.GettingStarted.IEntity.Id
 	{
 		get { Id.RecordGet(); return Id.OnGet?.Invoke(this) ?? IdBacking; }
 	}

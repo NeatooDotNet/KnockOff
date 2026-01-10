@@ -269,8 +269,8 @@ partial class DictionaryIntUserStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Collections.Generic.IDictionary<int, KnockOff.Tests.User>.</summary>
-		public class IDictionary : System.Collections.Generic.IDictionary<int, KnockOff.Tests.User>
+		/// <summary>Stub implementation of global::System.Collections.Generic.IDictionary<int, global::KnockOff.Tests.User>.</summary>
+		public class IDictionary : global::System.Collections.Generic.IDictionary<int, global::KnockOff.Tests.User>
 		{
 			/// <summary>Interceptor for Int32Indexer.</summary>
 			public IDictionary_Int32IndexerInterceptor Int32Indexer { get; } = new();
@@ -311,27 +311,27 @@ partial class DictionaryIntUserStubTests
 			/// <summary>Interceptor for GetEnumerator.</summary>
 			public IDictionary_GetEnumeratorInterceptor GetEnumerator { get; } = new();
 
-			void System.Collections.Generic.IDictionary<int, KnockOff.Tests.User>.Add(int key, global::KnockOff.Tests.User value)
+			void global::System.Collections.Generic.IDictionary<int, global::KnockOff.Tests.User>.Add(int key, global::KnockOff.Tests.User value)
 			{
 				Add.RecordCall(key, value, null);
 				if (Add.OnCall is { } onCall) onCall(this, key, value, null);
 			}
 
-			bool System.Collections.Generic.IDictionary<int, KnockOff.Tests.User>.ContainsKey(int key)
+			bool global::System.Collections.Generic.IDictionary<int, global::KnockOff.Tests.User>.ContainsKey(int key)
 			{
 				ContainsKey.RecordCall(key);
 				if (ContainsKey.OnCall is { } onCall) return onCall(this, key);
 				return default!;
 			}
 
-			bool System.Collections.Generic.IDictionary<int, KnockOff.Tests.User>.Remove(int key)
+			bool global::System.Collections.Generic.IDictionary<int, global::KnockOff.Tests.User>.Remove(int key)
 			{
 				Remove.RecordCall(key, null);
 				if (Remove.OnCall is { } onCall) return onCall(this, key, null);
 				return default!;
 			}
 
-			bool System.Collections.Generic.IDictionary<int, KnockOff.Tests.User>.TryGetValue(int key, out global::KnockOff.Tests.User value)
+			bool global::System.Collections.Generic.IDictionary<int, global::KnockOff.Tests.User>.TryGetValue(int key, out global::KnockOff.Tests.User value)
 			{
 				value = default!;
 				TryGetValue.RecordCall(key);
@@ -339,7 +339,7 @@ partial class DictionaryIntUserStubTests
 				return default!;
 			}
 
-			global::KnockOff.Tests.User System.Collections.Generic.IDictionary<int, KnockOff.Tests.User>.this[int key]
+			global::KnockOff.Tests.User global::System.Collections.Generic.IDictionary<int, global::KnockOff.Tests.User>.this[int key]
 			{
 				get
 				{
@@ -354,7 +354,7 @@ partial class DictionaryIntUserStubTests
 				}
 			}
 
-			global::System.Collections.Generic.ICollection<int> System.Collections.Generic.IDictionary<int, KnockOff.Tests.User>.Keys
+			global::System.Collections.Generic.ICollection<int> global::System.Collections.Generic.IDictionary<int, global::KnockOff.Tests.User>.Keys
 			{
 				get
 				{
@@ -364,7 +364,7 @@ partial class DictionaryIntUserStubTests
 				}
 			}
 
-			global::System.Collections.Generic.ICollection<global::KnockOff.Tests.User> System.Collections.Generic.IDictionary<int, KnockOff.Tests.User>.Values
+			global::System.Collections.Generic.ICollection<global::KnockOff.Tests.User> global::System.Collections.Generic.IDictionary<int, global::KnockOff.Tests.User>.Values
 			{
 				get
 				{
@@ -374,39 +374,39 @@ partial class DictionaryIntUserStubTests
 				}
 			}
 
-			void System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<int, KnockOff.Tests.User>>.Add(global::System.Collections.Generic.KeyValuePair<int, global::KnockOff.Tests.User> item)
+			void global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<int, global::KnockOff.Tests.User>>.Add(global::System.Collections.Generic.KeyValuePair<int, global::KnockOff.Tests.User> item)
 			{
 				Add.RecordCall(null, null, item);
 				if (Add.OnCall is { } onCall) onCall(this, null, null, item);
 			}
 
-			void System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<int, KnockOff.Tests.User>>.Clear()
+			void global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<int, global::KnockOff.Tests.User>>.Clear()
 			{
 				Clear.RecordCall();
 				if (Clear.OnCall is { } onCall) onCall(this);
 			}
 
-			bool System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<int, KnockOff.Tests.User>>.Contains(global::System.Collections.Generic.KeyValuePair<int, global::KnockOff.Tests.User> item)
+			bool global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<int, global::KnockOff.Tests.User>>.Contains(global::System.Collections.Generic.KeyValuePair<int, global::KnockOff.Tests.User> item)
 			{
 				Contains.RecordCall(item);
 				if (Contains.OnCall is { } onCall) return onCall(this, item);
 				return default!;
 			}
 
-			void System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<int, KnockOff.Tests.User>>.CopyTo(global::System.Collections.Generic.KeyValuePair<int, global::KnockOff.Tests.User>[] array, int arrayIndex)
+			void global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<int, global::KnockOff.Tests.User>>.CopyTo(global::System.Collections.Generic.KeyValuePair<int, global::KnockOff.Tests.User>[] array, int arrayIndex)
 			{
 				CopyTo.RecordCall(array, arrayIndex);
 				if (CopyTo.OnCall is { } onCall) onCall(this, array, arrayIndex);
 			}
 
-			bool System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<int, KnockOff.Tests.User>>.Remove(global::System.Collections.Generic.KeyValuePair<int, global::KnockOff.Tests.User> item)
+			bool global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<int, global::KnockOff.Tests.User>>.Remove(global::System.Collections.Generic.KeyValuePair<int, global::KnockOff.Tests.User> item)
 			{
 				Remove.RecordCall(null, item);
 				if (Remove.OnCall is { } onCall) return onCall(this, null, item);
 				return default!;
 			}
 
-			int System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<int, KnockOff.Tests.User>>.Count
+			int global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<int, global::KnockOff.Tests.User>>.Count
 			{
 				get
 				{
@@ -416,7 +416,7 @@ partial class DictionaryIntUserStubTests
 				}
 			}
 
-			bool System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<int, KnockOff.Tests.User>>.IsReadOnly
+			bool global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<int, global::KnockOff.Tests.User>>.IsReadOnly
 			{
 				get
 				{
@@ -426,14 +426,14 @@ partial class DictionaryIntUserStubTests
 				}
 			}
 
-			global::System.Collections.Generic.IEnumerator<global::System.Collections.Generic.KeyValuePair<int, global::KnockOff.Tests.User>> System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<int, KnockOff.Tests.User>>.GetEnumerator()
+			global::System.Collections.Generic.IEnumerator<global::System.Collections.Generic.KeyValuePair<int, global::KnockOff.Tests.User>> global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.KeyValuePair<int, global::KnockOff.Tests.User>>.GetEnumerator()
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
-			global::System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+			global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);

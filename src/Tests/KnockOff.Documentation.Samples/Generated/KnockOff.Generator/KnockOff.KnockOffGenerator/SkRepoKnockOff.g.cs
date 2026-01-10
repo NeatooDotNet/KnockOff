@@ -61,20 +61,20 @@ partial class SkRepoKnockOff
 	/// <summary>Interceptor for GetByIdAsync.</summary>
 	public GetByIdAsync2Interceptor GetByIdAsync2 { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkRepoService.</summary>
-	public KnockOff.Documentation.Samples.Skills.ISkRepoService AsSkRepoService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ISkRepoService.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkRepoService AsSkRepoService() => this;
 
-	global::KnockOff.Documentation.Samples.Skills.SkUser? KnockOff.Documentation.Samples.Skills.ISkRepoService.GetById(int id)
+	global::KnockOff.Documentation.Samples.Skills.SkUser? global::KnockOff.Documentation.Samples.Skills.ISkRepoService.GetById(int id)
 	{
 		GetById2.RecordCall(id);
-		if (GetById2.OnCall != null) return GetById2.OnCall(this, id);
+		if (GetById2.OnCall is { } callback) return callback(this, id);
 		return GetById(id);
 	}
 
-	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.SkUser?> KnockOff.Documentation.Samples.Skills.ISkRepoService.GetByIdAsync(int id)
+	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.SkUser?> global::KnockOff.Documentation.Samples.Skills.ISkRepoService.GetByIdAsync(int id)
 	{
 		GetByIdAsync2.RecordCall(id);
-		if (GetByIdAsync2.OnCall != null) return GetByIdAsync2.OnCall(this, id);
+		if (GetByIdAsync2.OnCall is { } callback) return callback(this, id);
 		return GetByIdAsync(id);
 	}
 

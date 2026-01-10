@@ -155,8 +155,8 @@ partial class TestRule
 	/// <summary>Interceptor for OnRuleAdded.</summary>
 	public OnRuleAddedInterceptor OnRuleAdded { get; } = new();
 
-	/// <summary>Returns this instance as Neatoo.Rules.IRule.</summary>
-	public Neatoo.Rules.IRule AsRule() => this;
+	/// <summary>Returns this instance as global::Neatoo.Rules.IRule.</summary>
+	public global::Neatoo.Rules.IRule AsRule() => this;
 
 	/// <summary>Backing storage for Executed.</summary>
 	protected bool ExecutedBacking { get; set; } = default!;
@@ -173,7 +173,7 @@ partial class TestRule
 	/// <summary>Backing storage for TriggerProperties.</summary>
 	protected global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.ITriggerProperty> TriggerPropertiesBacking { get; set; } = new global::System.Collections.Generic.List<global::Neatoo.Rules.ITriggerProperty>();
 
-	global::System.Threading.Tasks.Task<global::Neatoo.Rules.IRuleMessages> Neatoo.Rules.IRule.RunRule(global::Neatoo.IValidateBase target, global::System.Threading.CancellationToken? token)
+	global::System.Threading.Tasks.Task<global::Neatoo.Rules.IRuleMessages> global::Neatoo.Rules.IRule.RunRule(global::Neatoo.IValidateBase target, global::System.Threading.CancellationToken? token)
 	{
 		RunRule.RecordCall(target, token);
 		if (RunRule.OnCall is { } callback)
@@ -181,33 +181,33 @@ partial class TestRule
 		throw new global::System.InvalidOperationException("No implementation provided for RunRule. Set RunRule.OnCall or define a protected method 'RunRule' in your partial class.");
 	}
 
-	void Neatoo.Rules.IRule.OnRuleAdded(global::Neatoo.Rules.IRuleManager ruleManager, uint uniqueIndex)
+	void global::Neatoo.Rules.IRule.OnRuleAdded(global::Neatoo.Rules.IRuleManager ruleManager, uint uniqueIndex)
 	{
 		OnRuleAdded.RecordCall(ruleManager, uniqueIndex);
 		OnRuleAdded.OnCall?.Invoke(this, ruleManager, uniqueIndex);
 	}
 
-	bool Neatoo.Rules.IRule.Executed
+	bool global::Neatoo.Rules.IRule.Executed
 	{
 		get { Executed.RecordGet(); return Executed.OnGet?.Invoke(this) ?? ExecutedBacking; }
 	}
 
-	int Neatoo.Rules.IRule.RuleOrder
+	int global::Neatoo.Rules.IRule.RuleOrder
 	{
 		get { RuleOrder.RecordGet(); return RuleOrder.OnGet?.Invoke(this) ?? RuleOrderBacking; }
 	}
 
-	uint Neatoo.Rules.IRule.UniqueIndex
+	uint global::Neatoo.Rules.IRule.UniqueIndex
 	{
 		get { UniqueIndex.RecordGet(); return UniqueIndex.OnGet?.Invoke(this) ?? UniqueIndexBacking; }
 	}
 
-	global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.IRuleMessage> Neatoo.Rules.IRule.Messages
+	global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.IRuleMessage> global::Neatoo.Rules.IRule.Messages
 	{
 		get { Messages.RecordGet(); return Messages.OnGet?.Invoke(this) ?? MessagesBacking; }
 	}
 
-	global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.ITriggerProperty> Neatoo.Rules.IRule.TriggerProperties
+	global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.ITriggerProperty> global::Neatoo.Rules.IRule.TriggerProperties
 	{
 		get { TriggerProperties.RecordGet(); return TriggerProperties.OnGet?.Invoke(this) ?? TriggerPropertiesBacking; }
 	}

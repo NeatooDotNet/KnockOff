@@ -13,15 +13,15 @@
 		<Nullable>enable</Nullable>
 		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-		<FileVersion>10.11.1</FileVersion>
-		<PackageVersion>10.11.1</PackageVersion>
+		<FileVersion>10.12.0</FileVersion>
+		<PackageVersion>10.12.0</PackageVersion>
 		<PackageTags>Unit Testing Mocking Stubs Source Generator .NET</PackageTags>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<RepositoryUrl>https://github.com/NeatooDotNet/KnockOff</RepositoryUrl>
 		<PackageProjectUrl>https://github.com/NeatooDotNet/KnockOff</PackageProjectUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageReleaseNotes>Fix: BCL interface compatibility - deduplicate inherited members, add 'new' keyword for object member hiding, standalone stubs walk inherited interfaces</PackageReleaseNotes>
+		<PackageReleaseNotes>BCL interface compatibility: 117 common .NET interfaces now fully supported. Fixes duplicate interceptors for inherited members, CS0108 hiding warnings, CS8769 asymmetric nullability, and standalone stub inheritance.</PackageReleaseNotes>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	</PropertyGroup>
 </Project>

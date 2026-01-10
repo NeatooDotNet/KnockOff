@@ -90,11 +90,11 @@ partial class IhOrderKnockOff
 	/// <summary>Interceptor for GetErrors.</summary>
 	public GetErrorsInterceptor GetErrors { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIhOrder.</summary>
-	public KnockOff.Documentation.Samples.Guides.IIhOrder AsIhOrder() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IIhOrder.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IIhOrder AsIhOrder() => this;
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIhValidatable.</summary>
-	public KnockOff.Documentation.Samples.Guides.IIhValidatable AsIhValidatable() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IIhValidatable.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IIhValidatable AsIhValidatable() => this;
 
 	/// <summary>Backing storage for Total.</summary>
 	protected decimal TotalBacking { get; set; } = default!;
@@ -102,23 +102,23 @@ partial class IhOrderKnockOff
 	/// <summary>Backing storage for IsValid.</summary>
 	protected bool IsValidBacking { get; set; } = default!;
 
-	decimal KnockOff.Documentation.Samples.Guides.IIhOrder.Total
+	decimal global::KnockOff.Documentation.Samples.Guides.IIhOrder.Total
 	{
 		get { Total.RecordGet(); return Total.OnGet?.Invoke(this) ?? TotalBacking; }
 	}
 
-	void KnockOff.Documentation.Samples.Guides.IIhOrder.Submit()
+	void global::KnockOff.Documentation.Samples.Guides.IIhOrder.Submit()
 	{
 		Submit.RecordCall();
 		Submit.OnCall?.Invoke(this);
 	}
 
-	bool KnockOff.Documentation.Samples.Guides.IIhValidatable.IsValid
+	bool global::KnockOff.Documentation.Samples.Guides.IIhValidatable.IsValid
 	{
 		get { IsValid.RecordGet(); return IsValid.OnGet?.Invoke(this) ?? IsValidBacking; }
 	}
 
-	global::System.Collections.Generic.IEnumerable<string> KnockOff.Documentation.Samples.Guides.IIhValidatable.GetErrors()
+	global::System.Collections.Generic.IEnumerable<string> global::KnockOff.Documentation.Samples.Guides.IIhValidatable.GetErrors()
 	{
 		GetErrors.RecordCall();
 		return GetErrors.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<string>();

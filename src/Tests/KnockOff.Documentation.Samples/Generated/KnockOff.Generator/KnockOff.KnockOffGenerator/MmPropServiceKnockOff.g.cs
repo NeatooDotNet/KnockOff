@@ -36,13 +36,13 @@ partial class MmPropServiceKnockOff
 	/// <summary>Interceptor for Name.</summary>
 	public NameInterceptor Name { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmPropService.</summary>
-	public KnockOff.Documentation.Samples.Skills.IMmPropService AsMmPropService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.IMmPropService.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.IMmPropService AsMmPropService() => this;
 
 	/// <summary>Backing storage for Name.</summary>
 	protected string NameBacking { get; set; } = "";
 
-	string KnockOff.Documentation.Samples.Skills.IMmPropService.Name
+	string global::KnockOff.Documentation.Samples.Skills.IMmPropService.Name
 	{
 		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
 		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else NameBacking = value; }

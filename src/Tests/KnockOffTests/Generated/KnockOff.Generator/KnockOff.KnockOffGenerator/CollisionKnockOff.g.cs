@@ -58,19 +58,19 @@ partial class CollisionKnockOff
 	/// <summary>Interceptor for DoWork.</summary>
 	public DoWorkInterceptor DoWork { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Tests.ICollision.</summary>
-	public KnockOff.Tests.ICollision AsCollision() => this;
+	/// <summary>Returns this instance as global::KnockOff.Tests.ICollision.</summary>
+	public global::KnockOff.Tests.ICollision AsCollision() => this;
 
 	/// <summary>Backing storage for ICollision.</summary>
 	protected string ICollisionBacking { get; set; } = "";
 
-	string KnockOff.Tests.ICollision.ICollision
+	string global::KnockOff.Tests.ICollision.ICollision
 	{
 		get { ICollision.RecordGet(); return ICollision.OnGet?.Invoke(this) ?? ICollisionBacking; }
 		set { ICollision.RecordSet(value); if (ICollision.OnSet != null) ICollision.OnSet(this, value); else ICollisionBacking = value; }
 	}
 
-	void KnockOff.Tests.ICollision.DoWork()
+	void global::KnockOff.Tests.ICollision.DoWork()
 	{
 		DoWork.RecordCall();
 		DoWork.OnCall?.Invoke(this);

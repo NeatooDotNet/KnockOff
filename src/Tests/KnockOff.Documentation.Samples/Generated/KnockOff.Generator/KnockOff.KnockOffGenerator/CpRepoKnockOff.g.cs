@@ -58,20 +58,20 @@ partial class CpRepoKnockOff
 	/// <summary>Interceptor for CountAsync.</summary>
 	public CountAsync2Interceptor CountAsync2 { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpRepository.</summary>
-	public KnockOff.Documentation.Samples.Skills.ICpRepository AsCpRepository() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ICpRepository.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ICpRepository AsCpRepository() => this;
 
-	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.CpUser?> KnockOff.Documentation.Samples.Skills.ICpRepository.GetByIdAsync(int id)
+	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.CpUser?> global::KnockOff.Documentation.Samples.Skills.ICpRepository.GetByIdAsync(int id)
 	{
 		GetByIdAsync2.RecordCall(id);
-		if (GetByIdAsync2.OnCall != null) return GetByIdAsync2.OnCall(this, id);
+		if (GetByIdAsync2.OnCall is { } callback) return callback(this, id);
 		return GetByIdAsync(id);
 	}
 
-	global::System.Threading.Tasks.ValueTask<int> KnockOff.Documentation.Samples.Skills.ICpRepository.CountAsync()
+	global::System.Threading.Tasks.ValueTask<int> global::KnockOff.Documentation.Samples.Skills.ICpRepository.CountAsync()
 	{
 		CountAsync2.RecordCall();
-		if (CountAsync2.OnCall != null) return CountAsync2.OnCall(this);
+		if (CountAsync2.OnCall is { } callback) return callback(this);
 		return CountAsync();
 	}
 

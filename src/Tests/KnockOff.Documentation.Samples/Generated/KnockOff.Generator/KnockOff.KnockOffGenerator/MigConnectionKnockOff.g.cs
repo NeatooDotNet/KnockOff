@@ -27,10 +27,10 @@ partial class MigConnectionKnockOff
 	/// <summary>Interceptor for Connect.</summary>
 	public ConnectInterceptor Connect { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IMigConnection.</summary>
-	public KnockOff.Documentation.Samples.Comparison.IMigConnection AsMigConnection() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Comparison.IMigConnection.</summary>
+	public global::KnockOff.Documentation.Samples.Comparison.IMigConnection AsMigConnection() => this;
 
-	void KnockOff.Documentation.Samples.Comparison.IMigConnection.Connect()
+	void global::KnockOff.Documentation.Samples.Comparison.IMigConnection.Connect()
 	{
 		Connect.RecordCall();
 		Connect.OnCall?.Invoke(this);

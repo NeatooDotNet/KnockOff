@@ -27,10 +27,10 @@ partial class SingleUnitOfWorkKnockOff
 	/// <summary>Interceptor for Commit.</summary>
 	public CommitInterceptor Commit { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork.</summary>
-	public KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork AsUnitOfWork() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork.</summary>
+	public global::KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork AsUnitOfWork() => this;
 
-	void KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork.Commit()
+	void global::KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork.Commit()
 	{
 		Commit.RecordCall();
 		Commit.OnCall?.Invoke(this);

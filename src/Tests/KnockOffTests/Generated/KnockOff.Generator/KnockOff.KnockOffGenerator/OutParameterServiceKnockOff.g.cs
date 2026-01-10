@@ -86,10 +86,10 @@ partial class OutParameterServiceKnockOff
 	/// <summary>Interceptor for GetData.</summary>
 	public GetDataInterceptor GetData { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Tests.IOutParameterService.</summary>
-	public KnockOff.Tests.IOutParameterService AsOutParameterService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Tests.IOutParameterService.</summary>
+	public global::KnockOff.Tests.IOutParameterService AsOutParameterService() => this;
 
-	bool KnockOff.Tests.IOutParameterService.TryGetValue(string key, out string? @value)
+	bool global::KnockOff.Tests.IOutParameterService.TryGetValue(string key, out string? @value)
 	{
 		@value = default!;
 		TryGetValue.RecordCall(key);
@@ -98,7 +98,7 @@ partial class OutParameterServiceKnockOff
 		return default!;
 	}
 
-	bool KnockOff.Tests.IOutParameterService.TryParse(string input, out int result)
+	bool global::KnockOff.Tests.IOutParameterService.TryParse(string input, out int result)
 	{
 		result = default!;
 		TryParse.RecordCall(input);
@@ -107,7 +107,7 @@ partial class OutParameterServiceKnockOff
 		return default!;
 	}
 
-	void KnockOff.Tests.IOutParameterService.GetData(out string name, out int count)
+	void global::KnockOff.Tests.IOutParameterService.GetData(out string name, out int count)
 	{
 		name = default!;
 		count = default!;

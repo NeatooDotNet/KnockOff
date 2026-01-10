@@ -61,8 +61,8 @@ partial class EnumeratorStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Collections.IEnumerator.</summary>
-		public class IEnumerator : System.Collections.IEnumerator
+		/// <summary>Stub implementation of global::System.Collections.IEnumerator.</summary>
+		public class IEnumerator : global::System.Collections.IEnumerator
 		{
 			/// <summary>Interceptor for Current.</summary>
 			public IEnumerator_CurrentInterceptor Current { get; } = new();
@@ -73,20 +73,20 @@ partial class EnumeratorStubTests
 			/// <summary>Interceptor for Reset.</summary>
 			public IEnumerator_ResetInterceptor Reset { get; } = new();
 
-			bool System.Collections.IEnumerator.MoveNext()
+			bool global::System.Collections.IEnumerator.MoveNext()
 			{
 				MoveNext.RecordCall();
 				if (MoveNext.OnCall is { } onCall) return onCall(this);
 				return default!;
 			}
 
-			void System.Collections.IEnumerator.Reset()
+			void global::System.Collections.IEnumerator.Reset()
 			{
 				Reset.RecordCall();
 				if (Reset.OnCall is { } onCall) onCall(this);
 			}
 
-			object System.Collections.IEnumerator.Current
+			object global::System.Collections.IEnumerator.Current
 			{
 				get
 				{

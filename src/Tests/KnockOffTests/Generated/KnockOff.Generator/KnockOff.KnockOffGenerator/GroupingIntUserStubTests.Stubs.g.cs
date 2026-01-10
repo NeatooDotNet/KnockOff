@@ -44,8 +44,8 @@ partial class GroupingIntUserStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Linq.IGrouping<int, KnockOff.Tests.User>.</summary>
-		public class IGrouping : System.Linq.IGrouping<int, KnockOff.Tests.User>
+		/// <summary>Stub implementation of global::System.Linq.IGrouping<int, global::KnockOff.Tests.User>.</summary>
+		public class IGrouping : global::System.Linq.IGrouping<int, global::KnockOff.Tests.User>
 		{
 			/// <summary>Interceptor for Key.</summary>
 			public IGrouping_KeyInterceptor Key { get; } = new();
@@ -53,7 +53,7 @@ partial class GroupingIntUserStubTests
 			/// <summary>Interceptor for GetEnumerator.</summary>
 			public IGrouping_GetEnumeratorInterceptor GetEnumerator { get; } = new();
 
-			int System.Linq.IGrouping<int, KnockOff.Tests.User>.Key
+			int global::System.Linq.IGrouping<int, global::KnockOff.Tests.User>.Key
 			{
 				get
 				{
@@ -63,14 +63,14 @@ partial class GroupingIntUserStubTests
 				}
 			}
 
-			global::System.Collections.Generic.IEnumerator<global::KnockOff.Tests.User> System.Collections.Generic.IEnumerable<KnockOff.Tests.User>.GetEnumerator()
+			global::System.Collections.Generic.IEnumerator<global::KnockOff.Tests.User> global::System.Collections.Generic.IEnumerable<global::KnockOff.Tests.User>.GetEnumerator()
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
-			global::System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+			global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);

@@ -83,22 +83,22 @@ partial class AsyncRepositoryKnockOff
 	/// <summary>Interceptor for CountAsync.</summary>
 	public CountAsyncInterceptor CountAsync { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IAsyncRepository.</summary>
-	public KnockOff.Documentation.Samples.Guides.IAsyncRepository AsAsyncRepository() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IAsyncRepository.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IAsyncRepository AsAsyncRepository() => this;
 
-	global::System.Threading.Tasks.Task KnockOff.Documentation.Samples.Guides.IAsyncRepository.InitializeAsync()
+	global::System.Threading.Tasks.Task global::KnockOff.Documentation.Samples.Guides.IAsyncRepository.InitializeAsync()
 	{
 		InitializeAsync.RecordCall();
 		return InitializeAsync.OnCall?.Invoke(this) ?? global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
-	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.AsyncUser?> KnockOff.Documentation.Samples.Guides.IAsyncRepository.GetByIdAsync(int id)
+	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.AsyncUser?> global::KnockOff.Documentation.Samples.Guides.IAsyncRepository.GetByIdAsync(int id)
 	{
 		GetByIdAsync.RecordCall(id);
 		return GetByIdAsync.OnCall?.Invoke(this, id) ?? global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Guides.AsyncUser?>(default!);
 	}
 
-	global::System.Threading.Tasks.ValueTask<int> KnockOff.Documentation.Samples.Guides.IAsyncRepository.CountAsync()
+	global::System.Threading.Tasks.ValueTask<int> global::KnockOff.Documentation.Samples.Guides.IAsyncRepository.CountAsync()
 	{
 		CountAsync.RecordCall();
 		return CountAsync.OnCall?.Invoke(this) ?? default;

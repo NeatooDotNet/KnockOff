@@ -27,13 +27,13 @@ partial class IdxConfigStoreKnockOff
 	/// <summary>Interceptor for StringIndexer.</summary>
 	public StringIndexerInterceptor StringIndexer { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIdxConfigStore.</summary>
-	public KnockOff.Documentation.Samples.Guides.IIdxConfigStore AsIdxConfigStore() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IIdxConfigStore.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IIdxConfigStore AsIdxConfigStore() => this;
 
 	/// <summary>Backing storage for StringIndexer indexer.</summary>
 	public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Documentation.Samples.Guides.IdxConfigValue?> StringIndexerBacking { get; } = new();
 
-	global::KnockOff.Documentation.Samples.Guides.IdxConfigValue? KnockOff.Documentation.Samples.Guides.IIdxConfigStore.this[string key]
+	global::KnockOff.Documentation.Samples.Guides.IdxConfigValue? global::KnockOff.Documentation.Samples.Guides.IIdxConfigStore.this[string key]
 	{
 		get { StringIndexer.RecordGet(key); if (StringIndexer.OnGet != null) return StringIndexer.OnGet(this, key); return StringIndexerBacking.TryGetValue(key, out var v) ? v : default; }
 	}

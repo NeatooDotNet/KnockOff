@@ -145,8 +145,8 @@ partial class SkCallbackMethodKnockOff
 	/// <summary>Interceptor for Search.</summary>
 	public SearchInterceptor Search { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkCallbackService.</summary>
-	public KnockOff.Documentation.Samples.Skills.ISkCallbackService AsSkCallbackService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ISkCallbackService.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkCallbackService AsSkCallbackService() => this;
 
 	/// <summary>Backing storage for Name.</summary>
 	protected string NameBacking { get; set; } = "";
@@ -154,31 +154,31 @@ partial class SkCallbackMethodKnockOff
 	/// <summary>Backing storage for CurrentUser.</summary>
 	protected global::KnockOff.Documentation.Samples.Skills.SkUser? CurrentUserBacking { get; set; } = default!;
 
-	void KnockOff.Documentation.Samples.Skills.ISkCallbackService.DoWork()
+	void global::KnockOff.Documentation.Samples.Skills.ISkCallbackService.DoWork()
 	{
 		DoWork.RecordCall();
 		DoWork.OnCall?.Invoke(this);
 	}
 
-	global::KnockOff.Documentation.Samples.Skills.SkUser KnockOff.Documentation.Samples.Skills.ISkCallbackService.GetById(int id)
+	global::KnockOff.Documentation.Samples.Skills.SkUser global::KnockOff.Documentation.Samples.Skills.ISkCallbackService.GetById(int id)
 	{
 		GetById.RecordCall(id);
 		return GetById.OnCall?.Invoke(this, id) ?? new global::KnockOff.Documentation.Samples.Skills.SkUser();
 	}
 
-	global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser> KnockOff.Documentation.Samples.Skills.ISkCallbackService.Search(string query, int limit, int offset)
+	global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser> global::KnockOff.Documentation.Samples.Skills.ISkCallbackService.Search(string query, int limit, int offset)
 	{
 		Search.RecordCall(query, limit, offset);
 		return Search.OnCall?.Invoke(this, query, limit, offset) ?? new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser>();
 	}
 
-	string KnockOff.Documentation.Samples.Skills.ISkCallbackService.Name
+	string global::KnockOff.Documentation.Samples.Skills.ISkCallbackService.Name
 	{
 		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
 		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else NameBacking = value; }
 	}
 
-	global::KnockOff.Documentation.Samples.Skills.SkUser? KnockOff.Documentation.Samples.Skills.ISkCallbackService.CurrentUser
+	global::KnockOff.Documentation.Samples.Skills.SkUser? global::KnockOff.Documentation.Samples.Skills.ISkCallbackService.CurrentUser
 	{
 		get { CurrentUser.RecordGet(); return CurrentUser.OnGet?.Invoke(this) ?? CurrentUserBacking; }
 		set { CurrentUser.RecordSet(value); if (CurrentUser.OnSet != null) CurrentUser.OnSet(this, value); else CurrentUserBacking = value; }

@@ -83,22 +83,22 @@ partial class HaServiceKnockOff
 	/// <summary>Interceptor for Create.</summary>
 	public CreateInterceptor Create { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IHaService.</summary>
-	public KnockOff.Documentation.Samples.Skills.IHaService AsHaService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.IHaService.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.IHaService AsHaService() => this;
 
-	void KnockOff.Documentation.Samples.Skills.IHaService.Initialize()
+	void global::KnockOff.Documentation.Samples.Skills.IHaService.Initialize()
 	{
 		Initialize.RecordCall();
 		Initialize.OnCall?.Invoke(this);
 	}
 
-	global::KnockOff.Documentation.Samples.Skills.HaUser KnockOff.Documentation.Samples.Skills.IHaService.GetById(int id)
+	global::KnockOff.Documentation.Samples.Skills.HaUser global::KnockOff.Documentation.Samples.Skills.IHaService.GetById(int id)
 	{
 		GetById.RecordCall(id);
 		return GetById.OnCall?.Invoke(this, id) ?? new global::KnockOff.Documentation.Samples.Skills.HaUser();
 	}
 
-	global::KnockOff.Documentation.Samples.Skills.HaEntity KnockOff.Documentation.Samples.Skills.IHaService.Create(string name, int @value)
+	global::KnockOff.Documentation.Samples.Skills.HaEntity global::KnockOff.Documentation.Samples.Skills.IHaService.Create(string name, int @value)
 	{
 		Create.RecordCall(name, @value);
 		return Create.OnCall?.Invoke(this, name, @value) ?? new global::KnockOff.Documentation.Samples.Skills.HaEntity();

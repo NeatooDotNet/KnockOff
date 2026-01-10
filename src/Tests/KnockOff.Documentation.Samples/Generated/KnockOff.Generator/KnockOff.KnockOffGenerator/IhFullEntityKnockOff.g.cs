@@ -93,14 +93,14 @@ partial class IhFullEntityKnockOff
 	/// <summary>Interceptor for Id.</summary>
 	public IdInterceptor Id { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIhFullAuditableEntity.</summary>
-	public KnockOff.Documentation.Samples.Guides.IIhFullAuditableEntity AsIhFullAuditableEntity() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IIhFullAuditableEntity.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IIhFullAuditableEntity AsIhFullAuditableEntity() => this;
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIhTimestampedEntity.</summary>
-	public KnockOff.Documentation.Samples.Guides.IIhTimestampedEntity AsIhTimestampedEntity() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IIhTimestampedEntity.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IIhTimestampedEntity AsIhTimestampedEntity() => this;
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIhEntity.</summary>
-	public KnockOff.Documentation.Samples.Guides.IIhEntity AsIhEntity() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IIhEntity.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IIhEntity AsIhEntity() => this;
 
 	/// <summary>Backing storage for CreatedBy.</summary>
 	protected string CreatedByBacking { get; set; } = "";
@@ -114,23 +114,23 @@ partial class IhFullEntityKnockOff
 	/// <summary>Backing storage for Id.</summary>
 	protected int IdBacking { get; set; } = default!;
 
-	string KnockOff.Documentation.Samples.Guides.IIhFullAuditableEntity.CreatedBy
+	string global::KnockOff.Documentation.Samples.Guides.IIhFullAuditableEntity.CreatedBy
 	{
 		get { CreatedBy.RecordGet(); return CreatedBy.OnGet?.Invoke(this) ?? CreatedByBacking; }
 	}
 
-	string? KnockOff.Documentation.Samples.Guides.IIhFullAuditableEntity.ModifiedBy
+	string? global::KnockOff.Documentation.Samples.Guides.IIhFullAuditableEntity.ModifiedBy
 	{
 		get { ModifiedBy.RecordGet(); return ModifiedBy.OnGet?.Invoke(this) ?? ModifiedByBacking; }
 		set { ModifiedBy.RecordSet(value); if (ModifiedBy.OnSet != null) ModifiedBy.OnSet(this, value); else ModifiedByBacking = value; }
 	}
 
-	global::System.DateTime KnockOff.Documentation.Samples.Guides.IIhTimestampedEntity.CreatedAt
+	global::System.DateTime global::KnockOff.Documentation.Samples.Guides.IIhTimestampedEntity.CreatedAt
 	{
 		get { CreatedAt.RecordGet(); return CreatedAt.OnGet?.Invoke(this) ?? CreatedAtBacking; }
 	}
 
-	int KnockOff.Documentation.Samples.Guides.IIhEntity.Id
+	int global::KnockOff.Documentation.Samples.Guides.IIhEntity.Id
 	{
 		get { Id.RecordGet(); return Id.OnGet?.Invoke(this) ?? IdBacking; }
 	}

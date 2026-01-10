@@ -46,18 +46,18 @@ partial class PropConnectionKnockOff
 	/// <summary>Interceptor for Connect.</summary>
 	public ConnectInterceptor Connect { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IPropConnection.</summary>
-	public KnockOff.Documentation.Samples.Guides.IPropConnection AsPropConnection() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IPropConnection.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IPropConnection AsPropConnection() => this;
 
 	/// <summary>Backing storage for IsConnected.</summary>
 	protected bool IsConnectedBacking { get; set; } = default!;
 
-	bool KnockOff.Documentation.Samples.Guides.IPropConnection.IsConnected
+	bool global::KnockOff.Documentation.Samples.Guides.IPropConnection.IsConnected
 	{
 		get { IsConnected.RecordGet(); return IsConnected.OnGet?.Invoke(this) ?? IsConnectedBacking; }
 	}
 
-	void KnockOff.Documentation.Samples.Guides.IPropConnection.Connect()
+	void global::KnockOff.Documentation.Samples.Guides.IPropConnection.Connect()
 	{
 		Connect.RecordCall();
 		Connect.OnCall?.Invoke(this);

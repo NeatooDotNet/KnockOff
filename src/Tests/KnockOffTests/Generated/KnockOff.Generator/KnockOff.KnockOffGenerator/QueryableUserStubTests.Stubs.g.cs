@@ -82,8 +82,8 @@ partial class QueryableUserStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Linq.IQueryable<KnockOff.Tests.User>.</summary>
-		public class IQueryable : System.Linq.IQueryable<KnockOff.Tests.User>
+		/// <summary>Stub implementation of global::System.Linq.IQueryable<global::KnockOff.Tests.User>.</summary>
+		public class IQueryable : global::System.Linq.IQueryable<global::KnockOff.Tests.User>
 		{
 			/// <summary>Interceptor for ElementType.</summary>
 			public IQueryable_ElementTypeInterceptor ElementType { get; } = new();
@@ -97,14 +97,14 @@ partial class QueryableUserStubTests
 			/// <summary>Interceptor for GetEnumerator.</summary>
 			public IQueryable_GetEnumeratorInterceptor GetEnumerator { get; } = new();
 
-			global::System.Collections.Generic.IEnumerator<global::KnockOff.Tests.User> System.Collections.Generic.IEnumerable<KnockOff.Tests.User>.GetEnumerator()
+			global::System.Collections.Generic.IEnumerator<global::KnockOff.Tests.User> global::System.Collections.Generic.IEnumerable<global::KnockOff.Tests.User>.GetEnumerator()
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
-			global::System.Type System.Linq.IQueryable.ElementType
+			global::System.Type global::System.Linq.IQueryable.ElementType
 			{
 				get
 				{
@@ -114,7 +114,7 @@ partial class QueryableUserStubTests
 				}
 			}
 
-			global::System.Linq.Expressions.Expression System.Linq.IQueryable.Expression
+			global::System.Linq.Expressions.Expression global::System.Linq.IQueryable.Expression
 			{
 				get
 				{
@@ -124,7 +124,7 @@ partial class QueryableUserStubTests
 				}
 			}
 
-			global::System.Linq.IQueryProvider System.Linq.IQueryable.Provider
+			global::System.Linq.IQueryProvider global::System.Linq.IQueryable.Provider
 			{
 				get
 				{
@@ -134,7 +134,7 @@ partial class QueryableUserStubTests
 				}
 			}
 
-			global::System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+			global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);

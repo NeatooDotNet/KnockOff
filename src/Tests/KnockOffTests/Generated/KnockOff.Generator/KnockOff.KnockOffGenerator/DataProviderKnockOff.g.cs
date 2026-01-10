@@ -52,20 +52,20 @@ partial class DataProviderKnockOff
 	/// <summary>Interceptor for GetData.</summary>
 	public GetData2Interceptor GetData2 { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Tests.IDataProvider.</summary>
-	public KnockOff.Tests.IDataProvider AsDataProvider() => this;
+	/// <summary>Returns this instance as global::KnockOff.Tests.IDataProvider.</summary>
+	public global::KnockOff.Tests.IDataProvider AsDataProvider() => this;
 
 	/// <summary>Backing storage for Count.</summary>
 	protected int CountBacking { get; set; } = default!;
 
-	string KnockOff.Tests.IDataProvider.GetData(int id)
+	string global::KnockOff.Tests.IDataProvider.GetData(int id)
 	{
 		GetData2.RecordCall(id);
-		if (GetData2.OnCall != null) return GetData2.OnCall(this, id);
+		if (GetData2.OnCall is { } callback) return callback(this, id);
 		return GetData(id);
 	}
 
-	int KnockOff.Tests.IDataProvider.Count
+	int global::KnockOff.Tests.IDataProvider.Count
 	{
 		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? CountBacking; }
 	}

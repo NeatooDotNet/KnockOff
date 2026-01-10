@@ -167,44 +167,44 @@ partial class VsUserServiceKnockOff
 	/// <summary>Interceptor for Update.</summary>
 	public UpdateInterceptor Update { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IVsUserService.</summary>
-	public KnockOff.Documentation.Samples.Comparison.IVsUserService AsVsUserService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Comparison.IVsUserService.</summary>
+	public global::KnockOff.Documentation.Samples.Comparison.IVsUserService AsVsUserService() => this;
 
 	/// <summary>Backing storage for CurrentUser.</summary>
 	protected global::KnockOff.Documentation.Samples.Comparison.VsUser? CurrentUserBacking { get; set; } = default!;
 
-	global::KnockOff.Documentation.Samples.Comparison.VsUser KnockOff.Documentation.Samples.Comparison.IVsUserService.GetUser(int id)
+	global::KnockOff.Documentation.Samples.Comparison.VsUser global::KnockOff.Documentation.Samples.Comparison.IVsUserService.GetUser(int id)
 	{
 		GetUser2.RecordCall(id);
-		if (GetUser2.OnCall != null) return GetUser2.OnCall(this, id);
+		if (GetUser2.OnCall is { } callback) return callback(this, id);
 		return GetUser(id);
 	}
 
-	global::KnockOff.Documentation.Samples.Comparison.VsUser? KnockOff.Documentation.Samples.Comparison.IVsUserService.CurrentUser
+	global::KnockOff.Documentation.Samples.Comparison.VsUser? global::KnockOff.Documentation.Samples.Comparison.IVsUserService.CurrentUser
 	{
 		get { CurrentUser.RecordGet(); return CurrentUser.OnGet?.Invoke(this) ?? CurrentUserBacking; }
 		set { CurrentUser.RecordSet(value); if (CurrentUser.OnSet != null) CurrentUser.OnSet(this, value); else CurrentUserBacking = value; }
 	}
 
-	global::KnockOff.Documentation.Samples.Comparison.VsUser? KnockOff.Documentation.Samples.Comparison.IVsUserService.Save(global::KnockOff.Documentation.Samples.Comparison.VsUser user)
+	global::KnockOff.Documentation.Samples.Comparison.VsUser? global::KnockOff.Documentation.Samples.Comparison.IVsUserService.Save(global::KnockOff.Documentation.Samples.Comparison.VsUser user)
 	{
 		Save.RecordCall(user);
 		return Save.OnCall?.Invoke(this, user) ?? default!;
 	}
 
-	void KnockOff.Documentation.Samples.Comparison.IVsUserService.Delete(int id)
+	void global::KnockOff.Documentation.Samples.Comparison.IVsUserService.Delete(int id)
 	{
 		Delete.RecordCall(id);
 		Delete.OnCall?.Invoke(this, id);
 	}
 
-	global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Comparison.VsUser> KnockOff.Documentation.Samples.Comparison.IVsUserService.GetAll()
+	global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Comparison.VsUser> global::KnockOff.Documentation.Samples.Comparison.IVsUserService.GetAll()
 	{
 		GetAll.RecordCall();
 		return GetAll.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Comparison.VsUser>();
 	}
 
-	void KnockOff.Documentation.Samples.Comparison.IVsUserService.Update(global::KnockOff.Documentation.Samples.Comparison.VsUser user)
+	void global::KnockOff.Documentation.Samples.Comparison.IVsUserService.Update(global::KnockOff.Documentation.Samples.Comparison.VsUser user)
 	{
 		Update.RecordCall(user);
 		Update.OnCall?.Invoke(this, user);

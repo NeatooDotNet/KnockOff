@@ -141,8 +141,8 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Collections.Generic.IReadOnlyDictionary<string, int>.</summary>
-		public class IReadOnlyDictionary : System.Collections.Generic.IReadOnlyDictionary<string, int>
+		/// <summary>Stub implementation of global::System.Collections.Generic.IReadOnlyDictionary<string, int>.</summary>
+		public class IReadOnlyDictionary : global::System.Collections.Generic.IReadOnlyDictionary<string, int>
 		{
 			/// <summary>Interceptor for StringIndexer.</summary>
 			public IReadOnlyDictionary_StringIndexerInterceptor StringIndexer { get; } = new();
@@ -165,14 +165,14 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			/// <summary>Interceptor for GetEnumerator.</summary>
 			public IReadOnlyDictionary_GetEnumeratorInterceptor GetEnumerator { get; } = new();
 
-			bool System.Collections.Generic.IReadOnlyDictionary<string, int>.ContainsKey(string key)
+			bool global::System.Collections.Generic.IReadOnlyDictionary<string, int>.ContainsKey(string key)
 			{
 				ContainsKey.RecordCall(key);
 				if (ContainsKey.OnCall is { } onCall) return onCall(this, key);
 				return default!;
 			}
 
-			bool System.Collections.Generic.IReadOnlyDictionary<string, int>.TryGetValue(string key, out int value)
+			bool global::System.Collections.Generic.IReadOnlyDictionary<string, int>.TryGetValue(string key, out int value)
 			{
 				value = default!;
 				TryGetValue.RecordCall(key);
@@ -180,7 +180,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 				return default!;
 			}
 
-			int System.Collections.Generic.IReadOnlyDictionary<string, int>.this[string key]
+			int global::System.Collections.Generic.IReadOnlyDictionary<string, int>.this[string key]
 			{
 				get
 				{
@@ -190,7 +190,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 				}
 			}
 
-			global::System.Collections.Generic.IEnumerable<string> System.Collections.Generic.IReadOnlyDictionary<string, int>.Keys
+			global::System.Collections.Generic.IEnumerable<string> global::System.Collections.Generic.IReadOnlyDictionary<string, int>.Keys
 			{
 				get
 				{
@@ -200,7 +200,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 				}
 			}
 
-			global::System.Collections.Generic.IEnumerable<int> System.Collections.Generic.IReadOnlyDictionary<string, int>.Values
+			global::System.Collections.Generic.IEnumerable<int> global::System.Collections.Generic.IReadOnlyDictionary<string, int>.Values
 			{
 				get
 				{
@@ -210,7 +210,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 				}
 			}
 
-			int System.Collections.Generic.IReadOnlyCollection<System.Collections.Generic.KeyValuePair<string, int>>.Count
+			int global::System.Collections.Generic.IReadOnlyCollection<global::System.Collections.Generic.KeyValuePair<string, int>>.Count
 			{
 				get
 				{
@@ -220,14 +220,14 @@ partial class ReadOnlyDictionaryStringIntStubTests
 				}
 			}
 
-			global::System.Collections.Generic.IEnumerator<global::System.Collections.Generic.KeyValuePair<string, int>> System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, int>>.GetEnumerator()
+			global::System.Collections.Generic.IEnumerator<global::System.Collections.Generic.KeyValuePair<string, int>> global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.KeyValuePair<string, int>>.GetEnumerator()
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
-			global::System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+			global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);

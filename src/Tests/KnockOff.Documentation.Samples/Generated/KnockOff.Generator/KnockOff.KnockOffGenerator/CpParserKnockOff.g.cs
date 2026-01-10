@@ -58,10 +58,10 @@ partial class CpParserKnockOff
 	/// <summary>Interceptor for GetStats.</summary>
 	public GetStatsInterceptor GetStats { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpParser.</summary>
-	public KnockOff.Documentation.Samples.Skills.ICpParser AsCpParser() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ICpParser.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ICpParser AsCpParser() => this;
 
-	bool KnockOff.Documentation.Samples.Skills.ICpParser.TryParse(string input, out int result)
+	bool global::KnockOff.Documentation.Samples.Skills.ICpParser.TryParse(string input, out int result)
 	{
 		result = default!;
 		TryParse.RecordCall(input);
@@ -70,7 +70,7 @@ partial class CpParserKnockOff
 		return default!;
 	}
 
-	void KnockOff.Documentation.Samples.Skills.ICpParser.GetStats(out int count, out double average)
+	void global::KnockOff.Documentation.Samples.Skills.ICpParser.GetStats(out int count, out double average)
 	{
 		count = default!;
 		average = default!;

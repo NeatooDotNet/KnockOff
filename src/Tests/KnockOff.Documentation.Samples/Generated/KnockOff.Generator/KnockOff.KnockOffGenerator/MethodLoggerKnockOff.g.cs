@@ -55,16 +55,16 @@ partial class MethodLoggerKnockOff
 	/// <summary>Interceptor for LogError.</summary>
 	public LogErrorInterceptor LogError { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodLogger.</summary>
-	public KnockOff.Documentation.Samples.Guides.IMethodLogger AsMethodLogger() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IMethodLogger.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IMethodLogger AsMethodLogger() => this;
 
-	void KnockOff.Documentation.Samples.Guides.IMethodLogger.Log(string message)
+	void global::KnockOff.Documentation.Samples.Guides.IMethodLogger.Log(string message)
 	{
 		Log.RecordCall(message);
 		Log.OnCall?.Invoke(this, message);
 	}
 
-	void KnockOff.Documentation.Samples.Guides.IMethodLogger.LogError(string message, global::System.Exception ex)
+	void global::KnockOff.Documentation.Samples.Guides.IMethodLogger.LogError(string message, global::System.Exception ex)
 	{
 		LogError.RecordCall(message, ex);
 		LogError.OnCall?.Invoke(this, message, ex);

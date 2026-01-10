@@ -28,13 +28,13 @@ partial class SerializableStubTests
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Runtime.Serialization.ISerializable.</summary>
-		public class ISerializable : System.Runtime.Serialization.ISerializable
+		/// <summary>Stub implementation of global::System.Runtime.Serialization.ISerializable.</summary>
+		public class ISerializable : global::System.Runtime.Serialization.ISerializable
 		{
 			/// <summary>Interceptor for GetObjectData.</summary>
 			public ISerializable_GetObjectDataInterceptor GetObjectData { get; } = new();
 
-			void System.Runtime.Serialization.ISerializable.GetObjectData(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context)
+			void global::System.Runtime.Serialization.ISerializable.GetObjectData(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context)
 			{
 				GetObjectData.RecordCall(info, context);
 				if (GetObjectData.OnCall is { } onCall) onCall(this, info, context);

@@ -108,28 +108,28 @@ partial class SkOnCallKnockOff
 	/// <summary>Interceptor for Save.</summary>
 	public SaveInterceptor Save { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkOnCallService.</summary>
-	public KnockOff.Documentation.Samples.Skills.ISkOnCallService AsSkOnCallService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ISkOnCallService.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkOnCallService AsSkOnCallService() => this;
 
-	void KnockOff.Documentation.Samples.Skills.ISkOnCallService.Clear()
+	void global::KnockOff.Documentation.Samples.Skills.ISkOnCallService.Clear()
 	{
 		Clear.RecordCall();
 		Clear.OnCall?.Invoke(this);
 	}
 
-	global::KnockOff.Documentation.Samples.Skills.SkUser KnockOff.Documentation.Samples.Skills.ISkOnCallService.GetById(int id)
+	global::KnockOff.Documentation.Samples.Skills.SkUser global::KnockOff.Documentation.Samples.Skills.ISkOnCallService.GetById(int id)
 	{
 		GetById.RecordCall(id);
 		return GetById.OnCall?.Invoke(this, id) ?? new global::KnockOff.Documentation.Samples.Skills.SkUser();
 	}
 
-	global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser> KnockOff.Documentation.Samples.Skills.ISkOnCallService.Find(string name, bool active)
+	global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser> global::KnockOff.Documentation.Samples.Skills.ISkOnCallService.Find(string name, bool active)
 	{
 		Find.RecordCall(name, active);
 		return Find.OnCall?.Invoke(this, name, active) ?? new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser>();
 	}
 
-	void KnockOff.Documentation.Samples.Skills.ISkOnCallService.Save(object entity)
+	void global::KnockOff.Documentation.Samples.Skills.ISkOnCallService.Save(object entity)
 	{
 		Save.RecordCall(entity);
 		Save.OnCall?.Invoke(this, entity);

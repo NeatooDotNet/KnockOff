@@ -33,13 +33,13 @@ partial class MigSharedRepositoryKnockOff
 	/// <summary>Interceptor for GetById.</summary>
 	public GetById2Interceptor GetById2 { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IMigSharedRepository.</summary>
-	public KnockOff.Documentation.Samples.Comparison.IMigSharedRepository AsMigSharedRepository() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Comparison.IMigSharedRepository.</summary>
+	public global::KnockOff.Documentation.Samples.Comparison.IMigSharedRepository AsMigSharedRepository() => this;
 
-	global::KnockOff.Documentation.Samples.Comparison.MigUser? KnockOff.Documentation.Samples.Comparison.IMigSharedRepository.GetById(int id)
+	global::KnockOff.Documentation.Samples.Comparison.MigUser? global::KnockOff.Documentation.Samples.Comparison.IMigSharedRepository.GetById(int id)
 	{
 		GetById2.RecordCall(id);
-		if (GetById2.OnCall != null) return GetById2.OnCall(this, id);
+		if (GetById2.OnCall is { } callback) return callback(this, id);
 		return GetById(id);
 	}
 

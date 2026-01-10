@@ -25,24 +25,22 @@ partial class EnumerableUserStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Collections.Generic.IEnumerable<KnockOff.Tests.User>.</summary>
-		public class IEnumerable : System.Collections.Generic.IEnumerable<KnockOff.Tests.User>
+		/// <summary>Stub implementation of global::System.Collections.Generic.IEnumerable<global::KnockOff.Tests.User>.</summary>
+		public class IEnumerable : global::System.Collections.Generic.IEnumerable<global::KnockOff.Tests.User>
 		{
 			/// <summary>Interceptor for GetEnumerator.</summary>
 			public IEnumerable_GetEnumeratorInterceptor GetEnumerator { get; } = new();
 
-			global::System.Collections.Generic.IEnumerator<global::KnockOff.Tests.User> System.Collections.Generic.IEnumerable<KnockOff.Tests.User>.GetEnumerator()
+			global::System.Collections.Generic.IEnumerator<global::KnockOff.Tests.User> global::System.Collections.Generic.IEnumerable<global::KnockOff.Tests.User>.GetEnumerator()
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
-			global::System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+			global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
 			{
-				GetEnumerator.RecordCall();
-				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
-				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
+				return ((global::System.Collections.Generic.IEnumerable<global::KnockOff.Tests.User>)this).GetEnumerator();
 			}
 
 		}

@@ -25,13 +25,13 @@ partial class DisposableStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.IDisposable.</summary>
-		public class IDisposable : System.IDisposable
+		/// <summary>Stub implementation of global::System.IDisposable.</summary>
+		public class IDisposable : global::System.IDisposable
 		{
 			/// <summary>Interceptor for Dispose.</summary>
 			public IDisposable_DisposeInterceptor Dispose { get; } = new();
 
-			void System.IDisposable.Dispose()
+			void global::System.IDisposable.Dispose()
 			{
 				Dispose.RecordCall();
 				if (Dispose.OnCall is { } onCall) onCall(this);

@@ -25,7 +25,7 @@ partial class DelegateInlineTest
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub for KnockOff.Tests.VoidNoParamDelegate delegate.</summary>
+		/// <summary>Stub for global::KnockOff.Tests.VoidNoParamDelegate delegate.</summary>
 		public sealed class VoidNoParamDelegate
 		{
 			/// <summary>Interceptor for tracking and configuring delegate behavior.</summary>
@@ -37,8 +37,8 @@ partial class DelegateInlineTest
 				if (Interceptor.OnCall is { } onCall) onCall(this);
 			}
 
-			/// <summary>Implicit conversion to KnockOff.Tests.VoidNoParamDelegate.</summary>
-			public static implicit operator KnockOff.Tests.VoidNoParamDelegate(VoidNoParamDelegate stub) => stub.Invoke;
+			/// <summary>Implicit conversion to global::KnockOff.Tests.VoidNoParamDelegate.</summary>
+			public static implicit operator global::KnockOff.Tests.VoidNoParamDelegate(VoidNoParamDelegate stub) => stub.Invoke;
 		}
 
 		/// <summary>Interceptor for VoidOneParamDelegate delegate.</summary>
@@ -61,7 +61,7 @@ partial class DelegateInlineTest
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub for KnockOff.Tests.VoidOneParamDelegate delegate.</summary>
+		/// <summary>Stub for global::KnockOff.Tests.VoidOneParamDelegate delegate.</summary>
 		public sealed class VoidOneParamDelegate
 		{
 			/// <summary>Interceptor for tracking and configuring delegate behavior.</summary>
@@ -73,8 +73,8 @@ partial class DelegateInlineTest
 				if (Interceptor.OnCall is { } onCall) onCall(this, message);
 			}
 
-			/// <summary>Implicit conversion to KnockOff.Tests.VoidOneParamDelegate.</summary>
-			public static implicit operator KnockOff.Tests.VoidOneParamDelegate(VoidOneParamDelegate stub) => stub.Invoke;
+			/// <summary>Implicit conversion to global::KnockOff.Tests.VoidOneParamDelegate.</summary>
+			public static implicit operator global::KnockOff.Tests.VoidOneParamDelegate(VoidOneParamDelegate stub) => stub.Invoke;
 		}
 
 		/// <summary>Interceptor for ReturnOneParamDelegate delegate.</summary>
@@ -97,7 +97,7 @@ partial class DelegateInlineTest
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub for KnockOff.Tests.ReturnOneParamDelegate delegate.</summary>
+		/// <summary>Stub for global::KnockOff.Tests.ReturnOneParamDelegate delegate.</summary>
 		public sealed class ReturnOneParamDelegate
 		{
 			/// <summary>Interceptor for tracking and configuring delegate behavior.</summary>
@@ -110,8 +110,8 @@ partial class DelegateInlineTest
 				return default!;
 			}
 
-			/// <summary>Implicit conversion to KnockOff.Tests.ReturnOneParamDelegate.</summary>
-			public static implicit operator KnockOff.Tests.ReturnOneParamDelegate(ReturnOneParamDelegate stub) => stub.Invoke;
+			/// <summary>Implicit conversion to global::KnockOff.Tests.ReturnOneParamDelegate.</summary>
+			public static implicit operator global::KnockOff.Tests.ReturnOneParamDelegate(ReturnOneParamDelegate stub) => stub.Invoke;
 		}
 
 		/// <summary>Interceptor for MultiParamDelegate delegate.</summary>
@@ -134,7 +134,7 @@ partial class DelegateInlineTest
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Stub for KnockOff.Tests.MultiParamDelegate delegate.</summary>
+		/// <summary>Stub for global::KnockOff.Tests.MultiParamDelegate delegate.</summary>
 		public sealed class MultiParamDelegate
 		{
 			/// <summary>Interceptor for tracking and configuring delegate behavior.</summary>
@@ -147,8 +147,8 @@ partial class DelegateInlineTest
 				return default!;
 			}
 
-			/// <summary>Implicit conversion to KnockOff.Tests.MultiParamDelegate.</summary>
-			public static implicit operator KnockOff.Tests.MultiParamDelegate(MultiParamDelegate stub) => stub.Invoke;
+			/// <summary>Implicit conversion to global::KnockOff.Tests.MultiParamDelegate.</summary>
+			public static implicit operator global::KnockOff.Tests.MultiParamDelegate(MultiParamDelegate stub) => stub.Invoke;
 		}
 
 	}

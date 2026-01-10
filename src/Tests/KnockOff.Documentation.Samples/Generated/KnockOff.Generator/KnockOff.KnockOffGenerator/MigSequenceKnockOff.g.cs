@@ -30,10 +30,10 @@ partial class MigSequenceKnockOff
 	/// <summary>Interceptor for GetNext.</summary>
 	public GetNextInterceptor GetNext { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IMigSequence.</summary>
-	public KnockOff.Documentation.Samples.Comparison.IMigSequence AsMigSequence() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Comparison.IMigSequence.</summary>
+	public global::KnockOff.Documentation.Samples.Comparison.IMigSequence AsMigSequence() => this;
 
-	int KnockOff.Documentation.Samples.Comparison.IMigSequence.GetNext()
+	int global::KnockOff.Documentation.Samples.Comparison.IMigSequence.GetNext()
 	{
 		GetNext.RecordCall();
 		return GetNext.OnCall?.Invoke(this) ?? default!;

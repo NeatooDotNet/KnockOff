@@ -77,27 +77,27 @@ partial class EmailServiceWithValidation
 	/// <summary>Interceptor for IsValidAddress.</summary>
 	public IsValidAddress2Interceptor IsValidAddress2 { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation.</summary>
-	public KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation AsEmailServiceWithValidation() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation.</summary>
+	public global::KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation AsEmailServiceWithValidation() => this;
 
 	/// <summary>Backing storage for IsConnected.</summary>
 	protected bool IsConnectedBacking { get; set; } = default!;
 
-	void KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation.SendEmail(string to, string subject, string body)
+	void global::KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation.SendEmail(string to, string subject, string body)
 	{
 		SendEmail.RecordCall(to, subject, body);
 		SendEmail.OnCall?.Invoke(this, to, subject, body);
 	}
 
-	bool KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation.IsConnected
+	bool global::KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation.IsConnected
 	{
 		get { IsConnected.RecordGet(); return IsConnected.OnGet?.Invoke(this) ?? IsConnectedBacking; }
 	}
 
-	bool KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation.IsValidAddress(string email)
+	bool global::KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation.IsValidAddress(string email)
 	{
 		IsValidAddress2.RecordCall(email);
-		if (IsValidAddress2.OnCall != null) return IsValidAddress2.OnCall(this, email);
+		if (IsValidAddress2.OnCall is { } callback) return callback(this, email);
 		return IsValidAddress(email);
 	}
 

@@ -25,7 +25,7 @@ partial class GenericDelegateInlineTest
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub for KnockOff.Tests.Factory<string> delegate.</summary>
+		/// <summary>Stub for global::KnockOff.Tests.Factory<string> delegate.</summary>
 		public sealed class Factory
 		{
 			/// <summary>Interceptor for tracking and configuring delegate behavior.</summary>
@@ -38,8 +38,8 @@ partial class GenericDelegateInlineTest
 				return default!;
 			}
 
-			/// <summary>Implicit conversion to KnockOff.Tests.Factory<string>.</summary>
-			public static implicit operator KnockOff.Tests.Factory<string>(Factory stub) => stub.Invoke;
+			/// <summary>Implicit conversion to global::KnockOff.Tests.Factory<string>.</summary>
+			public static implicit operator global::KnockOff.Tests.Factory<string>(Factory stub) => stub.Invoke;
 		}
 
 		/// <summary>Interceptor for Converter delegate.</summary>
@@ -62,7 +62,7 @@ partial class GenericDelegateInlineTest
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub for KnockOff.Tests.Converter<int, string> delegate.</summary>
+		/// <summary>Stub for global::KnockOff.Tests.Converter<int, string> delegate.</summary>
 		public sealed class Converter
 		{
 			/// <summary>Interceptor for tracking and configuring delegate behavior.</summary>
@@ -75,8 +75,8 @@ partial class GenericDelegateInlineTest
 				return default!;
 			}
 
-			/// <summary>Implicit conversion to KnockOff.Tests.Converter<int, string>.</summary>
-			public static implicit operator KnockOff.Tests.Converter<int, string>(Converter stub) => stub.Invoke;
+			/// <summary>Implicit conversion to global::KnockOff.Tests.Converter<int, string>.</summary>
+			public static implicit operator global::KnockOff.Tests.Converter<int, string>(Converter stub) => stub.Invoke;
 		}
 
 	}

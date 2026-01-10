@@ -79,8 +79,8 @@ partial class PartialPropertyTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService.</summary>
-		public class IInUserService : KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService
+		/// <summary>Stub implementation of global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService.</summary>
+		public class IInUserService : global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService
 		{
 			/// <summary>Interceptor for ConnectionString.</summary>
 			public IInUserService_ConnectionStringInterceptor ConnectionString { get; } = new();
@@ -91,20 +91,20 @@ partial class PartialPropertyTests
 			/// <summary>Interceptor for SaveUser.</summary>
 			public IInUserService_SaveUserInterceptor SaveUser { get; } = new();
 
-			global::KnockOff.Documentation.Samples.Guides.InlineStubs.InUser? KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService.GetUser(int id)
+			global::KnockOff.Documentation.Samples.Guides.InlineStubs.InUser? global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService.GetUser(int id)
 			{
 				GetUser.RecordCall(id);
 				if (GetUser.OnCall is { } onCall) return onCall(this, id);
 				return default!;
 			}
 
-			void KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService.SaveUser(global::KnockOff.Documentation.Samples.Guides.InlineStubs.InUser user)
+			void global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService.SaveUser(global::KnockOff.Documentation.Samples.Guides.InlineStubs.InUser user)
 			{
 				SaveUser.RecordCall(user);
 				if (SaveUser.OnCall is { } onCall) onCall(this, user);
 			}
 
-			string KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService.ConnectionString
+			string global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService.ConnectionString
 			{
 				get
 				{
@@ -162,8 +162,8 @@ partial class PartialPropertyTests
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of KnockOff.Documentation.Samples.Guides.InlineStubs.IInLogger.</summary>
-		public class IInLogger : KnockOff.Documentation.Samples.Guides.InlineStubs.IInLogger
+		/// <summary>Stub implementation of global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInLogger.</summary>
+		public class IInLogger : global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInLogger
 		{
 			/// <summary>Interceptor for Log.</summary>
 			public IInLogger_LogInterceptor Log { get; } = new();
@@ -171,13 +171,13 @@ partial class PartialPropertyTests
 			/// <summary>Interceptor for LogError.</summary>
 			public IInLogger_LogErrorInterceptor LogError { get; } = new();
 
-			void KnockOff.Documentation.Samples.Guides.InlineStubs.IInLogger.Log(string message)
+			void global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInLogger.Log(string message)
 			{
 				Log.RecordCall(message);
 				if (Log.OnCall is { } onCall) onCall(this, message);
 			}
 
-			void KnockOff.Documentation.Samples.Guides.InlineStubs.IInLogger.LogError(string message, global::System.Exception? ex)
+			void global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInLogger.LogError(string message, global::System.Exception? ex)
 			{
 				LogError.RecordCall(message, ex);
 				if (LogError.OnCall is { } onCall) onCall(this, message, ex);

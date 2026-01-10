@@ -505,8 +505,8 @@ partial class DataRecordStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Data.IDataRecord.</summary>
-		public class IDataRecord : System.Data.IDataRecord
+		/// <summary>Stub implementation of global::System.Data.IDataRecord.</summary>
+		public class IDataRecord : global::System.Data.IDataRecord
 		{
 			/// <summary>Interceptor for FieldCount.</summary>
 			public IDataRecord_FieldCountInterceptor FieldCount { get; } = new();
@@ -583,161 +583,161 @@ partial class DataRecordStubTests
 			/// <summary>Interceptor for IsDBNull.</summary>
 			public IDataRecord_IsDBNullInterceptor IsDBNull { get; } = new();
 
-			bool System.Data.IDataRecord.GetBoolean(int i)
+			bool global::System.Data.IDataRecord.GetBoolean(int i)
 			{
 				GetBoolean.RecordCall(i);
 				if (GetBoolean.OnCall is { } onCall) return onCall(this, i);
 				return default!;
 			}
 
-			byte System.Data.IDataRecord.GetByte(int i)
+			byte global::System.Data.IDataRecord.GetByte(int i)
 			{
 				GetByte.RecordCall(i);
 				if (GetByte.OnCall is { } onCall) return onCall(this, i);
 				return default!;
 			}
 
-			long System.Data.IDataRecord.GetBytes(int i, long fieldOffset, byte[]? buffer, int bufferoffset, int length)
+			long global::System.Data.IDataRecord.GetBytes(int i, long fieldOffset, byte[]? buffer, int bufferoffset, int length)
 			{
 				GetBytes.RecordCall(i, fieldOffset, buffer, bufferoffset, length);
 				if (GetBytes.OnCall is { } onCall) return onCall(this, i, fieldOffset, buffer, bufferoffset, length);
 				return default!;
 			}
 
-			char System.Data.IDataRecord.GetChar(int i)
+			char global::System.Data.IDataRecord.GetChar(int i)
 			{
 				GetChar.RecordCall(i);
 				if (GetChar.OnCall is { } onCall) return onCall(this, i);
 				return default!;
 			}
 
-			long System.Data.IDataRecord.GetChars(int i, long fieldoffset, char[]? buffer, int bufferoffset, int length)
+			long global::System.Data.IDataRecord.GetChars(int i, long fieldoffset, char[]? buffer, int bufferoffset, int length)
 			{
 				GetChars.RecordCall(i, fieldoffset, buffer, bufferoffset, length);
 				if (GetChars.OnCall is { } onCall) return onCall(this, i, fieldoffset, buffer, bufferoffset, length);
 				return default!;
 			}
 
-			global::System.Data.IDataReader System.Data.IDataRecord.GetData(int i)
+			global::System.Data.IDataReader global::System.Data.IDataRecord.GetData(int i)
 			{
 				GetData.RecordCall(i);
 				if (GetData.OnCall is { } onCall) return onCall(this, i);
 				throw new global::System.InvalidOperationException("No implementation provided for GetData. Set GetData.OnCall.");
 			}
 
-			string System.Data.IDataRecord.GetDataTypeName(int i)
+			string global::System.Data.IDataRecord.GetDataTypeName(int i)
 			{
 				GetDataTypeName.RecordCall(i);
 				if (GetDataTypeName.OnCall is { } onCall) return onCall(this, i);
 				throw new global::System.InvalidOperationException("No implementation provided for GetDataTypeName. Set GetDataTypeName.OnCall.");
 			}
 
-			global::System.DateTime System.Data.IDataRecord.GetDateTime(int i)
+			global::System.DateTime global::System.Data.IDataRecord.GetDateTime(int i)
 			{
 				GetDateTime.RecordCall(i);
 				if (GetDateTime.OnCall is { } onCall) return onCall(this, i);
 				return default!;
 			}
 
-			decimal System.Data.IDataRecord.GetDecimal(int i)
+			decimal global::System.Data.IDataRecord.GetDecimal(int i)
 			{
 				GetDecimal.RecordCall(i);
 				if (GetDecimal.OnCall is { } onCall) return onCall(this, i);
 				return default!;
 			}
 
-			double System.Data.IDataRecord.GetDouble(int i)
+			double global::System.Data.IDataRecord.GetDouble(int i)
 			{
 				GetDouble.RecordCall(i);
 				if (GetDouble.OnCall is { } onCall) return onCall(this, i);
 				return default!;
 			}
 
-			global::System.Type System.Data.IDataRecord.GetFieldType(int i)
+			global::System.Type global::System.Data.IDataRecord.GetFieldType(int i)
 			{
 				GetFieldType.RecordCall(i);
 				if (GetFieldType.OnCall is { } onCall) return onCall(this, i);
 				throw new global::System.InvalidOperationException("No implementation provided for GetFieldType. Set GetFieldType.OnCall.");
 			}
 
-			float System.Data.IDataRecord.GetFloat(int i)
+			float global::System.Data.IDataRecord.GetFloat(int i)
 			{
 				GetFloat.RecordCall(i);
 				if (GetFloat.OnCall is { } onCall) return onCall(this, i);
 				return default!;
 			}
 
-			global::System.Guid System.Data.IDataRecord.GetGuid(int i)
+			global::System.Guid global::System.Data.IDataRecord.GetGuid(int i)
 			{
 				GetGuid.RecordCall(i);
 				if (GetGuid.OnCall is { } onCall) return onCall(this, i);
 				return default!;
 			}
 
-			short System.Data.IDataRecord.GetInt16(int i)
+			short global::System.Data.IDataRecord.GetInt16(int i)
 			{
 				GetInt16.RecordCall(i);
 				if (GetInt16.OnCall is { } onCall) return onCall(this, i);
 				return default!;
 			}
 
-			int System.Data.IDataRecord.GetInt32(int i)
+			int global::System.Data.IDataRecord.GetInt32(int i)
 			{
 				GetInt32.RecordCall(i);
 				if (GetInt32.OnCall is { } onCall) return onCall(this, i);
 				return default!;
 			}
 
-			long System.Data.IDataRecord.GetInt64(int i)
+			long global::System.Data.IDataRecord.GetInt64(int i)
 			{
 				GetInt64.RecordCall(i);
 				if (GetInt64.OnCall is { } onCall) return onCall(this, i);
 				return default!;
 			}
 
-			string System.Data.IDataRecord.GetName(int i)
+			string global::System.Data.IDataRecord.GetName(int i)
 			{
 				GetName.RecordCall(i);
 				if (GetName.OnCall is { } onCall) return onCall(this, i);
 				throw new global::System.InvalidOperationException("No implementation provided for GetName. Set GetName.OnCall.");
 			}
 
-			int System.Data.IDataRecord.GetOrdinal(string name)
+			int global::System.Data.IDataRecord.GetOrdinal(string name)
 			{
 				GetOrdinal.RecordCall(name);
 				if (GetOrdinal.OnCall is { } onCall) return onCall(this, name);
 				return default!;
 			}
 
-			string System.Data.IDataRecord.GetString(int i)
+			string global::System.Data.IDataRecord.GetString(int i)
 			{
 				GetString.RecordCall(i);
 				if (GetString.OnCall is { } onCall) return onCall(this, i);
 				throw new global::System.InvalidOperationException("No implementation provided for GetString. Set GetString.OnCall.");
 			}
 
-			object System.Data.IDataRecord.GetValue(int i)
+			object global::System.Data.IDataRecord.GetValue(int i)
 			{
 				GetValue.RecordCall(i);
 				if (GetValue.OnCall is { } onCall) return onCall(this, i);
 				return new object();
 			}
 
-			int System.Data.IDataRecord.GetValues(object[] values)
+			int global::System.Data.IDataRecord.GetValues(object[] values)
 			{
 				GetValues.RecordCall(values);
 				if (GetValues.OnCall is { } onCall) return onCall(this, values);
 				return default!;
 			}
 
-			bool System.Data.IDataRecord.IsDBNull(int i)
+			bool global::System.Data.IDataRecord.IsDBNull(int i)
 			{
 				IsDBNull.RecordCall(i);
 				if (IsDBNull.OnCall is { } onCall) return onCall(this, i);
 				return default!;
 			}
 
-			int System.Data.IDataRecord.FieldCount
+			int global::System.Data.IDataRecord.FieldCount
 			{
 				get
 				{
@@ -747,7 +747,7 @@ partial class DataRecordStubTests
 				}
 			}
 
-			object System.Data.IDataRecord.this[int i]
+			object global::System.Data.IDataRecord.this[int i]
 			{
 				get
 				{
@@ -757,7 +757,7 @@ partial class DataRecordStubTests
 				}
 			}
 
-			object System.Data.IDataRecord.this[string name]
+			object global::System.Data.IDataRecord.this[string name]
 			{
 				get
 				{

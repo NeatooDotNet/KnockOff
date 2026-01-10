@@ -28,13 +28,13 @@ partial class ComparerStringStubTests
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Collections.Generic.IComparer<string>.</summary>
-		public class IComparer : System.Collections.Generic.IComparer<string>
+		/// <summary>Stub implementation of global::System.Collections.Generic.IComparer<string>.</summary>
+		public class IComparer : global::System.Collections.Generic.IComparer<string>
 		{
 			/// <summary>Interceptor for Compare.</summary>
 			public IComparer_CompareInterceptor Compare { get; } = new();
 
-			int System.Collections.Generic.IComparer<string>.Compare(string? x, string? y)
+			int global::System.Collections.Generic.IComparer<string>.Compare(string? x, string? y)
 			{
 				Compare.RecordCall(x, y);
 				if (Compare.OnCall is { } onCall) return onCall(this, x, y);

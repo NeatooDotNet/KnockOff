@@ -28,7 +28,7 @@ partial class DelegateTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub for KnockOff.Documentation.Samples.Guides.Delegates.IsUniqueRule delegate.</summary>
+		/// <summary>Stub for global::KnockOff.Documentation.Samples.Guides.Delegates.IsUniqueRule delegate.</summary>
 		public sealed class IsUniqueRule
 		{
 			/// <summary>Interceptor for tracking and configuring delegate behavior.</summary>
@@ -41,8 +41,8 @@ partial class DelegateTests
 				return default!;
 			}
 
-			/// <summary>Implicit conversion to KnockOff.Documentation.Samples.Guides.Delegates.IsUniqueRule.</summary>
-			public static implicit operator KnockOff.Documentation.Samples.Guides.Delegates.IsUniqueRule(IsUniqueRule stub) => stub.Invoke;
+			/// <summary>Implicit conversion to global::KnockOff.Documentation.Samples.Guides.Delegates.IsUniqueRule.</summary>
+			public static implicit operator global::KnockOff.Documentation.Samples.Guides.Delegates.IsUniqueRule(IsUniqueRule stub) => stub.Invoke;
 		}
 
 		/// <summary>Interceptor for UserFactory delegate.</summary>
@@ -58,28 +58,28 @@ partial class DelegateTests
 			public int? LastCallArg { get; private set; }
 
 			/// <summary>Callback invoked when delegate is called.</summary>
-			public global::System.Func<Stubs.UserFactory, int, KnockOff.Documentation.Samples.Guides.Delegates.DelUser>? OnCall { get; set; }
+			public global::System.Func<Stubs.UserFactory, int, global::KnockOff.Documentation.Samples.Guides.Delegates.DelUser>? OnCall { get; set; }
 
 			public void RecordCall(int id) { CallCount++; LastCallArg = id; }
 
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub for KnockOff.Documentation.Samples.Guides.Delegates.UserFactory delegate.</summary>
+		/// <summary>Stub for global::KnockOff.Documentation.Samples.Guides.Delegates.UserFactory delegate.</summary>
 		public sealed class UserFactory
 		{
 			/// <summary>Interceptor for tracking and configuring delegate behavior.</summary>
 			public UserFactoryInterceptor Interceptor { get; } = new();
 
-			private KnockOff.Documentation.Samples.Guides.Delegates.DelUser Invoke(int id)
+			private global::KnockOff.Documentation.Samples.Guides.Delegates.DelUser Invoke(int id)
 			{
 				Interceptor.RecordCall(id);
 				if (Interceptor.OnCall is { } onCall) return onCall(this, id);
 				return default!;
 			}
 
-			/// <summary>Implicit conversion to KnockOff.Documentation.Samples.Guides.Delegates.UserFactory.</summary>
-			public static implicit operator KnockOff.Documentation.Samples.Guides.Delegates.UserFactory(UserFactory stub) => stub.Invoke;
+			/// <summary>Implicit conversion to global::KnockOff.Documentation.Samples.Guides.Delegates.UserFactory.</summary>
+			public static implicit operator global::KnockOff.Documentation.Samples.Guides.Delegates.UserFactory(UserFactory stub) => stub.Invoke;
 		}
 
 	}

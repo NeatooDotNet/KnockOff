@@ -196,11 +196,11 @@ partial class CollectionStringKnockOff
 	/// <summary>Interceptor for GetEnumerator.</summary>
 	public GetEnumeratorInterceptor GetEnumerator { get; } = new();
 
-	/// <summary>Returns this instance as System.Collections.Generic.ICollection<string>.</summary>
-	public System.Collections.Generic.ICollection<string> AsCollection() => this;
+	/// <summary>Returns this instance as global::System.Collections.Generic.ICollection<string>.</summary>
+	public global::System.Collections.Generic.ICollection<string> AsCollection() => this;
 
-	/// <summary>Returns this instance as System.Collections.Generic.IEnumerable<string>.</summary>
-	public System.Collections.Generic.IEnumerable<string> AsEnumerable() => this;
+	/// <summary>Returns this instance as global::System.Collections.Generic.IEnumerable<string>.</summary>
+	public global::System.Collections.Generic.IEnumerable<string> AsEnumerable() => this;
 
 	/// <summary>Backing storage for Count.</summary>
 	protected int CountBacking { get; set; } = default!;
@@ -208,47 +208,47 @@ partial class CollectionStringKnockOff
 	/// <summary>Backing storage for IsReadOnly.</summary>
 	protected bool IsReadOnlyBacking { get; set; } = default!;
 
-	void System.Collections.Generic.ICollection<string>.Add(string item)
+	void global::System.Collections.Generic.ICollection<string>.Add(string item)
 	{
 		Add.RecordCall(item);
 		Add.OnCall?.Invoke(this, item);
 	}
 
-	void System.Collections.Generic.ICollection<string>.Clear()
+	void global::System.Collections.Generic.ICollection<string>.Clear()
 	{
 		Clear.RecordCall();
 		Clear.OnCall?.Invoke(this);
 	}
 
-	bool System.Collections.Generic.ICollection<string>.Contains(string item)
+	bool global::System.Collections.Generic.ICollection<string>.Contains(string item)
 	{
 		Contains.RecordCall(item);
 		return Contains.OnCall?.Invoke(this, item) ?? default!;
 	}
 
-	void System.Collections.Generic.ICollection<string>.CopyTo(string[] array, int arrayIndex)
+	void global::System.Collections.Generic.ICollection<string>.CopyTo(string[] array, int arrayIndex)
 	{
 		CopyTo.RecordCall(array, arrayIndex);
 		CopyTo.OnCall?.Invoke(this, array, arrayIndex);
 	}
 
-	bool System.Collections.Generic.ICollection<string>.Remove(string item)
+	bool global::System.Collections.Generic.ICollection<string>.Remove(string item)
 	{
 		Remove.RecordCall(item);
 		return Remove.OnCall?.Invoke(this, item) ?? default!;
 	}
 
-	int System.Collections.Generic.ICollection<string>.Count
+	int global::System.Collections.Generic.ICollection<string>.Count
 	{
 		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? CountBacking; }
 	}
 
-	bool System.Collections.Generic.ICollection<string>.IsReadOnly
+	bool global::System.Collections.Generic.ICollection<string>.IsReadOnly
 	{
 		get { IsReadOnly.RecordGet(); return IsReadOnly.OnGet?.Invoke(this) ?? IsReadOnlyBacking; }
 	}
 
-	global::System.Collections.Generic.IEnumerator<string> System.Collections.Generic.IEnumerable<string>.GetEnumerator()
+	global::System.Collections.Generic.IEnumerator<string> global::System.Collections.Generic.IEnumerable<string>.GetEnumerator()
 	{
 		GetEnumerator.RecordCall();
 		if (GetEnumerator.OnCall is { } callback)
@@ -256,12 +256,9 @@ partial class CollectionStringKnockOff
 		throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall or define a protected method 'GetEnumerator' in your partial class.");
 	}
 
-	global::System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+	global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
 	{
-		GetEnumerator.RecordCall();
-		if (GetEnumerator.OnCall is { } callback)
-			return callback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall or define a protected method 'GetEnumerator' in your partial class.");
+		return ((global::System.Collections.Generic.IEnumerable<string>)this).GetEnumerator();
 	}
 
 }

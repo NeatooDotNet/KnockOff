@@ -30,10 +30,10 @@ partial class MethodSequentialKnockOff
 	/// <summary>Interceptor for GetNext.</summary>
 	public GetNextInterceptor GetNext { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodSequential.</summary>
-	public KnockOff.Documentation.Samples.Guides.IMethodSequential AsMethodSequential() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IMethodSequential.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IMethodSequential AsMethodSequential() => this;
 
-	int KnockOff.Documentation.Samples.Guides.IMethodSequential.GetNext()
+	int global::KnockOff.Documentation.Samples.Guides.IMethodSequential.GetNext()
 	{
 		GetNext.RecordCall();
 		return GetNext.OnCall?.Invoke(this) ?? default!;

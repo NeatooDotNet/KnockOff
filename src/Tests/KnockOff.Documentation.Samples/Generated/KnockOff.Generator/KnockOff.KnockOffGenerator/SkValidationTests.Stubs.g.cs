@@ -28,7 +28,7 @@ partial class SkValidationTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub for KnockOff.Documentation.Samples.Skills.SkIsUniqueRule delegate.</summary>
+		/// <summary>Stub for global::KnockOff.Documentation.Samples.Skills.SkIsUniqueRule delegate.</summary>
 		public sealed class SkIsUniqueRule
 		{
 			/// <summary>Interceptor for tracking and configuring delegate behavior.</summary>
@@ -41,8 +41,8 @@ partial class SkValidationTests
 				return default!;
 			}
 
-			/// <summary>Implicit conversion to KnockOff.Documentation.Samples.Skills.SkIsUniqueRule.</summary>
-			public static implicit operator KnockOff.Documentation.Samples.Skills.SkIsUniqueRule(SkIsUniqueRule stub) => stub.Invoke;
+			/// <summary>Implicit conversion to global::KnockOff.Documentation.Samples.Skills.SkIsUniqueRule.</summary>
+			public static implicit operator global::KnockOff.Documentation.Samples.Skills.SkIsUniqueRule(SkIsUniqueRule stub) => stub.Invoke;
 		}
 
 		/// <summary>Interceptor for SkUserFactory delegate.</summary>
@@ -58,28 +58,28 @@ partial class SkValidationTests
 			public int? LastCallArg { get; private set; }
 
 			/// <summary>Callback invoked when delegate is called.</summary>
-			public global::System.Func<Stubs.SkUserFactory, int, KnockOff.Documentation.Samples.Skills.SkUser>? OnCall { get; set; }
+			public global::System.Func<Stubs.SkUserFactory, int, global::KnockOff.Documentation.Samples.Skills.SkUser>? OnCall { get; set; }
 
 			public void RecordCall(int id) { CallCount++; LastCallArg = id; }
 
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub for KnockOff.Documentation.Samples.Skills.SkUserFactory delegate.</summary>
+		/// <summary>Stub for global::KnockOff.Documentation.Samples.Skills.SkUserFactory delegate.</summary>
 		public sealed class SkUserFactory
 		{
 			/// <summary>Interceptor for tracking and configuring delegate behavior.</summary>
 			public SkUserFactoryInterceptor Interceptor { get; } = new();
 
-			private KnockOff.Documentation.Samples.Skills.SkUser Invoke(int id)
+			private global::KnockOff.Documentation.Samples.Skills.SkUser Invoke(int id)
 			{
 				Interceptor.RecordCall(id);
 				if (Interceptor.OnCall is { } onCall) return onCall(this, id);
 				return default!;
 			}
 
-			/// <summary>Implicit conversion to KnockOff.Documentation.Samples.Skills.SkUserFactory.</summary>
-			public static implicit operator KnockOff.Documentation.Samples.Skills.SkUserFactory(SkUserFactory stub) => stub.Invoke;
+			/// <summary>Implicit conversion to global::KnockOff.Documentation.Samples.Skills.SkUserFactory.</summary>
+			public static implicit operator global::KnockOff.Documentation.Samples.Skills.SkUserFactory(SkUserFactory stub) => stub.Invoke;
 		}
 
 	}

@@ -158,10 +158,10 @@ partial class HaSerializerKnockOff
 	/// <summary>Interceptor for Convert (use .Of&lt;T&gt;() to access typed handler).</summary>
 	public ConvertInterceptor Convert { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IHaSerializer.</summary>
-	public KnockOff.Documentation.Samples.Skills.IHaSerializer AsHaSerializer() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.IHaSerializer.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.IHaSerializer AsHaSerializer() => this;
 
-	T KnockOff.Documentation.Samples.Skills.IHaSerializer.Deserialize<T>(string json)
+	T global::KnockOff.Documentation.Samples.Skills.IHaSerializer.Deserialize<T>(string json)
 	{
 		Deserialize.Of<T>().RecordCall(json);
 		if (Deserialize.Of<T>().OnCall is { } callback)
@@ -169,7 +169,7 @@ partial class HaSerializerKnockOff
 		return SmartDefault<T>("Deserialize");
 	}
 
-	TOut KnockOff.Documentation.Samples.Skills.IHaSerializer.Convert<TIn, TOut>(TIn input)
+	TOut global::KnockOff.Documentation.Samples.Skills.IHaSerializer.Convert<TIn, TOut>(TIn input)
 	{
 		Convert.Of<TIn, TOut>().RecordCall();
 		if (Convert.Of<TIn, TOut>().OnCall is { } callback)

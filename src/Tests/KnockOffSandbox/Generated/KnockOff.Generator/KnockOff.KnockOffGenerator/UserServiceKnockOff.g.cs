@@ -130,8 +130,8 @@ partial class UserServiceKnockOff
 	/// <summary>Interceptor for Process.</summary>
 	public ProcessInterceptor Process { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Sandbox.IUserService.</summary>
-	public KnockOff.Sandbox.IUserService AsUserService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Sandbox.IUserService.</summary>
+	public global::KnockOff.Sandbox.IUserService AsUserService() => this;
 
 	/// <summary>Backing storage for Name.</summary>
 	protected string NameBacking { get; set; } = "";
@@ -139,31 +139,31 @@ partial class UserServiceKnockOff
 	/// <summary>Backing storage for Count.</summary>
 	protected int CountBacking { get; set; } = default!;
 
-	string KnockOff.Sandbox.IUserService.Name
+	string global::KnockOff.Sandbox.IUserService.Name
 	{
 		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
 		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else NameBacking = value; }
 	}
 
-	int KnockOff.Sandbox.IUserService.Count
+	int global::KnockOff.Sandbox.IUserService.Count
 	{
 		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? CountBacking; }
 	}
 
-	void KnockOff.Sandbox.IUserService.DoWork()
+	void global::KnockOff.Sandbox.IUserService.DoWork()
 	{
 		DoWork.RecordCall();
 		DoWork.OnCall?.Invoke(this);
 	}
 
-	string KnockOff.Sandbox.IUserService.GetGreeting(string name)
+	string global::KnockOff.Sandbox.IUserService.GetGreeting(string name)
 	{
 		GetGreeting2.RecordCall(name);
-		if (GetGreeting2.OnCall != null) return GetGreeting2.OnCall(this, name);
+		if (GetGreeting2.OnCall is { } callback) return callback(this, name);
 		return GetGreeting(name);
 	}
 
-	void KnockOff.Sandbox.IUserService.Process(string id, int count, bool urgent)
+	void global::KnockOff.Sandbox.IUserService.Process(string id, int count, bool urgent)
 	{
 		Process.RecordCall(id, count, urgent);
 		Process.OnCall?.Invoke(this, id, count, urgent);

@@ -24,13 +24,13 @@ partial class PropSecureKnockOff
 	/// <summary>Interceptor for SecretKey.</summary>
 	public SecretKeyInterceptor SecretKey { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IPropSecure.</summary>
-	public KnockOff.Documentation.Samples.Guides.IPropSecure AsPropSecure() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IPropSecure.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IPropSecure AsPropSecure() => this;
 
 	/// <summary>Backing storage for SecretKey.</summary>
 	protected string SecretKeyBacking { get; set; } = "";
 
-	string KnockOff.Documentation.Samples.Guides.IPropSecure.SecretKey
+	string global::KnockOff.Documentation.Samples.Guides.IPropSecure.SecretKey
 	{
 		get { SecretKey.RecordGet(); return SecretKey.OnGet?.Invoke(this) ?? SecretKeyBacking; }
 	}

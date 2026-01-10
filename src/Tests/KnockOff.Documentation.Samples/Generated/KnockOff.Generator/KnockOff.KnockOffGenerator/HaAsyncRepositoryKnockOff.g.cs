@@ -61,16 +61,16 @@ partial class HaAsyncRepositoryKnockOff
 	/// <summary>Interceptor for SaveAsync.</summary>
 	public SaveAsyncInterceptor SaveAsync { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IHaAsyncRepository.</summary>
-	public KnockOff.Documentation.Samples.Skills.IHaAsyncRepository AsHaAsyncRepository() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.IHaAsyncRepository.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.IHaAsyncRepository AsHaAsyncRepository() => this;
 
-	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.HaUser?> KnockOff.Documentation.Samples.Skills.IHaAsyncRepository.GetByIdAsync(int id)
+	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.HaUser?> global::KnockOff.Documentation.Samples.Skills.IHaAsyncRepository.GetByIdAsync(int id)
 	{
 		GetByIdAsync.RecordCall(id);
 		return GetByIdAsync.OnCall?.Invoke(this, id) ?? global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Skills.HaUser?>(default!);
 	}
 
-	global::System.Threading.Tasks.Task<int> KnockOff.Documentation.Samples.Skills.IHaAsyncRepository.SaveAsync(object entity)
+	global::System.Threading.Tasks.Task<int> global::KnockOff.Documentation.Samples.Skills.IHaAsyncRepository.SaveAsync(object entity)
 	{
 		SaveAsync.RecordCall(entity);
 		return SaveAsync.OnCall?.Invoke(this, entity) ?? global::System.Threading.Tasks.Task.FromResult<int>(default!);

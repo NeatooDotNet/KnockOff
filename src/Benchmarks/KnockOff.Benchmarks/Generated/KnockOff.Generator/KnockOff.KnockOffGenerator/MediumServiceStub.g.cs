@@ -261,46 +261,46 @@ partial class MediumServiceStub
 	/// <summary>Interceptor for Method10.</summary>
 	public Method10Interceptor Method10 { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Benchmarks.Interfaces.IMediumService.</summary>
-	public KnockOff.Benchmarks.Interfaces.IMediumService AsMediumService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Benchmarks.Interfaces.IMediumService.</summary>
+	public global::KnockOff.Benchmarks.Interfaces.IMediumService AsMediumService() => this;
 
-	void KnockOff.Benchmarks.Interfaces.IMediumService.Method1()
+	void global::KnockOff.Benchmarks.Interfaces.IMediumService.Method1()
 	{
 		Method1.RecordCall();
 		Method1.OnCall?.Invoke(this);
 	}
 
-	void KnockOff.Benchmarks.Interfaces.IMediumService.Method2(int param)
+	void global::KnockOff.Benchmarks.Interfaces.IMediumService.Method2(int param)
 	{
 		Method2.RecordCall(param);
 		Method2.OnCall?.Invoke(this, param);
 	}
 
-	void KnockOff.Benchmarks.Interfaces.IMediumService.Method3(string param)
+	void global::KnockOff.Benchmarks.Interfaces.IMediumService.Method3(string param)
 	{
 		Method3.RecordCall(param);
 		Method3.OnCall?.Invoke(this, param);
 	}
 
-	void KnockOff.Benchmarks.Interfaces.IMediumService.Method4(int a, string b)
+	void global::KnockOff.Benchmarks.Interfaces.IMediumService.Method4(int a, string b)
 	{
 		Method4.RecordCall(a, b);
 		Method4.OnCall?.Invoke(this, a, b);
 	}
 
-	void KnockOff.Benchmarks.Interfaces.IMediumService.Method5(int a, int b, int c)
+	void global::KnockOff.Benchmarks.Interfaces.IMediumService.Method5(int a, int b, int c)
 	{
 		Method5.RecordCall(a, b, c);
 		Method5.OnCall?.Invoke(this, a, b, c);
 	}
 
-	int KnockOff.Benchmarks.Interfaces.IMediumService.Method6()
+	int global::KnockOff.Benchmarks.Interfaces.IMediumService.Method6()
 	{
 		Method6.RecordCall();
 		return Method6.OnCall?.Invoke(this) ?? default!;
 	}
 
-	string KnockOff.Benchmarks.Interfaces.IMediumService.Method7()
+	string global::KnockOff.Benchmarks.Interfaces.IMediumService.Method7()
 	{
 		Method7.RecordCall();
 		if (Method7.OnCall is { } callback)
@@ -308,13 +308,13 @@ partial class MediumServiceStub
 		throw new global::System.InvalidOperationException("No implementation provided for Method7. Set Method7.OnCall or define a protected method 'Method7' in your partial class.");
 	}
 
-	int KnockOff.Benchmarks.Interfaces.IMediumService.Method8(int param)
+	int global::KnockOff.Benchmarks.Interfaces.IMediumService.Method8(int param)
 	{
 		Method8.RecordCall(param);
 		return Method8.OnCall?.Invoke(this, param) ?? default!;
 	}
 
-	string KnockOff.Benchmarks.Interfaces.IMediumService.Method9(string param)
+	string global::KnockOff.Benchmarks.Interfaces.IMediumService.Method9(string param)
 	{
 		Method9.RecordCall(param);
 		if (Method9.OnCall is { } callback)
@@ -322,7 +322,7 @@ partial class MediumServiceStub
 		throw new global::System.InvalidOperationException("No implementation provided for Method9. Set Method9.OnCall or define a protected method 'Method9' in your partial class.");
 	}
 
-	bool KnockOff.Benchmarks.Interfaces.IMediumService.Method10(int a, string b)
+	bool global::KnockOff.Benchmarks.Interfaces.IMediumService.Method10(int a, string b)
 	{
 		Method10.RecordCall(a, b);
 		return Method10.OnCall?.Invoke(this, a, b) ?? default!;

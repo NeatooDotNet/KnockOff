@@ -28,13 +28,13 @@ partial class SkPartialPropertyTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of KnockOff.Documentation.Samples.Skills.ISkInlineUserService.</summary>
-		public class ISkInlineUserService : KnockOff.Documentation.Samples.Skills.ISkInlineUserService
+		/// <summary>Stub implementation of global::KnockOff.Documentation.Samples.Skills.ISkInlineUserService.</summary>
+		public class ISkInlineUserService : global::KnockOff.Documentation.Samples.Skills.ISkInlineUserService
 		{
 			/// <summary>Interceptor for GetUser.</summary>
 			public ISkInlineUserService_GetUserInterceptor GetUser { get; } = new();
 
-			global::KnockOff.Documentation.Samples.Skills.SkUser? KnockOff.Documentation.Samples.Skills.ISkInlineUserService.GetUser(int id)
+			global::KnockOff.Documentation.Samples.Skills.SkUser? global::KnockOff.Documentation.Samples.Skills.ISkInlineUserService.GetUser(int id)
 			{
 				GetUser.RecordCall(id);
 				if (GetUser.OnCall is { } onCall) return onCall(this, id);

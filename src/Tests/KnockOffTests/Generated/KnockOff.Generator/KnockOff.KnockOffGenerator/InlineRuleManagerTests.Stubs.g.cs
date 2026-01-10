@@ -244,8 +244,8 @@ partial class InlineRuleManagerTests
 			}
 		}
 
-		/// <summary>Stub implementation of Neatoo.Rules.IRuleManager.</summary>
-		public class IRuleManager : Neatoo.Rules.IRuleManager
+		/// <summary>Stub implementation of global::Neatoo.Rules.IRuleManager.</summary>
+		public class IRuleManager : global::Neatoo.Rules.IRuleManager
 		{
 			/// <summary>Interceptor for Rules.</summary>
 			public IRuleManager_RulesInterceptor Rules { get; } = new();
@@ -265,21 +265,21 @@ partial class InlineRuleManagerTests
 			/// <summary>Interceptor for RunRule (generic overloads, use .Of&lt;T&gt;()).</summary>
 			public IRuleManager_RunRuleGenericInterceptor RunRuleGeneric { get; } = new();
 
-			global::System.Threading.Tasks.Task Neatoo.Rules.IRuleManager.RunRules(string propertyName, global::System.Threading.CancellationToken? token)
+			global::System.Threading.Tasks.Task global::Neatoo.Rules.IRuleManager.RunRules(string propertyName, global::System.Threading.CancellationToken? token)
 			{
 				RunRules.RecordCall(propertyName, token, null);
 				if (RunRules.OnCall is { } onCall) return onCall(this, propertyName, token, null);
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
-			global::System.Threading.Tasks.Task Neatoo.Rules.IRuleManager.RunRules(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
+			global::System.Threading.Tasks.Task global::Neatoo.Rules.IRuleManager.RunRules(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
 			{
 				RunRules.RecordCall(null, token, runRules);
 				if (RunRules.OnCall is { } onCall) return onCall(this, null, token, runRules);
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
-			void Neatoo.Rules.IRuleManager.AddRule<T>(global::Neatoo.Rules.IRule<T> rule)
+			void global::Neatoo.Rules.IRuleManager.AddRule<T>(global::Neatoo.Rules.IRule<T> rule)
 			{
 				var typedHandler = AddRule.Of<T>();
 				typedHandler.RecordCall();
@@ -287,7 +287,7 @@ partial class InlineRuleManagerTests
 				{ onCallCallback(this, rule); return; }
 			}
 
-			void Neatoo.Rules.IRuleManager.AddRules<T>(global::Neatoo.Rules.IRule<T>[] rules)
+			void global::Neatoo.Rules.IRuleManager.AddRules<T>(global::Neatoo.Rules.IRule<T>[] rules)
 			{
 				var typedHandler = AddRules.Of<T>();
 				typedHandler.RecordCall();
@@ -295,14 +295,14 @@ partial class InlineRuleManagerTests
 				{ onCallCallback(this, rules); return; }
 			}
 
-			global::System.Threading.Tasks.Task Neatoo.Rules.IRuleManager.RunRule(global::Neatoo.Rules.IRule r, global::System.Threading.CancellationToken? token)
+			global::System.Threading.Tasks.Task global::Neatoo.Rules.IRuleManager.RunRule(global::Neatoo.Rules.IRule r, global::System.Threading.CancellationToken? token)
 			{
 				RunRule.RecordCall(r, token);
 				if (RunRule.OnCall is { } onCall) return onCall(this, r, token);
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
-			global::System.Threading.Tasks.Task Neatoo.Rules.IRuleManager.RunRule<T>(global::System.Threading.CancellationToken? token)
+			global::System.Threading.Tasks.Task global::Neatoo.Rules.IRuleManager.RunRule<T>(global::System.Threading.CancellationToken? token)
 			{
 				var typedHandler = RunRuleGeneric.Of<T>();
 				typedHandler.RecordCall(token);
@@ -311,7 +311,7 @@ partial class InlineRuleManagerTests
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
-			global::System.Collections.Generic.IEnumerable<global::Neatoo.Rules.IRule> Neatoo.Rules.IRuleManager.Rules
+			global::System.Collections.Generic.IEnumerable<global::Neatoo.Rules.IRule> global::Neatoo.Rules.IRuleManager.Rules
 			{
 				get
 				{

@@ -36,13 +36,13 @@ partial class HaPropertyServiceKnockOff
 	/// <summary>Interceptor for Name.</summary>
 	public NameInterceptor Name { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IHaPropertyService.</summary>
-	public KnockOff.Documentation.Samples.Skills.IHaPropertyService AsHaPropertyService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.IHaPropertyService.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.IHaPropertyService AsHaPropertyService() => this;
 
 	/// <summary>Backing storage for Name.</summary>
 	protected string NameBacking { get; set; } = "";
 
-	string KnockOff.Documentation.Samples.Skills.IHaPropertyService.Name
+	string global::KnockOff.Documentation.Samples.Skills.IHaPropertyService.Name
 	{
 		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
 		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else NameBacking = value; }

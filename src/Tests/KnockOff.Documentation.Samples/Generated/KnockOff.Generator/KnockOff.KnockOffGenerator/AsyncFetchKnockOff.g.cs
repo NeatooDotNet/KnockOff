@@ -33,10 +33,10 @@ partial class AsyncFetchKnockOff
 	/// <summary>Interceptor for FetchAsync.</summary>
 	public FetchAsyncInterceptor FetchAsync { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IAsyncFetch.</summary>
-	public KnockOff.Documentation.Samples.Guides.IAsyncFetch AsAsyncFetch() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IAsyncFetch.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IAsyncFetch AsAsyncFetch() => this;
 
-	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.AsyncData> KnockOff.Documentation.Samples.Guides.IAsyncFetch.FetchAsync(int id, global::System.Threading.CancellationToken ct)
+	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.AsyncData> global::KnockOff.Documentation.Samples.Guides.IAsyncFetch.FetchAsync(int id, global::System.Threading.CancellationToken ct)
 	{
 		FetchAsync.RecordCall(id, ct);
 		return FetchAsync.OnCall?.Invoke(this, id, ct) ?? global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Guides.AsyncData>(new global::KnockOff.Documentation.Samples.Guides.AsyncData());

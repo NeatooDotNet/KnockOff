@@ -335,8 +335,8 @@ partial class DbCommandStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Data.IDbCommand.</summary>
-		public class IDbCommand : System.Data.IDbCommand
+		/// <summary>Stub implementation of global::System.Data.IDbCommand.</summary>
+		public class IDbCommand : global::System.Data.IDbCommand
 		{
 			/// <summary>Interceptor for CommandText.</summary>
 			public IDbCommand_CommandTextInterceptor CommandText { get; } = new();
@@ -380,54 +380,54 @@ partial class DbCommandStubTests
 			/// <summary>Interceptor for Dispose.</summary>
 			public IDbCommand_DisposeInterceptor Dispose { get; } = new();
 
-			void System.Data.IDbCommand.Cancel()
+			void global::System.Data.IDbCommand.Cancel()
 			{
 				Cancel.RecordCall();
 				if (Cancel.OnCall is { } onCall) onCall(this);
 			}
 
-			global::System.Data.IDbDataParameter System.Data.IDbCommand.CreateParameter()
+			global::System.Data.IDbDataParameter global::System.Data.IDbCommand.CreateParameter()
 			{
 				CreateParameter.RecordCall();
 				if (CreateParameter.OnCall is { } onCall) return onCall(this);
 				throw new global::System.InvalidOperationException("No implementation provided for CreateParameter. Set CreateParameter.OnCall.");
 			}
 
-			int System.Data.IDbCommand.ExecuteNonQuery()
+			int global::System.Data.IDbCommand.ExecuteNonQuery()
 			{
 				ExecuteNonQuery.RecordCall();
 				if (ExecuteNonQuery.OnCall is { } onCall) return onCall(this);
 				return default!;
 			}
 
-			global::System.Data.IDataReader System.Data.IDbCommand.ExecuteReader()
+			global::System.Data.IDataReader global::System.Data.IDbCommand.ExecuteReader()
 			{
 				ExecuteReader.RecordCall(null);
 				if (ExecuteReader.OnCall is { } onCall) return onCall(this, null);
 				throw new global::System.InvalidOperationException("No implementation provided for ExecuteReader. Set ExecuteReader.OnCall.");
 			}
 
-			global::System.Data.IDataReader System.Data.IDbCommand.ExecuteReader(global::System.Data.CommandBehavior behavior)
+			global::System.Data.IDataReader global::System.Data.IDbCommand.ExecuteReader(global::System.Data.CommandBehavior behavior)
 			{
 				ExecuteReader.RecordCall(behavior);
 				if (ExecuteReader.OnCall is { } onCall) return onCall(this, behavior);
 				throw new global::System.InvalidOperationException("No implementation provided for ExecuteReader. Set ExecuteReader.OnCall.");
 			}
 
-			object? System.Data.IDbCommand.ExecuteScalar()
+			object? global::System.Data.IDbCommand.ExecuteScalar()
 			{
 				ExecuteScalar.RecordCall();
 				if (ExecuteScalar.OnCall is { } onCall) return onCall(this);
 				return default!;
 			}
 
-			void System.Data.IDbCommand.Prepare()
+			void global::System.Data.IDbCommand.Prepare()
 			{
 				Prepare.RecordCall();
 				if (Prepare.OnCall is { } onCall) onCall(this);
 			}
 
-			string System.Data.IDbCommand.CommandText
+			string global::System.Data.IDbCommand.CommandText
 			{
 				get
 				{
@@ -435,15 +435,18 @@ partial class DbCommandStubTests
 					if (CommandText.OnGet is { } onGet) return onGet(this);
 					return CommandText.Value;
 				}
+#pragma warning disable CS8769
 				set
 				{
 					CommandText.RecordSet(value);
 					if (CommandText.OnSet is { } onSet) onSet(this, value);
 					else CommandText.Value = value;
 				}
+
+#pragma warning restore CS8769
 			}
 
-			int System.Data.IDbCommand.CommandTimeout
+			int global::System.Data.IDbCommand.CommandTimeout
 			{
 				get
 				{
@@ -459,7 +462,7 @@ partial class DbCommandStubTests
 				}
 			}
 
-			global::System.Data.CommandType System.Data.IDbCommand.CommandType
+			global::System.Data.CommandType global::System.Data.IDbCommand.CommandType
 			{
 				get
 				{
@@ -475,7 +478,7 @@ partial class DbCommandStubTests
 				}
 			}
 
-			global::System.Data.IDbConnection? System.Data.IDbCommand.Connection
+			global::System.Data.IDbConnection? global::System.Data.IDbCommand.Connection
 			{
 				get
 				{
@@ -491,7 +494,7 @@ partial class DbCommandStubTests
 				}
 			}
 
-			global::System.Data.IDataParameterCollection System.Data.IDbCommand.Parameters
+			global::System.Data.IDataParameterCollection global::System.Data.IDbCommand.Parameters
 			{
 				get
 				{
@@ -501,7 +504,7 @@ partial class DbCommandStubTests
 				}
 			}
 
-			global::System.Data.IDbTransaction? System.Data.IDbCommand.Transaction
+			global::System.Data.IDbTransaction? global::System.Data.IDbCommand.Transaction
 			{
 				get
 				{
@@ -517,7 +520,7 @@ partial class DbCommandStubTests
 				}
 			}
 
-			global::System.Data.UpdateRowSource System.Data.IDbCommand.UpdatedRowSource
+			global::System.Data.UpdateRowSource global::System.Data.IDbCommand.UpdatedRowSource
 			{
 				get
 				{
@@ -533,7 +536,7 @@ partial class DbCommandStubTests
 				}
 			}
 
-			void System.IDisposable.Dispose()
+			void global::System.IDisposable.Dispose()
 			{
 				Dispose.RecordCall();
 				if (Dispose.OnCall is { } onCall) onCall(this);

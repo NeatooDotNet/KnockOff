@@ -27,13 +27,13 @@ partial class PropertyStoreKnockOff
 	/// <summary>Interceptor for StringIndexer.</summary>
 	public StringIndexerInterceptor StringIndexer { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Tests.IPropertyStore.</summary>
-	public KnockOff.Tests.IPropertyStore AsPropertyStore() => this;
+	/// <summary>Returns this instance as global::KnockOff.Tests.IPropertyStore.</summary>
+	public global::KnockOff.Tests.IPropertyStore AsPropertyStore() => this;
 
 	/// <summary>Backing storage for StringIndexer indexer.</summary>
 	public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Tests.PropertyInfo?> StringIndexerBacking { get; } = new();
 
-	global::KnockOff.Tests.PropertyInfo? KnockOff.Tests.IPropertyStore.this[string key]
+	global::KnockOff.Tests.PropertyInfo? global::KnockOff.Tests.IPropertyStore.this[string key]
 	{
 		get { StringIndexer.RecordGet(key); if (StringIndexer.OnGet != null) return StringIndexer.OnGet(this, key); return StringIndexerBacking.TryGetValue(key, out var v) ? v : default; }
 	}

@@ -64,20 +64,20 @@ partial class UserServiceKnockOff
 	/// <summary>Interceptor for GetUser.</summary>
 	public GetUser2Interceptor GetUser2 { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple.</summary>
-	public KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple AsUserServiceSimple() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple.</summary>
+	public global::KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple AsUserServiceSimple() => this;
 
 	/// <summary>Backing storage for Name.</summary>
 	protected string NameBacking { get; set; } = "";
 
-	global::KnockOff.Documentation.Samples.GettingStarted.User KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple.GetUser(int id)
+	global::KnockOff.Documentation.Samples.GettingStarted.User global::KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple.GetUser(int id)
 	{
 		GetUser2.RecordCall(id);
-		if (GetUser2.OnCall != null) return GetUser2.OnCall(this, id);
+		if (GetUser2.OnCall is { } callback) return callback(this, id);
 		return GetUser(id);
 	}
 
-	string KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple.Name
+	string global::KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple.Name
 	{
 		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
 		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else NameBacking = value; }

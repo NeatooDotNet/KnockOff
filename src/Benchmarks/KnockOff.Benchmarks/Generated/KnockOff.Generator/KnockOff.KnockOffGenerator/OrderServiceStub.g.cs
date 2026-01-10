@@ -167,40 +167,40 @@ partial class OrderServiceStub
 	/// <summary>Interceptor for CalculateTotal.</summary>
 	public CalculateTotalInterceptor CalculateTotal { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Benchmarks.Interfaces.IOrderService.</summary>
-	public KnockOff.Benchmarks.Interfaces.IOrderService AsOrderService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Benchmarks.Interfaces.IOrderService.</summary>
+	public global::KnockOff.Benchmarks.Interfaces.IOrderService AsOrderService() => this;
 
-	global::KnockOff.Benchmarks.Interfaces.Order? KnockOff.Benchmarks.Interfaces.IOrderService.GetOrder(int orderId)
+	global::KnockOff.Benchmarks.Interfaces.Order? global::KnockOff.Benchmarks.Interfaces.IOrderService.GetOrder(int orderId)
 	{
 		GetOrder.RecordCall(orderId);
 		return GetOrder.OnCall?.Invoke(this, orderId) ?? default!;
 	}
 
-	global::System.Collections.Generic.IEnumerable<global::KnockOff.Benchmarks.Interfaces.Order> KnockOff.Benchmarks.Interfaces.IOrderService.GetOrdersByCustomer(int customerId)
+	global::System.Collections.Generic.IEnumerable<global::KnockOff.Benchmarks.Interfaces.Order> global::KnockOff.Benchmarks.Interfaces.IOrderService.GetOrdersByCustomer(int customerId)
 	{
 		GetOrdersByCustomer.RecordCall(customerId);
 		return GetOrdersByCustomer.OnCall?.Invoke(this, customerId) ?? new global::System.Collections.Generic.List<global::KnockOff.Benchmarks.Interfaces.Order>();
 	}
 
-	void KnockOff.Benchmarks.Interfaces.IOrderService.SaveOrder(global::KnockOff.Benchmarks.Interfaces.Order order)
+	void global::KnockOff.Benchmarks.Interfaces.IOrderService.SaveOrder(global::KnockOff.Benchmarks.Interfaces.Order order)
 	{
 		SaveOrder.RecordCall(order);
 		SaveOrder.OnCall?.Invoke(this, order);
 	}
 
-	void KnockOff.Benchmarks.Interfaces.IOrderService.DeleteOrder(int orderId)
+	void global::KnockOff.Benchmarks.Interfaces.IOrderService.DeleteOrder(int orderId)
 	{
 		DeleteOrder.RecordCall(orderId);
 		DeleteOrder.OnCall?.Invoke(this, orderId);
 	}
 
-	bool KnockOff.Benchmarks.Interfaces.IOrderService.ValidateOrder(global::KnockOff.Benchmarks.Interfaces.Order order)
+	bool global::KnockOff.Benchmarks.Interfaces.IOrderService.ValidateOrder(global::KnockOff.Benchmarks.Interfaces.Order order)
 	{
 		ValidateOrder.RecordCall(order);
 		return ValidateOrder.OnCall?.Invoke(this, order) ?? default!;
 	}
 
-	decimal KnockOff.Benchmarks.Interfaces.IOrderService.CalculateTotal(global::KnockOff.Benchmarks.Interfaces.Order order)
+	decimal global::KnockOff.Benchmarks.Interfaces.IOrderService.CalculateTotal(global::KnockOff.Benchmarks.Interfaces.Order order)
 	{
 		CalculateTotal.RecordCall(order);
 		return CalculateTotal.OnCall?.Invoke(this, order) ?? default!;

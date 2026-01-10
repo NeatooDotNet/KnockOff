@@ -97,8 +97,8 @@ partial class DbTransactionStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Data.IDbTransaction.</summary>
-		public class IDbTransaction : System.Data.IDbTransaction
+		/// <summary>Stub implementation of global::System.Data.IDbTransaction.</summary>
+		public class IDbTransaction : global::System.Data.IDbTransaction
 		{
 			/// <summary>Interceptor for Connection.</summary>
 			public IDbTransaction_ConnectionInterceptor Connection { get; } = new();
@@ -115,19 +115,19 @@ partial class DbTransactionStubTests
 			/// <summary>Interceptor for Dispose.</summary>
 			public IDbTransaction_DisposeInterceptor Dispose { get; } = new();
 
-			void System.Data.IDbTransaction.Commit()
+			void global::System.Data.IDbTransaction.Commit()
 			{
 				Commit.RecordCall();
 				if (Commit.OnCall is { } onCall) onCall(this);
 			}
 
-			void System.Data.IDbTransaction.Rollback()
+			void global::System.Data.IDbTransaction.Rollback()
 			{
 				Rollback.RecordCall();
 				if (Rollback.OnCall is { } onCall) onCall(this);
 			}
 
-			global::System.Data.IDbConnection? System.Data.IDbTransaction.Connection
+			global::System.Data.IDbConnection? global::System.Data.IDbTransaction.Connection
 			{
 				get
 				{
@@ -137,7 +137,7 @@ partial class DbTransactionStubTests
 				}
 			}
 
-			global::System.Data.IsolationLevel System.Data.IDbTransaction.IsolationLevel
+			global::System.Data.IsolationLevel global::System.Data.IDbTransaction.IsolationLevel
 			{
 				get
 				{
@@ -147,7 +147,7 @@ partial class DbTransactionStubTests
 				}
 			}
 
-			void System.IDisposable.Dispose()
+			void global::System.IDisposable.Dispose()
 			{
 				Dispose.RecordCall();
 				if (Dispose.OnCall is { } onCall) onCall(this);

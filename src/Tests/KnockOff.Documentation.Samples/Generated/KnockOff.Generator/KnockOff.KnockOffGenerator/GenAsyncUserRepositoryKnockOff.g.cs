@@ -86,22 +86,22 @@ partial class GenAsyncUserRepositoryKnockOff
 	/// <summary>Interceptor for SaveAsync.</summary>
 	public SaveAsyncInterceptor SaveAsync { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
-	public KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<KnockOff.Documentation.Samples.Guides.GenUser> AsGenAsyncRepository() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<global::KnockOff.Documentation.Samples.Guides.GenUser> AsGenAsyncRepository() => this;
 
-	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.GenUser?> KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<KnockOff.Documentation.Samples.Guides.GenUser>.GetByIdAsync(int id)
+	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.GenUser?> global::KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>.GetByIdAsync(int id)
 	{
 		GetByIdAsync.RecordCall(id);
 		return GetByIdAsync.OnCall?.Invoke(this, id) ?? global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Guides.GenUser?>(default!);
 	}
 
-	global::System.Threading.Tasks.Task<global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Guides.GenUser>> KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<KnockOff.Documentation.Samples.Guides.GenUser>.GetAllAsync()
+	global::System.Threading.Tasks.Task<global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Guides.GenUser>> global::KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>.GetAllAsync()
 	{
 		GetAllAsync.RecordCall();
 		return GetAllAsync.OnCall?.Invoke(this) ?? global::System.Threading.Tasks.Task.FromResult<global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Guides.GenUser>>(new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Guides.GenUser>());
 	}
 
-	global::System.Threading.Tasks.Task KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<KnockOff.Documentation.Samples.Guides.GenUser>.SaveAsync(global::KnockOff.Documentation.Samples.Guides.GenUser entity)
+	global::System.Threading.Tasks.Task global::KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>.SaveAsync(global::KnockOff.Documentation.Samples.Guides.GenUser entity)
 	{
 		SaveAsync.RecordCall(entity);
 		return SaveAsync.OnCall?.Invoke(this, entity) ?? global::System.Threading.Tasks.Task.CompletedTask;

@@ -192,49 +192,49 @@ partial class MigUserServiceKnockOff
 	/// <summary>Interceptor for Update.</summary>
 	public UpdateInterceptor Update { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IMigUserService.</summary>
-	public KnockOff.Documentation.Samples.Comparison.IMigUserService AsMigUserService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Comparison.IMigUserService.</summary>
+	public global::KnockOff.Documentation.Samples.Comparison.IMigUserService AsMigUserService() => this;
 
 	/// <summary>Backing storage for Name.</summary>
 	protected string NameBacking { get; set; } = "";
 
-	global::KnockOff.Documentation.Samples.Comparison.MigUser KnockOff.Documentation.Samples.Comparison.IMigUserService.GetUser(int id)
+	global::KnockOff.Documentation.Samples.Comparison.MigUser global::KnockOff.Documentation.Samples.Comparison.IMigUserService.GetUser(int id)
 	{
 		GetUser.RecordCall(id);
 		return GetUser.OnCall?.Invoke(this, id) ?? new global::KnockOff.Documentation.Samples.Comparison.MigUser();
 	}
 
-	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Comparison.MigUser?> KnockOff.Documentation.Samples.Comparison.IMigUserService.GetUserAsync(int id)
+	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Comparison.MigUser?> global::KnockOff.Documentation.Samples.Comparison.IMigUserService.GetUserAsync(int id)
 	{
 		GetUserAsync.RecordCall(id);
 		return GetUserAsync.OnCall?.Invoke(this, id) ?? global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Comparison.MigUser?>(default!);
 	}
 
-	void KnockOff.Documentation.Samples.Comparison.IMigUserService.Save(global::KnockOff.Documentation.Samples.Comparison.MigUser user)
+	void global::KnockOff.Documentation.Samples.Comparison.IMigUserService.Save(global::KnockOff.Documentation.Samples.Comparison.MigUser user)
 	{
 		Save.RecordCall(user);
 		Save.OnCall?.Invoke(this, user);
 	}
 
-	void KnockOff.Documentation.Samples.Comparison.IMigUserService.Delete(int id)
+	void global::KnockOff.Documentation.Samples.Comparison.IMigUserService.Delete(int id)
 	{
 		Delete.RecordCall(id);
 		Delete.OnCall?.Invoke(this, id);
 	}
 
-	global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Comparison.MigUser> KnockOff.Documentation.Samples.Comparison.IMigUserService.GetAll()
+	global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Comparison.MigUser> global::KnockOff.Documentation.Samples.Comparison.IMigUserService.GetAll()
 	{
 		GetAll.RecordCall();
 		return GetAll.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Comparison.MigUser>();
 	}
 
-	void KnockOff.Documentation.Samples.Comparison.IMigUserService.Update(global::KnockOff.Documentation.Samples.Comparison.MigUser user)
+	void global::KnockOff.Documentation.Samples.Comparison.IMigUserService.Update(global::KnockOff.Documentation.Samples.Comparison.MigUser user)
 	{
 		Update.RecordCall(user);
 		Update.OnCall?.Invoke(this, user);
 	}
 
-	string KnockOff.Documentation.Samples.Comparison.IMigUserService.Name
+	string global::KnockOff.Documentation.Samples.Comparison.IMigUserService.Name
 	{
 		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
 		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else NameBacking = value; }

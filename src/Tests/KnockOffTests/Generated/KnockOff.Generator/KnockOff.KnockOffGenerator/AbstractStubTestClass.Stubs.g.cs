@@ -61,7 +61,7 @@ partial class AbstractStubTestClass
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub for KnockOff.Tests.AbstractRepository via composition.</summary>
+		/// <summary>Stub for global::KnockOff.Tests.AbstractRepository via composition.</summary>
 		public class AbstractRepository
 		{
 			/// <summary>Interceptor for ConnectionString.</summary>
@@ -71,8 +71,8 @@ partial class AbstractStubTestClass
 			/// <summary>Interceptor for Execute.</summary>
 			public AbstractRepository_ExecuteInterceptor Execute { get; } = new();
 
-			/// <summary>The KnockOff.Tests.AbstractRepository instance. Pass this to code expecting the target class.</summary>
-			public KnockOff.Tests.AbstractRepository Object { get; }
+			/// <summary>The global::KnockOff.Tests.AbstractRepository instance. Pass this to code expecting the target class.</summary>
+			public global::KnockOff.Tests.AbstractRepository Object { get; }
 
 			public AbstractRepository()
 			{
@@ -87,8 +87,8 @@ partial class AbstractStubTestClass
 				Execute.Reset();
 			}
 
-			/// <summary>Internal implementation that inherits from KnockOff.Tests.AbstractRepository.</summary>
-			private sealed class Impl : KnockOff.Tests.AbstractRepository
+			/// <summary>Internal implementation that inherits from global::KnockOff.Tests.AbstractRepository.</summary>
+			private sealed class Impl : global::KnockOff.Tests.AbstractRepository
 			{
 				private readonly AbstractRepository _stub;
 

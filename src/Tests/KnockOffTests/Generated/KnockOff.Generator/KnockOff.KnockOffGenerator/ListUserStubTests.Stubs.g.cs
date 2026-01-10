@@ -251,8 +251,8 @@ partial class ListUserStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Collections.Generic.IList<KnockOff.Tests.User>.</summary>
-		public class IList : System.Collections.Generic.IList<KnockOff.Tests.User>
+		/// <summary>Stub implementation of global::System.Collections.Generic.IList<global::KnockOff.Tests.User>.</summary>
+		public class IList : global::System.Collections.Generic.IList<global::KnockOff.Tests.User>
 		{
 			/// <summary>Interceptor for Int32Indexer.</summary>
 			public IList_Int32IndexerInterceptor Int32Indexer { get; } = new();
@@ -290,26 +290,26 @@ partial class ListUserStubTests
 			/// <summary>Interceptor for GetEnumerator.</summary>
 			public IList_GetEnumeratorInterceptor GetEnumerator { get; } = new();
 
-			int System.Collections.Generic.IList<KnockOff.Tests.User>.IndexOf(global::KnockOff.Tests.User item)
+			int global::System.Collections.Generic.IList<global::KnockOff.Tests.User>.IndexOf(global::KnockOff.Tests.User item)
 			{
 				IndexOf.RecordCall(item);
 				if (IndexOf.OnCall is { } onCall) return onCall(this, item);
 				return default!;
 			}
 
-			void System.Collections.Generic.IList<KnockOff.Tests.User>.Insert(int index, global::KnockOff.Tests.User item)
+			void global::System.Collections.Generic.IList<global::KnockOff.Tests.User>.Insert(int index, global::KnockOff.Tests.User item)
 			{
 				Insert.RecordCall(index, item);
 				if (Insert.OnCall is { } onCall) onCall(this, index, item);
 			}
 
-			void System.Collections.Generic.IList<KnockOff.Tests.User>.RemoveAt(int index)
+			void global::System.Collections.Generic.IList<global::KnockOff.Tests.User>.RemoveAt(int index)
 			{
 				RemoveAt.RecordCall(index);
 				if (RemoveAt.OnCall is { } onCall) onCall(this, index);
 			}
 
-			global::KnockOff.Tests.User System.Collections.Generic.IList<KnockOff.Tests.User>.this[int index]
+			global::KnockOff.Tests.User global::System.Collections.Generic.IList<global::KnockOff.Tests.User>.this[int index]
 			{
 				get
 				{
@@ -324,39 +324,39 @@ partial class ListUserStubTests
 				}
 			}
 
-			void System.Collections.Generic.ICollection<KnockOff.Tests.User>.Add(global::KnockOff.Tests.User item)
+			void global::System.Collections.Generic.ICollection<global::KnockOff.Tests.User>.Add(global::KnockOff.Tests.User item)
 			{
 				Add.RecordCall(item);
 				if (Add.OnCall is { } onCall) onCall(this, item);
 			}
 
-			void System.Collections.Generic.ICollection<KnockOff.Tests.User>.Clear()
+			void global::System.Collections.Generic.ICollection<global::KnockOff.Tests.User>.Clear()
 			{
 				Clear.RecordCall();
 				if (Clear.OnCall is { } onCall) onCall(this);
 			}
 
-			bool System.Collections.Generic.ICollection<KnockOff.Tests.User>.Contains(global::KnockOff.Tests.User item)
+			bool global::System.Collections.Generic.ICollection<global::KnockOff.Tests.User>.Contains(global::KnockOff.Tests.User item)
 			{
 				Contains.RecordCall(item);
 				if (Contains.OnCall is { } onCall) return onCall(this, item);
 				return default!;
 			}
 
-			void System.Collections.Generic.ICollection<KnockOff.Tests.User>.CopyTo(global::KnockOff.Tests.User[] array, int arrayIndex)
+			void global::System.Collections.Generic.ICollection<global::KnockOff.Tests.User>.CopyTo(global::KnockOff.Tests.User[] array, int arrayIndex)
 			{
 				CopyTo.RecordCall(array, arrayIndex);
 				if (CopyTo.OnCall is { } onCall) onCall(this, array, arrayIndex);
 			}
 
-			bool System.Collections.Generic.ICollection<KnockOff.Tests.User>.Remove(global::KnockOff.Tests.User item)
+			bool global::System.Collections.Generic.ICollection<global::KnockOff.Tests.User>.Remove(global::KnockOff.Tests.User item)
 			{
 				Remove.RecordCall(item);
 				if (Remove.OnCall is { } onCall) return onCall(this, item);
 				return default!;
 			}
 
-			int System.Collections.Generic.ICollection<KnockOff.Tests.User>.Count
+			int global::System.Collections.Generic.ICollection<global::KnockOff.Tests.User>.Count
 			{
 				get
 				{
@@ -366,7 +366,7 @@ partial class ListUserStubTests
 				}
 			}
 
-			bool System.Collections.Generic.ICollection<KnockOff.Tests.User>.IsReadOnly
+			bool global::System.Collections.Generic.ICollection<global::KnockOff.Tests.User>.IsReadOnly
 			{
 				get
 				{
@@ -376,14 +376,14 @@ partial class ListUserStubTests
 				}
 			}
 
-			global::System.Collections.Generic.IEnumerator<global::KnockOff.Tests.User> System.Collections.Generic.IEnumerable<KnockOff.Tests.User>.GetEnumerator()
+			global::System.Collections.Generic.IEnumerator<global::KnockOff.Tests.User> global::System.Collections.Generic.IEnumerable<global::KnockOff.Tests.User>.GetEnumerator()
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
-			global::System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+			global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);

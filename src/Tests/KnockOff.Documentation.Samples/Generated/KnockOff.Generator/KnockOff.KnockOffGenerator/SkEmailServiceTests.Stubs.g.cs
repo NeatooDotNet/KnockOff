@@ -56,7 +56,7 @@ partial class SkEmailServiceTests
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Stub for KnockOff.Documentation.Samples.Skills.SkEmailService via composition.</summary>
+		/// <summary>Stub for global::KnockOff.Documentation.Samples.Skills.SkEmailService via composition.</summary>
 		public class SkEmailService
 		{
 			/// <summary>Interceptor for ServerName.</summary>
@@ -64,8 +64,8 @@ partial class SkEmailServiceTests
 			/// <summary>Interceptor for Send.</summary>
 			public SkEmailService_SendInterceptor Send { get; } = new();
 
-			/// <summary>The KnockOff.Documentation.Samples.Skills.SkEmailService instance. Pass this to code expecting the target class.</summary>
-			public KnockOff.Documentation.Samples.Skills.SkEmailService Object { get; }
+			/// <summary>The global::KnockOff.Documentation.Samples.Skills.SkEmailService instance. Pass this to code expecting the target class.</summary>
+			public global::KnockOff.Documentation.Samples.Skills.SkEmailService Object { get; }
 
 			public SkEmailService()
 			{
@@ -79,8 +79,8 @@ partial class SkEmailServiceTests
 				Send.Reset();
 			}
 
-			/// <summary>Internal implementation that inherits from KnockOff.Documentation.Samples.Skills.SkEmailService.</summary>
-			private sealed class Impl : KnockOff.Documentation.Samples.Skills.SkEmailService
+			/// <summary>Internal implementation that inherits from global::KnockOff.Documentation.Samples.Skills.SkEmailService.</summary>
+			private sealed class Impl : global::KnockOff.Documentation.Samples.Skills.SkEmailService
 			{
 				private readonly SkEmailService _stub;
 

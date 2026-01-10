@@ -28,13 +28,13 @@ partial class ServiceProviderStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.IServiceProvider.</summary>
-		public class IServiceProvider : System.IServiceProvider
+		/// <summary>Stub implementation of global::System.IServiceProvider.</summary>
+		public class IServiceProvider : global::System.IServiceProvider
 		{
 			/// <summary>Interceptor for GetService.</summary>
 			public IServiceProvider_GetServiceInterceptor GetService { get; } = new();
 
-			object? System.IServiceProvider.GetService(global::System.Type serviceType)
+			object? global::System.IServiceProvider.GetService(global::System.Type serviceType)
 			{
 				GetService.RecordCall(serviceType);
 				if (GetService.OnCall is { } onCall) return onCall(this, serviceType);

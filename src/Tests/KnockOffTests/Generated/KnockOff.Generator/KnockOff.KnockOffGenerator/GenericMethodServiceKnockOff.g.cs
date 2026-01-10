@@ -401,10 +401,10 @@ partial class GenericMethodServiceKnockOff
 	/// <summary>Interceptor for Transfer (use .Of&lt;T&gt;() to access typed handler).</summary>
 	public TransferInterceptor Transfer { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Tests.IGenericMethodService.</summary>
-	public KnockOff.Tests.IGenericMethodService AsGenericMethodService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Tests.IGenericMethodService.</summary>
+	public global::KnockOff.Tests.IGenericMethodService AsGenericMethodService() => this;
 
-	T KnockOff.Tests.IGenericMethodService.Create<T>()
+	T global::KnockOff.Tests.IGenericMethodService.Create<T>()
 	{
 		Create.Of<T>().RecordCall();
 		if (Create.Of<T>().OnCall is { } callback)
@@ -412,13 +412,13 @@ partial class GenericMethodServiceKnockOff
 		return SmartDefault<T>("Create");
 	}
 
-	void KnockOff.Tests.IGenericMethodService.Process<T>(T @value)
+	void global::KnockOff.Tests.IGenericMethodService.Process<T>(T @value)
 	{
 		Process.Of<T>().RecordCall();
 		Process.Of<T>().OnCall?.Invoke(this, @value);
 	}
 
-	T KnockOff.Tests.IGenericMethodService.Deserialize<T>(string json)
+	T global::KnockOff.Tests.IGenericMethodService.Deserialize<T>(string json)
 	{
 		Deserialize.Of<T>().RecordCall(json);
 		if (Deserialize.Of<T>().OnCall is { } callback)
@@ -426,7 +426,7 @@ partial class GenericMethodServiceKnockOff
 		return SmartDefault<T>("Deserialize");
 	}
 
-	TOut KnockOff.Tests.IGenericMethodService.Convert<TIn, TOut>(TIn input)
+	TOut global::KnockOff.Tests.IGenericMethodService.Convert<TIn, TOut>(TIn input)
 	{
 		Convert.Of<TIn, TOut>().RecordCall();
 		if (Convert.Of<TIn, TOut>().OnCall is { } callback)
@@ -434,7 +434,7 @@ partial class GenericMethodServiceKnockOff
 		return SmartDefault<TOut>("Convert");
 	}
 
-	[return: global::System.Diagnostics.CodeAnalysis.MaybeNull] T KnockOff.Tests.IGenericMethodService.Find<T>(int id)
+	T? global::KnockOff.Tests.IGenericMethodService.Find<T>(int id) where T : class
 	{
 		Find.Of<T>().RecordCall(id);
 		if (Find.Of<T>().OnCall is { } callback)
@@ -442,7 +442,7 @@ partial class GenericMethodServiceKnockOff
 		return default!;
 	}
 
-	void KnockOff.Tests.IGenericMethodService.Transfer<TSource, TDest>(TSource source, TDest destination)
+	void global::KnockOff.Tests.IGenericMethodService.Transfer<TSource, TDest>(TSource source, TDest destination)
 	{
 		Transfer.Of<TSource, TDest>().RecordCall();
 		Transfer.Of<TSource, TDest>().OnCall?.Invoke(this, source, destination);

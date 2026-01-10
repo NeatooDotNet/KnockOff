@@ -56,7 +56,7 @@ partial class CsEmailServiceTests
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Stub for KnockOff.Documentation.Samples.Guides.InlineStubs.CsEmailService via composition.</summary>
+		/// <summary>Stub for global::KnockOff.Documentation.Samples.Guides.InlineStubs.CsEmailService via composition.</summary>
 		public class CsEmailService
 		{
 			/// <summary>Interceptor for ServerName.</summary>
@@ -64,8 +64,8 @@ partial class CsEmailServiceTests
 			/// <summary>Interceptor for Send.</summary>
 			public CsEmailService_SendInterceptor Send { get; } = new();
 
-			/// <summary>The KnockOff.Documentation.Samples.Guides.InlineStubs.CsEmailService instance. Pass this to code expecting the target class.</summary>
-			public KnockOff.Documentation.Samples.Guides.InlineStubs.CsEmailService Object { get; }
+			/// <summary>The global::KnockOff.Documentation.Samples.Guides.InlineStubs.CsEmailService instance. Pass this to code expecting the target class.</summary>
+			public global::KnockOff.Documentation.Samples.Guides.InlineStubs.CsEmailService Object { get; }
 
 			public CsEmailService()
 			{
@@ -79,8 +79,8 @@ partial class CsEmailServiceTests
 				Send.Reset();
 			}
 
-			/// <summary>Internal implementation that inherits from KnockOff.Documentation.Samples.Guides.InlineStubs.CsEmailService.</summary>
-			private sealed class Impl : KnockOff.Documentation.Samples.Guides.InlineStubs.CsEmailService
+			/// <summary>Internal implementation that inherits from global::KnockOff.Documentation.Samples.Guides.InlineStubs.CsEmailService.</summary>
+			private sealed class Impl : global::KnockOff.Documentation.Samples.Guides.InlineStubs.CsEmailService
 			{
 				private readonly CsEmailService _stub;
 

@@ -35,10 +35,10 @@ partial class NotifyPropertyChangedKnockOff
 	/// <summary>Interceptor for PropertyChanged event.</summary>
 	public PropertyChangedInterceptor PropertyChanged { get; } = new();
 
-	/// <summary>Returns this instance as System.ComponentModel.INotifyPropertyChanged.</summary>
-	public System.ComponentModel.INotifyPropertyChanged AsNotifyPropertyChanged() => this;
+	/// <summary>Returns this instance as global::System.ComponentModel.INotifyPropertyChanged.</summary>
+	public global::System.ComponentModel.INotifyPropertyChanged AsNotifyPropertyChanged() => this;
 
-	event global::System.ComponentModel.PropertyChangedEventHandler? System.ComponentModel.INotifyPropertyChanged.PropertyChanged
+	event global::System.ComponentModel.PropertyChangedEventHandler? global::System.ComponentModel.INotifyPropertyChanged.PropertyChanged
 	{
 		add => PropertyChanged.RecordAdd(value);
 		remove => PropertyChanged.RecordRemove(value);

@@ -64,20 +64,20 @@ partial class KeyLookupKnockOff
 	/// <summary>Interceptor for GetData.</summary>
 	public GetData2Interceptor GetData2 { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Tests.IKeyLookup.</summary>
-	public KnockOff.Tests.IKeyLookup AsKeyLookup() => this;
+	/// <summary>Returns this instance as global::KnockOff.Tests.IKeyLookup.</summary>
+	public global::KnockOff.Tests.IKeyLookup AsKeyLookup() => this;
 
 	/// <summary>Backing storage for Count.</summary>
 	protected int CountBacking { get; set; } = default!;
 
-	int KnockOff.Tests.IKeyLookup.GetData(string key)
+	int global::KnockOff.Tests.IKeyLookup.GetData(string key)
 	{
 		GetData2.RecordCall(key);
-		if (GetData2.OnCall != null) return GetData2.OnCall(this, key);
+		if (GetData2.OnCall is { } callback) return callback(this, key);
 		return GetData(key);
 	}
 
-	int KnockOff.Tests.IKeyLookup.Count
+	int global::KnockOff.Tests.IKeyLookup.Count
 	{
 		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? CountBacking; }
 		set { Count.RecordSet(value); if (Count.OnSet != null) Count.OnSet(this, value); else CountBacking = value; }

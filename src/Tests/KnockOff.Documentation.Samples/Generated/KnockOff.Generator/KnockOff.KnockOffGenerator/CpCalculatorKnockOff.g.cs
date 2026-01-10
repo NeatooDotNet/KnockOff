@@ -61,20 +61,20 @@ partial class CpCalculatorKnockOff
 	/// <summary>Interceptor for Divide.</summary>
 	public Divide2Interceptor Divide2 { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpCalculator.</summary>
-	public KnockOff.Documentation.Samples.Skills.ICpCalculator AsCpCalculator() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ICpCalculator.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ICpCalculator AsCpCalculator() => this;
 
-	int KnockOff.Documentation.Samples.Skills.ICpCalculator.Add(int a, int b)
+	int global::KnockOff.Documentation.Samples.Skills.ICpCalculator.Add(int a, int b)
 	{
 		Add2.RecordCall(a, b);
-		if (Add2.OnCall != null) return Add2.OnCall(this, a, b);
+		if (Add2.OnCall is { } callback) return callback(this, a, b);
 		return Add(a, b);
 	}
 
-	double KnockOff.Documentation.Samples.Skills.ICpCalculator.Divide(int numerator, int denominator)
+	double global::KnockOff.Documentation.Samples.Skills.ICpCalculator.Divide(int numerator, int denominator)
 	{
 		Divide2.RecordCall(numerator, denominator);
-		if (Divide2.OnCall != null) return Divide2.OnCall(this, numerator, denominator);
+		if (Divide2.OnCall is { } callback) return callback(this, numerator, denominator);
 		return Divide(numerator, denominator);
 	}
 

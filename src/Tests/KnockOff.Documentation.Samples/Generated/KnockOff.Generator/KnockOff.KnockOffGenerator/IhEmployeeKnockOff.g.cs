@@ -86,11 +86,11 @@ partial class IhEmployeeKnockOff
 	/// <summary>Interceptor for Id.</summary>
 	public IdInterceptor Id { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIhEmployee.</summary>
-	public KnockOff.Documentation.Samples.Guides.IIhEmployee AsIhEmployee() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IIhEmployee.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IIhEmployee AsIhEmployee() => this;
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIhEntityBase.</summary>
-	public KnockOff.Documentation.Samples.Guides.IIhEntityBase AsIhEntityBase() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IIhEntityBase.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IIhEntityBase AsIhEntityBase() => this;
 
 	/// <summary>Backing storage for Name.</summary>
 	protected string NameBacking { get; set; } = "";
@@ -101,19 +101,19 @@ partial class IhEmployeeKnockOff
 	/// <summary>Backing storage for Id.</summary>
 	protected int IdBacking { get; set; } = default!;
 
-	string KnockOff.Documentation.Samples.Guides.IIhEmployee.Name
+	string global::KnockOff.Documentation.Samples.Guides.IIhEmployee.Name
 	{
 		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
 		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else NameBacking = value; }
 	}
 
-	string KnockOff.Documentation.Samples.Guides.IIhEmployee.Department
+	string global::KnockOff.Documentation.Samples.Guides.IIhEmployee.Department
 	{
 		get { Department.RecordGet(); return Department.OnGet?.Invoke(this) ?? DepartmentBacking; }
 		set { Department.RecordSet(value); if (Department.OnSet != null) Department.OnSet(this, value); else DepartmentBacking = value; }
 	}
 
-	int KnockOff.Documentation.Samples.Guides.IIhEntityBase.Id
+	int global::KnockOff.Documentation.Samples.Guides.IIhEntityBase.Id
 	{
 		get { Id.RecordGet(); return Id.OnGet?.Invoke(this) ?? IdBacking; }
 	}

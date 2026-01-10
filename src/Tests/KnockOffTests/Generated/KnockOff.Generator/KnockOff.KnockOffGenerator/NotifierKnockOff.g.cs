@@ -49,19 +49,19 @@ partial class NotifierKnockOff
 	/// <summary>Interceptor for Notify.</summary>
 	public NotifyInterceptor Notify { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Tests.INotifier.</summary>
-	public KnockOff.Tests.INotifier AsNotifier() => this;
+	/// <summary>Returns this instance as global::KnockOff.Tests.INotifier.</summary>
+	public global::KnockOff.Tests.INotifier AsNotifier() => this;
 
 	/// <summary>Backing storage for Name.</summary>
 	protected string NameBacking { get; set; } = "";
 
-	void KnockOff.Tests.INotifier.Notify(string recipient)
+	void global::KnockOff.Tests.INotifier.Notify(string recipient)
 	{
 		Notify.RecordCall(recipient);
 		Notify.OnCall?.Invoke(this, recipient);
 	}
 
-	string KnockOff.Tests.INotifier.Name
+	string global::KnockOff.Tests.INotifier.Name
 	{
 		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
 	}

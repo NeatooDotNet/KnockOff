@@ -33,10 +33,10 @@ partial class AsyncSaveKnockOff
 	/// <summary>Interceptor for SaveAsync.</summary>
 	public SaveAsyncInterceptor SaveAsync { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IAsyncSave.</summary>
-	public KnockOff.Documentation.Samples.Guides.IAsyncSave AsAsyncSave() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IAsyncSave.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IAsyncSave AsAsyncSave() => this;
 
-	global::System.Threading.Tasks.Task<int> KnockOff.Documentation.Samples.Guides.IAsyncSave.SaveAsync(global::KnockOff.Documentation.Samples.Guides.AsyncData entity)
+	global::System.Threading.Tasks.Task<int> global::KnockOff.Documentation.Samples.Guides.IAsyncSave.SaveAsync(global::KnockOff.Documentation.Samples.Guides.AsyncData entity)
 	{
 		SaveAsync.RecordCall(entity);
 		return SaveAsync.OnCall?.Invoke(this, entity) ?? global::System.Threading.Tasks.Task.FromResult<int>(default!);

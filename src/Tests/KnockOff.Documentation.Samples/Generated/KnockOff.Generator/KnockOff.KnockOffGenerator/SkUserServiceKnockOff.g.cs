@@ -33,10 +33,10 @@ partial class SkUserServiceKnockOff
 	/// <summary>Interceptor for GetUser.</summary>
 	public GetUserInterceptor GetUser { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkUserService.</summary>
-	public KnockOff.Documentation.Samples.Skills.ISkUserService AsSkUserService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ISkUserService.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkUserService AsSkUserService() => this;
 
-	global::KnockOff.Documentation.Samples.Skills.SkUser KnockOff.Documentation.Samples.Skills.ISkUserService.GetUser(int id)
+	global::KnockOff.Documentation.Samples.Skills.SkUser global::KnockOff.Documentation.Samples.Skills.ISkUserService.GetUser(int id)
 	{
 		GetUser.RecordCall(id);
 		return GetUser.OnCall?.Invoke(this, id) ?? new global::KnockOff.Documentation.Samples.Skills.SkUser();

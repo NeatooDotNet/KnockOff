@@ -44,8 +44,8 @@ partial class GroupingStringIntStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Linq.IGrouping<string, int>.</summary>
-		public class IGrouping : System.Linq.IGrouping<string, int>
+		/// <summary>Stub implementation of global::System.Linq.IGrouping<string, int>.</summary>
+		public class IGrouping : global::System.Linq.IGrouping<string, int>
 		{
 			/// <summary>Interceptor for Key.</summary>
 			public IGrouping_KeyInterceptor Key { get; } = new();
@@ -53,7 +53,7 @@ partial class GroupingStringIntStubTests
 			/// <summary>Interceptor for GetEnumerator.</summary>
 			public IGrouping_GetEnumeratorInterceptor GetEnumerator { get; } = new();
 
-			string System.Linq.IGrouping<string, int>.Key
+			string global::System.Linq.IGrouping<string, int>.Key
 			{
 				get
 				{
@@ -63,14 +63,14 @@ partial class GroupingStringIntStubTests
 				}
 			}
 
-			global::System.Collections.Generic.IEnumerator<int> System.Collections.Generic.IEnumerable<int>.GetEnumerator()
+			global::System.Collections.Generic.IEnumerator<int> global::System.Collections.Generic.IEnumerable<int>.GetEnumerator()
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
-			global::System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+			global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);

@@ -28,13 +28,13 @@ partial class AsyncEnumerableIntStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Collections.Generic.IAsyncEnumerable<int>.</summary>
-		public class IAsyncEnumerable : System.Collections.Generic.IAsyncEnumerable<int>
+		/// <summary>Stub implementation of global::System.Collections.Generic.IAsyncEnumerable<int>.</summary>
+		public class IAsyncEnumerable : global::System.Collections.Generic.IAsyncEnumerable<int>
 		{
 			/// <summary>Interceptor for GetAsyncEnumerator.</summary>
 			public IAsyncEnumerable_GetAsyncEnumeratorInterceptor GetAsyncEnumerator { get; } = new();
 
-			global::System.Collections.Generic.IAsyncEnumerator<int> System.Collections.Generic.IAsyncEnumerable<int>.GetAsyncEnumerator(global::System.Threading.CancellationToken cancellationToken)
+			global::System.Collections.Generic.IAsyncEnumerator<int> global::System.Collections.Generic.IAsyncEnumerable<int>.GetAsyncEnumerator(global::System.Threading.CancellationToken cancellationToken)
 			{
 				GetAsyncEnumerator.RecordCall(cancellationToken);
 				if (GetAsyncEnumerator.OnCall is { } onCall) return onCall(this, cancellationToken);

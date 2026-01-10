@@ -30,10 +30,10 @@ partial class CloneableKnockOff
 	/// <summary>Interceptor for Clone.</summary>
 	public CloneInterceptor Clone { get; } = new();
 
-	/// <summary>Returns this instance as System.ICloneable.</summary>
-	public System.ICloneable AsCloneable() => this;
+	/// <summary>Returns this instance as global::System.ICloneable.</summary>
+	public global::System.ICloneable AsCloneable() => this;
 
-	object System.ICloneable.Clone()
+	object global::System.ICloneable.Clone()
 	{
 		Clone.RecordCall();
 		return Clone.OnCall?.Invoke(this) ?? new object();

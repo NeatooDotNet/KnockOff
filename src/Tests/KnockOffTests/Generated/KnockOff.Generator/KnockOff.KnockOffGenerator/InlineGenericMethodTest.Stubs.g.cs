@@ -359,8 +359,8 @@ partial class InlineGenericMethodTest
 			}
 		}
 
-		/// <summary>Stub implementation of KnockOff.Tests.IGenericMethodService.</summary>
-		public class IGenericMethodService : KnockOff.Tests.IGenericMethodService
+		/// <summary>Stub implementation of global::KnockOff.Tests.IGenericMethodService.</summary>
+		public class IGenericMethodService : global::KnockOff.Tests.IGenericMethodService
 		{
 			/// <summary>Interceptor for Create.</summary>
 			public IGenericMethodService_CreateInterceptor Create { get; } = new();
@@ -380,7 +380,7 @@ partial class InlineGenericMethodTest
 			/// <summary>Interceptor for Transfer.</summary>
 			public IGenericMethodService_TransferInterceptor Transfer { get; } = new();
 
-			T KnockOff.Tests.IGenericMethodService.Create<T>()
+			T global::KnockOff.Tests.IGenericMethodService.Create<T>()
 			{
 				var typedHandler = Create.Of<T>();
 				typedHandler.RecordCall();
@@ -389,7 +389,7 @@ partial class InlineGenericMethodTest
 				return SmartDefault<T>("Create");
 			}
 
-			void KnockOff.Tests.IGenericMethodService.Process<T>(T value)
+			void global::KnockOff.Tests.IGenericMethodService.Process<T>(T value)
 			{
 				var typedHandler = Process.Of<T>();
 				typedHandler.RecordCall();
@@ -397,7 +397,7 @@ partial class InlineGenericMethodTest
 				{ onCallCallback(this, value); return; }
 			}
 
-			T KnockOff.Tests.IGenericMethodService.Deserialize<T>(string json)
+			T global::KnockOff.Tests.IGenericMethodService.Deserialize<T>(string json)
 			{
 				var typedHandler = Deserialize.Of<T>();
 				typedHandler.RecordCall(json);
@@ -406,7 +406,7 @@ partial class InlineGenericMethodTest
 				return SmartDefault<T>("Deserialize");
 			}
 
-			TOut KnockOff.Tests.IGenericMethodService.Convert<TIn, TOut>(TIn input)
+			TOut global::KnockOff.Tests.IGenericMethodService.Convert<TIn, TOut>(TIn input)
 			{
 				var typedHandler = Convert.Of<TIn, TOut>();
 				typedHandler.RecordCall();
@@ -415,7 +415,7 @@ partial class InlineGenericMethodTest
 				return SmartDefault<TOut>("Convert");
 			}
 
-			T? KnockOff.Tests.IGenericMethodService.Find<T>(int id) where T : class
+			T? global::KnockOff.Tests.IGenericMethodService.Find<T>(int id) where T : class
 			{
 				var typedHandler = Find.Of<T>();
 				typedHandler.RecordCall(id);
@@ -424,7 +424,7 @@ partial class InlineGenericMethodTest
 				return default!;
 			}
 
-			void KnockOff.Tests.IGenericMethodService.Transfer<TSource, TDest>(TSource source, TDest destination)
+			void global::KnockOff.Tests.IGenericMethodService.Transfer<TSource, TDest>(TSource source, TDest destination)
 			{
 				var typedHandler = Transfer.Of<TSource, TDest>();
 				typedHandler.RecordCall();

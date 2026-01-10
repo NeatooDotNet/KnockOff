@@ -105,11 +105,11 @@ partial class AuditableEntityKnockOff
 	/// <summary>Interceptor for CreatedAt.</summary>
 	public CreatedAtInterceptor CreatedAt { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Tests.IAuditableEntity.</summary>
-	public KnockOff.Tests.IAuditableEntity AsAuditableEntity() => this;
+	/// <summary>Returns this instance as global::KnockOff.Tests.IAuditableEntity.</summary>
+	public global::KnockOff.Tests.IAuditableEntity AsAuditableEntity() => this;
 
-	/// <summary>Returns this instance as KnockOff.Tests.IBaseEntity.</summary>
-	public KnockOff.Tests.IBaseEntity AsBaseEntity() => this;
+	/// <summary>Returns this instance as global::KnockOff.Tests.IBaseEntity.</summary>
+	public global::KnockOff.Tests.IBaseEntity AsBaseEntity() => this;
 
 	/// <summary>Backing storage for ModifiedAt.</summary>
 	protected global::System.DateTime? ModifiedAtBacking { get; set; } = default!;
@@ -123,24 +123,24 @@ partial class AuditableEntityKnockOff
 	/// <summary>Backing storage for CreatedAt.</summary>
 	protected global::System.DateTime CreatedAtBacking { get; set; } = default!;
 
-	global::System.DateTime? KnockOff.Tests.IAuditableEntity.ModifiedAt
+	global::System.DateTime? global::KnockOff.Tests.IAuditableEntity.ModifiedAt
 	{
 		get { ModifiedAt.RecordGet(); return ModifiedAt.OnGet?.Invoke(this) ?? ModifiedAtBacking; }
 		set { ModifiedAt.RecordSet(value); if (ModifiedAt.OnSet != null) ModifiedAt.OnSet(this, value); else ModifiedAtBacking = value; }
 	}
 
-	string KnockOff.Tests.IAuditableEntity.ModifiedBy
+	string global::KnockOff.Tests.IAuditableEntity.ModifiedBy
 	{
 		get { ModifiedBy.RecordGet(); return ModifiedBy.OnGet?.Invoke(this) ?? ModifiedByBacking; }
 		set { ModifiedBy.RecordSet(value); if (ModifiedBy.OnSet != null) ModifiedBy.OnSet(this, value); else ModifiedByBacking = value; }
 	}
 
-	int KnockOff.Tests.IBaseEntity.Id
+	int global::KnockOff.Tests.IBaseEntity.Id
 	{
 		get { Id.RecordGet(); return Id.OnGet?.Invoke(this) ?? IdBacking; }
 	}
 
-	global::System.DateTime KnockOff.Tests.IBaseEntity.CreatedAt
+	global::System.DateTime global::KnockOff.Tests.IBaseEntity.CreatedAt
 	{
 		get { CreatedAt.RecordGet(); return CreatedAt.OnGet?.Invoke(this) ?? CreatedAtBacking; }
 	}

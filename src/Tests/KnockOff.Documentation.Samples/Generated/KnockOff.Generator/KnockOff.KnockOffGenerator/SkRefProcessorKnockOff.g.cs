@@ -61,17 +61,17 @@ partial class SkRefProcessorKnockOff
 	/// <summary>Interceptor for TryUpdate.</summary>
 	public TryUpdateInterceptor TryUpdate { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkRefProcessor.</summary>
-	public KnockOff.Documentation.Samples.Skills.ISkRefProcessor AsSkRefProcessor() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ISkRefProcessor.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkRefProcessor AsSkRefProcessor() => this;
 
-	void KnockOff.Documentation.Samples.Skills.ISkRefProcessor.Increment(ref int @value)
+	void global::KnockOff.Documentation.Samples.Skills.ISkRefProcessor.Increment(ref int @value)
 	{
 		Increment.RecordCall(@value);
 		if (Increment.OnCall is { } onCallCallback)
 		{ onCallCallback(this, ref @value); return; }
 	}
 
-	bool KnockOff.Documentation.Samples.Skills.ISkRefProcessor.TryUpdate(string key, ref string @value)
+	bool global::KnockOff.Documentation.Samples.Skills.ISkRefProcessor.TryUpdate(string key, ref string @value)
 	{
 		TryUpdate.RecordCall(key, @value);
 		if (TryUpdate.OnCall is { } onCallCallback)

@@ -58,16 +58,16 @@ partial class GenStringCacheKnockOff
 	/// <summary>Interceptor for Set.</summary>
 	public SetInterceptor Set { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IGenCache<string, KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
-	public KnockOff.Documentation.Samples.Guides.IGenCache<string, KnockOff.Documentation.Samples.Guides.GenUser> AsGenCache() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IGenCache<string, global::KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IGenCache<string, global::KnockOff.Documentation.Samples.Guides.GenUser> AsGenCache() => this;
 
-	global::KnockOff.Documentation.Samples.Guides.GenUser? KnockOff.Documentation.Samples.Guides.IGenCache<string, KnockOff.Documentation.Samples.Guides.GenUser>.Get(string key)
+	global::KnockOff.Documentation.Samples.Guides.GenUser? global::KnockOff.Documentation.Samples.Guides.IGenCache<string, global::KnockOff.Documentation.Samples.Guides.GenUser>.Get(string key)
 	{
 		Get.RecordCall(key);
 		return Get.OnCall?.Invoke(this, key) ?? default!;
 	}
 
-	void KnockOff.Documentation.Samples.Guides.IGenCache<string, KnockOff.Documentation.Samples.Guides.GenUser>.Set(string key, global::KnockOff.Documentation.Samples.Guides.GenUser @value)
+	void global::KnockOff.Documentation.Samples.Guides.IGenCache<string, global::KnockOff.Documentation.Samples.Guides.GenUser>.Set(string key, global::KnockOff.Documentation.Samples.Guides.GenUser @value)
 	{
 		Set.RecordCall(key, @value);
 		Set.OnCall?.Invoke(this, key, @value);

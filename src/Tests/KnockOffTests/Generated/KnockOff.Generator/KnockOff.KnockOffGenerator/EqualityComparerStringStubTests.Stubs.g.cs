@@ -48,8 +48,8 @@ partial class EqualityComparerStringStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Collections.Generic.IEqualityComparer<string>.</summary>
-		public class IEqualityComparer : System.Collections.Generic.IEqualityComparer<string>
+		/// <summary>Stub implementation of global::System.Collections.Generic.IEqualityComparer<string>.</summary>
+		public class IEqualityComparer : global::System.Collections.Generic.IEqualityComparer<string>
 		{
 			/// <summary>Interceptor for Equals.</summary>
 			public new IEqualityComparer_EqualsInterceptor Equals { get; } = new();
@@ -57,14 +57,14 @@ partial class EqualityComparerStringStubTests
 			/// <summary>Interceptor for GetHashCode.</summary>
 			public new IEqualityComparer_GetHashCodeInterceptor GetHashCode { get; } = new();
 
-			bool System.Collections.Generic.IEqualityComparer<string>.Equals(string? x, string? y)
+			bool global::System.Collections.Generic.IEqualityComparer<string>.Equals(string? x, string? y)
 			{
 				Equals.RecordCall(x, y);
 				if (Equals.OnCall is { } onCall) return onCall(this, x, y);
 				return default!;
 			}
 
-			int System.Collections.Generic.IEqualityComparer<string>.GetHashCode(string obj)
+			int global::System.Collections.Generic.IEqualityComparer<string>.GetHashCode(string obj)
 			{
 				GetHashCode.RecordCall(obj);
 				if (GetHashCode.OnCall is { } onCall) return onCall(this, obj);

@@ -161,29 +161,29 @@ partial class AsyncServiceKnockOff
 	/// <summary>Interceptor for GetValueValueTaskAsync.</summary>
 	public GetValueValueTaskAsync2Interceptor GetValueValueTaskAsync2 { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Tests.IAsyncService.</summary>
-	public KnockOff.Tests.IAsyncService AsAsyncService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Tests.IAsyncService.</summary>
+	public global::KnockOff.Tests.IAsyncService AsAsyncService() => this;
 
-	global::System.Threading.Tasks.Task KnockOff.Tests.IAsyncService.DoWorkAsync()
+	global::System.Threading.Tasks.Task global::KnockOff.Tests.IAsyncService.DoWorkAsync()
 	{
 		DoWorkAsync.RecordCall();
 		return DoWorkAsync.OnCall?.Invoke(this) ?? global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
-	global::System.Threading.Tasks.Task<int> KnockOff.Tests.IAsyncService.GetValueAsync(int input)
+	global::System.Threading.Tasks.Task<int> global::KnockOff.Tests.IAsyncService.GetValueAsync(int input)
 	{
 		GetValueAsync2.RecordCall(input);
-		if (GetValueAsync2.OnCall != null) return GetValueAsync2.OnCall(this, input);
+		if (GetValueAsync2.OnCall is { } callback) return callback(this, input);
 		return GetValueAsync(input);
 	}
 
-	global::System.Threading.Tasks.Task<string?> KnockOff.Tests.IAsyncService.GetOptionalAsync()
+	global::System.Threading.Tasks.Task<string?> global::KnockOff.Tests.IAsyncService.GetOptionalAsync()
 	{
 		GetOptionalAsync.RecordCall();
 		return GetOptionalAsync.OnCall?.Invoke(this) ?? global::System.Threading.Tasks.Task.FromResult<string?>(default!);
 	}
 
-	global::System.Threading.Tasks.Task<string> KnockOff.Tests.IAsyncService.GetRequiredAsync()
+	global::System.Threading.Tasks.Task<string> global::KnockOff.Tests.IAsyncService.GetRequiredAsync()
 	{
 		GetRequiredAsync.RecordCall();
 		if (GetRequiredAsync.OnCall is { } callback)
@@ -191,16 +191,16 @@ partial class AsyncServiceKnockOff
 		throw new global::System.InvalidOperationException("No implementation provided for GetRequiredAsync. Set GetRequiredAsync.OnCall or define a protected method 'GetRequiredAsync' in your partial class.");
 	}
 
-	global::System.Threading.Tasks.ValueTask KnockOff.Tests.IAsyncService.DoWorkValueTaskAsync()
+	global::System.Threading.Tasks.ValueTask global::KnockOff.Tests.IAsyncService.DoWorkValueTaskAsync()
 	{
 		DoWorkValueTaskAsync.RecordCall();
 		return DoWorkValueTaskAsync.OnCall?.Invoke(this) ?? default;
 	}
 
-	global::System.Threading.Tasks.ValueTask<int> KnockOff.Tests.IAsyncService.GetValueValueTaskAsync(int input)
+	global::System.Threading.Tasks.ValueTask<int> global::KnockOff.Tests.IAsyncService.GetValueValueTaskAsync(int input)
 	{
 		GetValueValueTaskAsync2.RecordCall(input);
-		if (GetValueValueTaskAsync2.OnCall != null) return GetValueValueTaskAsync2.OnCall(this, input);
+		if (GetValueValueTaskAsync2.OnCall is { } callback) return callback(this, input);
 		return GetValueValueTaskAsync(input);
 	}
 

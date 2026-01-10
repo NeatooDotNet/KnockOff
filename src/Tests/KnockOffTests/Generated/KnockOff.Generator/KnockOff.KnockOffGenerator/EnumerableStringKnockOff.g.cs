@@ -30,10 +30,10 @@ partial class EnumerableStringKnockOff
 	/// <summary>Interceptor for GetEnumerator.</summary>
 	public GetEnumeratorInterceptor GetEnumerator { get; } = new();
 
-	/// <summary>Returns this instance as System.Collections.Generic.IEnumerable<string>.</summary>
-	public System.Collections.Generic.IEnumerable<string> AsEnumerable() => this;
+	/// <summary>Returns this instance as global::System.Collections.Generic.IEnumerable<string>.</summary>
+	public global::System.Collections.Generic.IEnumerable<string> AsEnumerable() => this;
 
-	global::System.Collections.Generic.IEnumerator<string> System.Collections.Generic.IEnumerable<string>.GetEnumerator()
+	global::System.Collections.Generic.IEnumerator<string> global::System.Collections.Generic.IEnumerable<string>.GetEnumerator()
 	{
 		GetEnumerator.RecordCall();
 		if (GetEnumerator.OnCall is { } callback)
@@ -41,12 +41,9 @@ partial class EnumerableStringKnockOff
 		throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall or define a protected method 'GetEnumerator' in your partial class.");
 	}
 
-	global::System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+	global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
 	{
-		GetEnumerator.RecordCall();
-		if (GetEnumerator.OnCall is { } callback)
-			return callback(this);
-		throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall or define a protected method 'GetEnumerator' in your partial class.");
+		return ((global::System.Collections.Generic.IEnumerable<string>)this).GetEnumerator();
 	}
 
 }

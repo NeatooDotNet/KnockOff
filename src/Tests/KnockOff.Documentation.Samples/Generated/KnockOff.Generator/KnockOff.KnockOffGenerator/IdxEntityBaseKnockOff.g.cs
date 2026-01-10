@@ -46,8 +46,8 @@ partial class IdxEntityBaseKnockOff
 	/// <summary>Interceptor for IsNew.</summary>
 	public IsNewInterceptor IsNew { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIdxEntityBase.</summary>
-	public KnockOff.Documentation.Samples.Guides.IIdxEntityBase AsIdxEntityBase() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IIdxEntityBase.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IIdxEntityBase AsIdxEntityBase() => this;
 
 	/// <summary>Backing storage for StringIndexer indexer.</summary>
 	public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Documentation.Samples.Guides.IIdxEntityProperty?> StringIndexerBacking { get; } = new();
@@ -55,12 +55,12 @@ partial class IdxEntityBaseKnockOff
 	/// <summary>Backing storage for IsNew.</summary>
 	protected bool IsNewBacking { get; set; } = default!;
 
-	global::KnockOff.Documentation.Samples.Guides.IIdxEntityProperty? KnockOff.Documentation.Samples.Guides.IIdxEntityBase.this[string propertyName]
+	global::KnockOff.Documentation.Samples.Guides.IIdxEntityProperty? global::KnockOff.Documentation.Samples.Guides.IIdxEntityBase.this[string propertyName]
 	{
 		get { StringIndexer.RecordGet(propertyName); if (StringIndexer.OnGet != null) return StringIndexer.OnGet(this, propertyName); return StringIndexerBacking.TryGetValue(propertyName, out var v) ? v : default; }
 	}
 
-	bool KnockOff.Documentation.Samples.Guides.IIdxEntityBase.IsNew
+	bool global::KnockOff.Documentation.Samples.Guides.IIdxEntityBase.IsNew
 	{
 		get { IsNew.RecordGet(); return IsNew.OnGet?.Invoke(this) ?? IsNewBacking; }
 	}

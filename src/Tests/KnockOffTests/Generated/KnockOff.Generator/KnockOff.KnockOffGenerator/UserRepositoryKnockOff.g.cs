@@ -86,22 +86,22 @@ partial class UserRepositoryKnockOff
 	/// <summary>Interceptor for GetByIdAsync.</summary>
 	public GetByIdAsyncInterceptor GetByIdAsync { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Tests.IRepository<KnockOff.Tests.User>.</summary>
-	public KnockOff.Tests.IRepository<KnockOff.Tests.User> AsRepository() => this;
+	/// <summary>Returns this instance as global::KnockOff.Tests.IRepository<global::KnockOff.Tests.User>.</summary>
+	public global::KnockOff.Tests.IRepository<global::KnockOff.Tests.User> AsRepository() => this;
 
-	global::KnockOff.Tests.User? KnockOff.Tests.IRepository<KnockOff.Tests.User>.GetById(int id)
+	global::KnockOff.Tests.User? global::KnockOff.Tests.IRepository<global::KnockOff.Tests.User>.GetById(int id)
 	{
 		GetById.RecordCall(id);
 		return GetById.OnCall?.Invoke(this, id) ?? default!;
 	}
 
-	void KnockOff.Tests.IRepository<KnockOff.Tests.User>.Save(global::KnockOff.Tests.User entity)
+	void global::KnockOff.Tests.IRepository<global::KnockOff.Tests.User>.Save(global::KnockOff.Tests.User entity)
 	{
 		Save.RecordCall(entity);
 		Save.OnCall?.Invoke(this, entity);
 	}
 
-	global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> KnockOff.Tests.IRepository<KnockOff.Tests.User>.GetByIdAsync(int id)
+	global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> global::KnockOff.Tests.IRepository<global::KnockOff.Tests.User>.GetByIdAsync(int id)
 	{
 		GetByIdAsync.RecordCall(id);
 		return GetByIdAsync.OnCall?.Invoke(this, id) ?? global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.User?>(default!);

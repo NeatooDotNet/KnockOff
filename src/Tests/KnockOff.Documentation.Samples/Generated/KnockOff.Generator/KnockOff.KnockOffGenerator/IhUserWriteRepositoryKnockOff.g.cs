@@ -108,31 +108,31 @@ partial class IhUserWriteRepositoryKnockOff
 	/// <summary>Interceptor for GetAll.</summary>
 	public GetAllInterceptor GetAll { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIhWriteRepository<KnockOff.Documentation.Samples.Guides.IhUser>.</summary>
-	public KnockOff.Documentation.Samples.Guides.IIhWriteRepository<KnockOff.Documentation.Samples.Guides.IhUser> AsIhWriteRepository() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IIhWriteRepository<global::KnockOff.Documentation.Samples.Guides.IhUser>.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IIhWriteRepository<global::KnockOff.Documentation.Samples.Guides.IhUser> AsIhWriteRepository() => this;
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIhReadRepository<KnockOff.Documentation.Samples.Guides.IhUser>.</summary>
-	public KnockOff.Documentation.Samples.Guides.IIhReadRepository<KnockOff.Documentation.Samples.Guides.IhUser> AsIhReadRepository() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IIhReadRepository<global::KnockOff.Documentation.Samples.Guides.IhUser>.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IIhReadRepository<global::KnockOff.Documentation.Samples.Guides.IhUser> AsIhReadRepository() => this;
 
-	void KnockOff.Documentation.Samples.Guides.IIhWriteRepository<KnockOff.Documentation.Samples.Guides.IhUser>.Add(global::KnockOff.Documentation.Samples.Guides.IhUser entity)
+	void global::KnockOff.Documentation.Samples.Guides.IIhWriteRepository<global::KnockOff.Documentation.Samples.Guides.IhUser>.Add(global::KnockOff.Documentation.Samples.Guides.IhUser entity)
 	{
 		Add.RecordCall(entity);
 		Add.OnCall?.Invoke(this, entity);
 	}
 
-	void KnockOff.Documentation.Samples.Guides.IIhWriteRepository<KnockOff.Documentation.Samples.Guides.IhUser>.Delete(int id)
+	void global::KnockOff.Documentation.Samples.Guides.IIhWriteRepository<global::KnockOff.Documentation.Samples.Guides.IhUser>.Delete(int id)
 	{
 		Delete.RecordCall(id);
 		Delete.OnCall?.Invoke(this, id);
 	}
 
-	global::KnockOff.Documentation.Samples.Guides.IhUser? KnockOff.Documentation.Samples.Guides.IIhReadRepository<KnockOff.Documentation.Samples.Guides.IhUser>.GetById(int id)
+	global::KnockOff.Documentation.Samples.Guides.IhUser? global::KnockOff.Documentation.Samples.Guides.IIhReadRepository<global::KnockOff.Documentation.Samples.Guides.IhUser>.GetById(int id)
 	{
 		GetById.RecordCall(id);
 		return GetById.OnCall?.Invoke(this, id) ?? default!;
 	}
 
-	global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Guides.IhUser> KnockOff.Documentation.Samples.Guides.IIhReadRepository<KnockOff.Documentation.Samples.Guides.IhUser>.GetAll()
+	global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Guides.IhUser> global::KnockOff.Documentation.Samples.Guides.IIhReadRepository<global::KnockOff.Documentation.Samples.Guides.IhUser>.GetAll()
 	{
 		GetAll.RecordCall();
 		return GetAll.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Guides.IhUser>();

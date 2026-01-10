@@ -192,46 +192,46 @@ partial class OverloadedServiceKnockOff
 	/// <summary>Interceptor for Calculate.</summary>
 	public Calculate2Interceptor Calculate2 { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Tests.IOverloadedService.</summary>
-	public KnockOff.Tests.IOverloadedService AsOverloadedService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Tests.IOverloadedService.</summary>
+	public global::KnockOff.Tests.IOverloadedService AsOverloadedService() => this;
 
-	global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> KnockOff.Tests.IOverloadedService.GetByIdAsync(int id)
+	global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> global::KnockOff.Tests.IOverloadedService.GetByIdAsync(int id)
 	{
 		GetByIdAsync1.RecordCall(id);
 		return GetByIdAsync1.OnCall?.Invoke(this, id) ?? global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.User?>(default!);
 	}
 
-	global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> KnockOff.Tests.IOverloadedService.GetByIdAsync(int id, global::System.Threading.CancellationToken cancellationToken)
+	global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> global::KnockOff.Tests.IOverloadedService.GetByIdAsync(int id, global::System.Threading.CancellationToken cancellationToken)
 	{
 		GetByIdAsync2.RecordCall(id, cancellationToken);
 		return GetByIdAsync2.OnCall?.Invoke(this, id, cancellationToken) ?? global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.User?>(default!);
 	}
 
-	void KnockOff.Tests.IOverloadedService.Process(string data)
+	void global::KnockOff.Tests.IOverloadedService.Process(string data)
 	{
 		Process1.RecordCall(data);
 		Process1.OnCall?.Invoke(this, data);
 	}
 
-	void KnockOff.Tests.IOverloadedService.Process(string data, int priority)
+	void global::KnockOff.Tests.IOverloadedService.Process(string data, int priority)
 	{
 		Process2.RecordCall(data, priority);
 		Process2.OnCall?.Invoke(this, data, priority);
 	}
 
-	void KnockOff.Tests.IOverloadedService.Process(string data, int priority, bool async)
+	void global::KnockOff.Tests.IOverloadedService.Process(string data, int priority, bool async)
 	{
 		Process3.RecordCall(data, priority, async);
 		Process3.OnCall?.Invoke(this, data, priority, async);
 	}
 
-	int KnockOff.Tests.IOverloadedService.Calculate(int @value)
+	int global::KnockOff.Tests.IOverloadedService.Calculate(int @value)
 	{
 		Calculate1.RecordCall(@value);
 		return Calculate1.OnCall?.Invoke(this, @value) ?? default!;
 	}
 
-	int KnockOff.Tests.IOverloadedService.Calculate(int a, int b)
+	int global::KnockOff.Tests.IOverloadedService.Calculate(int a, int b)
 	{
 		Calculate2.RecordCall(a, b);
 		return Calculate2.OnCall?.Invoke(this, a, b) ?? default!;

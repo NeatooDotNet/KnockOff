@@ -58,20 +58,20 @@ partial class PatternRepositoryKnockOff
 	/// <summary>Interceptor for CountAsync.</summary>
 	public CountAsync2Interceptor CountAsync2 { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Concepts.IPatternRepository.</summary>
-	public KnockOff.Documentation.Samples.Concepts.IPatternRepository AsPatternRepository() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Concepts.IPatternRepository.</summary>
+	public global::KnockOff.Documentation.Samples.Concepts.IPatternRepository AsPatternRepository() => this;
 
-	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Concepts.PatternUser?> KnockOff.Documentation.Samples.Concepts.IPatternRepository.GetByIdAsync(int id)
+	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Concepts.PatternUser?> global::KnockOff.Documentation.Samples.Concepts.IPatternRepository.GetByIdAsync(int id)
 	{
 		GetByIdAsync2.RecordCall(id);
-		if (GetByIdAsync2.OnCall != null) return GetByIdAsync2.OnCall(this, id);
+		if (GetByIdAsync2.OnCall is { } callback) return callback(this, id);
 		return GetByIdAsync(id);
 	}
 
-	global::System.Threading.Tasks.ValueTask<int> KnockOff.Documentation.Samples.Concepts.IPatternRepository.CountAsync()
+	global::System.Threading.Tasks.ValueTask<int> global::KnockOff.Documentation.Samples.Concepts.IPatternRepository.CountAsync()
 	{
 		CountAsync2.RecordCall();
-		if (CountAsync2.OnCall != null) return CountAsync2.OnCall(this);
+		if (CountAsync2.OnCall is { } callback) return callback(this);
 		return CountAsync();
 	}
 

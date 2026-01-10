@@ -33,10 +33,10 @@ partial class GenEmployeeRepositoryKnockOff
 	/// <summary>Interceptor for FindById.</summary>
 	public FindByIdInterceptor FindById { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IGenEntityRepository<KnockOff.Documentation.Samples.Guides.GenEmployee>.</summary>
-	public KnockOff.Documentation.Samples.Guides.IGenEntityRepository<KnockOff.Documentation.Samples.Guides.GenEmployee> AsGenEntityRepository() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IGenEntityRepository<global::KnockOff.Documentation.Samples.Guides.GenEmployee>.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IGenEntityRepository<global::KnockOff.Documentation.Samples.Guides.GenEmployee> AsGenEntityRepository() => this;
 
-	global::KnockOff.Documentation.Samples.Guides.GenEmployee? KnockOff.Documentation.Samples.Guides.IGenEntityRepository<KnockOff.Documentation.Samples.Guides.GenEmployee>.FindById(int id)
+	global::KnockOff.Documentation.Samples.Guides.GenEmployee? global::KnockOff.Documentation.Samples.Guides.IGenEntityRepository<global::KnockOff.Documentation.Samples.Guides.GenEmployee>.FindById(int id)
 	{
 		FindById.RecordCall(id);
 		return FindById.OnCall?.Invoke(this, id) ?? default!;

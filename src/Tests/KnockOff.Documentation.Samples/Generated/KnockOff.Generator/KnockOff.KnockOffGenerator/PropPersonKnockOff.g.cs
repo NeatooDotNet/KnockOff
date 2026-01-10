@@ -86,8 +86,8 @@ partial class PropPersonKnockOff
 	/// <summary>Interceptor for FullName.</summary>
 	public FullNameInterceptor FullName { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IPropPerson.</summary>
-	public KnockOff.Documentation.Samples.Guides.IPropPerson AsPropPerson() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IPropPerson.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IPropPerson AsPropPerson() => this;
 
 	/// <summary>Backing storage for FirstName.</summary>
 	protected string FirstNameBacking { get; set; } = "";
@@ -98,19 +98,19 @@ partial class PropPersonKnockOff
 	/// <summary>Backing storage for FullName.</summary>
 	protected string FullNameBacking { get; set; } = "";
 
-	string KnockOff.Documentation.Samples.Guides.IPropPerson.FirstName
+	string global::KnockOff.Documentation.Samples.Guides.IPropPerson.FirstName
 	{
 		get { FirstName.RecordGet(); return FirstName.OnGet?.Invoke(this) ?? FirstNameBacking; }
 		set { FirstName.RecordSet(value); if (FirstName.OnSet != null) FirstName.OnSet(this, value); else FirstNameBacking = value; }
 	}
 
-	string KnockOff.Documentation.Samples.Guides.IPropPerson.LastName
+	string global::KnockOff.Documentation.Samples.Guides.IPropPerson.LastName
 	{
 		get { LastName.RecordGet(); return LastName.OnGet?.Invoke(this) ?? LastNameBacking; }
 		set { LastName.RecordSet(value); if (LastName.OnSet != null) LastName.OnSet(this, value); else LastNameBacking = value; }
 	}
 
-	string KnockOff.Documentation.Samples.Guides.IPropPerson.FullName
+	string global::KnockOff.Documentation.Samples.Guides.IPropPerson.FullName
 	{
 		get { FullName.RecordGet(); return FullName.OnGet?.Invoke(this) ?? FullNameBacking; }
 	}

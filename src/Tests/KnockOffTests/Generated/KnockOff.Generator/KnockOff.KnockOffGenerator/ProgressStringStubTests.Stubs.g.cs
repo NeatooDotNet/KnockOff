@@ -28,13 +28,13 @@ partial class ProgressStringStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.IProgress<string>.</summary>
-		public class IProgress : System.IProgress<string>
+		/// <summary>Stub implementation of global::System.IProgress<string>.</summary>
+		public class IProgress : global::System.IProgress<string>
 		{
 			/// <summary>Interceptor for Report.</summary>
 			public IProgress_ReportInterceptor Report { get; } = new();
 
-			void System.IProgress<string>.Report(string value)
+			void global::System.IProgress<string>.Report(string value)
 			{
 				Report.RecordCall(value);
 				if (Report.OnCall is { } onCall) onCall(this, value);

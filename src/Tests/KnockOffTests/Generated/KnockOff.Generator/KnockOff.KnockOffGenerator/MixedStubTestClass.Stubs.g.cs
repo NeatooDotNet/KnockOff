@@ -53,7 +53,7 @@ partial class MixedStubTestClass
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub for KnockOff.Tests.MixedService via composition.</summary>
+		/// <summary>Stub for global::KnockOff.Tests.MixedService via composition.</summary>
 		public class MixedService
 		{
 			/// <summary>Interceptor for VirtualProperty.</summary>
@@ -61,8 +61,8 @@ partial class MixedStubTestClass
 			/// <summary>Interceptor for VirtualMethod.</summary>
 			public MixedService_VirtualMethodInterceptor VirtualMethod { get; } = new();
 
-			/// <summary>The KnockOff.Tests.MixedService instance. Pass this to code expecting the target class.</summary>
-			public KnockOff.Tests.MixedService Object { get; }
+			/// <summary>The global::KnockOff.Tests.MixedService instance. Pass this to code expecting the target class.</summary>
+			public global::KnockOff.Tests.MixedService Object { get; }
 
 			public MixedService()
 			{
@@ -76,8 +76,8 @@ partial class MixedStubTestClass
 				VirtualMethod.Reset();
 			}
 
-			/// <summary>Internal implementation that inherits from KnockOff.Tests.MixedService.</summary>
-			private sealed class Impl : KnockOff.Tests.MixedService
+			/// <summary>Internal implementation that inherits from global::KnockOff.Tests.MixedService.</summary>
+			private sealed class Impl : global::KnockOff.Tests.MixedService
 			{
 				private readonly MixedService _stub;
 

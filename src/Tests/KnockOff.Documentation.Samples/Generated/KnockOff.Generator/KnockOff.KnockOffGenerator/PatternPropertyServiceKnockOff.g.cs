@@ -36,13 +36,13 @@ partial class PatternPropertyServiceKnockOff
 	/// <summary>Interceptor for Name.</summary>
 	public NameInterceptor Name { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Concepts.IPatternPropertyService.</summary>
-	public KnockOff.Documentation.Samples.Concepts.IPatternPropertyService AsPatternPropertyService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Concepts.IPatternPropertyService.</summary>
+	public global::KnockOff.Documentation.Samples.Concepts.IPatternPropertyService AsPatternPropertyService() => this;
 
 	/// <summary>Backing storage for Name.</summary>
 	protected string NameBacking { get; set; } = "";
 
-	string KnockOff.Documentation.Samples.Concepts.IPatternPropertyService.Name
+	string global::KnockOff.Documentation.Samples.Concepts.IPatternPropertyService.Name
 	{
 		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
 		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else NameBacking = value; }

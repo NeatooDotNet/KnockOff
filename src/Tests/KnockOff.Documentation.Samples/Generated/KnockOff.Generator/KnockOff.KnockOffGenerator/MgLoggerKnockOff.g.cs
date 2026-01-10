@@ -30,10 +30,10 @@ partial class MgLoggerKnockOff
 	/// <summary>Interceptor for Log.</summary>
 	public LogInterceptor Log { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMgLogger.</summary>
-	public KnockOff.Documentation.Samples.Skills.IMgLogger AsMgLogger() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.IMgLogger.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.IMgLogger AsMgLogger() => this;
 
-	void KnockOff.Documentation.Samples.Skills.IMgLogger.Log(string message)
+	void global::KnockOff.Documentation.Samples.Skills.IMgLogger.Log(string message)
 	{
 		Log.RecordCall(message);
 		Log.OnCall?.Invoke(this, message);

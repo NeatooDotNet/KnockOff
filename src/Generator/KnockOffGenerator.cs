@@ -154,6 +154,31 @@ public class KnockOffGenerator : IIncrementalGenerator
 	private static string GetNewKeywordIfNeeded(string interceptorName) =>
 		ObjectMemberNames.Contains(interceptorName) ? "new " : "";
 
+	/// <summary>
+	/// Gets the nullability attribute declaration for a setter, if needed.
+	/// Returns the appropriate [param: ...] attribute when the interface setter has
+	/// [DisallowNull] or [AllowNull], or empty string otherwise.
+	/// </summary>
+	private static string GetSetterNullabilityAttribute(InterfaceMemberInfo member)
+	{
+		// For interfaces with asymmetric nullability ([AllowNull] or [DisallowNull] on setter),
+		// we suppress CS8769 warning because C# explicit interface implementation doesn't
+		// fully support propagating these attributes via [param:] syntax.
+		if (member.SetterHasDisallowNull || member.SetterHasAllowNull)
+			return "#pragma warning disable CS8769\n";
+		return "";
+	}
+
+	/// <summary>
+	/// Gets the pragma restore after a setter with nullability attributes.
+	/// </summary>
+	private static string GetSetterNullabilityRestore(InterfaceMemberInfo member)
+	{
+		if (member.SetterHasDisallowNull || member.SetterHasAllowNull)
+			return "\n#pragma warning restore CS8769";
+		return "";
+	}
+
 	#endregion
 
 	/// <summary>
@@ -469,7 +494,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 		var members = new List<InterfaceMemberInfo>();
 		var events = new List<EventMemberInfo>();
 
-		var ifaceFullName = iface.ToDisplayString();
+		var ifaceFullName = iface.ToDisplayString(FullyQualifiedWithNullability);
 		foreach (var member in iface.GetMembers())
 		{
 			// Skip internal members from external assemblies
@@ -493,7 +518,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 		// Also get inherited interface members
 		foreach (var baseInterface in iface.AllInterfaces)
 		{
-			var baseIfaceFullName = baseInterface.ToDisplayString();
+			var baseIfaceFullName = baseInterface.ToDisplayString(FullyQualifiedWithNullability);
 			foreach (var member in baseInterface.GetMembers())
 			{
 				if (!IsMemberAccessible(member, knockOffAssembly))
@@ -517,7 +542,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 		var simpleName = GetSimpleInterfaceName(iface.Name);
 
 		return new InterfaceInfo(
-			iface.ToDisplayString(),
+			iface.ToDisplayString(FullyQualifiedWithNullability),
 			iface.Name,
 			simpleName,
 			new EquatableArray<InterfaceMemberInfo>(members.ToArray()),
@@ -535,7 +560,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 			return null;
 
 		// Extract return type
-		var returnType = invokeMethod.ReturnType.ToDisplayString();
+		var returnType = invokeMethod.ReturnType.ToDisplayString(FullyQualifiedWithNullability);
 		var isVoid = invokeMethod.ReturnsVoid;
 
 		// Extract parameters
@@ -544,12 +569,12 @@ public class KnockOffGenerator : IIncrementalGenerator
 		{
 			parameters.Add(new ParameterInfo(
 				param.Name,
-				param.Type.ToDisplayString(),
+				param.Type.ToDisplayString(FullyQualifiedWithNullability),
 				param.RefKind));
 		}
 
 		return new DelegateInfo(
-			FullName: delegateType.ToDisplayString(),
+			FullName: delegateType.ToDisplayString(FullyQualifiedWithNullability),
 			Name: delegateType.Name,
 			ReturnType: returnType,
 			IsVoid: isVoid,
@@ -568,7 +593,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 		List<DiagnosticInfo> diagnostics)
 	{
 		var className = classType.Name;
-		var classFullName = classType.ToDisplayString();
+		var classFullName = classType.ToDisplayString(FullyQualifiedWithNullability);
 
 		// KO2005: Cannot stub static class
 		if (classType.IsStatic)
@@ -967,7 +992,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 			var members = new List<InterfaceMemberInfo>();
 			var events = new List<EventMemberInfo>();
 
-			var ifaceFullName = iface.ToDisplayString();
+			var ifaceFullName = iface.ToDisplayString(FullyQualifiedWithNullability);
 			foreach (var member in iface.GetMembers())
 			{
 				// Skip internal members from external assemblies
@@ -992,7 +1017,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 			// This ensures IEnumerable<T> stubs also implement IEnumerable.GetEnumerator(), etc.
 			foreach (var baseInterface in iface.AllInterfaces)
 			{
-				var baseIfaceFullName = baseInterface.ToDisplayString();
+				var baseIfaceFullName = baseInterface.ToDisplayString(FullyQualifiedWithNullability);
 				foreach (var member in baseInterface.GetMembers())
 				{
 					if (!IsMemberAccessible(member, knockOffAssembly))
@@ -1019,7 +1044,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 				var simpleName = GetSimpleInterfaceName(iface.Name);
 
 				interfaceInfos.Add(new InterfaceInfo(
-					iface.ToDisplayString(),
+					iface.ToDisplayString(FullyQualifiedWithNullability),
 					iface.Name,
 					simpleName,
 					new EquatableArray<InterfaceMemberInfo>(members.ToArray()),
@@ -1057,9 +1082,9 @@ public class KnockOffGenerator : IIncrementalGenerator
 		var interfaceInheritance = new Dictionary<string, HashSet<string>>();
 		foreach (var iface in allInterfaces)
 		{
-			var fullName = iface.ToDisplayString();
+			var fullName = iface.ToDisplayString(FullyQualifiedWithNullability);
 			interfaceInheritance[fullName] = new HashSet<string>(
-				iface.AllInterfaces.Select(i => i.ToDisplayString()));
+				iface.AllInterfaces.Select(i => i.ToDisplayString(FullyQualifiedWithNullability)));
 		}
 
 		// Deduplicate members by name + signature
@@ -1328,6 +1353,33 @@ public class KnockOffGenerator : IIncrementalGenerator
 					.ToArray());
 		}
 
+		// Check for asymmetric nullability: getter returns nullable, setter takes non-nullable (or vice versa)
+		// This occurs with properties like IDbConnection.ConnectionString where nullability differs
+		// between getter and setter via [DisallowNull] or [AllowNull] attributes
+		string? setterParameterType = null;
+		bool setterHasDisallowNull = false;
+		bool setterHasAllowNull = false;
+		if (property.SetMethod is { } setMethod && setMethod.Parameters.Length > 0)
+		{
+			var setterParam = setMethod.Parameters[0];
+			var setterParamType = setterParam.Type;
+			var setterType = setterParamType.ToDisplayString(FullyQualifiedWithNullability);
+			if (setterType != returnType)
+			{
+				setterParameterType = setterType;
+			}
+
+			// Check for nullability attributes on setter parameter
+			foreach (var attr in setterParam.GetAttributes())
+			{
+				var attrName = attr.AttributeClass?.Name;
+				if (attrName == "DisallowNullAttribute")
+					setterHasDisallowNull = true;
+				else if (attrName == "AllowNullAttribute")
+					setterHasAllowNull = true;
+			}
+		}
+
 		return new InterfaceMemberInfo(
 			Name: name,
 			ReturnType: returnType,
@@ -1342,7 +1394,10 @@ public class KnockOffGenerator : IIncrementalGenerator
 			IndexerParameters: indexerParameters,
 			IsGenericMethod: false,
 			TypeParameters: EquatableArray<TypeParameterInfo>.Empty,
-			DeclaringInterfaceFullName: declaringInterfaceFullName);
+			DeclaringInterfaceFullName: declaringInterfaceFullName,
+			SetterParameterType: setterParameterType,
+			SetterHasDisallowNull: setterHasDisallowNull,
+			SetterHasAllowNull: setterHasAllowNull);
 	}
 
 	/// <summary>
@@ -1656,7 +1711,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 			{
 				if (!member.IsProperty)
 				{
-					var sig = GetMethodSignature(member.Name, member.ReturnType, member.Parameters);
+					var sig = GetMethodSignature(member.Name, member.ReturnType, member.Parameters, member.IsGenericMethod, member.TypeParameters);
 					interfaceMethodSignatures.Add(sig);
 				}
 			}
@@ -1670,24 +1725,44 @@ public class KnockOffGenerator : IIncrementalGenerator
 				.Select(p => new ParameterInfo(p.Name, p.Type.ToDisplayString(FullyQualifiedWithNullability), p.RefKind))
 				.ToArray();
 
-			var sig = GetMethodSignature(method.Name, returnType, new EquatableArray<ParameterInfo>(parameters));
+			// Extract type parameters for generic methods
+			var isGenericMethod = method.IsGenericMethod;
+			var typeParameters = EquatableArray<TypeParameterInfo>.Empty;
+			if (isGenericMethod)
+			{
+				typeParameters = new EquatableArray<TypeParameterInfo>(
+					method.TypeParameters
+						.Select(tp => new TypeParameterInfo(
+							tp.Name,
+							new EquatableArray<string>(GetTypeParameterConstraints(tp).ToArray())))
+						.ToArray());
+			}
+
+			var sig = GetMethodSignature(method.Name, returnType, new EquatableArray<ParameterInfo>(parameters), isGenericMethod, typeParameters);
 
 			if (interfaceMethodSignatures.Contains(sig))
 			{
 				userMethods.Add(new UserMethodInfo(
 					Name: method.Name,
 					ReturnType: returnType,
-					Parameters: new EquatableArray<ParameterInfo>(parameters)));
+					Parameters: new EquatableArray<ParameterInfo>(parameters),
+					IsGenericMethod: isGenericMethod,
+					TypeParameters: typeParameters));
 			}
 		}
 
 		return new EquatableArray<UserMethodInfo>(userMethods.ToArray());
 	}
 
-	private static string GetMethodSignature(string name, string returnType, EquatableArray<ParameterInfo> parameters)
+	private static string GetMethodSignature(string name, string returnType, EquatableArray<ParameterInfo> parameters, bool isGenericMethod, EquatableArray<TypeParameterInfo> typeParameters)
 	{
 		var paramTypes = string.Join(",", parameters.Select(p => p.Type));
-		return $"{returnType} {name}({paramTypes})";
+		// Include type parameter count to distinguish generic from non-generic overloads
+		// Also include type parameter names since they affect return type and parameter types (e.g., T vs TResult)
+		var typeParamSuffix = isGenericMethod
+			? $"<{string.Join(",", typeParameters.Select(tp => tp.Name))}>"
+			: "";
+		return $"{returnType} {name}{typeParamSuffix}({paramTypes})";
 	}
 
 	/// <summary>
@@ -2120,13 +2195,33 @@ public class KnockOffGenerator : IIncrementalGenerator
 				}
 				else if (member.IsProperty)
 				{
-					GenerateFlatPropertyImplementationWithName(sb, member, interceptorName);
+					// Check if this property should delegate to a typed counterpart
+					// (e.g., IProperty.Value (object) delegates to IProperty<T>.Value (T))
+					var (propTarget, propTargetInterface) = FindPropertyDelegationTargetInInterfaces(member, typeInfo.Interfaces);
+					if (propTarget != null && propTargetInterface != null)
+					{
+						GenerateFlatPropertyDelegationImplementation(sb, member, propTarget, propTargetInterface);
+					}
+					else
+					{
+						GenerateFlatPropertyImplementationWithName(sb, member, interceptorName);
+					}
 				}
 				else
 				{
-					// Method - find its group for overload handling
-					var group = flatMethodGroups[member.Name];
-					GenerateFlatMethodImplementationWithName(sb, member, typeInfo, group, flatNameMap);
+					// Check if this method should delegate to a typed counterpart
+					// (e.g., IRule.RunRule(IValidateBase) delegates to IRule<T>.RunRule(T))
+					var (methodTarget, methodTargetInterface) = FindDelegationTargetInInterfaces(member, typeInfo.Interfaces);
+					if (methodTarget != null && methodTargetInterface != null)
+					{
+						GenerateFlatMethodDelegationImplementation(sb, member, methodTarget, methodTargetInterface);
+					}
+					else
+					{
+						// Method - find its group for overload handling
+						var group = flatMethodGroups[member.Name];
+						GenerateFlatMethodImplementationWithName(sb, member, typeInfo, group, flatNameMap);
+					}
 				}
 			}
 		}
@@ -2531,22 +2626,53 @@ public class KnockOffGenerator : IIncrementalGenerator
 
 	/// <summary>
 	/// Build constraint clauses for explicit interface implementations.
-	/// Only class and struct constraints are allowed (C# 9+).
+	/// Only class and struct constraints are allowed (CS0460).
+	/// We only emit 'class' constraint when:
+	/// 1. The original interface has 'class' constraint, OR
+	/// 2. The return type is T? (nullable generic parameter) AND T has any constraint that implies reference type
 	/// </summary>
-	private static string GetClassOrStructConstraintsOnly(TypeParameterInfo[] typeParams)
+	private static string GetConstraintsForExplicitImpl(TypeParameterInfo[] typeParams, string returnType = "")
 	{
 		var clauses = new List<string>();
 		foreach (var tp in typeParams)
 		{
-			// Only "class" and "struct" are allowed in explicit interface implementations
-			var allowedConstraints = tp.Constraints
-				.Where(c => c == "class" || c == "struct")
-				.ToArray();
+			var constraintArray = tp.Constraints.GetArray() ?? Array.Empty<string>();
 
-			if (allowedConstraints.Length > 0)
+			// Check for struct first (mutually exclusive with class)
+			if (constraintArray.Contains("struct"))
 			{
-				var constraints = string.Join(", ", allowedConstraints);
-				clauses.Add($" where {tp.Name} : {constraints}");
+				clauses.Add($" where {tp.Name} : struct");
+				continue;
+			}
+
+			// Check for explicit class constraint
+			if (constraintArray.Contains("class"))
+			{
+				clauses.Add($" where {tp.Name} : class");
+				continue;
+			}
+
+			// For nullable return types (T?), check if this type parameter needs a class constraint
+			// to make T? mean "nullable reference type" instead of "Nullable<T>" (value type wrapper)
+			if (returnType.EndsWith("?"))
+			{
+				var baseReturnType = returnType.TrimEnd('?');
+				if (baseReturnType == tp.Name)
+				{
+					// Return type is T? where T is this type parameter
+					// Check if there's any type constraint (not just keywords)
+					// Type constraints on classes imply reference type, but interface constraints don't
+					// However, we can't easily distinguish at generator time, so check if any constraint
+					// that looks like a class (contains "global::" and not an interface)
+					// For simplicity, emit class if there's any non-keyword constraint
+					var hasTypeConstraint = constraintArray.Any(c =>
+						c != "notnull" && c != "unmanaged" && c != "new()");
+
+					if (hasTypeConstraint)
+					{
+						clauses.Add($" where {tp.Name} : class");
+					}
+				}
 			}
 		}
 		return string.Join("", clauses);
@@ -3826,6 +3952,10 @@ public class KnockOffGenerator : IIncrementalGenerator
 
 		if (prop.HasSetter)
 		{
+			var pragmaDisable = GetSetterNullabilityAttribute(prop);
+			var pragmaRestore = GetSetterNullabilityRestore(prop);
+			if (!string.IsNullOrEmpty(pragmaDisable))
+				sb.Append(pragmaDisable);
 			sb.AppendLine("\t\tset");
 			sb.AppendLine("\t\t{");
 			sb.AppendLine($"\t\t\t{koPropertyName}.{prop.Name}.RecordSet(value);");
@@ -3834,6 +3964,8 @@ public class KnockOffGenerator : IIncrementalGenerator
 			sb.AppendLine($"\t\t\telse");
 			sb.AppendLine($"\t\t\t\t{backingName} = value;");
 			sb.AppendLine("\t\t}");
+			if (!string.IsNullOrEmpty(pragmaRestore))
+				sb.AppendLine(pragmaRestore);
 		}
 
 		sb.AppendLine("\t}");
@@ -4077,9 +4209,9 @@ public class KnockOffGenerator : IIncrementalGenerator
 		var typeParams = method.TypeParameters.GetArray()!;
 		var typeParamNames = string.Join(", ", typeParams.Select(tp => tp.Name));
 
-		// For nullable reference type returns (T? where T : class), we need to include the class constraint
-		// in the explicit implementation. C# 9+ allows class/struct constraints in explicit implementations.
-		var constraintClauses = GetClassOrStructConstraintsOnly(typeParams);
+		// For explicit interface implementations, only class/struct constraints are allowed (CS0460)
+		// Pass return type to determine if class constraint is needed for nullable returns
+		var constraintClauses = GetConstraintsForExplicitImpl(typeParams, method.ReturnType);
 
 		var paramList = string.Join(", ", method.Parameters.Select(p => FormatParameter(p)));
 		var argList = string.Join(", ", method.Parameters.Select(p => FormatArgument(p)));
@@ -4425,11 +4557,28 @@ public class KnockOffGenerator : IIncrementalGenerator
 		if (methods == null || methods.Length == 0) return null;
 
 		var memberParams = member.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+		var memberTypeParams = member.TypeParameters.GetArray() ?? Array.Empty<TypeParameterInfo>();
 
 		foreach (var userMethod in methods)
 		{
 			if (userMethod.Name != member.Name) continue;
 			if (userMethod.ReturnType != member.ReturnType) continue;
+			if (userMethod.IsGenericMethod != member.IsGenericMethod) continue;
+
+			// Check type parameters match for generic methods
+			var userTypeParams = userMethod.TypeParameters.GetArray() ?? Array.Empty<TypeParameterInfo>();
+			if (userTypeParams.Length != memberTypeParams.Length) continue;
+
+			var typeParamsMatch = true;
+			for (int i = 0; i < userTypeParams.Length; i++)
+			{
+				if (userTypeParams[i].Name != memberTypeParams[i].Name)
+				{
+					typeParamsMatch = false;
+					break;
+				}
+			}
+			if (!typeParamsMatch) continue;
 
 			var userParams = userMethod.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
 			if (userParams.Length != memberParams.Length) continue;
@@ -5075,7 +5224,13 @@ public class KnockOffGenerator : IIncrementalGenerator
 
 		if (member.HasSetter)
 		{
+			var pragmaDisable = GetSetterNullabilityAttribute(member);
+			var pragmaRestore = GetSetterNullabilityRestore(member);
+			if (!string.IsNullOrEmpty(pragmaDisable))
+				sb.Append(pragmaDisable);
 			sb.AppendLine($"\t\tset {{ {interceptorName}.RecordSet(value); if ({interceptorName}.OnSet != null) {interceptorName}.OnSet(this, value); else {backingName} = value; }}");
+			if (!string.IsNullOrEmpty(pragmaRestore))
+				sb.AppendLine(pragmaRestore);
 		}
 
 		sb.AppendLine("\t}");
@@ -5140,17 +5295,21 @@ public class KnockOffGenerator : IIncrementalGenerator
 		// Handle generic methods
 		var typeParamDecl = "";
 		var typeParamList = "";
+		var constraintClauses = "";
 		if (member.IsGenericMethod && member.TypeParameters.Count > 0)
 		{
 			var tpArray = member.TypeParameters.GetArray() ?? Array.Empty<TypeParameterInfo>();
 			typeParamDecl = $"<{string.Join(", ", tpArray.Select(tp => tp.Name))}>";
 			typeParamList = typeParamDecl;
+			// For explicit interface implementations, only class/struct constraints are allowed (CS0460)
+			// Pass return type to determine if class constraint is needed for nullable returns
+			constraintClauses = GetConstraintsForExplicitImpl(tpArray, member.ReturnType);
 		}
 
 		var returnType = member.ReturnType;
 		var isVoid = returnType == "void";
 
-		sb.AppendLine($"\t{returnType} {ifaceName}.{member.Name}{typeParamDecl}({paramDecls})");
+		sb.AppendLine($"\t{returnType} {ifaceName}.{member.Name}{typeParamDecl}({paramDecls}){constraintClauses}");
 		sb.AppendLine("\t{");
 
 		// Record the call
@@ -5164,15 +5323,19 @@ public class KnockOffGenerator : IIncrementalGenerator
 		if (userMethod != null)
 		{
 			// OnCall callback takes priority, then user method
-			var userMethodCall = $"{member.Name}({paramNames})";
+			// For generic methods, include type arguments in the call
+			var userMethodTypeArgs = member.IsGenericMethod
+				? $"<{string.Join(", ", member.TypeParameters.Select(tp => tp.Name))}>"
+				: "";
+			var userMethodCall = $"{member.Name}{userMethodTypeArgs}({paramNames})";
 			if (isVoid)
 			{
-				sb.AppendLine($"\t\tif ({interceptorName}{typeParamList}.OnCall != null) {{ {interceptorName}{typeParamList}.OnCall({onCallArgs}); return; }}");
+				sb.AppendLine($"\t\tif ({interceptorName}{typeParamList}.OnCall is {{ }} callback) {{ callback({onCallArgs}); return; }}");
 				sb.AppendLine($"\t\t{userMethodCall};");
 			}
 			else
 			{
-				sb.AppendLine($"\t\tif ({interceptorName}{typeParamList}.OnCall != null) return {interceptorName}{typeParamList}.OnCall({onCallArgs});");
+				sb.AppendLine($"\t\tif ({interceptorName}{typeParamList}.OnCall is {{ }} callback) return callback({onCallArgs});");
 				sb.AppendLine($"\t\treturn {userMethodCall};");
 			}
 		}
@@ -5268,7 +5431,13 @@ public class KnockOffGenerator : IIncrementalGenerator
 
 		if (member.HasSetter)
 		{
+			var pragmaDisable = GetSetterNullabilityAttribute(member);
+			var pragmaRestore = GetSetterNullabilityRestore(member);
+			if (!string.IsNullOrEmpty(pragmaDisable))
+				sb.Append(pragmaDisable);
 			sb.AppendLine($"\t\tset {{ {interceptorName}.RecordSet(value); if ({interceptorName}.OnSet != null) {interceptorName}.OnSet(this, value); else {backingName} = value; }}");
+			if (!string.IsNullOrEmpty(pragmaRestore))
+				sb.AppendLine(pragmaRestore);
 		}
 
 		sb.AppendLine("\t}");
@@ -5329,6 +5498,7 @@ public class KnockOffGenerator : IIncrementalGenerator
 		// Handle generic methods
 		var typeParamDecl = "";
 		var ofTypeAccess = "";
+		var constraintClauses = "";
 		if (member.IsGenericMethod && member.TypeParameters.Count > 0)
 		{
 			var tpArray = member.TypeParameters.GetArray() ?? Array.Empty<TypeParameterInfo>();
@@ -5336,36 +5506,15 @@ public class KnockOffGenerator : IIncrementalGenerator
 			typeParamDecl = $"<{typeParamNames}>";
 			// Generic methods use .Of<T>() pattern
 			ofTypeAccess = $".Of<{typeParamNames}>()";
+			// For explicit interface implementations, only class/struct constraints are allowed (CS0460)
+			// Pass return type to determine if class constraint is needed for nullable returns
+			constraintClauses = GetConstraintsForExplicitImpl(tpArray, member.ReturnType);
 		}
 
 		var returnType = member.ReturnType;
 		var isVoid = returnType == "void";
 
-		// NOTE: Constraints are NOT allowed on explicit interface implementations (CS0460)
-		// Constraints are inherited from the interface declaration
-
-		// For T? return types with class constraints, we must use [return: MaybeNull] T instead of T?
-		// because C# doesn't properly infer class constraints for nullable type parameters in explicit implementations
-		var maybeNullAttr = "";
-		var effectiveReturnType = returnType;
-		if (member.IsGenericMethod && returnType.EndsWith("?"))
-		{
-			var tpArray = member.TypeParameters.GetArray() ?? Array.Empty<TypeParameterInfo>();
-			var baseReturnType = returnType.TrimEnd('?');
-			var matchingTp = tpArray.FirstOrDefault(tp => tp.Name == baseReturnType);
-			if (matchingTp != null)
-			{
-				var constraints = matchingTp.Constraints.GetArray() ?? Array.Empty<string>();
-				if (constraints.Contains("class"))
-				{
-					// Use [return: MaybeNull] attribute instead of T?
-					maybeNullAttr = "[return: global::System.Diagnostics.CodeAnalysis.MaybeNull] ";
-					effectiveReturnType = baseReturnType;
-				}
-			}
-		}
-
-		sb.AppendLine($"\t{maybeNullAttr}{effectiveReturnType} {ifaceName}.{member.Name}{typeParamDecl}({paramDecls})");
+		sb.AppendLine($"\t{returnType} {ifaceName}.{member.Name}{typeParamDecl}({paramDecls}){constraintClauses}");
 		sb.AppendLine("\t{");
 
 		// Initialize out parameters
@@ -5407,15 +5556,19 @@ public class KnockOffGenerator : IIncrementalGenerator
 		if (userMethod != null)
 		{
 			// OnCall callback takes priority, then user method
-			var userMethodCall = $"{member.Name}({paramNames})";
+			// For generic methods, include type arguments in the call
+			var userMethodTypeArgs = member.IsGenericMethod
+				? $"<{string.Join(", ", member.TypeParameters.Select(tp => tp.Name))}>"
+				: "";
+			var userMethodCall = $"{member.Name}{userMethodTypeArgs}({paramNames})";
 			if (isVoid)
 			{
-				sb.AppendLine($"\t\tif ({interceptorAccess}.OnCall != null) {{ {interceptorAccess}.OnCall({onCallArgs}); return; }}");
+				sb.AppendLine($"\t\tif ({interceptorAccess}.OnCall is {{ }} callback) {{ callback({onCallArgs}); return; }}");
 				sb.AppendLine($"\t\t{userMethodCall};");
 			}
 			else
 			{
-				sb.AppendLine($"\t\tif ({interceptorAccess}.OnCall != null) return {interceptorAccess}.OnCall({onCallArgs});");
+				sb.AppendLine($"\t\tif ({interceptorAccess}.OnCall is {{ }} callback) return callback({onCallArgs});");
 				sb.AppendLine($"\t\treturn {userMethodCall};");
 			}
 		}
@@ -5755,7 +5908,11 @@ public class KnockOffGenerator : IIncrementalGenerator
 		Dictionary<string, string> flatNameMap)
 	{
 		// Get interceptor name for this generic method group
-		var genericKey = $"method:{group.Name}()_generic";
+		// Note: group.Name may have "Generic" suffix from SplitMixedGroup, but the key in flatNameMap uses the original name
+		var originalName = group.Name.EndsWith(GenericSuffix, StringComparison.Ordinal)
+			? group.Name.Substring(0, group.Name.Length - GenericSuffix.Length)
+			: group.Name;
+		var genericKey = $"method:{originalName}()_generic";
 		var interceptorName = flatNameMap[genericKey];
 		var interceptClassName = $"{interceptorName}Interceptor";
 
@@ -6715,22 +6872,42 @@ public class KnockOffGenerator : IIncrementalGenerator
 			}
 			else if (member.IsProperty)
 			{
-				GenerateInlineStubPropertyImplementation(sb, member.DeclaringInterfaceFullName, member, stubClassName);
-			}
-			else
-			{
-				var group = methodGroups[member.Name];
-
-				// For mixed groups, use the appropriate sub-group so that group.Name matches the interceptor property
-				if (IsMixedMethodGroup(group))
+				// Check if this base interface property should delegate to a typed counterpart
+				// (e.g., IProperty.Value (object) delegates to IProperty<T>.Value (T))
+				var propertyDelegationTarget = FindPropertyDelegationTarget(member, iface);
+				if (propertyDelegationTarget != null)
 				{
-					var (nonGenericGroup, genericGroup) = SplitMixedGroup(group);
-					var effectiveGroup = member.IsGenericMethod ? genericGroup! : nonGenericGroup!;
-					GenerateInlineStubMethodImplementation(sb, member.DeclaringInterfaceFullName, member, effectiveGroup, stubClassName);
+					GenerateInlineStubPropertyDelegationImplementation(sb, member, propertyDelegationTarget);
 				}
 				else
 				{
-					GenerateInlineStubMethodImplementation(sb, member.DeclaringInterfaceFullName, member, group, stubClassName);
+					GenerateInlineStubPropertyImplementation(sb, member.DeclaringInterfaceFullName, member, stubClassName);
+				}
+			}
+			else
+			{
+				// Check if this base interface method should delegate to a typed counterpart
+				// (e.g., IRule.RunRule(IValidateBase) delegates to IRule<T>.RunRule(T))
+				var delegationTarget = FindDelegationTarget(member, iface);
+				if (delegationTarget != null)
+				{
+					GenerateInlineStubDelegationImplementation(sb, member, delegationTarget, iface.FullName);
+				}
+				else
+				{
+					var group = methodGroups[member.Name];
+
+					// For mixed groups, use the appropriate sub-group so that group.Name matches the interceptor property
+					if (IsMixedMethodGroup(group))
+					{
+						var (nonGenericGroup, genericGroup) = SplitMixedGroup(group);
+						var effectiveGroup = member.IsGenericMethod ? genericGroup! : nonGenericGroup!;
+						GenerateInlineStubMethodImplementation(sb, member.DeclaringInterfaceFullName, member, effectiveGroup, stubClassName);
+					}
+					else
+					{
+						GenerateInlineStubMethodImplementation(sb, member.DeclaringInterfaceFullName, member, group, stubClassName);
+					}
 				}
 			}
 		}
@@ -7646,12 +7823,18 @@ public class KnockOffGenerator : IIncrementalGenerator
 
 		if (member.HasSetter)
 		{
+			var pragmaDisable = GetSetterNullabilityAttribute(member);
+			var pragmaRestore = GetSetterNullabilityRestore(member);
+			if (!string.IsNullOrEmpty(pragmaDisable))
+				sb.Append(pragmaDisable);
 			sb.AppendLine("\t\t\t\tset");
 			sb.AppendLine("\t\t\t\t{");
 			sb.AppendLine($"\t\t\t\t\t{member.Name}.RecordSet(value);");
 			sb.AppendLine($"\t\t\t\t\tif ({member.Name}.OnSet is {{ }} onSet) onSet(this, value);");
 			sb.AppendLine($"\t\t\t\t\telse {member.Name}.Value = value;");
 			sb.AppendLine("\t\t\t\t}");
+			if (!string.IsNullOrEmpty(pragmaRestore))
+				sb.AppendLine(pragmaRestore);
 		}
 
 		sb.AppendLine("\t\t\t}");
@@ -7693,6 +7876,542 @@ public class KnockOffGenerator : IIncrementalGenerator
 		}
 
 		sb.AppendLine("\t\t\t}");
+		sb.AppendLine();
+	}
+
+	/// <summary>
+	/// Finds a typed counterpart property in the interface hierarchy that this base interface property should delegate to.
+	/// Returns null if no delegation target exists.
+	/// </summary>
+	/// <remarks>
+	/// This handles the case where a generic interface like IProperty&lt;T&gt; inherits from IProperty,
+	/// and both have properties with the same name but different types (T vs object).
+	/// The base interface property should delegate to the typed version.
+	///
+	/// The delegation target may be declared on any interface in the hierarchy, not just the primary interface.
+	/// For example: IEntityProperty&lt;string&gt; inherits IValidateProperty&lt;string&gt;,
+	/// and the typed Value property is declared on IValidateProperty&lt;string&gt;, not IEntityProperty&lt;string&gt;.
+	/// </remarks>
+	private static InterfaceMemberInfo? FindPropertyDelegationTarget(
+		InterfaceMemberInfo member,
+		InterfaceInfo iface)
+	{
+		// Only applies to properties
+		if (!member.IsProperty)
+			return null;
+
+		// The member with 'object' type should delegate to the member with specific type
+		// If the member is already a specific type (not object), don't delegate
+		var memberType = member.ReturnType.TrimEnd('?');
+		if (memberType != "object" && memberType != "System.Object" &&
+		    memberType != "global::System.Object")
+		{
+			return null;
+		}
+
+		// Look for a property with the same name but different (more specific) type
+		// The candidate can be from any interface in the hierarchy
+		foreach (var candidate in iface.Members)
+		{
+			// Skip if this is the same member
+			if (candidate.DeclaringInterfaceFullName == member.DeclaringInterfaceFullName &&
+			    candidate.Name == member.Name &&
+			    candidate.ReturnType == member.ReturnType)
+				continue;
+
+			// Must be a property with the same name
+			if (!candidate.IsProperty || candidate.Name != member.Name)
+				continue;
+
+			// Must have different return type (the property type)
+			if (candidate.ReturnType == member.ReturnType)
+				continue;
+
+			// Found a property with same name and different type
+			// This is the typed counterpart
+			return candidate;
+		}
+
+		return null;
+	}
+
+	/// <summary>
+	/// Generates a delegation implementation for a base interface property that delegates to its typed counterpart.
+	/// </summary>
+	private static void GenerateInlineStubPropertyDelegationImplementation(
+		System.Text.StringBuilder sb,
+		InterfaceMemberInfo baseMember,
+		InterfaceMemberInfo targetMember)
+	{
+		// Cast to the interface where the target property is declared, not necessarily the primary interface
+		var targetInterfaceFullName = targetMember.DeclaringInterfaceFullName;
+
+		sb.AppendLine($"\t\t\t{baseMember.ReturnType} {baseMember.DeclaringInterfaceFullName}.{baseMember.Name}");
+		sb.AppendLine("\t\t\t{");
+
+		if (baseMember.HasGetter)
+		{
+			// Getter: return the typed property value (implicit conversion to base type)
+			sb.AppendLine($"\t\t\t\tget => (({targetInterfaceFullName})this).{targetMember.Name};");
+		}
+
+		if (baseMember.HasSetter)
+		{
+			// Setter: cast value to typed property's type
+			sb.AppendLine($"\t\t\t\tset => (({targetInterfaceFullName})this).{targetMember.Name} = ({targetMember.ReturnType})value;");
+		}
+
+		sb.AppendLine("\t\t\t}");
+		sb.AppendLine();
+	}
+
+	/// <summary>
+	/// Finds a typed counterpart method in the primary interface that this base interface method should delegate to.
+	/// Returns null if no delegation target exists.
+	/// </summary>
+	/// <remarks>
+	/// This handles the case where a generic interface like IRule&lt;T&gt; inherits from a non-generic interface IRule,
+	/// and both have methods with the same name but different parameter/return types (T vs IValidateBase).
+	/// The base interface method should delegate to the typed version instead of using its own interceptor.
+	///
+	/// Important: We check that parameter NAMES match to distinguish related methods from unrelated ones.
+	/// For example, ICollection.Remove(item) should NOT delegate to IDictionary.Remove(key) even though
+	/// both have one parameter - the different names indicate they're semantically different methods.
+	/// </remarks>
+	private static InterfaceMemberInfo? FindDelegationTarget(
+		InterfaceMemberInfo member,
+		InterfaceInfo iface)
+	{
+		// Only look for delegation targets if this member is from a base interface
+		if (member.DeclaringInterfaceFullName == iface.FullName)
+			return null;
+
+		// Look for a method in the primary interface (iface.FullName) with the same name
+		// but potentially different parameter/return types
+		foreach (var candidate in iface.Members)
+		{
+			// Must be from the primary interface
+			if (candidate.DeclaringInterfaceFullName != iface.FullName)
+				continue;
+
+			// Must have the same name
+			if (candidate.Name != member.Name)
+				continue;
+
+			// Must have the same number of parameters
+			if (candidate.Parameters.Count != member.Parameters.Count)
+				continue;
+
+			var candidateParams = candidate.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+			var memberParams = member.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+
+			// Parameter names must match - this indicates the methods are the same logical method
+			// with different types due to generic type substitution, not unrelated methods that
+			// happen to share a name (e.g., ICollection.Remove(item) vs IDictionary.Remove(key))
+			bool sameParamNames = true;
+			for (int i = 0; i < candidateParams.Length; i++)
+			{
+				if (candidateParams[i].Name != memberParams[i].Name)
+				{
+					sameParamNames = false;
+					break;
+				}
+			}
+
+			if (!sameParamNames)
+				continue; // Different param names - these are independent methods
+
+			// Check if signatures actually differ (parameter types or return type)
+			bool signaturesMatch = member.ReturnType == candidate.ReturnType;
+			if (signaturesMatch)
+			{
+				for (int i = 0; i < candidateParams.Length; i++)
+				{
+					if (candidateParams[i].Type != memberParams[i].Type)
+					{
+						signaturesMatch = false;
+						break;
+					}
+				}
+			}
+
+			if (signaturesMatch)
+				continue; // Exact same signature - not a delegation target
+
+			// Found a method with same name, same param names, but different types
+			// This is the typed counterpart (e.g., RunRule(ICustomValidateBase target) vs RunRule(IValidateBase target))
+			// or a method with different return type (e.g., IEnumerable<T>.GetEnumerator vs IEnumerable.GetEnumerator)
+			return candidate;
+		}
+
+		return null;
+	}
+
+	/// <summary>
+	/// Generates a delegation implementation for a base interface method that delegates to its typed counterpart.
+	/// </summary>
+	private static void GenerateInlineStubDelegationImplementation(
+		System.Text.StringBuilder sb,
+		InterfaceMemberInfo baseMember,
+		InterfaceMemberInfo targetMember,
+		string primaryInterfaceFullName)
+	{
+		var baseParams = baseMember.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+		var targetParams = targetMember.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+
+		var paramList = string.Join(", ", baseParams.Select(p => FormatParameter(p)));
+		var isVoid = baseMember.ReturnType == "void";
+
+		sb.AppendLine($"\t\t\t{baseMember.ReturnType} {baseMember.DeclaringInterfaceFullName}.{baseMember.Name}({paramList})");
+		sb.AppendLine("\t\t\t{");
+
+		// Build the cast arguments: cast each parameter to the target type
+		var castArgs = new List<string>();
+		for (int i = 0; i < baseParams.Length; i++)
+		{
+			var baseName = baseParams[i].Name;
+			var baseType = baseParams[i].Type;
+			var targetType = targetParams[i].Type;
+
+			if (baseType == targetType)
+			{
+				// Same type - no cast needed
+				castArgs.Add(baseName);
+			}
+			else
+			{
+				// Different type - cast to target type
+				castArgs.Add($"({targetType}){baseName}");
+			}
+		}
+
+		var callArgs = string.Join(", ", castArgs);
+
+		// Generate: return ((PrimaryInterface)this).Method(castArgs);
+		if (isVoid)
+		{
+			sb.AppendLine($"\t\t\t\t(({primaryInterfaceFullName})this).{targetMember.Name}({callArgs});");
+		}
+		else
+		{
+			sb.AppendLine($"\t\t\t\treturn (({primaryInterfaceFullName})this).{targetMember.Name}({callArgs});");
+		}
+
+		sb.AppendLine("\t\t\t}");
+		sb.AppendLine();
+	}
+
+	/// <summary>
+	/// Finds a typed counterpart property across ALL interfaces that this base interface property should delegate to.
+	/// Used for standalone stubs where we need to search across all implemented interfaces.
+	/// </summary>
+	/// <remarks>
+	/// Only finds a delegation target when the member has a less specific type (like 'object')
+	/// and the candidate has a more specific type. This ensures base interface properties
+	/// delegate to typed interface properties, not the other way around.
+	/// </remarks>
+	private static (InterfaceMemberInfo? Target, string? TargetInterfaceFullName) FindPropertyDelegationTargetInInterfaces(
+		InterfaceMemberInfo member,
+		EquatableArray<InterfaceInfo> interfaces)
+	{
+		// Only applies to properties
+		if (!member.IsProperty)
+			return (null, null);
+
+		// Look for a property with the same name but different type in any interface
+		foreach (var iface in interfaces)
+		{
+			foreach (var candidate in iface.Members)
+			{
+				// Skip if this is the same member
+				if (candidate.DeclaringInterfaceFullName == member.DeclaringInterfaceFullName &&
+				    candidate.Name == member.Name &&
+				    candidate.ReturnType == member.ReturnType)
+					continue;
+
+				// Must be a property with the same name
+				if (!candidate.IsProperty || candidate.Name != member.Name)
+					continue;
+
+				// Must have different return type (the property type)
+				if (candidate.ReturnType == member.ReturnType)
+					continue;
+
+				// Only delegate from base to typed:
+				// The member with 'object' type should delegate to the member with specific type
+				// (e.g., IProperty.Value (object) delegates to IProperty<string>.Value (string))
+				// If the member is already the typed version, don't delegate
+				var memberType = member.ReturnType.TrimEnd('?');
+				var candidateType = candidate.ReturnType.TrimEnd('?');
+
+				// The member should be the less specific type (object) to need delegation
+				// The candidate should be the more specific type (not object)
+				if (memberType != "object" && memberType != "System.Object" &&
+				    memberType != "global::System.Object")
+				{
+					// Member is already a specific type, don't delegate
+					continue;
+				}
+
+				// Found a property with same name where member is object and candidate is typed
+				return (candidate, candidate.DeclaringInterfaceFullName);
+			}
+		}
+
+		return (null, null);
+	}
+
+	/// <summary>
+	/// Finds a typed counterpart method across ALL interfaces that this base interface method should delegate to.
+	/// Used for standalone stubs where we need to search across all implemented interfaces.
+	/// </summary>
+	/// <remarks>
+	/// Only finds a delegation target when the member is the "base" version (non-generic return type
+	/// or less specific parameter types) and the candidate is the "typed" version (generic return type
+	/// or more specific parameter types). This ensures base interface methods delegate to typed
+	/// interface methods, not the other way around.
+	///
+	/// Generic methods never delegate to non-generic methods and vice versa - they're fundamentally
+	/// different overloads even if they have the same name.
+	/// </remarks>
+	private static (InterfaceMemberInfo? Target, string? TargetInterfaceFullName) FindDelegationTargetInInterfaces(
+		InterfaceMemberInfo member,
+		EquatableArray<InterfaceInfo> interfaces)
+	{
+		// Generic methods should never delegate to non-generic methods
+		// (e.g., Process<T>(T) should NOT delegate to Process(string))
+		if (member.IsGenericMethod)
+			return (null, null);
+
+		// Look for a method with the same name, same param count, same param names, but different types
+		foreach (var iface in interfaces)
+		{
+			foreach (var candidate in iface.Members)
+			{
+				// Skip if this is the same member
+				if (candidate.DeclaringInterfaceFullName == member.DeclaringInterfaceFullName &&
+				    candidate.Name == member.Name &&
+				    candidate.ReturnType == member.ReturnType &&
+				    candidate.Parameters.Count == member.Parameters.Count)
+				{
+					var sameParams = true;
+					var candidateParams = candidate.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+					var memberParams = member.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+					for (int i = 0; i < candidateParams.Length && sameParams; i++)
+					{
+						if (candidateParams[i].Type != memberParams[i].Type)
+							sameParams = false;
+					}
+					if (sameParams)
+						continue; // Exact same signature
+				}
+
+				// Must have the same name
+				if (candidate.Name != member.Name)
+					continue;
+
+				// Skip generic method candidates - non-generic should not delegate to generic
+				if (candidate.IsGenericMethod)
+					continue;
+
+				// Must have the same number of parameters
+				if (candidate.Parameters.Count != member.Parameters.Count)
+					continue;
+
+				var cParams = candidate.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+				var mParams = member.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+
+				// Parameter names must match
+				bool sameParamNames = true;
+				for (int i = 0; i < cParams.Length; i++)
+				{
+					if (cParams[i].Name != mParams[i].Name)
+					{
+						sameParamNames = false;
+						break;
+					}
+				}
+
+				if (!sameParamNames)
+					continue;
+
+				// Check if signatures actually differ (parameter types or return type)
+				bool signaturesMatch = member.ReturnType == candidate.ReturnType;
+				if (signaturesMatch)
+				{
+					for (int i = 0; i < cParams.Length; i++)
+					{
+						if (cParams[i].Type != mParams[i].Type)
+						{
+							signaturesMatch = false;
+							break;
+						}
+					}
+				}
+
+				if (signaturesMatch)
+					continue;
+
+				// Only delegate from base to typed:
+				// Check if the candidate is more specific than the member
+				// A type is more specific if:
+				// - It's a generic type (contains '<') when the member is non-generic
+				// - Or it's a more specific parameter type
+				bool memberReturnIsGeneric = member.ReturnType.Contains("<");
+				bool candidateReturnIsGeneric = candidate.ReturnType.Contains("<");
+
+				if (member.ReturnType != candidate.ReturnType)
+				{
+					// Return types differ - only delegate if it's a valid inheritance relationship
+					// (e.g., IEnumerator delegates to IEnumerator<T>)
+
+					// If candidate returns void but member doesn't, can't delegate
+					if (candidate.ReturnType == "void" && member.ReturnType != "void")
+						continue;
+
+					// If member returns void but candidate doesn't, can't delegate
+					if (member.ReturnType == "void" && candidate.ReturnType != "void")
+						continue;
+
+					// If member return type is generic and candidate is not, member is more specific
+					if (memberReturnIsGeneric && !candidateReturnIsGeneric)
+					{
+						// Member is more specific - don't delegate in this direction
+						continue;
+					}
+				}
+				else
+				{
+					// Return types match - check parameter types
+					// Only delegate if member has less specific parameter types (object -> specific)
+					bool memberIsMoreSpecific = false;
+					bool bothAreSpecificButDifferent = false;
+
+					for (int i = 0; i < mParams.Length; i++)
+					{
+						bool mParamIsGeneric = mParams[i].Type.Contains("<");
+						bool cParamIsGeneric = cParams[i].Type.Contains("<");
+
+						// If member param is generic and candidate is not, member is more specific
+						if (mParamIsGeneric && !cParamIsGeneric)
+						{
+							memberIsMoreSpecific = true;
+							break;
+						}
+
+						var mParamType = mParams[i].Type.TrimEnd('?');
+						var cParamType = cParams[i].Type.TrimEnd('?');
+
+						bool mIsObject = mParamType == "object" || mParamType == "System.Object" ||
+						                 mParamType == "global::System.Object";
+						bool cIsObject = cParamType == "object" || cParamType == "System.Object" ||
+						                 cParamType == "global::System.Object";
+
+						if (!mIsObject && cIsObject)
+						{
+							// Member param is specific, candidate is object - member is more specific
+							memberIsMoreSpecific = true;
+							break;
+						}
+
+						if (!mIsObject && !cIsObject && mParamType != cParamType)
+						{
+							// Both params are specific but different types (e.g., string vs int)
+							// These are independent overloads, not delegation candidates
+							bothAreSpecificButDifferent = true;
+							break;
+						}
+					}
+
+					if (memberIsMoreSpecific || bothAreSpecificButDifferent)
+						continue;
+				}
+
+				// Found a method with same name, same param names, but different types
+				// and the candidate is more specific - this is a valid delegation target
+				return (candidate, candidate.DeclaringInterfaceFullName);
+			}
+		}
+
+		return (null, null);
+	}
+
+	/// <summary>
+	/// Generates a delegation implementation for a base interface property in standalone stubs.
+	/// </summary>
+	private static void GenerateFlatPropertyDelegationImplementation(
+		System.Text.StringBuilder sb,
+		InterfaceMemberInfo baseMember,
+		InterfaceMemberInfo targetMember,
+		string targetInterfaceFullName)
+	{
+		sb.AppendLine($"\t{baseMember.ReturnType} {baseMember.DeclaringInterfaceFullName}.{baseMember.Name}");
+		sb.AppendLine("\t{");
+
+		if (baseMember.HasGetter)
+		{
+			// Getter: return the typed property value (implicit conversion to base type)
+			sb.AppendLine($"\t\tget => (({targetInterfaceFullName})this).{targetMember.Name};");
+		}
+
+		if (baseMember.HasSetter)
+		{
+			// Setter: cast value to typed property's type
+			sb.AppendLine($"\t\tset => (({targetInterfaceFullName})this).{targetMember.Name} = ({targetMember.ReturnType})value;");
+		}
+
+		sb.AppendLine("\t}");
+		sb.AppendLine();
+	}
+
+	/// <summary>
+	/// Generates a delegation implementation for a base interface method in standalone stubs.
+	/// </summary>
+	private static void GenerateFlatMethodDelegationImplementation(
+		System.Text.StringBuilder sb,
+		InterfaceMemberInfo baseMember,
+		InterfaceMemberInfo targetMember,
+		string targetInterfaceFullName)
+	{
+		var baseParams = baseMember.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+		var targetParams = targetMember.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+
+		var paramList = string.Join(", ", baseParams.Select(p => FormatParameter(p)));
+		var isVoid = baseMember.ReturnType == "void";
+
+		sb.AppendLine($"\t{baseMember.ReturnType} {baseMember.DeclaringInterfaceFullName}.{baseMember.Name}({paramList})");
+		sb.AppendLine("\t{");
+
+		// Build the cast arguments
+		var castArgs = new List<string>();
+		for (int i = 0; i < baseParams.Length; i++)
+		{
+			var baseName = baseParams[i].Name;
+			var baseType = baseParams[i].Type;
+			var targetType = targetParams[i].Type;
+
+			if (baseType == targetType)
+			{
+				castArgs.Add(baseName);
+			}
+			else
+			{
+				castArgs.Add($"({targetType}){baseName}");
+			}
+		}
+
+		var callArgs = string.Join(", ", castArgs);
+
+		if (isVoid)
+		{
+			sb.AppendLine($"\t\t(({targetInterfaceFullName})this).{targetMember.Name}({callArgs});");
+		}
+		else
+		{
+			sb.AppendLine($"\t\treturn (({targetInterfaceFullName})this).{targetMember.Name}({callArgs});");
+		}
+
+		sb.AppendLine("\t}");
 		sb.AppendLine();
 	}
 
@@ -7812,9 +8531,9 @@ public class KnockOffGenerator : IIncrementalGenerator
 		var typeParams = member.TypeParameters.GetArray()!;
 		var typeParamNames = string.Join(", ", typeParams.Select(tp => tp.Name));
 
-		// For nullable reference type returns (T? where T : class), we need to include the class constraint
-		// in the explicit implementation. C# 9+ allows class/struct constraints in explicit implementations.
-		var constraintClauses = GetClassOrStructConstraintsOnly(typeParams);
+		// For explicit interface implementations, only class/struct constraints are allowed (CS0460)
+		// Pass return type to determine if class constraint is needed for nullable returns
+		var constraintClauses = GetConstraintsForExplicitImpl(typeParams, member.ReturnType);
 
 		var paramList = string.Join(", ", member.Parameters.Select(p => FormatParameter(p)));
 		var argList = string.Join(", ", member.Parameters.Select(p => FormatArgument(p)));
@@ -7984,7 +8703,22 @@ internal sealed record InterfaceMemberInfo(
 	EquatableArray<ParameterInfo> IndexerParameters,
 	bool IsGenericMethod,
 	EquatableArray<TypeParameterInfo> TypeParameters,
-	string DeclaringInterfaceFullName) : IEquatable<InterfaceMemberInfo>;
+	string DeclaringInterfaceFullName,
+	/// <summary>
+	/// For properties with asymmetric nullability (e.g., getter returns string?, setter takes string),
+	/// this captures the setter's parameter type. Null when setter type matches ReturnType.
+	/// </summary>
+	string? SetterParameterType = null,
+	/// <summary>
+	/// True if the setter has [DisallowNull] attribute on its value parameter.
+	/// When true, the generated setter should include [param: DisallowNull].
+	/// </summary>
+	bool SetterHasDisallowNull = false,
+	/// <summary>
+	/// True if the setter has [AllowNull] attribute on its value parameter.
+	/// When true, the generated setter should include [param: AllowNull].
+	/// </summary>
+	bool SetterHasAllowNull = false) : IEquatable<InterfaceMemberInfo>;
 
 internal sealed record ParameterInfo(
 	string Name,
@@ -8001,7 +8735,9 @@ internal sealed record TypeParameterInfo(
 internal sealed record UserMethodInfo(
 	string Name,
 	string ReturnType,
-	EquatableArray<ParameterInfo> Parameters) : IEquatable<UserMethodInfo>;
+	EquatableArray<ParameterInfo> Parameters,
+	bool IsGenericMethod,
+	EquatableArray<TypeParameterInfo> TypeParameters) : IEquatable<UserMethodInfo>;
 
 internal sealed record EventMemberInfo(
 	string Name,

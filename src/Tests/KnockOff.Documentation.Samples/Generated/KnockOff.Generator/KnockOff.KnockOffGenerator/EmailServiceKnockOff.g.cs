@@ -49,19 +49,19 @@ partial class EmailServiceKnockOff
 	/// <summary>Interceptor for SendEmail.</summary>
 	public SendEmailInterceptor SendEmail { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.GettingStarted.IEmailService.</summary>
-	public KnockOff.Documentation.Samples.GettingStarted.IEmailService AsEmailService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.GettingStarted.IEmailService.</summary>
+	public global::KnockOff.Documentation.Samples.GettingStarted.IEmailService AsEmailService() => this;
 
 	/// <summary>Backing storage for IsConnected.</summary>
 	protected bool IsConnectedBacking { get; set; } = default!;
 
-	void KnockOff.Documentation.Samples.GettingStarted.IEmailService.SendEmail(string to, string subject, string body)
+	void global::KnockOff.Documentation.Samples.GettingStarted.IEmailService.SendEmail(string to, string subject, string body)
 	{
 		SendEmail.RecordCall(to, subject, body);
 		SendEmail.OnCall?.Invoke(this, to, subject, body);
 	}
 
-	bool KnockOff.Documentation.Samples.GettingStarted.IEmailService.IsConnected
+	bool global::KnockOff.Documentation.Samples.GettingStarted.IEmailService.IsConnected
 	{
 		get { IsConnected.RecordGet(); return IsConnected.OnGet?.Invoke(this) ?? IsConnectedBacking; }
 	}

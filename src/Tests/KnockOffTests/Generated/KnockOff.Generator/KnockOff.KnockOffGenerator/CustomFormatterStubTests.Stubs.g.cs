@@ -28,13 +28,13 @@ partial class CustomFormatterStubTests
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.ICustomFormatter.</summary>
-		public class ICustomFormatter : System.ICustomFormatter
+		/// <summary>Stub implementation of global::System.ICustomFormatter.</summary>
+		public class ICustomFormatter : global::System.ICustomFormatter
 		{
 			/// <summary>Interceptor for Format.</summary>
 			public ICustomFormatter_FormatInterceptor Format { get; } = new();
 
-			string System.ICustomFormatter.Format(string? format, object? arg, global::System.IFormatProvider? formatProvider)
+			string global::System.ICustomFormatter.Format(string? format, object? arg, global::System.IFormatProvider? formatProvider)
 			{
 				Format.RecordCall(format, arg, formatProvider);
 				if (Format.OnCall is { } onCall) return onCall(this, format, arg, formatProvider);

@@ -33,10 +33,10 @@ partial class SkParserKnockOff
 	/// <summary>Interceptor for TryParse.</summary>
 	public TryParseInterceptor TryParse { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkParser.</summary>
-	public KnockOff.Documentation.Samples.Skills.ISkParser AsSkParser() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ISkParser.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkParser AsSkParser() => this;
 
-	bool KnockOff.Documentation.Samples.Skills.ISkParser.TryParse(string input, out int result)
+	bool global::KnockOff.Documentation.Samples.Skills.ISkParser.TryParse(string input, out int result)
 	{
 		result = default!;
 		TryParse.RecordCall(input);

@@ -30,10 +30,10 @@ partial class MmLoggerKnockOff
 	/// <summary>Interceptor for Log.</summary>
 	public LogInterceptor Log { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmLogger.</summary>
-	public KnockOff.Documentation.Samples.Skills.IMmLogger AsMmLogger() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.IMmLogger.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.IMmLogger AsMmLogger() => this;
 
-	void KnockOff.Documentation.Samples.Skills.IMmLogger.Log(string message)
+	void global::KnockOff.Documentation.Samples.Skills.IMmLogger.Log(string message)
 	{
 		Log.RecordCall(message);
 		Log.OnCall?.Invoke(this, message);

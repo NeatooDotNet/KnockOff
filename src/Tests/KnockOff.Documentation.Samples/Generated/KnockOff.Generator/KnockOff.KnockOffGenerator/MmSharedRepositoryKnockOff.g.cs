@@ -30,10 +30,10 @@ partial class MmSharedRepositoryKnockOff
 	/// <summary>Interceptor for Save.</summary>
 	public SaveInterceptor Save { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmRepository.</summary>
-	public KnockOff.Documentation.Samples.Skills.IMmRepository AsMmRepository() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.IMmRepository.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.IMmRepository AsMmRepository() => this;
 
-	void KnockOff.Documentation.Samples.Skills.IMmRepository.Save(object entity)
+	void global::KnockOff.Documentation.Samples.Skills.IMmRepository.Save(object entity)
 	{
 		Save.RecordCall(entity);
 		Save.OnCall?.Invoke(this, entity);

@@ -28,14 +28,14 @@ partial class RepoTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub for KnockOff.Documentation.Samples.Guides.InlineStubs.Repository via composition.</summary>
+		/// <summary>Stub for global::KnockOff.Documentation.Samples.Guides.InlineStubs.Repository via composition.</summary>
 		public class Repository
 		{
 			/// <summary>Interceptor for GetUser.</summary>
 			public Repository_GetUserInterceptor GetUser { get; } = new();
 
-			/// <summary>The KnockOff.Documentation.Samples.Guides.InlineStubs.Repository instance. Pass this to code expecting the target class.</summary>
-			public KnockOff.Documentation.Samples.Guides.InlineStubs.Repository Object { get; }
+			/// <summary>The global::KnockOff.Documentation.Samples.Guides.InlineStubs.Repository instance. Pass this to code expecting the target class.</summary>
+			public global::KnockOff.Documentation.Samples.Guides.InlineStubs.Repository Object { get; }
 
 			public Repository(string connectionString)
 			{
@@ -48,8 +48,8 @@ partial class RepoTests
 				GetUser.Reset();
 			}
 
-			/// <summary>Internal implementation that inherits from KnockOff.Documentation.Samples.Guides.InlineStubs.Repository.</summary>
-			private sealed class Impl : KnockOff.Documentation.Samples.Guides.InlineStubs.Repository
+			/// <summary>Internal implementation that inherits from global::KnockOff.Documentation.Samples.Guides.InlineStubs.Repository.</summary>
+			private sealed class Impl : global::KnockOff.Documentation.Samples.Guides.InlineStubs.Repository
 			{
 				private readonly Repository _stub;
 

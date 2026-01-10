@@ -158,10 +158,10 @@ partial class SkGenericSerializerKnockOff
 	/// <summary>Interceptor for Convert (use .Of&lt;T&gt;() to access typed handler).</summary>
 	public ConvertInterceptor Convert { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkGenericSerializer.</summary>
-	public KnockOff.Documentation.Samples.Skills.ISkGenericSerializer AsSkGenericSerializer() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ISkGenericSerializer.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkGenericSerializer AsSkGenericSerializer() => this;
 
-	T KnockOff.Documentation.Samples.Skills.ISkGenericSerializer.Deserialize<T>(string json)
+	T global::KnockOff.Documentation.Samples.Skills.ISkGenericSerializer.Deserialize<T>(string json)
 	{
 		Deserialize.Of<T>().RecordCall(json);
 		if (Deserialize.Of<T>().OnCall is { } callback)
@@ -169,7 +169,7 @@ partial class SkGenericSerializerKnockOff
 		return SmartDefault<T>("Deserialize");
 	}
 
-	TOut KnockOff.Documentation.Samples.Skills.ISkGenericSerializer.Convert<TIn, TOut>(TIn input)
+	TOut global::KnockOff.Documentation.Samples.Skills.ISkGenericSerializer.Convert<TIn, TOut>(TIn input)
 	{
 		Convert.Of<TIn, TOut>().RecordCall();
 		if (Convert.Of<TIn, TOut>().OnCall is { } callback)

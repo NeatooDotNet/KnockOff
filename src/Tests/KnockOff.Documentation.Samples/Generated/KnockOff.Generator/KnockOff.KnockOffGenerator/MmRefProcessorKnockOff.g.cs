@@ -33,10 +33,10 @@ partial class MmRefProcessorKnockOff
 	/// <summary>Interceptor for Increment.</summary>
 	public IncrementInterceptor Increment { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmRefProcessor.</summary>
-	public KnockOff.Documentation.Samples.Skills.IMmRefProcessor AsMmRefProcessor() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.IMmRefProcessor.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.IMmRefProcessor AsMmRefProcessor() => this;
 
-	void KnockOff.Documentation.Samples.Skills.IMmRefProcessor.Increment(ref int @value)
+	void global::KnockOff.Documentation.Samples.Skills.IMmRefProcessor.Increment(ref int @value)
 	{
 		Increment.RecordCall(@value);
 		if (Increment.OnCall is { } onCallCallback)

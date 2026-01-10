@@ -125,28 +125,28 @@ partial class GuideEventSourceKnockOff
 	/// <summary>Interceptor for OnData event.</summary>
 	public OnDataInterceptor OnData { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IGuideEventSource.</summary>
-	public KnockOff.Documentation.Samples.Guides.IGuideEventSource AsGuideEventSource() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IGuideEventSource.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IGuideEventSource AsGuideEventSource() => this;
 
-	event global::System.EventHandler<string>? KnockOff.Documentation.Samples.Guides.IGuideEventSource.MessageReceived
+	event global::System.EventHandler<string>? global::KnockOff.Documentation.Samples.Guides.IGuideEventSource.MessageReceived
 	{
 		add => MessageReceived.RecordAdd(value);
 		remove => MessageReceived.RecordRemove(value);
 	}
 
-	event global::System.EventHandler? KnockOff.Documentation.Samples.Guides.IGuideEventSource.OnCompleted
+	event global::System.EventHandler? global::KnockOff.Documentation.Samples.Guides.IGuideEventSource.OnCompleted
 	{
 		add => OnCompleted.RecordAdd(value);
 		remove => OnCompleted.RecordRemove(value);
 	}
 
-	event global::System.Action<int>? KnockOff.Documentation.Samples.Guides.IGuideEventSource.OnProgress
+	event global::System.Action<int>? global::KnockOff.Documentation.Samples.Guides.IGuideEventSource.OnProgress
 	{
 		add => OnProgress.RecordAdd(value);
 		remove => OnProgress.RecordRemove(value);
 	}
 
-	event global::System.Action<string, int>? KnockOff.Documentation.Samples.Guides.IGuideEventSource.OnData
+	event global::System.Action<string, int>? global::KnockOff.Documentation.Samples.Guides.IGuideEventSource.OnData
 	{
 		add => OnData.RecordAdd(value);
 		remove => OnData.RecordRemove(value);

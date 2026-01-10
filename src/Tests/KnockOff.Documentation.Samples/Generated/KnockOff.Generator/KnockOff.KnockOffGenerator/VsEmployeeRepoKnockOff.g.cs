@@ -33,10 +33,10 @@ partial class VsEmployeeRepoKnockOff
 	/// <summary>Interceptor for GetEmployee.</summary>
 	public GetEmployeeInterceptor GetEmployee { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IVsEmployeeRepository.</summary>
-	public KnockOff.Documentation.Samples.Comparison.IVsEmployeeRepository AsVsEmployeeRepository() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Comparison.IVsEmployeeRepository.</summary>
+	public global::KnockOff.Documentation.Samples.Comparison.IVsEmployeeRepository AsVsEmployeeRepository() => this;
 
-	global::KnockOff.Documentation.Samples.Comparison.VsUser? KnockOff.Documentation.Samples.Comparison.IVsEmployeeRepository.GetEmployee(int id)
+	global::KnockOff.Documentation.Samples.Comparison.VsUser? global::KnockOff.Documentation.Samples.Comparison.IVsEmployeeRepository.GetEmployee(int id)
 	{
 		GetEmployee.RecordCall(id);
 		return GetEmployee.OnCall?.Invoke(this, id) ?? default!;

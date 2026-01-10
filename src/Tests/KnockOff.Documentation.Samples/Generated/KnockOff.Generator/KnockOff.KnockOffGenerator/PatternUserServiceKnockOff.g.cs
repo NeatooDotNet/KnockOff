@@ -61,20 +61,20 @@ partial class PatternUserServiceKnockOff
 	/// <summary>Interceptor for CalculateScore.</summary>
 	public CalculateScore2Interceptor CalculateScore2 { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Concepts.IPatternUserService.</summary>
-	public KnockOff.Documentation.Samples.Concepts.IPatternUserService AsPatternUserService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Concepts.IPatternUserService.</summary>
+	public global::KnockOff.Documentation.Samples.Concepts.IPatternUserService AsPatternUserService() => this;
 
-	global::KnockOff.Documentation.Samples.Concepts.PatternUser KnockOff.Documentation.Samples.Concepts.IPatternUserService.GetUser(int id)
+	global::KnockOff.Documentation.Samples.Concepts.PatternUser global::KnockOff.Documentation.Samples.Concepts.IPatternUserService.GetUser(int id)
 	{
 		GetUser2.RecordCall(id);
-		if (GetUser2.OnCall != null) return GetUser2.OnCall(this, id);
+		if (GetUser2.OnCall is { } callback) return callback(this, id);
 		return GetUser(id);
 	}
 
-	int KnockOff.Documentation.Samples.Concepts.IPatternUserService.CalculateScore(string name, int baseScore)
+	int global::KnockOff.Documentation.Samples.Concepts.IPatternUserService.CalculateScore(string name, int baseScore)
 	{
 		CalculateScore2.RecordCall(name, baseScore);
-		if (CalculateScore2.OnCall != null) return CalculateScore2.OnCall(this, name, baseScore);
+		if (CalculateScore2.OnCall is { } callback) return callback(this, name, baseScore);
 		return CalculateScore(name, baseScore);
 	}
 

@@ -30,10 +30,10 @@ partial class GenUserFactoryKnockOff
 	/// <summary>Interceptor for Create.</summary>
 	public CreateInterceptor Create { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IGenFactory<KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
-	public KnockOff.Documentation.Samples.Guides.IGenFactory<KnockOff.Documentation.Samples.Guides.GenUser> AsGenFactory() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IGenFactory<global::KnockOff.Documentation.Samples.Guides.GenUser>.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IGenFactory<global::KnockOff.Documentation.Samples.Guides.GenUser> AsGenFactory() => this;
 
-	global::KnockOff.Documentation.Samples.Guides.GenUser KnockOff.Documentation.Samples.Guides.IGenFactory<KnockOff.Documentation.Samples.Guides.GenUser>.Create()
+	global::KnockOff.Documentation.Samples.Guides.GenUser global::KnockOff.Documentation.Samples.Guides.IGenFactory<global::KnockOff.Documentation.Samples.Guides.GenUser>.Create()
 	{
 		Create.RecordCall();
 		return Create.OnCall?.Invoke(this) ?? new global::KnockOff.Documentation.Samples.Guides.GenUser();

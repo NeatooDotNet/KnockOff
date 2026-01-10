@@ -61,19 +61,19 @@ partial class LoggerKnockOff
 	/// <summary>Interceptor for Log.</summary>
 	public LogInterceptor Log { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Tests.ILogger.</summary>
-	public KnockOff.Tests.ILogger AsLogger() => this;
+	/// <summary>Returns this instance as global::KnockOff.Tests.ILogger.</summary>
+	public global::KnockOff.Tests.ILogger AsLogger() => this;
 
 	/// <summary>Backing storage for Name.</summary>
 	protected string NameBacking { get; set; } = "";
 
-	void KnockOff.Tests.ILogger.Log(string message)
+	void global::KnockOff.Tests.ILogger.Log(string message)
 	{
 		Log.RecordCall(message);
 		Log.OnCall?.Invoke(this, message);
 	}
 
-	string KnockOff.Tests.ILogger.Name
+	string global::KnockOff.Tests.ILogger.Name
 	{
 		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
 		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else NameBacking = value; }

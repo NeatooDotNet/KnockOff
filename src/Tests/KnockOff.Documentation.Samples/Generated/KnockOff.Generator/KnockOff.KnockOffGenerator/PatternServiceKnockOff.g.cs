@@ -33,13 +33,13 @@ partial class PatternServiceKnockOff
 	/// <summary>Interceptor for Calculate.</summary>
 	public Calculate2Interceptor Calculate2 { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Concepts.IPatternService.</summary>
-	public KnockOff.Documentation.Samples.Concepts.IPatternService AsPatternService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Concepts.IPatternService.</summary>
+	public global::KnockOff.Documentation.Samples.Concepts.IPatternService AsPatternService() => this;
 
-	int KnockOff.Documentation.Samples.Concepts.IPatternService.Calculate(int input)
+	int global::KnockOff.Documentation.Samples.Concepts.IPatternService.Calculate(int input)
 	{
 		Calculate2.RecordCall(input);
-		if (Calculate2.OnCall != null) return Calculate2.OnCall(this, input);
+		if (Calculate2.OnCall is { } callback) return callback(this, input);
 		return Calculate(input);
 	}
 

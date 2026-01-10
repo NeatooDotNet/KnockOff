@@ -28,14 +28,14 @@ partial class SkConstructorTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub for KnockOff.Documentation.Samples.Skills.SkRepository via composition.</summary>
+		/// <summary>Stub for global::KnockOff.Documentation.Samples.Skills.SkRepository via composition.</summary>
 		public class SkRepository
 		{
 			/// <summary>Interceptor for Save.</summary>
 			public SkRepository_SaveInterceptor Save { get; } = new();
 
-			/// <summary>The KnockOff.Documentation.Samples.Skills.SkRepository instance. Pass this to code expecting the target class.</summary>
-			public KnockOff.Documentation.Samples.Skills.SkRepository Object { get; }
+			/// <summary>The global::KnockOff.Documentation.Samples.Skills.SkRepository instance. Pass this to code expecting the target class.</summary>
+			public global::KnockOff.Documentation.Samples.Skills.SkRepository Object { get; }
 
 			public SkRepository(string connectionString)
 			{
@@ -48,8 +48,8 @@ partial class SkConstructorTests
 				Save.Reset();
 			}
 
-			/// <summary>Internal implementation that inherits from KnockOff.Documentation.Samples.Skills.SkRepository.</summary>
-			private sealed class Impl : KnockOff.Documentation.Samples.Skills.SkRepository
+			/// <summary>Internal implementation that inherits from global::KnockOff.Documentation.Samples.Skills.SkRepository.</summary>
+			private sealed class Impl : global::KnockOff.Documentation.Samples.Skills.SkRepository
 			{
 				private readonly SkRepository _stub;
 

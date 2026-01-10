@@ -25,13 +25,13 @@ partial class CloneableStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.ICloneable.</summary>
-		public class ICloneable : System.ICloneable
+		/// <summary>Stub implementation of global::System.ICloneable.</summary>
+		public class ICloneable : global::System.ICloneable
 		{
 			/// <summary>Interceptor for Clone.</summary>
 			public ICloneable_CloneInterceptor Clone { get; } = new();
 
-			object System.ICloneable.Clone()
+			object global::System.ICloneable.Clone()
 			{
 				Clone.RecordCall();
 				if (Clone.OnCall is { } onCall) return onCall(this);

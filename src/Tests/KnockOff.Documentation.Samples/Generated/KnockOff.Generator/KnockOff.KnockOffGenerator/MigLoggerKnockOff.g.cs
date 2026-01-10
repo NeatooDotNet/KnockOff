@@ -30,10 +30,10 @@ partial class MigLoggerKnockOff
 	/// <summary>Interceptor for Log.</summary>
 	public LogInterceptor Log { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IMigLogger.</summary>
-	public KnockOff.Documentation.Samples.Comparison.IMigLogger AsMigLogger() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Comparison.IMigLogger.</summary>
+	public global::KnockOff.Documentation.Samples.Comparison.IMigLogger AsMigLogger() => this;
 
-	void KnockOff.Documentation.Samples.Comparison.IMigLogger.Log(string message)
+	void global::KnockOff.Documentation.Samples.Comparison.IMigLogger.Log(string message)
 	{
 		Log.RecordCall(message);
 		Log.OnCall?.Invoke(this, message);

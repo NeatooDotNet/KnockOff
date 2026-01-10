@@ -286,8 +286,8 @@ partial class DictionaryStubTests
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Collections.IDictionary.</summary>
-		public class IDictionary : System.Collections.IDictionary
+		/// <summary>Stub implementation of global::System.Collections.IDictionary.</summary>
+		public class IDictionary : global::System.Collections.IDictionary
 		{
 			/// <summary>Interceptor for IsFixedSize.</summary>
 			public IDictionary_IsFixedSizeInterceptor IsFixedSize { get; } = new();
@@ -331,39 +331,39 @@ partial class DictionaryStubTests
 			/// <summary>Interceptor for CopyTo.</summary>
 			public IDictionary_CopyToInterceptor CopyTo { get; } = new();
 
-			void System.Collections.IDictionary.Add(object key, object? value)
+			void global::System.Collections.IDictionary.Add(object key, object? value)
 			{
 				Add.RecordCall(key, value);
 				if (Add.OnCall is { } onCall) onCall(this, key, value);
 			}
 
-			void System.Collections.IDictionary.Clear()
+			void global::System.Collections.IDictionary.Clear()
 			{
 				Clear.RecordCall();
 				if (Clear.OnCall is { } onCall) onCall(this);
 			}
 
-			bool System.Collections.IDictionary.Contains(object key)
+			bool global::System.Collections.IDictionary.Contains(object key)
 			{
 				Contains.RecordCall(key);
 				if (Contains.OnCall is { } onCall) return onCall(this, key);
 				return default!;
 			}
 
-			global::System.Collections.IDictionaryEnumerator System.Collections.IDictionary.GetEnumerator()
+			global::System.Collections.IDictionaryEnumerator global::System.Collections.IDictionary.GetEnumerator()
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
-			void System.Collections.IDictionary.Remove(object key)
+			void global::System.Collections.IDictionary.Remove(object key)
 			{
 				Remove.RecordCall(key);
 				if (Remove.OnCall is { } onCall) onCall(this, key);
 			}
 
-			bool System.Collections.IDictionary.IsFixedSize
+			bool global::System.Collections.IDictionary.IsFixedSize
 			{
 				get
 				{
@@ -373,7 +373,7 @@ partial class DictionaryStubTests
 				}
 			}
 
-			bool System.Collections.IDictionary.IsReadOnly
+			bool global::System.Collections.IDictionary.IsReadOnly
 			{
 				get
 				{
@@ -383,7 +383,7 @@ partial class DictionaryStubTests
 				}
 			}
 
-			object? System.Collections.IDictionary.this[object key]
+			object? global::System.Collections.IDictionary.this[object key]
 			{
 				get
 				{
@@ -398,7 +398,7 @@ partial class DictionaryStubTests
 				}
 			}
 
-			global::System.Collections.ICollection System.Collections.IDictionary.Keys
+			global::System.Collections.ICollection global::System.Collections.IDictionary.Keys
 			{
 				get
 				{
@@ -408,7 +408,7 @@ partial class DictionaryStubTests
 				}
 			}
 
-			global::System.Collections.ICollection System.Collections.IDictionary.Values
+			global::System.Collections.ICollection global::System.Collections.IDictionary.Values
 			{
 				get
 				{
@@ -418,13 +418,13 @@ partial class DictionaryStubTests
 				}
 			}
 
-			void System.Collections.ICollection.CopyTo(global::System.Array array, int index)
+			void global::System.Collections.ICollection.CopyTo(global::System.Array array, int index)
 			{
 				CopyTo.RecordCall(array, index);
 				if (CopyTo.OnCall is { } onCall) onCall(this, array, index);
 			}
 
-			int System.Collections.ICollection.Count
+			int global::System.Collections.ICollection.Count
 			{
 				get
 				{
@@ -434,7 +434,7 @@ partial class DictionaryStubTests
 				}
 			}
 
-			bool System.Collections.ICollection.IsSynchronized
+			bool global::System.Collections.ICollection.IsSynchronized
 			{
 				get
 				{
@@ -444,7 +444,7 @@ partial class DictionaryStubTests
 				}
 			}
 
-			object System.Collections.ICollection.SyncRoot
+			object global::System.Collections.ICollection.SyncRoot
 			{
 				get
 				{
@@ -454,11 +454,9 @@ partial class DictionaryStubTests
 				}
 			}
 
-			global::System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+			global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
 			{
-				GetEnumerator.RecordCall();
-				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
-				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
+				return ((global::System.Collections.IDictionary)this).GetEnumerator();
 			}
 
 		}

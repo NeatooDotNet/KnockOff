@@ -88,8 +88,8 @@ partial class OrderedEnumerableStringStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Linq.IOrderedEnumerable<string>.</summary>
-		public class IOrderedEnumerable : System.Linq.IOrderedEnumerable<string>
+		/// <summary>Stub implementation of global::System.Linq.IOrderedEnumerable<string>.</summary>
+		public class IOrderedEnumerable : global::System.Linq.IOrderedEnumerable<string>
 		{
 			/// <summary>Interceptor for CreateOrderedEnumerable.</summary>
 			public IOrderedEnumerable_CreateOrderedEnumerableInterceptor CreateOrderedEnumerable { get; } = new();
@@ -97,7 +97,7 @@ partial class OrderedEnumerableStringStubTests
 			/// <summary>Interceptor for GetEnumerator.</summary>
 			public IOrderedEnumerable_GetEnumeratorInterceptor GetEnumerator { get; } = new();
 
-			global::System.Linq.IOrderedEnumerable<string> System.Linq.IOrderedEnumerable<string>.CreateOrderedEnumerable<TKey>(global::System.Func<string, TKey> keySelector, global::System.Collections.Generic.IComparer<TKey>? comparer, bool descending)
+			global::System.Linq.IOrderedEnumerable<string> global::System.Linq.IOrderedEnumerable<string>.CreateOrderedEnumerable<TKey>(global::System.Func<string, TKey> keySelector, global::System.Collections.Generic.IComparer<TKey>? comparer, bool descending)
 			{
 				var typedHandler = CreateOrderedEnumerable.Of<TKey>();
 				typedHandler.RecordCall(descending);
@@ -106,14 +106,14 @@ partial class OrderedEnumerableStringStubTests
 				return SmartDefault<global::System.Linq.IOrderedEnumerable<string>>("CreateOrderedEnumerable");
 			}
 
-			global::System.Collections.Generic.IEnumerator<string> System.Collections.Generic.IEnumerable<string>.GetEnumerator()
+			global::System.Collections.Generic.IEnumerator<string> global::System.Collections.Generic.IEnumerable<string>.GetEnumerator()
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
-			global::System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+			global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);

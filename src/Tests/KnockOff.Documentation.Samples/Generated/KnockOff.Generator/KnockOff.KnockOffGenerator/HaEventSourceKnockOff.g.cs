@@ -125,28 +125,28 @@ partial class HaEventSourceKnockOff
 	/// <summary>Interceptor for DataUpdated event.</summary>
 	public DataUpdatedInterceptor DataUpdated { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IHaEventSource.</summary>
-	public KnockOff.Documentation.Samples.Skills.IHaEventSource AsHaEventSource() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.IHaEventSource.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.IHaEventSource AsHaEventSource() => this;
 
-	event global::System.EventHandler<string>? KnockOff.Documentation.Samples.Skills.IHaEventSource.DataReceived
+	event global::System.EventHandler<string>? global::KnockOff.Documentation.Samples.Skills.IHaEventSource.DataReceived
 	{
 		add => DataReceived.RecordAdd(value);
 		remove => DataReceived.RecordRemove(value);
 	}
 
-	event global::System.EventHandler? KnockOff.Documentation.Samples.Skills.IHaEventSource.Completed
+	event global::System.EventHandler? global::KnockOff.Documentation.Samples.Skills.IHaEventSource.Completed
 	{
 		add => Completed.RecordAdd(value);
 		remove => Completed.RecordRemove(value);
 	}
 
-	event global::System.Action<int>? KnockOff.Documentation.Samples.Skills.IHaEventSource.ProgressChanged
+	event global::System.Action<int>? global::KnockOff.Documentation.Samples.Skills.IHaEventSource.ProgressChanged
 	{
 		add => ProgressChanged.RecordAdd(value);
 		remove => ProgressChanged.RecordRemove(value);
 	}
 
-	event global::System.Action<string, int>? KnockOff.Documentation.Samples.Skills.IHaEventSource.DataUpdated
+	event global::System.Action<string, int>? global::KnockOff.Documentation.Samples.Skills.IHaEventSource.DataUpdated
 	{
 		add => DataUpdated.RecordAdd(value);
 		remove => DataUpdated.RecordRemove(value);

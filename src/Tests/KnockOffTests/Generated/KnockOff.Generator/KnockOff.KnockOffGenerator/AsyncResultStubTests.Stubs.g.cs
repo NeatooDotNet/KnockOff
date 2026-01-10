@@ -84,8 +84,8 @@ partial class AsyncResultStubTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Stub implementation of System.IAsyncResult.</summary>
-		public class IAsyncResult : System.IAsyncResult
+		/// <summary>Stub implementation of global::System.IAsyncResult.</summary>
+		public class IAsyncResult : global::System.IAsyncResult
 		{
 			/// <summary>Interceptor for AsyncState.</summary>
 			public IAsyncResult_AsyncStateInterceptor AsyncState { get; } = new();
@@ -99,7 +99,7 @@ partial class AsyncResultStubTests
 			/// <summary>Interceptor for IsCompleted.</summary>
 			public IAsyncResult_IsCompletedInterceptor IsCompleted { get; } = new();
 
-			object? System.IAsyncResult.AsyncState
+			object? global::System.IAsyncResult.AsyncState
 			{
 				get
 				{
@@ -109,7 +109,7 @@ partial class AsyncResultStubTests
 				}
 			}
 
-			global::System.Threading.WaitHandle System.IAsyncResult.AsyncWaitHandle
+			global::System.Threading.WaitHandle global::System.IAsyncResult.AsyncWaitHandle
 			{
 				get
 				{
@@ -119,7 +119,7 @@ partial class AsyncResultStubTests
 				}
 			}
 
-			bool System.IAsyncResult.CompletedSynchronously
+			bool global::System.IAsyncResult.CompletedSynchronously
 			{
 				get
 				{
@@ -129,7 +129,7 @@ partial class AsyncResultStubTests
 				}
 			}
 
-			bool System.IAsyncResult.IsCompleted
+			bool global::System.IAsyncResult.IsCompleted
 			{
 				get
 				{

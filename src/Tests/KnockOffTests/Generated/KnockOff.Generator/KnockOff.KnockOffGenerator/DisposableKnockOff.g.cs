@@ -27,10 +27,10 @@ partial class DisposableKnockOff
 	/// <summary>Interceptor for Dispose.</summary>
 	public DisposeInterceptor Dispose { get; } = new();
 
-	/// <summary>Returns this instance as System.IDisposable.</summary>
-	public System.IDisposable AsDisposable() => this;
+	/// <summary>Returns this instance as global::System.IDisposable.</summary>
+	public global::System.IDisposable AsDisposable() => this;
 
-	void System.IDisposable.Dispose()
+	void global::System.IDisposable.Dispose()
 	{
 		Dispose.RecordCall();
 		Dispose.OnCall?.Invoke(this);

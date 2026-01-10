@@ -64,19 +64,19 @@ partial class MgUserServiceKnockOff
 	/// <summary>Interceptor for GetUser.</summary>
 	public GetUserInterceptor GetUser { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMgUserService.</summary>
-	public KnockOff.Documentation.Samples.Skills.IMgUserService AsMgUserService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.IMgUserService.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.IMgUserService AsMgUserService() => this;
 
 	/// <summary>Backing storage for Name.</summary>
 	protected string NameBacking { get; set; } = "";
 
-	global::KnockOff.Documentation.Samples.Skills.MgUser? KnockOff.Documentation.Samples.Skills.IMgUserService.GetUser(int id)
+	global::KnockOff.Documentation.Samples.Skills.MgUser? global::KnockOff.Documentation.Samples.Skills.IMgUserService.GetUser(int id)
 	{
 		GetUser.RecordCall(id);
 		return GetUser.OnCall?.Invoke(this, id) ?? default!;
 	}
 
-	string KnockOff.Documentation.Samples.Skills.IMgUserService.Name
+	string global::KnockOff.Documentation.Samples.Skills.IMgUserService.Name
 	{
 		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
 		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else NameBacking = value; }

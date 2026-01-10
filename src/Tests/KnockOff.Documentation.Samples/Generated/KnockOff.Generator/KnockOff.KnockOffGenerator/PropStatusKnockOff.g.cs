@@ -36,13 +36,13 @@ partial class PropStatusKnockOff
 	/// <summary>Interceptor for Status.</summary>
 	public StatusInterceptor Status { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IPropStatus.</summary>
-	public KnockOff.Documentation.Samples.Guides.IPropStatus AsPropStatus() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IPropStatus.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IPropStatus AsPropStatus() => this;
 
 	/// <summary>Backing storage for Status.</summary>
 	protected string StatusBacking { get; set; } = "";
 
-	string KnockOff.Documentation.Samples.Guides.IPropStatus.Status
+	string global::KnockOff.Documentation.Samples.Guides.IPropStatus.Status
 	{
 		get { Status.RecordGet(); return Status.OnGet?.Invoke(this) ?? StatusBacking; }
 		set { Status.RecordSet(value); if (Status.OnSet != null) Status.OnSet(this, value); else StatusBacking = value; }

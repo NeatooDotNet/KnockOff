@@ -30,10 +30,10 @@ partial class MmSequenceKnockOff
 	/// <summary>Interceptor for GetNext.</summary>
 	public GetNextInterceptor GetNext { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.IMmSequenceService.</summary>
-	public KnockOff.Documentation.Samples.Skills.IMmSequenceService AsMmSequenceService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.IMmSequenceService.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.IMmSequenceService AsMmSequenceService() => this;
 
-	int KnockOff.Documentation.Samples.Skills.IMmSequenceService.GetNext()
+	int global::KnockOff.Documentation.Samples.Skills.IMmSequenceService.GetNext()
 	{
 		GetNext.RecordCall();
 		return GetNext.OnCall?.Invoke(this) ?? default!;

@@ -36,14 +36,14 @@ partial class MixedTests
 			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; }
 		}
 
-		/// <summary>Stub for KnockOff.Documentation.Samples.Guides.InlineStubs.MixedService via composition.</summary>
+		/// <summary>Stub for global::KnockOff.Documentation.Samples.Guides.InlineStubs.MixedService via composition.</summary>
 		public class MixedService
 		{
 			/// <summary>Interceptor for VirtualProp.</summary>
 			public MixedService_VirtualPropInterceptor VirtualProp { get; } = new();
 
-			/// <summary>The KnockOff.Documentation.Samples.Guides.InlineStubs.MixedService instance. Pass this to code expecting the target class.</summary>
-			public KnockOff.Documentation.Samples.Guides.InlineStubs.MixedService Object { get; }
+			/// <summary>The global::KnockOff.Documentation.Samples.Guides.InlineStubs.MixedService instance. Pass this to code expecting the target class.</summary>
+			public global::KnockOff.Documentation.Samples.Guides.InlineStubs.MixedService Object { get; }
 
 			public MixedService()
 			{
@@ -56,8 +56,8 @@ partial class MixedTests
 				VirtualProp.Reset();
 			}
 
-			/// <summary>Internal implementation that inherits from KnockOff.Documentation.Samples.Guides.InlineStubs.MixedService.</summary>
-			private sealed class Impl : KnockOff.Documentation.Samples.Guides.InlineStubs.MixedService
+			/// <summary>Internal implementation that inherits from global::KnockOff.Documentation.Samples.Guides.InlineStubs.MixedService.</summary>
+			private sealed class Impl : global::KnockOff.Documentation.Samples.Guides.InlineStubs.MixedService
 			{
 				private readonly MixedService _stub;
 

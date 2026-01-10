@@ -145,34 +145,34 @@ partial class CalculatorStub
 	/// <summary>Interceptor for Square.</summary>
 	public SquareInterceptor Square { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Benchmarks.Interfaces.ICalculator.</summary>
-	public KnockOff.Benchmarks.Interfaces.ICalculator AsCalculator() => this;
+	/// <summary>Returns this instance as global::KnockOff.Benchmarks.Interfaces.ICalculator.</summary>
+	public global::KnockOff.Benchmarks.Interfaces.ICalculator AsCalculator() => this;
 
-	int KnockOff.Benchmarks.Interfaces.ICalculator.Add(int a, int b)
+	int global::KnockOff.Benchmarks.Interfaces.ICalculator.Add(int a, int b)
 	{
 		Add.RecordCall(a, b);
 		return Add.OnCall?.Invoke(this, a, b) ?? default!;
 	}
 
-	int KnockOff.Benchmarks.Interfaces.ICalculator.Subtract(int a, int b)
+	int global::KnockOff.Benchmarks.Interfaces.ICalculator.Subtract(int a, int b)
 	{
 		Subtract.RecordCall(a, b);
 		return Subtract.OnCall?.Invoke(this, a, b) ?? default!;
 	}
 
-	int KnockOff.Benchmarks.Interfaces.ICalculator.Multiply(int a, int b)
+	int global::KnockOff.Benchmarks.Interfaces.ICalculator.Multiply(int a, int b)
 	{
 		Multiply.RecordCall(a, b);
 		return Multiply.OnCall?.Invoke(this, a, b) ?? default!;
 	}
 
-	double KnockOff.Benchmarks.Interfaces.ICalculator.Divide(double a, double b)
+	double global::KnockOff.Benchmarks.Interfaces.ICalculator.Divide(double a, double b)
 	{
 		Divide.RecordCall(a, b);
 		return Divide.OnCall?.Invoke(this, a, b) ?? default!;
 	}
 
-	int KnockOff.Benchmarks.Interfaces.ICalculator.Square(int x)
+	int global::KnockOff.Benchmarks.Interfaces.ICalculator.Square(int x)
 	{
 		Square.RecordCall(x);
 		return Square.OnCall?.Invoke(this, x) ?? default!;

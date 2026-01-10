@@ -33,13 +33,13 @@ partial class PatternCombinedRepositoryKnockOff
 	/// <summary>Interceptor for GetById.</summary>
 	public GetById2Interceptor GetById2 { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Concepts.IPatternCombinedRepository.</summary>
-	public KnockOff.Documentation.Samples.Concepts.IPatternCombinedRepository AsPatternCombinedRepository() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Concepts.IPatternCombinedRepository.</summary>
+	public global::KnockOff.Documentation.Samples.Concepts.IPatternCombinedRepository AsPatternCombinedRepository() => this;
 
-	global::KnockOff.Documentation.Samples.Concepts.PatternUser? KnockOff.Documentation.Samples.Concepts.IPatternCombinedRepository.GetById(int id)
+	global::KnockOff.Documentation.Samples.Concepts.PatternUser? global::KnockOff.Documentation.Samples.Concepts.IPatternCombinedRepository.GetById(int id)
 	{
 		GetById2.RecordCall(id);
-		if (GetById2.OnCall != null) return GetById2.OnCall(this, id);
+		if (GetById2.OnCall is { } callback) return callback(this, id);
 		return GetById(id);
 	}
 

@@ -28,13 +28,13 @@ partial class FormatProviderStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.IFormatProvider.</summary>
-		public class IFormatProvider : System.IFormatProvider
+		/// <summary>Stub implementation of global::System.IFormatProvider.</summary>
+		public class IFormatProvider : global::System.IFormatProvider
 		{
 			/// <summary>Interceptor for GetFormat.</summary>
 			public IFormatProvider_GetFormatInterceptor GetFormat { get; } = new();
 
-			object? System.IFormatProvider.GetFormat(global::System.Type? formatType)
+			object? global::System.IFormatProvider.GetFormat(global::System.Type? formatType)
 			{
 				GetFormat.RecordCall(formatType);
 				if (GetFormat.OnCall is { } onCall) return onCall(this, formatType);

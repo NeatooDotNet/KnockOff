@@ -58,10 +58,10 @@ partial class SkOutParamParserKnockOff
 	/// <summary>Interceptor for GetData.</summary>
 	public GetDataInterceptor GetData { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkOutParamParser.</summary>
-	public KnockOff.Documentation.Samples.Skills.ISkOutParamParser AsSkOutParamParser() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ISkOutParamParser.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkOutParamParser AsSkOutParamParser() => this;
 
-	bool KnockOff.Documentation.Samples.Skills.ISkOutParamParser.TryParse(string input, out int result)
+	bool global::KnockOff.Documentation.Samples.Skills.ISkOutParamParser.TryParse(string input, out int result)
 	{
 		result = default!;
 		TryParse.RecordCall(input);
@@ -70,7 +70,7 @@ partial class SkOutParamParserKnockOff
 		return default!;
 	}
 
-	void KnockOff.Documentation.Samples.Skills.ISkOutParamParser.GetData(out string name, out int count)
+	void global::KnockOff.Documentation.Samples.Skills.ISkOutParamParser.GetData(out string name, out int count)
 	{
 		name = default!;
 		count = default!;

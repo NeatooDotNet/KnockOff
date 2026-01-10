@@ -136,38 +136,38 @@ partial class SampleKnockOff
 	/// <summary>Interceptor for GetOptional.</summary>
 	public GetOptionalInterceptor GetOptional { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Tests.ISampleService.</summary>
-	public KnockOff.Tests.ISampleService AsSampleService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Tests.ISampleService.</summary>
+	public global::KnockOff.Tests.ISampleService AsSampleService() => this;
 
 	/// <summary>Backing storage for Name.</summary>
 	protected string NameBacking { get; set; } = "";
 
-	string KnockOff.Tests.ISampleService.Name
+	string global::KnockOff.Tests.ISampleService.Name
 	{
 		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
 		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else NameBacking = value; }
 	}
 
-	void KnockOff.Tests.ISampleService.DoSomething()
+	void global::KnockOff.Tests.ISampleService.DoSomething()
 	{
 		DoSomething.RecordCall();
 		DoSomething.OnCall?.Invoke(this);
 	}
 
-	int KnockOff.Tests.ISampleService.GetValue(int input)
+	int global::KnockOff.Tests.ISampleService.GetValue(int input)
 	{
 		GetValue2.RecordCall(input);
-		if (GetValue2.OnCall != null) return GetValue2.OnCall(this, input);
+		if (GetValue2.OnCall is { } callback) return callback(this, input);
 		return GetValue(input);
 	}
 
-	void KnockOff.Tests.ISampleService.Calculate(string name, int @value, bool flag)
+	void global::KnockOff.Tests.ISampleService.Calculate(string name, int @value, bool flag)
 	{
 		Calculate.RecordCall(name, @value, flag);
 		Calculate.OnCall?.Invoke(this, name, @value, flag);
 	}
 
-	string? KnockOff.Tests.ISampleService.GetOptional()
+	string? global::KnockOff.Tests.ISampleService.GetOptional()
 	{
 		GetOptional.RecordCall();
 		return GetOptional.OnCall?.Invoke(this) ?? default!;

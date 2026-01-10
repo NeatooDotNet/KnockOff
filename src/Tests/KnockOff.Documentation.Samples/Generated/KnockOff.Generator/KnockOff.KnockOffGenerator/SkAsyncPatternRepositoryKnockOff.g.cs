@@ -61,16 +61,16 @@ partial class SkAsyncPatternRepositoryKnockOff
 	/// <summary>Interceptor for SaveAsync.</summary>
 	public SaveAsyncInterceptor SaveAsync { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkAsyncPatternRepository.</summary>
-	public KnockOff.Documentation.Samples.Skills.ISkAsyncPatternRepository AsSkAsyncPatternRepository() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ISkAsyncPatternRepository.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkAsyncPatternRepository AsSkAsyncPatternRepository() => this;
 
-	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.SkUser?> KnockOff.Documentation.Samples.Skills.ISkAsyncPatternRepository.GetUserAsync(int id)
+	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.SkUser?> global::KnockOff.Documentation.Samples.Skills.ISkAsyncPatternRepository.GetUserAsync(int id)
 	{
 		GetUserAsync.RecordCall(id);
 		return GetUserAsync.OnCall?.Invoke(this, id) ?? global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Skills.SkUser?>(default!);
 	}
 
-	global::System.Threading.Tasks.Task<int> KnockOff.Documentation.Samples.Skills.ISkAsyncPatternRepository.SaveAsync(object entity)
+	global::System.Threading.Tasks.Task<int> global::KnockOff.Documentation.Samples.Skills.ISkAsyncPatternRepository.SaveAsync(object entity)
 	{
 		SaveAsync.RecordCall(entity);
 		return SaveAsync.OnCall?.Invoke(this, entity) ?? global::System.Threading.Tasks.Task.FromResult<int>(default!);

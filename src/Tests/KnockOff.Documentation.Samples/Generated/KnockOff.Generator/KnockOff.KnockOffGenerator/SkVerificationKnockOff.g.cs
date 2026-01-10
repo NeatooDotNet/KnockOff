@@ -89,25 +89,25 @@ partial class SkVerificationKnockOff
 	/// <summary>Interceptor for Create.</summary>
 	public CreateInterceptor Create { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkVerificationService.</summary>
-	public KnockOff.Documentation.Samples.Skills.ISkVerificationService AsSkVerificationService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ISkVerificationService.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkVerificationService AsSkVerificationService() => this;
 
 	/// <summary>Backing storage for Name.</summary>
 	protected string NameBacking { get; set; } = "";
 
-	global::KnockOff.Documentation.Samples.Skills.SkUser KnockOff.Documentation.Samples.Skills.ISkVerificationService.GetUser(int id)
+	global::KnockOff.Documentation.Samples.Skills.SkUser global::KnockOff.Documentation.Samples.Skills.ISkVerificationService.GetUser(int id)
 	{
 		GetUser.RecordCall(id);
 		return GetUser.OnCall?.Invoke(this, id) ?? new global::KnockOff.Documentation.Samples.Skills.SkUser();
 	}
 
-	void KnockOff.Documentation.Samples.Skills.ISkVerificationService.Create(string name, int @value)
+	void global::KnockOff.Documentation.Samples.Skills.ISkVerificationService.Create(string name, int @value)
 	{
 		Create.RecordCall(name, @value);
 		Create.OnCall?.Invoke(this, name, @value);
 	}
 
-	string KnockOff.Documentation.Samples.Skills.ISkVerificationService.Name
+	string global::KnockOff.Documentation.Samples.Skills.ISkVerificationService.Name
 	{
 		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
 		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else NameBacking = value; }

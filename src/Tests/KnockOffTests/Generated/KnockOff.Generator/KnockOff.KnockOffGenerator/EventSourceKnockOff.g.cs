@@ -125,28 +125,28 @@ partial class EventSourceKnockOff
 	/// <summary>Interceptor for OnData event.</summary>
 	public OnDataInterceptor OnData { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Tests.IEventSource.</summary>
-	public KnockOff.Tests.IEventSource AsEventSource() => this;
+	/// <summary>Returns this instance as global::KnockOff.Tests.IEventSource.</summary>
+	public global::KnockOff.Tests.IEventSource AsEventSource() => this;
 
-	event global::System.EventHandler<string>? KnockOff.Tests.IEventSource.MessageReceived
+	event global::System.EventHandler<string>? global::KnockOff.Tests.IEventSource.MessageReceived
 	{
 		add => MessageReceived.RecordAdd(value);
 		remove => MessageReceived.RecordRemove(value);
 	}
 
-	event global::System.EventHandler? KnockOff.Tests.IEventSource.OnCompleted
+	event global::System.EventHandler? global::KnockOff.Tests.IEventSource.OnCompleted
 	{
 		add => OnCompleted.RecordAdd(value);
 		remove => OnCompleted.RecordRemove(value);
 	}
 
-	event global::System.Action<int>? KnockOff.Tests.IEventSource.OnProgress
+	event global::System.Action<int>? global::KnockOff.Tests.IEventSource.OnProgress
 	{
 		add => OnProgress.RecordAdd(value);
 		remove => OnProgress.RecordRemove(value);
 	}
 
-	event global::System.Action<string, int>? KnockOff.Tests.IEventSource.OnData
+	event global::System.Action<string, int>? global::KnockOff.Tests.IEventSource.OnData
 	{
 		add => OnData.RecordAdd(value);
 		remove => OnData.RecordRemove(value);

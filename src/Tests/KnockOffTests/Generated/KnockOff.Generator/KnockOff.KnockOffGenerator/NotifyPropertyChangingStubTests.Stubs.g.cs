@@ -30,13 +30,13 @@ partial class NotifyPropertyChangingStubTests
 			public void Reset() { AddCount = 0; RemoveCount = 0; Handler = null; }
 		}
 
-		/// <summary>Stub implementation of System.ComponentModel.INotifyPropertyChanging.</summary>
-		public class INotifyPropertyChanging : System.ComponentModel.INotifyPropertyChanging
+		/// <summary>Stub implementation of global::System.ComponentModel.INotifyPropertyChanging.</summary>
+		public class INotifyPropertyChanging : global::System.ComponentModel.INotifyPropertyChanging
 		{
 			/// <summary>Interceptor for PropertyChanging event.</summary>
 			public INotifyPropertyChanging_PropertyChangingInterceptor PropertyChangingInterceptor { get; } = new();
 
-			event global::System.ComponentModel.PropertyChangingEventHandler? System.ComponentModel.INotifyPropertyChanging.PropertyChanging
+			event global::System.ComponentModel.PropertyChangingEventHandler? global::System.ComponentModel.INotifyPropertyChanging.PropertyChanging
 			{
 				add => PropertyChangingInterceptor.RecordAdd(value);
 				remove => PropertyChangingInterceptor.RecordRemove(value);

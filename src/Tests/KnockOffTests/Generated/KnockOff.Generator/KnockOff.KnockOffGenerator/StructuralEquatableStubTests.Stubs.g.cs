@@ -48,8 +48,8 @@ partial class StructuralEquatableStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Collections.IStructuralEquatable.</summary>
-		public class IStructuralEquatable : System.Collections.IStructuralEquatable
+		/// <summary>Stub implementation of global::System.Collections.IStructuralEquatable.</summary>
+		public class IStructuralEquatable : global::System.Collections.IStructuralEquatable
 		{
 			/// <summary>Interceptor for Equals.</summary>
 			public new IStructuralEquatable_EqualsInterceptor Equals { get; } = new();
@@ -57,14 +57,14 @@ partial class StructuralEquatableStubTests
 			/// <summary>Interceptor for GetHashCode.</summary>
 			public new IStructuralEquatable_GetHashCodeInterceptor GetHashCode { get; } = new();
 
-			bool System.Collections.IStructuralEquatable.Equals(object? other, global::System.Collections.IEqualityComparer comparer)
+			bool global::System.Collections.IStructuralEquatable.Equals(object? other, global::System.Collections.IEqualityComparer comparer)
 			{
 				Equals.RecordCall(other, comparer);
 				if (Equals.OnCall is { } onCall) return onCall(this, other, comparer);
 				return default!;
 			}
 
-			int System.Collections.IStructuralEquatable.GetHashCode(global::System.Collections.IEqualityComparer comparer)
+			int global::System.Collections.IStructuralEquatable.GetHashCode(global::System.Collections.IEqualityComparer comparer)
 			{
 				GetHashCode.RecordCall(comparer);
 				if (GetHashCode.OnCall is { } onCall) return onCall(this, comparer);

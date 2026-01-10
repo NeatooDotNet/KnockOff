@@ -82,8 +82,8 @@ partial class QueryableStringStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Linq.IQueryable<string>.</summary>
-		public class IQueryable : System.Linq.IQueryable<string>
+		/// <summary>Stub implementation of global::System.Linq.IQueryable<string>.</summary>
+		public class IQueryable : global::System.Linq.IQueryable<string>
 		{
 			/// <summary>Interceptor for ElementType.</summary>
 			public IQueryable_ElementTypeInterceptor ElementType { get; } = new();
@@ -97,14 +97,14 @@ partial class QueryableStringStubTests
 			/// <summary>Interceptor for GetEnumerator.</summary>
 			public IQueryable_GetEnumeratorInterceptor GetEnumerator { get; } = new();
 
-			global::System.Collections.Generic.IEnumerator<string> System.Collections.Generic.IEnumerable<string>.GetEnumerator()
+			global::System.Collections.Generic.IEnumerator<string> global::System.Collections.Generic.IEnumerable<string>.GetEnumerator()
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
-			global::System.Type System.Linq.IQueryable.ElementType
+			global::System.Type global::System.Linq.IQueryable.ElementType
 			{
 				get
 				{
@@ -114,7 +114,7 @@ partial class QueryableStringStubTests
 				}
 			}
 
-			global::System.Linq.Expressions.Expression System.Linq.IQueryable.Expression
+			global::System.Linq.Expressions.Expression global::System.Linq.IQueryable.Expression
 			{
 				get
 				{
@@ -124,7 +124,7 @@ partial class QueryableStringStubTests
 				}
 			}
 
-			global::System.Linq.IQueryProvider System.Linq.IQueryable.Provider
+			global::System.Linq.IQueryProvider global::System.Linq.IQueryable.Provider
 			{
 				get
 				{
@@ -134,7 +134,7 @@ partial class QueryableStringStubTests
 				}
 			}
 
-			global::System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+			global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);

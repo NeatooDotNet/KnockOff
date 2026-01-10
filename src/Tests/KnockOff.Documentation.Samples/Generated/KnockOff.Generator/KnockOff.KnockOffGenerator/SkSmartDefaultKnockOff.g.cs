@@ -130,34 +130,34 @@ partial class SkSmartDefaultKnockOff
 	/// <summary>Interceptor for GetDisposable.</summary>
 	public GetDisposableInterceptor GetDisposable { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.</summary>
-	public KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService AsSkSmartDefaultService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService AsSkSmartDefaultService() => this;
 
-	int KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.GetCount()
+	int global::KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.GetCount()
 	{
 		GetCount.RecordCall();
 		return GetCount.OnCall?.Invoke(this) ?? default!;
 	}
 
-	global::System.Collections.Generic.List<string> KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.GetItems()
+	global::System.Collections.Generic.List<string> global::KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.GetItems()
 	{
 		GetItems.RecordCall();
 		return GetItems.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<string>();
 	}
 
-	global::System.Collections.Generic.IList<string> KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.GetIList()
+	global::System.Collections.Generic.IList<string> global::KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.GetIList()
 	{
 		GetIList.RecordCall();
 		return GetIList.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<string>();
 	}
 
-	string? KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.GetOptional()
+	string? global::KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.GetOptional()
 	{
 		GetOptional.RecordCall();
 		return GetOptional.OnCall?.Invoke(this) ?? default!;
 	}
 
-	global::System.IDisposable KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.GetDisposable()
+	global::System.IDisposable global::KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.GetDisposable()
 	{
 		GetDisposable.RecordCall();
 		if (GetDisposable.OnCall is { } callback)

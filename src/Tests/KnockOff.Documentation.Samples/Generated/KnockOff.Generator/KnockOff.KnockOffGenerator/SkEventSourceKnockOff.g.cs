@@ -35,10 +35,10 @@ partial class SkEventSourceKnockOff
 	/// <summary>Interceptor for DataReceived event.</summary>
 	public DataReceivedInterceptor DataReceived { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkEventSource.</summary>
-	public KnockOff.Documentation.Samples.Skills.ISkEventSource AsSkEventSource() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ISkEventSource.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkEventSource AsSkEventSource() => this;
 
-	event global::System.EventHandler<string>? KnockOff.Documentation.Samples.Skills.ISkEventSource.DataReceived
+	event global::System.EventHandler<string>? global::KnockOff.Documentation.Samples.Skills.ISkEventSource.DataReceived
 	{
 		add => DataReceived.RecordAdd(value);
 		remove => DataReceived.RecordRemove(value);

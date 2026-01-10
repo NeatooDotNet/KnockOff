@@ -33,13 +33,13 @@ partial class VsUnitOfWorkKnockOff
 	/// <summary>Interceptor for SaveChangesAsync.</summary>
 	public SaveChangesAsync2Interceptor SaveChangesAsync2 { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IVsUnitOfWork.</summary>
-	public KnockOff.Documentation.Samples.Comparison.IVsUnitOfWork AsVsUnitOfWork() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Comparison.IVsUnitOfWork.</summary>
+	public global::KnockOff.Documentation.Samples.Comparison.IVsUnitOfWork AsVsUnitOfWork() => this;
 
-	global::System.Threading.Tasks.Task<int> KnockOff.Documentation.Samples.Comparison.IVsUnitOfWork.SaveChangesAsync(global::System.Threading.CancellationToken cancellationToken)
+	global::System.Threading.Tasks.Task<int> global::KnockOff.Documentation.Samples.Comparison.IVsUnitOfWork.SaveChangesAsync(global::System.Threading.CancellationToken cancellationToken)
 	{
 		SaveChangesAsync2.RecordCall(cancellationToken);
-		if (SaveChangesAsync2.OnCall != null) return SaveChangesAsync2.OnCall(this, cancellationToken);
+		if (SaveChangesAsync2.OnCall is { } callback) return callback(this, cancellationToken);
 		return SaveChangesAsync(cancellationToken);
 	}
 

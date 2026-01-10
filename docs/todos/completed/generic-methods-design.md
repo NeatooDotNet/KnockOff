@@ -4,8 +4,9 @@
 
 This document provides a comprehensive design for supporting generic methods in KnockOff. Generic methods present a unique challenge: type parameters are only known at call sites, not at generation time. The solution uses a `.Of<T>()` pattern to provide type-keyed handlers.
 
-**Status:** Design Phase
+**Status:** Complete
 **Priority:** High - Required for full Moq feature parity
+**Completed:** 2026-01-09
 
 ---
 
@@ -1127,47 +1128,46 @@ internal sealed record TypeParameterInfo(
 ## Implementation Phases
 
 ### Phase 1: Basic Generic Methods
-- [ ] Add `TypeParameterInfo` record
-- [ ] Update `InterfaceMemberInfo` with generic method fields
-- [ ] Detect generic methods in `CreateMethodInfo`
-- [ ] Generate base handler with `Of<T>()` for single type parameter
-- [ ] Generate typed handler for single type parameter
-- [ ] Generate explicit interface implementation
-- [ ] Add basic tests for `T Get<T>()` pattern
+- [x] Add `TypeParameterInfo` record
+- [x] Update `InterfaceMemberInfo` with generic method fields
+- [x] Detect generic methods in `CreateMethodInfo`
+- [x] Generate base handler with `Of<T>()` for single type parameter
+- [x] Generate typed handler for single type parameter
+- [x] Generate explicit interface implementation
+- [x] Add basic tests for `T Get<T>()` pattern
 
 ### Phase 2: Multiple Type Parameters
-- [ ] Generate `Of<T1, T2>()` for two type parameters
-- [ ] Generate `Of<T1, T2, T3>()` for three type parameters
-- [ ] Handle type tuple keys in dictionary
-- [ ] Add tests for `TOut Convert<TIn, TOut>(TIn)` pattern
+- [x] Generate `Of<T1, T2>()` for two type parameters
+- [x] Generate `Of<T1, T2, T3>()` for three type parameters (not tested, but pattern is established)
+- [x] Handle type tuple keys in dictionary
+- [x] Add tests for `TOut Convert<TIn, TOut>(TIn)` pattern
 
 ### Phase 3: Constraints
-- [ ] Extract and format constraints from `ITypeParameterSymbol`
-- [ ] Apply constraints to `Of<T>()` method
-- [ ] Apply constraints to typed handler class
-- [ ] Test compile-time constraint enforcement
+- [x] Extract and format constraints from `ITypeParameterSymbol`
+- [x] Apply constraints to `Of<T>()` method
+- [x] Apply constraints to typed handler class
+- [x] Test compile-time constraint enforcement
 
 ### Phase 4: Mixed Parameters
-- [ ] Handle generic methods with non-generic parameters
-- [ ] Track non-generic parameters in typed handler
-- [ ] Test `T Find<T>(string key, int limit)` pattern
+- [x] Handle generic methods with non-generic parameters
+- [x] Track non-generic parameters in typed handler
+- [x] Test `T Find<T>(string key, int limit)` pattern
 
 ### Phase 5: User Method Detection
-- [ ] Detect user-defined generic methods
-- [ ] Match type parameters and constraints
-- [ ] Generate user method call in implementation
-- [ ] Test user method priority over default
+- [x] Detect user-defined generic methods by including type parameters in signature matching
+- [x] Call user method with correct type arguments (e.g., `Create<T>()` instead of `Create()`)
+- [x] Test user method priority over default
 
 ### Phase 6: Overload Handling
-- [ ] Handle methods with generic and non-generic overloads
-- [ ] Generate distinct handler names
-- [ ] Test mixed overload scenarios
+- [x] Handle mixed generic/non-generic overloads (e.g., `Process(string)` and `Process<T>(T)`)
+- [x] Generate separate interceptors for generic vs non-generic overloads
+- [x] Test mixed overload scenarios with independent tracking
 
 ### Phase 7: Documentation and Polish
-- [ ] Update README.md feature table
-- [ ] Add guides/generic-methods.md
-- [ ] Update knockoff-vs-moq.md
-- [ ] Add samples to Documentation.Samples project
+- [x] Update README.md feature table
+- [x] Add guides/generics.md (covers both generic interfaces and generic methods)
+- [x] Update knockoff-vs-moq.md
+- [x] Add samples to Documentation.Samples project
 
 ---
 

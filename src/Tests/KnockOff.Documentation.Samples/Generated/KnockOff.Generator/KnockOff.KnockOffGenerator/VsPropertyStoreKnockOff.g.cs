@@ -39,13 +39,13 @@ partial class VsPropertyStoreKnockOff
 	/// <summary>Interceptor for StringIndexer.</summary>
 	public StringIndexerInterceptor StringIndexer { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IVsPropertyStore.</summary>
-	public KnockOff.Documentation.Samples.Comparison.IVsPropertyStore AsVsPropertyStore() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Comparison.IVsPropertyStore.</summary>
+	public global::KnockOff.Documentation.Samples.Comparison.IVsPropertyStore AsVsPropertyStore() => this;
 
 	/// <summary>Backing storage for StringIndexer indexer.</summary>
 	public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Documentation.Samples.Comparison.VsPropertyInfo?> StringIndexerBacking { get; } = new();
 
-	global::KnockOff.Documentation.Samples.Comparison.VsPropertyInfo? KnockOff.Documentation.Samples.Comparison.IVsPropertyStore.this[string key]
+	global::KnockOff.Documentation.Samples.Comparison.VsPropertyInfo? global::KnockOff.Documentation.Samples.Comparison.IVsPropertyStore.this[string key]
 	{
 		get { StringIndexer.RecordGet(key); if (StringIndexer.OnGet != null) return StringIndexer.OnGet(this, key); return StringIndexerBacking.TryGetValue(key, out var v) ? v : default; }
 		set { StringIndexer.RecordSet(key, value); if (StringIndexer.OnSet != null) StringIndexer.OnSet(this, key, value); else StringIndexerBacking[key] = value; }

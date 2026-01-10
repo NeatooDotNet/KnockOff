@@ -28,7 +28,7 @@ partial class ValidationPatternTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub for KnockOff.Documentation.Samples.Guides.Delegates.IsUniqueRule delegate.</summary>
+		/// <summary>Stub for global::KnockOff.Documentation.Samples.Guides.Delegates.IsUniqueRule delegate.</summary>
 		public sealed class IsUniqueRule
 		{
 			/// <summary>Interceptor for tracking and configuring delegate behavior.</summary>
@@ -41,8 +41,8 @@ partial class ValidationPatternTests
 				return default!;
 			}
 
-			/// <summary>Implicit conversion to KnockOff.Documentation.Samples.Guides.Delegates.IsUniqueRule.</summary>
-			public static implicit operator KnockOff.Documentation.Samples.Guides.Delegates.IsUniqueRule(IsUniqueRule stub) => stub.Invoke;
+			/// <summary>Implicit conversion to global::KnockOff.Documentation.Samples.Guides.Delegates.IsUniqueRule.</summary>
+			public static implicit operator global::KnockOff.Documentation.Samples.Guides.Delegates.IsUniqueRule(IsUniqueRule stub) => stub.Invoke;
 		}
 
 	}

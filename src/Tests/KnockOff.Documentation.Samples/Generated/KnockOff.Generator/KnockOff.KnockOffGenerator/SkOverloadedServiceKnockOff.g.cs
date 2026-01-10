@@ -80,22 +80,22 @@ partial class SkOverloadedServiceKnockOff
 	/// <summary>Interceptor for Process.</summary>
 	public Process3Interceptor Process3 { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkOverloadedService.</summary>
-	public KnockOff.Documentation.Samples.Skills.ISkOverloadedService AsSkOverloadedService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ISkOverloadedService.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkOverloadedService AsSkOverloadedService() => this;
 
-	void KnockOff.Documentation.Samples.Skills.ISkOverloadedService.Process(string data)
+	void global::KnockOff.Documentation.Samples.Skills.ISkOverloadedService.Process(string data)
 	{
 		Process1.RecordCall(data);
 		Process1.OnCall?.Invoke(this, data);
 	}
 
-	void KnockOff.Documentation.Samples.Skills.ISkOverloadedService.Process(string data, int priority)
+	void global::KnockOff.Documentation.Samples.Skills.ISkOverloadedService.Process(string data, int priority)
 	{
 		Process2.RecordCall(data, priority);
 		Process2.OnCall?.Invoke(this, data, priority);
 	}
 
-	void KnockOff.Documentation.Samples.Skills.ISkOverloadedService.Process(string data, int priority, bool async)
+	void global::KnockOff.Documentation.Samples.Skills.ISkOverloadedService.Process(string data, int priority, bool async)
 	{
 		Process3.RecordCall(data, priority, async);
 		Process3.OnCall?.Invoke(this, data, priority, async);

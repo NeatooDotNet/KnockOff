@@ -83,23 +83,23 @@ partial class SkMinimalServiceKnockOff
 	/// <summary>Interceptor for GetUsers.</summary>
 	public GetUsersInterceptor GetUsers { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkMinimalService.</summary>
-	public KnockOff.Documentation.Samples.Skills.ISkMinimalService AsSkMinimalService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ISkMinimalService.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkMinimalService AsSkMinimalService() => this;
 
-	global::KnockOff.Documentation.Samples.Skills.SkUser? KnockOff.Documentation.Samples.Skills.ISkMinimalService.GetUser(int id)
+	global::KnockOff.Documentation.Samples.Skills.SkUser? global::KnockOff.Documentation.Samples.Skills.ISkMinimalService.GetUser(int id)
 	{
 		GetUser2.RecordCall(id);
-		if (GetUser2.OnCall != null) return GetUser2.OnCall(this, id);
+		if (GetUser2.OnCall is { } callback) return callback(this, id);
 		return GetUser(id);
 	}
 
-	int KnockOff.Documentation.Samples.Skills.ISkMinimalService.GetCount()
+	int global::KnockOff.Documentation.Samples.Skills.ISkMinimalService.GetCount()
 	{
 		GetCount.RecordCall();
 		return GetCount.OnCall?.Invoke(this) ?? default!;
 	}
 
-	global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser> KnockOff.Documentation.Samples.Skills.ISkMinimalService.GetUsers()
+	global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser> global::KnockOff.Documentation.Samples.Skills.ISkMinimalService.GetUsers()
 	{
 		GetUsers.RecordCall();
 		return GetUsers.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser>();

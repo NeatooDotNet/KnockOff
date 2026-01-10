@@ -49,16 +49,16 @@ partial class MethodHandlerStateKnockOff
 	/// <summary>Interceptor for Process.</summary>
 	public ProcessInterceptor Process { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodHandlerState.</summary>
-	public KnockOff.Documentation.Samples.Guides.IMethodHandlerState AsMethodHandlerState() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IMethodHandlerState.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IMethodHandlerState AsMethodHandlerState() => this;
 
-	void KnockOff.Documentation.Samples.Guides.IMethodHandlerState.Initialize()
+	void global::KnockOff.Documentation.Samples.Guides.IMethodHandlerState.Initialize()
 	{
 		Initialize.RecordCall();
 		Initialize.OnCall?.Invoke(this);
 	}
 
-	void KnockOff.Documentation.Samples.Guides.IMethodHandlerState.Process()
+	void global::KnockOff.Documentation.Samples.Guides.IMethodHandlerState.Process()
 	{
 		Process.RecordCall();
 		Process.OnCall?.Invoke(this);

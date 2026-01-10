@@ -63,8 +63,8 @@ partial class ReadOnlyListIntStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Collections.Generic.IReadOnlyList<int>.</summary>
-		public class IReadOnlyList : System.Collections.Generic.IReadOnlyList<int>
+		/// <summary>Stub implementation of global::System.Collections.Generic.IReadOnlyList<int>.</summary>
+		public class IReadOnlyList : global::System.Collections.Generic.IReadOnlyList<int>
 		{
 			/// <summary>Interceptor for Int32Indexer.</summary>
 			public IReadOnlyList_Int32IndexerInterceptor Int32Indexer { get; } = new();
@@ -75,7 +75,7 @@ partial class ReadOnlyListIntStubTests
 			/// <summary>Interceptor for GetEnumerator.</summary>
 			public IReadOnlyList_GetEnumeratorInterceptor GetEnumerator { get; } = new();
 
-			int System.Collections.Generic.IReadOnlyList<int>.this[int index]
+			int global::System.Collections.Generic.IReadOnlyList<int>.this[int index]
 			{
 				get
 				{
@@ -85,7 +85,7 @@ partial class ReadOnlyListIntStubTests
 				}
 			}
 
-			int System.Collections.Generic.IReadOnlyCollection<int>.Count
+			int global::System.Collections.Generic.IReadOnlyCollection<int>.Count
 			{
 				get
 				{
@@ -95,14 +95,14 @@ partial class ReadOnlyListIntStubTests
 				}
 			}
 
-			global::System.Collections.Generic.IEnumerator<int> System.Collections.Generic.IEnumerable<int>.GetEnumerator()
+			global::System.Collections.Generic.IEnumerator<int> global::System.Collections.Generic.IEnumerable<int>.GetEnumerator()
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
-			global::System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+			global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);

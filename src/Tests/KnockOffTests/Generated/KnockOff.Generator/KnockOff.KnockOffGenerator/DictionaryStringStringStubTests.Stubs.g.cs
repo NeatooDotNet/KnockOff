@@ -269,8 +269,8 @@ partial class DictionaryStringStringStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Collections.Generic.IDictionary<string, string>.</summary>
-		public class IDictionary : System.Collections.Generic.IDictionary<string, string>
+		/// <summary>Stub implementation of global::System.Collections.Generic.IDictionary<string, string>.</summary>
+		public class IDictionary : global::System.Collections.Generic.IDictionary<string, string>
 		{
 			/// <summary>Interceptor for StringIndexer.</summary>
 			public IDictionary_StringIndexerInterceptor StringIndexer { get; } = new();
@@ -311,27 +311,27 @@ partial class DictionaryStringStringStubTests
 			/// <summary>Interceptor for GetEnumerator.</summary>
 			public IDictionary_GetEnumeratorInterceptor GetEnumerator { get; } = new();
 
-			void System.Collections.Generic.IDictionary<string, string>.Add(string key, string value)
+			void global::System.Collections.Generic.IDictionary<string, string>.Add(string key, string value)
 			{
 				Add.RecordCall(key, value, null);
 				if (Add.OnCall is { } onCall) onCall(this, key, value, null);
 			}
 
-			bool System.Collections.Generic.IDictionary<string, string>.ContainsKey(string key)
+			bool global::System.Collections.Generic.IDictionary<string, string>.ContainsKey(string key)
 			{
 				ContainsKey.RecordCall(key);
 				if (ContainsKey.OnCall is { } onCall) return onCall(this, key);
 				return default!;
 			}
 
-			bool System.Collections.Generic.IDictionary<string, string>.Remove(string key)
+			bool global::System.Collections.Generic.IDictionary<string, string>.Remove(string key)
 			{
 				Remove.RecordCall(key, null);
 				if (Remove.OnCall is { } onCall) return onCall(this, key, null);
 				return default!;
 			}
 
-			bool System.Collections.Generic.IDictionary<string, string>.TryGetValue(string key, out string value)
+			bool global::System.Collections.Generic.IDictionary<string, string>.TryGetValue(string key, out string value)
 			{
 				value = default!;
 				TryGetValue.RecordCall(key);
@@ -339,7 +339,7 @@ partial class DictionaryStringStringStubTests
 				return default!;
 			}
 
-			string System.Collections.Generic.IDictionary<string, string>.this[string key]
+			string global::System.Collections.Generic.IDictionary<string, string>.this[string key]
 			{
 				get
 				{
@@ -354,7 +354,7 @@ partial class DictionaryStringStringStubTests
 				}
 			}
 
-			global::System.Collections.Generic.ICollection<string> System.Collections.Generic.IDictionary<string, string>.Keys
+			global::System.Collections.Generic.ICollection<string> global::System.Collections.Generic.IDictionary<string, string>.Keys
 			{
 				get
 				{
@@ -364,7 +364,7 @@ partial class DictionaryStringStringStubTests
 				}
 			}
 
-			global::System.Collections.Generic.ICollection<string> System.Collections.Generic.IDictionary<string, string>.Values
+			global::System.Collections.Generic.ICollection<string> global::System.Collections.Generic.IDictionary<string, string>.Values
 			{
 				get
 				{
@@ -374,39 +374,39 @@ partial class DictionaryStringStringStubTests
 				}
 			}
 
-			void System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<string, string>>.Add(global::System.Collections.Generic.KeyValuePair<string, string> item)
+			void global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, string>>.Add(global::System.Collections.Generic.KeyValuePair<string, string> item)
 			{
 				Add.RecordCall(null, null, item);
 				if (Add.OnCall is { } onCall) onCall(this, null, null, item);
 			}
 
-			void System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<string, string>>.Clear()
+			void global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, string>>.Clear()
 			{
 				Clear.RecordCall();
 				if (Clear.OnCall is { } onCall) onCall(this);
 			}
 
-			bool System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<string, string>>.Contains(global::System.Collections.Generic.KeyValuePair<string, string> item)
+			bool global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, string>>.Contains(global::System.Collections.Generic.KeyValuePair<string, string> item)
 			{
 				Contains.RecordCall(item);
 				if (Contains.OnCall is { } onCall) return onCall(this, item);
 				return default!;
 			}
 
-			void System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<string, string>>.CopyTo(global::System.Collections.Generic.KeyValuePair<string, string>[] array, int arrayIndex)
+			void global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, string>>.CopyTo(global::System.Collections.Generic.KeyValuePair<string, string>[] array, int arrayIndex)
 			{
 				CopyTo.RecordCall(array, arrayIndex);
 				if (CopyTo.OnCall is { } onCall) onCall(this, array, arrayIndex);
 			}
 
-			bool System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<string, string>>.Remove(global::System.Collections.Generic.KeyValuePair<string, string> item)
+			bool global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, string>>.Remove(global::System.Collections.Generic.KeyValuePair<string, string> item)
 			{
 				Remove.RecordCall(null, item);
 				if (Remove.OnCall is { } onCall) return onCall(this, null, item);
 				return default!;
 			}
 
-			int System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<string, string>>.Count
+			int global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, string>>.Count
 			{
 				get
 				{
@@ -416,7 +416,7 @@ partial class DictionaryStringStringStubTests
 				}
 			}
 
-			bool System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<string, string>>.IsReadOnly
+			bool global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, string>>.IsReadOnly
 			{
 				get
 				{
@@ -426,14 +426,14 @@ partial class DictionaryStringStringStubTests
 				}
 			}
 
-			global::System.Collections.Generic.IEnumerator<global::System.Collections.Generic.KeyValuePair<string, string>> System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, string>>.GetEnumerator()
+			global::System.Collections.Generic.IEnumerator<global::System.Collections.Generic.KeyValuePair<string, string>> global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.KeyValuePair<string, string>>.GetEnumerator()
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
-			global::System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+			global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);

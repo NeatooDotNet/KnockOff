@@ -60,16 +60,16 @@ partial class UserRepositoryKnockOff
 	/// <summary>Interceptor for SaveUser.</summary>
 	public SaveUserInterceptor SaveUser { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.GettingStarted.IUserRepository.</summary>
-	public KnockOff.Documentation.Samples.GettingStarted.IUserRepository AsUserRepository() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.GettingStarted.IUserRepository.</summary>
+	public global::KnockOff.Documentation.Samples.GettingStarted.IUserRepository AsUserRepository() => this;
 
-	global::KnockOff.Documentation.Samples.GettingStarted.User? KnockOff.Documentation.Samples.GettingStarted.IUserRepository.GetUser(int id)
+	global::KnockOff.Documentation.Samples.GettingStarted.User? global::KnockOff.Documentation.Samples.GettingStarted.IUserRepository.GetUser(int id)
 	{
 		GetUser.RecordCall(id);
 		return GetUser.OnCall?.Invoke(this, id) ?? default!;
 	}
 
-	void KnockOff.Documentation.Samples.GettingStarted.IUserRepository.SaveUser(global::KnockOff.Documentation.Samples.GettingStarted.User user)
+	void global::KnockOff.Documentation.Samples.GettingStarted.IUserRepository.SaveUser(global::KnockOff.Documentation.Samples.GettingStarted.User user)
 	{
 		SaveUser.RecordCall(user);
 		SaveUser.OnCall?.Invoke(this, user);

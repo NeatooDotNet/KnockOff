@@ -8,6 +8,7 @@ Releases with notable changes.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| [v10.12.0](v10.12.0.md) | 2026-01-09 | BCL interface compatibility (117 interfaces tested) |
 | [v10.11.0](v10.11.0.md) | 2026-01-09 | Mixed generic/non-generic overload fix |
 | [v10.10.0](v10.10.0.md) | 2026-01-08 | Inline stubs generic methods support |
 | [v10.7.0](v10.7.0.md) | 2026-01-06 | **Breaking:** Spy→KO rename, zero-allocation tracking |
@@ -19,6 +20,8 @@ Releases with notable changes.
 
 ## All Releases
 
+- [v10.12.0](v10.12.0.md) - 2026-01-09 - BCL interface compatibility (117 interfaces tested)
+- [v10.11.1](v10.11.1.md) - 2026-01-09 - BCL interface compatibility improvements
 - [v10.11.0](v10.11.0.md) - 2026-01-09 - Mixed generic/non-generic overload fix
 - [v10.10.1](v10.10.1.md) - 2026-01-08 - Documentation sync and snippet migration
 - [v10.10.0](v10.10.0.md) - 2026-01-08 - Inline stubs generic methods support

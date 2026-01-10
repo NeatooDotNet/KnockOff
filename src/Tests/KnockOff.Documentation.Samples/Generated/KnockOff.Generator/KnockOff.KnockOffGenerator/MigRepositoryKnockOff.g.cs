@@ -33,10 +33,10 @@ partial class MigRepositoryKnockOff
 	/// <summary>Interceptor for GetById.</summary>
 	public GetByIdInterceptor GetById { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IMigRepository.</summary>
-	public KnockOff.Documentation.Samples.Comparison.IMigRepository AsMigRepository() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Comparison.IMigRepository.</summary>
+	public global::KnockOff.Documentation.Samples.Comparison.IMigRepository AsMigRepository() => this;
 
-	global::KnockOff.Documentation.Samples.Comparison.MigEntity? KnockOff.Documentation.Samples.Comparison.IMigRepository.GetById(int id)
+	global::KnockOff.Documentation.Samples.Comparison.MigEntity? global::KnockOff.Documentation.Samples.Comparison.IMigRepository.GetById(int id)
 	{
 		GetById.RecordCall(id);
 		return GetById.OnCall?.Invoke(this, id) ?? default!;

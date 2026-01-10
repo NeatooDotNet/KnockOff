@@ -76,8 +76,8 @@ partial class InlineTestClass
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of KnockOff.Tests.ISimpleService.</summary>
-		public class ISimpleService : KnockOff.Tests.ISimpleService
+		/// <summary>Stub implementation of global::KnockOff.Tests.ISimpleService.</summary>
+		public class ISimpleService : global::KnockOff.Tests.ISimpleService
 		{
 			/// <summary>Interceptor for Name.</summary>
 			public ISimpleService_NameInterceptor Name { get; } = new();
@@ -88,7 +88,7 @@ partial class InlineTestClass
 			/// <summary>Interceptor for GetValue.</summary>
 			public ISimpleService_GetValueInterceptor GetValue { get; } = new();
 
-			string KnockOff.Tests.ISimpleService.Name
+			string global::KnockOff.Tests.ISimpleService.Name
 			{
 				get
 				{
@@ -104,13 +104,13 @@ partial class InlineTestClass
 				}
 			}
 
-			void KnockOff.Tests.ISimpleService.DoSomething()
+			void global::KnockOff.Tests.ISimpleService.DoSomething()
 			{
 				DoSomething.RecordCall();
 				if (DoSomething.OnCall is { } onCall) onCall(this);
 			}
 
-			int KnockOff.Tests.ISimpleService.GetValue(int input)
+			int global::KnockOff.Tests.ISimpleService.GetValue(int input)
 			{
 				GetValue.RecordCall(input);
 				if (GetValue.OnCall is { } onCall) return onCall(this, input);

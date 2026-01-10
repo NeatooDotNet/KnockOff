@@ -204,8 +204,8 @@ partial class DbConnectionStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Data.IDbConnection.</summary>
-		public class IDbConnection : System.Data.IDbConnection
+		/// <summary>Stub implementation of global::System.Data.IDbConnection.</summary>
+		public class IDbConnection : global::System.Data.IDbConnection
 		{
 			/// <summary>Interceptor for ConnectionString.</summary>
 			public IDbConnection_ConnectionStringInterceptor ConnectionString { get; } = new();
@@ -237,46 +237,46 @@ partial class DbConnectionStubTests
 			/// <summary>Interceptor for Dispose.</summary>
 			public IDbConnection_DisposeInterceptor Dispose { get; } = new();
 
-			global::System.Data.IDbTransaction System.Data.IDbConnection.BeginTransaction()
+			global::System.Data.IDbTransaction global::System.Data.IDbConnection.BeginTransaction()
 			{
 				BeginTransaction.RecordCall(null);
 				if (BeginTransaction.OnCall is { } onCall) return onCall(this, null);
 				throw new global::System.InvalidOperationException("No implementation provided for BeginTransaction. Set BeginTransaction.OnCall.");
 			}
 
-			global::System.Data.IDbTransaction System.Data.IDbConnection.BeginTransaction(global::System.Data.IsolationLevel il)
+			global::System.Data.IDbTransaction global::System.Data.IDbConnection.BeginTransaction(global::System.Data.IsolationLevel il)
 			{
 				BeginTransaction.RecordCall(il);
 				if (BeginTransaction.OnCall is { } onCall) return onCall(this, il);
 				throw new global::System.InvalidOperationException("No implementation provided for BeginTransaction. Set BeginTransaction.OnCall.");
 			}
 
-			void System.Data.IDbConnection.ChangeDatabase(string databaseName)
+			void global::System.Data.IDbConnection.ChangeDatabase(string databaseName)
 			{
 				ChangeDatabase.RecordCall(databaseName);
 				if (ChangeDatabase.OnCall is { } onCall) onCall(this, databaseName);
 			}
 
-			void System.Data.IDbConnection.Close()
+			void global::System.Data.IDbConnection.Close()
 			{
 				Close.RecordCall();
 				if (Close.OnCall is { } onCall) onCall(this);
 			}
 
-			global::System.Data.IDbCommand System.Data.IDbConnection.CreateCommand()
+			global::System.Data.IDbCommand global::System.Data.IDbConnection.CreateCommand()
 			{
 				CreateCommand.RecordCall();
 				if (CreateCommand.OnCall is { } onCall) return onCall(this);
 				throw new global::System.InvalidOperationException("No implementation provided for CreateCommand. Set CreateCommand.OnCall.");
 			}
 
-			void System.Data.IDbConnection.Open()
+			void global::System.Data.IDbConnection.Open()
 			{
 				Open.RecordCall();
 				if (Open.OnCall is { } onCall) onCall(this);
 			}
 
-			string System.Data.IDbConnection.ConnectionString
+			string global::System.Data.IDbConnection.ConnectionString
 			{
 				get
 				{
@@ -284,15 +284,18 @@ partial class DbConnectionStubTests
 					if (ConnectionString.OnGet is { } onGet) return onGet(this);
 					return ConnectionString.Value;
 				}
+#pragma warning disable CS8769
 				set
 				{
 					ConnectionString.RecordSet(value);
 					if (ConnectionString.OnSet is { } onSet) onSet(this, value);
 					else ConnectionString.Value = value;
 				}
+
+#pragma warning restore CS8769
 			}
 
-			int System.Data.IDbConnection.ConnectionTimeout
+			int global::System.Data.IDbConnection.ConnectionTimeout
 			{
 				get
 				{
@@ -302,7 +305,7 @@ partial class DbConnectionStubTests
 				}
 			}
 
-			string System.Data.IDbConnection.Database
+			string global::System.Data.IDbConnection.Database
 			{
 				get
 				{
@@ -312,7 +315,7 @@ partial class DbConnectionStubTests
 				}
 			}
 
-			global::System.Data.ConnectionState System.Data.IDbConnection.State
+			global::System.Data.ConnectionState global::System.Data.IDbConnection.State
 			{
 				get
 				{
@@ -322,7 +325,7 @@ partial class DbConnectionStubTests
 				}
 			}
 
-			void System.IDisposable.Dispose()
+			void global::System.IDisposable.Dispose()
 			{
 				Dispose.RecordCall();
 				if (Dispose.OnCall is { } onCall) onCall(this);

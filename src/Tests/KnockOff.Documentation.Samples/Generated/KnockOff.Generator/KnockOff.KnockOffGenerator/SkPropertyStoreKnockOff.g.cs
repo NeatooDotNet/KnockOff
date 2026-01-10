@@ -39,13 +39,13 @@ partial class SkPropertyStoreKnockOff
 	/// <summary>Interceptor for StringIndexer.</summary>
 	public StringIndexerInterceptor StringIndexer { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkPropertyStore.</summary>
-	public KnockOff.Documentation.Samples.Skills.ISkPropertyStore AsSkPropertyStore() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ISkPropertyStore.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkPropertyStore AsSkPropertyStore() => this;
 
 	/// <summary>Backing storage for StringIndexer indexer.</summary>
 	public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Documentation.Samples.Skills.SkUser?> StringIndexerBacking { get; } = new();
 
-	global::KnockOff.Documentation.Samples.Skills.SkUser? KnockOff.Documentation.Samples.Skills.ISkPropertyStore.this[string key]
+	global::KnockOff.Documentation.Samples.Skills.SkUser? global::KnockOff.Documentation.Samples.Skills.ISkPropertyStore.this[string key]
 	{
 		get { StringIndexer.RecordGet(key); if (StringIndexer.OnGet != null) return StringIndexer.OnGet(this, key); return StringIndexerBacking.TryGetValue(key, out var v) ? v : default; }
 		set { StringIndexer.RecordSet(key, value); if (StringIndexer.OnSet != null) StringIndexer.OnSet(this, key, value); else StringIndexerBacking[key] = value; }

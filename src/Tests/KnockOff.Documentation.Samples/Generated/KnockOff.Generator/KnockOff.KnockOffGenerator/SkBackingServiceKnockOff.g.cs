@@ -36,13 +36,13 @@ partial class SkBackingServiceKnockOff
 	/// <summary>Interceptor for Name.</summary>
 	public NameInterceptor Name { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkBackingService.</summary>
-	public KnockOff.Documentation.Samples.Skills.ISkBackingService AsSkBackingService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ISkBackingService.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkBackingService AsSkBackingService() => this;
 
 	/// <summary>Backing storage for Name.</summary>
 	protected string NameBacking { get; set; } = "";
 
-	string KnockOff.Documentation.Samples.Skills.ISkBackingService.Name
+	string global::KnockOff.Documentation.Samples.Skills.ISkBackingService.Name
 	{
 		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
 		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else NameBacking = value; }

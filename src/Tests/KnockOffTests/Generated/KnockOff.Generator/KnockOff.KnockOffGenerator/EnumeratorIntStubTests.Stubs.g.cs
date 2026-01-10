@@ -78,8 +78,8 @@ partial class EnumeratorIntStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Collections.Generic.IEnumerator<int>.</summary>
-		public class IEnumerator : System.Collections.Generic.IEnumerator<int>
+		/// <summary>Stub implementation of global::System.Collections.Generic.IEnumerator<int>.</summary>
+		public class IEnumerator : global::System.Collections.Generic.IEnumerator<int>
 		{
 			/// <summary>Interceptor for Current.</summary>
 			public IEnumerator_CurrentInterceptor Current { get; } = new();
@@ -93,7 +93,7 @@ partial class EnumeratorIntStubTests
 			/// <summary>Interceptor for Dispose.</summary>
 			public IEnumerator_DisposeInterceptor Dispose { get; } = new();
 
-			int System.Collections.Generic.IEnumerator<int>.Current
+			int global::System.Collections.Generic.IEnumerator<int>.Current
 			{
 				get
 				{
@@ -103,30 +103,25 @@ partial class EnumeratorIntStubTests
 				}
 			}
 
-			bool System.Collections.IEnumerator.MoveNext()
+			bool global::System.Collections.IEnumerator.MoveNext()
 			{
 				MoveNext.RecordCall();
 				if (MoveNext.OnCall is { } onCall) return onCall(this);
 				return default!;
 			}
 
-			void System.Collections.IEnumerator.Reset()
+			void global::System.Collections.IEnumerator.Reset()
 			{
 				Reset.RecordCall();
 				if (Reset.OnCall is { } onCall) onCall(this);
 			}
 
-			object System.Collections.IEnumerator.Current
+			object global::System.Collections.IEnumerator.Current
 			{
-				get
-				{
-					Current.RecordGet();
-					if (Current.OnGet is { } onGet) return onGet(this);
-					return Current.Value;
-				}
+				get => ((global::System.Collections.Generic.IEnumerator<int>)this).Current;
 			}
 
-			void System.IDisposable.Dispose()
+			void global::System.IDisposable.Dispose()
 			{
 				Dispose.RecordCall();
 				if (Dispose.OnCall is { } onCall) onCall(this);

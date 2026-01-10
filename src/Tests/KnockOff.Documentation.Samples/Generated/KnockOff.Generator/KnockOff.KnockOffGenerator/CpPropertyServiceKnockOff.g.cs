@@ -36,13 +36,13 @@ partial class CpPropertyServiceKnockOff
 	/// <summary>Interceptor for CurrentUser.</summary>
 	public CurrentUserInterceptor CurrentUser { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpPropertyService.</summary>
-	public KnockOff.Documentation.Samples.Skills.ICpPropertyService AsCpPropertyService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ICpPropertyService.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ICpPropertyService AsCpPropertyService() => this;
 
 	/// <summary>Backing storage for CurrentUser.</summary>
 	protected global::KnockOff.Documentation.Samples.Skills.CpUser? CurrentUserBacking { get; set; } = default!;
 
-	global::KnockOff.Documentation.Samples.Skills.CpUser? KnockOff.Documentation.Samples.Skills.ICpPropertyService.CurrentUser
+	global::KnockOff.Documentation.Samples.Skills.CpUser? global::KnockOff.Documentation.Samples.Skills.ICpPropertyService.CurrentUser
 	{
 		get { CurrentUser.RecordGet(); return CurrentUser.OnGet?.Invoke(this) ?? CurrentUserBacking; }
 		set { CurrentUser.RecordSet(value); if (CurrentUser.OnSet != null) CurrentUser.OnSet(this, value); else CurrentUserBacking = value; }

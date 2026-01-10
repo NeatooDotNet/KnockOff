@@ -39,13 +39,13 @@ partial class IdxListKnockOff
 	/// <summary>Interceptor for Int32Indexer.</summary>
 	public Int32IndexerInterceptor Int32Indexer { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIdxList.</summary>
-	public KnockOff.Documentation.Samples.Guides.IIdxList AsIdxList() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IIdxList.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IIdxList AsIdxList() => this;
 
 	/// <summary>Backing storage for Int32Indexer indexer.</summary>
 	public global::System.Collections.Generic.Dictionary<int, object?> Int32IndexerBacking { get; } = new();
 
-	object? KnockOff.Documentation.Samples.Guides.IIdxList.this[int index]
+	object? global::KnockOff.Documentation.Samples.Guides.IIdxList.this[int index]
 	{
 		get { Int32Indexer.RecordGet(index); if (Int32Indexer.OnGet != null) return Int32Indexer.OnGet(this, index); return Int32IndexerBacking.TryGetValue(index, out var v) ? v : default; }
 		set { Int32Indexer.RecordSet(index, value); if (Int32Indexer.OnSet != null) Int32Indexer.OnSet(this, index, value); else Int32IndexerBacking[index] = value; }

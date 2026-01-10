@@ -410,17 +410,17 @@ partial class ValidateBaseStub
 	/// <summary>Interceptor for NeatooPropertyChanged event.</summary>
 	public NeatooPropertyChangedInterceptor NeatooPropertyChanged { get; } = new();
 
-	/// <summary>Returns this instance as Neatoo.IValidateBase.</summary>
-	public Neatoo.IValidateBase AsValidateBase() => this;
+	/// <summary>Returns this instance as global::Neatoo.IValidateBase.</summary>
+	public global::Neatoo.IValidateBase AsValidateBase() => this;
 
-	/// <summary>Returns this instance as System.ComponentModel.INotifyPropertyChanged.</summary>
-	public System.ComponentModel.INotifyPropertyChanged AsNotifyPropertyChanged() => this;
+	/// <summary>Returns this instance as global::System.ComponentModel.INotifyPropertyChanged.</summary>
+	public global::System.ComponentModel.INotifyPropertyChanged AsNotifyPropertyChanged() => this;
 
-	/// <summary>Returns this instance as Neatoo.INotifyNeatooPropertyChanged.</summary>
-	public Neatoo.INotifyNeatooPropertyChanged AsNotifyNeatooPropertyChanged() => this;
+	/// <summary>Returns this instance as global::Neatoo.INotifyNeatooPropertyChanged.</summary>
+	public global::Neatoo.INotifyNeatooPropertyChanged AsNotifyNeatooPropertyChanged() => this;
 
-	/// <summary>Returns this instance as Neatoo.IValidateMetaProperties.</summary>
-	public Neatoo.IValidateMetaProperties AsValidateMetaProperties() => this;
+	/// <summary>Returns this instance as global::Neatoo.IValidateMetaProperties.</summary>
+	public global::Neatoo.IValidateMetaProperties AsValidateMetaProperties() => this;
 
 	/// <summary>Backing storage for Parent.</summary>
 	protected global::Neatoo.IValidateBase? ParentBacking { get; set; } = default!;
@@ -443,7 +443,7 @@ partial class ValidateBaseStub
 	/// <summary>Backing storage for PropertyMessages.</summary>
 	protected global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> PropertyMessagesBacking { get; set; } = new global::System.Collections.Generic.List<global::Neatoo.IPropertyMessage>();
 
-	global::Neatoo.IValidateProperty Neatoo.IValidateBase.GetProperty(string propertyName)
+	global::Neatoo.IValidateProperty global::Neatoo.IValidateBase.GetProperty(string propertyName)
 	{
 		GetProperty.RecordCall(propertyName);
 		if (GetProperty.OnCall is { } callback)
@@ -451,7 +451,7 @@ partial class ValidateBaseStub
 		throw new global::System.InvalidOperationException("No implementation provided for GetProperty. Set GetProperty.OnCall or define a protected method 'GetProperty' in your partial class.");
 	}
 
-	bool Neatoo.IValidateBase.TryGetProperty(string propertyName, out global::Neatoo.IValidateProperty validateProperty)
+	bool global::Neatoo.IValidateBase.TryGetProperty(string propertyName, out global::Neatoo.IValidateProperty validateProperty)
 	{
 		validateProperty = default!;
 		TryGetProperty.RecordCall(propertyName);
@@ -460,84 +460,84 @@ partial class ValidateBaseStub
 		return default!;
 	}
 
-	global::Neatoo.IValidateBase? Neatoo.IValidateBase.Parent
+	global::Neatoo.IValidateBase? global::Neatoo.IValidateBase.Parent
 	{
 		get { Parent.RecordGet(); return Parent.OnGet?.Invoke(this) ?? ParentBacking; }
 	}
 
-	bool Neatoo.IValidateBase.IsPaused
+	bool global::Neatoo.IValidateBase.IsPaused
 	{
 		get { IsPaused.RecordGet(); return IsPaused.OnGet?.Invoke(this) ?? IsPausedBacking; }
 	}
 
-	global::Neatoo.IValidateProperty Neatoo.IValidateBase.this[string propertyName]
+	global::Neatoo.IValidateProperty global::Neatoo.IValidateBase.this[string propertyName]
 	{
 		get { StringIndexer.RecordGet(propertyName); if (StringIndexer.OnGet != null) return StringIndexer.OnGet(this, propertyName); return StringIndexerBacking.TryGetValue(propertyName, out var v) ? v : default!; }
 	}
 
-	global::System.Threading.Tasks.Task Neatoo.IValidateMetaProperties.WaitForTasks()
+	global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.WaitForTasks()
 	{
 		WaitForTasks1.RecordCall();
 		return WaitForTasks1.OnCall?.Invoke(this) ?? global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
-	global::System.Threading.Tasks.Task Neatoo.IValidateMetaProperties.WaitForTasks(global::System.Threading.CancellationToken token)
+	global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.WaitForTasks(global::System.Threading.CancellationToken token)
 	{
 		WaitForTasks2.RecordCall(token);
 		return WaitForTasks2.OnCall?.Invoke(this, token) ?? global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
-	global::System.Threading.Tasks.Task Neatoo.IValidateMetaProperties.RunRules(string propertyName, global::System.Threading.CancellationToken? token)
+	global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.RunRules(string propertyName, global::System.Threading.CancellationToken? token)
 	{
 		RunRules1.RecordCall(propertyName, token);
 		return RunRules1.OnCall?.Invoke(this, propertyName, token) ?? global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
-	global::System.Threading.Tasks.Task Neatoo.IValidateMetaProperties.RunRules(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
+	global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.RunRules(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
 	{
 		RunRules2.RecordCall(runRules, token);
 		return RunRules2.OnCall?.Invoke(this, runRules, token) ?? global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
-	void Neatoo.IValidateMetaProperties.ClearAllMessages()
+	void global::Neatoo.IValidateMetaProperties.ClearAllMessages()
 	{
 		ClearAllMessages.RecordCall();
 		ClearAllMessages.OnCall?.Invoke(this);
 	}
 
-	void Neatoo.IValidateMetaProperties.ClearSelfMessages()
+	void global::Neatoo.IValidateMetaProperties.ClearSelfMessages()
 	{
 		ClearSelfMessages.RecordCall();
 		ClearSelfMessages.OnCall?.Invoke(this);
 	}
 
-	bool Neatoo.IValidateMetaProperties.IsBusy
+	bool global::Neatoo.IValidateMetaProperties.IsBusy
 	{
 		get { IsBusy.RecordGet(); return IsBusy.OnGet?.Invoke(this) ?? IsBusyBacking; }
 	}
 
-	bool Neatoo.IValidateMetaProperties.IsValid
+	bool global::Neatoo.IValidateMetaProperties.IsValid
 	{
 		get { IsValid.RecordGet(); return IsValid.OnGet?.Invoke(this) ?? IsValidBacking; }
 	}
 
-	bool Neatoo.IValidateMetaProperties.IsSelfValid
+	bool global::Neatoo.IValidateMetaProperties.IsSelfValid
 	{
 		get { IsSelfValid.RecordGet(); return IsSelfValid.OnGet?.Invoke(this) ?? IsSelfValidBacking; }
 	}
 
-	global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> Neatoo.IValidateMetaProperties.PropertyMessages
+	global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> global::Neatoo.IValidateMetaProperties.PropertyMessages
 	{
 		get { PropertyMessages.RecordGet(); return PropertyMessages.OnGet?.Invoke(this) ?? PropertyMessagesBacking; }
 	}
 
-	event global::System.ComponentModel.PropertyChangedEventHandler? System.ComponentModel.INotifyPropertyChanged.PropertyChanged
+	event global::System.ComponentModel.PropertyChangedEventHandler? global::System.ComponentModel.INotifyPropertyChanged.PropertyChanged
 	{
 		add => PropertyChanged.RecordAdd(value);
 		remove => PropertyChanged.RecordRemove(value);
 	}
 
-	event global::Neatoo.NeatooPropertyChanged? Neatoo.INotifyNeatooPropertyChanged.NeatooPropertyChanged
+	event global::Neatoo.NeatooPropertyChanged? global::Neatoo.INotifyNeatooPropertyChanged.NeatooPropertyChanged
 	{
 		add => NeatooPropertyChanged.RecordAdd(value);
 		remove => NeatooPropertyChanged.RecordRemove(value);

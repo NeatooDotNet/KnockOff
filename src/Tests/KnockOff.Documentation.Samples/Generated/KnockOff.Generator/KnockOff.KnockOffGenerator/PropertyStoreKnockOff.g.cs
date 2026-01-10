@@ -46,8 +46,8 @@ partial class PropertyStoreKnockOff
 	/// <summary>Interceptor for Count.</summary>
 	public CountInterceptor Count { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore.</summary>
-	public KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore AsInPropertyStore() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore AsInPropertyStore() => this;
 
 	/// <summary>Backing storage for Int32Indexer indexer.</summary>
 	public global::System.Collections.Generic.Dictionary<int, global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo> Int32IndexerBacking { get; } = new();
@@ -55,12 +55,12 @@ partial class PropertyStoreKnockOff
 	/// <summary>Backing storage for Count.</summary>
 	protected int CountBacking { get; set; } = default!;
 
-	global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore.this[int index]
+	global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore.this[int index]
 	{
 		get { Int32Indexer.RecordGet(index); if (Int32Indexer.OnGet != null) return Int32Indexer.OnGet(this, index); return Int32IndexerBacking.TryGetValue(index, out var v) ? v : default!; }
 	}
 
-	int KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore.Count
+	int global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore.Count
 	{
 		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? CountBacking; }
 	}

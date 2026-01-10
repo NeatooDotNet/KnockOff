@@ -118,8 +118,8 @@ partial class DictionaryEnumeratorStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Collections.IDictionaryEnumerator.</summary>
-		public class IDictionaryEnumerator : System.Collections.IDictionaryEnumerator
+		/// <summary>Stub implementation of global::System.Collections.IDictionaryEnumerator.</summary>
+		public class IDictionaryEnumerator : global::System.Collections.IDictionaryEnumerator
 		{
 			/// <summary>Interceptor for Entry.</summary>
 			public IDictionaryEnumerator_EntryInterceptor Entry { get; } = new();
@@ -139,7 +139,7 @@ partial class DictionaryEnumeratorStubTests
 			/// <summary>Interceptor for Reset.</summary>
 			public IDictionaryEnumerator_ResetInterceptor Reset { get; } = new();
 
-			global::System.Collections.DictionaryEntry System.Collections.IDictionaryEnumerator.Entry
+			global::System.Collections.DictionaryEntry global::System.Collections.IDictionaryEnumerator.Entry
 			{
 				get
 				{
@@ -149,7 +149,7 @@ partial class DictionaryEnumeratorStubTests
 				}
 			}
 
-			object System.Collections.IDictionaryEnumerator.Key
+			object global::System.Collections.IDictionaryEnumerator.Key
 			{
 				get
 				{
@@ -159,7 +159,7 @@ partial class DictionaryEnumeratorStubTests
 				}
 			}
 
-			object? System.Collections.IDictionaryEnumerator.Value
+			object? global::System.Collections.IDictionaryEnumerator.Value
 			{
 				get
 				{
@@ -169,20 +169,20 @@ partial class DictionaryEnumeratorStubTests
 				}
 			}
 
-			bool System.Collections.IEnumerator.MoveNext()
+			bool global::System.Collections.IEnumerator.MoveNext()
 			{
 				MoveNext.RecordCall();
 				if (MoveNext.OnCall is { } onCall) return onCall(this);
 				return default!;
 			}
 
-			void System.Collections.IEnumerator.Reset()
+			void global::System.Collections.IEnumerator.Reset()
 			{
 				Reset.RecordCall();
 				if (Reset.OnCall is { } onCall) onCall(this);
 			}
 
-			object System.Collections.IEnumerator.Current
+			object global::System.Collections.IEnumerator.Current
 			{
 				get
 				{

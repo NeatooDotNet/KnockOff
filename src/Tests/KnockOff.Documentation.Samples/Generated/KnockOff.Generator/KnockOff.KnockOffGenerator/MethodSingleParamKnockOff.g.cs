@@ -33,10 +33,10 @@ partial class MethodSingleParamKnockOff
 	/// <summary>Interceptor for GetUser.</summary>
 	public GetUserInterceptor GetUser { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodSingleParam.</summary>
-	public KnockOff.Documentation.Samples.Guides.IMethodSingleParam AsMethodSingleParam() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IMethodSingleParam.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IMethodSingleParam AsMethodSingleParam() => this;
 
-	global::KnockOff.Documentation.Samples.Guides.MethodUser KnockOff.Documentation.Samples.Guides.IMethodSingleParam.GetUser(int id)
+	global::KnockOff.Documentation.Samples.Guides.MethodUser global::KnockOff.Documentation.Samples.Guides.IMethodSingleParam.GetUser(int id)
 	{
 		GetUser.RecordCall(id);
 		return GetUser.OnCall?.Invoke(this, id) ?? new global::KnockOff.Documentation.Samples.Guides.MethodUser();

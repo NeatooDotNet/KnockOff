@@ -76,8 +76,8 @@ partial class MultiInterfaceInlineTest
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of KnockOff.Tests.ISimpleService.</summary>
-		public class ISimpleService : KnockOff.Tests.ISimpleService
+		/// <summary>Stub implementation of global::KnockOff.Tests.ISimpleService.</summary>
+		public class ISimpleService : global::KnockOff.Tests.ISimpleService
 		{
 			/// <summary>Interceptor for Name.</summary>
 			public ISimpleService_NameInterceptor Name { get; } = new();
@@ -88,7 +88,7 @@ partial class MultiInterfaceInlineTest
 			/// <summary>Interceptor for GetValue.</summary>
 			public ISimpleService_GetValueInterceptor GetValue { get; } = new();
 
-			string KnockOff.Tests.ISimpleService.Name
+			string global::KnockOff.Tests.ISimpleService.Name
 			{
 				get
 				{
@@ -104,13 +104,13 @@ partial class MultiInterfaceInlineTest
 				}
 			}
 
-			void KnockOff.Tests.ISimpleService.DoSomething()
+			void global::KnockOff.Tests.ISimpleService.DoSomething()
 			{
 				DoSomething.RecordCall();
 				if (DoSomething.OnCall is { } onCall) onCall(this);
 			}
 
-			int KnockOff.Tests.ISimpleService.GetValue(int input)
+			int global::KnockOff.Tests.ISimpleService.GetValue(int input)
 			{
 				GetValue.RecordCall(input);
 				if (GetValue.OnCall is { } onCall) return onCall(this, input);
@@ -139,13 +139,13 @@ partial class MultiInterfaceInlineTest
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of KnockOff.Tests.ISimpleLogger.</summary>
-		public class ISimpleLogger : KnockOff.Tests.ISimpleLogger
+		/// <summary>Stub implementation of global::KnockOff.Tests.ISimpleLogger.</summary>
+		public class ISimpleLogger : global::KnockOff.Tests.ISimpleLogger
 		{
 			/// <summary>Interceptor for Log.</summary>
 			public ISimpleLogger_LogInterceptor Log { get; } = new();
 
-			void KnockOff.Tests.ISimpleLogger.Log(string message)
+			void global::KnockOff.Tests.ISimpleLogger.Log(string message)
 			{
 				Log.RecordCall(message);
 				if (Log.OnCall is { } onCall) onCall(this, message);

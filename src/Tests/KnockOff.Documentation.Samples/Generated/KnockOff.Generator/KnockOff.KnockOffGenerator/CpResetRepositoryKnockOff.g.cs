@@ -33,10 +33,10 @@ partial class CpResetRepositoryKnockOff
 	/// <summary>Interceptor for GetUser.</summary>
 	public GetUserInterceptor GetUser { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpResetRepository.</summary>
-	public KnockOff.Documentation.Samples.Skills.ICpResetRepository AsCpResetRepository() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ICpResetRepository.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ICpResetRepository AsCpResetRepository() => this;
 
-	global::KnockOff.Documentation.Samples.Skills.CpUser? KnockOff.Documentation.Samples.Skills.ICpResetRepository.GetUser(int id)
+	global::KnockOff.Documentation.Samples.Skills.CpUser? global::KnockOff.Documentation.Samples.Skills.ICpResetRepository.GetUser(int id)
 	{
 		GetUser.RecordCall(id);
 		return GetUser.OnCall?.Invoke(this, id) ?? default!;

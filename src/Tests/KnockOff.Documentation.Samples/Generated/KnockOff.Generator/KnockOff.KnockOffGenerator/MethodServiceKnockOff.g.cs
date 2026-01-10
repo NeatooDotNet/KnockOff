@@ -27,10 +27,10 @@ partial class MethodServiceKnockOff
 	/// <summary>Interceptor for Initialize.</summary>
 	public InitializeInterceptor Initialize { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodService.</summary>
-	public KnockOff.Documentation.Samples.Guides.IMethodService AsMethodService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IMethodService.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IMethodService AsMethodService() => this;
 
-	void KnockOff.Documentation.Samples.Guides.IMethodService.Initialize()
+	void global::KnockOff.Documentation.Samples.Guides.IMethodService.Initialize()
 	{
 		Initialize.RecordCall();
 		Initialize.OnCall?.Invoke(this);

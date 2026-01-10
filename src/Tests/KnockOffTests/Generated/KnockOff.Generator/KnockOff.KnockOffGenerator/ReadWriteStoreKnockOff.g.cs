@@ -39,13 +39,13 @@ partial class ReadWriteStoreKnockOff
 	/// <summary>Interceptor for StringIndexer.</summary>
 	public StringIndexerInterceptor StringIndexer { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Tests.IReadWriteStore.</summary>
-	public KnockOff.Tests.IReadWriteStore AsReadWriteStore() => this;
+	/// <summary>Returns this instance as global::KnockOff.Tests.IReadWriteStore.</summary>
+	public global::KnockOff.Tests.IReadWriteStore AsReadWriteStore() => this;
 
 	/// <summary>Backing storage for StringIndexer indexer.</summary>
 	public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Tests.PropertyInfo?> StringIndexerBacking { get; } = new();
 
-	global::KnockOff.Tests.PropertyInfo? KnockOff.Tests.IReadWriteStore.this[string key]
+	global::KnockOff.Tests.PropertyInfo? global::KnockOff.Tests.IReadWriteStore.this[string key]
 	{
 		get { StringIndexer.RecordGet(key); if (StringIndexer.OnGet != null) return StringIndexer.OnGet(this, key); return StringIndexerBacking.TryGetValue(key, out var v) ? v : default; }
 		set { StringIndexer.RecordSet(key, value); if (StringIndexer.OnSet != null) StringIndexer.OnSet(this, key, value); else StringIndexerBacking[key] = value; }

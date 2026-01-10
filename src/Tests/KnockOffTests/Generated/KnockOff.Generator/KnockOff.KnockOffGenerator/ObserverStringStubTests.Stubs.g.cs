@@ -65,8 +65,8 @@ partial class ObserverStringStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.IObserver<string>.</summary>
-		public class IObserver : System.IObserver<string>
+		/// <summary>Stub implementation of global::System.IObserver<string>.</summary>
+		public class IObserver : global::System.IObserver<string>
 		{
 			/// <summary>Interceptor for OnCompleted.</summary>
 			public IObserver_OnCompletedInterceptor OnCompleted { get; } = new();
@@ -77,19 +77,19 @@ partial class ObserverStringStubTests
 			/// <summary>Interceptor for OnNext.</summary>
 			public IObserver_OnNextInterceptor OnNext { get; } = new();
 
-			void System.IObserver<string>.OnCompleted()
+			void global::System.IObserver<string>.OnCompleted()
 			{
 				OnCompleted.RecordCall();
 				if (OnCompleted.OnCall is { } onCall) onCall(this);
 			}
 
-			void System.IObserver<string>.OnError(global::System.Exception error)
+			void global::System.IObserver<string>.OnError(global::System.Exception error)
 			{
 				OnError.RecordCall(error);
 				if (OnError.OnCall is { } onCall) onCall(this, error);
 			}
 
-			void System.IObserver<string>.OnNext(string value)
+			void global::System.IObserver<string>.OnNext(string value)
 			{
 				OnNext.RecordCall(value);
 				if (OnNext.OnCall is { } onCall) onCall(this, value);

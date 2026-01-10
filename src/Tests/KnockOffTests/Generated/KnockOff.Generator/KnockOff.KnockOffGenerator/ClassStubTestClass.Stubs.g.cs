@@ -121,7 +121,7 @@ partial class ClassStubTestClass
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Stub for KnockOff.Tests.SimpleService via composition.</summary>
+		/// <summary>Stub for global::KnockOff.Tests.SimpleService via composition.</summary>
 		public class SimpleService
 		{
 			/// <summary>Interceptor for Name.</summary>
@@ -135,8 +135,8 @@ partial class ClassStubTestClass
 			/// <summary>Interceptor for Format.</summary>
 			public SimpleService_FormatInterceptor Format { get; } = new();
 
-			/// <summary>The KnockOff.Tests.SimpleService instance. Pass this to code expecting the target class.</summary>
-			public KnockOff.Tests.SimpleService Object { get; }
+			/// <summary>The global::KnockOff.Tests.SimpleService instance. Pass this to code expecting the target class.</summary>
+			public global::KnockOff.Tests.SimpleService Object { get; }
 
 			public SimpleService()
 			{
@@ -158,8 +158,8 @@ partial class ClassStubTestClass
 				Format.Reset();
 			}
 
-			/// <summary>Internal implementation that inherits from KnockOff.Tests.SimpleService.</summary>
-			private sealed class Impl : KnockOff.Tests.SimpleService
+			/// <summary>Internal implementation that inherits from global::KnockOff.Tests.SimpleService.</summary>
+			private sealed class Impl : global::KnockOff.Tests.SimpleService
 			{
 				private readonly SimpleService _stub;
 

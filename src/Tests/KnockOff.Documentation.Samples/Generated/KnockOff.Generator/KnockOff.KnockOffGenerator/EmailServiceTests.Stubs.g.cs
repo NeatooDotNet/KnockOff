@@ -56,7 +56,7 @@ partial class EmailServiceTests
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Stub for KnockOff.Documentation.Samples.Guides.InlineStubs.EmailService via composition.</summary>
+		/// <summary>Stub for global::KnockOff.Documentation.Samples.Guides.InlineStubs.EmailService via composition.</summary>
 		public class EmailService
 		{
 			/// <summary>Interceptor for ServerName.</summary>
@@ -64,8 +64,8 @@ partial class EmailServiceTests
 			/// <summary>Interceptor for Send.</summary>
 			public EmailService_SendInterceptor Send { get; } = new();
 
-			/// <summary>The KnockOff.Documentation.Samples.Guides.InlineStubs.EmailService instance. Pass this to code expecting the target class.</summary>
-			public KnockOff.Documentation.Samples.Guides.InlineStubs.EmailService Object { get; }
+			/// <summary>The global::KnockOff.Documentation.Samples.Guides.InlineStubs.EmailService instance. Pass this to code expecting the target class.</summary>
+			public global::KnockOff.Documentation.Samples.Guides.InlineStubs.EmailService Object { get; }
 
 			public EmailService()
 			{
@@ -79,8 +79,8 @@ partial class EmailServiceTests
 				Send.Reset();
 			}
 
-			/// <summary>Internal implementation that inherits from KnockOff.Documentation.Samples.Guides.InlineStubs.EmailService.</summary>
-			private sealed class Impl : KnockOff.Documentation.Samples.Guides.InlineStubs.EmailService
+			/// <summary>Internal implementation that inherits from global::KnockOff.Documentation.Samples.Guides.InlineStubs.EmailService.</summary>
+			private sealed class Impl : global::KnockOff.Documentation.Samples.Guides.InlineStubs.EmailService
 			{
 				private readonly EmailService _stub;
 

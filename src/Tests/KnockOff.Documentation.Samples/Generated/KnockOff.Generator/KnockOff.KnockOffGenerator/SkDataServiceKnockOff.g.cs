@@ -89,28 +89,28 @@ partial class SkDataServiceKnockOff
 	/// <summary>Interceptor for GetCount.</summary>
 	public GetCount2Interceptor GetCount2 { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkDataService.</summary>
-	public KnockOff.Documentation.Samples.Skills.ISkDataService AsSkDataService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ISkDataService.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkDataService AsSkDataService() => this;
 
 	/// <summary>Backing storage for Name.</summary>
 	protected string NameBacking { get; set; } = "";
 
-	string KnockOff.Documentation.Samples.Skills.ISkDataService.Name
+	string global::KnockOff.Documentation.Samples.Skills.ISkDataService.Name
 	{
 		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? NameBacking; }
 		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else NameBacking = value; }
 	}
 
-	string? KnockOff.Documentation.Samples.Skills.ISkDataService.GetDescription(int id)
+	string? global::KnockOff.Documentation.Samples.Skills.ISkDataService.GetDescription(int id)
 	{
 		GetDescription.RecordCall(id);
 		return GetDescription.OnCall?.Invoke(this, id) ?? default!;
 	}
 
-	int KnockOff.Documentation.Samples.Skills.ISkDataService.GetCount()
+	int global::KnockOff.Documentation.Samples.Skills.ISkDataService.GetCount()
 	{
 		GetCount2.RecordCall();
-		if (GetCount2.OnCall != null) return GetCount2.OnCall(this);
+		if (GetCount2.OnCall is { } callback) return callback(this);
 		return GetCount();
 	}
 

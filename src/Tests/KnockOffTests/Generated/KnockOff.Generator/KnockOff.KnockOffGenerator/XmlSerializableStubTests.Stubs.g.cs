@@ -65,8 +65,8 @@ partial class XmlSerializableStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Xml.Serialization.IXmlSerializable.</summary>
-		public class IXmlSerializable : System.Xml.Serialization.IXmlSerializable
+		/// <summary>Stub implementation of global::System.Xml.Serialization.IXmlSerializable.</summary>
+		public class IXmlSerializable : global::System.Xml.Serialization.IXmlSerializable
 		{
 			/// <summary>Interceptor for GetSchema.</summary>
 			public IXmlSerializable_GetSchemaInterceptor GetSchema { get; } = new();
@@ -77,20 +77,20 @@ partial class XmlSerializableStubTests
 			/// <summary>Interceptor for WriteXml.</summary>
 			public IXmlSerializable_WriteXmlInterceptor WriteXml { get; } = new();
 
-			global::System.Xml.Schema.XmlSchema? System.Xml.Serialization.IXmlSerializable.GetSchema()
+			global::System.Xml.Schema.XmlSchema? global::System.Xml.Serialization.IXmlSerializable.GetSchema()
 			{
 				GetSchema.RecordCall();
 				if (GetSchema.OnCall is { } onCall) return onCall(this);
 				return default!;
 			}
 
-			void System.Xml.Serialization.IXmlSerializable.ReadXml(global::System.Xml.XmlReader reader)
+			void global::System.Xml.Serialization.IXmlSerializable.ReadXml(global::System.Xml.XmlReader reader)
 			{
 				ReadXml.RecordCall(reader);
 				if (ReadXml.OnCall is { } onCall) onCall(this, reader);
 			}
 
-			void System.Xml.Serialization.IXmlSerializable.WriteXml(global::System.Xml.XmlWriter writer)
+			void global::System.Xml.Serialization.IXmlSerializable.WriteXml(global::System.Xml.XmlWriter writer)
 			{
 				WriteXml.RecordCall(writer);
 				if (WriteXml.OnCall is { } onCall) onCall(this, writer);

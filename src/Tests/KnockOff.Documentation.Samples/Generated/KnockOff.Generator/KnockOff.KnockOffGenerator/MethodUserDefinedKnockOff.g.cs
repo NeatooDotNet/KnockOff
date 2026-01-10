@@ -58,20 +58,20 @@ partial class MethodUserDefinedKnockOff
 	/// <summary>Interceptor for Count.</summary>
 	public Count2Interceptor Count2 { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IMethodUserDefined.</summary>
-	public KnockOff.Documentation.Samples.Guides.IMethodUserDefined AsMethodUserDefined() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IMethodUserDefined.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IMethodUserDefined AsMethodUserDefined() => this;
 
-	global::KnockOff.Documentation.Samples.Guides.MethodUser? KnockOff.Documentation.Samples.Guides.IMethodUserDefined.GetById(int id)
+	global::KnockOff.Documentation.Samples.Guides.MethodUser? global::KnockOff.Documentation.Samples.Guides.IMethodUserDefined.GetById(int id)
 	{
 		GetById2.RecordCall(id);
-		if (GetById2.OnCall != null) return GetById2.OnCall(this, id);
+		if (GetById2.OnCall is { } callback) return callback(this, id);
 		return GetById(id);
 	}
 
-	int KnockOff.Documentation.Samples.Guides.IMethodUserDefined.Count()
+	int global::KnockOff.Documentation.Samples.Guides.IMethodUserDefined.Count()
 	{
 		Count2.RecordCall();
-		if (Count2.OnCall != null) return Count2.OnCall(this);
+		if (Count2.OnCall is { } callback) return callback(this);
 		return Count();
 	}
 

@@ -393,8 +393,8 @@ partial class SmartDefaultsKnockOff
 	/// <summary>Interceptor for GetStringAsync.</summary>
 	public GetStringAsyncInterceptor GetStringAsync { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Tests.ISmartDefaultsService.</summary>
-	public KnockOff.Tests.ISmartDefaultsService AsSmartDefaultsService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Tests.ISmartDefaultsService.</summary>
+	public global::KnockOff.Tests.ISmartDefaultsService AsSmartDefaultsService() => this;
 
 	/// <summary>Backing storage for Count.</summary>
 	protected int CountBacking { get; set; } = default!;
@@ -402,61 +402,61 @@ partial class SmartDefaultsKnockOff
 	/// <summary>Backing storage for Items.</summary>
 	protected global::System.Collections.Generic.List<string> ItemsBacking { get; set; } = new global::System.Collections.Generic.List<string>();
 
-	int KnockOff.Tests.ISmartDefaultsService.GetInt()
+	int global::KnockOff.Tests.ISmartDefaultsService.GetInt()
 	{
 		GetInt.RecordCall();
 		return GetInt.OnCall?.Invoke(this) ?? default!;
 	}
 
-	bool KnockOff.Tests.ISmartDefaultsService.GetBool()
+	bool global::KnockOff.Tests.ISmartDefaultsService.GetBool()
 	{
 		GetBool.RecordCall();
 		return GetBool.OnCall?.Invoke(this) ?? default!;
 	}
 
-	global::System.DateTime KnockOff.Tests.ISmartDefaultsService.GetDateTime()
+	global::System.DateTime global::KnockOff.Tests.ISmartDefaultsService.GetDateTime()
 	{
 		GetDateTime.RecordCall();
 		return GetDateTime.OnCall?.Invoke(this) ?? default!;
 	}
 
-	string? KnockOff.Tests.ISmartDefaultsService.GetNullableString()
+	string? global::KnockOff.Tests.ISmartDefaultsService.GetNullableString()
 	{
 		GetNullableString.RecordCall();
 		return GetNullableString.OnCall?.Invoke(this) ?? default!;
 	}
 
-	global::KnockOff.Tests.TestEntity? KnockOff.Tests.ISmartDefaultsService.GetNullableEntity()
+	global::KnockOff.Tests.TestEntity? global::KnockOff.Tests.ISmartDefaultsService.GetNullableEntity()
 	{
 		GetNullableEntity.RecordCall();
 		return GetNullableEntity.OnCall?.Invoke(this) ?? default!;
 	}
 
-	global::System.Collections.Generic.List<string> KnockOff.Tests.ISmartDefaultsService.GetList()
+	global::System.Collections.Generic.List<string> global::KnockOff.Tests.ISmartDefaultsService.GetList()
 	{
 		GetList.RecordCall();
 		return GetList.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<string>();
 	}
 
-	global::System.Collections.Generic.Dictionary<string, int> KnockOff.Tests.ISmartDefaultsService.GetDictionary()
+	global::System.Collections.Generic.Dictionary<string, int> global::KnockOff.Tests.ISmartDefaultsService.GetDictionary()
 	{
 		GetDictionary.RecordCall();
 		return GetDictionary.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.Dictionary<string, int>();
 	}
 
-	global::KnockOff.Tests.TestEntity KnockOff.Tests.ISmartDefaultsService.GetEntity()
+	global::KnockOff.Tests.TestEntity global::KnockOff.Tests.ISmartDefaultsService.GetEntity()
 	{
 		GetEntity.RecordCall();
 		return GetEntity.OnCall?.Invoke(this) ?? new global::KnockOff.Tests.TestEntity();
 	}
 
-	global::System.Collections.Generic.IList<string> KnockOff.Tests.ISmartDefaultsService.GetIList()
+	global::System.Collections.Generic.IList<string> global::KnockOff.Tests.ISmartDefaultsService.GetIList()
 	{
 		GetIList.RecordCall();
 		return GetIList.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<string>();
 	}
 
-	string KnockOff.Tests.ISmartDefaultsService.GetString()
+	string global::KnockOff.Tests.ISmartDefaultsService.GetString()
 	{
 		GetString.RecordCall();
 		if (GetString.OnCall is { } callback)
@@ -464,7 +464,7 @@ partial class SmartDefaultsKnockOff
 		throw new global::System.InvalidOperationException("No implementation provided for GetString. Set GetString.OnCall or define a protected method 'GetString' in your partial class.");
 	}
 
-	global::System.IDisposable KnockOff.Tests.ISmartDefaultsService.GetDisposable()
+	global::System.IDisposable global::KnockOff.Tests.ISmartDefaultsService.GetDisposable()
 	{
 		GetDisposable.RecordCall();
 		if (GetDisposable.OnCall is { } callback)
@@ -472,19 +472,19 @@ partial class SmartDefaultsKnockOff
 		throw new global::System.InvalidOperationException("No implementation provided for GetDisposable. Set GetDisposable.OnCall or define a protected method 'GetDisposable' in your partial class.");
 	}
 
-	global::System.Threading.Tasks.Task<int> KnockOff.Tests.ISmartDefaultsService.GetIntAsync()
+	global::System.Threading.Tasks.Task<int> global::KnockOff.Tests.ISmartDefaultsService.GetIntAsync()
 	{
 		GetIntAsync.RecordCall();
 		return GetIntAsync.OnCall?.Invoke(this) ?? global::System.Threading.Tasks.Task.FromResult<int>(default!);
 	}
 
-	global::System.Threading.Tasks.Task<global::System.Collections.Generic.List<string>> KnockOff.Tests.ISmartDefaultsService.GetListAsync()
+	global::System.Threading.Tasks.Task<global::System.Collections.Generic.List<string>> global::KnockOff.Tests.ISmartDefaultsService.GetListAsync()
 	{
 		GetListAsync.RecordCall();
 		return GetListAsync.OnCall?.Invoke(this) ?? global::System.Threading.Tasks.Task.FromResult<global::System.Collections.Generic.List<string>>(new global::System.Collections.Generic.List<string>());
 	}
 
-	global::System.Threading.Tasks.Task<string> KnockOff.Tests.ISmartDefaultsService.GetStringAsync()
+	global::System.Threading.Tasks.Task<string> global::KnockOff.Tests.ISmartDefaultsService.GetStringAsync()
 	{
 		GetStringAsync.RecordCall();
 		if (GetStringAsync.OnCall is { } callback)
@@ -492,12 +492,12 @@ partial class SmartDefaultsKnockOff
 		throw new global::System.InvalidOperationException("No implementation provided for GetStringAsync. Set GetStringAsync.OnCall or define a protected method 'GetStringAsync' in your partial class.");
 	}
 
-	int KnockOff.Tests.ISmartDefaultsService.Count
+	int global::KnockOff.Tests.ISmartDefaultsService.Count
 	{
 		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? CountBacking; }
 	}
 
-	global::System.Collections.Generic.List<string> KnockOff.Tests.ISmartDefaultsService.Items
+	global::System.Collections.Generic.List<string> global::KnockOff.Tests.ISmartDefaultsService.Items
 	{
 		get { Items.RecordGet(); return Items.OnGet?.Invoke(this) ?? ItemsBacking; }
 	}

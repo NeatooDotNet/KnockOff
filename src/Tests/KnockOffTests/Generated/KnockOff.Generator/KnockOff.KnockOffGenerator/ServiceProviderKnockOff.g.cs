@@ -33,10 +33,10 @@ partial class ServiceProviderKnockOff
 	/// <summary>Interceptor for GetService.</summary>
 	public GetServiceInterceptor GetService { get; } = new();
 
-	/// <summary>Returns this instance as System.IServiceProvider.</summary>
-	public System.IServiceProvider AsServiceProvider() => this;
+	/// <summary>Returns this instance as global::System.IServiceProvider.</summary>
+	public global::System.IServiceProvider AsServiceProvider() => this;
 
-	object? System.IServiceProvider.GetService(global::System.Type serviceType)
+	object? global::System.IServiceProvider.GetService(global::System.Type serviceType)
 	{
 		GetService.RecordCall(serviceType);
 		return GetService.OnCall?.Invoke(this, serviceType) ?? default!;

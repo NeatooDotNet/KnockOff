@@ -28,7 +28,7 @@ partial class VoidDelegateTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub for KnockOff.Documentation.Samples.Guides.Delegates.LogAction delegate.</summary>
+		/// <summary>Stub for global::KnockOff.Documentation.Samples.Guides.Delegates.LogAction delegate.</summary>
 		public sealed class LogAction
 		{
 			/// <summary>Interceptor for tracking and configuring delegate behavior.</summary>
@@ -40,8 +40,8 @@ partial class VoidDelegateTests
 				if (Interceptor.OnCall is { } onCall) onCall(this, message);
 			}
 
-			/// <summary>Implicit conversion to KnockOff.Documentation.Samples.Guides.Delegates.LogAction.</summary>
-			public static implicit operator KnockOff.Documentation.Samples.Guides.Delegates.LogAction(LogAction stub) => stub.Invoke;
+			/// <summary>Implicit conversion to global::KnockOff.Documentation.Samples.Guides.Delegates.LogAction.</summary>
+			public static implicit operator global::KnockOff.Documentation.Samples.Guides.Delegates.LogAction(LogAction stub) => stub.Invoke;
 		}
 
 	}

@@ -61,8 +61,8 @@ partial class AsyncEnumeratorStringStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Collections.Generic.IAsyncEnumerator<string>.</summary>
-		public class IAsyncEnumerator : System.Collections.Generic.IAsyncEnumerator<string>
+		/// <summary>Stub implementation of global::System.Collections.Generic.IAsyncEnumerator<string>.</summary>
+		public class IAsyncEnumerator : global::System.Collections.Generic.IAsyncEnumerator<string>
 		{
 			/// <summary>Interceptor for Current.</summary>
 			public IAsyncEnumerator_CurrentInterceptor Current { get; } = new();
@@ -73,14 +73,14 @@ partial class AsyncEnumeratorStringStubTests
 			/// <summary>Interceptor for DisposeAsync.</summary>
 			public IAsyncEnumerator_DisposeAsyncInterceptor DisposeAsync { get; } = new();
 
-			global::System.Threading.Tasks.ValueTask<bool> System.Collections.Generic.IAsyncEnumerator<string>.MoveNextAsync()
+			global::System.Threading.Tasks.ValueTask<bool> global::System.Collections.Generic.IAsyncEnumerator<string>.MoveNextAsync()
 			{
 				MoveNextAsync.RecordCall();
 				if (MoveNextAsync.OnCall is { } onCall) return onCall(this);
 				return default;
 			}
 
-			string System.Collections.Generic.IAsyncEnumerator<string>.Current
+			string global::System.Collections.Generic.IAsyncEnumerator<string>.Current
 			{
 				get
 				{
@@ -90,7 +90,7 @@ partial class AsyncEnumeratorStringStubTests
 				}
 			}
 
-			global::System.Threading.Tasks.ValueTask System.IAsyncDisposable.DisposeAsync()
+			global::System.Threading.Tasks.ValueTask global::System.IAsyncDisposable.DisposeAsync()
 			{
 				DisposeAsync.RecordCall();
 				if (DisposeAsync.OnCall is { } onCall) return onCall(this);

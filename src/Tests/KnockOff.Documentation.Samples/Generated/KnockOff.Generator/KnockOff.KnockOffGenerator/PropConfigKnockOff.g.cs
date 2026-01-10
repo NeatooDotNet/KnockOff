@@ -24,13 +24,13 @@ partial class PropConfigKnockOff
 	/// <summary>Interceptor for ConnectionString.</summary>
 	public ConnectionStringInterceptor ConnectionString { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IPropConfig.</summary>
-	public KnockOff.Documentation.Samples.Guides.IPropConfig AsPropConfig() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IPropConfig.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IPropConfig AsPropConfig() => this;
 
 	/// <summary>Backing storage for ConnectionString.</summary>
 	protected string ConnectionStringBacking { get; set; } = "";
 
-	string KnockOff.Documentation.Samples.Guides.IPropConfig.ConnectionString
+	string global::KnockOff.Documentation.Samples.Guides.IPropConfig.ConnectionString
 	{
 		get { ConnectionString.RecordGet(); return ConnectionString.OnGet?.Invoke(this) ?? ConnectionStringBacking; }
 	}

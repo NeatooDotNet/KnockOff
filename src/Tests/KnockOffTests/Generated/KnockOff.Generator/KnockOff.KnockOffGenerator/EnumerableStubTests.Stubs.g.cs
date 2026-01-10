@@ -25,13 +25,13 @@ partial class EnumerableStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Collections.IEnumerable.</summary>
-		public class IEnumerable : System.Collections.IEnumerable
+		/// <summary>Stub implementation of global::System.Collections.IEnumerable.</summary>
+		public class IEnumerable : global::System.Collections.IEnumerable
 		{
 			/// <summary>Interceptor for GetEnumerator.</summary>
 			public IEnumerable_GetEnumeratorInterceptor GetEnumerator { get; } = new();
 
-			global::System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+			global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);

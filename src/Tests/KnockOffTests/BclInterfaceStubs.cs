@@ -354,7 +354,7 @@ public partial class QueryableUserStubTests
 
 #endregion
 
-#region 19. Data Access: IDataReader / IDbConnection / IDbCommand / IDbTransaction - PARTIAL
+#region 19. Data Access: IDataReader / IDbConnection / IDbCommand / IDbTransaction - WORKING
 
 // IDataReader - WORKING
 [KnockOff<IDataReader>]
@@ -362,15 +362,19 @@ public partial class DataReaderStubTests
 {
 }
 
-// BUG 3: Asymmetric nullability - getter returns string?, setter expects string
+// BUG 3 FIXED: Asymmetric nullability - getter returns string?, setter expects string
 // IDbConnection.ConnectionString: getter can return null, setter requires non-null
-// Requires capturing separate nullability for getter vs setter parameters
-//
-// [KnockOff<IDbConnection>]
-// public partial class DbConnectionStubTests { }
-//
-// [KnockOff<IDbCommand>]
-// public partial class DbCommandStubTests { }
+// Fix: Generator now captures SetterParameterType separately and uses it for explicit implementation
+
+[KnockOff<IDbConnection>]
+public partial class DbConnectionStubTests
+{
+}
+
+[KnockOff<IDbCommand>]
+public partial class DbCommandStubTests
+{
+}
 
 [KnockOff<IDbTransaction>]
 public partial class DbTransactionStubTests

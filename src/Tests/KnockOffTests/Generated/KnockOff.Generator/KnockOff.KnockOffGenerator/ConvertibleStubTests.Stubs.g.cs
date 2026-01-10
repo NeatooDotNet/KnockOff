@@ -345,8 +345,8 @@ partial class ConvertibleStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.IConvertible.</summary>
-		public class IConvertible : System.IConvertible
+		/// <summary>Stub implementation of global::System.IConvertible.</summary>
+		public class IConvertible : global::System.IConvertible
 		{
 			/// <summary>Interceptor for GetTypeCode.</summary>
 			public IConvertible_GetTypeCodeInterceptor GetTypeCode { get; } = new();
@@ -399,119 +399,119 @@ partial class ConvertibleStubTests
 			/// <summary>Interceptor for ToUInt64.</summary>
 			public IConvertible_ToUInt64Interceptor ToUInt64 { get; } = new();
 
-			global::System.TypeCode System.IConvertible.GetTypeCode()
+			global::System.TypeCode global::System.IConvertible.GetTypeCode()
 			{
 				GetTypeCode.RecordCall();
 				if (GetTypeCode.OnCall is { } onCall) return onCall(this);
 				return default!;
 			}
 
-			bool System.IConvertible.ToBoolean(global::System.IFormatProvider? provider)
+			bool global::System.IConvertible.ToBoolean(global::System.IFormatProvider? provider)
 			{
 				ToBoolean.RecordCall(provider);
 				if (ToBoolean.OnCall is { } onCall) return onCall(this, provider);
 				return default!;
 			}
 
-			byte System.IConvertible.ToByte(global::System.IFormatProvider? provider)
+			byte global::System.IConvertible.ToByte(global::System.IFormatProvider? provider)
 			{
 				ToByte.RecordCall(provider);
 				if (ToByte.OnCall is { } onCall) return onCall(this, provider);
 				return default!;
 			}
 
-			char System.IConvertible.ToChar(global::System.IFormatProvider? provider)
+			char global::System.IConvertible.ToChar(global::System.IFormatProvider? provider)
 			{
 				ToChar.RecordCall(provider);
 				if (ToChar.OnCall is { } onCall) return onCall(this, provider);
 				return default!;
 			}
 
-			global::System.DateTime System.IConvertible.ToDateTime(global::System.IFormatProvider? provider)
+			global::System.DateTime global::System.IConvertible.ToDateTime(global::System.IFormatProvider? provider)
 			{
 				ToDateTime.RecordCall(provider);
 				if (ToDateTime.OnCall is { } onCall) return onCall(this, provider);
 				return default!;
 			}
 
-			decimal System.IConvertible.ToDecimal(global::System.IFormatProvider? provider)
+			decimal global::System.IConvertible.ToDecimal(global::System.IFormatProvider? provider)
 			{
 				ToDecimal.RecordCall(provider);
 				if (ToDecimal.OnCall is { } onCall) return onCall(this, provider);
 				return default!;
 			}
 
-			double System.IConvertible.ToDouble(global::System.IFormatProvider? provider)
+			double global::System.IConvertible.ToDouble(global::System.IFormatProvider? provider)
 			{
 				ToDouble.RecordCall(provider);
 				if (ToDouble.OnCall is { } onCall) return onCall(this, provider);
 				return default!;
 			}
 
-			short System.IConvertible.ToInt16(global::System.IFormatProvider? provider)
+			short global::System.IConvertible.ToInt16(global::System.IFormatProvider? provider)
 			{
 				ToInt16.RecordCall(provider);
 				if (ToInt16.OnCall is { } onCall) return onCall(this, provider);
 				return default!;
 			}
 
-			int System.IConvertible.ToInt32(global::System.IFormatProvider? provider)
+			int global::System.IConvertible.ToInt32(global::System.IFormatProvider? provider)
 			{
 				ToInt32.RecordCall(provider);
 				if (ToInt32.OnCall is { } onCall) return onCall(this, provider);
 				return default!;
 			}
 
-			long System.IConvertible.ToInt64(global::System.IFormatProvider? provider)
+			long global::System.IConvertible.ToInt64(global::System.IFormatProvider? provider)
 			{
 				ToInt64.RecordCall(provider);
 				if (ToInt64.OnCall is { } onCall) return onCall(this, provider);
 				return default!;
 			}
 
-			sbyte System.IConvertible.ToSByte(global::System.IFormatProvider? provider)
+			sbyte global::System.IConvertible.ToSByte(global::System.IFormatProvider? provider)
 			{
 				ToSByte.RecordCall(provider);
 				if (ToSByte.OnCall is { } onCall) return onCall(this, provider);
 				return default!;
 			}
 
-			float System.IConvertible.ToSingle(global::System.IFormatProvider? provider)
+			float global::System.IConvertible.ToSingle(global::System.IFormatProvider? provider)
 			{
 				ToSingle.RecordCall(provider);
 				if (ToSingle.OnCall is { } onCall) return onCall(this, provider);
 				return default!;
 			}
 
-			string System.IConvertible.ToString(global::System.IFormatProvider? provider)
+			string global::System.IConvertible.ToString(global::System.IFormatProvider? provider)
 			{
 				ToString.RecordCall(provider);
 				if (ToString.OnCall is { } onCall) return onCall(this, provider);
 				throw new global::System.InvalidOperationException("No implementation provided for ToString. Set ToString.OnCall.");
 			}
 
-			object System.IConvertible.ToType(global::System.Type conversionType, global::System.IFormatProvider? provider)
+			object global::System.IConvertible.ToType(global::System.Type conversionType, global::System.IFormatProvider? provider)
 			{
 				ToType.RecordCall(conversionType, provider);
 				if (ToType.OnCall is { } onCall) return onCall(this, conversionType, provider);
 				return new object();
 			}
 
-			ushort System.IConvertible.ToUInt16(global::System.IFormatProvider? provider)
+			ushort global::System.IConvertible.ToUInt16(global::System.IFormatProvider? provider)
 			{
 				ToUInt16.RecordCall(provider);
 				if (ToUInt16.OnCall is { } onCall) return onCall(this, provider);
 				return default!;
 			}
 
-			uint System.IConvertible.ToUInt32(global::System.IFormatProvider? provider)
+			uint global::System.IConvertible.ToUInt32(global::System.IFormatProvider? provider)
 			{
 				ToUInt32.RecordCall(provider);
 				if (ToUInt32.OnCall is { } onCall) return onCall(this, provider);
 				return default!;
 			}
 
-			ulong System.IConvertible.ToUInt64(global::System.IFormatProvider? provider)
+			ulong global::System.IConvertible.ToUInt64(global::System.IFormatProvider? provider)
 			{
 				ToUInt64.RecordCall(provider);
 				if (ToUInt64.OnCall is { } onCall) return onCall(this, provider);

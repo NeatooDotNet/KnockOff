@@ -83,22 +83,22 @@ partial class PatternCallbackServiceKnockOff
 	/// <summary>Interceptor for Calculate.</summary>
 	public CalculateInterceptor Calculate { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Concepts.IPatternCallbackService.</summary>
-	public KnockOff.Documentation.Samples.Concepts.IPatternCallbackService AsPatternCallbackService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Concepts.IPatternCallbackService.</summary>
+	public global::KnockOff.Documentation.Samples.Concepts.IPatternCallbackService AsPatternCallbackService() => this;
 
-	void KnockOff.Documentation.Samples.Concepts.IPatternCallbackService.DoSomething()
+	void global::KnockOff.Documentation.Samples.Concepts.IPatternCallbackService.DoSomething()
 	{
 		DoSomething.RecordCall();
 		DoSomething.OnCall?.Invoke(this);
 	}
 
-	global::KnockOff.Documentation.Samples.Concepts.PatternUser KnockOff.Documentation.Samples.Concepts.IPatternCallbackService.GetUser(int id)
+	global::KnockOff.Documentation.Samples.Concepts.PatternUser global::KnockOff.Documentation.Samples.Concepts.IPatternCallbackService.GetUser(int id)
 	{
 		GetUser.RecordCall(id);
 		return GetUser.OnCall?.Invoke(this, id) ?? new global::KnockOff.Documentation.Samples.Concepts.PatternUser();
 	}
 
-	int KnockOff.Documentation.Samples.Concepts.IPatternCallbackService.Calculate(string name, int @value, bool flag)
+	int global::KnockOff.Documentation.Samples.Concepts.IPatternCallbackService.Calculate(string name, int @value, bool flag)
 	{
 		Calculate.RecordCall(name, @value, flag);
 		return Calculate.OnCall?.Invoke(this, name, @value, flag) ?? default!;

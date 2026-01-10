@@ -89,10 +89,10 @@ partial class OverloadedServiceKnockOff
 	/// <summary>Interceptor for Format.</summary>
 	public Format3Interceptor Format3 { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Sandbox.IOverloadedService.</summary>
-	public KnockOff.Sandbox.IOverloadedService AsOverloadedService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Sandbox.IOverloadedService.</summary>
+	public global::KnockOff.Sandbox.IOverloadedService AsOverloadedService() => this;
 
-	string KnockOff.Sandbox.IOverloadedService.Format(string input)
+	string global::KnockOff.Sandbox.IOverloadedService.Format(string input)
 	{
 		Format1.RecordCall(input);
 		if (Format1.OnCall is { } callback)
@@ -100,7 +100,7 @@ partial class OverloadedServiceKnockOff
 		throw new global::System.InvalidOperationException("No implementation provided for Format. Set Format1.OnCall or define a protected method 'Format' in your partial class.");
 	}
 
-	string KnockOff.Sandbox.IOverloadedService.Format(string input, bool uppercase)
+	string global::KnockOff.Sandbox.IOverloadedService.Format(string input, bool uppercase)
 	{
 		Format2.RecordCall(input, uppercase);
 		if (Format2.OnCall is { } callback)
@@ -108,7 +108,7 @@ partial class OverloadedServiceKnockOff
 		throw new global::System.InvalidOperationException("No implementation provided for Format. Set Format2.OnCall or define a protected method 'Format' in your partial class.");
 	}
 
-	string KnockOff.Sandbox.IOverloadedService.Format(string input, int maxLength)
+	string global::KnockOff.Sandbox.IOverloadedService.Format(string input, int maxLength)
 	{
 		Format3.RecordCall(input, maxLength);
 		if (Format3.OnCall is { } callback)

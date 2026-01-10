@@ -28,13 +28,13 @@ partial class InlineStubsExampleTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of KnockOff.Documentation.Samples.GettingStarted.IRepository.</summary>
-		public class IRepository : KnockOff.Documentation.Samples.GettingStarted.IRepository
+		/// <summary>Stub implementation of global::KnockOff.Documentation.Samples.GettingStarted.IRepository.</summary>
+		public class IRepository : global::KnockOff.Documentation.Samples.GettingStarted.IRepository
 		{
 			/// <summary>Interceptor for Save.</summary>
 			public IRepository_SaveInterceptor Save { get; } = new();
 
-			void KnockOff.Documentation.Samples.GettingStarted.IRepository.Save(object entity)
+			void global::KnockOff.Documentation.Samples.GettingStarted.IRepository.Save(object entity)
 			{
 				Save.RecordCall(entity);
 				if (Save.OnCall is { } onCall) onCall(this, entity);
@@ -59,13 +59,13 @@ partial class InlineStubsExampleTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork.</summary>
-		public class IUnitOfWork : KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork
+		/// <summary>Stub implementation of global::KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork.</summary>
+		public class IUnitOfWork : global::KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork
 		{
 			/// <summary>Interceptor for Commit.</summary>
 			public IUnitOfWork_CommitInterceptor Commit { get; } = new();
 
-			void KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork.Commit()
+			void global::KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork.Commit()
 			{
 				Commit.RecordCall();
 				if (Commit.OnCall is { } onCall) onCall(this);

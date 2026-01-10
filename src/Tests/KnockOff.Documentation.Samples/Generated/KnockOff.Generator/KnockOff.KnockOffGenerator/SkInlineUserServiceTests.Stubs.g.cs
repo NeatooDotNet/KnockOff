@@ -28,13 +28,13 @@ partial class SkInlineUserServiceTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of KnockOff.Documentation.Samples.Skills.ISkInlineUserService.</summary>
-		public class ISkInlineUserService : KnockOff.Documentation.Samples.Skills.ISkInlineUserService
+		/// <summary>Stub implementation of global::KnockOff.Documentation.Samples.Skills.ISkInlineUserService.</summary>
+		public class ISkInlineUserService : global::KnockOff.Documentation.Samples.Skills.ISkInlineUserService
 		{
 			/// <summary>Interceptor for GetUser.</summary>
 			public ISkInlineUserService_GetUserInterceptor GetUser { get; } = new();
 
-			global::KnockOff.Documentation.Samples.Skills.SkUser? KnockOff.Documentation.Samples.Skills.ISkInlineUserService.GetUser(int id)
+			global::KnockOff.Documentation.Samples.Skills.SkUser? global::KnockOff.Documentation.Samples.Skills.ISkInlineUserService.GetUser(int id)
 			{
 				GetUser.RecordCall(id);
 				if (GetUser.OnCall is { } onCall) return onCall(this, id);
@@ -63,13 +63,13 @@ partial class SkInlineUserServiceTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of KnockOff.Documentation.Samples.Skills.ISkInlineLogger.</summary>
-		public class ISkInlineLogger : KnockOff.Documentation.Samples.Skills.ISkInlineLogger
+		/// <summary>Stub implementation of global::KnockOff.Documentation.Samples.Skills.ISkInlineLogger.</summary>
+		public class ISkInlineLogger : global::KnockOff.Documentation.Samples.Skills.ISkInlineLogger
 		{
 			/// <summary>Interceptor for Log.</summary>
 			public ISkInlineLogger_LogInterceptor Log { get; } = new();
 
-			void KnockOff.Documentation.Samples.Skills.ISkInlineLogger.Log(string message)
+			void global::KnockOff.Documentation.Samples.Skills.ISkInlineLogger.Log(string message)
 			{
 				Log.RecordCall(message);
 				if (Log.OnCall is { } onCall) onCall(this, message);

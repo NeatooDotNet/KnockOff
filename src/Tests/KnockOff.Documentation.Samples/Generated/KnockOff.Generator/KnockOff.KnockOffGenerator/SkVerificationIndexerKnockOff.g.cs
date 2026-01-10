@@ -39,13 +39,13 @@ partial class SkVerificationIndexerKnockOff
 	/// <summary>Interceptor for StringIndexer.</summary>
 	public StringIndexerInterceptor StringIndexer { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkVerificationPropertyStore.</summary>
-	public KnockOff.Documentation.Samples.Skills.ISkVerificationPropertyStore AsSkVerificationPropertyStore() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ISkVerificationPropertyStore.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkVerificationPropertyStore AsSkVerificationPropertyStore() => this;
 
 	/// <summary>Backing storage for StringIndexer indexer.</summary>
 	public global::System.Collections.Generic.Dictionary<string, object?> StringIndexerBacking { get; } = new();
 
-	object? KnockOff.Documentation.Samples.Skills.ISkVerificationPropertyStore.this[string key]
+	object? global::KnockOff.Documentation.Samples.Skills.ISkVerificationPropertyStore.this[string key]
 	{
 		get { StringIndexer.RecordGet(key); if (StringIndexer.OnGet != null) return StringIndexer.OnGet(this, key); return StringIndexerBacking.TryGetValue(key, out var v) ? v : default; }
 		set { StringIndexer.RecordSet(key, value); if (StringIndexer.OnSet != null) StringIndexer.OnSet(this, key, value); else StringIndexerBacking[key] = value; }

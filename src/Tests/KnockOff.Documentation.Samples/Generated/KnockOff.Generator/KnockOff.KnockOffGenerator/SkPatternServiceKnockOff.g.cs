@@ -108,28 +108,28 @@ partial class SkPatternServiceKnockOff
 	/// <summary>Interceptor for GetNext.</summary>
 	public GetNextInterceptor GetNext { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ISkPatternService.</summary>
-	public KnockOff.Documentation.Samples.Skills.ISkPatternService AsSkPatternService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ISkPatternService.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkPatternService AsSkPatternService() => this;
 
-	global::KnockOff.Documentation.Samples.Skills.SkUser? KnockOff.Documentation.Samples.Skills.ISkPatternService.GetUser(int id)
+	global::KnockOff.Documentation.Samples.Skills.SkUser? global::KnockOff.Documentation.Samples.Skills.ISkPatternService.GetUser(int id)
 	{
 		GetUser.RecordCall(id);
 		return GetUser.OnCall?.Invoke(this, id) ?? default!;
 	}
 
-	void KnockOff.Documentation.Samples.Skills.ISkPatternService.Connect()
+	void global::KnockOff.Documentation.Samples.Skills.ISkPatternService.Connect()
 	{
 		Connect.RecordCall();
 		Connect.OnCall?.Invoke(this);
 	}
 
-	global::System.Threading.Tasks.Task<int> KnockOff.Documentation.Samples.Skills.ISkPatternService.SaveAsync(object entity)
+	global::System.Threading.Tasks.Task<int> global::KnockOff.Documentation.Samples.Skills.ISkPatternService.SaveAsync(object entity)
 	{
 		SaveAsync.RecordCall(entity);
 		return SaveAsync.OnCall?.Invoke(this, entity) ?? global::System.Threading.Tasks.Task.FromResult<int>(default!);
 	}
 
-	int KnockOff.Documentation.Samples.Skills.ISkPatternService.GetNext()
+	int global::KnockOff.Documentation.Samples.Skills.ISkPatternService.GetNext()
 	{
 		GetNext.RecordCall();
 		return GetNext.OnCall?.Invoke(this) ?? default!;

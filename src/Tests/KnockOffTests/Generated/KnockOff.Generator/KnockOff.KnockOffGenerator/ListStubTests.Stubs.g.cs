@@ -308,8 +308,8 @@ partial class ListStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Collections.IList.</summary>
-		public class IList : System.Collections.IList
+		/// <summary>Stub implementation of global::System.Collections.IList.</summary>
+		public class IList : global::System.Collections.IList
 		{
 			/// <summary>Interceptor for IsFixedSize.</summary>
 			public IList_IsFixedSizeInterceptor IsFixedSize { get; } = new();
@@ -356,52 +356,52 @@ partial class ListStubTests
 			/// <summary>Interceptor for GetEnumerator.</summary>
 			public IList_GetEnumeratorInterceptor GetEnumerator { get; } = new();
 
-			int System.Collections.IList.Add(object? value)
+			int global::System.Collections.IList.Add(object? value)
 			{
 				Add.RecordCall(value);
 				if (Add.OnCall is { } onCall) return onCall(this, value);
 				return default!;
 			}
 
-			void System.Collections.IList.Clear()
+			void global::System.Collections.IList.Clear()
 			{
 				Clear.RecordCall();
 				if (Clear.OnCall is { } onCall) onCall(this);
 			}
 
-			bool System.Collections.IList.Contains(object? value)
+			bool global::System.Collections.IList.Contains(object? value)
 			{
 				Contains.RecordCall(value);
 				if (Contains.OnCall is { } onCall) return onCall(this, value);
 				return default!;
 			}
 
-			int System.Collections.IList.IndexOf(object? value)
+			int global::System.Collections.IList.IndexOf(object? value)
 			{
 				IndexOf.RecordCall(value);
 				if (IndexOf.OnCall is { } onCall) return onCall(this, value);
 				return default!;
 			}
 
-			void System.Collections.IList.Insert(int index, object? value)
+			void global::System.Collections.IList.Insert(int index, object? value)
 			{
 				Insert.RecordCall(index, value);
 				if (Insert.OnCall is { } onCall) onCall(this, index, value);
 			}
 
-			void System.Collections.IList.Remove(object? value)
+			void global::System.Collections.IList.Remove(object? value)
 			{
 				Remove.RecordCall(value);
 				if (Remove.OnCall is { } onCall) onCall(this, value);
 			}
 
-			void System.Collections.IList.RemoveAt(int index)
+			void global::System.Collections.IList.RemoveAt(int index)
 			{
 				RemoveAt.RecordCall(index);
 				if (RemoveAt.OnCall is { } onCall) onCall(this, index);
 			}
 
-			bool System.Collections.IList.IsFixedSize
+			bool global::System.Collections.IList.IsFixedSize
 			{
 				get
 				{
@@ -411,7 +411,7 @@ partial class ListStubTests
 				}
 			}
 
-			bool System.Collections.IList.IsReadOnly
+			bool global::System.Collections.IList.IsReadOnly
 			{
 				get
 				{
@@ -421,7 +421,7 @@ partial class ListStubTests
 				}
 			}
 
-			object? System.Collections.IList.this[int index]
+			object? global::System.Collections.IList.this[int index]
 			{
 				get
 				{
@@ -436,13 +436,13 @@ partial class ListStubTests
 				}
 			}
 
-			void System.Collections.ICollection.CopyTo(global::System.Array array, int index)
+			void global::System.Collections.ICollection.CopyTo(global::System.Array array, int index)
 			{
 				CopyTo.RecordCall(array, index);
 				if (CopyTo.OnCall is { } onCall) onCall(this, array, index);
 			}
 
-			int System.Collections.ICollection.Count
+			int global::System.Collections.ICollection.Count
 			{
 				get
 				{
@@ -452,7 +452,7 @@ partial class ListStubTests
 				}
 			}
 
-			bool System.Collections.ICollection.IsSynchronized
+			bool global::System.Collections.ICollection.IsSynchronized
 			{
 				get
 				{
@@ -462,7 +462,7 @@ partial class ListStubTests
 				}
 			}
 
-			object System.Collections.ICollection.SyncRoot
+			object global::System.Collections.ICollection.SyncRoot
 			{
 				get
 				{
@@ -472,7 +472,7 @@ partial class ListStubTests
 				}
 			}
 
-			global::System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+			global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);

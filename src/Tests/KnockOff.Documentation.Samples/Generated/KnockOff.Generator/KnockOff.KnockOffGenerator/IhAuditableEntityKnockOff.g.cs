@@ -105,11 +105,11 @@ partial class IhAuditableEntityKnockOff
 	/// <summary>Interceptor for CreatedAt.</summary>
 	public CreatedAtInterceptor CreatedAt { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIhAuditableEntity.</summary>
-	public KnockOff.Documentation.Samples.Guides.IIhAuditableEntity AsIhAuditableEntity() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IIhAuditableEntity.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IIhAuditableEntity AsIhAuditableEntity() => this;
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Guides.IIhBaseEntity.</summary>
-	public KnockOff.Documentation.Samples.Guides.IIhBaseEntity AsIhBaseEntity() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Guides.IIhBaseEntity.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IIhBaseEntity AsIhBaseEntity() => this;
 
 	/// <summary>Backing storage for ModifiedAt.</summary>
 	protected global::System.DateTime? ModifiedAtBacking { get; set; } = default!;
@@ -123,24 +123,24 @@ partial class IhAuditableEntityKnockOff
 	/// <summary>Backing storage for CreatedAt.</summary>
 	protected global::System.DateTime CreatedAtBacking { get; set; } = default!;
 
-	global::System.DateTime? KnockOff.Documentation.Samples.Guides.IIhAuditableEntity.ModifiedAt
+	global::System.DateTime? global::KnockOff.Documentation.Samples.Guides.IIhAuditableEntity.ModifiedAt
 	{
 		get { ModifiedAt.RecordGet(); return ModifiedAt.OnGet?.Invoke(this) ?? ModifiedAtBacking; }
 		set { ModifiedAt.RecordSet(value); if (ModifiedAt.OnSet != null) ModifiedAt.OnSet(this, value); else ModifiedAtBacking = value; }
 	}
 
-	string KnockOff.Documentation.Samples.Guides.IIhAuditableEntity.ModifiedBy
+	string global::KnockOff.Documentation.Samples.Guides.IIhAuditableEntity.ModifiedBy
 	{
 		get { ModifiedBy.RecordGet(); return ModifiedBy.OnGet?.Invoke(this) ?? ModifiedByBacking; }
 		set { ModifiedBy.RecordSet(value); if (ModifiedBy.OnSet != null) ModifiedBy.OnSet(this, value); else ModifiedByBacking = value; }
 	}
 
-	int KnockOff.Documentation.Samples.Guides.IIhBaseEntity.Id
+	int global::KnockOff.Documentation.Samples.Guides.IIhBaseEntity.Id
 	{
 		get { Id.RecordGet(); return Id.OnGet?.Invoke(this) ?? IdBacking; }
 	}
 
-	global::System.DateTime KnockOff.Documentation.Samples.Guides.IIhBaseEntity.CreatedAt
+	global::System.DateTime global::KnockOff.Documentation.Samples.Guides.IIhBaseEntity.CreatedAt
 	{
 		get { CreatedAt.RecordGet(); return CreatedAt.OnGet?.Invoke(this) ?? CreatedAtBacking; }
 	}

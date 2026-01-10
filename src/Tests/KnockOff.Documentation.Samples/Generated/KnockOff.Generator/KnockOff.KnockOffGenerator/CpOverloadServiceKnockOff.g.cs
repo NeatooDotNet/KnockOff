@@ -111,28 +111,28 @@ partial class CpOverloadServiceKnockOff
 	/// <summary>Interceptor for Calculate.</summary>
 	public Calculate2Interceptor Calculate2 { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Skills.ICpOverloadService.</summary>
-	public KnockOff.Documentation.Samples.Skills.ICpOverloadService AsCpOverloadService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Skills.ICpOverloadService.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ICpOverloadService AsCpOverloadService() => this;
 
-	void KnockOff.Documentation.Samples.Skills.ICpOverloadService.Process(string data)
+	void global::KnockOff.Documentation.Samples.Skills.ICpOverloadService.Process(string data)
 	{
 		Process1.RecordCall(data);
 		Process1.OnCall?.Invoke(this, data);
 	}
 
-	void KnockOff.Documentation.Samples.Skills.ICpOverloadService.Process(string data, int priority)
+	void global::KnockOff.Documentation.Samples.Skills.ICpOverloadService.Process(string data, int priority)
 	{
 		Process2.RecordCall(data, priority);
 		Process2.OnCall?.Invoke(this, data, priority);
 	}
 
-	int KnockOff.Documentation.Samples.Skills.ICpOverloadService.Calculate(int @value)
+	int global::KnockOff.Documentation.Samples.Skills.ICpOverloadService.Calculate(int @value)
 	{
 		Calculate1.RecordCall(@value);
 		return Calculate1.OnCall?.Invoke(this, @value) ?? default!;
 	}
 
-	int KnockOff.Documentation.Samples.Skills.ICpOverloadService.Calculate(int a, int b)
+	int global::KnockOff.Documentation.Samples.Skills.ICpOverloadService.Calculate(int a, int b)
 	{
 		Calculate2.RecordCall(a, b);
 		return Calculate2.OnCall?.Invoke(this, a, b) ?? default!;

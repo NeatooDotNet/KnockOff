@@ -18,28 +18,28 @@ partial class GenericDelegateTests
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Callback invoked when delegate is called.</summary>
-			public global::System.Func<Stubs.Factory, KnockOff.Documentation.Samples.Guides.Delegates.DelUser>? OnCall { get; set; }
+			public global::System.Func<Stubs.Factory, global::KnockOff.Documentation.Samples.Guides.Delegates.DelUser>? OnCall { get; set; }
 
 			public void RecordCall() { CallCount++; }
 
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub for KnockOff.Documentation.Samples.Guides.Delegates.Factory<KnockOff.Documentation.Samples.Guides.Delegates.DelUser> delegate.</summary>
+		/// <summary>Stub for global::KnockOff.Documentation.Samples.Guides.Delegates.Factory<global::KnockOff.Documentation.Samples.Guides.Delegates.DelUser> delegate.</summary>
 		public sealed class Factory
 		{
 			/// <summary>Interceptor for tracking and configuring delegate behavior.</summary>
 			public FactoryInterceptor Interceptor { get; } = new();
 
-			private KnockOff.Documentation.Samples.Guides.Delegates.DelUser Invoke()
+			private global::KnockOff.Documentation.Samples.Guides.Delegates.DelUser Invoke()
 			{
 				Interceptor.RecordCall();
 				if (Interceptor.OnCall is { } onCall) return onCall(this);
 				return default!;
 			}
 
-			/// <summary>Implicit conversion to KnockOff.Documentation.Samples.Guides.Delegates.Factory<KnockOff.Documentation.Samples.Guides.Delegates.DelUser>.</summary>
-			public static implicit operator KnockOff.Documentation.Samples.Guides.Delegates.Factory<KnockOff.Documentation.Samples.Guides.Delegates.DelUser>(Factory stub) => stub.Invoke;
+			/// <summary>Implicit conversion to global::KnockOff.Documentation.Samples.Guides.Delegates.Factory<global::KnockOff.Documentation.Samples.Guides.Delegates.DelUser>.</summary>
+			public static implicit operator global::KnockOff.Documentation.Samples.Guides.Delegates.Factory<global::KnockOff.Documentation.Samples.Guides.Delegates.DelUser>(Factory stub) => stub.Invoke;
 		}
 
 		/// <summary>Interceptor for Converter delegate.</summary>
@@ -62,7 +62,7 @@ partial class GenericDelegateTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub for KnockOff.Documentation.Samples.Guides.Delegates.Converter<int, string> delegate.</summary>
+		/// <summary>Stub for global::KnockOff.Documentation.Samples.Guides.Delegates.Converter<int, string> delegate.</summary>
 		public sealed class Converter
 		{
 			/// <summary>Interceptor for tracking and configuring delegate behavior.</summary>
@@ -75,8 +75,8 @@ partial class GenericDelegateTests
 				return default!;
 			}
 
-			/// <summary>Implicit conversion to KnockOff.Documentation.Samples.Guides.Delegates.Converter<int, string>.</summary>
-			public static implicit operator KnockOff.Documentation.Samples.Guides.Delegates.Converter<int, string>(Converter stub) => stub.Invoke;
+			/// <summary>Implicit conversion to global::KnockOff.Documentation.Samples.Guides.Delegates.Converter<int, string>.</summary>
+			public static implicit operator global::KnockOff.Documentation.Samples.Guides.Delegates.Converter<int, string>(Converter stub) => stub.Invoke;
 		}
 
 	}

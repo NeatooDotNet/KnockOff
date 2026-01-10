@@ -25,13 +25,13 @@ partial class AsyncDisposableStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.IAsyncDisposable.</summary>
-		public class IAsyncDisposable : System.IAsyncDisposable
+		/// <summary>Stub implementation of global::System.IAsyncDisposable.</summary>
+		public class IAsyncDisposable : global::System.IAsyncDisposable
 		{
 			/// <summary>Interceptor for DisposeAsync.</summary>
 			public IAsyncDisposable_DisposeAsyncInterceptor DisposeAsync { get; } = new();
 
-			global::System.Threading.Tasks.ValueTask System.IAsyncDisposable.DisposeAsync()
+			global::System.Threading.Tasks.ValueTask global::System.IAsyncDisposable.DisposeAsync()
 			{
 				DisposeAsync.RecordCall();
 				if (DisposeAsync.OnCall is { } onCall) return onCall(this);

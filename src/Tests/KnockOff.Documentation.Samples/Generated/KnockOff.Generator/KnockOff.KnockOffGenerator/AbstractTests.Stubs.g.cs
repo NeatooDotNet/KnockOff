@@ -44,7 +44,7 @@ partial class AbstractTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub for KnockOff.Documentation.Samples.Guides.InlineStubs.BaseRepository via composition.</summary>
+		/// <summary>Stub for global::KnockOff.Documentation.Samples.Guides.InlineStubs.BaseRepository via composition.</summary>
 		public class BaseRepository
 		{
 			/// <summary>Interceptor for ConnectionString.</summary>
@@ -52,8 +52,8 @@ partial class AbstractTests
 			/// <summary>Interceptor for Execute.</summary>
 			public BaseRepository_ExecuteInterceptor Execute { get; } = new();
 
-			/// <summary>The KnockOff.Documentation.Samples.Guides.InlineStubs.BaseRepository instance. Pass this to code expecting the target class.</summary>
-			public KnockOff.Documentation.Samples.Guides.InlineStubs.BaseRepository Object { get; }
+			/// <summary>The global::KnockOff.Documentation.Samples.Guides.InlineStubs.BaseRepository instance. Pass this to code expecting the target class.</summary>
+			public global::KnockOff.Documentation.Samples.Guides.InlineStubs.BaseRepository Object { get; }
 
 			public BaseRepository()
 			{
@@ -67,8 +67,8 @@ partial class AbstractTests
 				Execute.Reset();
 			}
 
-			/// <summary>Internal implementation that inherits from KnockOff.Documentation.Samples.Guides.InlineStubs.BaseRepository.</summary>
-			private sealed class Impl : KnockOff.Documentation.Samples.Guides.InlineStubs.BaseRepository
+			/// <summary>Internal implementation that inherits from global::KnockOff.Documentation.Samples.Guides.InlineStubs.BaseRepository.</summary>
+			private sealed class Impl : global::KnockOff.Documentation.Samples.Guides.InlineStubs.BaseRepository
 			{
 				private readonly BaseRepository _stub;
 

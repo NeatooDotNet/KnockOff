@@ -28,13 +28,13 @@ partial class EquatableIntStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.IEquatable<int>.</summary>
-		public class IEquatable : System.IEquatable<int>
+		/// <summary>Stub implementation of global::System.IEquatable<int>.</summary>
+		public class IEquatable : global::System.IEquatable<int>
 		{
 			/// <summary>Interceptor for Equals.</summary>
 			public new IEquatable_EqualsInterceptor Equals { get; } = new();
 
-			bool System.IEquatable<int>.Equals(int other)
+			bool global::System.IEquatable<int>.Equals(int other)
 			{
 				Equals.RecordCall(other);
 				if (Equals.OnCall is { } onCall) return onCall(this, other);

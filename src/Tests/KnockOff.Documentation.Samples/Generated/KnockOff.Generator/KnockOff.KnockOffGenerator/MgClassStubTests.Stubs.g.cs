@@ -56,7 +56,7 @@ partial class MgClassStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub for KnockOff.Documentation.Samples.Skills.MgUserService via composition.</summary>
+		/// <summary>Stub for global::KnockOff.Documentation.Samples.Skills.MgUserService via composition.</summary>
 		public class MgUserService
 		{
 			/// <summary>Interceptor for Name.</summary>
@@ -64,8 +64,8 @@ partial class MgClassStubTests
 			/// <summary>Interceptor for GetUser.</summary>
 			public MgUserService_GetUserInterceptor GetUser { get; } = new();
 
-			/// <summary>The KnockOff.Documentation.Samples.Skills.MgUserService instance. Pass this to code expecting the target class.</summary>
-			public KnockOff.Documentation.Samples.Skills.MgUserService Object { get; }
+			/// <summary>The global::KnockOff.Documentation.Samples.Skills.MgUserService instance. Pass this to code expecting the target class.</summary>
+			public global::KnockOff.Documentation.Samples.Skills.MgUserService Object { get; }
 
 			public MgUserService()
 			{
@@ -79,8 +79,8 @@ partial class MgClassStubTests
 				GetUser.Reset();
 			}
 
-			/// <summary>Internal implementation that inherits from KnockOff.Documentation.Samples.Skills.MgUserService.</summary>
-			private sealed class Impl : KnockOff.Documentation.Samples.Skills.MgUserService
+			/// <summary>Internal implementation that inherits from global::KnockOff.Documentation.Samples.Skills.MgUserService.</summary>
+			private sealed class Impl : global::KnockOff.Documentation.Samples.Skills.MgUserService
 			{
 				private readonly MgUserService _stub;
 

@@ -102,8 +102,8 @@ partial class CollectionStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Collections.ICollection.</summary>
-		public class ICollection : System.Collections.ICollection
+		/// <summary>Stub implementation of global::System.Collections.ICollection.</summary>
+		public class ICollection : global::System.Collections.ICollection
 		{
 			/// <summary>Interceptor for Count.</summary>
 			public ICollection_CountInterceptor Count { get; } = new();
@@ -120,13 +120,13 @@ partial class CollectionStubTests
 			/// <summary>Interceptor for GetEnumerator.</summary>
 			public ICollection_GetEnumeratorInterceptor GetEnumerator { get; } = new();
 
-			void System.Collections.ICollection.CopyTo(global::System.Array array, int index)
+			void global::System.Collections.ICollection.CopyTo(global::System.Array array, int index)
 			{
 				CopyTo.RecordCall(array, index);
 				if (CopyTo.OnCall is { } onCall) onCall(this, array, index);
 			}
 
-			int System.Collections.ICollection.Count
+			int global::System.Collections.ICollection.Count
 			{
 				get
 				{
@@ -136,7 +136,7 @@ partial class CollectionStubTests
 				}
 			}
 
-			bool System.Collections.ICollection.IsSynchronized
+			bool global::System.Collections.ICollection.IsSynchronized
 			{
 				get
 				{
@@ -146,7 +146,7 @@ partial class CollectionStubTests
 				}
 			}
 
-			object System.Collections.ICollection.SyncRoot
+			object global::System.Collections.ICollection.SyncRoot
 			{
 				get
 				{
@@ -156,7 +156,7 @@ partial class CollectionStubTests
 				}
 			}
 
-			global::System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+			global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);

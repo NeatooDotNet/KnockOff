@@ -28,13 +28,13 @@ partial class StructuralComparableStubTests
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Collections.IStructuralComparable.</summary>
-		public class IStructuralComparable : System.Collections.IStructuralComparable
+		/// <summary>Stub implementation of global::System.Collections.IStructuralComparable.</summary>
+		public class IStructuralComparable : global::System.Collections.IStructuralComparable
 		{
 			/// <summary>Interceptor for CompareTo.</summary>
 			public IStructuralComparable_CompareToInterceptor CompareTo { get; } = new();
 
-			int System.Collections.IStructuralComparable.CompareTo(object? other, global::System.Collections.IComparer comparer)
+			int global::System.Collections.IStructuralComparable.CompareTo(object? other, global::System.Collections.IComparer comparer)
 			{
 				CompareTo.RecordCall(other, comparer);
 				if (CompareTo.OnCall is { } onCall) return onCall(this, other, comparer);

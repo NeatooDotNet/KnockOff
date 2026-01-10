@@ -160,8 +160,8 @@ partial class CollectionIntStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.Collections.Generic.ICollection<int>.</summary>
-		public class ICollection : System.Collections.Generic.ICollection<int>
+		/// <summary>Stub implementation of global::System.Collections.Generic.ICollection<int>.</summary>
+		public class ICollection : global::System.Collections.Generic.ICollection<int>
 		{
 			/// <summary>Interceptor for Count.</summary>
 			public ICollection_CountInterceptor Count { get; } = new();
@@ -187,39 +187,39 @@ partial class CollectionIntStubTests
 			/// <summary>Interceptor for GetEnumerator.</summary>
 			public ICollection_GetEnumeratorInterceptor GetEnumerator { get; } = new();
 
-			void System.Collections.Generic.ICollection<int>.Add(int item)
+			void global::System.Collections.Generic.ICollection<int>.Add(int item)
 			{
 				Add.RecordCall(item);
 				if (Add.OnCall is { } onCall) onCall(this, item);
 			}
 
-			void System.Collections.Generic.ICollection<int>.Clear()
+			void global::System.Collections.Generic.ICollection<int>.Clear()
 			{
 				Clear.RecordCall();
 				if (Clear.OnCall is { } onCall) onCall(this);
 			}
 
-			bool System.Collections.Generic.ICollection<int>.Contains(int item)
+			bool global::System.Collections.Generic.ICollection<int>.Contains(int item)
 			{
 				Contains.RecordCall(item);
 				if (Contains.OnCall is { } onCall) return onCall(this, item);
 				return default!;
 			}
 
-			void System.Collections.Generic.ICollection<int>.CopyTo(int[] array, int arrayIndex)
+			void global::System.Collections.Generic.ICollection<int>.CopyTo(int[] array, int arrayIndex)
 			{
 				CopyTo.RecordCall(array, arrayIndex);
 				if (CopyTo.OnCall is { } onCall) onCall(this, array, arrayIndex);
 			}
 
-			bool System.Collections.Generic.ICollection<int>.Remove(int item)
+			bool global::System.Collections.Generic.ICollection<int>.Remove(int item)
 			{
 				Remove.RecordCall(item);
 				if (Remove.OnCall is { } onCall) return onCall(this, item);
 				return default!;
 			}
 
-			int System.Collections.Generic.ICollection<int>.Count
+			int global::System.Collections.Generic.ICollection<int>.Count
 			{
 				get
 				{
@@ -229,7 +229,7 @@ partial class CollectionIntStubTests
 				}
 			}
 
-			bool System.Collections.Generic.ICollection<int>.IsReadOnly
+			bool global::System.Collections.Generic.ICollection<int>.IsReadOnly
 			{
 				get
 				{
@@ -239,14 +239,14 @@ partial class CollectionIntStubTests
 				}
 			}
 
-			global::System.Collections.Generic.IEnumerator<int> System.Collections.Generic.IEnumerable<int>.GetEnumerator()
+			global::System.Collections.Generic.IEnumerator<int> global::System.Collections.Generic.IEnumerable<int>.GetEnumerator()
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
-			global::System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+			global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);

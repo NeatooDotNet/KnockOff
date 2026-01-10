@@ -105,28 +105,28 @@ partial class VsVerificationRepositoryKnockOff
 	/// <summary>Interceptor for Update.</summary>
 	public UpdateInterceptor Update { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository.</summary>
-	public KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository AsVsVerificationRepository() => this;
+	/// <summary>Returns this instance as global::KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository.</summary>
+	public global::KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository AsVsVerificationRepository() => this;
 
-	void KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository.Save(global::KnockOff.Documentation.Samples.Comparison.VsEntity entity)
+	void global::KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository.Save(global::KnockOff.Documentation.Samples.Comparison.VsEntity entity)
 	{
 		Save.RecordCall(entity);
 		Save.OnCall?.Invoke(this, entity);
 	}
 
-	void KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository.Delete(int id)
+	void global::KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository.Delete(int id)
 	{
 		Delete.RecordCall(id);
 		Delete.OnCall?.Invoke(this, id);
 	}
 
-	global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Comparison.VsEntity> KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository.GetAll()
+	global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Comparison.VsEntity> global::KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository.GetAll()
 	{
 		GetAll.RecordCall();
 		return GetAll.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Comparison.VsEntity>();
 	}
 
-	void KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository.Update(global::KnockOff.Documentation.Samples.Comparison.VsEntity entity)
+	void global::KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository.Update(global::KnockOff.Documentation.Samples.Comparison.VsEntity entity)
 	{
 		Update.RecordCall(entity);
 		Update.OnCall?.Invoke(this, entity);

@@ -28,13 +28,13 @@ partial class ComparableIntStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of System.IComparable<int>.</summary>
-		public class IComparable : System.IComparable<int>
+		/// <summary>Stub implementation of global::System.IComparable<int>.</summary>
+		public class IComparable : global::System.IComparable<int>
 		{
 			/// <summary>Interceptor for CompareTo.</summary>
 			public IComparable_CompareToInterceptor CompareTo { get; } = new();
 
-			int System.IComparable<int>.CompareTo(int other)
+			int global::System.IComparable<int>.CompareTo(int other)
 			{
 				CompareTo.RecordCall(other);
 				if (CompareTo.OnCall is { } onCall) return onCall(this, other);

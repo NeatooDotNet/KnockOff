@@ -1255,190 +1255,190 @@ partial class LargeServiceStub
 	/// <summary>Interceptor for IntMethodWithParam10.</summary>
 	public IntMethodWithParam10Interceptor IntMethodWithParam10 { get; } = new();
 
-	/// <summary>Returns this instance as KnockOff.Benchmarks.Interfaces.ILargeService.</summary>
-	public KnockOff.Benchmarks.Interfaces.ILargeService AsLargeService() => this;
+	/// <summary>Returns this instance as global::KnockOff.Benchmarks.Interfaces.ILargeService.</summary>
+	public global::KnockOff.Benchmarks.Interfaces.ILargeService AsLargeService() => this;
 
-	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod01()
+	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod01()
 	{
 		VoidMethod01.RecordCall();
 		VoidMethod01.OnCall?.Invoke(this);
 	}
 
-	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod02()
+	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod02()
 	{
 		VoidMethod02.RecordCall();
 		VoidMethod02.OnCall?.Invoke(this);
 	}
 
-	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod03()
+	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod03()
 	{
 		VoidMethod03.RecordCall();
 		VoidMethod03.OnCall?.Invoke(this);
 	}
 
-	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod04()
+	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod04()
 	{
 		VoidMethod04.RecordCall();
 		VoidMethod04.OnCall?.Invoke(this);
 	}
 
-	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod05()
+	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod05()
 	{
 		VoidMethod05.RecordCall();
 		VoidMethod05.OnCall?.Invoke(this);
 	}
 
-	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod06()
+	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod06()
 	{
 		VoidMethod06.RecordCall();
 		VoidMethod06.OnCall?.Invoke(this);
 	}
 
-	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod07()
+	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod07()
 	{
 		VoidMethod07.RecordCall();
 		VoidMethod07.OnCall?.Invoke(this);
 	}
 
-	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod08()
+	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod08()
 	{
 		VoidMethod08.RecordCall();
 		VoidMethod08.OnCall?.Invoke(this);
 	}
 
-	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod09()
+	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod09()
 	{
 		VoidMethod09.RecordCall();
 		VoidMethod09.OnCall?.Invoke(this);
 	}
 
-	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod10()
+	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod10()
 	{
 		VoidMethod10.RecordCall();
 		VoidMethod10.OnCall?.Invoke(this);
 	}
 
-	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam01(int p)
+	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam01(int p)
 	{
 		VoidMethodWithParam01.RecordCall(p);
 		VoidMethodWithParam01.OnCall?.Invoke(this, p);
 	}
 
-	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam02(int p)
+	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam02(int p)
 	{
 		VoidMethodWithParam02.RecordCall(p);
 		VoidMethodWithParam02.OnCall?.Invoke(this, p);
 	}
 
-	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam03(int p)
+	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam03(int p)
 	{
 		VoidMethodWithParam03.RecordCall(p);
 		VoidMethodWithParam03.OnCall?.Invoke(this, p);
 	}
 
-	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam04(int p)
+	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam04(int p)
 	{
 		VoidMethodWithParam04.RecordCall(p);
 		VoidMethodWithParam04.OnCall?.Invoke(this, p);
 	}
 
-	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam05(int p)
+	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam05(int p)
 	{
 		VoidMethodWithParam05.RecordCall(p);
 		VoidMethodWithParam05.OnCall?.Invoke(this, p);
 	}
 
-	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam06(int p)
+	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam06(int p)
 	{
 		VoidMethodWithParam06.RecordCall(p);
 		VoidMethodWithParam06.OnCall?.Invoke(this, p);
 	}
 
-	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam07(int p)
+	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam07(int p)
 	{
 		VoidMethodWithParam07.RecordCall(p);
 		VoidMethodWithParam07.OnCall?.Invoke(this, p);
 	}
 
-	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam08(int p)
+	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam08(int p)
 	{
 		VoidMethodWithParam08.RecordCall(p);
 		VoidMethodWithParam08.OnCall?.Invoke(this, p);
 	}
 
-	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam09(int p)
+	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam09(int p)
 	{
 		VoidMethodWithParam09.RecordCall(p);
 		VoidMethodWithParam09.OnCall?.Invoke(this, p);
 	}
 
-	void KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam10(int p)
+	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam10(int p)
 	{
 		VoidMethodWithParam10.RecordCall(p);
 		VoidMethodWithParam10.OnCall?.Invoke(this, p);
 	}
 
-	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod01()
+	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod01()
 	{
 		IntMethod01.RecordCall();
 		return IntMethod01.OnCall?.Invoke(this) ?? default!;
 	}
 
-	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod02()
+	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod02()
 	{
 		IntMethod02.RecordCall();
 		return IntMethod02.OnCall?.Invoke(this) ?? default!;
 	}
 
-	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod03()
+	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod03()
 	{
 		IntMethod03.RecordCall();
 		return IntMethod03.OnCall?.Invoke(this) ?? default!;
 	}
 
-	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod04()
+	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod04()
 	{
 		IntMethod04.RecordCall();
 		return IntMethod04.OnCall?.Invoke(this) ?? default!;
 	}
 
-	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod05()
+	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod05()
 	{
 		IntMethod05.RecordCall();
 		return IntMethod05.OnCall?.Invoke(this) ?? default!;
 	}
 
-	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod06()
+	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod06()
 	{
 		IntMethod06.RecordCall();
 		return IntMethod06.OnCall?.Invoke(this) ?? default!;
 	}
 
-	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod07()
+	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod07()
 	{
 		IntMethod07.RecordCall();
 		return IntMethod07.OnCall?.Invoke(this) ?? default!;
 	}
 
-	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod08()
+	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod08()
 	{
 		IntMethod08.RecordCall();
 		return IntMethod08.OnCall?.Invoke(this) ?? default!;
 	}
 
-	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod09()
+	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod09()
 	{
 		IntMethod09.RecordCall();
 		return IntMethod09.OnCall?.Invoke(this) ?? default!;
 	}
 
-	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod10()
+	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod10()
 	{
 		IntMethod10.RecordCall();
 		return IntMethod10.OnCall?.Invoke(this) ?? default!;
 	}
 
-	string KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod01()
+	string global::KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod01()
 	{
 		StringMethod01.RecordCall();
 		if (StringMethod01.OnCall is { } callback)
@@ -1446,7 +1446,7 @@ partial class LargeServiceStub
 		throw new global::System.InvalidOperationException("No implementation provided for StringMethod01. Set StringMethod01.OnCall or define a protected method 'StringMethod01' in your partial class.");
 	}
 
-	string KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod02()
+	string global::KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod02()
 	{
 		StringMethod02.RecordCall();
 		if (StringMethod02.OnCall is { } callback)
@@ -1454,7 +1454,7 @@ partial class LargeServiceStub
 		throw new global::System.InvalidOperationException("No implementation provided for StringMethod02. Set StringMethod02.OnCall or define a protected method 'StringMethod02' in your partial class.");
 	}
 
-	string KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod03()
+	string global::KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod03()
 	{
 		StringMethod03.RecordCall();
 		if (StringMethod03.OnCall is { } callback)
@@ -1462,7 +1462,7 @@ partial class LargeServiceStub
 		throw new global::System.InvalidOperationException("No implementation provided for StringMethod03. Set StringMethod03.OnCall or define a protected method 'StringMethod03' in your partial class.");
 	}
 
-	string KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod04()
+	string global::KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod04()
 	{
 		StringMethod04.RecordCall();
 		if (StringMethod04.OnCall is { } callback)
@@ -1470,7 +1470,7 @@ partial class LargeServiceStub
 		throw new global::System.InvalidOperationException("No implementation provided for StringMethod04. Set StringMethod04.OnCall or define a protected method 'StringMethod04' in your partial class.");
 	}
 
-	string KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod05()
+	string global::KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod05()
 	{
 		StringMethod05.RecordCall();
 		if (StringMethod05.OnCall is { } callback)
@@ -1478,7 +1478,7 @@ partial class LargeServiceStub
 		throw new global::System.InvalidOperationException("No implementation provided for StringMethod05. Set StringMethod05.OnCall or define a protected method 'StringMethod05' in your partial class.");
 	}
 
-	string KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod06()
+	string global::KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod06()
 	{
 		StringMethod06.RecordCall();
 		if (StringMethod06.OnCall is { } callback)
@@ -1486,7 +1486,7 @@ partial class LargeServiceStub
 		throw new global::System.InvalidOperationException("No implementation provided for StringMethod06. Set StringMethod06.OnCall or define a protected method 'StringMethod06' in your partial class.");
 	}
 
-	string KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod07()
+	string global::KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod07()
 	{
 		StringMethod07.RecordCall();
 		if (StringMethod07.OnCall is { } callback)
@@ -1494,7 +1494,7 @@ partial class LargeServiceStub
 		throw new global::System.InvalidOperationException("No implementation provided for StringMethod07. Set StringMethod07.OnCall or define a protected method 'StringMethod07' in your partial class.");
 	}
 
-	string KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod08()
+	string global::KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod08()
 	{
 		StringMethod08.RecordCall();
 		if (StringMethod08.OnCall is { } callback)
@@ -1502,7 +1502,7 @@ partial class LargeServiceStub
 		throw new global::System.InvalidOperationException("No implementation provided for StringMethod08. Set StringMethod08.OnCall or define a protected method 'StringMethod08' in your partial class.");
 	}
 
-	string KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod09()
+	string global::KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod09()
 	{
 		StringMethod09.RecordCall();
 		if (StringMethod09.OnCall is { } callback)
@@ -1510,7 +1510,7 @@ partial class LargeServiceStub
 		throw new global::System.InvalidOperationException("No implementation provided for StringMethod09. Set StringMethod09.OnCall or define a protected method 'StringMethod09' in your partial class.");
 	}
 
-	string KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod10()
+	string global::KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod10()
 	{
 		StringMethod10.RecordCall();
 		if (StringMethod10.OnCall is { } callback)
@@ -1518,61 +1518,61 @@ partial class LargeServiceStub
 		throw new global::System.InvalidOperationException("No implementation provided for StringMethod10. Set StringMethod10.OnCall or define a protected method 'StringMethod10' in your partial class.");
 	}
 
-	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam01(int p)
+	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam01(int p)
 	{
 		IntMethodWithParam01.RecordCall(p);
 		return IntMethodWithParam01.OnCall?.Invoke(this, p) ?? default!;
 	}
 
-	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam02(int p)
+	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam02(int p)
 	{
 		IntMethodWithParam02.RecordCall(p);
 		return IntMethodWithParam02.OnCall?.Invoke(this, p) ?? default!;
 	}
 
-	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam03(int p)
+	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam03(int p)
 	{
 		IntMethodWithParam03.RecordCall(p);
 		return IntMethodWithParam03.OnCall?.Invoke(this, p) ?? default!;
 	}
 
-	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam04(int p)
+	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam04(int p)
 	{
 		IntMethodWithParam04.RecordCall(p);
 		return IntMethodWithParam04.OnCall?.Invoke(this, p) ?? default!;
 	}
 
-	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam05(int p)
+	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam05(int p)
 	{
 		IntMethodWithParam05.RecordCall(p);
 		return IntMethodWithParam05.OnCall?.Invoke(this, p) ?? default!;
 	}
 
-	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam06(int p)
+	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam06(int p)
 	{
 		IntMethodWithParam06.RecordCall(p);
 		return IntMethodWithParam06.OnCall?.Invoke(this, p) ?? default!;
 	}
 
-	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam07(int p)
+	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam07(int p)
 	{
 		IntMethodWithParam07.RecordCall(p);
 		return IntMethodWithParam07.OnCall?.Invoke(this, p) ?? default!;
 	}
 
-	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam08(int p)
+	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam08(int p)
 	{
 		IntMethodWithParam08.RecordCall(p);
 		return IntMethodWithParam08.OnCall?.Invoke(this, p) ?? default!;
 	}
 
-	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam09(int p)
+	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam09(int p)
 	{
 		IntMethodWithParam09.RecordCall(p);
 		return IntMethodWithParam09.OnCall?.Invoke(this, p) ?? default!;
 	}
 
-	int KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam10(int p)
+	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam10(int p)
 	{
 		IntMethodWithParam10.RecordCall(p);
 		return IntMethodWithParam10.OnCall?.Invoke(this, p) ?? default!;
