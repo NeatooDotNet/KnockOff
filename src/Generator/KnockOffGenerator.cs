@@ -49,6 +49,17 @@ public partial class KnockOffGenerator : IIncrementalGenerator
 	#region Standalone Stub Diagnostics (KO0xxx)
 
 	/// <summary>
+	/// KO0008: Generic standalone stub type parameter count must match interface.
+	/// </summary>
+	private static readonly DiagnosticDescriptor KO0008_TypeParameterArityMismatch = new(
+		id: "KO0008",
+		title: "Type parameter count mismatch",
+		messageFormat: "Generic standalone stub '{0}' has {1} type parameter(s) but interface '{2}' has {3}. Type parameter count must match exactly.",
+		category: "KnockOff",
+		defaultSeverity: DiagnosticSeverity.Error,
+		isEnabledByDefault: true);
+
+	/// <summary>
 	/// KO0010: Standalone stubs should implement a single interface.
 	/// </summary>
 	private static readonly DiagnosticDescriptor KO0010_MultipleInterfaces = new(
@@ -240,9 +251,7 @@ public partial class KnockOffGenerator : IIncrementalGenerator
 		if (classDecl.Modifiers.Any(m => m.IsKind(SyntaxKind.AbstractKeyword)))
 			return false;
 
-		// Must not be generic (Phase 1 limitation)
-		if (classDecl.TypeParameterList?.Parameters.Count > 0)
-			return false;
+		// Generic classes are now supported - removed Phase 1 limitation
 
 		// Must have base list (potential interfaces)
 		if (classDecl.BaseList is null || classDecl.BaseList.Types.Count == 0)
@@ -314,8 +323,15 @@ public partial class KnockOffGenerator : IIncrementalGenerator
 			sb.AppendLine("{");
 		}
 
-		sb.AppendLine($"partial class {typeInfo.ClassName}");
+		// Generate class declaration with type parameters and constraints for generic stubs
+		var typeParamList = SymbolHelpers.FormatTypeParameterList(typeInfo.TypeParameters);
+		var constraints = SymbolHelpers.FormatTypeConstraints(typeInfo.TypeParameters);
+		var constraintClause = string.IsNullOrEmpty(constraints) ? "" : $" {constraints}";
+		sb.AppendLine($"partial class {typeInfo.ClassName}{typeParamList}{constraintClause}");
 		sb.AppendLine("{");
+
+		// Class name with type parameters for use in delegate signatures (e.g., "RepositoryStub<T>")
+		var classNameWithTypeParams = $"{typeInfo.ClassName}{typeParamList}";
 
 		// Add marker interfaces and SmartDefault helper for generic method tracking if needed
 		if (hasGenericMethods)
@@ -363,7 +379,7 @@ public partial class KnockOffGenerator : IIncrementalGenerator
 			if (member.IsProperty || member.IsIndexer)
 			{
 				var interceptorName = flatNameMap[GetMemberKey(member)];
-				GenerateFlatMemberInterceptorClass(sb, member, typeInfo.ClassName, interceptorName);
+				GenerateFlatMemberInterceptorClass(sb, member, classNameWithTypeParams, interceptorName);
 			}
 		}
 
@@ -377,12 +393,12 @@ public partial class KnockOffGenerator : IIncrementalGenerator
 
 				if (nonGenericGroup is not null)
 				{
-					GenerateFlatMethodGroupInterceptorClassWithNames(sb, nonGenericGroup, typeInfo.ClassName, flatNameMap);
+					GenerateFlatMethodGroupInterceptorClassWithNames(sb, nonGenericGroup, classNameWithTypeParams, flatNameMap);
 				}
 
 				if (genericGroup is not null)
 				{
-					GenerateFlatGenericMethodHandler(sb, genericGroup, typeInfo.ClassName, flatNameMap);
+					GenerateFlatGenericMethodHandler(sb, genericGroup, classNameWithTypeParams, flatNameMap);
 				}
 			}
 			else
@@ -391,11 +407,11 @@ public partial class KnockOffGenerator : IIncrementalGenerator
 				if (groupHasGenericMethods)
 				{
 					// Generic methods use the Of<T>() pattern - generate base handler class
-					GenerateFlatGenericMethodHandler(sb, group, typeInfo.ClassName, flatNameMap);
+					GenerateFlatGenericMethodHandler(sb, group, classNameWithTypeParams, flatNameMap);
 				}
 				else
 				{
-					GenerateFlatMethodGroupInterceptorClassWithNames(sb, group, typeInfo.ClassName, flatNameMap);
+					GenerateFlatMethodGroupInterceptorClassWithNames(sb, group, classNameWithTypeParams, flatNameMap);
 				}
 			}
 		}
@@ -404,7 +420,7 @@ public partial class KnockOffGenerator : IIncrementalGenerator
 		foreach (var evt in typeInfo.FlatEvents)
 		{
 			var interceptorName = flatNameMap[$"event:{evt.Name}"];
-			GenerateFlatEventInterceptorClassWithName(sb, evt, typeInfo.ClassName, interceptorName);
+			GenerateFlatEventInterceptorClassWithName(sb, evt, classNameWithTypeParams, interceptorName);
 		}
 
 		// 4. Generate flat interceptor properties directly on stub
@@ -553,9 +569,13 @@ public partial class KnockOffGenerator : IIncrementalGenerator
 		}
 
 		// Build hint name including containing types to ensure uniqueness
-		var hintName = typeInfo.ContainingTypes.Count > 0
-			? string.Join(".", typeInfo.ContainingTypes.Select(ct => ct.Name)) + "." + typeInfo.ClassName
+		// For generic classes, add arity suffix (e.g., RepositoryStub`1) to make valid filename
+		var className = typeInfo.TypeParameters.Count > 0
+			? $"{typeInfo.ClassName}`{typeInfo.TypeParameters.Count}"
 			: typeInfo.ClassName;
+		var hintName = typeInfo.ContainingTypes.Count > 0
+			? string.Join(".", typeInfo.ContainingTypes.Select(ct => ct.Name)) + "." + className
+			: className;
 
 		context.AddSource($"{hintName}.g.cs", sb.ToString());
 	}

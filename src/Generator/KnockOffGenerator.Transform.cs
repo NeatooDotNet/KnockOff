@@ -517,6 +517,9 @@ public partial class KnockOffGenerator
 		// Get containing types chain (for nested class support)
 		var containingTypes = GetContainingTypes(classSymbol);
 
+		// Extract class type parameters for generic standalone stubs
+		var classTypeParameters = SymbolHelpers.ExtractTypeParameters(classSymbol.TypeParameters);
+
 		var diagnostics = new List<DiagnosticInfo>();
 		var filePath = classDeclaration.SyntaxTree.FilePath;
 
@@ -545,11 +548,49 @@ public partial class KnockOffGenerator
 				Namespace: namespaceName,
 				ClassName: classSymbol.Name,
 				ContainingTypes: containingTypes,
+				TypeParameters: classTypeParameters,
 				Interfaces: new EquatableArray<InterfaceInfo>(Array.Empty<InterfaceInfo>()),
 				UserMethods: new EquatableArray<UserMethodInfo>(Array.Empty<UserMethodInfo>()),
 				Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
 				FlatMembers: new EquatableArray<InterfaceMemberInfo>(Array.Empty<InterfaceMemberInfo>()),
 				FlatEvents: new EquatableArray<EventMemberInfo>(Array.Empty<EventMemberInfo>()));
+		}
+
+		// For generic standalone stubs, validate type parameter arity matches interface (KO0008)
+		if (classTypeParameters.Count > 0)
+		{
+			// The root interface (we've already validated there's only one) must have matching arity
+			var rootInterface = rootInterfaces[0];
+			var interfaceArity = rootInterface.TypeParameters.Length;
+
+			if (classTypeParameters.Count != interfaceArity)
+			{
+				var location = classDeclaration.Identifier.GetLocation();
+				var lineSpan = location.GetLineSpan();
+				diagnostics.Add(new DiagnosticInfo(
+					"KO0008",
+					filePath,
+					lineSpan.StartLinePosition.Line,
+					lineSpan.StartLinePosition.Character,
+					new[] {
+						classSymbol.Name,
+						classTypeParameters.Count.ToString(),
+						rootInterface.Name,
+						interfaceArity.ToString()
+					}));
+
+				// Return with diagnostics but no generation
+				return new KnockOffTypeInfo(
+					Namespace: namespaceName,
+					ClassName: classSymbol.Name,
+					ContainingTypes: containingTypes,
+					TypeParameters: classTypeParameters,
+					Interfaces: new EquatableArray<InterfaceInfo>(Array.Empty<InterfaceInfo>()),
+					UserMethods: new EquatableArray<UserMethodInfo>(Array.Empty<UserMethodInfo>()),
+					Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
+					FlatMembers: new EquatableArray<InterfaceMemberInfo>(Array.Empty<InterfaceMemberInfo>()),
+					FlatEvents: new EquatableArray<EventMemberInfo>(Array.Empty<EventMemberInfo>()));
+			}
 		}
 
 		// Get all implemented interfaces (includes inheritance chain)
@@ -635,6 +676,7 @@ public partial class KnockOffGenerator
 			Namespace: namespaceName,
 			ClassName: classSymbol.Name,
 			ContainingTypes: containingTypes,
+			TypeParameters: classTypeParameters,
 			Interfaces: new EquatableArray<InterfaceInfo>(interfaceInfos.ToArray()),
 			UserMethods: userMethods,
 			Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),

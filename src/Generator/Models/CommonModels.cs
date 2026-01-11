@@ -6,6 +6,11 @@ internal sealed record KnockOffTypeInfo(
 	string Namespace,
 	string ClassName,
 	EquatableArray<ContainingTypeInfo> ContainingTypes,
+	/// <summary>
+	/// Type parameters for generic standalone stub classes (e.g., T in RepositoryStub&lt;T&gt;).
+	/// Empty for non-generic classes.
+	/// </summary>
+	EquatableArray<TypeParameterInfo> TypeParameters,
 	EquatableArray<InterfaceInfo> Interfaces,
 	EquatableArray<UserMethodInfo> UserMethods,
 	EquatableArray<DiagnosticInfo> Diagnostics,
