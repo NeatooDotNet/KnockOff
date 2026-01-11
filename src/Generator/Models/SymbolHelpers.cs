@@ -188,4 +188,51 @@ internal static class SymbolHelpers
 
 		return false;
 	}
+
+	/// <summary>
+	/// Formats a type parameter list string (e.g., "&lt;T, U&gt;") from type parameter info.
+	/// Returns empty string if no type parameters.
+	/// </summary>
+	public static string FormatTypeParameterList(EquatableArray<TypeParameterInfo> typeParameters)
+	{
+		if (typeParameters.Count == 0)
+			return "";
+
+		return $"<{string.Join(", ", typeParameters.Select(tp => tp.Name))}>";
+	}
+
+	/// <summary>
+	/// Formats type constraint clauses (e.g., "where T : class where U : new()") from type parameter info.
+	/// Returns empty string if no constraints.
+	/// </summary>
+	public static string FormatTypeConstraints(EquatableArray<TypeParameterInfo> typeParameters)
+	{
+		if (typeParameters.Count == 0)
+			return "";
+
+		var clauses = new List<string>();
+		foreach (var tp in typeParameters)
+		{
+			if (tp.Constraints.Count > 0)
+			{
+				clauses.Add($"where {tp.Name} : {string.Join(", ", tp.Constraints)}");
+			}
+		}
+
+		return clauses.Count > 0 ? string.Join(" ", clauses) : "";
+	}
+
+	/// <summary>
+	/// Extracts TypeParameterInfo from a type symbol's type parameters.
+	/// </summary>
+	public static EquatableArray<TypeParameterInfo> ExtractTypeParameters(IEnumerable<ITypeParameterSymbol> typeParams)
+	{
+		var result = new List<TypeParameterInfo>();
+		foreach (var tp in typeParams)
+		{
+			var constraints = GetTypeParameterConstraints(tp).ToArray();
+			result.Add(new TypeParameterInfo(tp.Name, new EquatableArray<string>(constraints)));
+		}
+		return new EquatableArray<TypeParameterInfo>(result.ToArray());
+	}
 }

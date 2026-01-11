@@ -451,8 +451,10 @@ protected Task<bool> SaveAsync(User user) => Task.FromResult(true);
 
 - [Getting Started](docs/getting-started.md) - Installation and first steps
 - [Customization Patterns](docs/concepts/customization-patterns.md) - The two ways to customize stub behavior
+- [Generic Interfaces](docs/guides/generics.md) - Generic interfaces and standalone stubs
 - [KnockOff vs Moq Comparison](docs/knockoff-vs-moq.md) - Side-by-side comparison for supported scenarios
 - [Migration from Moq](docs/migration-from-moq.md) - Step-by-step migration guide
+- [Diagnostics](docs/diagnostics.md) - Compiler diagnostics and how to resolve them
 - [Release Notes](docs/release-notes/index.md) - Version history
 
 ## Concept
@@ -589,6 +591,7 @@ Assert.Equal("Second", knockOff.IDataService.Name.LastSetValue);
 | Method overloads | Supported |
 | Async methods (Task, Task&lt;T&gt;, ValueTask, ValueTask&lt;T&gt;) | Supported |
 | Generic interfaces | Supported |
+| Generic standalone stubs (`Stub<T> : IRepo<T>`) | Supported |
 | Multiple interface implementation | Supported |
 | Interface inheritance | Supported |
 | Indexers (get-only, get/set) | Supported |
