@@ -20,6 +20,7 @@ The answer is almost always **yes**.
 
 ### Complex Interfaces Are Fine
 
+<!-- pseudo:complex-interface-ok -->
 ```csharp
 // IEditBase has 50+ members? Doesn't matter.
 [KnockOff<IEditBase>]
@@ -31,11 +32,13 @@ public partial class MyTests
     // The other 48 members work with smart defaults.
 }
 ```
+<!-- /snippet -->
 
 ### Anti-Pattern: Manual Test Doubles
 
 **Never** create hand-written test doubles when KnockOff would work:
 
+<!-- invalid:manual-test-double -->
 ```csharp
 // WRONG - Don't do this
 public class FakeEditBase : IEditBase
@@ -45,6 +48,7 @@ public class FakeEditBase : IEditBase
     // ... 48 more manual implementations
 }
 ```
+<!-- /snippet -->
 
 This defeats the purpose of having a source generator. Use `[KnockOff<IEditBase>]` instead.
 
@@ -52,8 +56,8 @@ This defeats the purpose of having a source generator. Use `[KnockOff<IEditBase>
 
 **Only stub what the test needs.** Don't implement every interface member—let smart defaults handle the rest.
 
-<!-- snippet: docs:best-practices:stub-minimalism -->
-```csharp
+<!-- snippet: best-practices-stub-minimalism -->
+```cs
 [KnockOff]
 public partial class BpUserServiceKnockOff : IBpUserService
 {
@@ -62,8 +66,9 @@ public partial class BpUserServiceKnockOff : IBpUserService
     // GetCount() returns 0, GetUsers() returns empty list, etc.
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
+<!-- invalid:over-stubbing -->
 ```csharp
 // BAD - over-stubbing
 [KnockOff]
@@ -75,6 +80,7 @@ public partial class UserServiceKnockOff : IUserService
     protected void Save(User u) { }  // Unnecessary - void methods work by default
 }
 ```
+<!-- /snippet -->
 
 ## Choose the Right Pattern
 
@@ -96,8 +102,8 @@ KnockOff provides two complementary patterns:
 - Simple, deterministic returns
 - No access to test-specific state
 
-<!-- snippet: docs:best-practices:user-methods -->
-```csharp
+<!-- snippet: best-practices-user-methods -->
+```cs
 [KnockOff]
 public partial class BpRepositoryKnockOff : IBpRepository
 {
@@ -105,7 +111,7 @@ public partial class BpRepositoryKnockOff : IBpRepository
     protected User? GetById(int id) => new User { Id = id, Name = "Test User" };
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### When to Use Callbacks
 
@@ -115,8 +121,8 @@ public partial class BpRepositoryKnockOff : IBpRepository
 - Accessing stub state
 - Temporarily overriding user methods
 
-<!-- snippet: docs:best-practices:callbacks-test -->
-```csharp
+<!-- snippet: best-practices-callbacks-test -->
+```cs
 public class BpCallbacksExample
 {
     public void ReturnsAdmin_WhenIdIs1()
@@ -135,7 +141,7 @@ public class BpCallbacksExample
     }
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Property Configuration
 
@@ -143,8 +149,8 @@ public class BpCallbacksExample
 
 For simple, static test data, use `Value` instead of `OnGet`:
 
-<!-- snippet: docs:best-practices:value-usage -->
-```csharp
+<!-- snippet: best-practices-value-usage -->
+```cs
 public class BpValueUsageExample
 {
     public void ConfigureWithValue()
@@ -157,20 +163,22 @@ public class BpValueUsageExample
     }
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
+<!-- invalid:unnecessary-onget -->
 ```csharp
 // UNNECESSARY COMPLEXITY
 knockOff.Name.OnGet = (ko) => "John Doe";
 knockOff.IsActive.OnGet = (ko) => true;
 ```
+<!-- /snippet -->
 
 ### Use `OnGet` for Dynamic Values
 
 Only use `OnGet` when you need computed or dynamic behavior:
 
-<!-- snippet: docs:best-practices:dynamic-onget -->
-```csharp
+<!-- snippet: best-practices-dynamic-onget -->
+```cs
 public class BpDynamicOnGetExample
 {
     public void ConfigureWithOnGet()
@@ -187,7 +195,7 @@ public class BpDynamicOnGetExample
     }
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Decision Guide
 
@@ -203,8 +211,8 @@ public class BpDynamicOnGetExample
 
 `Reset()` clears tracking and callbacks, but **NOT** backing storage:
 
-<!-- snippet: docs:best-practices:reset-behavior -->
-```csharp
+<!-- snippet: best-practices-reset-behavior -->
+```cs
 public class BpResetBehaviorExample
 {
     public void ResetPreservesValue()
@@ -224,26 +232,30 @@ public class BpResetBehaviorExample
     }
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 If you need to clear backing storage, set it explicitly:
 
+<!-- pseudo:reset-clear-backing -->
 ```csharp
 knockOff.Name.Reset();
 knockOff.Name.Value = default;  // Clear backing value
 ```
+<!-- /snippet -->
 
 ## Handle Out/Ref Parameters Correctly
 
 Methods with `out` or `ref` parameters require explicit delegate types:
 
+<!-- invalid:out-param-wrong -->
 ```csharp
 // WRONG - won't compile
 knockOff.TryParse.OnCall = (ko, input, out result) => { ... };
 ```
+<!-- /snippet -->
 
-<!-- snippet: docs:best-practices:out-param-correct -->
-```csharp
+<!-- snippet: best-practices-out-param-correct -->
+```cs
 public class BpOutParamExample
 {
     public void ConfigureOutParam()
@@ -259,7 +271,7 @@ public class BpOutParamExample
     }
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 **Tracking differences:**
 - `out` parameters: NOT tracked (they're outputs)
@@ -269,6 +281,7 @@ public class BpOutParamExample
 
 When nesting `[KnockOff]` classes, **all containing classes must be `partial`**:
 
+<!-- invalid:nested-not-partial -->
 ```csharp
 // WRONG - won't compile
 public class MyTests
@@ -277,16 +290,17 @@ public class MyTests
     public partial class ServiceKnockOff : IService { }
 }
 ```
+<!-- /snippet -->
 
-<!-- snippet: docs:best-practices:partial-container -->
-```csharp
+<!-- snippet: best-practices-partial-container -->
+```cs
 public partial class BpMyTests  // <-- partial required
 {
     [KnockOff]
     public partial class BpServiceKnockOff : IBpService { }
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 This applies at any nesting depth.
 
@@ -294,8 +308,8 @@ This applies at any nesting depth.
 
 When an interface has overloaded methods, each overload gets its own interceptor:
 
-<!-- snippet: docs:best-practices:method-overloads -->
-```csharp
+<!-- snippet: best-practices-method-overloads -->
+```cs
 public interface IBpProcessor
 {
     void Process(string data);
@@ -317,7 +331,7 @@ public class BpOverloadsExample
     }
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 Methods without overloads don't get suffixes.
 
@@ -329,6 +343,7 @@ Methods without overloads don't get suffixes.
 
 Each `[KnockOff<IFoo>]` attribute generates a complete stub class. Using inline stubs for the same interface across many test classes duplicates all that generated code—interceptors, backing fields, implementations—in every class.
 
+<!-- invalid:inefficient-inline-duplication -->
 ```csharp
 // INEFFICIENT - duplicates generated code in every test class
 [KnockOff<IUserRepository>]  // Generates Stubs.IUserRepository here
@@ -340,9 +355,10 @@ public partial class OrderServiceTests { }
 [KnockOff<IUserRepository>]  // And again here...
 public partial class NotificationTests { }
 ```
+<!-- /snippet -->
 
-<!-- snippet: docs:best-practices:standalone-stub -->
-```csharp
+<!-- snippet: best-practices-standalone-stub -->
+```cs
 [KnockOff]
 public partial class BpUserRepositoryKnockOff : IBpUserRepository
 {
@@ -355,7 +371,7 @@ public class BpUserServiceTests
     private readonly BpUserRepositoryKnockOff _repoKnockOff = new();
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 Benefits of stand-alone stubs:
 - **Less generated code** — compiled once, shared everywhere
@@ -381,8 +397,8 @@ Best for reusable stubs with user methods. See the example above in [Prefer Stan
 
 Best for test-local stubs or when you need multiple interfaces:
 
-<!-- snippet: docs:best-practices:inline-stubs -->
-```csharp
+<!-- snippet: best-practices-inline-stubs -->
+```cs
 [KnockOff<IBpInlineUserService>]
 [KnockOff<IBpInlineLogger>]
 public partial class BpInlineTests
@@ -395,7 +411,7 @@ public partial class BpInlineTests
     }
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## When KnockOff Won't Work
 

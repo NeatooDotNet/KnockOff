@@ -4,127 +4,55 @@
 
 This document tracks gaps in the Claude Code skill file (`~/.claude/skills/knockoff/SKILL.md`) that were identified during a Neatoo migration evaluation on 2026-01-07.
 
+**Updated 2026-01-10:** Class Stubs documentation complete. Remaining work is skill-to-repo migration.
+
 ## Task List
 
-- [ ] Add Class Stubs documentation to skill
-- [ ] Add comprehensive delegate stubs section with examples
-- [ ] Update skill sync status after documentation complete
+- [x] Add Class Stubs documentation to skill
+- [x] Add comprehensive delegate stubs section with examples
+- [ ] Move skills into repo at `.claude/skills/knockoff/`
+- [ ] Run `dotnet mdsnippets` to expand snippet markers
+- [ ] Add `<!-- pseudo: -->` markers for intentional inline code in migrations.md
 
-## Gap 1: Missing Class Stubs Documentation
+## Gap 1: Class Stubs Documentation - COMPLETE
 
-**Severity:** High - Class stubs are a major v10.8.0 feature
+**Status:** Done (SKILL.md lines 136-199)
 
-The skill documents:
-- Explicit stubs (`[KnockOff]` on interface implementations)
-- Inline stubs (`[KnockOff<TInterface>]`)
-- Delegate stubs (`[KnockOff<TDelegate>]`)
+The skill now documents:
+- Basic usage pattern with `[KnockOff<TClass>]`
+- Unified API (same as interface stubs)
+- Constructor parameters
+- Abstract classes
+- Non-virtual members
+- Comparison table (interface vs class stubs)
 
-**Missing:** Class stubs via `[KnockOff<TClass>]`
+## Gap 2: Delegate Stubs - COMPLETE
 
-### What Should Be Added
+**Status:** Done (SKILL.md lines 124-134)
 
-The skill should document:
+Basic delegate stub pattern documented with snippet markers.
 
-1. **Basic usage pattern:**
-```csharp
-public class UserService
-{
-    public virtual string Name { get; set; }
-    public virtual User GetUser(int id) => LoadFromDb(id);
-}
+## Gap 3: Skills Not in Repository
 
-[KnockOff<UserService>]
-public partial class ServiceTests
-{
-    [Fact]
-    public void Test()
-    {
-        var stub = new Stubs.UserService();
-        stub.Interceptor.GetUser.OnCall = (ko, id) => new User { Id = id };
+**Status:** In Progress
 
-        UserService service = stub;  // Full substitutability
-        Assert.Equal(42, service.GetUser(42).Id);
-    }
-}
-```
-
-2. **Key differences from interface stubs:**
-   - Access via `stub.Interceptor.{Member}` (not `stub.IInterface.{Member}`)
-   - Only virtual/abstract members intercepted
-   - Default behavior delegates to base class
-   - Full substitutability (stub IS-A target class)
-
-3. **Constructor chaining:**
-```csharp
-var stub = new Stubs.UserService(dependency);  // Chains to base constructor
-```
-
-4. **Limitations:**
-   - Cannot stub sealed classes (KO2001)
-   - Non-virtual members use base behavior (KO2003 info)
-   - Requires accessible constructors (KO2002)
-
-### Source Reference
-
-Design document: `docs/todos/completed/class-stubs-design.md`
-Release notes: `docs/release-notes/v10.8.0.md`
-
-## Gap 2: Delegate Stubs Could Be More Comprehensive
-
-**Severity:** Medium
-
-The skill mentions delegate stubs briefly in the "Delegate Stubs" section, but could benefit from:
-
-1. **More examples for multi-parameter delegates:**
-```csharp
-public delegate Task<bool> IsUniqueName(Guid? id, string firstName, string lastName);
-
-[KnockOff<IsUniqueName>]
-public partial class Tests
-{
-    [Fact]
-    public async Task Test()
-    {
-        var stub = new Stubs.IsUniqueName();
-        stub.Interceptor.OnCall = (ko, id, firstName, lastName) =>
-            Task.FromResult(firstName != "duplicate");
-
-        IsUniqueName check = stub;
-        Assert.True(await check(null, "unique", "name"));
-
-        // Verify with named tuple args
-        var args = stub.Interceptor.LastCallArgs;
-        Assert.Equal("unique", args?.firstName);
-        Assert.Equal("name", args?.lastName);
-    }
-}
-```
-
-2. **Async delegate patterns:**
-```csharp
-// Task<T> return
-stub.Interceptor.OnCall = (ko, args...) => Task.FromResult(result);
-
-// Task return (void async)
-stub.Interceptor.OnCall = (ko, args...) => Task.CompletedTask;
-```
-
-3. **Common Neatoo patterns:**
-   - Validation rule delegates
-   - Factory delegates
-
-## Gap 3: Skill Sync Status Outdated
-
-The skill mentions it's sourced from `src/Tests/KnockOff.Documentation.Samples/Skills/`, but the class stubs feature doesn't have corresponding skill samples yet.
+Skills are currently at `~/.claude/skills/knockoff/` (shared location) but should live in the repo at `.claude/skills/knockoff/` per the new MarkdownSnippets workflow.
 
 ### Action Required
 
-1. Create skill samples for class stubs in `Skills/ClassStubsSamples.cs`
-2. Run `.\scripts\extract-snippets.ps1 -Update`
-3. Add class stubs section to SKILL.md
+1. Copy skills into repo: `.claude/skills/knockoff/`
+2. Run `dotnet mdsnippets` to expand snippet markers
+3. Add `<!-- pseudo: -->` markers for inline code in migrations.md (10 blocks)
+4. Update copy-on-commit hook to sync repo → shared location
+
+### Why This Matters
+
+- Skills should be versioned with the code they describe
+- MarkdownSnippets can process skills in repo
+- Shared location (`~/.claude/skills/`) gets updated on commit
 
 ## Priority
 
-1. **High:** Class stubs documentation (major feature missing)
-2. **Medium:** Delegate stubs enhancements
-3. **Low:** Sync status update (documentation task)
+1. ~~**High:** Class stubs documentation~~ - DONE
+2. ~~**Medium:** Delegate stubs enhancements~~ - DONE
+3. **Medium:** Move skills into repo (enables proper snippet sync)

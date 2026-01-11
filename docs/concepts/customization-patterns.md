@@ -15,8 +15,8 @@ Define protected methods in your stub class that match interface method signatur
 
 ### Basic Example
 
-<!-- snippet: docs:customization-patterns:user-method-basic -->
-```csharp
+<!-- snippet: customization-patterns-user-method-basic -->
+```cs
 public interface IPatternUserService
 {
     PatternUser GetUser(int id);
@@ -33,7 +33,7 @@ public partial class PatternUserServiceKnockOff : IPatternUserService
     protected int CalculateScore(string name, int baseScore) => baseScore * 2;
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Rules for User Methods
 
@@ -45,8 +45,8 @@ public partial class PatternUserServiceKnockOff : IPatternUserService
 
 User methods work with async return types:
 
-<!-- snippet: docs:customization-patterns:user-method-async -->
-```csharp
+<!-- snippet: customization-patterns-user-method-async -->
+```cs
 public interface IPatternRepository
 {
     Task<PatternUser?> GetByIdAsync(int id);
@@ -63,7 +63,7 @@ public partial class PatternRepositoryKnockOff : IPatternRepository
         new ValueTask<int>(42);
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### When to Use User Methods
 
@@ -78,61 +78,61 @@ Set delegates on the interface handlers at runtime. Callbacks provide per-test c
 
 ### Method Callbacks (`OnCall`)
 
-<!-- snippet: docs:customization-patterns:callback-method -->
-```csharp
+<!-- snippet: customization-patterns-callback-method -->
+```cs
 // Void method
-        knockOff.DoSomething.OnCall = (ko) =>
-        {
-            // Custom logic for this test
-        };
+knockOff.DoSomething.OnCall = (ko) =>
+{
+    // Custom logic for this test
+};
 
-        // Method with return value
-        knockOff.GetUser.OnCall = (ko, id) => new PatternUser { Id = id, Name = "Mocked" };
+// Method with return value
+knockOff.GetUser.OnCall = (ko, id) => new PatternUser { Id = id, Name = "Mocked" };
 
-        // Method with multiple parameters (individual params)
-        knockOff.Calculate.OnCall = (ko, name, value, flag) =>
-        {
-            return flag ? value * 2 : value;
-        };
+// Method with multiple parameters (individual params)
+knockOff.Calculate.OnCall = (ko, name, value, flag) =>
+{
+    return flag ? value * 2 : value;
+};
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Property Callbacks (`OnGet` / `OnSet`)
 
-<!-- snippet: docs:customization-patterns:callback-property -->
-```csharp
+<!-- snippet: customization-patterns-callback-property -->
+```cs
 // Getter callback
-        knockOff.Name.OnGet = (ko) => "Dynamic Value";
+knockOff.Name.OnGet = (ko) => "Dynamic Value";
 
-        // Setter callback
-        knockOff.Name.OnSet = (ko, value) =>
-        {
-            // Custom logic when property is set
-            // Note: When OnSet is set, value does NOT go to backing field
-        };
+// Setter callback
+knockOff.Name.OnSet = (ko, value) =>
+{
+    // Custom logic when property is set
+    // Note: When OnSet is set, value does NOT go to backing field
+};
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Indexer Callbacks
 
-<!-- snippet: docs:customization-patterns:callback-indexer -->
-```csharp
+<!-- snippet: customization-patterns-callback-indexer -->
+```cs
 // Getter with key parameter
-        knockOff.StringIndexer.OnGet = (ko, key) => key switch
-        {
-            "Name" => new PatternPropertyInfo { Value = "Test" },
-            "Age" => new PatternPropertyInfo { Value = "25" },
-            _ => null
-        };
+knockOff.StringIndexer.OnGet = (ko, key) => key switch
+{
+    "Name" => new PatternPropertyInfo { Value = "Test" },
+    "Age" => new PatternPropertyInfo { Value = "25" },
+    _ => null
+};
 
-        // Setter with key and value parameters
-        knockOff.StringIndexer.OnSet = (ko, key, value) =>
-        {
-            // Custom logic
-            // Note: When OnSet is set, value does NOT go to backing dictionary
-        };
+// Setter with key and value parameters
+knockOff.StringIndexer.OnSet = (ko, key, value) =>
+{
+    // Custom logic
+    // Note: When OnSet is set, value does NOT go to backing dictionary
+};
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Callback Signatures
 
@@ -153,6 +153,7 @@ Each method gets a generated delegate type. The callback signature varies by mem
 
 All callbacks receive the KnockOff instance (`ko`) as the first parameter. This allows:
 
+<!-- pseudo:callback-ko-access -->
 ```csharp
 knockOff.GetUser.OnCall = (ko, id) =>
 {
@@ -164,6 +165,7 @@ knockOff.GetUser.OnCall = (ko, id) =>
     return new User { Id = id, Name = ko.NameBacking };
 };
 ```
+<!-- /snippet -->
 
 ### When to Use Callbacks
 
@@ -198,8 +200,8 @@ When an interface member is invoked, KnockOff checks in this order:
 
 ### Example: Priority in Action
 
-<!-- snippet: docs:customization-patterns:priority-example -->
-```csharp
+<!-- snippet: customization-patterns-priority-example -->
+```cs
 public interface IPatternService
 {
     int Calculate(int input);
@@ -212,8 +214,10 @@ public partial class PatternServiceKnockOff : IPatternService
     protected int Calculate(int input) => input * 2;
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
+<!-- pseudo:priority-example-usage -->
+```csharp
 // Test
 var knockOff = new PatternServiceKnockOff();
 IPatternService service = knockOff;
@@ -229,6 +233,7 @@ var result2 = service.Calculate(5);  // Returns 500 (callback)
 knockOff.Calculate.Reset();
 var result3 = service.Calculate(5);  // Returns 10 (user method)
 ```
+<!-- /snippet -->
 
 ## Reset Behavior
 
@@ -240,6 +245,7 @@ It does **NOT** clear:
 - Backing fields for properties
 - Backing dictionaries for indexers
 
+<!-- pseudo:reset-behavior -->
 ```csharp
 // Set up state
 knockOff.GetUser.OnCall = (ko, id) => new User { Name = "Callback" };
@@ -257,13 +263,14 @@ Assert.Null(knockOff.GetUser.OnCall);  // Callback cleared
 // Now uses user method (or default if no user method)
 var user = service.GetUser(3);
 ```
+<!-- /snippet -->
 
 ## Combining Both Patterns
 
 The patterns work together for layered customization:
 
-<!-- snippet: docs:customization-patterns:combining-patterns -->
-```csharp
+<!-- snippet: customization-patterns-combining-patterns -->
+```cs
 public interface IPatternCombinedRepository
 {
     PatternUser? GetById(int id);
@@ -276,8 +283,10 @@ public partial class PatternCombinedRepositoryKnockOff : IPatternCombinedReposit
     protected PatternUser? GetById(int id) => null;
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
+<!-- pseudo:combining-patterns-usage -->
+```csharp
 // Test 1: Uses default (null)
 var knockOff = new PatternCombinedRepositoryKnockOff();
 Assert.Null(knockOff.AsIPatternCombinedRepository().GetById(999));
@@ -300,6 +309,7 @@ knockOff.GetById.OnCall = (ko, id) =>
 
 Assert.Equal("User-999", knockOff.AsIPatternCombinedRepository().GetById(999)?.Name);
 ```
+<!-- /snippet -->
 
 ## Decision Guide
 

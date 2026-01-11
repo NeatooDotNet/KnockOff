@@ -38,7 +38,7 @@ partial class NeatooPropertyChangedDelegateTests
 			{
 				Interceptor.RecordCall(propertyNameBreadCrumbs);
 				if (Interceptor.OnCall is { } onCall) return onCall(this, propertyNameBreadCrumbs);
-				return default!;
+				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
 			/// <summary>Implicit conversion to global::Neatoo.NeatooPropertyChanged.</summary>

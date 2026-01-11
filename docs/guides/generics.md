@@ -6,8 +6,8 @@ KnockOff supports generic interfaces with concrete type parameters.
 
 For generic interfaces, create a KnockOff class with concrete type arguments:
 
-<!-- snippet: docs:generics:basic-interface -->
-```csharp
+<!-- snippet: generics-basic-interface -->
+```cs
 public interface IGenRepository<T> where T : class
 {
     T? GetById(int id);
@@ -23,43 +23,43 @@ public partial class GenUserRepositoryKnockOff : IGenRepository<GenUser> { }
 [KnockOff]
 public partial class GenOrderRepositoryKnockOff : IGenRepository<GenOrder> { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Tracking
 
 Tracking uses the concrete types:
 
-<!-- snippet: docs:generics:tracking -->
-```csharp
+<!-- snippet: generics-tracking -->
+```cs
 var user = new GenUser { Id = 1, Name = "Test" };
-        repo.Save(user);
+repo.Save(user);
 
-        // LastCallArg is strongly typed as GenUser
-        GenUser? savedUser = knockOff.Save.LastCallArg;  // same as user
+// LastCallArg is strongly typed as GenUser
+GenUser? savedUser = knockOff.Save.LastCallArg;  // same as user
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Callbacks
 
 Callbacks also use concrete types:
 
-<!-- snippet: docs:generics:callbacks -->
-```csharp
+<!-- snippet: generics-callbacks -->
+```cs
 knockOff.GetById.OnCall = (ko, id) =>
-            new GenUser { Id = id, Name = $"User-{id}" };
+    new GenUser { Id = id, Name = $"User-{id}" };
 
-        knockOff.Save.OnCall = (ko, user) =>
-        {
-            // user is typed as GenUser, not T
-            Console.WriteLine($"Saving: {user.Name}");
-        };
+knockOff.Save.OnCall = (ko, user) =>
+{
+    // user is typed as GenUser, not T
+    Console.WriteLine($"Saving: {user.Name}");
+};
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Multiple Generic Parameters
 
-<!-- snippet: docs:generics:multiple-params -->
-```csharp
+<!-- snippet: generics-multiple-params -->
+```cs
 public interface IGenCache<TKey, TValue>
 {
     TValue? Get(TKey key);
@@ -69,32 +69,32 @@ public interface IGenCache<TKey, TValue>
 [KnockOff]
 public partial class GenStringCacheKnockOff : IGenCache<string, GenUser> { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 Usage:
 
-<!-- snippet: docs:generics:multiple-params-usage -->
-```csharp
+<!-- snippet: generics-multiple-params-usage -->
+```cs
 knockOff.Get.OnCall = (ko, key) => key switch
-        {
-            "admin" => new GenUser { Name = "Admin" },
-            _ => null
-        };
+{
+    "admin" => new GenUser { Name = "Admin" },
+    _ => null
+};
 
-        knockOff.Set.OnCall = (ko, key, value) =>
-        {
-            // string key, GenUser value
-            Console.WriteLine($"Cached {key}: {value.Name}");
-        };
+knockOff.Set.OnCall = (ko, key, value) =>
+{
+    // string key, GenUser value
+    Console.WriteLine($"Cached {key}: {value.Name}");
+};
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Constrained Generics
 
 KnockOff works with constrained generic interfaces:
 
-<!-- snippet: docs:generics:constrained -->
-```csharp
+<!-- snippet: generics-constrained -->
+```cs
 public interface IGenEntityRepository<T> where T : class, IGenEntity
 {
     T? FindById(int id);
@@ -104,14 +104,14 @@ public interface IGenEntityRepository<T> where T : class, IGenEntity
 [KnockOff]
 public partial class GenEmployeeRepositoryKnockOff : IGenEntityRepository<GenEmployee> { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Common Patterns
 
 ### Factory Pattern
 
-<!-- snippet: docs:generics:factory-pattern -->
-```csharp
+<!-- snippet: generics-factory-pattern -->
+```cs
 public interface IGenFactory<T> where T : new()
 {
     T Create();
@@ -120,18 +120,18 @@ public interface IGenFactory<T> where T : new()
 [KnockOff]
 public partial class GenUserFactoryKnockOff : IGenFactory<GenUser> { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
-<!-- snippet: docs:generics:factory-usage -->
-```csharp
+<!-- snippet: generics-factory-usage -->
+```cs
 knockOff.Create.OnCall = (ko) => new GenUser { Name = "Created" };
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Collection Repositories
 
-<!-- snippet: docs:generics:collection-repo -->
-```csharp
+<!-- snippet: generics-collection-repo -->
+```cs
 public interface IGenReadOnlyRepository<T>
 {
     IEnumerable<T> GetAll();
@@ -141,27 +141,27 @@ public interface IGenReadOnlyRepository<T>
 [KnockOff]
 public partial class GenProductRepositoryKnockOff : IGenReadOnlyRepository<GenProduct> { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
-<!-- snippet: docs:generics:collection-usage -->
-```csharp
+<!-- snippet: generics-collection-usage -->
+```cs
 var products = new List<GenProduct>
-        {
-            new GenProduct { Id = 1, Name = "Widget" },
-            new GenProduct { Id = 2, Name = "Gadget" }
-        };
+{
+    new GenProduct { Id = 1, Name = "Widget" },
+    new GenProduct { Id = 2, Name = "Gadget" }
+};
 
-        knockOff.GetAll.OnCall = (ko) => products;
+knockOff.GetAll.OnCall = (ko) => products;
 
-        knockOff.FindFirst.OnCall = (ko, predicate) =>
-            products.FirstOrDefault(predicate);
+knockOff.FindFirst.OnCall = (ko, predicate) =>
+    products.FirstOrDefault(predicate);
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Async Generic Repositories
 
-<!-- snippet: docs:generics:async-generic -->
-```csharp
+<!-- snippet: generics-async-generic -->
+```cs
 public interface IGenAsyncRepository<T> where T : class
 {
     Task<T?> GetByIdAsync(int id);
@@ -172,17 +172,17 @@ public interface IGenAsyncRepository<T> where T : class
 [KnockOff]
 public partial class GenAsyncUserRepositoryKnockOff : IGenAsyncRepository<GenUser> { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
-<!-- snippet: docs:generics:async-usage -->
-```csharp
+<!-- snippet: generics-async-usage -->
+```cs
 knockOff.GetByIdAsync.OnCall = (ko, id) =>
-            Task.FromResult<GenUser?>(new GenUser { Id = id });
+    Task.FromResult<GenUser?>(new GenUser { Id = id });
 
-        knockOff.GetAllAsync.OnCall = (ko) =>
-            Task.FromResult<IEnumerable<GenUser>>(users);
+knockOff.GetAllAsync.OnCall = (ko) =>
+    Task.FromResult<IEnumerable<GenUser>>(users);
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Generic Methods
 
@@ -190,6 +190,7 @@ KnockOff supports generic methods using the `.Of<T>()` pattern. This allows type
 
 ### Basic Usage
 
+<!-- pseudo:generic-method-interface -->
 ```csharp
 public interface ISerializer
 {
@@ -200,9 +201,11 @@ public interface ISerializer
 [KnockOff]
 public partial class SerializerKnockOff : ISerializer { }
 ```
+<!-- /snippet -->
 
 Configure behavior per type argument:
 
+<!-- pseudo:generic-method-config -->
 ```csharp
 var knockOff = new SerializerKnockOff();
 
@@ -213,9 +216,11 @@ knockOff.Deserialize.Of<User>().OnCall = (ko, json) =>
 knockOff.Deserialize.Of<Order>().OnCall = (ko, json) =>
     new Order { Id = 123 };
 ```
+<!-- /snippet -->
 
 ### Per-Type Call Tracking
 
+<!-- pseudo:generic-method-tracking -->
 ```csharp
 ISerializer service = knockOff;
 
@@ -235,9 +240,11 @@ Assert.True(knockOff.Deserialize.WasCalled);
 var types = knockOff.Deserialize.CalledTypeArguments;
 // Returns: [typeof(User), typeof(Order)]
 ```
+<!-- /snippet -->
 
 ### Multiple Type Parameters
 
+<!-- pseudo:generic-method-multi-param -->
 ```csharp
 public interface IConverter
 {
@@ -247,27 +254,34 @@ public interface IConverter
 [KnockOff]
 public partial class ConverterKnockOff : IConverter { }
 ```
+<!-- /snippet -->
 
+<!-- pseudo:generic-method-multi-usage -->
 ```csharp
 knockOff.Convert.Of<string, int>().OnCall = (ko, s) => s.Length;
 knockOff.Convert.Of<int, string>().OnCall = (ko, i) => i.ToString();
 ```
+<!-- /snippet -->
 
 ### Constrained Generic Methods
 
 Type constraints are preserved on the `.Of<T>()` method:
 
+<!-- pseudo:generic-method-constrained -->
 ```csharp
 public interface IEntityFactory
 {
     T Create<T>() where T : class, IEntity, new();
 }
 ```
+<!-- /snippet -->
 
+<!-- pseudo:generic-method-constrained-usage -->
 ```csharp
 // Constraints enforced at compile time
 knockOff.Create.Of<Employee>().OnCall = (ko) => new Employee();
 ```
+<!-- /snippet -->
 
 ### Smart Defaults
 

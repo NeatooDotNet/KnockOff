@@ -47,7 +47,7 @@ public class IdxEntityProperty : IIdxEntityProperty
 // Basic Usage
 // ============================================================================
 
-#region docs:indexers:basic-interface
+#region indexers-basic-interface
 public interface IIdxPropertyStore
 {
     IdxPropertyInfo? this[string key] { get; }
@@ -69,7 +69,7 @@ public partial class IdxReadWriteStoreKnockOff : IIdxReadWriteStore { }
 // Entity Property Access (IEntityBase Pattern)
 // ============================================================================
 
-#region docs:indexers:entity-property
+#region indexers-entity-property
 public interface IIdxEntityBase
 {
     IIdxEntityProperty? this[string propertyName] { get; }
@@ -89,7 +89,7 @@ public interface IIdxConfigStore
     IdxConfigValue? this[string key] { get; }
 }
 
-#region docs:indexers:dictionary-like
+#region indexers-dictionary-like
 [KnockOff]
 public partial class IdxConfigStoreKnockOff : IIdxConfigStore { }
 #endregion
@@ -98,7 +98,7 @@ public partial class IdxConfigStoreKnockOff : IIdxConfigStore { }
 // Integer Indexers
 // ============================================================================
 
-#region docs:indexers:integer-indexer
+#region indexers-integer-indexer
 public interface IIdxList
 {
     object? this[int index] { get; set; }
@@ -123,7 +123,7 @@ public static class IndexersUsageExamples
         var knockOff = new IdxReadWriteStoreKnockOff();
         IIdxReadWriteStore store = knockOff;
 
-        #region docs:indexers:get-tracking
+        #region indexers-get-tracking
         _ = store["Name"];
         _ = store["Age"];
 
@@ -140,7 +140,7 @@ public static class IndexersUsageExamples
         IIdxReadWriteStore store = knockOff;
         var value1 = new IdxPropertyInfo { Name = "Test", Value = 123 };
 
-        #region docs:indexers:set-tracking
+        #region indexers-set-tracking
         store["Key"] = value1;
 
         var setCount = knockOff.StringIndexer.SetCount;         // 1
@@ -157,7 +157,7 @@ public static class IndexersUsageExamples
         var knockOff = new IdxReadWriteStoreKnockOff();
         IIdxReadWriteStore store = knockOff;
 
-        #region docs:indexers:backing-dictionary
+        #region indexers-backing-dictionary
         // Pre-populate backing dictionary
         knockOff.StringIndexerBacking["Config"] = new IdxPropertyInfo { Value = "Value1" };
         knockOff.StringIndexerBacking["Setting"] = new IdxPropertyInfo { Value = "Value2" };
@@ -175,7 +175,7 @@ public static class IndexersUsageExamples
         var knockOff = new IdxReadWriteStoreKnockOff();
         IIdxReadWriteStore store = knockOff;
 
-        #region docs:indexers:onget-callback
+        #region indexers-onget-callback
         knockOff.StringIndexer.OnGet = (ko, key) =>
         {
             // Compute or fetch value dynamically
@@ -194,7 +194,7 @@ public static class IndexersUsageExamples
         IIdxReadWriteStore store = knockOff;
         var changes = new List<(string key, IdxPropertyInfo? value)>();
 
-        #region docs:indexers:onset-callback
+        #region indexers-onset-callback
         knockOff.StringIndexer.OnSet = (ko, key, value) =>
         {
             changes.Add((key, value));
@@ -214,7 +214,7 @@ public static class IndexersUsageExamples
         var knockOff = new IdxReadWriteStoreKnockOff();
         IIdxReadWriteStore store = knockOff;
 
-        #region docs:indexers:fallback-to-backing
+        #region indexers-fallback-to-backing
         // No OnGet callback - falls back to backing dictionary
         knockOff.StringIndexerBacking["Existing"] = new IdxPropertyInfo { Value = "Found" };
 
@@ -233,7 +233,7 @@ public static class IndexersUsageExamples
         _ = store["Test"];
         knockOff.StringIndexer.OnGet = (ko, key) => new IdxPropertyInfo();
 
-        #region docs:indexers:reset
+        #region indexers-reset
         knockOff.StringIndexer.Reset();
 
         var getCount = knockOff.StringIndexer.GetCount;    // 0
@@ -249,7 +249,7 @@ public static class IndexersUsageExamples
         var knockOff = new IdxListKnockOff();
         IIdxList list = knockOff;
 
-        #region docs:indexers:integer-indexer-usage
+        #region indexers-integer-indexer-usage
         knockOff.Int32IndexerBacking[0] = "First";
         knockOff.Int32IndexerBacking[1] = "Second";
 

@@ -188,33 +188,34 @@ See README.md "Open Questions" section:
 
 ## Documentation Snippets
 
-Code examples in documentation must come from the `KnockOff.Documentation.Samples` project:
+Code examples in documentation must come from the `KnockOff.Documentation.Samples` project. Uses [MarkdownSnippets](https://github.com/SimonCropp/MarkdownSnippets) for sync.
 
 ```
 src/Tests/KnockOff.Documentation.Samples/     # Compiled samples with #region markers
 src/Tests/KnockOff.Documentation.Samples.Tests/ # Tests for samples
-docs/                                          # Markdown with <!-- snippet: --> markers
-scripts/extract-snippets.ps1                   # Sync script
+docs/                                          # Markdown with snippet: markers
+mdsnippets.json                                # MarkdownSnippets config
+scripts/verify-code-blocks.ps1                 # Verification for pseudo/invalid markers
 ```
 
 ### Commands
 
 ```powershell
-# Verify docs are in sync (for CI)
-.\scripts\extract-snippets.ps1 -Verify
+# Sync documentation with code snippets
+dotnet mdsnippets
 
-# Update docs from samples
-.\scripts\extract-snippets.ps1 -Update
+# Verify docs unchanged after sync (CI check)
+dotnet mdsnippets && git diff --exit-code docs/
 
-# List all snippets
-.\scripts\extract-snippets.ps1
+# Verify all code blocks have markers
+pwsh scripts/verify-code-blocks.ps1
 ```
 
 ### Adding Code to Docs
 
-1. Add `#region docs:{doc-file}:{snippet-id}` in `Documentation.Samples`
-2. Add `<!-- snippet: docs:{doc-file}:{snippet-id} -->` marker in markdown
-3. Run `-Update` to sync
+1. Add `#region {snippet-id}` in `Documentation.Samples` (e.g., `#region getting-started-interface`)
+2. Add `snippet: {snippet-id}` line in markdown
+3. Run `dotnet mdsnippets` to sync
 
 See `/docs-snippets` skill for full documentation.
 
@@ -224,8 +225,9 @@ See `/docs-snippets` skill for full documentation.
 
 1. `dotnet build` - Code compiles
 2. `dotnet test` - Tests pass
-3. `.\scripts\extract-snippets.ps1 -Verify` - Docs in sync
-4. If release: version updated, release notes created
+3. `dotnet mdsnippets` - Snippets synced
+4. `pwsh scripts/verify-code-blocks.ps1` - All code blocks have markers
+5. If release: version updated, release notes created
 
 ## Implementation Phases
 

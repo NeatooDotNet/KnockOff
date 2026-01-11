@@ -30,7 +30,7 @@ public class DelUser
 // Delegate Types for Samples
 // ============================================================================
 
-#region docs:delegates:basic-delegate
+#region delegates-basic-delegate
 // Named delegate types can be stubbed with [KnockOff<TDelegate>]
 public delegate bool IsUniqueRule(string value);
 
@@ -48,7 +48,7 @@ public delegate bool Validator(string field, object value, out string error);
 // Basic Delegate Stub Example
 // ============================================================================
 
-#region docs:delegates:basic-usage
+#region delegates-basic-usage
 [KnockOff<IsUniqueRule>]
 [KnockOff<UserFactory>]
 public partial class DelegateTests
@@ -77,7 +77,7 @@ public partial class DelegateTests
 // Void Delegate Example
 // ============================================================================
 
-#region docs:delegates:void-delegate
+#region delegates-void-delegate
 [KnockOff<LogAction>]
 public partial class VoidDelegateTests
 {
@@ -100,7 +100,7 @@ public partial class VoidDelegateTests
 // Implicit Conversion
 // ============================================================================
 
-#region docs:delegates:implicit-conversion
+#region delegates-implicit-conversion
 // Stub classes have implicit conversion operators to the delegate type.
 // This enables seamless passing to methods that expect the delegate:
 
@@ -123,7 +123,7 @@ public partial class VoidDelegateTests
 // Interceptor API Reference
 // ============================================================================
 
-#region docs:delegates:interceptor-api
+#region delegates-interceptor-api
 // Delegate stub interceptor properties:
 // stub.Interceptor.CallCount      // int - number of invocations
 // stub.Interceptor.WasCalled      // bool - invoked at least once
@@ -140,7 +140,7 @@ public partial class VoidDelegateTests
 public delegate T Factory<T>();
 public delegate TResult Converter<TInput, TResult>(TInput input);
 
-#region docs:delegates:closed-generics
+#region delegates-closed-generics
 [KnockOff<Factory<DelUser>>]
 [KnockOff<Converter<int, string>>]
 public partial class GenericDelegateTests
@@ -169,7 +169,7 @@ public partial class GenericDelegateTests
 // Validation Pattern
 // ============================================================================
 
-#region docs:delegates:validation-pattern
+#region delegates-validation-pattern
 [KnockOff<IsUniqueRule>]
 public partial class ValidationPatternTests
 {
@@ -204,7 +204,7 @@ public static class DelegateStubsUsageExamples
 {
     public static void FactoryCallbackExample()
     {
-        #region docs:delegates:factory-callback
+        #region delegates-factory-callback
         var factoryStub = new DelegateTests.Stubs.UserFactory();
         factoryStub.Interceptor.OnCall = (ko, id) => new DelUser
         {
@@ -226,7 +226,7 @@ public static class DelegateStubsUsageExamples
 
     public static void CapturingMultipleCallsExample()
     {
-        #region docs:delegates:capturing-calls
+        #region delegates-capturing-calls
         var logStub = new VoidDelegateTests.Stubs.LogAction();
         var capturedMessages = new List<string>();
 

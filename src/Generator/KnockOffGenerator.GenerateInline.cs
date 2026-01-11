@@ -931,7 +931,8 @@ public partial class KnockOffGenerator
 		{
 			var onCallArgs = del.Parameters.Count > 0 ? $"this, {invokeArgList}" : "this";
 			sb.AppendLine($"\t\t\t\tif (Interceptor.OnCall is {{ }} onCall) return onCall({onCallArgs});");
-			sb.AppendLine("\t\t\t\treturn default!;");
+			var defaultExpr = GetDefaultForType(del.ReturnType, DefaultValueStrategy.Default, null);
+			sb.AppendLine($"\t\t\t\treturn {defaultExpr};");
 		}
 		sb.AppendLine("\t\t\t}");
 		sb.AppendLine();

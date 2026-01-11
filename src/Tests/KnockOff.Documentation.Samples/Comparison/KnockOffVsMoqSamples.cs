@@ -64,7 +64,7 @@ public interface IVsUserService
     void Update(VsUser user);
 }
 
-#region docs:knockoff-vs-moq:basic-stub
+#region knockoff-vs-moq-basic-stub
 [KnockOff]
 public partial class VsUserServiceKnockOff : IVsUserService
 {
@@ -82,7 +82,7 @@ public interface IVsRepository
     void Save(VsEntity entity);
 }
 
-#region docs:knockoff-vs-moq:async-stub
+#region knockoff-vs-moq-async-stub
 [KnockOff]
 public partial class VsRepositoryKnockOff : IVsRepository
 {
@@ -107,7 +107,7 @@ public interface IVsUnitOfWork
 
 // Note: Multi-interface standalone stubs are no longer supported (KO0010).
 // Use inline stubs [KnockOff<T>] or separate single-interface stubs.
-#region docs:knockoff-vs-moq:multiple-interfaces
+#region knockoff-vs-moq-multiple-interfaces
 [KnockOff]
 public partial class VsEmployeeRepoKnockOff : IVsEmployeeRepository
 {
@@ -129,7 +129,7 @@ public interface IVsPropertyStore
     VsPropertyInfo? this[string key] { get; set; }
 }
 
-#region docs:knockoff-vs-moq:indexer-stub
+#region knockoff-vs-moq-indexer-stub
 [KnockOff]
 public partial class VsPropertyStoreKnockOff : IVsPropertyStore { }
 #endregion
@@ -143,7 +143,7 @@ public interface IVsEventSource
     event EventHandler<string>? DataReceived;
 }
 
-#region docs:knockoff-vs-moq:event-stub
+#region knockoff-vs-moq-event-stub
 [KnockOff]
 public partial class VsEventSourceKnockOff : IVsEventSource { }
 #endregion
@@ -160,7 +160,7 @@ public interface IVsVerificationRepository
     void Update(VsEntity entity);
 }
 
-#region docs:knockoff-vs-moq:verification-patterns
+#region knockoff-vs-moq-verification-patterns
 [KnockOff]
 public partial class VsVerificationRepositoryKnockOff : IVsVerificationRepository { }
 #endregion
@@ -174,7 +174,7 @@ public interface IVsSequence
     int GetNext();
 }
 
-#region docs:knockoff-vs-moq:sequential-returns
+#region knockoff-vs-moq-sequential-returns
 [KnockOff]
 public partial class VsSequenceKnockOff : IVsSequence { }
 #endregion
@@ -188,7 +188,7 @@ public interface IVsOverrideService
     VsUser GetUser(int id);
 }
 
-#region docs:knockoff-vs-moq:per-test-override
+#region knockoff-vs-moq-per-test-override
 [KnockOff]
 public partial class VsOverrideServiceKnockOff : IVsOverrideService
 {
@@ -201,7 +201,7 @@ public partial class VsOverrideServiceKnockOff : IVsOverrideService
 // Comment-based usage examples
 // ============================================================================
 
-#region docs:knockoff-vs-moq:basic-stub-usage
+#region knockoff-vs-moq-basic-stub-usage
 // // Use in test
 // var knockOff = new VsUserServiceKnockOff();
 // IVsUserService service = knockOff;
@@ -212,7 +212,7 @@ public partial class VsOverrideServiceKnockOff : IVsOverrideService
 // Assert.Equal(42, knockOff.GetUser.LastCallArg);
 #endregion
 
-#region docs:knockoff-vs-moq:property-mocking
+#region knockoff-vs-moq-property-mocking
 // // Define stub - properties use auto-generated backing fields
 // [KnockOff]
 // public partial class UserServiceKnockOff : IUserService { }
@@ -232,7 +232,7 @@ public partial class VsOverrideServiceKnockOff : IVsOverrideService
 // Assert.Equal("New", knockOff.CurrentUser.LastSetValue?.Name);
 #endregion
 
-#region docs:knockoff-vs-moq:argument-capture
+#region knockoff-vs-moq-argument-capture
 // // Define stub - arguments are captured automatically
 // [KnockOff]
 // public partial class RepositoryKnockOff : IRepository
@@ -250,13 +250,13 @@ public partial class VsOverrideServiceKnockOff : IVsOverrideService
 // Assert.Equal(1, captured?.Id);
 #endregion
 
-#region docs:knockoff-vs-moq:async-stub-usage
+#region knockoff-vs-moq-async-stub-usage
 // // Use in test
 // var knockOff = new VsRepositoryKnockOff();
 // var entity = await knockOff.AsIVsRepository().GetByIdAsync(42);
 #endregion
 
-#region docs:knockoff-vs-moq:multiple-interfaces-usage
+#region knockoff-vs-moq-multiple-interfaces-usage
 // // Use in tests - separate stubs for each interface
 // var repoKnockOff = new VsEmployeeRepoKnockOff();
 // IVsEmployeeRepository repo = repoKnockOff.AsIVsEmployeeRepository();
@@ -265,7 +265,7 @@ public partial class VsOverrideServiceKnockOff : IVsOverrideService
 // IVsUnitOfWork unitOfWork = uowKnockOff.AsIVsUnitOfWork();
 #endregion
 
-#region docs:knockoff-vs-moq:indexer-stub-usage
+#region knockoff-vs-moq-indexer-stub-usage
 // // Use in test - pre-populate backing dictionary
 // var knockOff = new VsPropertyStoreKnockOff();
 // knockOff.StringIndexerBacking["Name"] = new VsPropertyInfo { Value = "Test" };
@@ -277,7 +277,7 @@ public partial class VsOverrideServiceKnockOff : IVsOverrideService
 // Assert.Equal("Name", knockOff.StringIndexer.LastGetKey);
 #endregion
 
-#region docs:knockoff-vs-moq:event-stub-usage
+#region knockoff-vs-moq-event-stub-usage
 // // Use in test
 // var knockOff = new VsEventSourceKnockOff();
 // IVsEventSource source = knockOff;
@@ -296,7 +296,7 @@ public partial class VsOverrideServiceKnockOff : IVsOverrideService
 // Assert.Equal("test data", receivedData);
 #endregion
 
-#region docs:knockoff-vs-moq:verification-patterns-usage
+#region knockoff-vs-moq-verification-patterns-usage
 // // Verify in test
 // Assert.Equal(1, knockOff.Save.CallCount);      // Times.Once
 // Assert.Equal(0, knockOff.Delete.CallCount);    // Times.Never
@@ -304,13 +304,13 @@ public partial class VsOverrideServiceKnockOff : IVsOverrideService
 // Assert.Equal(3, knockOff.Update.CallCount);    // Times.Exactly(3)
 #endregion
 
-#region docs:knockoff-vs-moq:sequential-returns-usage
+#region knockoff-vs-moq-sequential-returns-usage
 // var knockOff = new VsSequenceKnockOff();
 // var returnValues = new Queue<int>([1, 2, 3]);
 // knockOff.GetNext.OnCall = (ko) => returnValues.Dequeue();
 #endregion
 
-#region docs:knockoff-vs-moq:per-test-override-usage
+#region knockoff-vs-moq-per-test-override-usage
 // [Fact]
 // public void Test_WithSpecialCase()
 // {
@@ -324,7 +324,7 @@ public partial class VsOverrideServiceKnockOff : IVsOverrideService
 // }
 #endregion
 
-#region docs:knockoff-vs-moq:reset-and-reuse
+#region knockoff-vs-moq-reset-and-reuse
 // var knockOff = new UserServiceKnockOff();
 // IUserService service = knockOff;
 //

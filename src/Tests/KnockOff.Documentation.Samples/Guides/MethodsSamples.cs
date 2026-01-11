@@ -47,7 +47,7 @@ public class MethodEntity
 // Void Methods (No Parameters)
 // ============================================================================
 
-#region docs:methods:void-no-params
+#region methods-void-no-params
 public interface IMethodService
 {
     void Initialize();
@@ -61,7 +61,7 @@ public partial class MethodServiceKnockOff : IMethodService { }
 // Void Methods (With Parameters)
 // ============================================================================
 
-#region docs:methods:void-with-params
+#region methods-void-with-params
 public interface IMethodLogger
 {
     void Log(string message);
@@ -76,7 +76,7 @@ public partial class MethodLoggerKnockOff : IMethodLogger { }
 // Methods with Return Values
 // ============================================================================
 
-#region docs:methods:return-value
+#region methods-return-value
 public interface IMethodRepository
 {
     MethodUser? GetById(int id);
@@ -121,7 +121,7 @@ public interface IMethodUserDefined
     int Count();
 }
 
-#region docs:methods:user-defined
+#region methods-user-defined
 [KnockOff]
 public partial class MethodUserDefinedKnockOff : IMethodUserDefined
 {
@@ -140,7 +140,7 @@ public interface IMethodPriority
     int Calculate(int x);
 }
 
-#region docs:methods:priority-order
+#region methods-priority-order
 [KnockOff]
 public partial class MethodPriorityKnockOff : IMethodPriority
 {
@@ -157,7 +157,7 @@ public interface IMethodFailure
     void Save(MethodEntity entity);
 }
 
-#region docs:methods:simulating-failures
+#region methods-simulating-failures
 [KnockOff]
 public partial class MethodFailureKnockOff : IMethodFailure { }
 #endregion
@@ -173,7 +173,7 @@ public interface IMethodCallOrder
     void Cleanup();
 }
 
-#region docs:methods:verifying-call-order
+#region methods-verifying-call-order
 [KnockOff]
 public partial class MethodCallOrderKnockOff : IMethodCallOrder { }
 #endregion
@@ -187,7 +187,7 @@ public interface IMethodSequential
     int GetNext();
 }
 
-#region docs:methods:sequential-returns
+#region methods-sequential-returns
 [KnockOff]
 public partial class MethodSequentialKnockOff : IMethodSequential { }
 #endregion
@@ -202,7 +202,7 @@ public interface IMethodHandlerState
     void Process();
 }
 
-#region docs:methods:accessing-handler-state
+#region methods-accessing-handler-state
 [KnockOff]
 public partial class MethodHandlerStateKnockOff : IMethodHandlerState { }
 #endregion
@@ -222,7 +222,7 @@ public static class MethodsUsageExamples
         var knockOff = new MethodSingleParamKnockOff();
         IMethodSingleParam service = knockOff;
 
-        #region docs:methods:single-param
+        #region methods-single-param
         service.GetUser(42);
 
         // Tracking - single parameter uses raw type (not a tuple)
@@ -237,7 +237,7 @@ public static class MethodsUsageExamples
         var knockOff = new MethodMultiParamKnockOff();
         IMethodMultiParam service = knockOff;
 
-        #region docs:methods:multiple-params
+        #region methods-multiple-params
         service.Process("test", 42, true);
 
         // Tracking - named tuple with original parameter names
@@ -255,7 +255,7 @@ public static class MethodsUsageExamples
         var serviceKnockOff = new MethodServiceKnockOff();
         var loggerKnockOff = new MethodLoggerKnockOff();
 
-        #region docs:methods:void-callbacks
+        #region methods-void-callbacks
         // No parameters
         serviceKnockOff.Initialize.OnCall = (ko) =>
         {
@@ -280,7 +280,7 @@ public static class MethodsUsageExamples
     {
         var knockOff = new MethodRepositoryKnockOff();
 
-        #region docs:methods:return-callbacks
+        #region methods-return-callbacks
         // No parameters
         knockOff.Count.OnCall = (ko) => 42;
 
@@ -294,7 +294,7 @@ public static class MethodsUsageExamples
         var knockOff = new MethodPriorityKnockOff();
         IMethodPriority service = knockOff;
 
-        #region docs:methods:priority-order-usage
+        #region methods-priority-order-usage
         // No callback → uses user method
         var result1 = service.Calculate(5);  // 10 (5 * 2)
 
@@ -314,7 +314,7 @@ public static class MethodsUsageExamples
     {
         var knockOff = new MethodFailureKnockOff();
 
-        #region docs:methods:simulating-failures-usage
+        #region methods-simulating-failures-usage
         knockOff.Save.OnCall = (ko, entity) =>
         {
             throw new InvalidOperationException("Connection failed");
@@ -326,7 +326,7 @@ public static class MethodsUsageExamples
     {
         var knockOff = new MethodRepositoryKnockOff();
 
-        #region docs:methods:conditional-returns
+        #region methods-conditional-returns
         knockOff.GetById.OnCall = (ko, id) => id switch
         {
             1 => new MethodUser { Id = 1, Name = "Admin" },
@@ -340,7 +340,7 @@ public static class MethodsUsageExamples
     {
         var knockOff = new MethodRepositoryKnockOff();
 
-        #region docs:methods:capturing-arguments
+        #region methods-capturing-arguments
         var capturedIds = new List<int>();
         knockOff.GetById.OnCall = (ko, id) =>
         {
@@ -355,7 +355,7 @@ public static class MethodsUsageExamples
         var knockOff = new MethodCallOrderKnockOff();
         IMethodCallOrder service = knockOff;
 
-        #region docs:methods:verifying-call-order-usage
+        #region methods-verifying-call-order-usage
         var callOrder = new List<string>();
 
         knockOff.Initialize.OnCall = (ko) => callOrder.Add("Initialize");
@@ -377,7 +377,7 @@ public static class MethodsUsageExamples
         var knockOff = new MethodSequentialKnockOff();
         IMethodSequential service = knockOff;
 
-        #region docs:methods:sequential-returns-usage
+        #region methods-sequential-returns-usage
         var results = new Queue<int>([1, 2, 3]);
         knockOff.GetNext.OnCall = (ko) => results.Dequeue();
 
@@ -393,7 +393,7 @@ public static class MethodsUsageExamples
     {
         var knockOff = new MethodHandlerStateKnockOff();
 
-        #region docs:methods:accessing-handler-state-usage
+        #region methods-accessing-handler-state-usage
         knockOff.Process.OnCall = (ko) =>
         {
             if (!ko.Initialize.WasCalled)

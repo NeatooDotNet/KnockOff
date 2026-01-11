@@ -30,7 +30,7 @@ public class IhUser
 // Basic Usage
 // ============================================================================
 
-#region docs:interface-inheritance:basic-usage
+#region interface-inheritance-basic-usage
 public interface IIhBaseEntity
 {
     int Id { get; }
@@ -51,7 +51,7 @@ public partial class IhAuditableEntityKnockOff : IIhAuditableEntity { }
 // Deep Inheritance
 // ============================================================================
 
-#region docs:interface-inheritance:deep-inheritance
+#region interface-inheritance-deep-inheritance
 public interface IIhEntity
 {
     int Id { get; }
@@ -76,7 +76,7 @@ public partial class IhFullEntityKnockOff : IIhFullAuditableEntity { }
 // Entity Base Pattern
 // ============================================================================
 
-#region docs:interface-inheritance:entity-base
+#region interface-inheritance-entity-base
 public interface IIhEntityBase
 {
     int Id { get; }
@@ -96,7 +96,7 @@ public partial class IhEmployeeKnockOff : IIhEmployee { }
 // Validation Pattern
 // ============================================================================
 
-#region docs:interface-inheritance:validation-pattern
+#region interface-inheritance-validation-pattern
 public interface IIhValidatable
 {
     bool IsValid { get; }
@@ -117,7 +117,7 @@ public partial class IhOrderKnockOff : IIhOrder { }
 // Repository Hierarchy
 // ============================================================================
 
-#region docs:interface-inheritance:repository-hierarchy
+#region interface-inheritance-repository-hierarchy
 public interface IIhReadRepository<T>
 {
     T? GetById(int id);
@@ -149,7 +149,7 @@ public static class InterfaceInheritanceUsageExamples
         var knockOff = new IhAuditableEntityKnockOff();
         IIhAuditableEntity entity = knockOff;
 
-        #region docs:interface-inheritance:tracking
+        #region interface-inheritance-tracking
         // Access base interface properties
         var id = entity.Id;
         var created = entity.CreatedAt;
@@ -172,7 +172,7 @@ public static class InterfaceInheritanceUsageExamples
     {
         var knockOff = new IhAuditableEntityKnockOff();
 
-        #region docs:interface-inheritance:interface-access
+        #region interface-inheritance-interface-access
         // Access as derived interface via implicit conversion
         IIhAuditableEntity auditable = knockOff;
 
@@ -190,7 +190,7 @@ public static class InterfaceInheritanceUsageExamples
     {
         var knockOff = new IhAuditableEntityKnockOff();
 
-        #region docs:interface-inheritance:callbacks
+        #region interface-inheritance-callbacks
         // Base interface member
         knockOff.Id.OnGet = (ko) => 42;
 
@@ -207,7 +207,7 @@ public static class InterfaceInheritanceUsageExamples
     {
         var knockOff = new IhOrderKnockOff();
 
-        #region docs:interface-inheritance:validation-usage
+        #region interface-inheritance-validation-usage
         // Configure validation (flat API)
         knockOff.IsValid.OnGet = (ko) => ko.Total.GetCount > 0;
         knockOff.GetErrors.OnCall = (ko) =>
@@ -220,7 +220,7 @@ public static class InterfaceInheritanceUsageExamples
         var knockOff = new IhUserWriteRepositoryKnockOff();
         var users = new List<IhUser>();
 
-        #region docs:interface-inheritance:repository-usage
+        #region interface-inheritance-repository-usage
         // All members accessed via flat API regardless of declaring interface
         knockOff.GetById.OnCall = (ko, id) => users.FirstOrDefault(u => u.Id == id);
         knockOff.GetAll.OnCall = (ko) => users;

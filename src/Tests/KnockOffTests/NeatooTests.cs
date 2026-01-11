@@ -892,7 +892,6 @@ public partial class NestedClassTests
 
 /// <summary>
 /// Inline stubs in nested class.
-/// NOTE: Using IValidateBase instead of IEntityBase due to duplicate indexer issue.
 /// </summary>
 public partial class NestedInlineTests
 {
@@ -908,6 +907,25 @@ public partial class NestedInlineTests
             stub.IsValid.Value = true;
 
             Assert.True(validate.IsValid);
+        }
+    }
+
+    /// <summary>
+    /// Test for IEntityBase inline stub - verifies duplicate indexer fix.
+    /// IEntityBase inherits from IValidateBase and both have this[string] with different return types.
+    /// </summary>
+    [KnockOff<IEntityBase>]
+    public partial class InlineEntityContainer
+    {
+        [Fact]
+        public void InlineEntityBase_Works()
+        {
+            var stub = new Stubs.IEntityBase();
+            IEntityBase entity = stub;
+
+            stub.IsValid.Value = true;
+
+            Assert.True(entity.IsValid);
         }
     }
 }

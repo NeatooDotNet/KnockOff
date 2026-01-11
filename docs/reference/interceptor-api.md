@@ -53,6 +53,7 @@ For interface methods: `void M()`, `T M()`, `void M(args)`, `T M(args)`
 
 ### Examples
 
+<!-- pseudo:method-interceptor-examples -->
 ```csharp
 // Void method, no params
 Assert.True(knockOff.Initialize.WasCalled);
@@ -72,6 +73,7 @@ knockOff.Log.OnCall = (ko, level, message) =>
     Console.WriteLine($"[{level}] {message}");
 };
 ```
+<!-- /snippet -->
 
 ## Property Interceptor
 
@@ -108,6 +110,7 @@ For interface properties: `T Prop { get; }`, `T Prop { set; }`, `T Prop { get; s
 
 ### Examples
 
+<!-- pseudo:property-interceptor-examples -->
 ```csharp
 // Track property access
 Assert.Equal(3, knockOff.Name.GetCount);
@@ -128,6 +131,7 @@ knockOff.Name.OnSet = (ko, value) =>
 knockOff.Name.Reset();
 Assert.Equal(0, knockOff.Name.GetCount);
 ```
+<!-- /snippet -->
 
 ## Indexer Interceptor
 
@@ -184,6 +188,7 @@ When **`OnGet` is set**:
 
 ### Examples
 
+<!-- pseudo:indexer-interceptor-examples -->
 ```csharp
 // Pre-populate backing
 knockOff.StringIndexerBacking["Key1"] = value1;
@@ -213,6 +218,7 @@ knockOff.StringIndexer.OnSet = (ko, key, value) =>
     // Value does NOT go to backing dictionary
 };
 ```
+<!-- /snippet -->
 
 ## Event Interceptor
 
@@ -252,6 +258,7 @@ For interface events: `event EventHandler E`, `event EventHandler<T> E`, `event 
 
 ### Examples
 
+<!-- pseudo:event-interceptor-examples -->
 ```csharp
 // Subscribe tracking
 source.DataReceived += handler;
@@ -278,6 +285,7 @@ knockOff.DataReceived.Reset();
 Assert.Equal(0, knockOff.DataReceived.AddCount);
 Assert.Equal(0, knockOff.DataReceived.RemoveCount);
 ```
+<!-- /snippet -->
 
 ## Reset Behavior Summary
 
@@ -301,6 +309,7 @@ Async methods use the same interceptor structure as sync methods. The `OnCall` c
 | `ValueTask` | `ValueTask` |
 | `ValueTask<T>` | `ValueTask<T>` |
 
+<!-- pseudo:async-method-examples -->
 ```csharp
 knockOff.GetByIdAsync.OnCall = (ko, id) =>
     Task.FromResult<User?>(new User { Id = id });
@@ -308,6 +317,7 @@ knockOff.GetByIdAsync.OnCall = (ko, id) =>
 knockOff.SaveAsync.OnCall = (ko, entity) =>
     Task.FromException<int>(new DbException("Failed"));
 ```
+<!-- /snippet -->
 
 ## Generic Method Interceptors
 
@@ -361,6 +371,7 @@ Accessed via `.Of<T>()`:
 
 ### Examples
 
+<!-- pseudo:generic-method-interceptor-examples -->
 ```csharp
 // Configure per type
 knockOff.Deserialize.Of<User>().OnCall = (ko, json) =>
@@ -387,6 +398,7 @@ knockOff.Deserialize.Of<User>().Reset();
 // Reset all types
 knockOff.Deserialize.Reset();
 ```
+<!-- /snippet -->
 
 ### Smart Defaults
 

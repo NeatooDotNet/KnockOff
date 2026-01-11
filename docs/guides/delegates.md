@@ -6,8 +6,8 @@ KnockOff can generate stubs for named delegate types using `KnockOffAttribute<TD
 
 Define delegates and stub them with `[KnockOff<TDelegate>]`:
 
-<!-- snippet: docs:delegates:basic-delegate -->
-```csharp
+<!-- snippet: delegates-basic-delegate -->
+```cs
 // Named delegate types can be stubbed with [KnockOff<TDelegate>]
 public delegate bool IsUniqueRule(string value);
 
@@ -15,10 +15,10 @@ public delegate DelUser UserFactory(int id);
 
 public delegate void LogAction(string message);
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
-<!-- snippet: docs:delegates:basic-usage -->
-```csharp
+<!-- snippet: delegates-basic-usage -->
+```cs
 [KnockOff<IsUniqueRule>]
 [KnockOff<UserFactory>]
 public partial class DelegateTests
@@ -42,14 +42,14 @@ public partial class DelegateTests
 // Assert.Equal(2, uniqueStub.Interceptor.CallCount);
 // Assert.Equal("duplicate", uniqueStub.Interceptor.LastCallArg);
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Void Delegates
 
 Delegates that return void track calls and arguments:
 
-<!-- snippet: docs:delegates:void-delegate -->
-```csharp
+<!-- snippet: delegates-void-delegate -->
+```cs
 [KnockOff<LogAction>]
 public partial class VoidDelegateTests
 {
@@ -67,14 +67,14 @@ public partial class VoidDelegateTests
 // Assert.Equal(2, logStub.Interceptor.CallCount);
 // Assert.Equal(["Hello", "World"], messages);
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Implicit Conversion
 
 Stub classes convert implicitly to their delegate type:
 
-<!-- snippet: docs:delegates:implicit-conversion -->
-```csharp
+<!-- snippet: delegates-implicit-conversion -->
+```cs
 // Stub classes have implicit conversion operators to the delegate type.
 // This enables seamless passing to methods that expect the delegate:
 
@@ -92,12 +92,12 @@ Stub classes convert implicitly to their delegate type:
 // var validator = new Validator(stub);
 // Assert.True(validator.Validate("test"));
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Interceptor API
 
-<!-- snippet: docs:delegates:interceptor-api -->
-```csharp
+<!-- snippet: delegates-interceptor-api -->
+```cs
 // Delegate stub interceptor properties:
 // stub.Interceptor.CallCount      // int - number of invocations
 // stub.Interceptor.WasCalled      // bool - invoked at least once
@@ -106,7 +106,7 @@ Stub classes convert implicitly to their delegate type:
 // stub.Interceptor.OnCall         // Func/Action - callback for custom behavior
 // stub.Interceptor.Reset()        // Clear all tracking and callback
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 | Delegate Type | Interceptor Properties |
 |--------------|-------------------|
@@ -121,8 +121,8 @@ Stub classes convert implicitly to their delegate type:
 
 Generic delegates must be closed with concrete type arguments:
 
-<!-- snippet: docs:delegates:closed-generics -->
-```csharp
+<!-- snippet: delegates-closed-generics -->
+```cs
 [KnockOff<Factory<DelUser>>]
 [KnockOff<Converter<int, string>>]
 public partial class GenericDelegateTests
@@ -146,14 +146,14 @@ public partial class GenericDelegateTests
 // Converter<int, string> converter = converterStub;
 // Assert.Equal("Number: 42", converter(42));
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Common Patterns
 
 ### Validation Rules
 
-<!-- snippet: docs:delegates:validation-pattern -->
-```csharp
+<!-- snippet: delegates-validation-pattern -->
+```cs
 [KnockOff<IsUniqueRule>]
 public partial class ValidationPatternTests
 {
@@ -175,49 +175,49 @@ public partial class ValidationPatternTests
 // entity.Name = "duplicate";  // Triggers validation error
 // Assert.True(entity.HasErrors);
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Factory Callbacks
 
-<!-- snippet: docs:delegates:factory-callback -->
-```csharp
+<!-- snippet: delegates-factory-callback -->
+```cs
 var factoryStub = new DelegateTests.Stubs.UserFactory();
-        factoryStub.Interceptor.OnCall = (ko, id) => new DelUser
-        {
-            Id = id,
-            Name = $"User{id}"
-        };
+factoryStub.Interceptor.OnCall = (ko, id) => new DelUser
+{
+    Id = id,
+    Name = $"User{id}"
+};
 
-        // Implicit conversion to delegate
-        UserFactory factory = factoryStub;
-        var user = factory(42);
+// Implicit conversion to delegate
+UserFactory factory = factoryStub;
+var user = factory(42);
 
-        var userId = user.Id;                            // 42
-        var userName = user.Name;                        // "User42"
-        var wasCalled = factoryStub.Interceptor.WasCalled;  // true
+var userId = user.Id;                            // 42
+var userName = user.Name;                        // "User42"
+var wasCalled = factoryStub.Interceptor.WasCalled;  // true
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Capturing Multiple Calls
 
-<!-- snippet: docs:delegates:capturing-calls -->
-```csharp
+<!-- snippet: delegates-capturing-calls -->
+```cs
 var logStub = new VoidDelegateTests.Stubs.LogAction();
-        var capturedMessages = new List<string>();
+var capturedMessages = new List<string>();
 
-        logStub.Interceptor.OnCall = (ko, msg) => capturedMessages.Add(msg);
+logStub.Interceptor.OnCall = (ko, msg) => capturedMessages.Add(msg);
 
-        // Invoke the delegate multiple times
-        LogAction logger = logStub;
-        logger("Starting");
-        logger("Processing");
-        logger("Complete");
+// Invoke the delegate multiple times
+LogAction logger = logStub;
+logger("Starting");
+logger("Processing");
+logger("Complete");
 
-        var messageCount = capturedMessages.Count;           // 3
-        var callCount = logStub.Interceptor.CallCount;       // 3
-        var lastMessage = logStub.Interceptor.LastCallArg;   // "Complete"
+var messageCount = capturedMessages.Count;           // 3
+var callCount = logStub.Interceptor.CallCount;       // 3
+var lastMessage = logStub.Interceptor.LastCallArg;   // "Complete"
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Limitations
 
@@ -225,6 +225,7 @@ var logStub = new VoidDelegateTests.Stubs.LogAction();
 
 Open generic delegates cannot be stubbed:
 
+<!-- invalid:open-generic-delegate -->
 ```csharp
 // NOT supported - open generic
 [KnockOff<Func<T>>]  // Error: T is not resolved
@@ -232,11 +233,13 @@ Open generic delegates cannot be stubbed:
 // Supported - closed generic
 [KnockOff<Func<int>>]  // OK: concrete type
 ```
+<!-- /snippet -->
 
 ### Ref/Out Parameters
 
 Delegates with `ref` or `out` parameters cannot be stubbed because the generated callback signature uses `Func<>` or `Action<>` which don't support by-reference parameters:
 
+<!-- invalid:delegate-ref-out -->
 ```csharp
 // NOT supported
 public delegate bool TryParse(string input, out int result);
@@ -247,11 +250,13 @@ public interface ITryParser
     bool TryParse(string input, out int result);
 }
 ```
+<!-- /snippet -->
 
 ### Anonymous Delegates
 
 Only named delegate types can be stubbed. For `Func<>` or `Action<>`, define a named delegate:
 
+<!-- pseudo:named-delegate-workaround -->
 ```csharp
 // Instead of: Func<int, string>
 public delegate string IntToStringConverter(int value);
@@ -259,3 +264,4 @@ public delegate string IntToStringConverter(int value);
 [KnockOff<IntToStringConverter>]
 public partial class Tests { }
 ```
+<!-- /snippet -->

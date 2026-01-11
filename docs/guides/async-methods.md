@@ -13,8 +13,8 @@ KnockOff supports all async return types: `Task`, `Task<T>`, `ValueTask`, and `V
 
 ## Basic Usage
 
-<!-- snippet: docs:async-methods:basic-interface -->
-```csharp
+<!-- snippet: async-methods-basic-interface -->
+```cs
 public interface IAsyncRepository
 {
     Task InitializeAsync();
@@ -25,26 +25,26 @@ public interface IAsyncRepository
 [KnockOff]
 public partial class AsyncRepositoryKnockOff : IAsyncRepository { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Default Behavior
 
 Without callbacks or user methods, async methods return completed tasks:
 
-<!-- snippet: docs:async-methods:default-behavior -->
-```csharp
+<!-- snippet: async-methods-default-behavior -->
+```cs
 await repo.InitializeAsync();       // Completes immediately
-        var user = await repo.GetByIdAsync(1);  // Returns null (default)
-        var count = await repo.CountAsync();    // Returns 0 (default)
+var user = await repo.GetByIdAsync(1);  // Returns null (default)
+var count = await repo.CountAsync();    // Returns 0 (default)
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## User-Defined Methods
 
 Define protected async methods for default behavior:
 
-<!-- snippet: docs:async-methods:user-defined -->
-```csharp
+<!-- snippet: async-methods-user-defined -->
+```cs
 [KnockOff]
 public partial class AsyncUserDefinedKnockOff : IAsyncUserDefined
 {
@@ -55,110 +55,110 @@ public partial class AsyncUserDefinedKnockOff : IAsyncUserDefined
         new ValueTask<int>(42);
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Callbacks
 
 ### Task Methods
 
-<!-- snippet: docs:async-methods:task-callbacks -->
-```csharp
+<!-- snippet: async-methods-task-callbacks -->
+```cs
 // Task (void equivalent)
-        knockOff.InitializeAsync.OnCall = (ko) =>
-        {
-            // Custom logic
-            return Task.CompletedTask;
-        };
+knockOff.InitializeAsync.OnCall = (ko) =>
+{
+    // Custom logic
+    return Task.CompletedTask;
+};
 
-        // Task<T>
-        knockOff.GetByIdAsync.OnCall = (ko, id) =>
-            Task.FromResult<AsyncUser?>(new AsyncUser { Id = id, Name = "Mocked" });
+// Task<T>
+knockOff.GetByIdAsync.OnCall = (ko, id) =>
+    Task.FromResult<AsyncUser?>(new AsyncUser { Id = id, Name = "Mocked" });
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### ValueTask Methods
 
-<!-- snippet: docs:async-methods:valuetask-callbacks -->
-```csharp
+<!-- snippet: async-methods-valuetask-callbacks -->
+```cs
 // ValueTask<T>
-        knockOff.CountAsync.OnCall = (ko) => new ValueTask<int>(100);
+knockOff.CountAsync.OnCall = (ko) => new ValueTask<int>(100);
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Tracking
 
 Async methods use the same tracking as sync methods:
 
-<!-- snippet: docs:async-methods:tracking -->
-```csharp
+<!-- snippet: async-methods-tracking -->
+```cs
 await repo.GetByIdAsync(1);
-        await repo.GetByIdAsync(2);
-        await repo.GetByIdAsync(3);
+await repo.GetByIdAsync(2);
+await repo.GetByIdAsync(3);
 
-        var callCount = knockOff.GetByIdAsync.CallCount;  // 3
-        var lastArg = knockOff.GetByIdAsync.LastCallArg;  // 3
+var callCount = knockOff.GetByIdAsync.CallCount;  // 3
+var lastArg = knockOff.GetByIdAsync.LastCallArg;  // 3
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Common Patterns
 
 ### Simulating Delays
 
-<!-- snippet: docs:async-methods:simulating-delays -->
-```csharp
+<!-- snippet: async-methods-simulating-delays -->
+```cs
 knockOff.GetByIdAsync.OnCall = async (ko, id) =>
-        {
-            await Task.Delay(100);  // Simulate network latency
-            return new AsyncUser { Id = id };
-        };
+{
+    await Task.Delay(100);  // Simulate network latency
+    return new AsyncUser { Id = id };
+};
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 Note: This requires the callback to be `async`.
 
 ### Simulating Failures
 
-<!-- snippet: docs:async-methods:simulating-failures -->
-```csharp
+<!-- snippet: async-methods-simulating-failures -->
+```cs
 [KnockOff]
 public partial class AsyncSaveKnockOff : IAsyncSave { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
-<!-- snippet: docs:async-methods:simulating-failures-usage -->
-```csharp
+<!-- snippet: async-methods-simulating-failures-usage -->
+```cs
 // Faulted task
-        knockOff.SaveAsync.OnCall = (ko, entity) =>
-            Task.FromException<int>(new InvalidOperationException("Connection lost"));
+knockOff.SaveAsync.OnCall = (ko, entity) =>
+    Task.FromException<int>(new InvalidOperationException("Connection lost"));
 
-        // Or throw directly in callback
-        knockOff.SaveAsync.OnCall = (ko, entity) =>
-        {
-            throw new InvalidOperationException("Connection lost");
-        };
+// Or throw directly in callback
+knockOff.SaveAsync.OnCall = (ko, entity) =>
+{
+    throw new InvalidOperationException("Connection lost");
+};
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Conditional Async Behavior
 
-<!-- snippet: docs:async-methods:conditional-behavior -->
-```csharp
+<!-- snippet: async-methods-conditional-behavior -->
+```cs
 knockOff.GetByIdAsync.OnCall = (ko, id) =>
-        {
-            if (id <= 0)
-                return Task.FromException<AsyncUser?>(new ArgumentException("Invalid ID"));
+{
+    if (id <= 0)
+        return Task.FromException<AsyncUser?>(new ArgumentException("Invalid ID"));
 
-            return Task.FromResult<AsyncUser?>(new AsyncUser { Id = id });
-        };
+    return Task.FromResult<AsyncUser?>(new AsyncUser { Id = id });
+};
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Cancellation Support
 
 For methods with `CancellationToken`:
 
-<!-- snippet: docs:async-methods:cancellation -->
-```csharp
+<!-- snippet: async-methods-cancellation -->
+```cs
 public interface IAsyncFetch
 {
     Task<AsyncData> FetchAsync(int id, CancellationToken ct);
@@ -167,64 +167,64 @@ public interface IAsyncFetch
 [KnockOff]
 public partial class AsyncFetchKnockOff : IAsyncFetch { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
-<!-- snippet: docs:async-methods:cancellation-usage -->
-```csharp
+<!-- snippet: async-methods-cancellation-usage -->
+```cs
 knockOff.FetchAsync.OnCall = (ko, id, ct) =>
-        {
-            ct.ThrowIfCancellationRequested();
-            return Task.FromResult(new AsyncData { Id = id });
-        };
+{
+    ct.ThrowIfCancellationRequested();
+    return Task.FromResult(new AsyncData { Id = id });
+};
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Sequential Async Returns
 
-<!-- snippet: docs:async-methods:sequential-returns -->
-```csharp
+<!-- snippet: async-methods-sequential-returns -->
+```cs
 var results = new Queue<AsyncUser?>([
-            new AsyncUser { Name = "First" },
-            new AsyncUser { Name = "Second" },
-            null  // Then not found
-        ]);
+    new AsyncUser { Name = "First" },
+    new AsyncUser { Name = "Second" },
+    null  // Then not found
+]);
 
-        knockOff.GetByIdAsync.OnCall = (ko, id) =>
-            Task.FromResult(results.Dequeue());
+knockOff.GetByIdAsync.OnCall = (ko, id) =>
+    Task.FromResult(results.Dequeue());
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Verifying Async Call Order
 
-<!-- snippet: docs:async-methods:call-order -->
-```csharp
+<!-- snippet: async-methods-call-order -->
+```cs
 [KnockOff]
 public partial class AsyncCallOrderKnockOff : IAsyncCallOrder { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
-<!-- snippet: docs:async-methods:call-order-usage -->
-```csharp
+<!-- snippet: async-methods-call-order-usage -->
+```cs
 var order = new List<string>();
 
-        knockOff.StartAsync.OnCall = (ko) =>
-        {
-            order.Add("Start");
-            return Task.CompletedTask;
-        };
+knockOff.StartAsync.OnCall = (ko) =>
+{
+    order.Add("Start");
+    return Task.CompletedTask;
+};
 
-        knockOff.ProcessAsync.OnCall = (ko) =>
-        {
-            order.Add("Process");
-            return Task.CompletedTask;
-        };
+knockOff.ProcessAsync.OnCall = (ko) =>
+{
+    order.Add("Process");
+    return Task.CompletedTask;
+};
 
-        await service.StartAsync();
-        await service.ProcessAsync();
+await service.StartAsync();
+await service.ProcessAsync();
 
-        // order is ["Start", "Process"]
+// order is ["Start", "Process"]
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## ValueTask vs Task
 
@@ -234,12 +234,12 @@ var order = new List<string>();
 
 Reset works the same for async methods:
 
-<!-- snippet: docs:async-methods:reset -->
-```csharp
+<!-- snippet: async-methods-reset -->
+```cs
 await repo.GetByIdAsync(1);
-        knockOff.GetByIdAsync.Reset();
+knockOff.GetByIdAsync.Reset();
 
-        var callCount = knockOff.GetByIdAsync.CallCount;  // 0
-        var onCall = knockOff.GetByIdAsync.OnCall;        // null
+var callCount = knockOff.GetByIdAsync.CallCount;  // 0
+var onCall = knockOff.GetByIdAsync.OnCall;        // null
 ```
-<!-- /snippet -->
+<!-- endSnippet -->

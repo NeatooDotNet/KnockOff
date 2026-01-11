@@ -20,7 +20,7 @@ namespace KnockOff.Documentation.Samples.Concepts;
 // User-Defined Methods - Basic Example
 // ============================================================================
 
-#region docs:customization-patterns:user-method-basic
+#region customization-patterns-user-method-basic
 public interface IPatternUserService
 {
     PatternUser GetUser(int id);
@@ -48,7 +48,7 @@ public class PatternUser
 // User-Defined Methods - Async Example
 // ============================================================================
 
-#region docs:customization-patterns:user-method-async
+#region customization-patterns-user-method-async
 public interface IPatternRepository
 {
     Task<PatternUser?> GetByIdAsync(int id);
@@ -113,7 +113,7 @@ public class PatternPropertyInfo
 // Priority Example
 // ============================================================================
 
-#region docs:customization-patterns:priority-example
+#region customization-patterns-priority-example
 public interface IPatternService
 {
     int Calculate(int input);
@@ -131,7 +131,7 @@ public partial class PatternServiceKnockOff : IPatternService
 // Combining Patterns Example
 // ============================================================================
 
-#region docs:customization-patterns:combining-patterns
+#region customization-patterns-combining-patterns
 public interface IPatternCombinedRepository
 {
     PatternUser? GetById(int id);
@@ -159,7 +159,7 @@ public static class CustomizationPatternsUsageExamples
     {
         var knockOff = new PatternCallbackServiceKnockOff();
 
-        #region docs:customization-patterns:callback-method
+        #region customization-patterns-callback-method
         // Void method
         knockOff.DoSomething.OnCall = (ko) =>
         {
@@ -181,7 +181,7 @@ public static class CustomizationPatternsUsageExamples
     {
         var knockOff = new PatternPropertyServiceKnockOff();
 
-        #region docs:customization-patterns:callback-property
+        #region customization-patterns-callback-property
         // Getter callback
         knockOff.Name.OnGet = (ko) => "Dynamic Value";
 
@@ -198,7 +198,7 @@ public static class CustomizationPatternsUsageExamples
     {
         var knockOff = new PatternIndexerServiceKnockOff();
 
-        #region docs:customization-patterns:callback-indexer
+        #region customization-patterns-callback-indexer
         // Getter with key parameter
         knockOff.StringIndexer.OnGet = (ko, key) => key switch
         {

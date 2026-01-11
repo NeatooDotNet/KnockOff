@@ -4,8 +4,8 @@ KnockOff supports interface inheritance, automatically implementing members from
 
 ## Basic Usage
 
-<!-- snippet: docs:interface-inheritance:basic-usage -->
-```csharp
+<!-- snippet: interface-inheritance-basic-usage -->
+```cs
 public interface IIhBaseEntity
 {
     int Id { get; }
@@ -21,7 +21,7 @@ public interface IIhAuditableEntity : IIhBaseEntity
 [KnockOff]
 public partial class IhAuditableEntityKnockOff : IIhAuditableEntity { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 The generator implements:
 - `Id` and `CreatedAt` from `IBaseEntity`
@@ -31,65 +31,65 @@ The generator implements:
 
 All members from all inherited interfaces are tracked. With the flat API, all members are accessed directly on the stub regardless of which interface declared them:
 
-<!-- snippet: docs:interface-inheritance:tracking -->
-```csharp
+<!-- snippet: interface-inheritance-tracking -->
+```cs
 // Access base interface properties
-        var id = entity.Id;
-        var created = entity.CreatedAt;
+var id = entity.Id;
+var created = entity.CreatedAt;
 
-        // Access derived interface properties
-        entity.ModifiedAt = DateTime.Now;
-        entity.ModifiedBy = "TestUser";
+// Access derived interface properties
+entity.ModifiedAt = DateTime.Now;
+entity.ModifiedBy = "TestUser";
 
-        // All members tracked directly on the stub (flat API)
-        var idCount = knockOff.Id.GetCount;           // 1
-        var createdCount = knockOff.CreatedAt.GetCount; // 1
-        var modAtCount = knockOff.ModifiedAt.SetCount;  // 1
-        var modByCount = knockOff.ModifiedBy.SetCount;  // 1
+// All members tracked directly on the stub (flat API)
+var idCount = knockOff.Id.GetCount;           // 1
+var createdCount = knockOff.CreatedAt.GetCount; // 1
+var modAtCount = knockOff.ModifiedAt.SetCount;  // 1
+var modByCount = knockOff.ModifiedBy.SetCount;  // 1
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## AsXYZ() Methods
 
 Helper methods are generated for both base and derived interfaces:
 
-<!-- snippet: docs:interface-inheritance:as-methods -->
-```csharp
-// Access as derived interface
-        IIhAuditableEntity auditable = knockOff.AsIhAuditableEntity();
+<!-- snippet: interface-inheritance-interface-access -->
+```cs
+// Access as derived interface via implicit conversion
+IIhAuditableEntity auditable = knockOff;
 
-        // Access as base interface
-        IIhBaseEntity baseEntity = knockOff.AsIhBaseEntity();
+// Access as base interface
+IIhBaseEntity baseEntity = knockOff;
 
-        // Same underlying instance
-        var areSame = ReferenceEquals(knockOff, auditable);  // true
+// Same underlying instance
+var areSame = ReferenceEquals(knockOff, auditable);  // true
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Callbacks
 
 Set callbacks for any member directly on the stub (flat API):
 
-<!-- snippet: docs:interface-inheritance:callbacks -->
-```csharp
+<!-- snippet: interface-inheritance-callbacks -->
+```cs
 // Base interface member
-        knockOff.Id.OnGet = (ko) => 42;
+knockOff.Id.OnGet = (ko) => 42;
 
-        // Derived interface member
-        knockOff.ModifiedBy.OnGet = (ko) => "System";
-        knockOff.ModifiedAt.OnSet = (ko, value) =>
-        {
-            Console.WriteLine($"Modified at {value}");
-        };
+// Derived interface member
+knockOff.ModifiedBy.OnGet = (ko) => "System";
+knockOff.ModifiedAt.OnSet = (ko, value) =>
+{
+    Console.WriteLine($"Modified at {value}");
+};
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Deep Inheritance
 
 KnockOff handles multiple levels of inheritance:
 
-<!-- snippet: docs:interface-inheritance:deep-inheritance -->
-```csharp
+<!-- snippet: interface-inheritance-deep-inheritance -->
+```cs
 public interface IIhEntity
 {
     int Id { get; }
@@ -109,7 +109,7 @@ public interface IIhFullAuditableEntity : IIhTimestampedEntity
 [KnockOff]
 public partial class IhFullEntityKnockOff : IIhFullAuditableEntity { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 All members from all levels are generated:
 - `Id` from `IEntity`
@@ -120,8 +120,8 @@ All members from all levels are generated:
 
 ### Entity Base Pattern
 
-<!-- snippet: docs:interface-inheritance:entity-base -->
-```csharp
+<!-- snippet: interface-inheritance-entity-base -->
+```cs
 public interface IIhEntityBase
 {
     int Id { get; }
@@ -136,12 +136,12 @@ public interface IIhEmployee : IIhEntityBase
 [KnockOff]
 public partial class IhEmployeeKnockOff : IIhEmployee { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Validation Pattern
 
-<!-- snippet: docs:interface-inheritance:validation-pattern -->
-```csharp
+<!-- snippet: interface-inheritance-validation-pattern -->
+```cs
 public interface IIhValidatable
 {
     bool IsValid { get; }
@@ -157,21 +157,21 @@ public interface IIhOrder : IIhValidatable
 [KnockOff]
 public partial class IhOrderKnockOff : IIhOrder { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
-<!-- snippet: docs:interface-inheritance:validation-usage -->
-```csharp
+<!-- snippet: interface-inheritance-validation-usage -->
+```cs
 // Configure validation (flat API)
-        knockOff.IsValid.OnGet = (ko) => ko.Total.GetCount > 0;
-        knockOff.GetErrors.OnCall = (ko) =>
-            ko.IsValid.OnGet!(ko) ? [] : ["No total calculated"];
+knockOff.IsValid.OnGet = (ko) => ko.Total.GetCount > 0;
+knockOff.GetErrors.OnCall = (ko) =>
+    ko.IsValid.OnGet!(ko) ? [] : ["No total calculated"];
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Repository Hierarchy
 
-<!-- snippet: docs:interface-inheritance:repository-hierarchy -->
-```csharp
+<!-- snippet: interface-inheritance-repository-hierarchy -->
+```cs
 public interface IIhReadRepository<T>
 {
     T? GetById(int id);
@@ -187,14 +187,14 @@ public interface IIhWriteRepository<T> : IIhReadRepository<T>
 [KnockOff]
 public partial class IhUserWriteRepositoryKnockOff : IIhWriteRepository<IhUser> { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
-<!-- snippet: docs:interface-inheritance:repository-usage -->
-```csharp
+<!-- snippet: interface-inheritance-repository-usage -->
+```cs
 // All members accessed via flat API regardless of declaring interface
-        knockOff.GetById.OnCall = (ko, id) => users.FirstOrDefault(u => u.Id == id);
-        knockOff.GetAll.OnCall = (ko) => users;
-        knockOff.Add.OnCall = (ko, user) => users.Add(user);
-        knockOff.Delete.OnCall = (ko, id) => users.RemoveAll(u => u.Id == id);
+knockOff.GetById.OnCall = (ko, id) => users.FirstOrDefault(u => u.Id == id);
+knockOff.GetAll.OnCall = (ko) => users;
+knockOff.Add.OnCall = (ko, user) => users.Add(user);
+knockOff.Delete.OnCall = (ko, id) => users.RemoveAll(u => u.Id == id);
 ```
-<!-- /snippet -->
+<!-- endSnippet -->

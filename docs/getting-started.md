@@ -20,29 +20,29 @@ Or add directly to your `.csproj`:
 
 ### Step 1: Define an Interface
 
-<!-- snippet: docs:getting-started:interface-definition -->
-```csharp
+<!-- snippet: getting-started-interface-definition -->
+```cs
 public interface IEmailService
 {
     void SendEmail(string to, string subject, string body);
     bool IsConnected { get; }
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Step 2: Create a KnockOff Stub
 
 Create a partial class marked with `[KnockOff]` that implements your interface:
 
-<!-- snippet: docs:getting-started:stub-class -->
-```csharp
+<!-- snippet: getting-started-stub-class -->
+```cs
 [KnockOff]
 public partial class EmailServiceKnockOff : IEmailService
 {
     // That's it! The generator creates the implementation.
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 The source generator automatically creates:
 - Explicit interface implementations
@@ -52,8 +52,8 @@ The source generator automatically creates:
 
 ### Step 3: Use in Tests
 
-<!-- snippet: docs:getting-started:step3-test -->
-```csharp
+<!-- snippet: getting-started-step3-test -->
+```cs
 // [Fact]
 // public void NotificationService_SendsEmail_WhenUserRegisters()
 // {
@@ -71,7 +71,7 @@ The source generator automatically creates:
 //     Assert.Equal("user@example.com", emailKnockOff.SendEmail.LastCallArgs?.to);
 // }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Verification Basics
 
@@ -79,8 +79,8 @@ Every interface member gets an interceptor with tracking properties. Access inte
 
 ### For Methods
 
-<!-- snippet: docs:getting-started:method-verification -->
-```csharp
+<!-- snippet: getting-started-method-verification -->
+```cs
 // Check if called
 // Assert.True(knockOff.SendEmail.WasCalled);
 //
@@ -95,12 +95,12 @@ Every interface member gets an interceptor with tracking properties. Access inte
 // Assert.Equal("user@example.com", args?.to);
 // Assert.Equal("Welcome", args?.subject);
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### For Properties
 
-<!-- snippet: docs:getting-started:property-verification -->
-```csharp
+<!-- snippet: getting-started-property-verification -->
+```cs
 // Check getter calls
 // Assert.Equal(2, knockOff.IsConnected.GetCount);
 //
@@ -108,7 +108,7 @@ Every interface member gets an interceptor with tracking properties. Access inte
 // Assert.Equal(1, knockOff.Name.SetCount);
 // Assert.Equal("NewValue", knockOff.Name.LastSetValue);
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Adding Custom Behavior
 
@@ -116,8 +116,8 @@ Every interface member gets an interceptor with tracking properties. Access inte
 
 Define protected methods in your stub class for consistent behavior:
 
-<!-- snippet: docs:getting-started:user-method -->
-```csharp
+<!-- snippet: getting-started-user-method -->
+```cs
 [KnockOff]
 public partial class EmailServiceWithValidation : IEmailServiceWithValidation
 {
@@ -126,14 +126,14 @@ public partial class EmailServiceWithValidation : IEmailServiceWithValidation
         email.Contains("@") && email.Contains(".");
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Option 2: Callbacks (Runtime)
 
 Set callbacks for per-test behavior:
 
-<!-- snippet: docs:getting-started:callbacks -->
-```csharp
+<!-- snippet: getting-started-callbacks -->
+```cs
 // [Fact]
 // public void RejectsEmail_WhenNotConnected()
 // {
@@ -151,7 +151,7 @@ Set callbacks for per-test behavior:
 //     // ... test code
 // }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 See [Customization Patterns](concepts/customization-patterns.md) for detailed guidance.
 
@@ -159,8 +159,8 @@ See [Customization Patterns](concepts/customization-patterns.md) for detailed gu
 
 Clear tracking and callbacks between tests or test phases:
 
-<!-- snippet: docs:getting-started:reset -->
-```csharp
+<!-- snippet: getting-started-reset -->
+```cs
 // Reset specific handler
 // knockOff.SendEmail.Reset();
 //
@@ -168,7 +168,7 @@ Clear tracking and callbacks between tests or test phases:
 // Assert.Equal(0, knockOff.SendEmail.CallCount);
 // Callbacks are also cleared
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Viewing Generated Code
 
@@ -188,16 +188,16 @@ Generated files appear in `Generated/KnockOff.Generator/KnockOff.KnockOffGenerat
 ### Returning Values from Methods
 
 Via callback:
-<!-- snippet: docs:getting-started:via-callback -->
-```csharp
+<!-- snippet: getting-started-via-callback -->
+```cs
 // knockOff.GetUser.OnCall = (ko, id) => new User { Id = id, Name = "Test" };
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 Via user method (in stub class):
 
-<!-- snippet: docs:getting-started:returning-values -->
-```csharp
+<!-- snippet: getting-started-returning-values -->
+```cs
 [KnockOff]
 public partial class UserServiceKnockOff : IUserServiceSimple
 {
@@ -205,21 +205,21 @@ public partial class UserServiceKnockOff : IUserServiceSimple
     protected User GetUser(int id) => new User { Id = id, Name = "Default" };
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Simulating Failures
 
-<!-- snippet: docs:getting-started:simulating-failures -->
-```csharp
+<!-- snippet: getting-started-simulating-failures -->
+```cs
 // knockOff.SaveAsync.OnCall = (ko, entity) =>
 //     Task.FromException<int>(new DbException("Connection lost"));
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Capturing Arguments for Later Assertions
 
-<!-- snippet: docs:getting-started:capturing-arguments -->
-```csharp
+<!-- snippet: getting-started-capturing-arguments -->
+```cs
 // List<string> sentEmails = new();
 //
 // knockOff.SendEmail.OnCall = (ko, to, subject, body) =>
@@ -232,14 +232,14 @@ public partial class UserServiceKnockOff : IUserServiceSimple
 // Assert.Equal(3, sentEmails.Count);
 // Assert.Contains("admin@example.com", sentEmails);
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Method Overloads
 
 When an interface has method overloads, each overload gets its own interceptor with a numeric suffix:
 
-<!-- snippet: docs:getting-started:method-overloads -->
-```csharp
+<!-- snippet: getting-started-method-overloads -->
+```cs
 public interface IProcessService
 {
     void Process(string data);                           // Overload 1
@@ -270,21 +270,21 @@ public partial class ProcessServiceKnockOff : IProcessService { }
 // Assert.Equal(5, args.Value.priority);  // int, not int?
 // Assert.True(args.Value.async);
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 Methods without overloads don't get a suffix:
-<!-- snippet: docs:getting-started:single-method-suffix -->
-```csharp
+<!-- snippet: getting-started-single-method-suffix -->
+```cs
 // knockOff.SendEmail.CallCount;  // Single method - no suffix
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Single Interface Constraint
 
 Standalone KnockOff stubs implement **one interface** (plus its inheritance chain). If you need multiple unrelated interfaces, create separate stubs:
 
-<!-- snippet: docs:getting-started:single-interface -->
-```csharp
+<!-- snippet: getting-started-single-interface -->
+```cs
 // Single interface - this is the standard pattern
 [KnockOff]
 public partial class SingleRepositoryKnockOff : IRepository { }
@@ -301,12 +301,12 @@ public partial class EntityKnockOff : IEntity { }
 // [KnockOff]
 // public partial class DataContextKnockOff : IRepository, IUnitOfWork { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 For multiple unrelated interfaces, use [inline stubs](guides/inline-stubs.md) instead:
 
-<!-- snippet: docs:getting-started:inline-stubs-example -->
-```csharp
+<!-- snippet: getting-started-inline-stubs-example -->
+```cs
 [KnockOff<IRepository>]
 [KnockOff<IUnitOfWork>]
 public partial class InlineStubsExampleTests
@@ -320,14 +320,14 @@ public partial class InlineStubsExampleTests
     // }
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Nested Classes
 
 KnockOff stubs can be nested inside test classes, which is a common pattern for organizing test fixtures:
 
-<!-- snippet: docs:getting-started:nested-classes -->
-```csharp
+<!-- snippet: getting-started-nested-classes -->
+```cs
 public partial class UserServiceTests  // Must be partial!
 {
     [KnockOff]
@@ -343,12 +343,12 @@ public partial class UserServiceTests  // Must be partial!
     // }
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 **Important:** When nesting a `[KnockOff]` class inside another class, all containing classes must also be marked `partial`. This is a C# requirement—the generator produces a partial class that must merge with your nested class declaration.
 
-<!-- snippet: docs:getting-started:nested-partial-error -->
-```csharp
+<!-- snippet: getting-started-nested-partial-error -->
+```cs
 // Won't compile - containing class not partial
 // public class MyBadTests
 // {
@@ -356,10 +356,10 @@ public partial class UserServiceTests  // Must be partial!
 //     public partial class ServiceKnockOff : IService { }
 // }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
-<!-- snippet: docs:getting-started:nested-partial-correct -->
-```csharp
+<!-- snippet: getting-started-nested-partial-correct -->
+```cs
 // Correct - containing class is partial
 // public partial class MyGoodTests
 // {
@@ -367,7 +367,7 @@ public partial class UserServiceTests  // Must be partial!
 //     public partial class ServiceKnockOff : IService { }
 // }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 This works for any nesting depth—just ensure every class in the hierarchy is `partial`.
 

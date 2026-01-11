@@ -23,7 +23,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 // Basic Usage
 // ============================================================================
 
-#region docs:events:basic-interface
+#region events-basic-interface
 public interface IGuideEventSource
 {
     event EventHandler<string>? MessageReceived;
@@ -50,7 +50,7 @@ public interface IGuideDataService
     event EventHandler<DataChangedEventArgs>? DataChanged;
 }
 
-#region docs:events:testing-viewmodel
+#region events-testing-viewmodel
 [KnockOff]
 public partial class GuideDataServiceKnockOff : IGuideDataService { }
 #endregion
@@ -64,7 +64,7 @@ public interface IGuideDownloader
     event Action<int>? ProgressChanged;
 }
 
-#region docs:events:progress-reporting
+#region events-progress-reporting
 [KnockOff]
 public partial class GuideDownloaderKnockOff : IGuideDownloader { }
 #endregion
@@ -84,7 +84,7 @@ public static class EventsUsageExamples
         var knockOff = new GuideEventSourceKnockOff();
         IGuideEventSource source = knockOff;
 
-        #region docs:events:subscription-tracking
+        #region events-subscription-tracking
         // Initially no subscribers
         var hasSubscribers = knockOff.MessageReceived.HasSubscribers;  // false
         var addCount = knockOff.MessageReceived.AddCount;              // 0
@@ -110,7 +110,7 @@ public static class EventsUsageExamples
         var knockOff = new GuideEventSourceKnockOff();
         IGuideEventSource source = knockOff;
 
-        #region docs:events:eventhandler-raise
+        #region events-eventhandler-raise
         string? received = null;
         source.MessageReceived += (sender, e) => received = e;
 
@@ -128,7 +128,7 @@ public static class EventsUsageExamples
         var knockOff = new GuideEventSourceKnockOff();
         IGuideEventSource source = knockOff;
 
-        #region docs:events:eventhandler-noargs
+        #region events-eventhandler-noargs
         var invoked = false;
         source.OnCompleted += (sender, e) => invoked = true;
 
@@ -146,7 +146,7 @@ public static class EventsUsageExamples
         var knockOff = new GuideEventSourceKnockOff();
         IGuideEventSource source = knockOff;
 
-        #region docs:events:action-raise
+        #region events-action-raise
         int? progress = null;
         source.OnProgress += (value) => progress = value;
 
@@ -163,7 +163,7 @@ public static class EventsUsageExamples
         var knockOff = new GuideEventSourceKnockOff();
         IGuideEventSource source = knockOff;
 
-        #region docs:events:action-multi
+        #region events-action-multi
         string? name = null;
         int? value = null;
         source.OnData += (n, v) => { name = n; value = v; };
@@ -185,7 +185,7 @@ public static class EventsUsageExamples
         source.MessageReceived += (s, e) => { };
         source.MessageReceived -= (s, e) => { };
 
-        #region docs:events:tracking-properties
+        #region events-tracking-properties
         // Subscription tracking
         var addCount = knockOff.MessageReceived.AddCount;        // Times += was called
         var removeCount = knockOff.MessageReceived.RemoveCount;  // Times -= was called
@@ -200,7 +200,7 @@ public static class EventsUsageExamples
         var knockOff = new GuideEventSourceKnockOff();
         IGuideEventSource source = knockOff;
 
-        #region docs:events:reset
+        #region events-reset
         var invoked = false;
         source.MessageReceived += (s, e) => invoked = true;
 
@@ -226,7 +226,7 @@ public static class EventsUsageExamples
 
     public static void NoSubscribersSafe()
     {
-        #region docs:events:no-subscribers
+        #region events-no-subscribers
         var knockOff = new GuideEventSourceKnockOff();
 
         // No exception - safe to raise with no handlers
@@ -239,7 +239,7 @@ public static class EventsUsageExamples
         var knockOff = new GuideEventSourceKnockOff();
         IGuideEventSource source = knockOff;
 
-        #region docs:events:multiple-subscribers
+        #region events-multiple-subscribers
         var received = new List<string>();
         source.MessageReceived += (s, e) => received.Add($"Handler1: {e}");
         source.MessageReceived += (s, e) => received.Add($"Handler2: {e}");
@@ -259,7 +259,7 @@ public static class EventsUsageExamples
     {
         var knockOff = new GuideDownloaderKnockOff();
 
-        #region docs:events:progress-example
+        #region events-progress-example
         var progressValues = new List<int>();
         ((IGuideDownloader)knockOff).ProgressChanged += (p) => progressValues.Add(p);
 
