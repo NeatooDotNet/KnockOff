@@ -202,6 +202,8 @@ Use setup methods to reset stubs between tests:
 | Class type | Must be separate class | Can be test class |
 | Use case | Production DI, shared stubs | Test-local stubs |
 | Generated code location | On the class itself | Nested `Stubs` class |
+| Class stubbing | Not supported | Supported (see below) |
+| Delegate stubbing | Not supported | Supported (see [Delegates](delegates.md)) |
 
 ### When to Use Each
 
