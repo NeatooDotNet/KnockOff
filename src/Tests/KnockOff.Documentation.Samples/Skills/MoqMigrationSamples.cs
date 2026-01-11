@@ -53,7 +53,7 @@ public interface IMmUserService
     void Update(MmUser user);
 }
 
-#region skill:moq-migration:step1-create
+#region skill-moq-migration-step1-create
 [KnockOff]
 public partial class MmUserServiceKnockOff : IMmUserService { }
 #endregion
@@ -73,7 +73,7 @@ public interface IMmConfigService
     MmConfig GetConfig();
 }
 
-#region skill:moq-migration:static-returns
+#region skill-moq-migration-static-returns
 [KnockOff]
 public partial class MmConfigServiceKnockOff : IMmConfigService
 {
@@ -92,7 +92,7 @@ public interface IMmConnectionService
     void Connect();
 }
 
-#region skill:moq-migration:throwing-exceptions
+#region skill-moq-migration-throwing-exceptions
 [KnockOff]
 public partial class MmConnectionKnockOff : IMmConnectionService { }
 #endregion
@@ -106,7 +106,7 @@ public interface IMmSequenceService
     int GetNext();
 }
 
-#region skill:moq-migration:sequential-returns
+#region skill-moq-migration-sequential-returns
 [KnockOff]
 public partial class MmSequenceKnockOff : IMmSequenceService { }
 #endregion
@@ -120,7 +120,7 @@ public interface IMmPropService
     string Name { get; set; }
 }
 
-#region skill:moq-migration:property-setup
+#region skill-moq-migration-property-setup
 [KnockOff]
 public partial class MmPropServiceKnockOff : IMmPropService { }
 #endregion
@@ -141,7 +141,7 @@ public interface IMmUnitOfWork
 
 // Note: Multi-interface standalone stubs are no longer supported (KO0010).
 // Use inline stubs [KnockOff<T>] or separate single-interface stubs.
-#region skill:moq-migration:multiple-interfaces
+#region skill-moq-migration-multiple-interfaces
 [KnockOff]
 public partial class MmRepositoryKnockOff : IMmRepository { }
 
@@ -158,7 +158,7 @@ public interface IMmLogger
     void Log(string message);
 }
 
-#region skill:moq-migration:argument-matching
+#region skill-moq-migration-argument-matching
 [KnockOff]
 public partial class MmLoggerKnockOff : IMmLogger { }
 #endregion
@@ -175,7 +175,7 @@ public interface IMmProcessorService
     int Calculate(int a, int b);
 }
 
-#region skill:moq-migration:method-overloads
+#region skill-moq-migration-method-overloads
 [KnockOff]
 public partial class MmProcessorKnockOff : IMmProcessorService { }
 #endregion
@@ -189,7 +189,7 @@ public interface IMmParser
     bool TryParse(string input, out int result);
 }
 
-#region skill:moq-migration:out-params
+#region skill-moq-migration-out-params
 [KnockOff]
 public partial class MmParserKnockOff : IMmParser { }
 #endregion
@@ -203,7 +203,7 @@ public interface IMmRefProcessor
     void Increment(ref int value);
 }
 
-#region skill:moq-migration:ref-params
+#region skill-moq-migration-ref-params
 [KnockOff]
 public partial class MmRefProcessorKnockOff : IMmRefProcessor { }
 #endregion
@@ -233,7 +233,7 @@ public class MmEmailService
     public virtual void Send(string to, string body) { }
 }
 
-#region skill:moq-migration:class-stub-object
+#region skill-moq-migration-class-stub-object
 [KnockOff<MmEmailService>]
 public partial class MmEmailServiceTests { }
 #endregion
@@ -254,7 +254,7 @@ public interface IMmEmployee : IMmEntityBase
     string Name { get; set; }
 }
 
-#region skill:moq-migration:as-interface-helpers
+#region skill-moq-migration-as-interface-helpers
 [KnockOff]
 public partial class MmEmployeeKnockOff : IMmEmployee { }
 #endregion
@@ -274,7 +274,7 @@ public interface IMmTrackedPropService
     DateTime? PreviousVisitDate { get; set; }
 }
 
-#region skill:moq-migration:setup-property
+#region skill-moq-migration-setup-property
 [KnockOff]
 public partial class MmTrackedPropServiceKnockOff : IMmTrackedPropService { }
 #endregion
@@ -296,7 +296,7 @@ public interface IMmInheritedEmployee : IMmInheritedEntityBase
     string Department { get; set; }
 }
 
-#region skill:moq-migration:interface-inheritance
+#region skill-moq-migration-interface-inheritance
 [KnockOff]
 public partial class MmInheritedEmployeeKnockOff : IMmInheritedEmployee { }
 #endregion
@@ -314,7 +314,7 @@ public static class MoqMigrationUsageExamples
 {
     public static void ClassStubObjectUsage()
     {
-        #region skill:moq-migration:class-stub-object-usage
+        #region skill-moq-migration-class-stub-object-usage
         var stub = new MmEmailServiceTests.Stubs.MmEmailService();
         MmEmailService service = stub.Object;
         #endregion
@@ -326,7 +326,7 @@ public static class MoqMigrationUsageExamples
     {
         var knockOff = new MmEmployeeKnockOff();
 
-        #region skill:moq-migration:interface-access-usage
+        #region skill-moq-migration-interface-access-usage
         // Standalone stubs implement interfaces via implicit conversion
         IMmEmployee employee = knockOff;
 
@@ -339,7 +339,7 @@ public static class MoqMigrationUsageExamples
 
     public static void InterfaceInheritanceCallbacksUsage()
     {
-        #region skill:moq-migration:interface-inheritance-callbacks
+        #region skill-moq-migration-interface-inheritance-callbacks
         var knockOff = new MmInheritedEmployeeKnockOff();
 
         // All members tracked on stub (flat API)

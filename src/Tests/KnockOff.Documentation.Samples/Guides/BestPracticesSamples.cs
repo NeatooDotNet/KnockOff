@@ -33,7 +33,7 @@ public interface IBpUserService
     void Save(User user);
 }
 
-#region docs:best-practices:stub-minimalism
+#region best-practices-stub-minimalism
 [KnockOff]
 public partial class BpUserServiceKnockOff : IBpUserService
 {
@@ -52,7 +52,7 @@ public interface IBpRepository
     User? GetById(int id);
 }
 
-#region docs:best-practices:user-methods
+#region best-practices-user-methods
 [KnockOff]
 public partial class BpRepositoryKnockOff : IBpRepository
 {
@@ -73,7 +73,7 @@ public interface IBpCallbackRepo
 [KnockOff]
 public partial class BpCallbackRepoKnockOff : IBpCallbackRepo { }
 
-#region docs:best-practices:callbacks-test
+#region best-practices-callbacks-test
 public class BpCallbacksExample
 {
     public void ReturnsAdmin_WhenIdIs1()
@@ -106,7 +106,7 @@ public interface IBpPropertyService
 [KnockOff]
 public partial class BpPropertyServiceKnockOff : IBpPropertyService { }
 
-#region docs:best-practices:value-usage
+#region best-practices-value-usage
 public class BpValueUsageExample
 {
     public void ConfigureWithValue()
@@ -134,7 +134,7 @@ public interface IBpDynamicService
 [KnockOff]
 public partial class BpDynamicServiceKnockOff : IBpDynamicService { }
 
-#region docs:best-practices:dynamic-onget
+#region best-practices-dynamic-onget
 public class BpDynamicOnGetExample
 {
     public void ConfigureWithOnGet()
@@ -164,7 +164,7 @@ public interface IBpResetService
 [KnockOff]
 public partial class BpResetServiceKnockOff : IBpResetService { }
 
-#region docs:best-practices:reset-behavior
+#region best-practices-reset-behavior
 public class BpResetBehaviorExample
 {
     public void ResetPreservesValue()
@@ -197,7 +197,7 @@ public interface IBpParser
 [KnockOff]
 public partial class BpParserKnockOff : IBpParser { }
 
-#region docs:best-practices:out-param-correct
+#region best-practices-out-param-correct
 public class BpOutParamExample
 {
     public void ConfigureOutParam()
@@ -218,7 +218,7 @@ public class BpOutParamExample
 // Method Overloads - Numeric suffixes
 // ============================================================================
 
-#region docs:best-practices:method-overloads
+#region best-practices-method-overloads
 public interface IBpProcessor
 {
     void Process(string data);
@@ -250,7 +250,7 @@ public interface IBpService
     void DoWork();
 }
 
-#region docs:best-practices:partial-container
+#region best-practices-partial-container
 public partial class BpMyTests  // <-- partial required
 {
     [KnockOff]
@@ -267,7 +267,7 @@ public interface IBpUserRepository
     User? GetById(int id);
 }
 
-#region docs:best-practices:standalone-stub
+#region best-practices-standalone-stub
 [KnockOff]
 public partial class BpUserRepositoryKnockOff : IBpUserRepository
 {
@@ -295,7 +295,7 @@ public interface IBpInlineLogger
     void Log(string message);
 }
 
-#region docs:best-practices:inline-stubs
+#region best-practices-inline-stubs
 [KnockOff<IBpInlineUserService>]
 [KnockOff<IBpInlineLogger>]
 public partial class BpInlineTests

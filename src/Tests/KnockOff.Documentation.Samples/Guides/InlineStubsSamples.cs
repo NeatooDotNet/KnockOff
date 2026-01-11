@@ -60,7 +60,7 @@ public interface IInRepository
 // Basic Inline Stub Example
 // ============================================================================
 
-#region docs:inline-stubs:basic-example
+#region inline-stubs-basic-example
 [KnockOff<IInUserService>]
 public partial class UserServiceTests
 {
@@ -71,7 +71,7 @@ public partial class UserServiceTests
 }
 #endregion
 
-#region docs:inline-stubs:basic-usage
+#region inline-stubs-basic-usage
 // In your test method:
 // var stub = new UserServiceTests.Stubs.IInUserService();
 //
@@ -91,7 +91,7 @@ public partial class UserServiceTests
 // Multiple Interfaces Example
 // ============================================================================
 
-#region docs:inline-stubs:multiple-interfaces
+#region inline-stubs-multiple-interfaces
 [KnockOff<IInUserService>]
 [KnockOff<IInLogger>]
 [KnockOff<IInRepository>]
@@ -109,7 +109,7 @@ public partial class MultiServiceTests
 // ============================================================================
 
 #if NET9_0_OR_GREATER
-#region docs:inline-stubs:partial-property
+#region inline-stubs-partial-property
 [KnockOff<IInUserService>]
 [KnockOff<IInLogger>]
 public partial class PartialPropertyTests
@@ -129,7 +129,7 @@ public partial class PartialPropertyTests
 // Direct Instantiation (Works on all .NET versions)
 // ============================================================================
 
-#region docs:inline-stubs:direct-instantiation
+#region inline-stubs-direct-instantiation
 [KnockOff<IInUserService>]
 public partial class DirectInstantiationTests
 {
@@ -155,7 +155,7 @@ public interface IInPropertyInfo
 	object? Value { get; set; }
 }
 
-#region docs:inline-stubs:nested-stubs-interfaces
+#region inline-stubs-nested-stubs-interfaces
 // When an interface returns another interface:
 [KnockOff]                      // Explicit pattern for outer interface
 [KnockOff<IInPropertyInfo>]     // Inline pattern for nested interface
@@ -165,7 +165,7 @@ public partial class PropertyStoreKnockOff : IInPropertyStore
 }
 #endregion
 
-#region docs:inline-stubs:nested-stubs-usage
+#region inline-stubs-nested-stubs-usage
 // var store = new PropertyStoreKnockOff();
 // var propStub = new PropertyStoreKnockOff.Stubs.IInPropertyInfo();
 //
@@ -185,7 +185,7 @@ public partial class PropertyStoreKnockOff : IInPropertyStore
 // Interceptor API Reference
 // ============================================================================
 
-#region docs:inline-stubs:interceptor-api
+#region inline-stubs-interceptor-api
 // Method interceptors:
 // stub.MethodName.CallCount        // int - number of calls
 // stub.MethodName.WasCalled        // bool - called at least once
@@ -208,7 +208,7 @@ public partial class PropertyStoreKnockOff : IInPropertyStore
 // Test Isolation (Reset Pattern)
 // ============================================================================
 
-#region docs:inline-stubs:test-isolation-reset
+#region inline-stubs-test-isolation-reset
 // xUnit: Creates new test class instance per test - automatic isolation
 
 // NUnit/MSTest: Shared instance - use [SetUp]/[TestInitialize]:
@@ -260,7 +260,7 @@ public abstract class BaseRepository
 // Class Stub Declarations
 // ============================================================================
 
-#region docs:inline-stubs:class-stub-example
+#region inline-stubs-class-stub-example
 public class CsEmailService
 {
 	public virtual void Send(string to, string subject, string body)
@@ -295,7 +295,7 @@ public static class ClassStubUsageExamples
 {
 	public static void EmailServiceExample()
 	{
-		#region docs:inline-stubs:class-stub-usage
+		#region inline-stubs-class-stub-usage
 		var stub = new CsEmailServiceTests.Stubs.CsEmailService();
 		stub.Send.OnCall = (ko, to, subject, body) =>
 			Console.WriteLine($"STUBBED: {to}");
@@ -311,7 +311,7 @@ public static class ClassStubUsageExamples
 		_ = (wasCalled, lastTo);
 	}
 
-	#region docs:inline-stubs:class-stub-mixed
+	#region inline-stubs-class-stub-mixed
 	public static void MixedServiceExample()
 	{
 		var stub = new MixedTests.Stubs.MixedService();
@@ -328,7 +328,7 @@ public static class ClassStubUsageExamples
 	}
 	#endregion
 
-	#region docs:inline-stubs:class-stub-constructor
+	#region inline-stubs-class-stub-constructor
 	public static void ConstructorChainingExample()
 	{
 		var stub = new RepoTests.Stubs.Repository("Server=test");
@@ -338,7 +338,7 @@ public static class ClassStubUsageExamples
 	}
 	#endregion
 
-	#region docs:inline-stubs:class-stub-abstract
+	#region inline-stubs-class-stub-abstract
 	public static void AbstractClassExample()
 	{
 		var stub = new AbstractTests.Stubs.BaseRepository();

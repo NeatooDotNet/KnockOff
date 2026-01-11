@@ -38,7 +38,7 @@ public class AsyncData
 // Basic Usage
 // ============================================================================
 
-#region docs:async-methods:basic-interface
+#region async-methods-basic-interface
 public interface IAsyncRepository
 {
     Task InitializeAsync();
@@ -60,7 +60,7 @@ public interface IAsyncUserDefined
     ValueTask<int> CountAsync();
 }
 
-#region docs:async-methods:user-defined
+#region async-methods-user-defined
 [KnockOff]
 public partial class AsyncUserDefinedKnockOff : IAsyncUserDefined
 {
@@ -76,7 +76,7 @@ public partial class AsyncUserDefinedKnockOff : IAsyncUserDefined
 // Cancellation Support
 // ============================================================================
 
-#region docs:async-methods:cancellation
+#region async-methods-cancellation
 public interface IAsyncFetch
 {
     Task<AsyncData> FetchAsync(int id, CancellationToken ct);
@@ -95,7 +95,7 @@ public interface IAsyncSave
     Task<int> SaveAsync(AsyncData entity);
 }
 
-#region docs:async-methods:simulating-failures
+#region async-methods-simulating-failures
 [KnockOff]
 public partial class AsyncSaveKnockOff : IAsyncSave { }
 #endregion
@@ -110,7 +110,7 @@ public interface IAsyncCallOrder
     Task ProcessAsync();
 }
 
-#region docs:async-methods:call-order
+#region async-methods-call-order
 [KnockOff]
 public partial class AsyncCallOrderKnockOff : IAsyncCallOrder { }
 #endregion
@@ -130,7 +130,7 @@ public static class AsyncMethodsUsageExamples
         var knockOff = new AsyncRepositoryKnockOff();
         IAsyncRepository repo = knockOff;
 
-        #region docs:async-methods:default-behavior
+        #region async-methods-default-behavior
         await repo.InitializeAsync();       // Completes immediately
         var user = await repo.GetByIdAsync(1);  // Returns null (default)
         var count = await repo.CountAsync();    // Returns 0 (default)
@@ -143,7 +143,7 @@ public static class AsyncMethodsUsageExamples
     {
         var knockOff = new AsyncRepositoryKnockOff();
 
-        #region docs:async-methods:task-callbacks
+        #region async-methods-task-callbacks
         // Task (void equivalent)
         knockOff.InitializeAsync.OnCall = (ko) =>
         {
@@ -161,7 +161,7 @@ public static class AsyncMethodsUsageExamples
     {
         var knockOff = new AsyncRepositoryKnockOff();
 
-        #region docs:async-methods:valuetask-callbacks
+        #region async-methods-valuetask-callbacks
         // ValueTask<T>
         knockOff.CountAsync.OnCall = (ko) => new ValueTask<int>(100);
         #endregion
@@ -172,7 +172,7 @@ public static class AsyncMethodsUsageExamples
         var knockOff = new AsyncRepositoryKnockOff();
         IAsyncRepository repo = knockOff;
 
-        #region docs:async-methods:tracking
+        #region async-methods-tracking
         await repo.GetByIdAsync(1);
         await repo.GetByIdAsync(2);
         await repo.GetByIdAsync(3);
@@ -188,7 +188,7 @@ public static class AsyncMethodsUsageExamples
     {
         var knockOff = new AsyncRepositoryKnockOff();
 
-        #region docs:async-methods:simulating-delays
+        #region async-methods-simulating-delays
         knockOff.GetByIdAsync.OnCall = async (ko, id) =>
         {
             await Task.Delay(100);  // Simulate network latency
@@ -201,7 +201,7 @@ public static class AsyncMethodsUsageExamples
     {
         var knockOff = new AsyncSaveKnockOff();
 
-        #region docs:async-methods:simulating-failures-usage
+        #region async-methods-simulating-failures-usage
         // Faulted task
         knockOff.SaveAsync.OnCall = (ko, entity) =>
             Task.FromException<int>(new InvalidOperationException("Connection lost"));
@@ -218,7 +218,7 @@ public static class AsyncMethodsUsageExamples
     {
         var knockOff = new AsyncRepositoryKnockOff();
 
-        #region docs:async-methods:conditional-behavior
+        #region async-methods-conditional-behavior
         knockOff.GetByIdAsync.OnCall = (ko, id) =>
         {
             if (id <= 0)
@@ -233,7 +233,7 @@ public static class AsyncMethodsUsageExamples
     {
         var knockOff = new AsyncFetchKnockOff();
 
-        #region docs:async-methods:cancellation-usage
+        #region async-methods-cancellation-usage
         knockOff.FetchAsync.OnCall = (ko, id, ct) =>
         {
             ct.ThrowIfCancellationRequested();
@@ -246,7 +246,7 @@ public static class AsyncMethodsUsageExamples
     {
         var knockOff = new AsyncRepositoryKnockOff();
 
-        #region docs:async-methods:sequential-returns
+        #region async-methods-sequential-returns
         var results = new Queue<AsyncUser?>([
             new AsyncUser { Name = "First" },
             new AsyncUser { Name = "Second" },
@@ -263,7 +263,7 @@ public static class AsyncMethodsUsageExamples
         var knockOff = new AsyncCallOrderKnockOff();
         IAsyncCallOrder service = knockOff;
 
-        #region docs:async-methods:call-order-usage
+        #region async-methods-call-order-usage
         var order = new List<string>();
 
         knockOff.StartAsync.OnCall = (ko) =>
@@ -292,7 +292,7 @@ public static class AsyncMethodsUsageExamples
         var knockOff = new AsyncRepositoryKnockOff();
         IAsyncRepository repo = knockOff;
 
-        #region docs:async-methods:reset
+        #region async-methods-reset
         await repo.GetByIdAsync(1);
         knockOff.GetByIdAsync.Reset();
 

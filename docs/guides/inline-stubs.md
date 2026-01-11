@@ -6,8 +6,8 @@ Inline stubs generate test doubles inside your test class using `KnockOffAttribu
 
 Add `[KnockOff<TInterface>]` to your test class:
 
-<!-- snippet: docs:inline-stubs:basic-example -->
-```csharp
+<!-- snippet: inline-stubs-basic-example -->
+```cs
 [KnockOff<IInUserService>]
 public partial class UserServiceTests
 {
@@ -17,12 +17,12 @@ public partial class UserServiceTests
 	// - Interceptor properties for verification and callbacks
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 The generator creates a `Stubs` nested class containing stub implementations:
 
-<!-- snippet: docs:inline-stubs:basic-usage -->
-```csharp
+<!-- snippet: inline-stubs-basic-usage -->
+```cs
 // In your test method:
 // var stub = new UserServiceTests.Stubs.IInUserService();
 //
@@ -37,14 +37,14 @@ The generator creates a `Stubs` nested class containing stub implementations:
 // Assert.True(stub.GetUser.WasCalled);
 // Assert.Equal(42, stub.GetUser.LastCallArg);
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Multiple Interfaces
 
 Stack multiple `[KnockOff<T>]` attributes on a single test class:
 
-<!-- snippet: docs:inline-stubs:multiple-interfaces -->
-```csharp
+<!-- snippet: inline-stubs-multiple-interfaces -->
+```cs
 [KnockOff<IInUserService>]
 [KnockOff<IInLogger>]
 [KnockOff<IInRepository>]
@@ -56,7 +56,7 @@ public partial class MultiServiceTests
 	// - Stubs.IInRepository
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 Each stub tracks invocations independently.
 
@@ -66,8 +66,8 @@ Each stub tracks invocations independently.
 
 Declare partial properties for auto-instantiation:
 
-<!-- snippet: docs:inline-stubs:partial-property -->
-```csharp
+<!-- snippet: inline-stubs-partial-property -->
+```cs
 [KnockOff<IInUserService>]
 [KnockOff<IInLogger>]
 public partial class PartialPropertyTests
@@ -81,14 +81,14 @@ public partial class PartialPropertyTests
 	// Logger.Log.OnCall = (ko, msg) => Console.WriteLine(msg);
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Direct Instantiation (All .NET Versions)
 
 Without partial properties, instantiate stubs directly:
 
-<!-- snippet: docs:inline-stubs:direct-instantiation -->
-```csharp
+<!-- snippet: inline-stubs-direct-instantiation -->
+```cs
 [KnockOff<IInUserService>]
 public partial class DirectInstantiationTests
 {
@@ -97,14 +97,14 @@ public partial class DirectInstantiationTests
 	// var logger = new MultiServiceTests.Stubs.IInLogger();
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Nested Stubs
 
 When interfaces return other interfaces, combine explicit and inline patterns:
 
-<!-- snippet: docs:inline-stubs:nested-stubs-interfaces -->
-```csharp
+<!-- snippet: inline-stubs-nested-stubs-interfaces -->
+```cs
 // When an interface returns another interface:
 [KnockOff]                      // Explicit pattern for outer interface
 [KnockOff<IInPropertyInfo>]     // Inline pattern for nested interface
@@ -113,12 +113,12 @@ public partial class PropertyStoreKnockOff : IInPropertyStore
 	// Access the nested stub via partial property or direct instantiation
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 Wire stubs together using callbacks:
 
-<!-- snippet: docs:inline-stubs:nested-stubs-usage -->
-```csharp
+<!-- snippet: inline-stubs-nested-stubs-usage -->
+```cs
 // var store = new PropertyStoreKnockOff();
 // var propStub = new PropertyStoreKnockOff.Stubs.IInPropertyInfo();
 //
@@ -133,14 +133,14 @@ Wire stubs together using callbacks:
 // IInPropertyStore service = store;
 // Assert.Equal("TestProp", service[0].Name);
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Interceptor API
 
 ### Method Interceptors
 
-<!-- snippet: docs:inline-stubs:interceptor-api -->
-```csharp
+<!-- snippet: inline-stubs-interceptor-api -->
+```cs
 // Method interceptors:
 // stub.MethodName.CallCount        // int - number of calls
 // stub.MethodName.WasCalled        // bool - called at least once
@@ -158,7 +158,7 @@ Wire stubs together using callbacks:
 // stub.PropertyName.OnSet          // Action - setter callback
 // stub.PropertyName.Reset()        // Clear all tracking
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 | Interceptor Type | Properties |
 |-------------|------------|
@@ -178,8 +178,8 @@ xUnit creates new test class instances per test—stubs are automatically isolat
 
 Use setup methods to reset stubs between tests:
 
-<!-- snippet: docs:inline-stubs:test-isolation-reset -->
-```csharp
+<!-- snippet: inline-stubs-test-isolation-reset -->
+```cs
 // xUnit: Creates new test class instance per test - automatic isolation
 
 // NUnit/MSTest: Shared instance - use [SetUp]/[TestInitialize]:
@@ -191,7 +191,7 @@ Use setup methods to reset stubs between tests:
 //     UserService.ConnectionString.Reset();
 // }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Explicit vs Inline Pattern
 
@@ -219,8 +219,8 @@ Use setup methods to reset stubs between tests:
 
 Use `[KnockOff<TClass>]` to stub virtual/abstract class members:
 
-<!-- snippet: docs:inline-stubs:class-stub-example -->
-```csharp
+<!-- snippet: inline-stubs-class-stub-example -->
+```cs
 public class CsEmailService
 {
 	public virtual void Send(string to, string subject, string body)
@@ -234,7 +234,7 @@ public partial class CsEmailServiceTests
 {
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Key Differences from Interface Stubs
 
@@ -249,63 +249,63 @@ public partial class CsEmailServiceTests
 
 Non-virtual members are not intercepted. Access them through `.Object`:
 
-<!-- snippet: docs:inline-stubs:class-stub-mixed -->
-```csharp
+<!-- snippet: inline-stubs-class-stub-mixed -->
+```cs
 public static void MixedServiceExample()
-	{
-		var stub = new MixedTests.Stubs.MixedService();
+{
+	var stub = new MixedTests.Stubs.MixedService();
 
-		// Virtual member - has interceptor
-		stub.VirtualProp.OnGet = (ko) => "Intercepted";
-		var virtualValue = stub.Object.VirtualProp;  // "Intercepted"
+	// Virtual member - has interceptor
+	stub.VirtualProp.OnGet = (ko) => "Intercepted";
+	var virtualValue = stub.Object.VirtualProp;  // "Intercepted"
 
-		// Non-virtual member - no interceptor, use .Object
-		stub.Object.NonVirtualProp = "Direct";
-		var nonVirtualValue = stub.Object.NonVirtualProp;  // "Direct"
+	// Non-virtual member - no interceptor, use .Object
+	stub.Object.NonVirtualProp = "Direct";
+	var nonVirtualValue = stub.Object.NonVirtualProp;  // "Direct"
 
-		_ = (virtualValue, nonVirtualValue);
-	}
+	_ = (virtualValue, nonVirtualValue);
+}
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Constructor Chaining
 
 Class stubs support constructor parameters:
 
-<!-- snippet: docs:inline-stubs:class-stub-constructor -->
-```csharp
+<!-- snippet: inline-stubs-class-stub-constructor -->
+```cs
 public static void ConstructorChainingExample()
-	{
-		var stub = new RepoTests.Stubs.Repository("Server=test");
-		var connectionString = stub.Object.ConnectionString;  // "Server=test"
+{
+	var stub = new RepoTests.Stubs.Repository("Server=test");
+	var connectionString = stub.Object.ConnectionString;  // "Server=test"
 
-		_ = connectionString;
-	}
+	_ = connectionString;
+}
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Abstract Classes
 
 Abstract members return defaults unless configured:
 
-<!-- snippet: docs:inline-stubs:class-stub-abstract -->
-```csharp
+<!-- snippet: inline-stubs-class-stub-abstract -->
+```cs
 public static void AbstractClassExample()
-	{
-		var stub = new AbstractTests.Stubs.BaseRepository();
+{
+	var stub = new AbstractTests.Stubs.BaseRepository();
 
-		// Without callback - returns defaults
-		var defaultConnection = stub.Object.ConnectionString;  // null
-		var defaultExecute = stub.Object.Execute("SELECT 1");  // 0
+	// Without callback - returns defaults
+	var defaultConnection = stub.Object.ConnectionString;  // null
+	var defaultExecute = stub.Object.Execute("SELECT 1");  // 0
 
-		// With callback
-		stub.ConnectionString.OnGet = (ko) => "Server=test";
-		stub.Execute.OnCall = (ko, sql) => sql.Length;
+	// With callback
+	stub.ConnectionString.OnGet = (ko) => "Server=test";
+	stub.Execute.OnCall = (ko, sql) => sql.Length;
 
-		var configuredConnection = stub.Object.ConnectionString;  // "Server=test"
-		var configuredExecute = stub.Object.Execute("SELECT 1");  // 8
+	var configuredConnection = stub.Object.ConnectionString;  // "Server=test"
+	var configuredExecute = stub.Object.Execute("SELECT 1");  // 8
 
-		_ = (defaultConnection, defaultExecute, configuredConnection, configuredExecute);
-	}
+	_ = (defaultConnection, defaultExecute, configuredConnection, configuredExecute);
+}
 ```
-<!-- /snippet -->
+<!-- endSnippet -->

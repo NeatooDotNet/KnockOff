@@ -26,17 +26,20 @@ Each KnockOff class gets its own file: `{ClassName}.g.cs`
 
 Add to your project file:
 
+<!-- pseudo:emit-generated-files-csproj -->
 ```xml
 <PropertyGroup>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
 </PropertyGroup>
 ```
+<!-- /snippet -->
 
 ## Example: Full Generated Structure
 
 Given this input:
 
+<!-- pseudo:generated-code-input-example -->
 ```csharp
 public interface IUserService
 {
@@ -50,9 +53,11 @@ public partial class UserServiceKnockOff : IUserService
     protected User? GetUser(int id) => new User { Id = id };
 }
 ```
+<!-- /snippet -->
 
 KnockOff generates:
 
+<!-- pseudo:generated-code-full-structure -->
 ```csharp
 public partial class UserServiceKnockOff
 {
@@ -146,6 +151,7 @@ public partial class UserServiceKnockOff
     public IUserService AsIUserService() => this;
 }
 ```
+<!-- /snippet -->
 
 ## Naming Conventions
 
@@ -170,6 +176,7 @@ public partial class UserServiceKnockOff
 
 The generator looks for protected methods matching interface signatures:
 
+<!-- pseudo:user-method-detection -->
 ```csharp
 [KnockOff]
 public partial class ServiceKnockOff : IService
@@ -184,6 +191,7 @@ public partial class ServiceKnockOff : IService
     protected int GetValue(string id) => 0;
 }
 ```
+<!-- /snippet -->
 
 Rules:
 - Must be `protected`
@@ -205,6 +213,7 @@ Indexer interceptors use the key type name:
 
 For methods with 2+ parameters, tracking uses named tuples:
 
+<!-- pseudo:multiple-parameters-tracking -->
 ```csharp
 // Interface: void Log(string level, string message, int code)
 
@@ -222,11 +231,13 @@ knockOff.Log.OnCall = (ko, level, message, code) =>
     Console.WriteLine($"[{level}] {message} ({code})");
 };
 ```
+<!-- /snippet -->
 
 ## Interface Constraint
 
 Standalone `[KnockOff]` stubs implement exactly one interface. Attempting to implement multiple unrelated interfaces emits diagnostic `KO0010`:
 
+<!-- pseudo:interface-constraint-valid -->
 ```csharp
 // VALID - single interface
 [KnockOff]
@@ -240,9 +251,11 @@ public partial class ChildKnockOff : IChild { }  // Also implements IParent memb
 [KnockOff]
 public partial class BadKnockOff : ILogger, IAuditor { }  // Error!
 ```
+<!-- /snippet -->
 
 If you need multiple unrelated interfaces, use separate stubs:
 
+<!-- pseudo:interface-constraint-separate -->
 ```csharp
 [KnockOff]
 public partial class LoggerKnockOff : ILogger { }
@@ -254,6 +267,7 @@ public partial class AuditorKnockOff : IAuditor { }
 var logger = new LoggerKnockOff();
 var auditor = new AuditorKnockOff();
 ```
+<!-- /snippet -->
 
 For **inline stubs** within a test class, multiple interfaces are supported - see the inline stubs documentation.
 

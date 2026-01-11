@@ -39,6 +39,8 @@ KnockOff provides a subset of mocking functionality focused on interface stubbin
 ### Basic Setup and Verification
 
 **Moq**
+
+<!-- pseudo:moq-basic-setup -->
 ```csharp
 var mock = new Mock<IUserService>();
 mock.Setup(x => x.GetUser(It.IsAny<int>())).Returns(new User { Id = 1 });
@@ -48,21 +50,22 @@ var user = service.GetUser(42);
 
 mock.Verify(x => x.GetUser(42), Times.Once);
 ```
+<!-- /snippet -->
 
 **KnockOff**
 
-<!-- snippet: docs:knockoff-vs-moq:basic-stub -->
-```csharp
+<!-- snippet: knockoff-vs-moq-basic-stub -->
+```cs
 [KnockOff]
 public partial class VsUserServiceKnockOff : IVsUserService
 {
     protected VsUser GetUser(int id) => new VsUser { Id = id, Name = "Test User" };
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
-<!-- snippet: docs:knockoff-vs-moq:basic-stub-usage -->
-```csharp
+<!-- snippet: knockoff-vs-moq-basic-stub-usage -->
+```cs
 // // Use in test
 // var knockOff = new VsUserServiceKnockOff();
 // IVsUserService service = knockOff;
@@ -72,11 +75,13 @@ public partial class VsUserServiceKnockOff : IVsUserService
 // Assert.Equal(1, knockOff.GetUser.CallCount);
 // Assert.Equal(42, knockOff.GetUser.LastCallArg);
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Property Mocking
 
 **Moq**
+
+<!-- pseudo:moq-property-mocking -->
 ```csharp
 var mock = new Mock<IUserService>();
 mock.Setup(x => x.CurrentUser).Returns(new User { Name = "Test" });
@@ -87,11 +92,12 @@ mock.Object.CurrentUser = new User { Name = "New" };
 
 mock.VerifySet(x => x.CurrentUser = It.IsAny<User>(), Times.Once);
 ```
+<!-- /snippet -->
 
 **KnockOff**
 
-<!-- snippet: docs:knockoff-vs-moq:property-mocking -->
-```csharp
+<!-- snippet: knockoff-vs-moq-property-mocking -->
+```cs
 // // Define stub - properties use auto-generated backing fields
 // [KnockOff]
 // public partial class UserServiceKnockOff : IUserService { }
@@ -110,11 +116,13 @@ mock.VerifySet(x => x.CurrentUser = It.IsAny<User>(), Times.Once);
 // Assert.Equal(1, knockOff.CurrentUser.SetCount);
 // Assert.Equal("New", knockOff.CurrentUser.LastSetValue?.Name);
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Async Methods
 
 **Moq**
+
+<!-- pseudo:moq-async-methods -->
 ```csharp
 var mock = new Mock<IRepository>();
 mock.Setup(x => x.GetByIdAsync(It.IsAny<int>()))
@@ -122,11 +130,12 @@ mock.Setup(x => x.GetByIdAsync(It.IsAny<int>()))
 
 var entity = await mock.Object.GetByIdAsync(42);
 ```
+<!-- /snippet -->
 
 **KnockOff**
 
-<!-- snippet: docs:knockoff-vs-moq:async-stub -->
-```csharp
+<!-- snippet: knockoff-vs-moq-async-stub -->
+```cs
 [KnockOff]
 public partial class VsRepositoryKnockOff : IVsRepository
 {
@@ -134,19 +143,21 @@ public partial class VsRepositoryKnockOff : IVsRepository
         Task.FromResult<VsEntity?>(new VsEntity { Id = id });
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
-<!-- snippet: docs:knockoff-vs-moq:async-stub-usage -->
-```csharp
+<!-- snippet: knockoff-vs-moq-async-stub-usage -->
+```cs
 // // Use in test
 // var knockOff = new VsRepositoryKnockOff();
 // var entity = await knockOff.AsIVsRepository().GetByIdAsync(42);
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Argument Capture
 
 **Moq**
+
+<!-- pseudo:moq-argument-capture -->
 ```csharp
 Entity? captured = null;
 var mock = new Mock<IRepository>();
@@ -157,11 +168,12 @@ mock.Object.Save(new Entity { Id = 1 });
 
 Assert.Equal(1, captured?.Id);
 ```
+<!-- /snippet -->
 
 **KnockOff**
 
-<!-- snippet: docs:knockoff-vs-moq:argument-capture -->
-```csharp
+<!-- snippet: knockoff-vs-moq-argument-capture -->
+```cs
 // // Define stub - arguments are captured automatically
 // [KnockOff]
 // public partial class RepositoryKnockOff : IRepository
@@ -178,11 +190,13 @@ Assert.Equal(1, captured?.Id);
 // var captured = knockOff.Save.LastCallArg;
 // Assert.Equal(1, captured?.Id);
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Multiple Interface Implementation
 
 **Moq**
+
+<!-- pseudo:moq-multiple-interfaces -->
 ```csharp
 var mock = new Mock<IEmployeeRepository>();
 mock.As<IUnitOfWork>()
@@ -192,11 +206,12 @@ mock.As<IUnitOfWork>()
 var repo = mock.Object;
 var unitOfWork = mock.As<IUnitOfWork>().Object;
 ```
+<!-- /snippet -->
 
 **KnockOff**
 
-<!-- snippet: docs:knockoff-vs-moq:multiple-interfaces -->
-```csharp
+<!-- snippet: knockoff-vs-moq-multiple-interfaces -->
+```cs
 [KnockOff]
 public partial class VsEmployeeRepoKnockOff : IVsEmployeeRepository
 {
@@ -208,10 +223,10 @@ public partial class VsUnitOfWorkKnockOff : IVsUnitOfWork
     protected Task<int> SaveChangesAsync(CancellationToken ct) => Task.FromResult(1);
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
-<!-- snippet: docs:knockoff-vs-moq:multiple-interfaces-usage -->
-```csharp
+<!-- snippet: knockoff-vs-moq-multiple-interfaces-usage -->
+```cs
 // // Use in tests - separate stubs for each interface
 // var repoKnockOff = new VsEmployeeRepoKnockOff();
 // IVsEmployeeRepository repo = repoKnockOff.AsIVsEmployeeRepository();
@@ -219,11 +234,13 @@ public partial class VsUnitOfWorkKnockOff : IVsUnitOfWork
 // var uowKnockOff = new VsUnitOfWorkKnockOff();
 // IVsUnitOfWork unitOfWork = uowKnockOff.AsIVsUnitOfWork();
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Indexer Mocking
 
 **Moq**
+
+<!-- pseudo:moq-indexer-mocking -->
 ```csharp
 var mock = new Mock<IPropertyStore>();
 mock.Setup(x => x["Name"]).Returns(new PropertyInfo { Value = "Test" });
@@ -231,18 +248,19 @@ mock.Setup(x => x["Age"]).Returns(new PropertyInfo { Value = "25" });
 
 var name = mock.Object["Name"];
 ```
+<!-- /snippet -->
 
 **KnockOff**
 
-<!-- snippet: docs:knockoff-vs-moq:indexer-stub -->
-```csharp
+<!-- snippet: knockoff-vs-moq-indexer-stub -->
+```cs
 [KnockOff]
 public partial class VsPropertyStoreKnockOff : IVsPropertyStore { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
-<!-- snippet: docs:knockoff-vs-moq:indexer-stub-usage -->
-```csharp
+<!-- snippet: knockoff-vs-moq-indexer-stub-usage -->
+```cs
 // // Use in test - pre-populate backing dictionary
 // var knockOff = new VsPropertyStoreKnockOff();
 // knockOff.StringIndexerBacking["Name"] = new VsPropertyInfo { Value = "Test" };
@@ -253,11 +271,13 @@ public partial class VsPropertyStoreKnockOff : IVsPropertyStore { }
 //
 // Assert.Equal("Name", knockOff.StringIndexer.LastGetKey);
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Event Mocking
 
 **Moq**
+
+<!-- pseudo:moq-event-mocking -->
 ```csharp
 var mock = new Mock<IEventSource>();
 
@@ -269,18 +289,19 @@ bool subscribed = false;
 mock.SetupAdd(x => x.DataReceived += It.IsAny<EventHandler<string>>())
     .Callback(() => subscribed = true);
 ```
+<!-- /snippet -->
 
 **KnockOff**
 
-<!-- snippet: docs:knockoff-vs-moq:event-stub -->
-```csharp
+<!-- snippet: knockoff-vs-moq-event-stub -->
+```cs
 [KnockOff]
 public partial class VsEventSourceKnockOff : IVsEventSource { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
-<!-- snippet: docs:knockoff-vs-moq:event-stub-usage -->
-```csharp
+<!-- snippet: knockoff-vs-moq-event-stub-usage -->
+```cs
 // // Use in test
 // var knockOff = new VsEventSourceKnockOff();
 // IVsEventSource source = knockOff;
@@ -298,36 +319,39 @@ public partial class VsEventSourceKnockOff : IVsEventSource { }
 //
 // Assert.Equal("test data", receivedData);
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Verification Patterns
 
 **Moq**
+
+<!-- pseudo:moq-verification-patterns -->
 ```csharp
 mock.Verify(x => x.Save(It.IsAny<Entity>()), Times.Once);
 mock.Verify(x => x.Delete(It.IsAny<int>()), Times.Never);
 mock.Verify(x => x.GetAll(), Times.AtLeastOnce);
 mock.Verify(x => x.Update(It.IsAny<Entity>()), Times.Exactly(3));
 ```
+<!-- /snippet -->
 
 **KnockOff**
 
-<!-- snippet: docs:knockoff-vs-moq:verification-patterns -->
-```csharp
+<!-- snippet: knockoff-vs-moq-verification-patterns -->
+```cs
 [KnockOff]
 public partial class VsVerificationRepositoryKnockOff : IVsVerificationRepository { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
-<!-- snippet: docs:knockoff-vs-moq:verification-patterns-usage -->
-```csharp
+<!-- snippet: knockoff-vs-moq-verification-patterns-usage -->
+```cs
 // // Verify in test
 // Assert.Equal(1, knockOff.Save.CallCount);      // Times.Once
 // Assert.Equal(0, knockOff.Delete.CallCount);    // Times.Never
 // Assert.True(knockOff.GetAll.WasCalled);        // Times.AtLeastOnce
 // Assert.Equal(3, knockOff.Update.CallCount);    // Times.Exactly(3)
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Dynamic Behavior with Callbacks
 
@@ -336,36 +360,39 @@ For scenarios requiring per-test dynamic behavior, KnockOff provides `OnCall` ca
 ### Sequential Returns
 
 **Moq**
+
+<!-- pseudo:moq-sequential-returns -->
 ```csharp
 mock.SetupSequence(x => x.GetNext())
     .Returns(1)
     .Returns(2)
     .Returns(3);
 ```
+<!-- /snippet -->
 
 **KnockOff**
 
-<!-- snippet: docs:knockoff-vs-moq:sequential-returns -->
-```csharp
+<!-- snippet: knockoff-vs-moq-sequential-returns -->
+```cs
 [KnockOff]
 public partial class VsSequenceKnockOff : IVsSequence { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
-<!-- snippet: docs:knockoff-vs-moq:sequential-returns-usage -->
-```csharp
+<!-- snippet: knockoff-vs-moq-sequential-returns-usage -->
+```cs
 // var knockOff = new VsSequenceKnockOff();
 // var returnValues = new Queue<int>([1, 2, 3]);
 // knockOff.GetNext.OnCall = (ko) => returnValues.Dequeue();
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Per-Test Overrides
 
 When the stub's default behavior isn't right for a specific test:
 
-<!-- snippet: docs:knockoff-vs-moq:per-test-override -->
-```csharp
+<!-- snippet: knockoff-vs-moq-per-test-override -->
+```cs
 [KnockOff]
 public partial class VsOverrideServiceKnockOff : IVsOverrideService
 {
@@ -373,10 +400,10 @@ public partial class VsOverrideServiceKnockOff : IVsOverrideService
     protected VsUser GetUser(int id) => new VsUser { Id = id, Name = "Default" };
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
-<!-- snippet: docs:knockoff-vs-moq:per-test-override-usage -->
-```csharp
+<!-- snippet: knockoff-vs-moq-per-test-override-usage -->
+```cs
 // [Fact]
 // public void Test_WithSpecialCase()
 // {
@@ -389,14 +416,14 @@ public partial class VsOverrideServiceKnockOff : IVsOverrideService
 //     Assert.Equal("Special", user.Name);
 // }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Reset and Reuse
 
 **KnockOff** (no Moq equivalent - Moq requires new mock)
 
-<!-- snippet: docs:knockoff-vs-moq:reset-and-reuse -->
-```csharp
+<!-- snippet: knockoff-vs-moq-reset-and-reuse -->
+```cs
 // var knockOff = new UserServiceKnockOff();
 // IUserService service = knockOff;
 //
@@ -409,7 +436,7 @@ public partial class VsOverrideServiceKnockOff : IVsOverrideService
 // var user2 = service.GetUser(2);
 // Assert.Equal(0, knockOff.GetUser.CallCount); // Reset cleared count
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Callback Priority
 

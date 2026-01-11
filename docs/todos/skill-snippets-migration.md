@@ -155,12 +155,8 @@ public void ExampleUsage()
 
 ### 2. Add marker in skill file
 
-```markdown
-<!-- snippet: skill:SKILL:example-id -->
-```csharp
-// Content synced by extract-snippets.ps1
-```
-<!-- /snippet -->
+```text
+snippet: {region-id}
 ```
 
 ### 3. Sync and verify
