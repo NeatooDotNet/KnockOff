@@ -6,6 +6,7 @@ The primary attribute that marks a class for code generation.
 
 ### Declaration
 
+<!-- pseudo:knockoff-attribute-declaration -->
 ```csharp
 namespace KnockOff;
 
@@ -14,9 +15,11 @@ public sealed class KnockOffAttribute : Attribute
 {
 }
 ```
+<!-- /snippet -->
 
 ### Usage
 
+<!-- pseudo:knockoff-attribute-usage -->
 ```csharp
 using KnockOff;
 
@@ -25,6 +28,7 @@ public partial class MyServiceKnockOff : IMyService
 {
 }
 ```
+<!-- /snippet -->
 
 ### Requirements
 
@@ -35,6 +39,7 @@ public partial class MyServiceKnockOff : IMyService
 
 ### Valid Examples
 
+<!-- pseudo:knockoff-valid-examples -->
 ```csharp
 // Basic usage
 [KnockOff]
@@ -63,9 +68,11 @@ public class TestFixture
     public partial class NestedKnockOff : IService { }
 }
 ```
+<!-- /snippet -->
 
 ### Invalid Examples
 
+<!-- invalid:knockoff-invalid-examples -->
 ```csharp
 // Missing partial keyword - COMPILE ERROR
 [KnockOff]
@@ -87,21 +94,26 @@ public static partial class StaticKnockOff : IService { }
 [KnockOff]
 public partial class GenericKnockOff<T> : IRepository<T> { }
 ```
+<!-- /snippet -->
 
 ### Namespace
 
 The attribute is in the `KnockOff` namespace:
 
+<!-- pseudo:knockoff-namespace-using -->
 ```csharp
 using KnockOff;
 ```
+<!-- /snippet -->
 
 Or use fully qualified:
 
+<!-- pseudo:knockoff-namespace-qualified -->
 ```csharp
 [KnockOff.KnockOff]
 public partial class ServiceKnockOff : IService { }
 ```
+<!-- /snippet -->
 
 ## Future Attribute Options
 
@@ -109,29 +121,35 @@ The following options are under consideration for future versions:
 
 ### Naming Customization
 
+<!-- pseudo:knockoff-future-naming -->
 ```csharp
 // Hypothetical - NOT YET IMPLEMENTED
 [KnockOff(KOPropertyName = "Mock")]
 public partial class ServiceKnockOff : IService { }
 // Would generate: public ServiceKnockOffKO Mock { get; }
 ```
+<!-- /snippet -->
 
 ### Strict Mode
 
+<!-- pseudo:knockoff-future-strict -->
 ```csharp
 // Hypothetical - NOT YET IMPLEMENTED
 [KnockOff(Strict = true)]
 public partial class ServiceKnockOff : IService { }
 // Would throw if any member is called without setup
 ```
+<!-- /snippet -->
 
 ### Include/Exclude Members
 
+<!-- pseudo:knockoff-future-exclude -->
 ```csharp
 // Hypothetical - NOT YET IMPLEMENTED
 [KnockOff(Exclude = ["Dispose"])]
 public partial class ServiceKnockOff : IService, IDisposable { }
 // Would not generate handler for Dispose
 ```
+<!-- /snippet -->
 
 These are design considerations only. The current implementation has no attribute options.

@@ -52,7 +52,7 @@ public class GenEmployee : IGenEntity
 // Basic Usage
 // ============================================================================
 
-#region docs:generics:basic-interface
+#region generics-basic-interface
 public interface IGenRepository<T> where T : class
 {
     T? GetById(int id);
@@ -73,7 +73,7 @@ public partial class GenOrderRepositoryKnockOff : IGenRepository<GenOrder> { }
 // Multiple Generic Parameters
 // ============================================================================
 
-#region docs:generics:multiple-params
+#region generics-multiple-params
 public interface IGenCache<TKey, TValue>
 {
     TValue? Get(TKey key);
@@ -88,7 +88,7 @@ public partial class GenStringCacheKnockOff : IGenCache<string, GenUser> { }
 // Constrained Generics
 // ============================================================================
 
-#region docs:generics:constrained
+#region generics-constrained
 public interface IGenEntityRepository<T> where T : class, IGenEntity
 {
     T? FindById(int id);
@@ -103,7 +103,7 @@ public partial class GenEmployeeRepositoryKnockOff : IGenEntityRepository<GenEmp
 // Factory Pattern
 // ============================================================================
 
-#region docs:generics:factory-pattern
+#region generics-factory-pattern
 public interface IGenFactory<T> where T : new()
 {
     T Create();
@@ -117,7 +117,7 @@ public partial class GenUserFactoryKnockOff : IGenFactory<GenUser> { }
 // Collection Repositories
 // ============================================================================
 
-#region docs:generics:collection-repo
+#region generics-collection-repo
 public interface IGenReadOnlyRepository<T>
 {
     IEnumerable<T> GetAll();
@@ -132,7 +132,7 @@ public partial class GenProductRepositoryKnockOff : IGenReadOnlyRepository<GenPr
 // Async Generic Repositories
 // ============================================================================
 
-#region docs:generics:async-generic
+#region generics-async-generic
 public interface IGenAsyncRepository<T> where T : class
 {
     Task<T?> GetByIdAsync(int id);
@@ -159,7 +159,7 @@ public static class GenericsUsageExamples
         var knockOff = new GenUserRepositoryKnockOff();
         IGenRepository<GenUser> repo = knockOff;
 
-        #region docs:generics:tracking
+        #region generics-tracking
         var user = new GenUser { Id = 1, Name = "Test" };
         repo.Save(user);
 
@@ -174,7 +174,7 @@ public static class GenericsUsageExamples
     {
         var knockOff = new GenUserRepositoryKnockOff();
 
-        #region docs:generics:callbacks
+        #region generics-callbacks
         knockOff.GetById.OnCall = (ko, id) =>
             new GenUser { Id = id, Name = $"User-{id}" };
 
@@ -190,7 +190,7 @@ public static class GenericsUsageExamples
     {
         var knockOff = new GenStringCacheKnockOff();
 
-        #region docs:generics:multiple-params-usage
+        #region generics-multiple-params-usage
         knockOff.Get.OnCall = (ko, key) => key switch
         {
             "admin" => new GenUser { Name = "Admin" },
@@ -209,7 +209,7 @@ public static class GenericsUsageExamples
     {
         var knockOff = new GenUserFactoryKnockOff();
 
-        #region docs:generics:factory-usage
+        #region generics-factory-usage
         knockOff.Create.OnCall = (ko) => new GenUser { Name = "Created" };
         #endregion
     }
@@ -218,7 +218,7 @@ public static class GenericsUsageExamples
     {
         var knockOff = new GenProductRepositoryKnockOff();
 
-        #region docs:generics:collection-usage
+        #region generics-collection-usage
         var products = new List<GenProduct>
         {
             new GenProduct { Id = 1, Name = "Widget" },
@@ -237,7 +237,7 @@ public static class GenericsUsageExamples
         var knockOff = new GenAsyncUserRepositoryKnockOff();
         var users = new List<GenUser> { new GenUser { Id = 1, Name = "Test" } };
 
-        #region docs:generics:async-usage
+        #region generics-async-usage
         knockOff.GetByIdAsync.OnCall = (ko, id) =>
             Task.FromResult<GenUser?>(new GenUser { Id = id });
 

@@ -6,6 +6,7 @@ Starting in v10.9, standalone KnockOff stubs implement **one interface** (plus i
 
 Standalone stubs must implement exactly one interface:
 
+<!-- invalid:multiple-interface-constraint -->
 ```csharp
 // Valid - single interface
 [KnockOff]
@@ -19,6 +20,7 @@ public partial class EntityKnockOff : IEntityBase { }  // IEntityBase : IValidat
 [KnockOff]
 public partial class DataContextKnockOff : IRepository, IUnitOfWork { }  // Error!
 ```
+<!-- /snippet -->
 
 **Diagnostic KO0010:** "KnockOff stubs should implement a single interface. Create separate stubs for IRepository and IUnitOfWork."
 
@@ -26,6 +28,7 @@ public partial class DataContextKnockOff : IRepository, IUnitOfWork { }  // Erro
 
 Create separate stub classes for each interface:
 
+<!-- pseudo:separate-standalone-stubs -->
 ```csharp
 [KnockOff]
 public partial class RepositoryKnockOff : IRepository { }
@@ -41,18 +44,18 @@ var uow = new UnitOfWorkKnockOff();
 repo.GetById.OnCall = (ko, id) => new User { Id = id };
 uow.SaveChangesAsync.OnCall = (ko, ct) => Task.FromResult(1);
 ```
+<!-- /snippet -->
 
 ## Option 2: Inline Stubs
 
-For tests that need multiple interfaces, use inline stubs with the `[InlineStub<T>]` attribute:
+For tests that need multiple interfaces, use inline stubs with `[KnockOff<T>]` attributes on the test class:
 
+<!-- pseudo:inline-stubs-multiple -->
 ```csharp
+[KnockOff<IRepository>]
+[KnockOff<IUnitOfWork>]
 public partial class DataContextTests
 {
-    [InlineStub<IRepository>]
-    [InlineStub<IUnitOfWork>]
-    partial void DefineStubs();
-
     [Fact]
     public async Task SaveChanges_ReturnsAddCount()
     {
@@ -76,6 +79,7 @@ public partial class DataContextTests
     }
 }
 ```
+<!-- /snippet -->
 
 See [Inline Stubs Guide](inline-stubs.md) for more details.
 
@@ -93,6 +97,7 @@ The single interface constraint exists because:
 
 If you have existing stubs implementing multiple interfaces:
 
+<!-- pseudo:migration-from-multiple -->
 ```csharp
 // v10 - worked but now deprecated
 [KnockOff]
@@ -105,11 +110,12 @@ public partial class RepositoryKnockOff : IRepository { }
 [KnockOff]
 public partial class UnitOfWorkKnockOff : IUnitOfWork { }
 
-// v10.9 - Option B: Inline stubs
-[InlineStub<IRepository>]
-[InlineStub<IUnitOfWork>]
-partial void DefineStubs();
+// v10.9 - Option B: Inline stubs on test class
+[KnockOff<IRepository>]
+[KnockOff<IUnitOfWork>]
+public partial class DataContextTests { }
 ```
+<!-- /snippet -->
 
 ## Related Guides
 

@@ -68,7 +68,7 @@ public interface ISkService
     int GetValue(int id);
 }
 
-#region skill:SKILL:duality-pattern
+#region skill-SKILL-duality-pattern
 // Pattern 1: User method (compile-time default)
 [KnockOff]
 public partial class SkServiceKnockOff : ISkService
@@ -81,7 +81,7 @@ public partial class SkServiceKnockOff : ISkService
 // Quick Start
 // ============================================================================
 
-#region skill:SKILL:quick-start-interface
+#region skill-SKILL-quick-start-interface
 public interface ISkDataService
 {
     string Name { get; set; }
@@ -90,7 +90,7 @@ public interface ISkDataService
 }
 #endregion
 
-#region skill:SKILL:quick-start-stub
+#region skill-SKILL-quick-start-stub
 [KnockOff]
 public partial class SkDataServiceKnockOff : ISkDataService
 {
@@ -128,7 +128,7 @@ public interface ISkEventSource
 
 // Note: Multi-interface standalone stubs are no longer supported (KO0010).
 // Use inline stubs [KnockOff<T>] or separate single-interface stubs.
-#region skill:SKILL:interface-access
+#region skill-SKILL-interface-access
 [KnockOff]
 public partial class SkUserServiceKnockOff : ISkUserService { }
 
@@ -160,7 +160,7 @@ public interface ISkUnitOfWork
 
 // Note: Multi-interface standalone stubs are no longer supported (KO0010).
 // Use inline stubs [KnockOff<T>] or separate single-interface stubs.
-#region skill:SKILL:multiple-interfaces
+#region skill-SKILL-multiple-interfaces
 [KnockOff]
 public partial class SkRepositoryKnockOff : ISkRepository { }
 
@@ -184,7 +184,7 @@ public interface ISkOnCallService
     void Save(object entity);
 }
 
-#region skill:SKILL:oncall-patterns
+#region skill-SKILL-oncall-patterns
 [KnockOff]
 public partial class SkOnCallKnockOff : ISkOnCallService { }
 #endregion
@@ -198,7 +198,7 @@ public interface ISkParser
     bool TryParse(string input, out int result);
 }
 
-#region skill:SKILL:oncall-out-ref
+#region skill-SKILL-oncall-out-ref
 [KnockOff]
 public partial class SkParserKnockOff : ISkParser { }
 #endregion
@@ -216,7 +216,7 @@ public interface ISkSmartDefaultService
     IDisposable GetDisposable();
 }
 
-#region skill:SKILL:smart-defaults
+#region skill-SKILL-smart-defaults
 [KnockOff]
 public partial class SkSmartDefaultKnockOff : ISkSmartDefaultService { }
 #endregion
@@ -231,7 +231,7 @@ public interface ISkRepoService
     Task<SkUser?> GetByIdAsync(int id);
 }
 
-#region skill:SKILL:customization-user-method
+#region skill-SKILL-customization-user-method
 [KnockOff]
 public partial class SkRepoKnockOff : ISkRepoService
 {
@@ -258,7 +258,7 @@ public interface ISkCallbackPropertyStore
     object? this[string key] { get; set; }
 }
 
-#region skill:SKILL:customization-callbacks-method
+#region skill-SKILL-customization-callbacks-method
 [KnockOff]
 public partial class SkCallbackMethodKnockOff : ISkCallbackService { }
 #endregion
@@ -266,7 +266,7 @@ public partial class SkCallbackMethodKnockOff : ISkCallbackService { }
 // skill:SKILL:property-value-pattern sourced from SkillSamplesTests.cs
 // skill:SKILL:customization-callbacks-property sourced from SkillSamplesTests.cs
 
-#region skill:SKILL:customization-callbacks-indexer
+#region skill-SKILL-customization-callbacks-indexer
 [KnockOff]
 public partial class SkCallbackIndexerKnockOff : ISkCallbackPropertyStore { }
 #endregion
@@ -309,14 +309,14 @@ public interface ISkVerificationPropertyStore
     object? this[string key] { get; set; }
 }
 
-#region skill:SKILL:verification-call-tracking
+#region skill-SKILL-verification-call-tracking
 [KnockOff]
 public partial class SkVerificationKnockOff : ISkVerificationService { }
 #endregion
 
 // skill:SKILL:verification-property-tracking sourced from SkillSamplesTests.cs
 
-#region skill:SKILL:verification-indexer-tracking
+#region skill-SKILL-verification-indexer-tracking
 [KnockOff]
 public partial class SkVerificationIndexerKnockOff : ISkVerificationPropertyStore { }
 #endregion
@@ -335,12 +335,12 @@ public interface ISkBackingPropertyStore
     object? this[string key] { get; set; }
 }
 
-#region skill:SKILL:backing-properties
+#region skill-SKILL-backing-properties
 [KnockOff]
 public partial class SkBackingServiceKnockOff : ISkBackingService { }
 #endregion
 
-#region skill:SKILL:backing-indexers
+#region skill-SKILL-backing-indexers
 [KnockOff]
 public partial class SkBackingPropertyStoreKnockOff : ISkBackingPropertyStore { }
 #endregion
@@ -358,7 +358,7 @@ public interface ISkPatternService
 }
 
 // Conditional Returns
-#region skill:SKILL:pattern-conditional
+#region skill-SKILL-pattern-conditional
 [KnockOff]
 public partial class SkPatternServiceKnockOff : ISkPatternService { }
 #endregion
@@ -373,7 +373,7 @@ public interface ISkAsyncPatternRepository
     Task<int> SaveAsync(object entity);
 }
 
-#region skill:SKILL:pattern-async
+#region skill-SKILL-pattern-async
 [KnockOff]
 public partial class SkAsyncPatternRepositoryKnockOff : ISkAsyncPatternRepository { }
 #endregion
@@ -385,7 +385,7 @@ public interface ISkEventPatternSource
     event Action<int> ProgressChanged;
 }
 
-#region skill:SKILL:pattern-events
+#region skill-SKILL-pattern-events
 [KnockOff]
 public partial class SkEventPatternSourceKnockOff : ISkEventPatternSource { }
 #endregion
@@ -397,7 +397,7 @@ public interface ISkGenericSerializer
     TOut Convert<TIn, TOut>(TIn input);
 }
 
-#region skill:SKILL:pattern-generics
+#region skill-SKILL-pattern-generics
 [KnockOff]
 public partial class SkGenericSerializerKnockOff : ISkGenericSerializer { }
 #endregion
@@ -410,13 +410,13 @@ public interface ISkOverloadedService
     void Process(string data, int priority, bool async);
 }
 
-#region skill:SKILL:pattern-overloads
+#region skill-SKILL-pattern-overloads
 [KnockOff]
 public partial class SkOverloadedServiceKnockOff : ISkOverloadedService { }
 #endregion
 
 // Nested Classes
-#region skill:SKILL:pattern-nested
+#region skill-SKILL-pattern-nested
 public partial class SkUserServiceTests  // Must be partial!
 {
     [KnockOff]
@@ -431,7 +431,7 @@ public interface ISkOutParamParser
     void GetData(out string name, out int count);
 }
 
-#region skill:SKILL:pattern-out-params
+#region skill-SKILL-pattern-out-params
 [KnockOff]
 public partial class SkOutParamParserKnockOff : ISkOutParamParser { }
 #endregion
@@ -443,7 +443,7 @@ public interface ISkRefProcessor
     bool TryUpdate(string key, ref string value);
 }
 
-#region skill:SKILL:pattern-ref-params
+#region skill-SKILL-pattern-ref-params
 [KnockOff]
 public partial class SkRefProcessorKnockOff : ISkRefProcessor { }
 #endregion
@@ -468,7 +468,7 @@ public interface ISkInlineLogger
     void Log(string message);
 }
 
-#region skill:SKILL:inline-stub-pattern
+#region skill-SKILL-inline-stub-pattern
 [KnockOff<ISkInlineUserService>]
 [KnockOff<ISkInlineLogger>]
 public partial class SkInlineUserServiceTests
@@ -481,7 +481,7 @@ public partial class SkInlineUserServiceTests
 // Partial Properties (C# 13+)
 // ============================================================================
 
-#region skill:SKILL:partial-properties
+#region skill-SKILL-partial-properties
 [KnockOff<ISkInlineUserService>]
 public partial class SkPartialPropertyTests
 {
@@ -496,7 +496,7 @@ public partial class SkPartialPropertyTests
 public delegate bool SkIsUniqueRule(string value);
 public delegate SkUser SkUserFactory(int id);
 
-#region skill:SKILL:delegate-stubs
+#region skill-SKILL-delegate-stubs
 [KnockOff<SkIsUniqueRule>]
 [KnockOff<SkUserFactory>]
 public partial class SkValidationTests
@@ -509,7 +509,7 @@ public partial class SkValidationTests
 // Class Stubs
 // ============================================================================
 
-#region skill:SKILL:class-stubs-class
+#region skill-SKILL-class-stubs-class
 public class SkEmailService
 {
     public virtual void Send(string to, string subject, string body)
@@ -519,7 +519,7 @@ public class SkEmailService
 }
 #endregion
 
-#region skill:SKILL:class-stubs
+#region skill-SKILL-class-stubs
 [KnockOff<SkEmailService>]
 public partial class SkEmailServiceTests
 {
@@ -538,7 +538,7 @@ public class SkRepository
     public virtual void Save(object entity) { }
 }
 
-#region skill:SKILL:class-constructor
+#region skill-SKILL-class-constructor
 [KnockOff<SkRepository>]
 public partial class SkConstructorTests
 {
@@ -556,7 +556,7 @@ public abstract class SkBaseRepository
     public abstract void Save(object entity);
 }
 
-#region skill:SKILL:abstract-classes
+#region skill-SKILL-abstract-classes
 [KnockOff<SkBaseRepository>]
 public partial class SkAbstractTests
 {
@@ -575,7 +575,7 @@ public class SkNonVirtualService
     public virtual string VirtualProperty { get; set; } = "Virtual";
 }
 
-#region skill:SKILL:non-virtual-members
+#region skill-SKILL-non-virtual-members
 [KnockOff<SkNonVirtualService>]
 public partial class SkNonVirtualTests
 {
@@ -594,7 +594,7 @@ public interface ISkMinimalService
     List<SkUser> GetUsers();
 }
 
-#region skill:SKILL:stub-minimalism
+#region skill-SKILL-stub-minimalism
 // GOOD - minimal stub, most methods just work with smart defaults
 [KnockOff]
 public partial class SkMinimalServiceKnockOff : ISkMinimalService
@@ -616,7 +616,7 @@ public interface ISkSingleMethodService
     void SendEmail(string to, string subject);
 }
 
-#region skill:SKILL:overload-no-suffix
+#region skill-SKILL-overload-no-suffix
 [KnockOff]
 public partial class SkSingleMethodServiceKnockOff : ISkSingleMethodService { }
 #endregion

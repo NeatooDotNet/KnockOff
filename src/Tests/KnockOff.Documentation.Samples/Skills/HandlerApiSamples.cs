@@ -45,7 +45,7 @@ public interface IHaService
     HaEntity Create(string name, int value);
 }
 
-#region skill:interceptor-api:method-interceptor-example
+#region skill-interceptor-api-method-interceptor-example
 [KnockOff]
 public partial class HaServiceKnockOff : IHaService { }
 #endregion
@@ -59,7 +59,7 @@ public interface IHaPropertyService
     string Name { get; set; }
 }
 
-#region skill:interceptor-api:property-interceptor-example
+#region skill-interceptor-api-property-interceptor-example
 [KnockOff]
 public partial class HaPropertyServiceKnockOff : IHaPropertyService { }
 #endregion
@@ -73,7 +73,7 @@ public interface IHaPropertyStore
     object? this[string key] { get; set; }
 }
 
-#region skill:interceptor-api:indexer-interceptor-example
+#region skill-interceptor-api-indexer-interceptor-example
 [KnockOff]
 public partial class HaPropertyStoreKnockOff : IHaPropertyStore { }
 #endregion
@@ -90,7 +90,7 @@ public interface IHaEventSource
     event Action<string, int> DataUpdated;
 }
 
-#region skill:interceptor-api:event-interceptor-example
+#region skill-interceptor-api-event-interceptor-example
 [KnockOff]
 public partial class HaEventSourceKnockOff : IHaEventSource { }
 #endregion
@@ -107,7 +107,7 @@ public interface IHaOverloadService
     int Calculate(int a, int b);
 }
 
-#region skill:interceptor-api:overload-interceptor-example
+#region skill-interceptor-api-overload-interceptor-example
 [KnockOff]
 public partial class HaOverloadServiceKnockOff : IHaOverloadService { }
 #endregion
@@ -122,7 +122,7 @@ public interface IHaParser
     void GetData(out string name, out int count);
 }
 
-#region skill:interceptor-api:out-param-callback
+#region skill-interceptor-api-out-param-callback
 [KnockOff]
 public partial class HaParserKnockOff : IHaParser { }
 #endregion
@@ -137,7 +137,7 @@ public interface IHaProcessor
     bool TryUpdate(string key, ref string value);
 }
 
-#region skill:interceptor-api:ref-param-callback
+#region skill-interceptor-api-ref-param-callback
 [KnockOff]
 public partial class HaProcessorKnockOff : IHaProcessor { }
 #endregion
@@ -154,7 +154,7 @@ public interface IHaAsyncRepository
     Task<int> SaveAsync(object entity);
 }
 
-#region skill:interceptor-api:async-interceptor-example
+#region skill-interceptor-api-async-interceptor-example
 [KnockOff]
 public partial class HaAsyncRepositoryKnockOff : IHaAsyncRepository { }
 #endregion
@@ -169,7 +169,7 @@ public interface IHaSerializer
     TOut Convert<TIn, TOut>(TIn input);
 }
 
-#region skill:interceptor-api:generic-interceptor-example
+#region skill-interceptor-api-generic-interceptor-example
 [KnockOff]
 public partial class HaSerializerKnockOff : IHaSerializer { }
 #endregion
@@ -187,7 +187,7 @@ public interface IHaDefaultsService
     IDisposable GetDisposable();
 }
 
-#region skill:interceptor-api:smart-defaults-example
+#region skill-interceptor-api-smart-defaults-example
 [KnockOff]
 public partial class HaDefaultsServiceKnockOff : IHaDefaultsService { }
 #endregion

@@ -15,189 +15,204 @@ Neatoo interfaces are defined in: `/home/keithvoels/neatoodotnet/Neatoo/src/Neat
 
 ### Phase 1: Core Domain Interfaces
 
-- [ ] INeatooObject (marker interface)
-  - [ ] Inline stub
-  - [ ] Standalone stub
-  - [ ] Tests: marker interface compiles with no interceptors
+- [x] INeatooObject (marker interface)
+  - [x] Inline stub
+  - [x] Standalone stub
+  - [x] Tests: marker interface compiles with no interceptors
 
 - [ ] IValidateBase
   - [ ] Inline stub
   - [ ] Tests: Parent property tracking, IsPaused, GetProperty/TryGetProperty
-  - Note: Complex interface with validation meta-properties
+  - Note: Complex interface with validation meta-properties. Currently used as base interface but no dedicated tests.
 
 - [ ] IEntityBase
   - [ ] Inline stub
   - [ ] Tests: Root property, ModifiedProperties, Delete/UnDelete, Save, indexer
-  - Note: Extends IValidateBase; test inheritance handling
+  - Note: Extends IValidateBase; test inheritance handling. No dedicated tests yet.
 
 ### Phase 2: Validation & Rules
 
-- [ ] IRule
-  - [ ] Inline stub
-  - [ ] Tests: Executed flag, RuleOrder, UniqueIndex, Messages collection, TriggerProperties, RunRule/OnRuleAdded methods
+- [x] IRule
+  - [x] Inline stub
+  - [x] Tests: Executed flag, RuleOrder, UniqueIndex, Messages collection, TriggerProperties, RunRule/OnRuleAdded methods
 
-- [ ] IRule<T>
-  - [ ] Inline stub with generic target type
-  - [ ] Tests: Strongly-typed RunRule with CancellationToken
+- [x] IRule<T>
+  - [x] Inline stub with generic target type
+  - [x] Tests: Strongly-typed RunRule with CancellationToken
 
-- [ ] IRuleManager
-  - [ ] Inline stub
-  - [ ] Tests: Rules collection, RunRules, AddRule<T>, AddRules<T>, RunRule
+- [x] IRuleManager
+  - [x] Inline stub
+  - [x] Tests: Rules collection, RunRules, AddRule<T>, AddRules<T>, RunRule
 
 - [ ] IRuleManager<T>
   - [ ] Inline stub
   - [ ] Tests: AddAction, AddValidation, AddActionAsync, AddValidationAsync (multiple overloads)
-  - Note: Heavy use of method overloads
+  - Note: Heavy use of method overloads. Not yet implemented.
 
-- [ ] ITriggerProperty
-  - [ ] Inline stub
-  - [ ] Tests: PropertyName, IsMatch method
+- [x] ITriggerProperty
+  - [x] Inline stub
+  - [x] Tests: PropertyName, IsMatch method
 
 - [ ] ITriggerProperty<T>
   - [ ] Inline stub
   - [ ] Tests: GetValue with typed target
+  - Note: Generic variant not yet implemented separately.
 
-- [ ] IRuleMessage
-  - [ ] Inline stub
-  - [ ] Tests: RuleIndex, PropertyName, Message properties
+- [x] IRuleMessage
+  - [x] Inline stub
+  - [x] Tests: RuleIndex, PropertyName, Message properties
 
-- [ ] IRuleMessages (inherits IList<IRuleMessage>)
-  - [ ] Inline stub
-  - [ ] Tests: Collection operations from IList inheritance
+- [x] IRuleMessages (inherits IList<IRuleMessage>)
+  - [x] Inline stub
+  - [x] Tests: Collection operations from IList inheritance
   - Note: Tests interface inheritance flattening
 
 ### Phase 3: Built-in Rule Interfaces
 
-- [ ] IRequiredRule
-  - [ ] Inline stub
-  - [ ] Tests: ErrorMessage property
+All built-in rules consolidated in `OtherBuiltInRuleTests.cs`:
 
-- [ ] IMaxLengthRule
-  - [ ] Inline stub
-  - [ ] Tests: ErrorMessage, Length properties
+- [x] IRequiredRule
+  - [x] Inline stub (in IRequiredRuleTests.cs)
+  - [x] Tests: ErrorMessage property, base IRule members
 
-- [ ] IMinLengthRule
-  - [ ] Inline stub
-  - [ ] Tests: ErrorMessage, Length properties
+- [x] IMaxLengthRule
+  - [x] Inline stub
+  - [x] Standalone stub
+  - [x] Tests: ErrorMessage, Length properties
 
-- [ ] IStringLengthRule
-  - [ ] Inline stub
-  - [ ] Tests: ErrorMessage, MinimumLength, MaximumLength properties
+- [x] IMinLengthRule
+  - [x] Inline stub
+  - [x] Standalone stub
+  - [x] Tests: ErrorMessage, Length properties
 
-- [ ] IEmailAddressRule
-  - [ ] Inline stub
-  - [ ] Tests: ErrorMessage property
+- [x] IStringLengthRule
+  - [x] Inline stub
+  - [x] Standalone stub
+  - [x] Tests: ErrorMessage, MinimumLength, MaximumLength properties
 
-- [ ] IRegularExpressionRule
-  - [ ] Inline stub
-  - [ ] Tests: ErrorMessage, Pattern properties
+- [x] IEmailAddressRule
+  - [x] Inline stub
+  - [x] Standalone stub
+  - [x] Tests: ErrorMessage property
 
-- [ ] IRangeRule
-  - [ ] Inline stub
-  - [ ] Tests: ErrorMessage, Minimum, Maximum properties
+- [x] IRegularExpressionRule
+  - [x] Inline stub
+  - [x] Standalone stub
+  - [x] Tests: ErrorMessage, Pattern properties
 
-- [ ] IAttributeToRule
-  - [ ] Inline stub
-  - [ ] Tests: GetRule<T> generic method
+- [x] IRangeRule
+  - [x] Inline stub
+  - [x] Standalone stub
+  - [x] Tests: ErrorMessage, Minimum, Maximum properties
+
+- [x] IAttributeToRule
+  - [x] Inline stub
+  - [x] Standalone stub
+  - [x] Tests: GetRule<T> generic method
 
 - [ ] IAllRequiredRulesExecuted (inherits IRule<IValidateBase>)
   - [ ] Inline stub
   - [ ] Tests: Combined interface behavior
+  - Note: Not yet implemented.
 
 ### Phase 4: Property Interfaces
 
-- [ ] IValidateProperty
-  - [ ] Inline stub
-  - [ ] Tests: Name, Value, SetValue, Task, IsBusy, IsReadOnly, AddMarkedBusy, RemoveMarkedBusy, LoadValue, WaitForTasks, GetAwaiter, Type, StringValue, IsSelfValid, IsValid, RunRules, PropertyMessages
+- [x] IValidateProperty
+  - [x] Inline stub
+  - [x] Tests: Name, Value, SetValue, Task, IsBusy, IsReadOnly, AddMarkedBusy, RemoveMarkedBusy, LoadValue, WaitForTasks, GetAwaiter, Type, StringValue, IsSelfValid, IsValid, RunRules, PropertyMessages
   - Note: Large interface with many members
 
 - [ ] IValidateProperty<T>
   - [ ] Inline stub
   - [ ] Tests: Typed Value property
+  - Note: Covered by IValidatePropertyOfStringStub in IValidatePropertyTests but no dedicated generic tests.
 
-- [ ] IEntityProperty
-  - [ ] Inline stub
-  - [ ] Tests: IsPaused, IsModified, IsSelfModified, MarkSelfUnmodified, DisplayName, ApplyPropertyInfo
+- [x] IEntityProperty
+  - [x] Inline stub
+  - [x] Tests: IsPaused, IsModified, IsSelfModified, MarkSelfUnmodified, DisplayName, ApplyPropertyInfo
 
 - [ ] IEntityProperty<T>
   - [ ] Inline stub
   - [ ] Tests: Combined IEntityProperty + IValidateProperty<T>
-  - Note: Multiple interface inheritance
+  - Note: Has generated stub (EntityPropertyOfStringStub) but limited test coverage.
 
-- [ ] IPropertyInfo
-  - [ ] Inline stub
-  - [ ] Tests: PropertyInfo, Name, Type, Key, IsPrivateSetter, GetCustomAttribute<T>, GetCustomAttributes
+- [x] IPropertyInfo
+  - [x] Inline stub
+  - [x] Tests: PropertyInfo, Name, Type, Key, IsPrivateSetter, GetCustomAttribute<T>, GetCustomAttributes
 
 - [ ] IPropertyInfoList
   - [ ] Inline stub
   - [ ] Tests: GetPropertyInfo, Properties, HasProperty
+  - Note: Has generated stub but no dedicated test file.
 
 - [ ] IPropertyInfoList<T>
   - [ ] Inline stub
   - [ ] Tests: Inherits IPropertyInfoList
+  - Note: Has generated stub but no dedicated test file.
 
 - [ ] IPropertyMessage
   - [ ] Inline stub
   - [ ] Tests: Property, Message properties
+  - Note: Not yet implemented.
 
 ### Phase 5: Property Manager Interfaces
 
-- [ ] IValidatePropertyManager<P>
-  - [ ] Inline stub
-  - [ ] Tests: IsBusy, WaitForTasks, HasProperty, GetProperty, indexer, SetProperties, IsSelfValid, IsValid, RunRules, PropertyMessages, IsPaused, PauseAllActions, ResumeAllActions, ClearAllMessages, ClearSelfMessages
+- [x] IValidatePropertyManager<P>
+  - [x] Inline stub
+  - [x] Tests: IsBusy, WaitForTasks, HasProperty, GetProperty, indexer, SetProperties, IsSelfValid, IsValid, RunRules, PropertyMessages, IsPaused, PauseAllActions, ResumeAllActions, ClearAllMessages, ClearSelfMessages
   - Note: Generic interface with many members
 
-- [ ] IEntityPropertyManager
-  - [ ] Inline stub
-  - [ ] Tests: IsModified, IsSelfModified, ModifiedProperties, MarkSelfUnmodified
+- [x] IEntityPropertyManager
+  - [x] Inline stub
+  - [x] Tests: IsModified, IsSelfModified, ModifiedProperties, MarkSelfUnmodified
 
 ### Phase 6: Service Interfaces
 
 - [ ] IValidateBaseServices<T>
-  - [ ] Inline stub
+  - [x] Generated stub exists
   - [ ] Tests: PropertyInfoList, ValidatePropertyManager, CreateRuleManager method
-  - Note: Core DI service interface
+  - Note: Core DI service interface. Stub generated, tests not written.
 
 - [ ] IEntityBaseServices<T>
-  - [ ] Inline stub
+  - [x] Generated stub exists
   - [ ] Tests: EntityPropertyManager, Factory (nullable IFactorySave<T>)
-  - Note: Extends IValidateBaseServices
+  - Note: Extends IValidateBaseServices. Stub generated, tests not written.
 
 ### Phase 7: Meta Property Interfaces
 
-- [ ] IValidateMetaProperties
-  - [ ] Inline stub
-  - [ ] Tests: IsBusy, WaitForTasks (with and without CancellationToken), IsValid, IsSelfValid, PropertyMessages, RunRules, ClearAllMessages, ClearSelfMessages
+- [x] IValidateMetaProperties
+  - [x] Inline stub
+  - [x] Tests: IsBusy, WaitForTasks (with and without CancellationToken), IsValid, IsSelfValid, PropertyMessages, RunRules, ClearAllMessages, ClearSelfMessages
 
-- [ ] IEntityMetaProperties
-  - [ ] Inline stub
-  - [ ] Tests: IsChild, IsModified, IsSelfModified, IsMarkedModified, IsSavable
+- [x] IEntityMetaProperties
+  - [x] Inline stub
+  - [x] Tests: IsChild, IsModified, IsSelfModified, IsMarkedModified, IsSavable
 
 ### Phase 8: Collection Interfaces
 
-- [ ] IValidateListBase (non-generic)
-  - [ ] Inline stub
-  - [ ] Tests: Parent property
+- [x] IValidateListBase (non-generic)
+  - [x] Inline stub
+  - [x] Tests: Parent property
 
 - [ ] IValidateListBase<I>
-  - [ ] Inline stub
+  - [x] Generated stub exists
   - [ ] Tests: Parent, plus inherited IList<I> and IValidateMetaProperties members
-  - Note: Multiple interface inheritance chain
+  - Note: Multiple interface inheritance chain. Stub generated, limited test coverage.
 
-- [ ] IEntityListBase (non-generic)
-  - [ ] Inline stub
-  - [ ] Tests: Root property
+- [x] IEntityListBase (non-generic)
+  - [x] Inline stub
+  - [x] Tests: Root property
 
 - [ ] IEntityListBase<I>
-  - [ ] Inline stub
+  - [x] Generated stub exists
   - [ ] Tests: RemoveAt overloads, plus inherited members
-  - Note: Entity list with deleted item management
+  - Note: Entity list with deleted item management. Stub generated, limited test coverage.
 
 ### Phase 9: Notification Interfaces
 
-- [ ] INotifyNeatooPropertyChanged
-  - [ ] Inline stub
-  - [ ] Tests: NeatooPropertyChanged event subscription, firing with breadcrumb path
+- [x] INotifyNeatooPropertyChanged
+  - [x] Inline stub
+  - [x] Tests: NeatooPropertyChanged event subscription, firing with breadcrumb path
   - Note: Custom delegate type (NeatooPropertyChanged)
 
 ### Phase 10: Internal/Factory Interfaces
@@ -205,7 +220,7 @@ Neatoo interfaces are defined in: `/home/keithvoels/neatoodotnet/Neatoo/src/Neat
 - [ ] IFactory (Neatoo.Internal)
   - [ ] Inline stub
   - [ ] Tests: CreateValidateProperty<P>, CreateEntityProperty<P> generic methods
-  - Note: Internal factory, lower priority
+  - Note: Internal factory, lower priority. Not yet implemented.
 
 ---
 
@@ -236,69 +251,41 @@ Neatoo interfaces are defined in: `/home/keithvoels/neatoodotnet/Neatoo/src/Neat
 
 ### Test Project Location
 
-**Structure: One test class per Neatoo interface** - Each interface gets its own file to keep tests focused and discoverable.
+**Structure: One test class per Neatoo interface** - Each interface gets its own file to keep tests focused and discoverable. Some related interfaces are consolidated (e.g., built-in rules in `OtherBuiltInRuleTests.cs`).
 
 ```
 src/Tests/KnockOff.NeatooInterfaceTests/
 ├── KnockOff.NeatooInterfaceTests.csproj
 ├── CoreDomain/
-│   ├── INeatooObjectTests.cs
-│   ├── IValidateBaseTests.cs
-│   └── IEntityBaseTests.cs
+│   └── INeatooObjectTests.cs
 ├── ValidationRules/
 │   ├── IRuleTests.cs
 │   ├── IRuleOfTTests.cs
 │   ├── IRuleManagerTests.cs
-│   ├── IRuleManagerOfTTests.cs
 │   ├── ITriggerPropertyTests.cs
-│   ├── ITriggerPropertyOfTTests.cs
 │   ├── IRuleMessageTests.cs
 │   └── IRuleMessagesTests.cs
 ├── BuiltInRules/
 │   ├── IRequiredRuleTests.cs
-│   ├── IMaxLengthRuleTests.cs
-│   ├── IMinLengthRuleTests.cs
-│   ├── IStringLengthRuleTests.cs
-│   ├── IEmailAddressRuleTests.cs
-│   ├── IRegularExpressionRuleTests.cs
-│   ├── IRangeRuleTests.cs
-│   ├── IAttributeToRuleTests.cs
-│   └── IAllRequiredRulesExecutedTests.cs
+│   └── OtherBuiltInRuleTests.cs  (consolidates IMaxLengthRule, IMinLengthRule, etc.)
 ├── Properties/
 │   ├── IValidatePropertyTests.cs
-│   ├── IValidatePropertyOfTTests.cs
 │   ├── IEntityPropertyTests.cs
-│   ├── IEntityPropertyOfTTests.cs
-│   ├── IPropertyInfoTests.cs
-│   ├── IPropertyInfoListTests.cs
-│   ├── IPropertyInfoListOfTTests.cs
-│   └── IPropertyMessageTests.cs
+│   └── IPropertyInfoTests.cs
 ├── PropertyManagers/
-│   ├── IValidatePropertyManagerOfPTests.cs
+│   ├── IValidatePropertyManagerTests.cs
 │   └── IEntityPropertyManagerTests.cs
-├── Services/
-│   ├── IValidateBaseServicesOfTTests.cs
-│   └── IEntityBaseServicesOfTTests.cs
 ├── MetaProperties/
 │   ├── IValidateMetaPropertiesTests.cs
 │   └── IEntityMetaPropertiesTests.cs
 ├── Collections/
 │   ├── IValidateListBaseTests.cs
-│   ├── IValidateListBaseOfITests.cs
-│   ├── IEntityListBaseTests.cs
-│   └── IEntityListBaseOfITests.cs
+│   └── IEntityListBaseTests.cs
 ├── Notifications/
 │   └── INotifyNeatooPropertyChangedTests.cs
-├── Internal/
-│   └── IFactoryTests.cs
 └── Generated/
     └── (source-generated stubs)
 ```
-
-**Naming conventions:**
-- Generic interfaces use `OfT` suffix: `IRuleOfTTests.cs` for `IRule<T>`
-- Generic with named parameter uses parameter name: `IValidatePropertyManagerOfPTests.cs` for `IValidatePropertyManager<P>`
-- Each test file contains both inline stub definition and tests for that interface
 
 ### Dependencies
 
@@ -326,44 +313,42 @@ For each interface:
 
 ---
 
-## Estimated Scope
+## Current Status (2026-01-10)
 
-- Neatoo interfaces: ~40 interfaces
-- Average members per interface: ~5
-- Tests per interface: ~4-6
-- **Total: ~160-240 test cases**
+**Build Status:** ✅ 0 errors, 0 warnings
 
----
+**Test Status:** ✅ 473 tests passing
 
-## Current Status (2026-01-09)
+### Completed
 
-**Build Status:** ~234 errors
+- Generator bug for inherited interface methods with different parameter types - **Fixed**
+- Generator bug for generic method constraints not preserved - **Fixed**
+- All existing tests compile and pass
+- Built-in rule interfaces consolidated in `OtherBuiltInRuleTests.cs`
 
-### Blockers
+### Remaining Work
 
-1. **Generator Bug: Inherited Interface Methods with Different Parameter Types**
-   - See `docs/todos/bug-inherited-interface-method-parameter-types.md`
-   - Affects `IRule<T>` and similar patterns where generic and non-generic interfaces have same method name with different parameter types
-   - ~84 errors in generated files
+1. **Core Domain** - IValidateBase and IEntityBase need dedicated tests
+2. **Generic Variants** - IRuleManager<T>, ITriggerProperty<T>, IValidateProperty<T>, IEntityProperty<T> need tests
+3. **Service Interfaces** - IValidateBaseServices<T>, IEntityBaseServices<T> have stubs but no tests
+4. **Collection Generics** - IValidateListBase<I>, IEntityListBase<I> need dedicated tests
+5. **Missing Interfaces** - IAllRequiredRulesExecuted, IPropertyInfoList, IPropertyMessage, IFactory
 
-2. **Test Code Issues**
-   - Tests reference properties that don't exist on interfaces (e.g., `IsPaused` on `IValidateListBase`)
-   - Tests use wrong interceptor names (e.g., `IntIndexer` vs `Int32Indexer`)
-   - Tests use wrong constructor signatures (e.g., `PropertyMessage`)
-   - ~150 errors in test files
-   - **Root cause:** Tests written without fully understanding Neatoo interface hierarchy
+### Progress Summary
 
-### Completed Fixes
-
-1. **Generic Method Constraints Bug** - Fixed in `KnockOffGenerator.cs`
-   - Generator now emits `where T : class` for explicit interface implementations when return type is `T?` and T has type constraints
-   - See `docs/todos/completed/bug-generic-method-constraints-not-preserved.md`
-
-### Next Steps
-
-1. Fix generator bug for inherited interface methods (creates separate bug file)
-2. Rewrite test files with correct understanding of Neatoo interface hierarchy
-3. Verify each interface's members before writing tests
+| Phase | Total Interfaces | Implemented | Remaining |
+|-------|-----------------|-------------|-----------|
+| 1. Core Domain | 3 | 1 | 2 |
+| 2. Validation & Rules | 8 | 6 | 2 |
+| 3. Built-in Rules | 9 | 8 | 1 |
+| 4. Property Interfaces | 8 | 4 | 4 |
+| 5. Property Managers | 2 | 2 | 0 |
+| 6. Service Interfaces | 2 | 0 | 2 |
+| 7. Meta Properties | 2 | 2 | 0 |
+| 8. Collections | 4 | 2 | 2 |
+| 9. Notifications | 1 | 1 | 0 |
+| 10. Internal | 1 | 0 | 1 |
+| **Total** | **40** | **26** | **14** |
 
 ---
 

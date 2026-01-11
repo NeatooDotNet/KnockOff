@@ -31,7 +31,7 @@ namespace KnockOff.Documentation.Samples.GettingStarted;
 // Interface Definition
 // ============================================================================
 
-#region docs:getting-started:interface-definition
+#region getting-started-interface-definition
 public interface IEmailService
 {
     void SendEmail(string to, string subject, string body);
@@ -43,7 +43,7 @@ public interface IEmailService
 // Basic Stub Class
 // ============================================================================
 
-#region docs:getting-started:stub-class
+#region getting-started-stub-class
 [KnockOff]
 public partial class EmailServiceKnockOff : IEmailService
 {
@@ -55,7 +55,7 @@ public partial class EmailServiceKnockOff : IEmailService
 // Stub with User-Defined Method
 // ============================================================================
 
-#region docs:getting-started:user-method
+#region getting-started-user-method
 [KnockOff]
 public partial class EmailServiceWithValidation : IEmailServiceWithValidation
 {
@@ -77,7 +77,7 @@ public interface IEmailServiceWithValidation
 // Stub for Return Values Example
 // ============================================================================
 
-#region docs:getting-started:returning-values
+#region getting-started-returning-values
 [KnockOff]
 public partial class UserServiceKnockOff : IUserServiceSimple
 {
@@ -139,7 +139,7 @@ public interface IAsyncSaveService
 // Step 3: Use in Tests (Comment-based sample)
 // ============================================================================
 
-#region docs:getting-started:step3-test
+#region getting-started-step3-test
 // [Fact]
 // public void NotificationService_SendsEmail_WhenUserRegisters()
 // {
@@ -162,7 +162,7 @@ public interface IAsyncSaveService
 // Method Verification Patterns (Comment-based sample)
 // ============================================================================
 
-#region docs:getting-started:method-verification
+#region getting-started-method-verification
 // Check if called
 // Assert.True(knockOff.SendEmail.WasCalled);
 //
@@ -182,7 +182,7 @@ public interface IAsyncSaveService
 // Property Verification Patterns (Comment-based sample)
 // ============================================================================
 
-#region docs:getting-started:property-verification
+#region getting-started-property-verification
 // Check getter calls
 // Assert.Equal(2, knockOff.IsConnected.GetCount);
 //
@@ -195,7 +195,7 @@ public interface IAsyncSaveService
 // Callbacks Example (Comment-based sample)
 // ============================================================================
 
-#region docs:getting-started:callbacks
+#region getting-started-callbacks
 // [Fact]
 // public void RejectsEmail_WhenNotConnected()
 // {
@@ -218,7 +218,7 @@ public interface IAsyncSaveService
 // Reset Example (Comment-based sample)
 // ============================================================================
 
-#region docs:getting-started:reset
+#region getting-started-reset
 // Reset specific handler
 // knockOff.SendEmail.Reset();
 //
@@ -231,16 +231,16 @@ public interface IAsyncSaveService
 // Simulating Failures Example (Comment-based sample)
 // ============================================================================
 
-#region docs:getting-started:via-callback
+#region getting-started-via-callback
 // knockOff.GetUser.OnCall = (ko, id) => new User { Id = id, Name = "Test" };
 #endregion
 
-#region docs:getting-started:simulating-failures
+#region getting-started-simulating-failures
 // knockOff.SaveAsync.OnCall = (ko, entity) =>
 //     Task.FromException<int>(new DbException("Connection lost"));
 #endregion
 
-#region docs:getting-started:single-method-suffix
+#region getting-started-single-method-suffix
 // knockOff.SendEmail.CallCount;  // Single method - no suffix
 #endregion
 
@@ -248,7 +248,7 @@ public interface IAsyncSaveService
 // Capturing Arguments Example (Comment-based sample)
 // ============================================================================
 
-#region docs:getting-started:capturing-arguments
+#region getting-started-capturing-arguments
 // List<string> sentEmails = new();
 //
 // knockOff.SendEmail.OnCall = (ko, to, subject, body) =>
@@ -266,7 +266,7 @@ public interface IAsyncSaveService
 // Method Overloads Example
 // ============================================================================
 
-#region docs:getting-started:method-overloads
+#region getting-started-method-overloads
 public interface IProcessService
 {
     void Process(string data);                           // Overload 1
@@ -307,7 +307,7 @@ public interface IEntity
     int Id { get; }
 }
 
-#region docs:getting-started:single-interface
+#region getting-started-single-interface
 // Single interface - this is the standard pattern
 [KnockOff]
 public partial class SingleRepositoryKnockOff : IRepository { }
@@ -329,7 +329,7 @@ public partial class EntityKnockOff : IEntity { }
 // Inline Stubs Example (Cross-reference to inline-stubs.md)
 // ============================================================================
 
-#region docs:getting-started:inline-stubs-example
+#region getting-started-inline-stubs-example
 [KnockOff<IRepository>]
 [KnockOff<IUnitOfWork>]
 public partial class InlineStubsExampleTests
@@ -354,7 +354,7 @@ public interface IUserRepository
     void SaveUser(User user);
 }
 
-#region docs:getting-started:nested-classes
+#region getting-started-nested-classes
 public partial class UserServiceTests  // Must be partial!
 {
     [KnockOff]
@@ -375,7 +375,7 @@ public partial class UserServiceTests  // Must be partial!
 // Nested Classes - Partial Requirement (Error example)
 // ============================================================================
 
-#region docs:getting-started:nested-partial-error
+#region getting-started-nested-partial-error
 // Won't compile - containing class not partial
 // public class MyBadTests
 // {
@@ -384,7 +384,7 @@ public partial class UserServiceTests  // Must be partial!
 // }
 #endregion
 
-#region docs:getting-started:nested-partial-correct
+#region getting-started-nested-partial-correct
 // Correct - containing class is partial
 // public partial class MyGoodTests
 // {

@@ -17,7 +17,7 @@ public class FrameworkComparisonSamplesTests
     // Tests a happy path where order processing succeeds
     // ========================================================================
 
-    #region docs:framework-comparison:order-success-moq
+    #region framework-comparison-order-success-moq
     [Fact]
     public void OrderProcessing_Success_Moq()
     {
@@ -61,7 +61,7 @@ public class FrameworkComparisonSamplesTests
     }
     #endregion
 
-    #region docs:framework-comparison:order-success-knockoff
+    #region framework-comparison-order-success-knockoff
     [Fact]
     public void OrderProcessing_Success_KnockOff()
     {
@@ -104,7 +104,7 @@ public class FrameworkComparisonSamplesTests
     }
     #endregion
 
-    #region docs:framework-comparison:order-success-rocks
+    #region framework-comparison-order-success-rocks
     [Fact]
     public void OrderProcessing_Success_Rocks()
     {
@@ -152,7 +152,7 @@ public class FrameworkComparisonSamplesTests
     // Tests error handling when payment fails
     // ========================================================================
 
-    #region docs:framework-comparison:order-payment-failure-moq
+    #region framework-comparison-order-payment-failure-moq
     [Fact]
     public void OrderProcessing_PaymentFailure_Moq()
     {
@@ -202,7 +202,7 @@ public class FrameworkComparisonSamplesTests
     }
     #endregion
 
-    #region docs:framework-comparison:order-payment-failure-knockoff
+    #region framework-comparison-order-payment-failure-knockoff
     [Fact]
     public void OrderProcessing_PaymentFailure_KnockOff()
     {
@@ -245,7 +245,7 @@ public class FrameworkComparisonSamplesTests
     }
     #endregion
 
-    #region docs:framework-comparison:order-payment-failure-rocks
+    #region framework-comparison-order-payment-failure-rocks
     [Fact]
     public void OrderProcessing_PaymentFailure_Rocks()
     {
@@ -295,7 +295,7 @@ public class FrameworkComparisonSamplesTests
     // Tests that cached data is returned without hitting the repository
     // ========================================================================
 
-    #region docs:framework-comparison:cache-hit-moq
+    #region framework-comparison-cache-hit-moq
     [Fact]
     public async Task CachedRepository_CacheHit_Moq()
     {
@@ -323,7 +323,7 @@ public class FrameworkComparisonSamplesTests
     }
     #endregion
 
-    #region docs:framework-comparison:cache-hit-knockoff
+    #region framework-comparison-cache-hit-knockoff
     [Fact]
     public async Task CachedRepository_CacheHit_KnockOff()
     {
@@ -349,7 +349,7 @@ public class FrameworkComparisonSamplesTests
     }
     #endregion
 
-    #region docs:framework-comparison:cache-hit-rocks
+    #region framework-comparison-cache-hit-rocks
     [Fact]
     public async Task CachedRepository_CacheHit_Rocks()
     {
@@ -385,7 +385,7 @@ public class FrameworkComparisonSamplesTests
     // Tests that repository is called on cache miss and result is cached
     // ========================================================================
 
-    #region docs:framework-comparison:cache-miss-moq
+    #region framework-comparison-cache-miss-moq
     [Fact]
     public async Task CachedRepository_CacheMiss_Moq()
     {
@@ -420,7 +420,7 @@ public class FrameworkComparisonSamplesTests
     }
     #endregion
 
-    #region docs:framework-comparison:cache-miss-knockoff
+    #region framework-comparison-cache-miss-knockoff
     [Fact]
     public async Task CachedRepository_CacheMiss_KnockOff()
     {
@@ -449,7 +449,7 @@ public class FrameworkComparisonSamplesTests
     }
     #endregion
 
-    #region docs:framework-comparison:cache-miss-rocks
+    #region framework-comparison-cache-miss-rocks
     [Fact]
     public async Task CachedRepository_CacheMiss_Rocks()
     {

@@ -10,6 +10,25 @@ partial class InlineEntityContainer
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
+		/// <summary>Interceptor for IEntityBase.Root.</summary>
+		public sealed class IEntityBase_RootInterceptor
+		{
+			/// <summary>Number of times the getter was accessed.</summary>
+			public int GetCount { get; private set; }
+
+			/// <summary>Callback for getter. If set, returns its value.</summary>
+			public global::System.Func<Stubs.IEntityBase, global::Neatoo.IValidateBase?>? OnGet { get; set; }
+
+			/// <summary>Value returned by getter when OnGet is not set.</summary>
+			public global::Neatoo.IValidateBase? Value { get; set; } = default!;
+
+			/// <summary>Records a getter access.</summary>
+			public void RecordGet() => GetCount++;
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		}
+
 		/// <summary>Interceptor for IEntityBase.ModifiedProperties.</summary>
 		public sealed class IEntityBase_ModifiedPropertiesInterceptor
 		{
@@ -48,6 +67,25 @@ partial class InlineEntityContainer
 			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
 		}
 
+		/// <summary>Interceptor for IEntityBase.Parent.</summary>
+		public sealed class IEntityBase_ParentInterceptor
+		{
+			/// <summary>Number of times the getter was accessed.</summary>
+			public int GetCount { get; private set; }
+
+			/// <summary>Callback for getter. If set, returns its value.</summary>
+			public global::System.Func<Stubs.IEntityBase, global::Neatoo.IValidateBase?>? OnGet { get; set; }
+
+			/// <summary>Value returned by getter when OnGet is not set.</summary>
+			public global::Neatoo.IValidateBase? Value { get; set; } = default!;
+
+			/// <summary>Records a getter access.</summary>
+			public void RecordGet() => GetCount++;
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		}
+
 		/// <summary>Interceptor for IEntityBase.IsPaused.</summary>
 		public sealed class IEntityBase_IsPausedInterceptor
 		{
@@ -67,36 +105,17 @@ partial class InlineEntityContainer
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IEntityBase.StringIndexer.</summary>
-		public sealed class IEntityBase_StringIndexerInterceptor
-		{
-			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
-
-			/// <summary>The last key used to access the getter.</summary>
-			public string? LastGetKey { get; private set; }
-
-			/// <summary>Callback for getter.</summary>
-			public global::System.Func<Stubs.IEntityBase, string, global::Neatoo.IValidateProperty>? OnGet { get; set; }
-
-			/// <summary>Records a getter access.</summary>
-			public void RecordGet(string propertyName) { GetCount++; LastGetKey = propertyName; }
-
-			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
-		}
-
-		/// <summary>Interceptor for IEntityBase.Parent.</summary>
-		public sealed class IEntityBase_ParentInterceptor
+		/// <summary>Interceptor for IEntityBase.IsBusy.</summary>
+		public sealed class IEntityBase_IsBusyInterceptor
 		{
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IEntityBase, global::Neatoo.IBase?>? OnGet { get; set; }
+			public global::System.Func<Stubs.IEntityBase, bool>? OnGet { get; set; }
 
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
-			public global::Neatoo.IBase? Value { get; set; } = default!;
+			public bool Value { get; set; } = default!;
 
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
@@ -154,25 +173,6 @@ partial class InlineEntityContainer
 
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> Value { get; set; } = default!;
-
-			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => GetCount++;
-
-			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
-		}
-
-		/// <summary>Interceptor for IEntityBase.IsBusy.</summary>
-		public sealed class IEntityBase_IsBusyInterceptor
-		{
-			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
-
-			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IEntityBase, bool>? OnGet { get; set; }
-
-			/// <summary>Value returned by getter when OnGet is not set.</summary>
-			public bool Value { get; set; } = default!;
 
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
@@ -405,6 +405,26 @@ partial class InlineEntityContainer
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
+		/// <summary>Interceptor for IEntityBase.WaitForTasks.</summary>
+		public sealed class IEntityBase_WaitForTasksInterceptor
+		{
+			/// <summary>Number of times this method was called.</summary>
+			public int CallCount { get; private set; }
+
+			/// <summary>Whether this method was called at least once.</summary>
+			public bool WasCalled => CallCount > 0;
+
+			/// <summary>The argument from the last call.</summary>
+			public global::System.Threading.CancellationToken? LastCallArg { get; private set; }
+
+			/// <summary>Callback invoked when method is called.</summary>
+			public global::System.Func<Stubs.IEntityBase, global::System.Threading.CancellationToken?, global::System.Threading.Tasks.Task>? OnCall { get; set; }
+
+			public void RecordCall(global::System.Threading.CancellationToken? token) { CallCount++; LastCallArg = token; }
+
+			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+		}
+
 		/// <summary>Interceptor for IEntityBase.RunRules.</summary>
 		public sealed class IEntityBase_RunRulesInterceptor
 		{
@@ -459,23 +479,6 @@ partial class InlineEntityContainer
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IEntityBase.WaitForTasks.</summary>
-		public sealed class IEntityBase_WaitForTasksInterceptor
-		{
-			/// <summary>Number of times this method was called.</summary>
-			public int CallCount { get; private set; }
-
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
-			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Func<Stubs.IEntityBase, global::System.Threading.Tasks.Task>? OnCall { get; set; }
-
-			public void RecordCall() { CallCount++; }
-
-			public void Reset() { CallCount = 0; OnCall = null; }
-		}
-
 		/// <summary>Interceptor for IEntityBase.PropertyChanged event.</summary>
 		public sealed class IEntityBase_PropertyChangedInterceptor
 		{
@@ -520,23 +523,26 @@ partial class InlineEntityContainer
 			public void Reset() { AddCount = 0; RemoveCount = 0; Handler = null; }
 		}
 
-		/// <summary>Stub implementation of Neatoo.IEntityBase.</summary>
-		public class IEntityBase : Neatoo.IEntityBase
+		/// <summary>Stub implementation of global::Neatoo.IEntityBase.</summary>
+		public class IEntityBase : global::Neatoo.IEntityBase
 		{
+			/// <summary>Interceptor for Root.</summary>
+			public IEntityBase_RootInterceptor Root { get; } = new();
+
 			/// <summary>Interceptor for ModifiedProperties.</summary>
 			public IEntityBase_ModifiedPropertiesInterceptor ModifiedProperties { get; } = new();
 
 			/// <summary>Interceptor for StringIndexer.</summary>
 			public IEntityBase_StringIndexerInterceptor StringIndexer { get; } = new();
 
+			/// <summary>Interceptor for Parent.</summary>
+			public IEntityBase_ParentInterceptor Parent { get; } = new();
+
 			/// <summary>Interceptor for IsPaused.</summary>
 			public IEntityBase_IsPausedInterceptor IsPaused { get; } = new();
 
-			/// <summary>Interceptor for StringIndexer.</summary>
-			public IEntityBase_StringIndexerInterceptor StringIndexer { get; } = new();
-
-			/// <summary>Interceptor for Parent.</summary>
-			public IEntityBase_ParentInterceptor Parent { get; } = new();
+			/// <summary>Interceptor for IsBusy.</summary>
+			public IEntityBase_IsBusyInterceptor IsBusy { get; } = new();
 
 			/// <summary>Interceptor for IsValid.</summary>
 			public IEntityBase_IsValidInterceptor IsValid { get; } = new();
@@ -546,9 +552,6 @@ partial class InlineEntityContainer
 
 			/// <summary>Interceptor for PropertyMessages.</summary>
 			public IEntityBase_PropertyMessagesInterceptor PropertyMessages { get; } = new();
-
-			/// <summary>Interceptor for IsBusy.</summary>
-			public IEntityBase_IsBusyInterceptor IsBusy { get; } = new();
 
 			/// <summary>Interceptor for IsChild.</summary>
 			public IEntityBase_IsChildInterceptor IsChild { get; } = new();
@@ -586,6 +589,9 @@ partial class InlineEntityContainer
 			/// <summary>Interceptor for TryGetProperty.</summary>
 			public IEntityBase_TryGetPropertyInterceptor TryGetProperty { get; } = new();
 
+			/// <summary>Interceptor for WaitForTasks.</summary>
+			public IEntityBase_WaitForTasksInterceptor WaitForTasks { get; } = new();
+
 			/// <summary>Interceptor for RunRules.</summary>
 			public IEntityBase_RunRulesInterceptor RunRules { get; } = new();
 
@@ -595,35 +601,42 @@ partial class InlineEntityContainer
 			/// <summary>Interceptor for ClearSelfMessages.</summary>
 			public IEntityBase_ClearSelfMessagesInterceptor ClearSelfMessages { get; } = new();
 
-			/// <summary>Interceptor for WaitForTasks.</summary>
-			public IEntityBase_WaitForTasksInterceptor WaitForTasks { get; } = new();
-
 			/// <summary>Interceptor for PropertyChanged event.</summary>
 			public IEntityBase_PropertyChangedInterceptor PropertyChangedInterceptor { get; } = new();
 
 			/// <summary>Interceptor for NeatooPropertyChanged event.</summary>
 			public IEntityBase_NeatooPropertyChangedInterceptor NeatooPropertyChangedInterceptor { get; } = new();
 
-			void Neatoo.IEntityBase.Delete()
+			void global::Neatoo.IEntityBase.Delete()
 			{
 				Delete.RecordCall();
 				if (Delete.OnCall is { } onCall) onCall(this);
 			}
 
-			void Neatoo.IEntityBase.UnDelete()
+			void global::Neatoo.IEntityBase.UnDelete()
 			{
 				UnDelete.RecordCall();
 				if (UnDelete.OnCall is { } onCall) onCall(this);
 			}
 
-			global::System.Threading.Tasks.Task<global::Neatoo.IEntityBase> Neatoo.IEntityBase.Save()
+			global::System.Threading.Tasks.Task<global::Neatoo.IEntityBase> global::Neatoo.IEntityBase.Save()
 			{
 				Save.RecordCall();
 				if (Save.OnCall is { } onCall) return onCall(this);
-				return default!;
+				throw new global::System.InvalidOperationException("No implementation provided for Save. Set Save.OnCall.");
 			}
 
-			global::System.Collections.Generic.IEnumerable<string> Neatoo.IEntityBase.ModifiedProperties
+			global::Neatoo.IValidateBase? global::Neatoo.IEntityBase.Root
+			{
+				get
+				{
+					Root.RecordGet();
+					if (Root.OnGet is { } onGet) return onGet(this);
+					return Root.Value;
+				}
+			}
+
+			global::System.Collections.Generic.IEnumerable<string> global::Neatoo.IEntityBase.ModifiedProperties
 			{
 				get
 				{
@@ -633,7 +646,7 @@ partial class InlineEntityContainer
 				}
 			}
 
-			global::Neatoo.IEntityProperty Neatoo.IEntityBase.this[string propertyName]
+			global::Neatoo.IEntityProperty global::Neatoo.IEntityBase.this[string propertyName]
 			{
 				get
 				{
@@ -643,14 +656,14 @@ partial class InlineEntityContainer
 				}
 			}
 
-			global::Neatoo.IValidateProperty Neatoo.IValidateBase.GetProperty(string propertyName)
+			global::Neatoo.IValidateProperty global::Neatoo.IValidateBase.GetProperty(string propertyName)
 			{
 				GetProperty.RecordCall(propertyName);
 				if (GetProperty.OnCall is { } onCall) return onCall(this, propertyName);
-				return default!;
+				throw new global::System.InvalidOperationException("No implementation provided for GetProperty. Set GetProperty.OnCall.");
 			}
 
-			bool Neatoo.IValidateBase.TryGetProperty(string propertyName, out global::Neatoo.IValidateProperty validateProperty)
+			bool global::Neatoo.IValidateBase.TryGetProperty(string propertyName, out global::Neatoo.IValidateProperty validateProperty)
 			{
 				validateProperty = default!;
 				TryGetProperty.RecordCall(propertyName);
@@ -658,27 +671,7 @@ partial class InlineEntityContainer
 				return default!;
 			}
 
-			bool Neatoo.IValidateBase.IsPaused
-			{
-				get
-				{
-					IsPaused.RecordGet();
-					if (IsPaused.OnGet is { } onGet) return onGet(this);
-					return IsPaused.Value;
-				}
-			}
-
-			global::Neatoo.IValidateProperty Neatoo.IValidateBase.this[string propertyName]
-			{
-				get
-				{
-					StringIndexer.RecordGet(propertyName);
-					if (StringIndexer.OnGet is { } onGet) return onGet(this, propertyName);
-					return default!;
-				}
-			}
-
-			global::Neatoo.IBase? Neatoo.IBase.Parent
+			global::Neatoo.IValidateBase? global::Neatoo.IValidateBase.Parent
 			{
 				get
 				{
@@ -688,70 +681,67 @@ partial class InlineEntityContainer
 				}
 			}
 
-			global::System.Threading.Tasks.Task Neatoo.IValidateMetaProperties.RunRules(string propertyName, global::System.Threading.CancellationToken? token)
+			bool global::Neatoo.IValidateBase.IsPaused
+			{
+				get
+				{
+					IsPaused.RecordGet();
+					if (IsPaused.OnGet is { } onGet) return onGet(this);
+					return IsPaused.Value;
+				}
+			}
+
+			global::Neatoo.IValidateProperty global::Neatoo.IValidateBase.this[string propertyName]
+			{
+				get
+				{
+					StringIndexer.RecordGet(propertyName);
+					if (StringIndexer.OnGet is { } onGet) return onGet(this, propertyName);
+					return default!;
+				}
+			}
+
+			global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.WaitForTasks()
+			{
+				WaitForTasks.RecordCall(null);
+				if (WaitForTasks.OnCall is { } onCall) return onCall(this, null);
+				return global::System.Threading.Tasks.Task.CompletedTask;
+			}
+
+			global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.WaitForTasks(global::System.Threading.CancellationToken token)
+			{
+				WaitForTasks.RecordCall(token);
+				if (WaitForTasks.OnCall is { } onCall) return onCall(this, token);
+				return global::System.Threading.Tasks.Task.CompletedTask;
+			}
+
+			global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.RunRules(string propertyName, global::System.Threading.CancellationToken? token)
 			{
 				RunRules.RecordCall(propertyName, token, null);
 				if (RunRules.OnCall is { } onCall) return onCall(this, propertyName, token, null);
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
-			global::System.Threading.Tasks.Task Neatoo.IValidateMetaProperties.RunRules(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
+			global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.RunRules(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
 			{
 				RunRules.RecordCall(null, token, runRules);
 				if (RunRules.OnCall is { } onCall) return onCall(this, null, token, runRules);
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
-			void Neatoo.IValidateMetaProperties.ClearAllMessages()
+			void global::Neatoo.IValidateMetaProperties.ClearAllMessages()
 			{
 				ClearAllMessages.RecordCall();
 				if (ClearAllMessages.OnCall is { } onCall) onCall(this);
 			}
 
-			void Neatoo.IValidateMetaProperties.ClearSelfMessages()
+			void global::Neatoo.IValidateMetaProperties.ClearSelfMessages()
 			{
 				ClearSelfMessages.RecordCall();
 				if (ClearSelfMessages.OnCall is { } onCall) onCall(this);
 			}
 
-			bool Neatoo.IValidateMetaProperties.IsValid
-			{
-				get
-				{
-					IsValid.RecordGet();
-					if (IsValid.OnGet is { } onGet) return onGet(this);
-					return IsValid.Value;
-				}
-			}
-
-			bool Neatoo.IValidateMetaProperties.IsSelfValid
-			{
-				get
-				{
-					IsSelfValid.RecordGet();
-					if (IsSelfValid.OnGet is { } onGet) return onGet(this);
-					return IsSelfValid.Value;
-				}
-			}
-
-			global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> Neatoo.IValidateMetaProperties.PropertyMessages
-			{
-				get
-				{
-					PropertyMessages.RecordGet();
-					if (PropertyMessages.OnGet is { } onGet) return onGet(this);
-					return PropertyMessages.Value;
-				}
-			}
-
-			global::System.Threading.Tasks.Task Neatoo.IBaseMetaProperties.WaitForTasks()
-			{
-				WaitForTasks.RecordCall();
-				if (WaitForTasks.OnCall is { } onCall) return onCall(this);
-				return global::System.Threading.Tasks.Task.CompletedTask;
-			}
-
-			bool Neatoo.IBaseMetaProperties.IsBusy
+			bool global::Neatoo.IValidateMetaProperties.IsBusy
 			{
 				get
 				{
@@ -761,7 +751,37 @@ partial class InlineEntityContainer
 				}
 			}
 
-			bool Neatoo.IEntityMetaProperties.IsChild
+			bool global::Neatoo.IValidateMetaProperties.IsValid
+			{
+				get
+				{
+					IsValid.RecordGet();
+					if (IsValid.OnGet is { } onGet) return onGet(this);
+					return IsValid.Value;
+				}
+			}
+
+			bool global::Neatoo.IValidateMetaProperties.IsSelfValid
+			{
+				get
+				{
+					IsSelfValid.RecordGet();
+					if (IsSelfValid.OnGet is { } onGet) return onGet(this);
+					return IsSelfValid.Value;
+				}
+			}
+
+			global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> global::Neatoo.IValidateMetaProperties.PropertyMessages
+			{
+				get
+				{
+					PropertyMessages.RecordGet();
+					if (PropertyMessages.OnGet is { } onGet) return onGet(this);
+					return PropertyMessages.Value;
+				}
+			}
+
+			bool global::Neatoo.IEntityMetaProperties.IsChild
 			{
 				get
 				{
@@ -771,7 +791,7 @@ partial class InlineEntityContainer
 				}
 			}
 
-			bool Neatoo.IEntityMetaProperties.IsModified
+			bool global::Neatoo.IEntityMetaProperties.IsModified
 			{
 				get
 				{
@@ -781,7 +801,7 @@ partial class InlineEntityContainer
 				}
 			}
 
-			bool Neatoo.IEntityMetaProperties.IsSelfModified
+			bool global::Neatoo.IEntityMetaProperties.IsSelfModified
 			{
 				get
 				{
@@ -791,7 +811,7 @@ partial class InlineEntityContainer
 				}
 			}
 
-			bool Neatoo.IEntityMetaProperties.IsMarkedModified
+			bool global::Neatoo.IEntityMetaProperties.IsMarkedModified
 			{
 				get
 				{
@@ -801,7 +821,7 @@ partial class InlineEntityContainer
 				}
 			}
 
-			bool Neatoo.IEntityMetaProperties.IsSavable
+			bool global::Neatoo.IEntityMetaProperties.IsSavable
 			{
 				get
 				{
@@ -811,7 +831,7 @@ partial class InlineEntityContainer
 				}
 			}
 
-			bool Neatoo.RemoteFactory.IFactorySaveMeta.IsDeleted
+			bool global::Neatoo.RemoteFactory.IFactorySaveMeta.IsDeleted
 			{
 				get
 				{
@@ -821,7 +841,7 @@ partial class InlineEntityContainer
 				}
 			}
 
-			bool Neatoo.RemoteFactory.IFactorySaveMeta.IsNew
+			bool global::Neatoo.RemoteFactory.IFactorySaveMeta.IsNew
 			{
 				get
 				{
@@ -831,13 +851,13 @@ partial class InlineEntityContainer
 				}
 			}
 
-			event global::System.ComponentModel.PropertyChangedEventHandler? System.ComponentModel.INotifyPropertyChanged.PropertyChanged
+			event global::System.ComponentModel.PropertyChangedEventHandler? global::System.ComponentModel.INotifyPropertyChanged.PropertyChanged
 			{
 				add => PropertyChangedInterceptor.RecordAdd(value);
 				remove => PropertyChangedInterceptor.RecordRemove(value);
 			}
 
-			event global::Neatoo.NeatooPropertyChanged? Neatoo.INotifyNeatooPropertyChanged.NeatooPropertyChanged
+			event global::Neatoo.NeatooPropertyChanged? global::Neatoo.INotifyNeatooPropertyChanged.NeatooPropertyChanged
 			{
 				add => NeatooPropertyChangedInterceptor.RecordAdd(value);
 				remove => NeatooPropertyChangedInterceptor.RecordRemove(value);

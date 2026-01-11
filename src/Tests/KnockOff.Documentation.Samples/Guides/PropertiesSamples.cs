@@ -21,7 +21,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 // Get/Set Properties
 // ============================================================================
 
-#region docs:properties:get-set-property
+#region properties-get-set-property
 public interface IPropUserService
 {
     string Name { get; set; }
@@ -35,7 +35,7 @@ public partial class PropUserServiceKnockOff : IPropUserService { }
 // Get-Only Properties
 // ============================================================================
 
-#region docs:properties:get-only-property
+#region properties-get-only-property
 public interface IPropConfig
 {
     string ConnectionString { get; }
@@ -49,7 +49,7 @@ public partial class PropConfigKnockOff : IPropConfig { }
 // Conditional Logic (with Connect method)
 // ============================================================================
 
-#region docs:properties:conditional-logic
+#region properties-conditional-logic
 public interface IPropConnection
 {
     bool IsConnected { get; }
@@ -64,7 +64,7 @@ public partial class PropConnectionKnockOff : IPropConnection { }
 // Computed Property
 // ============================================================================
 
-#region docs:properties:computed-property
+#region properties-computed-property
 public interface IPropPerson
 {
     string FirstName { get; set; }
@@ -80,7 +80,7 @@ public partial class PropPersonKnockOff : IPropPerson { }
 // Status Tracking
 // ============================================================================
 
-#region docs:properties:tracking-changes
+#region properties-tracking-changes
 public interface IPropStatus
 {
     string Status { get; set; }
@@ -94,7 +94,7 @@ public partial class PropStatusKnockOff : IPropStatus { }
 // Throwing on Access
 // ============================================================================
 
-#region docs:properties:throwing-on-access
+#region properties-throwing-on-access
 public interface IPropSecure
 {
     string SecretKey { get; }
@@ -118,7 +118,7 @@ public static class PropertiesUsageExamples
     {
         var knockOff = new PropConfigKnockOff();
 
-        #region docs:properties:get-only-usage
+        #region properties-get-only-usage
         // Set value directly (recommended for static values)
         knockOff.ConnectionString.Value = "Server=test";
         #endregion
@@ -128,7 +128,7 @@ public static class PropertiesUsageExamples
     {
         var knockOff = new PropConfigKnockOff();
 
-        #region docs:properties:get-only-dynamic
+        #region properties-get-only-dynamic
         // Use OnGet callback for dynamic/computed values
         knockOff.ConnectionString.OnGet = (ko) => Environment.GetEnvironmentVariable("DB_CONN") ?? "Server=fallback";
         #endregion
@@ -139,7 +139,7 @@ public static class PropertiesUsageExamples
         var knockOff = new PropUserServiceKnockOff();
         IPropUserService service = knockOff;
 
-        #region docs:properties:value-preset
+        #region properties-value-preset
         // Pre-set a property value before test execution
         knockOff.Name.Value = "John Doe";
 
@@ -155,7 +155,7 @@ public static class PropertiesUsageExamples
         var knockOff = new PropUserServiceKnockOff();
         IPropUserService service = knockOff;
 
-        #region docs:properties:get-tracking
+        #region properties-get-tracking
         _ = service.Name;
         _ = service.Name;
         _ = service.Name;
@@ -171,7 +171,7 @@ public static class PropertiesUsageExamples
         var knockOff = new PropUserServiceKnockOff();
         IPropUserService service = knockOff;
 
-        #region docs:properties:set-tracking
+        #region properties-set-tracking
         service.Name = "First";
         service.Name = "Second";
         service.Name = "Third";
@@ -188,7 +188,7 @@ public static class PropertiesUsageExamples
         var knockOff = new PropUserServiceKnockOff();
         IPropUserService service = knockOff;
 
-        #region docs:properties:default-behavior
+        #region properties-default-behavior
         service.Name = "Test";
         var value = service.Name;  // "Test" - read from backing
         #endregion
@@ -201,7 +201,7 @@ public static class PropertiesUsageExamples
         var knockOff = new PropUserServiceKnockOff();
         IPropUserService service = knockOff;
 
-        #region docs:properties:onget-callback
+        #region properties-onget-callback
         knockOff.Name.OnGet = (ko) => "Always This Value";
 
         var value = service.Name;  // "Always This Value"
@@ -215,7 +215,7 @@ public static class PropertiesUsageExamples
         var knockOff = new PropUserServiceKnockOff();
         IPropUserService service = knockOff;
 
-        #region docs:properties:dynamic-values
+        #region properties-dynamic-values
         var counter = 0;
         knockOff.Name.OnGet = (ko) => $"Call-{++counter}";
 
@@ -231,7 +231,7 @@ public static class PropertiesUsageExamples
         var knockOff = new PropUserServiceKnockOff();
         IPropUserService service = knockOff;
 
-        #region docs:properties:onset-callback
+        #region properties-onset-callback
         string? captured = null;
         knockOff.Name.OnSet = (ko, value) =>
         {
@@ -250,7 +250,7 @@ public static class PropertiesUsageExamples
     {
         var knockOff = new PropConnectionKnockOff();
 
-        #region docs:properties:conditional-usage
+        #region properties-conditional-usage
         knockOff.IsConnected.OnGet = (ko) =>
         {
             // Check other interceptor state
@@ -267,7 +267,7 @@ public static class PropertiesUsageExamples
         service.Name = "Value";
         _ = service.Name;
 
-        #region docs:properties:reset
+        #region properties-reset
         knockOff.Name.Reset();
 
         var getCount = knockOff.Name.GetCount;    // 0
@@ -285,7 +285,7 @@ public static class PropertiesUsageExamples
         var knockOff = new PropPersonKnockOff();
         IPropPerson person = knockOff;
 
-        #region docs:properties:computed-usage
+        #region properties-computed-usage
         // Set up first/last names
         person.FirstName = "John";
         person.LastName = "Doe";
@@ -304,7 +304,7 @@ public static class PropertiesUsageExamples
     {
         var knockOff = new PropStatusKnockOff();
 
-        #region docs:properties:tracking-usage
+        #region properties-tracking-usage
         var changes = new List<string>();
         knockOff.Status.OnSet = (ko, value) =>
         {
@@ -320,7 +320,7 @@ public static class PropertiesUsageExamples
     {
         var knockOff = new PropSecureKnockOff();
 
-        #region docs:properties:throwing-usage
+        #region properties-throwing-usage
         knockOff.SecretKey.OnGet = (ko) =>
             throw new UnauthorizedAccessException("Access denied");
         #endregion

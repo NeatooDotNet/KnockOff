@@ -39,7 +39,7 @@ public interface ICpCalculator
     double Divide(int numerator, int denominator);
 }
 
-#region skill:customization-patterns:user-method-basic
+#region skill-customization-patterns-user-method-basic
 [KnockOff]
 public partial class CpCalculatorKnockOff : ICpCalculator
 {
@@ -60,7 +60,7 @@ public interface ICpRepository
     ValueTask<int> CountAsync();
 }
 
-#region skill:customization-patterns:user-method-async
+#region skill-customization-patterns-user-method-async
 [KnockOff]
 public partial class CpRepoKnockOff : ICpRepository
 {
@@ -83,7 +83,7 @@ public interface ICpCallbackService
     List<CpUser> Search(string query, int limit, int offset);
 }
 
-#region skill:customization-patterns:callback-method
+#region skill-customization-patterns-callback-method
 [KnockOff]
 public partial class CpCallbackServiceKnockOff : ICpCallbackService { }
 #endregion
@@ -97,7 +97,7 @@ public interface ICpPropertyService
     CpUser? CurrentUser { get; set; }
 }
 
-#region skill:customization-patterns:callback-property
+#region skill-customization-patterns-callback-property
 [KnockOff]
 public partial class CpPropertyServiceKnockOff : ICpPropertyService { }
 #endregion
@@ -111,7 +111,7 @@ public interface ICpPropertyStore
     object? this[string key] { get; set; }
 }
 
-#region skill:customization-patterns:callback-indexer
+#region skill-customization-patterns-callback-indexer
 [KnockOff]
 public partial class CpPropertyStoreKnockOff : ICpPropertyStore { }
 #endregion
@@ -128,7 +128,7 @@ public interface ICpOverloadService
     int Calculate(int a, int b);
 }
 
-#region skill:customization-patterns:callback-overloads
+#region skill-customization-patterns-callback-overloads
 [KnockOff]
 public partial class CpOverloadServiceKnockOff : ICpOverloadService { }
 #endregion
@@ -143,7 +143,7 @@ public interface ICpParser
     void GetStats(out int count, out double average);
 }
 
-#region skill:customization-patterns:callback-out-params
+#region skill-customization-patterns-callback-out-params
 [KnockOff]
 public partial class CpParserKnockOff : ICpParser { }
 #endregion
@@ -158,7 +158,7 @@ public interface ICpProcessor
     bool TryUpdate(string key, ref string value);
 }
 
-#region skill:customization-patterns:callback-ref-params
+#region skill-customization-patterns-callback-ref-params
 [KnockOff]
 public partial class CpProcessorKnockOff : ICpProcessor { }
 #endregion
@@ -172,7 +172,7 @@ public interface ICpPriorityService
     int Calculate(int x);
 }
 
-#region skill:customization-patterns:priority-in-action
+#region skill-customization-patterns-priority-in-action
 [KnockOff]
 public partial class CpPriorityServiceKnockOff : ICpPriorityService
 {
@@ -189,7 +189,7 @@ public interface ICpResetRepository
     CpUser? GetUser(int id);
 }
 
-#region skill:customization-patterns:reset-behavior
+#region skill-customization-patterns-reset-behavior
 [KnockOff]
 public partial class CpResetRepositoryKnockOff : ICpResetRepository { }
 #endregion
@@ -203,7 +203,7 @@ public interface ICpCombinedRepository
     CpUser? GetById(int id);
 }
 
-#region skill:customization-patterns:combining-patterns
+#region skill-customization-patterns-combining-patterns
 [KnockOff]
 public partial class CpCombinedRepoKnockOff : ICpCombinedRepository
 {

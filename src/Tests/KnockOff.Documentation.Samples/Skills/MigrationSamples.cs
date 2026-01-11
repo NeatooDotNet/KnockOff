@@ -35,7 +35,7 @@ public class MgUserService
     public virtual string Name { get; set; } = "default";
 }
 
-#region skill:migrations:v10-9-after
+#region skill-migrations-v10-9-after
 [KnockOff<MgUserService>]
 public partial class MgClassStubTests
 {
@@ -58,7 +58,7 @@ public interface IMgParser
     bool TryParse(string input, out int result);
 }
 
-#region skill:migrations:v10-8-works-same
+#region skill-migrations-v10-8-works-same
 [KnockOff]
 public partial class MgUserServiceKnockOff : IMgUserService { }
 #endregion
@@ -72,7 +72,7 @@ public interface IMgLogger
     void Log(string message);
 }
 
-#region skill:migrations:v10-7-works-same
+#region skill-migrations-v10-7-works-same
 [KnockOff]
 public partial class MgLoggerKnockOff : IMgLogger { }
 #endregion
@@ -86,7 +86,7 @@ public interface IMgService
     MgUser? GetUser(int id);
 }
 
-#region skill:migrations:v10-7-callback-capture
+#region skill-migrations-v10-7-callback-capture
 [KnockOff]
 public partial class MgServiceKnockOff : IMgService { }
 #endregion

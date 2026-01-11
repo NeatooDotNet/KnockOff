@@ -70,7 +70,7 @@ public class SkillSamplesTests : SamplesTestBase
     [Fact]
     public void QuickStart_Usage_DemonstratesAllFeatures()
     {
-        #region skill:SKILL:quick-start-usage
+        #region skill-SKILL-quick-start-usage
         var knockOff = new SkDataServiceKnockOff(count: 100);
         ISkDataService service = knockOff;
 
@@ -366,7 +366,7 @@ public class SkillSamplesTests : SamplesTestBase
         var knockOff = new SkBackingServiceKnockOff();
         ISkBackingService service = knockOff;
 
-        #region skill:SKILL:property-value-pattern
+        #region skill-SKILL-property-value-pattern
         // Use Value for static test data (recommended)
         knockOff.Name.Value = "John Doe";
 
@@ -387,7 +387,7 @@ public class SkillSamplesTests : SamplesTestBase
         var knockOff = new SkVerificationKnockOff();
         ISkVerificationService service = knockOff;
 
-        #region skill:SKILL:customization-callbacks-property
+        #region skill-SKILL-customization-callbacks-property
         // Use OnGet for dynamic/computed values
         knockOff.Name.OnGet = (ko) => $"Call #{ko.Name.GetCount}";
 
@@ -659,7 +659,7 @@ public class SkillSamplesTests : SamplesTestBase
     [Fact]
     public void InlineStub_Usage_DemonstratesPattern()
     {
-        #region skill:SKILL:inline-stub-usage
+        #region skill-SKILL-inline-stub-usage
         var stub = new SkInlineUserServiceTests.Stubs.ISkInlineUserService();
         stub.GetUser.OnCall = (ko, id) => new SkUser { Id = id };
 
@@ -678,7 +678,7 @@ public class SkillSamplesTests : SamplesTestBase
     [Fact]
     public void DelegateStub_Usage_DemonstratesPattern()
     {
-        #region skill:SKILL:delegate-stubs-usage
+        #region skill-SKILL-delegate-stubs-usage
         var stub = new SkValidationTests.Stubs.SkIsUniqueRule();
         stub.Interceptor.OnCall = (ko, value) => value != "duplicate";
 
@@ -698,7 +698,7 @@ public class SkillSamplesTests : SamplesTestBase
     [Fact]
     public void SmartDefaults_Usage_DemonstratesPattern()
     {
-        #region skill:SKILL:smart-defaults-usage
+        #region skill-SKILL-smart-defaults-usage
         var knockOff = new SkSmartDefaultKnockOff();
         ISkSmartDefaultService service = knockOff;
 
@@ -726,7 +726,7 @@ public class SkillSamplesTests : SamplesTestBase
     [Fact]
     public void InterfaceClassAccess_DemonstratesPattern()
     {
-        #region skill:SKILL:interface-class-access
+        #region skill-SKILL-interface-class-access
         // Interface stubs: implicit conversion
         var interfaceKnockOff = new SkAccessDemoServiceKnockOff();
         ISkAccessDemoService service = interfaceKnockOff;

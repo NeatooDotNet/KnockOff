@@ -6,8 +6,8 @@ KnockOff supports all property types: get/set, get-only, and set-only.
 
 ### Get/Set Properties
 
-<!-- snippet: docs:properties:get-set-property -->
-```csharp
+<!-- snippet: properties-get-set-property -->
+```cs
 public interface IPropUserService
 {
     string Name { get; set; }
@@ -16,7 +16,7 @@ public interface IPropUserService
 [KnockOff]
 public partial class PropUserServiceKnockOff : IPropUserService { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 Generated:
 - `knockOff.Name.Value` — backing value (read/write)
@@ -28,8 +28,8 @@ Generated:
 
 ### Get-Only Properties
 
-<!-- snippet: docs:properties:get-only-property -->
-```csharp
+<!-- snippet: properties-get-only-property -->
+```cs
 public interface IPropConfig
 {
     string ConnectionString { get; }
@@ -38,7 +38,7 @@ public interface IPropConfig
 [KnockOff]
 public partial class PropConfigKnockOff : IPropConfig { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 For get-only properties:
 - `Value` is available for setting the return value
@@ -46,30 +46,32 @@ For get-only properties:
 
 **Use `Value` for static values (recommended):**
 
-<!-- snippet: docs:properties:get-only-usage -->
-```csharp
+<!-- snippet: properties-get-only-usage -->
+```cs
 // Set value directly (recommended for static values)
-        knockOff.ConnectionString.Value = "Server=test";
+knockOff.ConnectionString.Value = "Server=test";
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 **Use `OnGet` for dynamic/computed values:**
 
-<!-- snippet: docs:properties:get-only-dynamic -->
-```csharp
+<!-- snippet: properties-get-only-dynamic -->
+```cs
 // Use OnGet callback for dynamic/computed values
-        knockOff.ConnectionString.OnGet = (ko) => Environment.GetEnvironmentVariable("DB_CONN") ?? "Server=fallback";
+knockOff.ConnectionString.OnGet = (ko) => Environment.GetEnvironmentVariable("DB_CONN") ?? "Server=fallback";
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Set-Only Properties
 
+<!-- pseudo:set-only-property-interface -->
 ```csharp
 public interface ILogger
 {
     string Output { set; }
 }
 ```
+<!-- /snippet -->
 
 For set-only properties:
 - Only `OnSet` callback and `SetCount`/`LastSetValue` are available
@@ -79,28 +81,28 @@ For set-only properties:
 
 ### Get Tracking
 
-<!-- snippet: docs:properties:get-tracking -->
-```csharp
+<!-- snippet: properties-get-tracking -->
+```cs
 _ = service.Name;
-        _ = service.Name;
-        _ = service.Name;
+_ = service.Name;
+_ = service.Name;
 
-        var getCount = knockOff.Name.GetCount;  // 3
+var getCount = knockOff.Name.GetCount;  // 3
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Set Tracking
 
-<!-- snippet: docs:properties:set-tracking -->
-```csharp
+<!-- snippet: properties-set-tracking -->
+```cs
 service.Name = "First";
-        service.Name = "Second";
-        service.Name = "Third";
+service.Name = "Second";
+service.Name = "Third";
 
-        var setCount = knockOff.Name.SetCount;          // 3
-        var lastValue = knockOff.Name.LastSetValue;     // "Third"
+var setCount = knockOff.Name.SetCount;          // 3
+var lastValue = knockOff.Name.LastSetValue;     // "Third"
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Customization
 
@@ -108,15 +110,15 @@ service.Name = "First";
 
 The simplest way to configure a property is using `Value`:
 
-<!-- snippet: docs:properties:value-preset -->
-```csharp
+<!-- snippet: properties-value-preset -->
+```cs
 // Pre-set a property value before test execution
-        knockOff.Name.Value = "John Doe";
+knockOff.Name.Value = "John Doe";
 
-        // Now accessing the property returns the pre-set value
-        var name = service.Name;  // "John Doe"
+// Now accessing the property returns the pre-set value
+var name = service.Name;  // "John Doe"
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 **When to use `Value`:**
 - Static test data that doesn't change
@@ -127,61 +129,61 @@ The simplest way to configure a property is using `Value`:
 
 You can also set/get through the interface itself:
 
-<!-- snippet: docs:properties:default-behavior -->
-```csharp
+<!-- snippet: properties-default-behavior -->
+```cs
 service.Name = "Test";
-        var value = service.Name;  // "Test" - read from backing
+var value = service.Name;  // "Test" - read from backing
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### OnGet Callback (For Dynamic Values)
 
 Use `OnGet` when you need dynamic or computed values:
 
-<!-- snippet: docs:properties:onget-callback -->
-```csharp
+<!-- snippet: properties-onget-callback -->
+```cs
 knockOff.Name.OnGet = (ko) => "Always This Value";
 
-        var value = service.Name;  // "Always This Value"
+var value = service.Name;  // "Always This Value"
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 Dynamic values:
 
-<!-- snippet: docs:properties:dynamic-values -->
-```csharp
+<!-- snippet: properties-dynamic-values -->
+```cs
 var counter = 0;
-        knockOff.Name.OnGet = (ko) => $"Call-{++counter}";
+knockOff.Name.OnGet = (ko) => $"Call-{++counter}";
 
-        var first = service.Name;   // "Call-1"
-        var second = service.Name;  // "Call-2"
+var first = service.Name;   // "Call-1"
+var second = service.Name;  // "Call-2"
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### OnSet Callback
 
 Override setter behavior:
 
-<!-- snippet: docs:properties:onset-callback -->
-```csharp
+<!-- snippet: properties-onset-callback -->
+```cs
 string? captured = null;
-        knockOff.Name.OnSet = (ko, value) =>
-        {
-            captured = value;
-            // Value does NOT go to backing field when OnSet is set
-        };
+knockOff.Name.OnSet = (ko, value) =>
+{
+    captured = value;
+    // Value does NOT go to backing field when OnSet is set
+};
 
-        service.Name = "Test";
-        // captured is now "Test"
+service.Name = "Test";
+// captured is now "Test"
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 **Important**: When `OnSet` is set, the value is NOT stored in the backing field.
 
 ### Conditional Logic
 
-<!-- snippet: docs:properties:conditional-logic -->
-```csharp
+<!-- snippet: properties-conditional-logic -->
+```cs
 public interface IPropConnection
 {
     bool IsConnected { get; }
@@ -191,38 +193,38 @@ public interface IPropConnection
 [KnockOff]
 public partial class PropConnectionKnockOff : IPropConnection { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
-<!-- snippet: docs:properties:conditional-usage -->
-```csharp
+<!-- snippet: properties-conditional-usage -->
+```cs
 knockOff.IsConnected.OnGet = (ko) =>
-        {
-            // Check other interceptor state
-            return ko.Connect.WasCalled;
-        };
+{
+    // Check other interceptor state
+    return ko.Connect.WasCalled;
+};
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Reset
 
-<!-- snippet: docs:properties:reset -->
-```csharp
+<!-- snippet: properties-reset -->
+```cs
 knockOff.Name.Reset();
 
-        var getCount = knockOff.Name.GetCount;    // 0
-        var setCount = knockOff.Name.SetCount;    // 0
-        var onGet = knockOff.Name.OnGet;          // null
-        var onSet = knockOff.Name.OnSet;          // null
-        // Note: Backing field is NOT cleared by Reset
+var getCount = knockOff.Name.GetCount;    // 0
+var setCount = knockOff.Name.SetCount;    // 0
+var onGet = knockOff.Name.OnGet;          // null
+var onSet = knockOff.Name.OnSet;          // null
+// Note: Backing field is NOT cleared by Reset
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Common Patterns
 
 ### Simulating Read-Only Computed Properties
 
-<!-- snippet: docs:properties:computed-property -->
-```csharp
+<!-- snippet: properties-computed-property -->
+```cs
 public interface IPropPerson
 {
     string FirstName { get; set; }
@@ -233,26 +235,26 @@ public interface IPropPerson
 [KnockOff]
 public partial class PropPersonKnockOff : IPropPerson { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
-<!-- snippet: docs:properties:computed-usage -->
-```csharp
+<!-- snippet: properties-computed-usage -->
+```cs
 // Set up first/last names
-        person.FirstName = "John";
-        person.LastName = "Doe";
+person.FirstName = "John";
+person.LastName = "Doe";
 
-        // Computed property uses backing values
-        knockOff.FullName.OnGet = (ko) =>
-            $"{person.FirstName} {person.LastName}";
+// Computed property uses backing values
+knockOff.FullName.OnGet = (ko) =>
+    $"{person.FirstName} {person.LastName}";
 
-        var fullName = person.FullName;  // "John Doe"
+var fullName = person.FullName;  // "John Doe"
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Tracking Property Changes
 
-<!-- snippet: docs:properties:tracking-changes -->
-```csharp
+<!-- snippet: properties-tracking-changes -->
+```cs
 public interface IPropStatus
 {
     string Status { get; set; }
@@ -261,23 +263,23 @@ public interface IPropStatus
 [KnockOff]
 public partial class PropStatusKnockOff : IPropStatus { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
-<!-- snippet: docs:properties:tracking-usage -->
-```csharp
+<!-- snippet: properties-tracking-usage -->
+```cs
 var changes = new List<string>();
-        knockOff.Status.OnSet = (ko, value) =>
-        {
-            changes.Add(value);
-            // Value still goes to backing when not using OnSet
-        };
+knockOff.Status.OnSet = (ko, value) =>
+{
+    changes.Add(value);
+    // Value still goes to backing when not using OnSet
+};
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Throwing on Access
 
-<!-- snippet: docs:properties:throwing-on-access -->
-```csharp
+<!-- snippet: properties-throwing-on-access -->
+```cs
 public interface IPropSecure
 {
     string SecretKey { get; }
@@ -286,14 +288,14 @@ public interface IPropSecure
 [KnockOff]
 public partial class PropSecureKnockOff : IPropSecure { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
-<!-- snippet: docs:properties:throwing-usage -->
-```csharp
+<!-- snippet: properties-throwing-usage -->
+```cs
 knockOff.SecretKey.OnGet = (ko) =>
-            throw new UnauthorizedAccessException("Access denied");
+    throw new UnauthorizedAccessException("Access denied");
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Value vs OnGet: Decision Guide
 

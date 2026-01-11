@@ -4,8 +4,8 @@ KnockOff supports indexer properties, both get-only and get/set.
 
 ## Basic Usage
 
-<!-- snippet: docs:indexers:basic-interface -->
-```csharp
+<!-- snippet: indexers-basic-interface -->
+```cs
 public interface IIdxPropertyStore
 {
     IdxPropertyInfo? this[string key] { get; }
@@ -22,7 +22,7 @@ public partial class IdxPropertyStoreKnockOff : IIdxPropertyStore { }
 [KnockOff]
 public partial class IdxReadWriteStoreKnockOff : IIdxReadWriteStore { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Naming Convention
 
@@ -31,59 +31,63 @@ Indexer interceptors are named based on the key type:
 - `int` key → `Int32Indexer`
 - Custom type → `{TypeName}Indexer`
 
+<!-- pseudo:indexer-interceptor-naming -->
 ```csharp
 knockOff.StringIndexer       // for this[string key]
 knockOff.Int32Indexer        // for this[int index]
 ```
+<!-- /snippet -->
 
 Backing dictionaries:
+<!-- pseudo:indexer-backing-naming -->
 ```csharp
 knockOff.StringIndexerBacking  // Dictionary<string, PropertyInfo?>
 knockOff.Int32IndexerBacking   // Dictionary<int, object?>
 ```
+<!-- /snippet -->
 
 ## Tracking
 
 ### Get Tracking
 
-<!-- snippet: docs:indexers:get-tracking -->
-```csharp
+<!-- snippet: indexers-get-tracking -->
+```cs
 _ = store["Name"];
-        _ = store["Age"];
+_ = store["Age"];
 
-        var getCount = knockOff.StringIndexer.GetCount;       // 2
-        var lastKey = knockOff.StringIndexer.LastGetKey;      // "Age"
+var getCount = knockOff.StringIndexer.GetCount;       // 2
+var lastKey = knockOff.StringIndexer.LastGetKey;      // "Age"
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Set Tracking
 
-<!-- snippet: docs:indexers:set-tracking -->
-```csharp
+<!-- snippet: indexers-set-tracking -->
+```cs
 store["Key"] = value1;
 
-        var setCount = knockOff.StringIndexer.SetCount;         // 1
-        var lastEntry = knockOff.StringIndexer.LastSetEntry;
-        var lastSetKey = lastEntry?.Key;                        // "Key"
-        var lastSetValue = lastEntry?.Value;                    // value1
+var setCount = knockOff.StringIndexer.SetCount;         // 1
+var lastEntry = knockOff.StringIndexer.LastSetEntry;
+var lastSetKey = lastEntry?.Key;                        // "Key"
+var lastSetValue = lastEntry?.Value;                    // value1
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Backing Dictionary
 
 KnockOff generates a backing dictionary for each indexer:
 
-<!-- snippet: docs:indexers:backing-dictionary -->
-```csharp
+<!-- snippet: indexers-backing-dictionary -->
+```cs
 // Pre-populate backing dictionary
-        knockOff.StringIndexerBacking["Config"] = new IdxPropertyInfo { Value = "Value1" };
-        knockOff.StringIndexerBacking["Setting"] = new IdxPropertyInfo { Value = "Value2" };
+knockOff.StringIndexerBacking["Config"] = new IdxPropertyInfo { Value = "Value1" };
+knockOff.StringIndexerBacking["Setting"] = new IdxPropertyInfo { Value = "Value2" };
 
-        // Access returns backing values
-        var config = store["Config"];   // Returns the pre-populated value
-        var setting = store["Setting"]; // Returns the pre-populated value
+// Access returns backing values
+var config = store["Config"];   // Returns the pre-populated value
+var setting = store["Setting"]; // Returns the pre-populated value
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 For get/set indexers, setting via the interface stores in the backing dictionary automatically (unless `OnSet` is defined).
 
@@ -91,33 +95,33 @@ For get/set indexers, setting via the interface stores in the backing dictionary
 
 ### OnGet Callback
 
-<!-- snippet: docs:indexers:onget-callback -->
-```csharp
+<!-- snippet: indexers-onget-callback -->
+```cs
 knockOff.StringIndexer.OnGet = (ko, key) =>
-        {
-            // Compute or fetch value dynamically
-            return new IdxPropertyInfo { Name = key, Value = key.Length };
-        };
+{
+    // Compute or fetch value dynamically
+    return new IdxPropertyInfo { Name = key, Value = key.Length };
+};
 
-        var result = store["Hello"];  // Returns IdxPropertyInfo with Value = 5
+var result = store["Hello"];  // Returns IdxPropertyInfo with Value = 5
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### OnSet Callback
 
-<!-- snippet: docs:indexers:onset-callback -->
-```csharp
+<!-- snippet: indexers-onset-callback -->
+```cs
 knockOff.StringIndexer.OnSet = (ko, key, value) =>
-        {
-            changes.Add((key, value));
-        };
+{
+    changes.Add((key, value));
+};
 
-        store["Key1"] = new IdxPropertyInfo { Value = "A" };
-        store["Key2"] = new IdxPropertyInfo { Value = "B" };
+store["Key1"] = new IdxPropertyInfo { Value = "A" };
+store["Key2"] = new IdxPropertyInfo { Value = "B" };
 
-        // changes contains [("Key1", ...), ("Key2", ...)]
+// changes contains [("Key1", ...), ("Key2", ...)]
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 Note: When `OnSet` is set, values do NOT go to the backing dictionary.
 
@@ -134,36 +138,36 @@ When **no `OnGet` callback** is set:
 1. Backing dictionary is checked (returns value if key exists)
 2. Returns `default(T)` if key not found
 
-<!-- snippet: docs:indexers:fallback-to-backing -->
-```csharp
+<!-- snippet: indexers-fallback-to-backing -->
+```cs
 // No OnGet callback - falls back to backing dictionary
-        knockOff.StringIndexerBacking["Existing"] = new IdxPropertyInfo { Value = "Found" };
+knockOff.StringIndexerBacking["Existing"] = new IdxPropertyInfo { Value = "Found" };
 
-        var existing = store["Existing"];  // Returns backing value
-        var missing = store["Missing"];    // Returns null (not in backing)
+var existing = store["Existing"];  // Returns backing value
+var missing = store["Missing"];    // Returns null (not in backing)
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 When **`OnGet` callback is set**, the callback completely replaces the getter logic. The backing dictionary is NOT checked automatically.
 
 ## Reset
 
-<!-- snippet: docs:indexers:reset -->
-```csharp
+<!-- snippet: indexers-reset -->
+```cs
 knockOff.StringIndexer.Reset();
 
-        var getCount = knockOff.StringIndexer.GetCount;    // 0
-        var onGet = knockOff.StringIndexer.OnGet;          // null
-        // Note: Backing dictionary is NOT cleared
+var getCount = knockOff.StringIndexer.GetCount;    // 0
+var onGet = knockOff.StringIndexer.OnGet;          // null
+// Note: Backing dictionary is NOT cleared
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Common Patterns
 
 ### Entity Property Access (IEntityBase Pattern)
 
-<!-- snippet: docs:indexers:entity-property -->
-```csharp
+<!-- snippet: indexers-entity-property -->
+```cs
 public interface IIdxEntityBase
 {
     IIdxEntityProperty? this[string propertyName] { get; }
@@ -173,23 +177,23 @@ public interface IIdxEntityBase
 [KnockOff]
 public partial class IdxEntityBaseKnockOff : IIdxEntityBase { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Dictionary-Like Behavior
 
-<!-- snippet: docs:indexers:dictionary-like -->
-```csharp
+<!-- snippet: indexers-dictionary-like -->
+```cs
 [KnockOff]
 public partial class IdxConfigStoreKnockOff : IIdxConfigStore { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 Pre-populate the backing dictionary for dictionary-like behavior.
 
 ### Integer Indexers
 
-<!-- snippet: docs:indexers:integer-indexer -->
-```csharp
+<!-- snippet: indexers-integer-indexer -->
+```cs
 public interface IIdxList
 {
     object? this[int index] { get; set; }
@@ -198,16 +202,16 @@ public interface IIdxList
 [KnockOff]
 public partial class IdxListKnockOff : IIdxList { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
-<!-- snippet: docs:indexers:integer-indexer-usage -->
-```csharp
+<!-- snippet: indexers-integer-indexer-usage -->
+```cs
 knockOff.Int32IndexerBacking[0] = "First";
-        knockOff.Int32IndexerBacking[1] = "Second";
+knockOff.Int32IndexerBacking[1] = "Second";
 
-        var first = list[0];   // "First"
-        var second = list[1];  // "Second"
+var first = list[0];   // "First"
+var second = list[1];  // "Second"
 
-        var lastGetIndex = knockOff.Int32Indexer.LastGetKey;  // 1
+var lastGetIndex = knockOff.Int32Indexer.LastGetKey;  // 1
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
