@@ -155,7 +155,7 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new PatternIndexerServiceKnockOff();
         IPatternIndexerService service = knockOff;
 
-        knockOff.StringIndexer.OnGet = (ko, key) => key switch
+        knockOff.Indexer.OnGet = (ko, key) => key switch
         {
             "Name" => new PatternPropertyInfo { Value = "Test" },
             "Age" => new PatternPropertyInfo { Value = "25" },
@@ -174,7 +174,7 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         IPatternIndexerService service = knockOff;
         (string key, PatternPropertyInfo? value)? captured = null;
 
-        knockOff.StringIndexer.OnSet = (ko, key, value) =>
+        knockOff.Indexer.OnSet = (ko, key, value) =>
         {
             captured = (key, value);
         };

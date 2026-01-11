@@ -160,7 +160,7 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new CpPropertyStoreKnockOff();
         ICpPropertyStore store = knockOff;
 
-        knockOff.StringIndexer.OnGet = (ko, key) => key switch
+        knockOff.Indexer.OnGet = (ko, key) => key switch
         {
             "admin" => "AdminConfig",
             "guest" => "GuestConfig",
@@ -179,7 +179,7 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         ICpPropertyStore store = knockOff;
         (string key, object? value)? captured = null;
 
-        knockOff.StringIndexer.OnSet = (ko, key, value) =>
+        knockOff.Indexer.OnSet = (ko, key, value) =>
         {
             captured = (key, value);
         };

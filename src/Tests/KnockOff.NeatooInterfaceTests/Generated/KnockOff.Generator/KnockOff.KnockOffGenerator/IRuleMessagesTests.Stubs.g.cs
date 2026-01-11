@@ -8,8 +8,8 @@ partial class IRuleMessagesTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IRuleMessages.Int32Indexer.</summary>
-		public sealed class IRuleMessages_Int32IndexerInterceptor
+		/// <summary>Interceptor for IRuleMessages.Indexer.</summary>
+		public sealed class IRuleMessages_IndexerInterceptor
 		{
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
@@ -34,6 +34,9 @@ partial class IRuleMessagesTests
 
 			/// <summary>Records a setter access.</summary>
 			public void RecordSet(int index, global::Neatoo.Rules.IRuleMessage value) { SetCount++; LastSetEntry = (index, value); }
+
+			/// <summary>Backing storage for this indexer.</summary>
+			public global::System.Collections.Generic.Dictionary<int, global::Neatoo.Rules.IRuleMessage> Backing { get; } = new();
 
 			/// <summary>Resets all tracking state.</summary>
 			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
@@ -254,8 +257,8 @@ partial class IRuleMessagesTests
 		/// <summary>Stub implementation of global::Neatoo.Rules.IRuleMessages.</summary>
 		public class IRuleMessages : global::Neatoo.Rules.IRuleMessages
 		{
-			/// <summary>Interceptor for Int32Indexer.</summary>
-			public IRuleMessages_Int32IndexerInterceptor Int32Indexer { get; } = new();
+			/// <summary>Interceptor for Indexer.</summary>
+			public IRuleMessages_IndexerInterceptor Indexer { get; } = new();
 
 			/// <summary>Interceptor for Count.</summary>
 			public IRuleMessages_CountInterceptor Count { get; } = new();
@@ -319,14 +322,15 @@ partial class IRuleMessagesTests
 			{
 				get
 				{
-					Int32Indexer.RecordGet(index);
-					if (Int32Indexer.OnGet is { } onGet) return onGet(this, index);
-					return default!;
+					Indexer.RecordGet(index);
+					if (Indexer.OnGet is { } onGet) return onGet(this, index);
+					return Indexer.Backing.TryGetValue(index, out var v) ? v : default!;
 				}
 				set
 				{
-					Int32Indexer.RecordSet(index, value);
-					if (Int32Indexer.OnSet is { } onSet) onSet(this, index, value);
+					Indexer.RecordSet(index, value);
+					if (Indexer.OnSet is { } onSet) onSet(this, index, value);
+					else Indexer.Backing[index] = value;
 				}
 			}
 

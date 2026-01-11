@@ -22,12 +22,15 @@ public partial class KnockOffGenerator
 		// Group methods by name for overload handling
 		var methodGroups = GroupClassMethodsByName(cls.Members.Where(m => !m.IsProperty && !m.IsIndexer));
 
+		// Count indexers to determine naming strategy
+		var indexerCount = SymbolHelpers.CountClassIndexers(cls.Members);
+
 		// Generate interceptor classes for properties/indexers
 		foreach (var member in cls.Members)
 		{
 			if (member.IsProperty || member.IsIndexer)
 			{
-				GenerateClassMemberInterceptorClass(sb, member, cls.Name);
+				GenerateClassMemberInterceptorClass(sb, member, cls.Name, indexerCount);
 			}
 		}
 
@@ -53,9 +56,13 @@ public partial class KnockOffGenerator
 		{
 			if (member.IsProperty || member.IsIndexer)
 			{
-				var interceptorType = $"{cls.Name}_{member.Name}Interceptor";
-				sb.AppendLine($"\t\t\t/// <summary>Interceptor for {member.Name}.</summary>");
-				sb.AppendLine($"\t\t\tpublic {interceptorType} {member.Name} {{ get; }} = new();");
+				// For indexers, compute name based on count (single: Indexer, multiple: IndexerString, IndexerInt)
+				var memberName = member.IsIndexer
+					? SymbolHelpers.GetIndexerName(indexerCount, member.IndexerTypeSuffix)
+					: member.Name;
+				var interceptorType = $"{cls.Name}_{memberName}Interceptor";
+				sb.AppendLine($"\t\t\t/// <summary>Interceptor for {memberName}.</summary>");
+				sb.AppendLine($"\t\t\tpublic {interceptorType} {memberName} {{ get; }} = new();");
 			}
 		}
 
@@ -102,7 +109,11 @@ public partial class KnockOffGenerator
 		{
 			if (member.IsProperty || member.IsIndexer)
 			{
-				sb.AppendLine($"\t\t\t\t{member.Name}.Reset();");
+				// For indexers, compute name based on count (single: Indexer, multiple: IndexerString, IndexerInt)
+				var memberName = member.IsIndexer
+					? SymbolHelpers.GetIndexerName(indexerCount, member.IndexerTypeSuffix)
+					: member.Name;
+				sb.AppendLine($"\t\t\t\t{memberName}.Reset();");
 			}
 		}
 
@@ -125,7 +136,7 @@ public partial class KnockOffGenerator
 		sb.AppendLine();
 
 		// Generate nested Impl class that inherits from target
-		GenerateClassImplClass(sb, cls, methodGroups, stubClassName);
+		GenerateClassImplClass(sb, cls, methodGroups, stubClassName, indexerCount);
 
 		sb.AppendLine("\t\t}");
 		sb.AppendLine();
@@ -138,7 +149,8 @@ public partial class KnockOffGenerator
 		System.Text.StringBuilder sb,
 		ClassStubInfo cls,
 		Dictionary<string, ClassMethodGroupInfo> methodGroups,
-		string stubClassName)
+		string stubClassName,
+		int indexerCount)
 	{
 		sb.AppendLine($"\t\t\t/// <summary>Internal implementation that inherits from {cls.FullName}.</summary>");
 		sb.AppendLine($"\t\t\tprivate sealed class Impl : {cls.FullName}");
@@ -163,7 +175,7 @@ public partial class KnockOffGenerator
 			}
 			else if (member.IsIndexer)
 			{
-				GenerateClassImplIndexerOverride(sb, member, cls.Name);
+				GenerateClassImplIndexerOverride(sb, member, cls.Name, indexerCount);
 			}
 		}
 
@@ -227,12 +239,17 @@ public partial class KnockOffGenerator
 	private static void GenerateClassMemberInterceptorClass(
 		System.Text.StringBuilder sb,
 		ClassMemberInfo member,
-		string className)
+		string className,
+		int indexerCount)
 	{
-		var interceptClassName = $"{className}_{member.Name}Interceptor";
+		// For indexers, compute name based on count (single: Indexer, multiple: IndexerString, IndexerInt)
+		var memberName = member.IsIndexer
+			? SymbolHelpers.GetIndexerName(indexerCount, member.IndexerTypeSuffix)
+			: member.Name;
+		var interceptClassName = $"{className}_{memberName}Interceptor";
 		var stubClassName = $"Stubs.{className}";
 
-		sb.AppendLine($"\t\t/// <summary>Interceptor for {className}.{member.Name}.</summary>");
+		sb.AppendLine($"\t\t/// <summary>Interceptor for {className}.{memberName}.</summary>");
 		sb.AppendLine($"\t\tpublic sealed class {interceptClassName}");
 		sb.AppendLine("\t\t{");
 
@@ -362,11 +379,20 @@ public partial class KnockOffGenerator
 			sb.AppendLine();
 		}
 
+		// Add Backing property inside the interceptor
+		var singleKeyType = member.IndexerParameters.Count == 1
+			? member.IndexerParameters.GetArray()![0].Type
+			: keyType;
+		sb.AppendLine($"\t\t\t/// <summary>Backing storage for this indexer.</summary>");
+		sb.AppendLine($"\t\t\tpublic global::System.Collections.Generic.Dictionary<{singleKeyType}, {member.ReturnType}> Backing {{ get; }} = new();");
+		sb.AppendLine();
+
 		// Reset method
 		sb.AppendLine("\t\t\t/// <summary>Resets all tracking state.</summary>");
 		sb.Append("\t\t\tpublic void Reset() { ");
 		if (member.HasGetter) sb.Append("GetCount = 0; LastGetKey = default; OnGet = null; ");
 		if (member.HasSetter) sb.Append("SetCount = 0; LastSetEntry = default; OnSet = null; ");
+		// Note: Backing dictionary is intentionally NOT cleared - pre-populated data is preserved
 		sb.AppendLine("}");
 	}
 
@@ -571,10 +597,17 @@ public partial class KnockOffGenerator
 	private static void GenerateClassImplIndexerOverride(
 		System.Text.StringBuilder sb,
 		ClassMemberInfo member,
-		string className)
+		string className,
+		int indexerCount)
 	{
 		var paramList = string.Join(", ", member.IndexerParameters.Select(p => $"{p.Type} {p.Name}"));
 		var argList = string.Join(", ", member.IndexerParameters.Select(p => p.Name));
+		var keyArg = member.IndexerParameters.Count == 1
+			? member.IndexerParameters.GetArray()![0].Name
+			: $"({argList})";
+
+		// Compute indexer name based on count (single: Indexer, multiple: IndexerString, IndexerInt)
+		var indexerName = SymbolHelpers.GetIndexerName(indexerCount, member.IndexerTypeSuffix);
 
 		sb.AppendLine($"\t\t\t\t/// <inheritdoc />");
 		sb.AppendLine($"\t\t\t\t{member.AccessModifier} override {member.ReturnType} this[{paramList}]");
@@ -585,11 +618,13 @@ public partial class KnockOffGenerator
 			sb.AppendLine("\t\t\t\t\tget");
 			sb.AppendLine("\t\t\t\t\t{");
 			// Handle calls from base constructor when _stub is null
-			sb.AppendLine($"\t\t\t\t\t\t_stub?.{member.Name}.RecordGet({argList});");
-			sb.AppendLine($"\t\t\t\t\t\tif (_stub?.{member.Name}.OnGet is {{ }} onGet) return onGet(_stub, {argList});");
+			sb.AppendLine($"\t\t\t\t\t\t_stub?.{indexerName}.RecordGet({argList});");
+			sb.AppendLine($"\t\t\t\t\t\tif (_stub?.{indexerName}.OnGet is {{ }} onGet) return onGet(_stub, {argList});");
 			if (member.IsAbstract)
 			{
-				sb.AppendLine($"\t\t\t\t\t\treturn default!;");
+				var defaultExpr = member.IsNullable ? "default" : GetDefaultForType(member.ReturnType, member.DefaultStrategy, member.ConcreteTypeForNew);
+				sb.AppendLine($"\t\t\t\t\t\tif (_stub?.{indexerName}.Backing.TryGetValue({keyArg}, out var v) == true) return v;");
+				sb.AppendLine($"\t\t\t\t\t\treturn {defaultExpr};");
 			}
 			else
 			{
@@ -603,9 +638,13 @@ public partial class KnockOffGenerator
 			sb.AppendLine("\t\t\t\t\tset");
 			sb.AppendLine("\t\t\t\t\t{");
 			// Handle calls from base constructor when _stub is null
-			sb.AppendLine($"\t\t\t\t\t\t_stub?.{member.Name}.RecordSet({argList}, value);");
-			sb.AppendLine($"\t\t\t\t\t\tif (_stub?.{member.Name}.OnSet is {{ }} onSet) onSet(_stub, {argList}, value);");
-			if (!member.IsAbstract)
+			sb.AppendLine($"\t\t\t\t\t\t_stub?.{indexerName}.RecordSet({argList}, value);");
+			sb.AppendLine($"\t\t\t\t\t\tif (_stub?.{indexerName}.OnSet is {{ }} onSet) onSet(_stub, {argList}, value);");
+			if (member.IsAbstract)
+			{
+				sb.AppendLine($"\t\t\t\t\t\telse if (_stub is not null) _stub.{indexerName}.Backing[{keyArg}] = value;");
+			}
+			else
 			{
 				sb.AppendLine($"\t\t\t\t\t\telse base[{argList}] = value;");
 			}

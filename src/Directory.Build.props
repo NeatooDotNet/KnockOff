@@ -21,7 +21,7 @@
 		<RepositoryUrl>https://github.com/NeatooDotNet/KnockOff</RepositoryUrl>
 		<PackageProjectUrl>https://github.com/NeatooDotNet/KnockOff</PackageProjectUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageReleaseNotes>feat: Generic standalone stubs - create reusable stub classes like `RepositoryStub&lt;T&gt; : IRepository&lt;T&gt;`. New KO0008 diagnostic for type parameter arity mismatch.</PackageReleaseNotes>
+		<PackageReleaseNotes>BREAKING: Unified generic type API - Indexers: StringIndexer→Indexer (single) or IndexerString (multiple), Backing now inside interceptor. Inline stubs: collision detection adds type suffix. Also: Generic standalone stubs (`RepositoryStub&lt;T&gt; : IRepository&lt;T&gt;`), new KO0008 diagnostic.</PackageReleaseNotes>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	</PropertyGroup>
 </Project>

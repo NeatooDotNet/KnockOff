@@ -127,8 +127,8 @@ public static class IndexersUsageExamples
         _ = store["Name"];
         _ = store["Age"];
 
-        var getCount = knockOff.StringIndexer.GetCount;       // 2
-        var lastKey = knockOff.StringIndexer.LastGetKey;      // "Age"
+        var getCount = knockOff.Indexer.GetCount;       // 2
+        var lastKey = knockOff.Indexer.LastGetKey;      // "Age"
         #endregion
 
         _ = (getCount, lastKey);
@@ -143,8 +143,8 @@ public static class IndexersUsageExamples
         #region indexers-set-tracking
         store["Key"] = value1;
 
-        var setCount = knockOff.StringIndexer.SetCount;         // 1
-        var lastEntry = knockOff.StringIndexer.LastSetEntry;
+        var setCount = knockOff.Indexer.SetCount;         // 1
+        var lastEntry = knockOff.Indexer.LastSetEntry;
         var lastSetKey = lastEntry?.Key;                        // "Key"
         var lastSetValue = lastEntry?.Value;                    // value1
         #endregion
@@ -159,8 +159,8 @@ public static class IndexersUsageExamples
 
         #region indexers-backing-dictionary
         // Pre-populate backing dictionary
-        knockOff.StringIndexerBacking["Config"] = new IdxPropertyInfo { Value = "Value1" };
-        knockOff.StringIndexerBacking["Setting"] = new IdxPropertyInfo { Value = "Value2" };
+        knockOff.Indexer.Backing["Config"] = new IdxPropertyInfo { Value = "Value1" };
+        knockOff.Indexer.Backing["Setting"] = new IdxPropertyInfo { Value = "Value2" };
 
         // Access returns backing values
         var config = store["Config"];   // Returns the pre-populated value
@@ -176,7 +176,7 @@ public static class IndexersUsageExamples
         IIdxReadWriteStore store = knockOff;
 
         #region indexers-onget-callback
-        knockOff.StringIndexer.OnGet = (ko, key) =>
+        knockOff.Indexer.OnGet = (ko, key) =>
         {
             // Compute or fetch value dynamically
             return new IdxPropertyInfo { Name = key, Value = key.Length };
@@ -195,7 +195,7 @@ public static class IndexersUsageExamples
         var changes = new List<(string key, IdxPropertyInfo? value)>();
 
         #region indexers-onset-callback
-        knockOff.StringIndexer.OnSet = (ko, key, value) =>
+        knockOff.Indexer.OnSet = (ko, key, value) =>
         {
             changes.Add((key, value));
         };
@@ -216,7 +216,7 @@ public static class IndexersUsageExamples
 
         #region indexers-fallback-to-backing
         // No OnGet callback - falls back to backing dictionary
-        knockOff.StringIndexerBacking["Existing"] = new IdxPropertyInfo { Value = "Found" };
+        knockOff.Indexer.Backing["Existing"] = new IdxPropertyInfo { Value = "Found" };
 
         var existing = store["Existing"];  // Returns backing value
         var missing = store["Missing"];    // Returns null (not in backing)
@@ -231,13 +231,13 @@ public static class IndexersUsageExamples
         IIdxReadWriteStore store = knockOff;
 
         _ = store["Test"];
-        knockOff.StringIndexer.OnGet = (ko, key) => new IdxPropertyInfo();
+        knockOff.Indexer.OnGet = (ko, key) => new IdxPropertyInfo();
 
         #region indexers-reset
-        knockOff.StringIndexer.Reset();
+        knockOff.Indexer.Reset();
 
-        var getCount = knockOff.StringIndexer.GetCount;    // 0
-        var onGet = knockOff.StringIndexer.OnGet;          // null
+        var getCount = knockOff.Indexer.GetCount;    // 0
+        var onGet = knockOff.Indexer.OnGet;          // null
         // Note: Backing dictionary is NOT cleared
         #endregion
 
@@ -250,13 +250,13 @@ public static class IndexersUsageExamples
         IIdxList list = knockOff;
 
         #region indexers-integer-indexer-usage
-        knockOff.Int32IndexerBacking[0] = "First";
-        knockOff.Int32IndexerBacking[1] = "Second";
+        knockOff.Indexer.Backing[0] = "First";
+        knockOff.Indexer.Backing[1] = "Second";
 
         var first = list[0];   // "First"
         var second = list[1];  // "Second"
 
-        var lastGetIndex = knockOff.Int32Indexer.LastGetKey;  // 1
+        var lastGetIndex = knockOff.Indexer.LastGetKey;  // 1
         #endregion
 
         _ = (first, second, lastGetIndex);

@@ -425,7 +425,7 @@ public class SkillSamplesTests : SamplesTestBase
         var knockOff = new SkBackingPropertyStoreKnockOff();
         ISkBackingPropertyStore store = knockOff;
 
-        knockOff.StringIndexerBacking["key1"] = "value1";
+        knockOff.Indexer.Backing["key1"] = "value1";
 
         Assert.Equal("value1", store["key1"]);
     }

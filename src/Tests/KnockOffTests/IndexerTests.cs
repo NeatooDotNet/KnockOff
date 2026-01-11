@@ -11,12 +11,12 @@ public class IndexerTests
 		var knockOff = new PropertyStoreKnockOff();
 		IPropertyStore store = knockOff;
 
-		knockOff.StringIndexerBacking["Name"] = new PropertyInfo { Name = "Name", Value = "Test" };
+		knockOff.Indexer.Backing["Name"] = new PropertyInfo { Name = "Name", Value = "Test" };
 
 		var result = store["Name"];
 
-		Assert.Equal(1, knockOff.StringIndexer.GetCount);
-		Assert.Equal("Name", knockOff.StringIndexer.LastGetKey);
+		Assert.Equal(1, knockOff.Indexer.GetCount);
+		Assert.Equal("Name", knockOff.Indexer.LastGetKey);
 		Assert.NotNull(result);
 		Assert.Equal("Name", result.Name);
 	}
@@ -27,16 +27,16 @@ public class IndexerTests
 		var knockOff = new PropertyStoreKnockOff();
 		IPropertyStore store = knockOff;
 
-		knockOff.StringIndexerBacking["First"] = new PropertyInfo { Name = "First", Value = "1" };
-		knockOff.StringIndexerBacking["Second"] = new PropertyInfo { Name = "Second", Value = "2" };
-		knockOff.StringIndexerBacking["Third"] = new PropertyInfo { Name = "Third", Value = "3" };
+		knockOff.Indexer.Backing["First"] = new PropertyInfo { Name = "First", Value = "1" };
+		knockOff.Indexer.Backing["Second"] = new PropertyInfo { Name = "Second", Value = "2" };
+		knockOff.Indexer.Backing["Third"] = new PropertyInfo { Name = "Third", Value = "3" };
 
 		_ = store["First"];
 		_ = store["Second"];
 		_ = store["Third"];
 
-		Assert.Equal(3, knockOff.StringIndexer.GetCount);
-		Assert.Equal("Third", knockOff.StringIndexer.LastGetKey); // Last key accessed
+		Assert.Equal(3, knockOff.Indexer.GetCount);
+		Assert.Equal("Third", knockOff.Indexer.LastGetKey); // Last key accessed
 	}
 
 	[Fact]
@@ -46,7 +46,7 @@ public class IndexerTests
 		IPropertyStore store = knockOff;
 
 		var mockProperty = new PropertyInfo { Name = "FromCallback", Value = "Mocked" };
-		knockOff.StringIndexer.OnGet = (ko, key) =>
+		knockOff.Indexer.OnGet = (ko, key) =>
 		{
 			if (key == "Special") return mockProperty;
 			return null;
@@ -55,7 +55,7 @@ public class IndexerTests
 		var result = store["Special"];
 
 		Assert.Same(mockProperty, result);
-		Assert.Equal("Special", knockOff.StringIndexer.LastGetKey);
+		Assert.Equal("Special", knockOff.Indexer.LastGetKey);
 	}
 
 	[Fact]
@@ -64,10 +64,10 @@ public class IndexerTests
 		var knockOff = new PropertyStoreKnockOff();
 		IPropertyStore store = knockOff;
 
-		knockOff.StringIndexer.OnGet = (ko, key) =>
+		knockOff.Indexer.OnGet = (ko, key) =>
 		{
 			Assert.Same(knockOff, ko);
-			return new PropertyInfo { Name = key, Value = $"Accessed {ko.StringIndexer.GetCount} times" };
+			return new PropertyInfo { Name = key, Value = $"Accessed {ko.Indexer.GetCount} times" };
 		};
 
 		_ = store["First"];
@@ -86,10 +86,10 @@ public class IndexerTests
 		var prop = new PropertyInfo { Name = "Test", Value = "Value" };
 		store["Test"] = prop;
 
-		Assert.Equal(1, knockOff.StringIndexer.SetCount);
-		Assert.NotNull(knockOff.StringIndexer.LastSetEntry);
-		Assert.Equal("Test", knockOff.StringIndexer.LastSetEntry.Value.Key);
-		Assert.Same(prop, knockOff.StringIndexer.LastSetEntry.Value.Value);
+		Assert.Equal(1, knockOff.Indexer.SetCount);
+		Assert.NotNull(knockOff.Indexer.LastSetEntry);
+		Assert.Equal("Test", knockOff.Indexer.LastSetEntry.Value.Key);
+		Assert.Same(prop, knockOff.Indexer.LastSetEntry.Value.Value);
 	}
 
 	[Fact]
@@ -101,8 +101,8 @@ public class IndexerTests
 		var prop = new PropertyInfo { Name = "Stored", Value = "InBacking" };
 		store["Stored"] = prop;
 
-		Assert.True(knockOff.StringIndexerBacking.ContainsKey("Stored"));
-		Assert.Same(prop, knockOff.StringIndexerBacking["Stored"]);
+		Assert.True(knockOff.Indexer.Backing.ContainsKey("Stored"));
+		Assert.Same(prop, knockOff.Indexer.Backing["Stored"]);
 
 		var retrieved = store["Stored"];
 		Assert.Same(prop, retrieved);
@@ -115,7 +115,7 @@ public class IndexerTests
 		IReadWriteStore store = knockOff;
 
 		(string key, PropertyInfo? value)? capturedEntry = null;
-		knockOff.StringIndexer.OnSet = (ko, key, value) =>
+		knockOff.Indexer.OnSet = (ko, key, value) =>
 		{
 			capturedEntry = (key, value);
 		};
@@ -128,7 +128,7 @@ public class IndexerTests
 		Assert.Same(prop, capturedEntry.Value.value);
 
 		// Since OnSet was used, backing was NOT updated
-		Assert.False(knockOff.StringIndexerBacking.ContainsKey("MyKey"));
+		Assert.False(knockOff.Indexer.Backing.ContainsKey("MyKey"));
 	}
 
 	[Fact]
@@ -138,28 +138,28 @@ public class IndexerTests
 		IReadWriteStore store = knockOff;
 
 		var prop = new PropertyInfo { Name = "Test", Value = "Value" };
-		knockOff.StringIndexerBacking["Existing"] = prop;
-		knockOff.StringIndexer.OnGet = (ko, key) => prop;
+		knockOff.Indexer.Backing["Existing"] = prop;
+		knockOff.Indexer.OnGet = (ko, key) => prop;
 
 		_ = store["Key1"];
 		_ = store["Key2"];
 		store["Key3"] = prop;
 
-		Assert.Equal(2, knockOff.StringIndexer.GetCount);
-		Assert.Equal(1, knockOff.StringIndexer.SetCount);
-		Assert.NotNull(knockOff.StringIndexer.OnGet);
+		Assert.Equal(2, knockOff.Indexer.GetCount);
+		Assert.Equal(1, knockOff.Indexer.SetCount);
+		Assert.NotNull(knockOff.Indexer.OnGet);
 
-		knockOff.StringIndexer.Reset();
+		knockOff.Indexer.Reset();
 
-		Assert.Equal(0, knockOff.StringIndexer.GetCount);
-		Assert.Null(knockOff.StringIndexer.LastGetKey);
-		Assert.Equal(0, knockOff.StringIndexer.SetCount);
-		Assert.Null(knockOff.StringIndexer.LastSetEntry);
-		Assert.Null(knockOff.StringIndexer.OnGet);
-		Assert.Null(knockOff.StringIndexer.OnSet);
+		Assert.Equal(0, knockOff.Indexer.GetCount);
+		Assert.Null(knockOff.Indexer.LastGetKey);
+		Assert.Equal(0, knockOff.Indexer.SetCount);
+		Assert.Null(knockOff.Indexer.LastSetEntry);
+		Assert.Null(knockOff.Indexer.OnGet);
+		Assert.Null(knockOff.Indexer.OnSet);
 
 		// Backing dictionary is NOT cleared by Reset
-		Assert.True(knockOff.StringIndexerBacking.ContainsKey("Existing"));
+		Assert.True(knockOff.Indexer.Backing.ContainsKey("Existing"));
 	}
 
 	[Fact]
@@ -171,6 +171,6 @@ public class IndexerTests
 		var result = store["NonExistent"];
 
 		Assert.Null(result);
-		Assert.Equal(1, knockOff.StringIndexer.GetCount);
+		Assert.Equal(1, knockOff.Indexer.GetCount);
 	}
 }

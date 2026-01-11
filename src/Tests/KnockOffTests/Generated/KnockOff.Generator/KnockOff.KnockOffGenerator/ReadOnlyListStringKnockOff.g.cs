@@ -5,8 +5,8 @@ namespace KnockOff.Tests;
 
 partial class ReadOnlyListStringKnockOff
 {
-	/// <summary>Tracks and configures behavior for Int32Indexer.</summary>
-	public sealed class Int32IndexerInterceptor
+	/// <summary>Tracks and configures behavior for Indexer.</summary>
+	public sealed class IndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -19,6 +19,9 @@ partial class ReadOnlyListStringKnockOff
 
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet(int? index) { GetCount++; LastGetKey = index; }
+
+		/// <summary>Backing storage for this indexer.</summary>
+		public global::System.Collections.Generic.Dictionary<int, string> Backing { get; } = new();
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
@@ -65,8 +68,8 @@ partial class ReadOnlyListStringKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Int32Indexer.</summary>
-	public Int32IndexerInterceptor Int32Indexer { get; } = new();
+	/// <summary>Interceptor for Indexer.</summary>
+	public IndexerInterceptor Indexer { get; } = new();
 
 	/// <summary>Interceptor for Count.</summary>
 	public CountInterceptor Count { get; } = new();
@@ -74,12 +77,9 @@ partial class ReadOnlyListStringKnockOff
 	/// <summary>Interceptor for GetEnumerator.</summary>
 	public GetEnumeratorInterceptor GetEnumerator { get; } = new();
 
-	/// <summary>Backing storage for Int32Indexer indexer.</summary>
-	public global::System.Collections.Generic.Dictionary<int, string> Int32IndexerBacking { get; } = new();
-
 	string global::System.Collections.Generic.IReadOnlyList<string>.this[int index]
 	{
-		get { Int32Indexer.RecordGet(index); if (Int32Indexer.OnGet != null) return Int32Indexer.OnGet(this, index); return Int32IndexerBacking.TryGetValue(index, out var v) ? v : default!; }
+		get { Indexer.RecordGet(index); if (Indexer.OnGet != null) return Indexer.OnGet(this, index); return Indexer.Backing.TryGetValue(index, out var v) ? v : default!; }
 	}
 
 	int global::System.Collections.Generic.IReadOnlyCollection<string>.Count

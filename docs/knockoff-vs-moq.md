@@ -263,13 +263,13 @@ public partial class VsPropertyStoreKnockOff : IVsPropertyStore { }
 ```cs
 // // Use in test - pre-populate backing dictionary
 // var knockOff = new VsPropertyStoreKnockOff();
-// knockOff.StringIndexerBacking["Name"] = new VsPropertyInfo { Value = "Test" };
-// knockOff.StringIndexerBacking["Age"] = new VsPropertyInfo { Value = "25" };
+// knockOff.Indexer.Backing["Name"] = new VsPropertyInfo { Value = "Test" };
+// knockOff.Indexer.Backing["Age"] = new VsPropertyInfo { Value = "25" };
 //
 // IVsPropertyStore store = knockOff;
 // var name = store["Name"];
 //
-// Assert.Equal("Name", knockOff.StringIndexer.LastGetKey);
+// Assert.Equal("Name", knockOff.Indexer.LastGetKey);
 ```
 <!-- endSnippet -->
 

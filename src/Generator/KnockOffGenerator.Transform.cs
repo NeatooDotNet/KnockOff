@@ -50,14 +50,17 @@ public partial class KnockOffGenerator
 				Array.Empty<string>()));
 		}
 
-		// Track names for collision detection (KO1002)
-		var nameToFullNames = new Dictionary<string, List<string>>();
+		// Track names for collision detection
+		// Key: simpleName, Value: list of (typeSuffix, fullName) pairs
+		var nameToTypeSuffixes = new Dictionary<string, List<(string typeSuffix, string fullName)>>();
 
 		// Process ALL [KnockOff<T>] attributes on this class
-		var interfaces = new List<InterfaceInfo>();
+		// First pass: collect all interfaces and track name collisions
+		var interfaceEntries = new List<(INamedTypeSymbol symbol, InterfaceInfo info)>();
 		var delegates = new List<DelegateInfo>();
 		var classes = new List<ClassStubInfo>();
 		var stubTypeNames = new HashSet<string>();
+
 		foreach (var attributeData in context.Attributes)
 		{
 			if (attributeData.AttributeClass is not INamedTypeSymbol attrType || !attrType.IsGenericType)
@@ -86,19 +89,24 @@ public partial class KnockOffGenerator
 			// Track name for collision detection
 			var simpleName = typeArg.Name;
 			var fullName = typeArg.ToDisplayString();
-			if (!nameToFullNames.TryGetValue(simpleName, out var fullNames))
+			var typeSuffix = typeArg is INamedTypeSymbol namedType
+				? SymbolHelpers.GetTypeArgumentsSuffix(namedType)
+				: "";
+
+			if (!nameToTypeSuffixes.TryGetValue(simpleName, out var entries))
 			{
-				fullNames = new List<string>();
-				nameToFullNames[simpleName] = fullNames;
+				entries = new List<(string, string)>();
+				nameToTypeSuffixes[simpleName] = entries;
 			}
-			if (!fullNames.Contains(fullName))
-				fullNames.Add(fullName);
+			// Track unique combinations of (typeSuffix, fullName)
+			if (!entries.Any(e => e.fullName == fullName))
+				entries.Add((typeSuffix, fullName));
 
 			// Get interface info
 			if (typeArg.TypeKind == TypeKind.Interface && typeArg is INamedTypeSymbol namedInterface)
 			{
-				var interfaceInfo = ExtractInterfaceInfo(namedInterface, classSymbol.ContainingAssembly);
-				interfaces.Add(interfaceInfo);
+				var interfaceInfo = ExtractInterfaceInfo(namedInterface, classSymbol.ContainingAssembly, typeSuffix);
+				interfaceEntries.Add((namedInterface, interfaceInfo));
 				stubTypeNames.Add(namedInterface.Name); // e.g., "IUserService"
 			}
 			// Get delegate info
@@ -123,10 +131,19 @@ public partial class KnockOffGenerator
 			}
 		}
 
-		// Check for name collisions (KO1002) - same simple name from different namespaces
-		foreach (var kvp in nameToFullNames)
+		// Detect collisions and update NeedsSuffix
+		// Collision = same simple name with different type suffixes (e.g., IList<string> and IList<int>)
+		var needsSuffixNames = new HashSet<string>();
+		foreach (var kvp in nameToTypeSuffixes)
 		{
-			if (kvp.Value.Count > 1)
+			// Check for same name with different type suffixes
+			var distinctSuffixes = kvp.Value.Select(e => e.typeSuffix).Distinct().ToList();
+			if (distinctSuffixes.Count > 1)
+			{
+				needsSuffixNames.Add(kvp.Key);
+			}
+			// Also check for KO1002 - same simple name from different namespaces (non-generic collision)
+			else if (kvp.Value.Count > 1 && string.IsNullOrEmpty(distinctSuffixes.FirstOrDefault()))
 			{
 				var location = classDeclaration.Identifier.GetLocation();
 				var lineSpan = location.GetLineSpan();
@@ -136,6 +153,24 @@ public partial class KnockOffGenerator
 					lineSpan.StartLinePosition.Line,
 					lineSpan.StartLinePosition.Character,
 					new[] { kvp.Key }));
+			}
+		}
+
+		// Second pass: create final interface list with NeedsSuffix set
+		var interfaces = new List<InterfaceInfo>();
+		foreach (var (symbol, info) in interfaceEntries)
+		{
+			var needsSuffix = needsSuffixNames.Contains(symbol.Name);
+			if (needsSuffix)
+			{
+				// Create new record with NeedsSuffix = true
+				interfaces.Add(info with { NeedsSuffix = true });
+				// Add the suffixed name to stubTypeNames for partial property detection
+				stubTypeNames.Add(info.StubClassName);
+			}
+			else
+			{
+				interfaces.Add(info);
 			}
 		}
 
@@ -161,10 +196,12 @@ public partial class KnockOffGenerator
 
 	/// <summary>
 	/// Detects partial properties in the class declaration that return Stubs.{InterfaceName}.
+	/// The stubTypeNames set includes both regular names (e.g., "IUserService") and suffixed
+	/// names (e.g., "IListString") for collision avoidance scenarios.
 	/// </summary>
 	private static List<PartialPropertyInfo> DetectPartialProperties(
 		ClassDeclarationSyntax classDeclaration,
-		HashSet<string> interfaceNames)
+		HashSet<string> stubTypeNames)
 	{
 		var partialProperties = new List<PartialPropertyInfo>();
 
@@ -183,7 +220,7 @@ public partial class KnockOffGenerator
 				continue;
 
 			var stubTypeName = typeText.Substring(6); // Remove "Stubs." prefix
-			if (!interfaceNames.Contains(stubTypeName))
+			if (!stubTypeNames.Contains(stubTypeName))
 				continue;
 
 			// Property matches - extract info
@@ -231,7 +268,7 @@ public partial class KnockOffGenerator
 	/// <summary>
 	/// Extracts interface info for inline stubs (reuses same InterfaceInfo as explicit pattern).
 	/// </summary>
-	private static InterfaceInfo ExtractInterfaceInfo(INamedTypeSymbol iface, IAssemblySymbol knockOffAssembly)
+	private static InterfaceInfo ExtractInterfaceInfo(INamedTypeSymbol iface, IAssemblySymbol knockOffAssembly, string typeSuffix = "")
 	{
 		var members = new List<InterfaceMemberInfo>();
 		var events = new List<EventMemberInfo>();
@@ -288,7 +325,8 @@ public partial class KnockOffGenerator
 			iface.Name,
 			simpleName,
 			new EquatableArray<InterfaceMemberInfo>(members.ToArray()),
-			new EquatableArray<EventMemberInfo>(events.ToArray()));
+			new EquatableArray<EventMemberInfo>(events.ToArray()),
+			TypeSuffix: typeSuffix);
 	}
 
 	/// <summary>

@@ -5,8 +5,8 @@ namespace KnockOff.Benchmarks.Stubs;
 
 partial class CacheStub
 {
-	/// <summary>Tracks and configures behavior for StringIndexer.</summary>
-	public sealed class StringIndexerInterceptor
+	/// <summary>Tracks and configures behavior for Indexer.</summary>
+	public sealed class IndexerStringInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -32,12 +32,15 @@ partial class CacheStub
 		/// <summary>Records a setter access.</summary>
 		public void RecordSet(string? key, object? value) { SetCount++; LastSetEntry = (key, value); }
 
+		/// <summary>Backing storage for this indexer.</summary>
+		public global::System.Collections.Generic.Dictionary<string, object> Backing { get; } = new();
+
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for Int32Indexer.</summary>
-	public sealed class Int32IndexerInterceptor
+	/// <summary>Tracks and configures behavior for Indexer.</summary>
+	public sealed class IndexerInt32Interceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -51,31 +54,28 @@ partial class CacheStub
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet(int? index) { GetCount++; LastGetKey = index; }
 
+		/// <summary>Backing storage for this indexer.</summary>
+		public global::System.Collections.Generic.Dictionary<int, int> Backing { get; } = new();
+
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
 	}
 
-	/// <summary>Interceptor for StringIndexer.</summary>
-	public StringIndexerInterceptor StringIndexer { get; } = new();
+	/// <summary>Interceptor for Indexer.</summary>
+	public IndexerStringInterceptor IndexerString { get; } = new();
 
-	/// <summary>Interceptor for Int32Indexer.</summary>
-	public Int32IndexerInterceptor Int32Indexer { get; } = new();
-
-	/// <summary>Backing storage for StringIndexer indexer.</summary>
-	public global::System.Collections.Generic.Dictionary<string, object> StringIndexerBacking { get; } = new();
-
-	/// <summary>Backing storage for Int32Indexer indexer.</summary>
-	public global::System.Collections.Generic.Dictionary<int, int> Int32IndexerBacking { get; } = new();
+	/// <summary>Interceptor for Indexer.</summary>
+	public IndexerInt32Interceptor IndexerInt32 { get; } = new();
 
 	object global::KnockOff.Benchmarks.Interfaces.ICache.this[string key]
 	{
-		get { StringIndexer.RecordGet(key); if (StringIndexer.OnGet != null) return StringIndexer.OnGet(this, key); return StringIndexerBacking.TryGetValue(key, out var v) ? v : new object(); }
-		set { StringIndexer.RecordSet(key, value); if (StringIndexer.OnSet != null) StringIndexer.OnSet(this, key, value); else StringIndexerBacking[key] = value; }
+		get { IndexerString.RecordGet(key); if (IndexerString.OnGet != null) return IndexerString.OnGet(this, key); return IndexerString.Backing.TryGetValue(key, out var v) ? v : new object(); }
+		set { IndexerString.RecordSet(key, value); if (IndexerString.OnSet != null) IndexerString.OnSet(this, key, value); else IndexerString.Backing[key] = value; }
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ICache.this[int index]
 	{
-		get { Int32Indexer.RecordGet(index); if (Int32Indexer.OnGet != null) return Int32Indexer.OnGet(this, index); return Int32IndexerBacking.TryGetValue(index, out var v) ? v : default!; }
+		get { IndexerInt32.RecordGet(index); if (IndexerInt32.OnGet != null) return IndexerInt32.OnGet(this, index); return IndexerInt32.Backing.TryGetValue(index, out var v) ? v : default!; }
 	}
 
 }

@@ -108,15 +108,22 @@ public partial class KnockOffGenerator
 			// Generate handler classes for this interface's members
 			var methodGroups = GroupMethodsByName(iface.Members.Where(m => !m.IsProperty && !m.IsIndexer));
 
+			// Count indexers to determine naming strategy
+			var indexerCount = SymbolHelpers.CountIndexers(iface.Members);
+
 			// Deduplicate property/indexer members by name for interceptor class generation
 			// (Keep first occurrence, which is from the most-derived interface)
+			// For indexers, use the computed name (Indexer vs IndexerString/IndexerInt)
 			var processedPropertyNames = new HashSet<string>();
 			var deduplicatedPropertyMembers = new List<InterfaceMemberInfo>();
 			foreach (var member in iface.Members)
 			{
 				if (member.IsProperty || member.IsIndexer)
 				{
-					if (processedPropertyNames.Add(member.Name))
+					var memberName = member.IsIndexer
+						? SymbolHelpers.GetIndexerName(indexerCount, member.IndexerTypeSuffix)
+						: member.Name;
+					if (processedPropertyNames.Add(memberName))
 					{
 						deduplicatedPropertyMembers.Add(member);
 					}
@@ -134,27 +141,30 @@ public partial class KnockOffGenerator
 				}
 			}
 
+			// Use StubClassName which includes type suffix when needed for collision avoidance
+			var stubClassName = iface.StubClassName;
+
 			// Generate handler classes for deduplicated properties/indexers
 			foreach (var member in deduplicatedPropertyMembers)
 			{
-				GenerateInlineStubMemberHandlerClass(sb, member, iface.Name);
+				GenerateInlineStubMemberHandlerClass(sb, member, stubClassName, indexerCount);
 			}
 
 			// Generate handler classes for methods
 			foreach (var group in methodGroups.Values)
 			{
-				GenerateInlineStubMethodGroupHandlerClass(sb, group, iface.Name);
+				GenerateInlineStubMethodGroupHandlerClass(sb, group, stubClassName);
 			}
 
 			// Generate handler classes for deduplicated events
 			foreach (var evt in deduplicatedEvents)
 			{
-				GenerateInlineStubEventHandlerClass(sb, evt, iface.Name);
+				GenerateInlineStubEventHandlerClass(sb, evt, stubClassName);
 			}
 
 			// Generate the stub class implementing the interface
 			// Pass deduplicated members for interceptor properties, but full members for implementations
-			GenerateInlineStubClass(sb, iface, methodGroups, deduplicatedPropertyMembers, deduplicatedEvents);
+			GenerateInlineStubClass(sb, iface, methodGroups, deduplicatedPropertyMembers, deduplicatedEvents, indexerCount);
 		}
 
 		// Generate delegate stub classes
@@ -208,12 +218,17 @@ public partial class KnockOffGenerator
 	private static void GenerateInlineStubMemberHandlerClass(
 		System.Text.StringBuilder sb,
 		InterfaceMemberInfo member,
-		string interfaceSimpleName)
+		string interfaceSimpleName,
+		int indexerCount)
 	{
-		var interceptClassName = $"{interfaceSimpleName}_{member.Name}Interceptor";
+		// For indexers, compute name based on count (single: Indexer, multiple: IndexerString, IndexerInt)
+		var memberName = member.IsIndexer
+			? SymbolHelpers.GetIndexerName(indexerCount, member.IndexerTypeSuffix)
+			: member.Name;
+		var interceptClassName = $"{interfaceSimpleName}_{memberName}Interceptor";
 		var stubClassName = $"Stubs.{interfaceSimpleName}";
 
-		sb.AppendLine($"\t\t/// <summary>Interceptor for {interfaceSimpleName}.{member.Name}.</summary>");
+		sb.AppendLine($"\t\t/// <summary>Interceptor for {interfaceSimpleName}.{memberName}.</summary>");
 		sb.AppendLine($"\t\tpublic sealed class {interceptClassName}");
 		sb.AppendLine("\t\t{");
 
@@ -351,11 +366,20 @@ public partial class KnockOffGenerator
 			sb.AppendLine();
 		}
 
+		// Add Backing property inside the interceptor
+		var singleKeyType = member.IndexerParameters.Count == 1
+			? member.IndexerParameters.GetArray()![0].Type
+			: keyType;
+		sb.AppendLine($"\t\t\t/// <summary>Backing storage for this indexer.</summary>");
+		sb.AppendLine($"\t\t\tpublic global::System.Collections.Generic.Dictionary<{singleKeyType}, {member.ReturnType}> Backing {{ get; }} = new();");
+		sb.AppendLine();
+
 		// Reset method
 		sb.AppendLine("\t\t\t/// <summary>Resets all tracking state.</summary>");
 		sb.Append("\t\t\tpublic void Reset() { ");
 		if (member.HasGetter) sb.Append("GetCount = 0; LastGetKey = default; OnGet = null; ");
 		if (member.HasSetter) sb.Append("SetCount = 0; LastSetEntry = default; OnSet = null; ");
+		// Note: Backing dictionary is intentionally NOT cleared - pre-populated data is preserved
 		sb.AppendLine("}");
 	}
 
@@ -699,9 +723,11 @@ public partial class KnockOffGenerator
 		InterfaceInfo iface,
 		Dictionary<string, MethodGroupInfo> methodGroups,
 		List<InterfaceMemberInfo> deduplicatedPropertyMembers,
-		List<EventMemberInfo> deduplicatedEvents)
+		List<EventMemberInfo> deduplicatedEvents,
+		int indexerCount)
 	{
-		var stubClassName = iface.Name;
+		// Use StubClassName which includes type suffix when needed for collision avoidance
+		var stubClassName = iface.StubClassName;
 
 		sb.AppendLine($"\t\t/// <summary>Stub implementation of {iface.FullName}.</summary>");
 		sb.AppendLine($"\t\tpublic class {stubClassName} : {iface.FullName}");
@@ -710,8 +736,12 @@ public partial class KnockOffGenerator
 		// Generate intercept properties (using deduplicated members to avoid duplicates)
 		foreach (var member in deduplicatedPropertyMembers)
 		{
-			sb.AppendLine($"\t\t\t/// <summary>Interceptor for {member.Name}.</summary>");
-			sb.AppendLine($"\t\t\tpublic {GetNewKeywordIfNeeded(member.Name)}{stubClassName}_{member.Name}Interceptor {member.Name} {{ get; }} = new();");
+			// For indexers, compute name based on count (single: Indexer, multiple: IndexerString, IndexerInt)
+			var memberName = member.IsIndexer
+				? SymbolHelpers.GetIndexerName(indexerCount, member.IndexerTypeSuffix)
+				: member.Name;
+			sb.AppendLine($"\t\t\t/// <summary>Interceptor for {memberName}.</summary>");
+			sb.AppendLine($"\t\t\tpublic {GetNewKeywordIfNeeded(memberName)}{stubClassName}_{memberName}Interceptor {memberName} {{ get; }} = new();");
 			sb.AppendLine();
 		}
 		foreach (var group in methodGroups.Values)
@@ -747,7 +777,7 @@ public partial class KnockOffGenerator
 		{
 			if (member.IsIndexer)
 			{
-				GenerateInlineStubIndexerImplementation(sb, member.DeclaringInterfaceFullName, member, stubClassName);
+				GenerateInlineStubIndexerImplementation(sb, member.DeclaringInterfaceFullName, member, stubClassName, indexerCount);
 			}
 			else if (member.IsProperty)
 			{
@@ -1018,21 +1048,29 @@ public partial class KnockOffGenerator
 		System.Text.StringBuilder sb,
 		string interfaceFullName,
 		InterfaceMemberInfo member,
-		string stubClassName)
+		string stubClassName,
+		int indexerCount)
 	{
 		var paramList = string.Join(", ", member.IndexerParameters.Select(p => $"{p.Type} {p.Name}"));
 		var argList = string.Join(", ", member.IndexerParameters.Select(p => p.Name));
+		var keyArg = member.IndexerParameters.Count == 1
+			? member.IndexerParameters.GetArray()![0].Name
+			: $"({argList})";
+
+		// Compute indexer name based on count (single: Indexer, multiple: IndexerString, IndexerInt)
+		var indexerName = SymbolHelpers.GetIndexerName(indexerCount, member.IndexerTypeSuffix);
 
 		sb.AppendLine($"\t\t\t{member.ReturnType} {interfaceFullName}.this[{paramList}]");
 		sb.AppendLine("\t\t\t{");
 
 		if (member.HasGetter)
 		{
+			var defaultExpr = member.IsNullable ? "default" : GetDefaultForType(member.ReturnType, member.DefaultStrategy, member.ConcreteTypeForNew);
 			sb.AppendLine("\t\t\t\tget");
 			sb.AppendLine("\t\t\t\t{");
-			sb.AppendLine($"\t\t\t\t\t{member.Name}.RecordGet({argList});");
-			sb.AppendLine($"\t\t\t\t\tif ({member.Name}.OnGet is {{ }} onGet) return onGet(this, {argList});");
-			sb.AppendLine($"\t\t\t\t\treturn default!;");
+			sb.AppendLine($"\t\t\t\t\t{indexerName}.RecordGet({argList});");
+			sb.AppendLine($"\t\t\t\t\tif ({indexerName}.OnGet is {{ }} onGet) return onGet(this, {argList});");
+			sb.AppendLine($"\t\t\t\t\treturn {indexerName}.Backing.TryGetValue({keyArg}, out var v) ? v : {defaultExpr};");
 			sb.AppendLine("\t\t\t\t}");
 		}
 
@@ -1040,8 +1078,9 @@ public partial class KnockOffGenerator
 		{
 			sb.AppendLine("\t\t\t\tset");
 			sb.AppendLine("\t\t\t\t{");
-			sb.AppendLine($"\t\t\t\t\t{member.Name}.RecordSet({argList}, value);");
-			sb.AppendLine($"\t\t\t\t\tif ({member.Name}.OnSet is {{ }} onSet) onSet(this, {argList}, value);");
+			sb.AppendLine($"\t\t\t\t\t{indexerName}.RecordSet({argList}, value);");
+			sb.AppendLine($"\t\t\t\t\tif ({indexerName}.OnSet is {{ }} onSet) onSet(this, {argList}, value);");
+			sb.AppendLine($"\t\t\t\t\telse {indexerName}.Backing[{keyArg}] = value;");
 			sb.AppendLine("\t\t\t\t}");
 		}
 

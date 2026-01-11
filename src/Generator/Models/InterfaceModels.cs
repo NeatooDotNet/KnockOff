@@ -10,7 +10,25 @@ internal sealed record InterfaceInfo(
 	string Name,
 	string SimpleName,
 	EquatableArray<InterfaceMemberInfo> Members,
-	EquatableArray<EventMemberInfo> Events) : IEquatable<InterfaceInfo>;
+	EquatableArray<EventMemberInfo> Events,
+	/// <summary>
+	/// Type suffix for generic interfaces (e.g., "String" for IList&lt;string&gt;).
+	/// Used to disambiguate when multiple interfaces have the same simple name.
+	/// </summary>
+	string TypeSuffix = "",
+	/// <summary>
+	/// True when this interface needs a suffix to avoid collision with another
+	/// interface of the same simple name but different type arguments.
+	/// </summary>
+	bool NeedsSuffix = false) : IEquatable<InterfaceInfo>
+{
+	/// <summary>
+	/// Gets the stub class name, including type suffix when needed for collision avoidance.
+	/// </summary>
+	public string StubClassName => NeedsSuffix && !string.IsNullOrEmpty(TypeSuffix)
+		? Name + TypeSuffix
+		: Name;
+}
 
 internal sealed record InterfaceMemberInfo(
 	string Name,
@@ -41,7 +59,13 @@ internal sealed record InterfaceMemberInfo(
 	/// True if the setter has [AllowNull] attribute on its value parameter.
 	/// When true, the generated setter should include [param: AllowNull].
 	/// </summary>
-	bool SetterHasAllowNull = false) : IEquatable<InterfaceMemberInfo>
+	bool SetterHasAllowNull = false,
+	/// <summary>
+	/// For indexers, the type suffix to append when multiple indexers exist.
+	/// E.g., "String" for this[string key], "Int32" for this[int index].
+	/// Used to generate names like "IndexerString" or "IndexerInt32" when needed.
+	/// </summary>
+	string? IndexerTypeSuffix = null) : IEquatable<InterfaceMemberInfo>
 {
 	/// <summary>
 	/// Creates an InterfaceMemberInfo from a property symbol.
@@ -57,14 +81,18 @@ internal sealed record InterfaceMemberInfo(
 		var isIndexer = property.IsIndexer;
 		var indexerParameters = EquatableArray<ParameterInfo>.Empty;
 		var name = property.Name;
+		string? indexerTypeSuffix = null;
 
 		if (isIndexer)
 		{
-			// For indexers, create a name based on parameter types for uniqueness
+			// For indexers, use "Indexer" as base name with type suffix for disambiguation
+			// Single indexer: "Indexer"
+			// Multiple indexers: "IndexerString", "IndexerInt32", etc.
+			name = "Indexer";
 			var paramTypes = property.Parameters
 				.Select(p => SymbolHelpers.GetSimpleTypeName(p.Type))
 				.ToArray();
-			name = string.Join("", paramTypes) + "Indexer";
+			indexerTypeSuffix = string.Join("", paramTypes);
 
 			indexerParameters = new EquatableArray<ParameterInfo>(
 				property.Parameters
@@ -114,7 +142,8 @@ internal sealed record InterfaceMemberInfo(
 			DeclaringInterfaceFullName: declaringInterfaceFullName,
 			SetterParameterType: setterParameterType,
 			SetterHasDisallowNull: setterHasDisallowNull,
-			SetterHasAllowNull: setterHasAllowNull);
+			SetterHasAllowNull: setterHasAllowNull,
+			IndexerTypeSuffix: indexerTypeSuffix);
 	}
 
 	/// <summary>

@@ -27,8 +27,8 @@ partial class IValidatePropertyManagerTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IValidatePropertyManager.StringIndexer.</summary>
-		public sealed class IValidatePropertyManager_StringIndexerInterceptor
+		/// <summary>Interceptor for IValidatePropertyManager.Indexer.</summary>
+		public sealed class IValidatePropertyManager_IndexerInterceptor
 		{
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
@@ -41,6 +41,9 @@ partial class IValidatePropertyManagerTests
 
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet(string propertyName) { GetCount++; LastGetKey = propertyName; }
+
+			/// <summary>Backing storage for this indexer.</summary>
+			public global::System.Collections.Generic.Dictionary<string, global::Neatoo.IValidateProperty> Backing { get; } = new();
 
 			/// <summary>Resets all tracking state.</summary>
 			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
@@ -337,8 +340,8 @@ partial class IValidatePropertyManagerTests
 			/// <summary>Interceptor for IsBusy.</summary>
 			public IValidatePropertyManager_IsBusyInterceptor IsBusy { get; } = new();
 
-			/// <summary>Interceptor for StringIndexer.</summary>
-			public IValidatePropertyManager_StringIndexerInterceptor StringIndexer { get; } = new();
+			/// <summary>Interceptor for Indexer.</summary>
+			public IValidatePropertyManager_IndexerInterceptor Indexer { get; } = new();
 
 			/// <summary>Interceptor for IsSelfValid.</summary>
 			public IValidatePropertyManager_IsSelfValidInterceptor IsSelfValid { get; } = new();
@@ -457,9 +460,9 @@ partial class IValidatePropertyManagerTests
 			{
 				get
 				{
-					StringIndexer.RecordGet(propertyName);
-					if (StringIndexer.OnGet is { } onGet) return onGet(this, propertyName);
-					return default!;
+					Indexer.RecordGet(propertyName);
+					if (Indexer.OnGet is { } onGet) return onGet(this, propertyName);
+					return Indexer.Backing.TryGetValue(propertyName, out var v) ? v : default!;
 				}
 			}
 

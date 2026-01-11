@@ -177,12 +177,12 @@ public partial class IValidatePropertyManagerTests
         IValidatePropertyManager<IValidateProperty> manager = stub;
 
         var propertyStub = new ValidatePropertyStubForManager();
-        stub.StringIndexer.OnGet = (ko, name) => propertyStub;
+        stub.Indexer.OnGet = (ko, name) => propertyStub;
 
         _ = manager["PropertyName"];
 
-        Assert.Equal(1, stub.StringIndexer.GetCount);
-        Assert.Equal("PropertyName", stub.StringIndexer.LastGetKey);
+        Assert.Equal(1, stub.Indexer.GetCount);
+        Assert.Equal("PropertyName", stub.Indexer.LastGetKey);
     }
 
     [Fact]

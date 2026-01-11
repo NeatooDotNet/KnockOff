@@ -298,7 +298,7 @@ Starting in v10.14, KnockOff supports **generic standalone stubs** - stub classe
 ### Basic Usage
 
 <!-- snippet: docs:generics:standalone-basic -->
-```csharp
+```cs
 public interface IGenericRepo<T> where T : class
 {
     T? GetById(int id);
@@ -310,45 +310,45 @@ public interface IGenericRepo<T> where T : class
 [KnockOff]
 public partial class GenericRepoStub<T> : IGenericRepo<T> where T : class { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 Use the same stub class with different type arguments:
 
 <!-- snippet: docs:generics:standalone-usage -->
-```csharp
+```cs
 // Same stub class, different type arguments
-        var userRepo = new GenericRepoStub<GenUser>();
-        var orderRepo = new GenericRepoStub<GenOrder>();
+var userRepo = new GenericRepoStub<GenUser>();
+var orderRepo = new GenericRepoStub<GenOrder>();
 
-        // Configure user repository
-        userRepo.GetById.OnCall = (ko, id) => new GenUser { Id = id, Name = $"User-{id}" };
-        userRepo.GetAll.OnCall = (ko) => new List<GenUser>();
+// Configure user repository
+userRepo.GetById.OnCall = (ko, id) => new GenUser { Id = id, Name = $"User-{id}" };
+userRepo.GetAll.OnCall = (ko) => new List<GenUser>();
 
-        // Configure order repository
-        orderRepo.GetById.OnCall = (ko, id) => new GenOrder { Id = id };
+// Configure order repository
+orderRepo.GetById.OnCall = (ko, id) => new GenOrder { Id = id };
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Tracking
 
 <!-- snippet: docs:generics:standalone-tracking -->
-```csharp
+```cs
 var stub = new GenericRepoStub<GenUser>();
-        IGenericRepo<GenUser> repo = stub;
+IGenericRepo<GenUser> repo = stub;
 
-        var user = new GenUser { Id = 1, Name = "Test" };
-        repo.Save(user);
+var user = new GenUser { Id = 1, Name = "Test" };
+repo.Save(user);
 
-        // Tracking works with the type parameter
-        var callCount = stub.Save.CallCount;      // 1
-        var lastArg = stub.Save.LastCallArg;      // same as user
+// Tracking works with the type parameter
+var callCount = stub.Save.CallCount;      // 1
+var lastArg = stub.Save.LastCallArg;      // same as user
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Multiple Type Parameters
 
 <!-- snippet: docs:generics:standalone-multiple-params -->
-```csharp
+```cs
 public interface IGenericKeyValue<TKey, TValue>
     where TKey : notnull
     where TValue : class
@@ -362,26 +362,26 @@ public partial class GenericKeyValueStub<TKey, TValue> : IGenericKeyValue<TKey, 
     where TKey : notnull
     where TValue : class { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 <!-- snippet: docs:generics:standalone-multiple-usage -->
-```csharp
+```cs
 var cache = new GenericKeyValueStub<string, GenUser>();
-        IGenericKeyValue<string, GenUser> service = cache;
+IGenericKeyValue<string, GenUser> service = cache;
 
-        cache.Get.OnCall = (ko, key) => new GenUser { Name = key };
-        cache.Set.OnCall = (ko, key, value) => { /* stored */ };
+cache.Get.OnCall = (ko, key) => new GenUser { Name = key };
+cache.Set.OnCall = (ko, key, value) => { /* stored */ };
 
-        var result = service.Get("admin");  // returns GenUser with Name="admin"
+var result = service.Get("admin");  // returns GenUser with Name="admin"
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Constraints
 
 Type parameter constraints must match between the stub class and interface:
 
 <!-- snippet: docs:generics:standalone-constrained -->
-```csharp
+```cs
 public interface IGenericEntityRepo<T> where T : class, IGenEntity
 {
     T? FindById(int id);
@@ -392,7 +392,7 @@ public interface IGenericEntityRepo<T> where T : class, IGenEntity
 public partial class GenericEntityRepoStub<T> : IGenericEntityRepo<T>
     where T : class, IGenEntity { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Type Parameter Arity
 

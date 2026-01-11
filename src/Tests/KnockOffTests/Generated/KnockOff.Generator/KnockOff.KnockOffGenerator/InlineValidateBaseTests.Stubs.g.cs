@@ -46,8 +46,8 @@ partial class InlineValidateBaseTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IValidateBase.StringIndexer.</summary>
-		public sealed class IValidateBase_StringIndexerInterceptor
+		/// <summary>Interceptor for IValidateBase.Indexer.</summary>
+		public sealed class IValidateBase_IndexerInterceptor
 		{
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
@@ -60,6 +60,9 @@ partial class InlineValidateBaseTests
 
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet(string propertyName) { GetCount++; LastGetKey = propertyName; }
+
+			/// <summary>Backing storage for this indexer.</summary>
+			public global::System.Collections.Generic.Dictionary<string, global::Neatoo.IValidateProperty> Backing { get; } = new();
 
 			/// <summary>Resets all tracking state.</summary>
 			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
@@ -308,8 +311,8 @@ partial class InlineValidateBaseTests
 			/// <summary>Interceptor for IsPaused.</summary>
 			public IValidateBase_IsPausedInterceptor IsPaused { get; } = new();
 
-			/// <summary>Interceptor for StringIndexer.</summary>
-			public IValidateBase_StringIndexerInterceptor StringIndexer { get; } = new();
+			/// <summary>Interceptor for Indexer.</summary>
+			public IValidateBase_IndexerInterceptor Indexer { get; } = new();
 
 			/// <summary>Interceptor for IsBusy.</summary>
 			public IValidateBase_IsBusyInterceptor IsBusy { get; } = new();
@@ -386,9 +389,9 @@ partial class InlineValidateBaseTests
 			{
 				get
 				{
-					StringIndexer.RecordGet(propertyName);
-					if (StringIndexer.OnGet is { } onGet) return onGet(this, propertyName);
-					return default!;
+					Indexer.RecordGet(propertyName);
+					if (Indexer.OnGet is { } onGet) return onGet(this, propertyName);
+					return Indexer.Backing.TryGetValue(propertyName, out var v) ? v : default!;
 				}
 			}
 

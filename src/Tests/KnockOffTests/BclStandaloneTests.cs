@@ -544,13 +544,13 @@ public class BclStandaloneTests
     public void ListStringKnockOff_Indexer_TracksInvocation()
     {
         var knockOff = new ListStringKnockOff();
-        knockOff.Int32Indexer.OnGet = (ko, index) => $"item_{index}";
+        knockOff.Indexer.OnGet = (ko, index) => $"item_{index}";
         IList<string> list = knockOff;
 
         var result = list[5];
 
         Assert.Equal("item_5", result);
-        Assert.Equal(1, knockOff.Int32Indexer.GetCount);
+        Assert.Equal(1, knockOff.Indexer.GetCount);
     }
 
     [Fact]
@@ -601,7 +601,7 @@ public class BclStandaloneTests
     public void DictionaryStringIntKnockOff_Indexer_TracksInvocation()
     {
         var knockOff = new DictionaryStringIntKnockOff();
-        knockOff.StringIndexer.OnGet = (ko, key) => key.Length;
+        knockOff.Indexer.OnGet = (ko, key) => key.Length;
         IDictionary<string, int> dict = knockOff;
 
         var result = dict["hello"];
@@ -694,7 +694,7 @@ public class BclStandaloneTests
     public void ReadOnlyListStringKnockOff_Indexer_TracksInvocation()
     {
         var knockOff = new ReadOnlyListStringKnockOff();
-        knockOff.Int32Indexer.OnGet = (ko, index) => $"item_{index}";
+        knockOff.Indexer.OnGet = (ko, index) => $"item_{index}";
         IReadOnlyList<string> list = knockOff;
 
         var result = list[7];

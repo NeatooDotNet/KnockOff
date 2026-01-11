@@ -123,6 +123,93 @@ internal static class SymbolHelpers
 	}
 
 	/// <summary>
+	/// Computes the final indexer name based on whether there are multiple indexers.
+	/// - Single indexer: "Indexer"
+	/// - Multiple indexers: "Indexer{TypeSuffix}" (e.g., "IndexerString", "IndexerInt32")
+	/// </summary>
+	/// <param name="indexerCount">Total number of indexers in the containing type.</param>
+	/// <param name="typeSuffix">The type suffix for this specific indexer (e.g., "String").</param>
+	/// <returns>The computed indexer name.</returns>
+	public static string GetIndexerName(int indexerCount, string? typeSuffix)
+	{
+		if (indexerCount == 1)
+			return "Indexer";
+
+		// Multiple indexers - use type suffix
+		return "Indexer" + (typeSuffix ?? "Unknown");
+	}
+
+	/// <summary>
+	/// Counts the number of indexers in a collection of interface members.
+	/// </summary>
+	public static int CountIndexers(EquatableArray<InterfaceMemberInfo> members)
+	{
+		var arr = members.GetArray();
+		if (arr is null) return 0;
+		return arr.Count(m => m.IsIndexer);
+	}
+
+	/// <summary>
+	/// Counts the number of indexers in a collection of class members.
+	/// </summary>
+	public static int CountClassIndexers(EquatableArray<ClassMemberInfo> members)
+	{
+		var arr = members.GetArray();
+		if (arr is null) return 0;
+		return arr.Count(m => m.IsIndexer);
+	}
+
+	/// <summary>
+	/// Gets a type suffix for generic type arguments to disambiguate collision scenarios.
+	/// Examples:
+	/// - IList&lt;string&gt; → "String"
+	/// - IList&lt;int&gt; → "Int32"
+	/// - IDictionary&lt;string, int&gt; → "StringInt32"
+	/// - IList&lt;string[]&gt; → "StringArray"
+	/// - IList&lt;int?&gt; → "NullableInt32"
+	/// </summary>
+	public static string GetTypeSuffix(ITypeSymbol type)
+	{
+		return type switch
+		{
+			IArrayTypeSymbol array =>
+				GetTypeSuffix(array.ElementType) + "Array",
+
+			// Check for Nullable<T> using OriginalDefinition comparison
+			INamedTypeSymbol named when IsNullableValueType(named) =>
+				"Nullable" + GetTypeSuffix(named.TypeArguments[0]),
+
+			INamedTypeSymbol { IsTupleType: true } tuple =>
+				"ValueTuple" + string.Concat(tuple.TupleElements.Select(e => GetTypeSuffix(e.Type))),
+
+			INamedTypeSymbol named when named.IsGenericType =>
+				GetSimpleTypeName(named) + string.Concat(named.TypeArguments.Select(GetTypeSuffix)),
+
+			_ => GetSimpleTypeName(type)
+		};
+	}
+
+	/// <summary>
+	/// Checks if a type is a nullable value type (e.g., int?, DateTime?).
+	/// </summary>
+	private static bool IsNullableValueType(INamedTypeSymbol type)
+	{
+		return type.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T;
+	}
+
+	/// <summary>
+	/// Gets a combined type suffix for all type arguments of a generic type.
+	/// Returns empty string for non-generic types.
+	/// </summary>
+	public static string GetTypeArgumentsSuffix(INamedTypeSymbol type)
+	{
+		if (!type.IsGenericType || type.TypeArguments.Length == 0)
+			return "";
+
+		return string.Concat(type.TypeArguments.Select(GetTypeSuffix));
+	}
+
+	/// <summary>
 	/// Extracts constraint strings from a type parameter symbol.
 	/// </summary>
 	public static IEnumerable<string> GetTypeParameterConstraints(ITypeParameterSymbol tp)

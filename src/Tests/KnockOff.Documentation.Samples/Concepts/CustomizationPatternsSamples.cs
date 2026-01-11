@@ -200,7 +200,7 @@ public static class CustomizationPatternsUsageExamples
 
         #region customization-patterns-callback-indexer
         // Getter with key parameter
-        knockOff.StringIndexer.OnGet = (ko, key) => key switch
+        knockOff.Indexer.OnGet = (ko, key) => key switch
         {
             "Name" => new PatternPropertyInfo { Value = "Test" },
             "Age" => new PatternPropertyInfo { Value = "25" },
@@ -208,7 +208,7 @@ public static class CustomizationPatternsUsageExamples
         };
 
         // Setter with key and value parameters
-        knockOff.StringIndexer.OnSet = (ko, key, value) =>
+        knockOff.Indexer.OnSet = (ko, key, value) =>
         {
             // Custom logic
             // Note: When OnSet is set, value does NOT go to backing dictionary

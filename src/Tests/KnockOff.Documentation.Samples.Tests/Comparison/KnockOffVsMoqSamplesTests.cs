@@ -125,14 +125,14 @@ public class KnockOffVsMoqSamplesTests : SamplesTestBase
     public void IndexerStub_BackingDictionary_Works()
     {
         var knockOff = new VsPropertyStoreKnockOff();
-        knockOff.StringIndexerBacking["Name"] = new VsPropertyInfo { Value = "Test" };
-        knockOff.StringIndexerBacking["Age"] = new VsPropertyInfo { Value = "25" };
+        knockOff.Indexer.Backing["Name"] = new VsPropertyInfo { Value = "Test" };
+        knockOff.Indexer.Backing["Age"] = new VsPropertyInfo { Value = "25" };
 
         IVsPropertyStore store = knockOff;
         var name = store["Name"];
 
         Assert.Equal("Test", name?.Value);
-        Assert.Equal("Name", knockOff.StringIndexer.LastGetKey);
+        Assert.Equal("Name", knockOff.Indexer.LastGetKey);
     }
 
     // ========================================================================

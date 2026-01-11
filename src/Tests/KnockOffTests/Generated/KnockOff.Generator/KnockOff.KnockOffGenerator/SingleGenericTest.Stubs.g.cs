@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class ListIntStubTests
+partial class SingleGenericTest
 {
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
@@ -18,25 +18,25 @@ partial class ListIntStubTests
 			public int? LastGetKey { get; private set; }
 
 			/// <summary>Callback for getter.</summary>
-			public global::System.Func<Stubs.IList, int, int>? OnGet { get; set; }
+			public global::System.Func<Stubs.IList, int, string>? OnGet { get; set; }
 
 			/// <summary>Number of times the setter was accessed.</summary>
 			public int SetCount { get; private set; }
 
 			/// <summary>The last key-value pair passed to the setter.</summary>
-			public (int Key, int Value)? LastSetEntry { get; private set; }
+			public (int Key, string Value)? LastSetEntry { get; private set; }
 
 			/// <summary>Callback for setter.</summary>
-			public global::System.Action<Stubs.IList, int, int>? OnSet { get; set; }
+			public global::System.Action<Stubs.IList, int, string>? OnSet { get; set; }
 
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet(int index) { GetCount++; LastGetKey = index; }
 
 			/// <summary>Records a setter access.</summary>
-			public void RecordSet(int index, int value) { SetCount++; LastSetEntry = (index, value); }
+			public void RecordSet(int index, string value) { SetCount++; LastSetEntry = (index, value); }
 
 			/// <summary>Backing storage for this indexer.</summary>
-			public global::System.Collections.Generic.Dictionary<int, int> Backing { get; } = new();
+			public global::System.Collections.Generic.Dictionary<int, string> Backing { get; } = new();
 
 			/// <summary>Resets all tracking state.</summary>
 			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
@@ -90,12 +90,12 @@ partial class ListIntStubTests
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>The argument from the last call.</summary>
-			public int? LastCallArg { get; private set; }
+			public string? LastCallArg { get; private set; }
 
 			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Func<Stubs.IList, int, int>? OnCall { get; set; }
+			public global::System.Func<Stubs.IList, string, int>? OnCall { get; set; }
 
-			public void RecordCall(int item) { CallCount++; LastCallArg = item; }
+			public void RecordCall(string item) { CallCount++; LastCallArg = item; }
 
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
@@ -110,12 +110,12 @@ partial class ListIntStubTests
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>The arguments from the last call.</summary>
-			public (int? index, int? item)? LastCallArgs { get; private set; }
+			public (int? index, string? item)? LastCallArgs { get; private set; }
 
 			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Action<Stubs.IList, int, int>? OnCall { get; set; }
+			public global::System.Action<Stubs.IList, int, string>? OnCall { get; set; }
 
-			public void RecordCall(int index, int item) { CallCount++; LastCallArgs = (index, item); }
+			public void RecordCall(int index, string item) { CallCount++; LastCallArgs = (index, item); }
 
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
@@ -150,12 +150,12 @@ partial class ListIntStubTests
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>The argument from the last call.</summary>
-			public int? LastCallArg { get; private set; }
+			public string? LastCallArg { get; private set; }
 
 			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Action<Stubs.IList, int>? OnCall { get; set; }
+			public global::System.Action<Stubs.IList, string>? OnCall { get; set; }
 
-			public void RecordCall(int item) { CallCount++; LastCallArg = item; }
+			public void RecordCall(string item) { CallCount++; LastCallArg = item; }
 
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
@@ -187,12 +187,12 @@ partial class ListIntStubTests
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>The argument from the last call.</summary>
-			public int? LastCallArg { get; private set; }
+			public string? LastCallArg { get; private set; }
 
 			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Func<Stubs.IList, int, bool>? OnCall { get; set; }
+			public global::System.Func<Stubs.IList, string, bool>? OnCall { get; set; }
 
-			public void RecordCall(int item) { CallCount++; LastCallArg = item; }
+			public void RecordCall(string item) { CallCount++; LastCallArg = item; }
 
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
@@ -207,12 +207,12 @@ partial class ListIntStubTests
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>The arguments from the last call.</summary>
-			public (int[]? array, int? arrayIndex)? LastCallArgs { get; private set; }
+			public (string[]? array, int? arrayIndex)? LastCallArgs { get; private set; }
 
 			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Action<Stubs.IList, int[], int>? OnCall { get; set; }
+			public global::System.Action<Stubs.IList, string[], int>? OnCall { get; set; }
 
-			public void RecordCall(int[] array, int arrayIndex) { CallCount++; LastCallArgs = (array, arrayIndex); }
+			public void RecordCall(string[] array, int arrayIndex) { CallCount++; LastCallArgs = (array, arrayIndex); }
 
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
@@ -227,12 +227,12 @@ partial class ListIntStubTests
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>The argument from the last call.</summary>
-			public int? LastCallArg { get; private set; }
+			public string? LastCallArg { get; private set; }
 
 			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Func<Stubs.IList, int, bool>? OnCall { get; set; }
+			public global::System.Func<Stubs.IList, string, bool>? OnCall { get; set; }
 
-			public void RecordCall(int item) { CallCount++; LastCallArg = item; }
+			public void RecordCall(string item) { CallCount++; LastCallArg = item; }
 
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
@@ -247,15 +247,15 @@ partial class ListIntStubTests
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Func<Stubs.IList, global::System.Collections.Generic.IEnumerator<int>>? OnCall { get; set; }
+			public global::System.Func<Stubs.IList, global::System.Collections.Generic.IEnumerator<string>>? OnCall { get; set; }
 
 			public void RecordCall() { CallCount++; }
 
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Stub implementation of global::System.Collections.Generic.IList<int>.</summary>
-		public class IList : global::System.Collections.Generic.IList<int>
+		/// <summary>Stub implementation of global::System.Collections.Generic.IList<string>.</summary>
+		public class IList : global::System.Collections.Generic.IList<string>
 		{
 			/// <summary>Interceptor for Indexer.</summary>
 			public IList_IndexerInterceptor Indexer { get; } = new();
@@ -293,26 +293,26 @@ partial class ListIntStubTests
 			/// <summary>Interceptor for GetEnumerator.</summary>
 			public IList_GetEnumeratorInterceptor GetEnumerator { get; } = new();
 
-			int global::System.Collections.Generic.IList<int>.IndexOf(int item)
+			int global::System.Collections.Generic.IList<string>.IndexOf(string item)
 			{
 				IndexOf.RecordCall(item);
 				if (IndexOf.OnCall is { } onCall) return onCall(this, item);
 				return default!;
 			}
 
-			void global::System.Collections.Generic.IList<int>.Insert(int index, int item)
+			void global::System.Collections.Generic.IList<string>.Insert(int index, string item)
 			{
 				Insert.RecordCall(index, item);
 				if (Insert.OnCall is { } onCall) onCall(this, index, item);
 			}
 
-			void global::System.Collections.Generic.IList<int>.RemoveAt(int index)
+			void global::System.Collections.Generic.IList<string>.RemoveAt(int index)
 			{
 				RemoveAt.RecordCall(index);
 				if (RemoveAt.OnCall is { } onCall) onCall(this, index);
 			}
 
-			int global::System.Collections.Generic.IList<int>.this[int index]
+			string global::System.Collections.Generic.IList<string>.this[int index]
 			{
 				get
 				{
@@ -328,39 +328,39 @@ partial class ListIntStubTests
 				}
 			}
 
-			void global::System.Collections.Generic.ICollection<int>.Add(int item)
+			void global::System.Collections.Generic.ICollection<string>.Add(string item)
 			{
 				Add.RecordCall(item);
 				if (Add.OnCall is { } onCall) onCall(this, item);
 			}
 
-			void global::System.Collections.Generic.ICollection<int>.Clear()
+			void global::System.Collections.Generic.ICollection<string>.Clear()
 			{
 				Clear.RecordCall();
 				if (Clear.OnCall is { } onCall) onCall(this);
 			}
 
-			bool global::System.Collections.Generic.ICollection<int>.Contains(int item)
+			bool global::System.Collections.Generic.ICollection<string>.Contains(string item)
 			{
 				Contains.RecordCall(item);
 				if (Contains.OnCall is { } onCall) return onCall(this, item);
 				return default!;
 			}
 
-			void global::System.Collections.Generic.ICollection<int>.CopyTo(int[] array, int arrayIndex)
+			void global::System.Collections.Generic.ICollection<string>.CopyTo(string[] array, int arrayIndex)
 			{
 				CopyTo.RecordCall(array, arrayIndex);
 				if (CopyTo.OnCall is { } onCall) onCall(this, array, arrayIndex);
 			}
 
-			bool global::System.Collections.Generic.ICollection<int>.Remove(int item)
+			bool global::System.Collections.Generic.ICollection<string>.Remove(string item)
 			{
 				Remove.RecordCall(item);
 				if (Remove.OnCall is { } onCall) return onCall(this, item);
 				return default!;
 			}
 
-			int global::System.Collections.Generic.ICollection<int>.Count
+			int global::System.Collections.Generic.ICollection<string>.Count
 			{
 				get
 				{
@@ -370,7 +370,7 @@ partial class ListIntStubTests
 				}
 			}
 
-			bool global::System.Collections.Generic.ICollection<int>.IsReadOnly
+			bool global::System.Collections.Generic.ICollection<string>.IsReadOnly
 			{
 				get
 				{
@@ -380,7 +380,7 @@ partial class ListIntStubTests
 				}
 			}
 
-			global::System.Collections.Generic.IEnumerator<int> global::System.Collections.Generic.IEnumerable<int>.GetEnumerator()
+			global::System.Collections.Generic.IEnumerator<string> global::System.Collections.Generic.IEnumerable<string>.GetEnumerator()
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);

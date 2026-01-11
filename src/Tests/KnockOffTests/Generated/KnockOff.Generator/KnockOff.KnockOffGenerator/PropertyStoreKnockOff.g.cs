@@ -5,8 +5,8 @@ namespace KnockOff.Tests;
 
 partial class PropertyStoreKnockOff
 {
-	/// <summary>Tracks and configures behavior for StringIndexer.</summary>
-	public sealed class StringIndexerInterceptor
+	/// <summary>Tracks and configures behavior for Indexer.</summary>
+	public sealed class IndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -20,19 +20,19 @@ partial class PropertyStoreKnockOff
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet(string? key) { GetCount++; LastGetKey = key; }
 
+		/// <summary>Backing storage for this indexer.</summary>
+		public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Tests.PropertyInfo?> Backing { get; } = new();
+
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
 	}
 
-	/// <summary>Interceptor for StringIndexer.</summary>
-	public StringIndexerInterceptor StringIndexer { get; } = new();
-
-	/// <summary>Backing storage for StringIndexer indexer.</summary>
-	public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Tests.PropertyInfo?> StringIndexerBacking { get; } = new();
+	/// <summary>Interceptor for Indexer.</summary>
+	public IndexerInterceptor Indexer { get; } = new();
 
 	global::KnockOff.Tests.PropertyInfo? global::KnockOff.Tests.IPropertyStore.this[string key]
 	{
-		get { StringIndexer.RecordGet(key); if (StringIndexer.OnGet != null) return StringIndexer.OnGet(this, key); return StringIndexerBacking.TryGetValue(key, out var v) ? v : default; }
+		get { Indexer.RecordGet(key); if (Indexer.OnGet != null) return Indexer.OnGet(this, key); return Indexer.Backing.TryGetValue(key, out var v) ? v : default; }
 	}
 
 }

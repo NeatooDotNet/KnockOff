@@ -5,8 +5,8 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class IdxListKnockOff
 {
-	/// <summary>Tracks and configures behavior for Int32Indexer.</summary>
-	public sealed class Int32IndexerInterceptor
+	/// <summary>Tracks and configures behavior for Indexer.</summary>
+	public sealed class IndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -32,20 +32,20 @@ partial class IdxListKnockOff
 		/// <summary>Records a setter access.</summary>
 		public void RecordSet(int? index, object? value) { SetCount++; LastSetEntry = (index, value); }
 
+		/// <summary>Backing storage for this indexer.</summary>
+		public global::System.Collections.Generic.Dictionary<int, object?> Backing { get; } = new();
+
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; }
 	}
 
-	/// <summary>Interceptor for Int32Indexer.</summary>
-	public Int32IndexerInterceptor Int32Indexer { get; } = new();
-
-	/// <summary>Backing storage for Int32Indexer indexer.</summary>
-	public global::System.Collections.Generic.Dictionary<int, object?> Int32IndexerBacking { get; } = new();
+	/// <summary>Interceptor for Indexer.</summary>
+	public IndexerInterceptor Indexer { get; } = new();
 
 	object? global::KnockOff.Documentation.Samples.Guides.IIdxList.this[int index]
 	{
-		get { Int32Indexer.RecordGet(index); if (Int32Indexer.OnGet != null) return Int32Indexer.OnGet(this, index); return Int32IndexerBacking.TryGetValue(index, out var v) ? v : default; }
-		set { Int32Indexer.RecordSet(index, value); if (Int32Indexer.OnSet != null) Int32Indexer.OnSet(this, index, value); else Int32IndexerBacking[index] = value; }
+		get { Indexer.RecordGet(index); if (Indexer.OnGet != null) return Indexer.OnGet(this, index); return Indexer.Backing.TryGetValue(index, out var v) ? v : default; }
+		set { Indexer.RecordSet(index, value); if (Indexer.OnSet != null) Indexer.OnSet(this, index, value); else Indexer.Backing[index] = value; }
 	}
 
 }

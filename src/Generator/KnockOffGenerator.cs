@@ -483,16 +483,7 @@ public partial class KnockOffGenerator : IIncrementalGenerator
 			sb.AppendLine();
 		}
 
-		// 5. Generate flat backing dictionaries for indexers only (properties use interceptor.Value)
-		foreach (var member in typeInfo.FlatMembers)
-		{
-			if (member.IsIndexer)
-			{
-				var interceptorName = flatNameMap[GetMemberKey(member)];
-				GenerateFlatIndexerBackingDictionary(sb, member, interceptorName);
-			}
-			// Properties no longer need backing - they use interceptor.Value
-		}
+		// Backing dictionaries for indexers are now inside the interceptor class (Indexer.Backing)
 
 		// 7. Generate explicit interface implementations for ALL members from ALL interfaces
 		// We iterate over all interfaces (not FlatMembers) to ensure inherited interface members
@@ -504,7 +495,11 @@ public partial class KnockOffGenerator : IIncrementalGenerator
 			foreach (var member in iface.Members)
 			{
 				// Create unique key for this specific interface implementation
-				var implKey = $"{member.DeclaringInterfaceFullName}.{member.Name}({string.Join(",", member.Parameters.Select(p => p.Type))})";
+				// For indexers, use IndexerParameters; for methods, use Parameters
+				var paramList = member.IsIndexer && member.IndexerParameters.Count > 0
+					? member.IndexerParameters.Select(p => p.Type)
+					: member.Parameters.Select(p => p.Type);
+				var implKey = $"{member.DeclaringInterfaceFullName}.{member.Name}({string.Join(",", paramList)})";
 				if (!generatedImplementations.Add(implKey))
 					continue; // Skip duplicates
 
@@ -2198,24 +2193,6 @@ public partial class KnockOffGenerator : IIncrementalGenerator
 
 		sb.AppendLine($"\t/// <summary>Backing field for {koPropertyName}.{prop.Name}.</summary>");
 		sb.AppendLine($"\tprotected {prop.ReturnType} {backingName} {{ get; set; }}{initializer}");
-		sb.AppendLine();
-	}
-
-	/// <summary>
-	/// Generate backing dictionary for an indexer property (interface-scoped version)
-	/// </summary>
-	private static void GenerateInterfaceIndexerBackingDictionary(
-		System.Text.StringBuilder sb,
-		InterfaceMemberInfo indexer,
-		string koPropertyName)
-	{
-		var backingName = $"{koPropertyName}_{indexer.Name}Backing";
-		var keyType = indexer.IndexerParameters.Count > 0
-			? indexer.IndexerParameters.GetArray()![0].Type
-			: "object";
-
-		sb.AppendLine($"\t/// <summary>Backing dictionary for {koPropertyName}.{indexer.Name}. Pre-populate with values or use OnGet callback.</summary>");
-		sb.AppendLine($"\tpublic global::System.Collections.Generic.Dictionary<{keyType}, {indexer.ReturnType}> {backingName} {{ get; }} = new();");
 		sb.AppendLine();
 	}
 

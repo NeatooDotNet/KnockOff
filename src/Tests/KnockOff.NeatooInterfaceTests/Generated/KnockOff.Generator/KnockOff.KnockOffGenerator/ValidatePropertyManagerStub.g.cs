@@ -24,8 +24,8 @@ partial class ValidatePropertyManagerStub
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
-	/// <summary>Tracks and configures behavior for StringIndexer.</summary>
-	public sealed class StringIndexerInterceptor
+	/// <summary>Tracks and configures behavior for Indexer.</summary>
+	public sealed class IndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -38,6 +38,9 @@ partial class ValidatePropertyManagerStub
 
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet(string? propertyName) { GetCount++; LastGetKey = propertyName; }
+
+		/// <summary>Backing storage for this indexer.</summary>
+		public global::System.Collections.Generic.Dictionary<string, global::Neatoo.IValidateProperty> Backing { get; } = new();
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
@@ -371,8 +374,8 @@ partial class ValidatePropertyManagerStub
 	/// <summary>Interceptor for IsBusy.</summary>
 	public IsBusyInterceptor IsBusy { get; } = new();
 
-	/// <summary>Interceptor for StringIndexer.</summary>
-	public StringIndexerInterceptor StringIndexer { get; } = new();
+	/// <summary>Interceptor for Indexer.</summary>
+	public IndexerInterceptor Indexer { get; } = new();
 
 	/// <summary>Interceptor for IsSelfValid.</summary>
 	public IsSelfValidInterceptor IsSelfValid { get; } = new();
@@ -418,9 +421,6 @@ partial class ValidatePropertyManagerStub
 
 	/// <summary>Interceptor for PropertyChanged event.</summary>
 	public PropertyChangedInterceptor PropertyChanged { get; } = new();
-
-	/// <summary>Backing storage for StringIndexer indexer.</summary>
-	public global::System.Collections.Generic.Dictionary<string, global::Neatoo.IValidateProperty> StringIndexerBacking { get; } = new();
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidatePropertyManager<global::Neatoo.IValidateProperty>.WaitForTasks()
 	{
@@ -485,7 +485,7 @@ partial class ValidatePropertyManagerStub
 
 	global::Neatoo.IValidateProperty global::Neatoo.IValidatePropertyManager<global::Neatoo.IValidateProperty>.this[string propertyName]
 	{
-		get { StringIndexer.RecordGet(propertyName); if (StringIndexer.OnGet != null) return StringIndexer.OnGet(this, propertyName); return StringIndexerBacking.TryGetValue(propertyName, out var v) ? v : default!; }
+		get { Indexer.RecordGet(propertyName); if (Indexer.OnGet != null) return Indexer.OnGet(this, propertyName); return Indexer.Backing.TryGetValue(propertyName, out var v) ? v : default!; }
 	}
 
 	bool global::Neatoo.IValidatePropertyManager<global::Neatoo.IValidateProperty>.IsSelfValid

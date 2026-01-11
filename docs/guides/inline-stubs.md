@@ -60,6 +60,43 @@ public partial class MultiServiceTests
 
 Each stub tracks invocations independently.
 
+## Generic Interface Collision
+
+When multiple `[KnockOff<T>]` attributes use the same interface name with different type arguments, the generator appends a type suffix to avoid naming collisions:
+
+```csharp
+[KnockOff<IList<string>>]
+[KnockOff<IList<int>>]
+public partial class MultiListTests
+{
+    // Generates suffixed stub classes:
+    // - Stubs.IListString
+    // - Stubs.IListInt32
+}
+```
+
+**Single generic interface uses simple name:**
+```csharp
+[KnockOff<IList<string>>]
+public partial class SingleListTests
+{
+    // No collision - simple name:
+    // - Stubs.IList
+}
+```
+
+**Type suffix rules:**
+
+| Generic Type | Stub Name |
+|--------------|-----------|
+| `IList<string>` | `IListString` |
+| `IList<int>` | `IListInt32` |
+| `IDictionary<string, int>` | `IDictionaryStringInt32` |
+| `IList<string[]>` | `IListStringArray` |
+| `IList<int?>` | `IListNullableInt32` |
+
+This collision detection applies only to inline stubs within the same class. Different type arguments on the same interface trigger suffixed names.
+
 ## Instantiation Options
 
 ### Partial Properties (C# 13 / .NET 9+)

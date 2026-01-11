@@ -150,8 +150,8 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaPropertyStoreKnockOff();
         IHaPropertyStore store = knockOff;
 
-        knockOff.StringIndexerBacking["Key1"] = "Value1";
-        knockOff.StringIndexerBacking["Key2"] = "Value2";
+        knockOff.Indexer.Backing["Key1"] = "Value1";
+        knockOff.Indexer.Backing["Key2"] = "Value2";
 
         Assert.Equal("Value1", store["Key1"]);
         Assert.Equal("Value2", store["Key2"]);
@@ -166,7 +166,7 @@ public class HandlerApiSamplesTests : SamplesTestBase
         _ = store["Key1"];
         _ = store["Key2"];
 
-        Assert.Equal(2, knockOff.StringIndexer.GetCount);
+        Assert.Equal(2, knockOff.Indexer.GetCount);
     }
 
     [Fact]
@@ -178,7 +178,7 @@ public class HandlerApiSamplesTests : SamplesTestBase
         _ = store["Key1"];
         _ = store["Key2"];
 
-        Assert.Equal("Key2", knockOff.StringIndexer.LastGetKey);
+        Assert.Equal("Key2", knockOff.Indexer.LastGetKey);
     }
 
     [Fact]
@@ -187,10 +187,10 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaPropertyStoreKnockOff();
         IHaPropertyStore store = knockOff;
 
-        knockOff.StringIndexer.OnGet = (ko, key) =>
+        knockOff.Indexer.OnGet = (ko, key) =>
         {
             if (key == "special") return "SpecialValue";
-            return ko.StringIndexerBacking.GetValueOrDefault(key);
+            return ko.Indexer.Backing.GetValueOrDefault(key);
         };
 
         Assert.Equal("SpecialValue", store["special"]);
@@ -204,8 +204,8 @@ public class HandlerApiSamplesTests : SamplesTestBase
 
         store["NewKey"] = "NewValue";
 
-        Assert.Equal("NewKey", knockOff.StringIndexer.LastSetEntry?.Key);
-        Assert.Equal("NewValue", knockOff.StringIndexer.LastSetEntry?.Value);
+        Assert.Equal("NewKey", knockOff.Indexer.LastSetEntry?.Key);
+        Assert.Equal("NewValue", knockOff.Indexer.LastSetEntry?.Value);
     }
 
     // ========================================================================

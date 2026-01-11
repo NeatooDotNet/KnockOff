@@ -43,8 +43,8 @@ partial class ValidateBaseStubForEntityListT
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
-	/// <summary>Tracks and configures behavior for StringIndexer.</summary>
-	public sealed class StringIndexerInterceptor
+	/// <summary>Tracks and configures behavior for Indexer.</summary>
+	public sealed class IndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -57,6 +57,9 @@ partial class ValidateBaseStubForEntityListT
 
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet(string? propertyName) { GetCount++; LastGetKey = propertyName; }
+
+		/// <summary>Backing storage for this indexer.</summary>
+		public global::System.Collections.Generic.Dictionary<string, global::Neatoo.IValidateProperty> Backing { get; } = new();
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
@@ -383,8 +386,8 @@ partial class ValidateBaseStubForEntityListT
 	/// <summary>Interceptor for IsPaused.</summary>
 	public IsPausedInterceptor IsPaused { get; } = new();
 
-	/// <summary>Interceptor for StringIndexer.</summary>
-	public StringIndexerInterceptor StringIndexer { get; } = new();
+	/// <summary>Interceptor for Indexer.</summary>
+	public IndexerInterceptor Indexer { get; } = new();
 
 	/// <summary>Interceptor for IsBusy.</summary>
 	public IsBusyInterceptor IsBusy { get; } = new();
@@ -428,9 +431,6 @@ partial class ValidateBaseStubForEntityListT
 	/// <summary>Interceptor for NeatooPropertyChanged event.</summary>
 	public NeatooPropertyChangedInterceptor NeatooPropertyChanged { get; } = new();
 
-	/// <summary>Backing storage for StringIndexer indexer.</summary>
-	public global::System.Collections.Generic.Dictionary<string, global::Neatoo.IValidateProperty> StringIndexerBacking { get; } = new();
-
 	global::Neatoo.IValidateProperty global::Neatoo.IValidateBase.GetProperty(string propertyName)
 	{
 		GetProperty.RecordCall(propertyName);
@@ -460,7 +460,7 @@ partial class ValidateBaseStubForEntityListT
 
 	global::Neatoo.IValidateProperty global::Neatoo.IValidateBase.this[string propertyName]
 	{
-		get { StringIndexer.RecordGet(propertyName); if (StringIndexer.OnGet != null) return StringIndexer.OnGet(this, propertyName); return StringIndexerBacking.TryGetValue(propertyName, out var v) ? v : default!; }
+		get { Indexer.RecordGet(propertyName); if (Indexer.OnGet != null) return Indexer.OnGet(this, propertyName); return Indexer.Backing.TryGetValue(propertyName, out var v) ? v : default!; }
 	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.WaitForTasks()

@@ -29,13 +29,19 @@ public partial class KnockOffGenerator
 			usedNames.Add(userMethod.Name);
 		}
 
+		// Count indexers to determine naming strategy
+		var indexerCount = SymbolHelpers.CountIndexers(flatMembers);
+
 		// Process properties and indexers
 		foreach (var member in flatMembers)
 		{
 			if (member.IsProperty || member.IsIndexer)
 			{
 				var key = GetMemberKey(member);
-				var baseName = member.Name;
+				// For indexers, compute name based on count (single: Indexer, multiple: IndexerString, IndexerInt)
+				var baseName = member.IsIndexer
+					? SymbolHelpers.GetIndexerName(indexerCount, member.IndexerTypeSuffix)
+					: member.Name;
 				var finalName = GetUniqueInterceptorName(baseName, usedNames);
 				nameMap[key] = finalName;
 				usedNames.Add(finalName);
@@ -309,10 +315,16 @@ public partial class KnockOffGenerator
 			sb.AppendLine();
 		}
 
+		// Add Backing property inside the interceptor
+		sb.AppendLine($"\t\t/// <summary>Backing storage for this indexer.</summary>");
+		sb.AppendLine($"\t\tpublic global::System.Collections.Generic.Dictionary<{keyType}, {member.ReturnType}> Backing {{ get; }} = new();");
+		sb.AppendLine();
+
 		sb.AppendLine("\t\t/// <summary>Resets all tracking state.</summary>");
 		sb.Append("\t\tpublic void Reset() { ");
 		if (member.HasGetter) sb.Append("GetCount = 0; LastGetKey = default; OnGet = null; ");
 		if (member.HasSetter) sb.Append("SetCount = 0; LastSetEntry = null; OnSet = null; ");
+		// Note: Backing dictionary is intentionally NOT cleared - pre-populated data is preserved
 		sb.AppendLine("}");
 	}
 
@@ -608,6 +620,72 @@ public partial class KnockOffGenerator
 	}
 
 	/// <summary>
+	/// Generate flat property explicit interface implementation
+	/// </summary>
+	private static void GenerateFlatPropertyImplementation(System.Text.StringBuilder sb, InterfaceMemberInfo member)
+	{
+		var ifaceName = member.DeclaringInterfaceFullName;
+		var backingName = $"{member.Name}Backing";
+		var interceptorName = member.Name;
+
+		sb.AppendLine($"\t{member.ReturnType} {ifaceName}.{member.Name}");
+		sb.AppendLine("\t{");
+
+		if (member.HasGetter)
+		{
+			sb.AppendLine($"\t\tget {{ {interceptorName}.RecordGet(); return {interceptorName}.OnGet?.Invoke(this) ?? {backingName}; }}");
+		}
+
+		if (member.HasSetter)
+		{
+			var pragmaDisable = GetSetterNullabilityAttribute(member);
+			var pragmaRestore = GetSetterNullabilityRestore(member);
+			if (!string.IsNullOrEmpty(pragmaDisable))
+				sb.Append(pragmaDisable);
+			sb.AppendLine($"\t\tset {{ {interceptorName}.RecordSet(value); if ({interceptorName}.OnSet != null) {interceptorName}.OnSet(this, value); else {backingName} = value; }}");
+			if (!string.IsNullOrEmpty(pragmaRestore))
+				sb.AppendLine(pragmaRestore);
+		}
+
+		sb.AppendLine("\t}");
+		sb.AppendLine();
+	}
+
+	/// <summary>
+	/// Generate flat indexer explicit interface implementation
+	/// </summary>
+	private static void GenerateFlatIndexerImplementation(System.Text.StringBuilder sb, InterfaceMemberInfo member)
+	{
+		var ifaceName = member.DeclaringInterfaceFullName;
+		var backingName = $"{member.Name}Backing";
+		var interceptorName = member.Name;
+
+		var keyType = member.IndexerParameters.Count > 0
+			? member.IndexerParameters.GetArray()![0].Type
+			: "object";
+		var keyParam = member.IndexerParameters.Count > 0
+			? member.IndexerParameters.GetArray()![0].Name
+			: "key";
+
+		sb.AppendLine($"\t{member.ReturnType} {ifaceName}.this[{keyType} {keyParam}]");
+		sb.AppendLine("\t{");
+
+		if (member.HasGetter)
+		{
+			var defaultExpr = member.IsNullable ? "default" : GetDefaultForType(member.ReturnType, member.DefaultStrategy, member.ConcreteTypeForNew);
+			sb.AppendLine($"\t\tget {{ {interceptorName}.RecordGet({keyParam}); if ({interceptorName}.OnGet != null) return {interceptorName}.OnGet(this, {keyParam}); return {backingName}.TryGetValue({keyParam}, out var v) ? v : {defaultExpr}; }}");
+		}
+
+		if (member.HasSetter)
+		{
+			sb.AppendLine($"\t\tset {{ {interceptorName}.RecordSet({keyParam}, value); if ({interceptorName}.OnSet != null) {interceptorName}.OnSet(this, {keyParam}, value); else {backingName}[{keyParam}] = value; }}");
+		}
+
+		sb.AppendLine("\t}");
+		sb.AppendLine();
+	}
+
+	/// <summary>
 	/// Generate flat method explicit interface implementation
 	/// </summary>
 	private static void GenerateFlatMethodImplementation(
@@ -722,21 +800,6 @@ public partial class KnockOffGenerator
 	// ===== WithName versions for flat API =====
 
 	/// <summary>
-	/// Generate flat indexer backing dictionary with custom name
-	/// </summary>
-	private static void GenerateFlatIndexerBackingDictionary(System.Text.StringBuilder sb, InterfaceMemberInfo member, string interceptorName)
-	{
-		var keyType = member.IndexerParameters.Count > 0
-			? member.IndexerParameters.GetArray()![0].Type
-			: "object";
-		var backingName = $"{interceptorName}Backing";
-
-		sb.AppendLine($"\t/// <summary>Backing storage for {member.Name} indexer.</summary>");
-		sb.AppendLine($"\tpublic global::System.Collections.Generic.Dictionary<{keyType}, {member.ReturnType}> {backingName} {{ get; }} = new();");
-		sb.AppendLine();
-	}
-
-	/// <summary>
 	/// Generate flat property explicit interface implementation with custom name
 	/// </summary>
 	private static void GenerateFlatPropertyImplementationWithName(System.Text.StringBuilder sb, InterfaceMemberInfo member, string interceptorName)
@@ -772,7 +835,6 @@ public partial class KnockOffGenerator
 	private static void GenerateFlatIndexerImplementationWithName(System.Text.StringBuilder sb, InterfaceMemberInfo member, string interceptorName)
 	{
 		var ifaceName = member.DeclaringInterfaceFullName;
-		var backingName = $"{interceptorName}Backing";
 
 		var keyType = member.IndexerParameters.Count > 0
 			? member.IndexerParameters.GetArray()![0].Type
@@ -787,12 +849,12 @@ public partial class KnockOffGenerator
 		if (member.HasGetter)
 		{
 			var defaultExpr = member.IsNullable ? "default" : GetDefaultForType(member.ReturnType, member.DefaultStrategy, member.ConcreteTypeForNew);
-			sb.AppendLine($"\t\tget {{ {interceptorName}.RecordGet({keyParam}); if ({interceptorName}.OnGet != null) return {interceptorName}.OnGet(this, {keyParam}); return {backingName}.TryGetValue({keyParam}, out var v) ? v : {defaultExpr}; }}");
+			sb.AppendLine($"\t\tget {{ {interceptorName}.RecordGet({keyParam}); if ({interceptorName}.OnGet != null) return {interceptorName}.OnGet(this, {keyParam}); return {interceptorName}.Backing.TryGetValue({keyParam}, out var v) ? v : {defaultExpr}; }}");
 		}
 
 		if (member.HasSetter)
 		{
-			sb.AppendLine($"\t\tset {{ {interceptorName}.RecordSet({keyParam}, value); if ({interceptorName}.OnSet != null) {interceptorName}.OnSet(this, {keyParam}, value); else {backingName}[{keyParam}] = value; }}");
+			sb.AppendLine($"\t\tset {{ {interceptorName}.RecordSet({keyParam}, value); if ({interceptorName}.OnSet != null) {interceptorName}.OnSet(this, {keyParam}, value); else {interceptorName}.Backing[{keyParam}] = value; }}");
 		}
 
 		sb.AppendLine("\t}");

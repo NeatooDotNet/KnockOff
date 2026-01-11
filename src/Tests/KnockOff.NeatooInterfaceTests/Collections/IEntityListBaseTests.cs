@@ -353,12 +353,12 @@ public partial class IEntityListBaseOfTTests
         IEntityListBase<IEntityBase> list = stub;
 
         var itemStub = new EntityBaseStubForListT();
-        stub.Int32Indexer.OnGet = (ko, index) => itemStub;
+        stub.Indexer.OnGet = (ko, index) => itemStub;
 
         _ = list[0];
 
-        Assert.Equal(1, stub.Int32Indexer.GetCount);
-        Assert.Equal(0, stub.Int32Indexer.LastGetKey);
+        Assert.Equal(1, stub.Indexer.GetCount);
+        Assert.Equal(0, stub.Indexer.LastGetKey);
     }
 
     [Fact]

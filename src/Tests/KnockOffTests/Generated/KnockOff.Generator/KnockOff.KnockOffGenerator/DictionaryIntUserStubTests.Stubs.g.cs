@@ -8,8 +8,8 @@ partial class DictionaryIntUserStubTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IDictionary.Int32Indexer.</summary>
-		public sealed class IDictionary_Int32IndexerInterceptor
+		/// <summary>Interceptor for IDictionary.Indexer.</summary>
+		public sealed class IDictionary_IndexerInterceptor
 		{
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
@@ -34,6 +34,9 @@ partial class DictionaryIntUserStubTests
 
 			/// <summary>Records a setter access.</summary>
 			public void RecordSet(int key, global::KnockOff.Tests.User value) { SetCount++; LastSetEntry = (key, value); }
+
+			/// <summary>Backing storage for this indexer.</summary>
+			public global::System.Collections.Generic.Dictionary<int, global::KnockOff.Tests.User> Backing { get; } = new();
 
 			/// <summary>Resets all tracking state.</summary>
 			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
@@ -272,8 +275,8 @@ partial class DictionaryIntUserStubTests
 		/// <summary>Stub implementation of global::System.Collections.Generic.IDictionary<int, global::KnockOff.Tests.User>.</summary>
 		public class IDictionary : global::System.Collections.Generic.IDictionary<int, global::KnockOff.Tests.User>
 		{
-			/// <summary>Interceptor for Int32Indexer.</summary>
-			public IDictionary_Int32IndexerInterceptor Int32Indexer { get; } = new();
+			/// <summary>Interceptor for Indexer.</summary>
+			public IDictionary_IndexerInterceptor Indexer { get; } = new();
 
 			/// <summary>Interceptor for Keys.</summary>
 			public IDictionary_KeysInterceptor Keys { get; } = new();
@@ -343,14 +346,15 @@ partial class DictionaryIntUserStubTests
 			{
 				get
 				{
-					Int32Indexer.RecordGet(key);
-					if (Int32Indexer.OnGet is { } onGet) return onGet(this, key);
-					return default!;
+					Indexer.RecordGet(key);
+					if (Indexer.OnGet is { } onGet) return onGet(this, key);
+					return Indexer.Backing.TryGetValue(key, out var v) ? v : new global::KnockOff.Tests.User();
 				}
 				set
 				{
-					Int32Indexer.RecordSet(key, value);
-					if (Int32Indexer.OnSet is { } onSet) onSet(this, key, value);
+					Indexer.RecordSet(key, value);
+					if (Indexer.OnSet is { } onSet) onSet(this, key, value);
+					else Indexer.Backing[key] = value;
 				}
 			}
 

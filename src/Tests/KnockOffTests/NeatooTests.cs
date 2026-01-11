@@ -120,13 +120,13 @@ public class EntityBaseStandaloneTests
         var stub = new EntityBaseStub();
         IEntityBase entity = stub;
 
-        stub.StringIndexer.OnGet = (ko, propertyName) => null!;
+        stub.Indexer.OnGet = (ko, propertyName) => null!;
 
         _ = entity["FirstName"];
         _ = entity["LastName"];
 
-        Assert.Equal(2, stub.StringIndexer.GetCount);
-        Assert.Equal("LastName", stub.StringIndexer.LastGetKey);
+        Assert.Equal(2, stub.Indexer.GetCount);
+        Assert.Equal("LastName", stub.Indexer.LastGetKey);
     }
 
     [Fact]
@@ -381,12 +381,12 @@ public class ValidateBaseStandaloneTests
         var stub = new ValidateBaseStub();
         IValidateBase validate = stub;
 
-        stub.StringIndexer.OnGet = (ko, name) => null!;
+        stub.Indexer.OnGet = (ko, name) => null!;
 
         _ = validate["Email"];
 
-        Assert.Equal(1, stub.StringIndexer.GetCount);
-        Assert.Equal("Email", stub.StringIndexer.LastGetKey);
+        Assert.Equal(1, stub.Indexer.GetCount);
+        Assert.Equal("Email", stub.Indexer.LastGetKey);
     }
 }
 
@@ -461,12 +461,12 @@ public partial class InlineValidateBaseTests
         var stub = new Stubs.IValidateBase();
         IValidateBase validate = stub;
 
-        stub.StringIndexer.OnGet = (s, name) => null!;
+        stub.Indexer.OnGet = (s, name) => null!;
 
         _ = validate["PropertyName"];
 
-        Assert.Equal(1, stub.StringIndexer.GetCount);
-        Assert.Equal("PropertyName", stub.StringIndexer.LastGetKey);
+        Assert.Equal(1, stub.Indexer.GetCount);
+        Assert.Equal("PropertyName", stub.Indexer.LastGetKey);
     }
 
     [Fact]

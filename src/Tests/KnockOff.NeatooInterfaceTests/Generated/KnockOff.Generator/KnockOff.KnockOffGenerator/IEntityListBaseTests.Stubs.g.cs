@@ -84,8 +84,8 @@ partial class IEntityListBaseTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IEntityListBase.Int32Indexer.</summary>
-		public sealed class IEntityListBase_Int32IndexerInterceptor
+		/// <summary>Interceptor for IEntityListBase.Indexer.</summary>
+		public sealed class IEntityListBase_IndexerInterceptor
 		{
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
@@ -110,6 +110,9 @@ partial class IEntityListBaseTests
 
 			/// <summary>Records a setter access.</summary>
 			public void RecordSet(int index, object? value) { SetCount++; LastSetEntry = (index, value); }
+
+			/// <summary>Backing storage for this indexer.</summary>
+			public global::System.Collections.Generic.Dictionary<int, object?> Backing { get; } = new();
 
 			/// <summary>Resets all tracking state.</summary>
 			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
@@ -710,8 +713,8 @@ partial class IEntityListBaseTests
 			/// <summary>Interceptor for IsReadOnly.</summary>
 			public IEntityListBase_IsReadOnlyInterceptor IsReadOnly { get; } = new();
 
-			/// <summary>Interceptor for Int32Indexer.</summary>
-			public IEntityListBase_Int32IndexerInterceptor Int32Indexer { get; } = new();
+			/// <summary>Interceptor for Indexer.</summary>
+			public IEntityListBase_IndexerInterceptor Indexer { get; } = new();
 
 			/// <summary>Interceptor for Count.</summary>
 			public IEntityListBase_CountInterceptor Count { get; } = new();
@@ -892,14 +895,15 @@ partial class IEntityListBaseTests
 			{
 				get
 				{
-					Int32Indexer.RecordGet(index);
-					if (Int32Indexer.OnGet is { } onGet) return onGet(this, index);
-					return default!;
+					Indexer.RecordGet(index);
+					if (Indexer.OnGet is { } onGet) return onGet(this, index);
+					return Indexer.Backing.TryGetValue(index, out var v) ? v : default;
 				}
 				set
 				{
-					Int32Indexer.RecordSet(index, value);
-					if (Int32Indexer.OnSet is { } onSet) onSet(this, index, value);
+					Indexer.RecordSet(index, value);
+					if (Indexer.OnSet is { } onSet) onSet(this, index, value);
+					else Indexer.Backing[index] = value;
 				}
 			}
 

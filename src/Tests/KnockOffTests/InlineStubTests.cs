@@ -611,6 +611,107 @@ public partial class MixedStubTestClass
 
 #endregion
 
+#region Generic Collision Tests
+
+/// <summary>
+/// Test class with same interface name, different type arguments.
+/// Should generate suffixed stub names to avoid collision.
+/// </summary>
+[KnockOff<IList<string>>]
+[KnockOff<IList<int>>]
+public partial class GenericCollisionTest
+{
+}
+
+/// <summary>
+/// Test class with single generic interface (no collision).
+/// Should use simple name without suffix.
+/// </summary>
+[KnockOff<IList<string>>]
+public partial class SingleGenericTest
+{
+}
+
+/// <summary>
+/// Test class with more complex generic types for collision.
+/// </summary>
+[KnockOff<IDictionary<string, int>>]
+[KnockOff<IDictionary<int, string>>]
+public partial class DictionaryCollisionTest
+{
+}
+
+public class GenericCollisionTests
+{
+	[Fact]
+	public void GenericCollision_GeneratesSuffixedNames()
+	{
+		// Same interface (IList) with different type args should get suffixed names
+		var stringStub = new GenericCollisionTest.Stubs.IListString();
+		var intStub = new GenericCollisionTest.Stubs.IListInt32();
+
+		Assert.NotNull(stringStub);
+		Assert.NotNull(intStub);
+	}
+
+	[Fact]
+	public void GenericCollision_StubsAreFullyFunctional()
+	{
+		var stringStub = new GenericCollisionTest.Stubs.IListString();
+		var intStub = new GenericCollisionTest.Stubs.IListInt32();
+
+		// Verify they implement the correct interfaces
+		IList<string> stringList = stringStub;
+		IList<int> intList = intStub;
+
+		// Verify tracking works
+		stringList.Add("hello");
+		intList.Add(42);
+
+		Assert.True(stringStub.Add.WasCalled);
+		Assert.Equal("hello", stringStub.Add.LastCallArg);
+		Assert.True(intStub.Add.WasCalled);
+		Assert.Equal(42, intStub.Add.LastCallArg);
+	}
+
+	[Fact]
+	public void SingleGeneric_UsesSimpleName()
+	{
+		// Single generic interface should use simple name (no suffix needed)
+		var stub = new SingleGenericTest.Stubs.IList();
+
+		Assert.NotNull(stub);
+
+		IList<string> list = stub;
+		list.Add("test");
+
+		Assert.True(stub.Add.WasCalled);
+	}
+
+	[Fact]
+	public void DictionaryCollision_GeneratesSuffixedNames()
+	{
+		// IDictionary<string, int> and IDictionary<int, string> should get different suffixes
+		var stringIntStub = new DictionaryCollisionTest.Stubs.IDictionaryStringInt32();
+		var intStringStub = new DictionaryCollisionTest.Stubs.IDictionaryInt32String();
+
+		Assert.NotNull(stringIntStub);
+		Assert.NotNull(intStringStub);
+
+		// Verify correct interface implementations
+		IDictionary<string, int> dict1 = stringIntStub;
+		IDictionary<int, string> dict2 = intStringStub;
+
+		dict1.Add("key", 123);
+		dict2.Add(456, "value");
+
+		Assert.True(stringIntStub.Add.WasCalled);
+		Assert.True(intStringStub.Add.WasCalled);
+	}
+}
+
+#endregion
+
 #region Class Stub Tests
 
 public class ClassStubTests

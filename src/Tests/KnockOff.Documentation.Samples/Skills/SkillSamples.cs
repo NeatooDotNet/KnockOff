@@ -140,7 +140,7 @@ public partial class SkEventSourceKnockOff : ISkEventSource { }
 
 // Access patterns with flat API (v11.x):
 // userKnockOff.GetUser             // Method handler
-// storeKnockOff.StringIndexer      // Indexer handler
+// storeKnockOff.Indexer      // Indexer handler
 // eventKnockOff.DataReceivedInterceptor // Event handler
 #endregion
 

@@ -8,8 +8,8 @@ partial class ReadOnlyListStringStubTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IReadOnlyList.Int32Indexer.</summary>
-		public sealed class IReadOnlyList_Int32IndexerInterceptor
+		/// <summary>Interceptor for IReadOnlyList.Indexer.</summary>
+		public sealed class IReadOnlyList_IndexerInterceptor
 		{
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
@@ -22,6 +22,9 @@ partial class ReadOnlyListStringStubTests
 
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet(int index) { GetCount++; LastGetKey = index; }
+
+			/// <summary>Backing storage for this indexer.</summary>
+			public global::System.Collections.Generic.Dictionary<int, string> Backing { get; } = new();
 
 			/// <summary>Resets all tracking state.</summary>
 			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
@@ -66,8 +69,8 @@ partial class ReadOnlyListStringStubTests
 		/// <summary>Stub implementation of global::System.Collections.Generic.IReadOnlyList<string>.</summary>
 		public class IReadOnlyList : global::System.Collections.Generic.IReadOnlyList<string>
 		{
-			/// <summary>Interceptor for Int32Indexer.</summary>
-			public IReadOnlyList_Int32IndexerInterceptor Int32Indexer { get; } = new();
+			/// <summary>Interceptor for Indexer.</summary>
+			public IReadOnlyList_IndexerInterceptor Indexer { get; } = new();
 
 			/// <summary>Interceptor for Count.</summary>
 			public IReadOnlyList_CountInterceptor Count { get; } = new();
@@ -79,9 +82,9 @@ partial class ReadOnlyListStringStubTests
 			{
 				get
 				{
-					Int32Indexer.RecordGet(index);
-					if (Int32Indexer.OnGet is { } onGet) return onGet(this, index);
-					return default!;
+					Indexer.RecordGet(index);
+					if (Indexer.OnGet is { } onGet) return onGet(this, index);
+					return Indexer.Backing.TryGetValue(index, out var v) ? v : default!;
 				}
 			}
 

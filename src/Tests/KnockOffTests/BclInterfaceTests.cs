@@ -152,8 +152,8 @@ public class BclInterfaceTests
         list[0] = "value";
         var _ = list[1];
 
-        Assert.Equal(1, stub.Int32Indexer.SetCount);
-        Assert.Equal(1, stub.Int32Indexer.GetCount);
+        Assert.Equal(1, stub.Indexer.SetCount);
+        Assert.Equal(1, stub.Indexer.GetCount);
     }
 
     [Fact]
@@ -190,8 +190,8 @@ public class BclInterfaceTests
         list[0] = "value";
         var _ = list[1];
 
-        Assert.Equal(1, stub.Int32Indexer.SetCount);
-        Assert.Equal(1, stub.Int32Indexer.GetCount);
+        Assert.Equal(1, stub.Indexer.SetCount);
+        Assert.Equal(1, stub.Indexer.GetCount);
     }
 
     [Fact]
@@ -306,8 +306,8 @@ public class BclInterfaceTests
         dict["key"] = "value";
         var _ = dict["otherKey"];
 
-        Assert.Equal(1, stub.ObjectIndexer.SetCount);
-        Assert.Equal(1, stub.ObjectIndexer.GetCount);
+        Assert.Equal(1, stub.Indexer.SetCount);
+        Assert.Equal(1, stub.Indexer.GetCount);
     }
 
     [Fact]
@@ -342,8 +342,8 @@ public class BclInterfaceTests
         dict[1] = user;
         var _ = dict[2];
 
-        Assert.Equal(1, stub.Int32Indexer.SetCount);
-        Assert.Equal(1, stub.Int32Indexer.GetCount);
+        Assert.Equal(1, stub.Indexer.SetCount);
+        Assert.Equal(1, stub.Indexer.GetCount);
     }
 
     [Fact]
@@ -370,7 +370,7 @@ public class BclInterfaceTests
 
         var _ = list[0];
 
-        Assert.Equal(1, stub.Int32Indexer.GetCount);
+        Assert.Equal(1, stub.Indexer.GetCount);
     }
 
     [Fact]
@@ -403,7 +403,7 @@ public class BclInterfaceTests
 
         var _ = dict["key"];
 
-        Assert.Equal(1, stub.StringIndexer.GetCount);
+        Assert.Equal(1, stub.Indexer.GetCount);
     }
 
     [Fact]

@@ -5,8 +5,8 @@ namespace KnockOff.Tests;
 
 partial class DictionaryStringIntKnockOff
 {
-	/// <summary>Tracks and configures behavior for StringIndexer.</summary>
-	public sealed class StringIndexerInterceptor
+	/// <summary>Tracks and configures behavior for Indexer.</summary>
+	public sealed class IndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -31,6 +31,9 @@ partial class DictionaryStringIntKnockOff
 
 		/// <summary>Records a setter access.</summary>
 		public void RecordSet(string? key, int? value) { SetCount++; LastSetEntry = (key, value); }
+
+		/// <summary>Backing storage for this indexer.</summary>
+		public global::System.Collections.Generic.Dictionary<string, int> Backing { get; } = new();
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; }
@@ -344,8 +347,8 @@ partial class DictionaryStringIntKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for StringIndexer.</summary>
-	public StringIndexerInterceptor StringIndexer { get; } = new();
+	/// <summary>Interceptor for Indexer.</summary>
+	public IndexerInterceptor Indexer { get; } = new();
 
 	/// <summary>Interceptor for Keys.</summary>
 	public KeysInterceptor Keys { get; } = new();
@@ -389,9 +392,6 @@ partial class DictionaryStringIntKnockOff
 	/// <summary>Interceptor for GetEnumerator.</summary>
 	public GetEnumeratorInterceptor GetEnumerator { get; } = new();
 
-	/// <summary>Backing storage for StringIndexer indexer.</summary>
-	public global::System.Collections.Generic.Dictionary<string, int> StringIndexerBacking { get; } = new();
-
 	void global::System.Collections.Generic.IDictionary<string, int>.Add(string key, int @value)
 	{
 		Add1.RecordCall(key, @value);
@@ -421,8 +421,8 @@ partial class DictionaryStringIntKnockOff
 
 	int global::System.Collections.Generic.IDictionary<string, int>.this[string key]
 	{
-		get { StringIndexer.RecordGet(key); if (StringIndexer.OnGet != null) return StringIndexer.OnGet(this, key); return StringIndexerBacking.TryGetValue(key, out var v) ? v : default!; }
-		set { StringIndexer.RecordSet(key, value); if (StringIndexer.OnSet != null) StringIndexer.OnSet(this, key, value); else StringIndexerBacking[key] = value; }
+		get { Indexer.RecordGet(key); if (Indexer.OnGet != null) return Indexer.OnGet(this, key); return Indexer.Backing.TryGetValue(key, out var v) ? v : default!; }
+		set { Indexer.RecordSet(key, value); if (Indexer.OnSet != null) Indexer.OnSet(this, key, value); else Indexer.Backing[key] = value; }
 	}
 
 	global::System.Collections.Generic.ICollection<string> global::System.Collections.Generic.IDictionary<string, int>.Keys

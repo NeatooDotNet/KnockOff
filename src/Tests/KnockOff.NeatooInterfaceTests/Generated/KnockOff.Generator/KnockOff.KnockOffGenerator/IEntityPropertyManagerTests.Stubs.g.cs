@@ -84,8 +84,8 @@ partial class IEntityPropertyManagerTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IEntityPropertyManager.StringIndexer.</summary>
-		public sealed class IEntityPropertyManager_StringIndexerInterceptor
+		/// <summary>Interceptor for IEntityPropertyManager.Indexer.</summary>
+		public sealed class IEntityPropertyManager_IndexerInterceptor
 		{
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
@@ -98,6 +98,9 @@ partial class IEntityPropertyManagerTests
 
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet(string propertyName) { GetCount++; LastGetKey = propertyName; }
+
+			/// <summary>Backing storage for this indexer.</summary>
+			public global::System.Collections.Generic.Dictionary<string, global::Neatoo.IEntityProperty> Backing { get; } = new();
 
 			/// <summary>Resets all tracking state.</summary>
 			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
@@ -420,8 +423,8 @@ partial class IEntityPropertyManagerTests
 			/// <summary>Interceptor for IsBusy.</summary>
 			public IEntityPropertyManager_IsBusyInterceptor IsBusy { get; } = new();
 
-			/// <summary>Interceptor for StringIndexer.</summary>
-			public IEntityPropertyManager_StringIndexerInterceptor StringIndexer { get; } = new();
+			/// <summary>Interceptor for Indexer.</summary>
+			public IEntityPropertyManager_IndexerInterceptor Indexer { get; } = new();
 
 			/// <summary>Interceptor for IsSelfValid.</summary>
 			public IEntityPropertyManager_IsSelfValidInterceptor IsSelfValid { get; } = new();
@@ -579,9 +582,9 @@ partial class IEntityPropertyManagerTests
 			{
 				get
 				{
-					StringIndexer.RecordGet(propertyName);
-					if (StringIndexer.OnGet is { } onGet) return onGet(this, propertyName);
-					return default!;
+					Indexer.RecordGet(propertyName);
+					if (Indexer.OnGet is { } onGet) return onGet(this, propertyName);
+					return Indexer.Backing.TryGetValue(propertyName, out var v) ? v : default!;
 				}
 			}
 

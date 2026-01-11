@@ -5,8 +5,8 @@ namespace KnockOff.NeatooInterfaceTests.ValidationRules;
 
 partial class RuleMessagesStub
 {
-	/// <summary>Tracks and configures behavior for Int32Indexer.</summary>
-	public sealed class Int32IndexerInterceptor
+	/// <summary>Tracks and configures behavior for Indexer.</summary>
+	public sealed class IndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
@@ -31,6 +31,9 @@ partial class RuleMessagesStub
 
 		/// <summary>Records a setter access.</summary>
 		public void RecordSet(int? index, global::Neatoo.Rules.IRuleMessage? value) { SetCount++; LastSetEntry = (index, value); }
+
+		/// <summary>Backing storage for this indexer.</summary>
+		public global::System.Collections.Generic.Dictionary<int, global::Neatoo.Rules.IRuleMessage> Backing { get; } = new();
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; }
@@ -300,8 +303,8 @@ partial class RuleMessagesStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Int32Indexer.</summary>
-	public Int32IndexerInterceptor Int32Indexer { get; } = new();
+	/// <summary>Interceptor for Indexer.</summary>
+	public IndexerInterceptor Indexer { get; } = new();
 
 	/// <summary>Interceptor for Count.</summary>
 	public CountInterceptor Count { get; } = new();
@@ -339,9 +342,6 @@ partial class RuleMessagesStub
 	/// <summary>Interceptor for GetEnumerator.</summary>
 	public GetEnumeratorInterceptor GetEnumerator { get; } = new();
 
-	/// <summary>Backing storage for Int32Indexer indexer.</summary>
-	public global::System.Collections.Generic.Dictionary<int, global::Neatoo.Rules.IRuleMessage> Int32IndexerBacking { get; } = new();
-
 	void global::Neatoo.Rules.IRuleMessages.Add(string propertyName, string message)
 	{
 		Add1.RecordCall(propertyName, message);
@@ -368,8 +368,8 @@ partial class RuleMessagesStub
 
 	global::Neatoo.Rules.IRuleMessage global::System.Collections.Generic.IList<global::Neatoo.Rules.IRuleMessage>.this[int index]
 	{
-		get { Int32Indexer.RecordGet(index); if (Int32Indexer.OnGet != null) return Int32Indexer.OnGet(this, index); return Int32IndexerBacking.TryGetValue(index, out var v) ? v : default!; }
-		set { Int32Indexer.RecordSet(index, value); if (Int32Indexer.OnSet != null) Int32Indexer.OnSet(this, index, value); else Int32IndexerBacking[index] = value; }
+		get { Indexer.RecordGet(index); if (Indexer.OnGet != null) return Indexer.OnGet(this, index); return Indexer.Backing.TryGetValue(index, out var v) ? v : default!; }
+		set { Indexer.RecordSet(index, value); if (Indexer.OnSet != null) Indexer.OnSet(this, index, value); else Indexer.Backing[index] = value; }
 	}
 
 	void global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>.Add(global::Neatoo.Rules.IRuleMessage item)

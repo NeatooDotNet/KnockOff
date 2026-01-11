@@ -46,8 +46,8 @@ partial class DictionaryStubTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IDictionary.ObjectIndexer.</summary>
-		public sealed class IDictionary_ObjectIndexerInterceptor
+		/// <summary>Interceptor for IDictionary.Indexer.</summary>
+		public sealed class IDictionary_IndexerInterceptor
 		{
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
@@ -72,6 +72,9 @@ partial class DictionaryStubTests
 
 			/// <summary>Records a setter access.</summary>
 			public void RecordSet(object key, object? value) { SetCount++; LastSetEntry = (key, value); }
+
+			/// <summary>Backing storage for this indexer.</summary>
+			public global::System.Collections.Generic.Dictionary<object, object?> Backing { get; } = new();
 
 			/// <summary>Resets all tracking state.</summary>
 			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
@@ -295,8 +298,8 @@ partial class DictionaryStubTests
 			/// <summary>Interceptor for IsReadOnly.</summary>
 			public IDictionary_IsReadOnlyInterceptor IsReadOnly { get; } = new();
 
-			/// <summary>Interceptor for ObjectIndexer.</summary>
-			public IDictionary_ObjectIndexerInterceptor ObjectIndexer { get; } = new();
+			/// <summary>Interceptor for Indexer.</summary>
+			public IDictionary_IndexerInterceptor Indexer { get; } = new();
 
 			/// <summary>Interceptor for Keys.</summary>
 			public IDictionary_KeysInterceptor Keys { get; } = new();
@@ -387,14 +390,15 @@ partial class DictionaryStubTests
 			{
 				get
 				{
-					ObjectIndexer.RecordGet(key);
-					if (ObjectIndexer.OnGet is { } onGet) return onGet(this, key);
-					return default!;
+					Indexer.RecordGet(key);
+					if (Indexer.OnGet is { } onGet) return onGet(this, key);
+					return Indexer.Backing.TryGetValue(key, out var v) ? v : default;
 				}
 				set
 				{
-					ObjectIndexer.RecordSet(key, value);
-					if (ObjectIndexer.OnSet is { } onSet) onSet(this, key, value);
+					Indexer.RecordSet(key, value);
+					if (Indexer.OnSet is { } onSet) onSet(this, key, value);
+					else Indexer.Backing[key] = value;
 				}
 			}
 

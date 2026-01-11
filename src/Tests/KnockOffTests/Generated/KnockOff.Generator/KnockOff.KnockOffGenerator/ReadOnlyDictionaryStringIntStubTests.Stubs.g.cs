@@ -8,8 +8,8 @@ partial class ReadOnlyDictionaryStringIntStubTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IReadOnlyDictionary.StringIndexer.</summary>
-		public sealed class IReadOnlyDictionary_StringIndexerInterceptor
+		/// <summary>Interceptor for IReadOnlyDictionary.Indexer.</summary>
+		public sealed class IReadOnlyDictionary_IndexerInterceptor
 		{
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
@@ -22,6 +22,9 @@ partial class ReadOnlyDictionaryStringIntStubTests
 
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet(string key) { GetCount++; LastGetKey = key; }
+
+			/// <summary>Backing storage for this indexer.</summary>
+			public global::System.Collections.Generic.Dictionary<string, int> Backing { get; } = new();
 
 			/// <summary>Resets all tracking state.</summary>
 			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
@@ -144,8 +147,8 @@ partial class ReadOnlyDictionaryStringIntStubTests
 		/// <summary>Stub implementation of global::System.Collections.Generic.IReadOnlyDictionary<string, int>.</summary>
 		public class IReadOnlyDictionary : global::System.Collections.Generic.IReadOnlyDictionary<string, int>
 		{
-			/// <summary>Interceptor for StringIndexer.</summary>
-			public IReadOnlyDictionary_StringIndexerInterceptor StringIndexer { get; } = new();
+			/// <summary>Interceptor for Indexer.</summary>
+			public IReadOnlyDictionary_IndexerInterceptor Indexer { get; } = new();
 
 			/// <summary>Interceptor for Keys.</summary>
 			public IReadOnlyDictionary_KeysInterceptor Keys { get; } = new();
@@ -184,9 +187,9 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			{
 				get
 				{
-					StringIndexer.RecordGet(key);
-					if (StringIndexer.OnGet is { } onGet) return onGet(this, key);
-					return default!;
+					Indexer.RecordGet(key);
+					if (Indexer.OnGet is { } onGet) return onGet(this, key);
+					return Indexer.Backing.TryGetValue(key, out var v) ? v : default!;
 				}
 			}
 

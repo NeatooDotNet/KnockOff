@@ -48,8 +48,8 @@ partial class InlineEntityContainer
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IEntityBase.StringIndexer.</summary>
-		public sealed class IEntityBase_StringIndexerInterceptor
+		/// <summary>Interceptor for IEntityBase.IndexerString.</summary>
+		public sealed class IEntityBase_IndexerStringInterceptor
 		{
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
@@ -62,6 +62,9 @@ partial class InlineEntityContainer
 
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet(string propertyName) { GetCount++; LastGetKey = propertyName; }
+
+			/// <summary>Backing storage for this indexer.</summary>
+			public global::System.Collections.Generic.Dictionary<string, global::Neatoo.IEntityProperty> Backing { get; } = new();
 
 			/// <summary>Resets all tracking state.</summary>
 			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
@@ -532,8 +535,8 @@ partial class InlineEntityContainer
 			/// <summary>Interceptor for ModifiedProperties.</summary>
 			public IEntityBase_ModifiedPropertiesInterceptor ModifiedProperties { get; } = new();
 
-			/// <summary>Interceptor for StringIndexer.</summary>
-			public IEntityBase_StringIndexerInterceptor StringIndexer { get; } = new();
+			/// <summary>Interceptor for IndexerString.</summary>
+			public IEntityBase_IndexerStringInterceptor IndexerString { get; } = new();
 
 			/// <summary>Interceptor for Parent.</summary>
 			public IEntityBase_ParentInterceptor Parent { get; } = new();
@@ -650,9 +653,9 @@ partial class InlineEntityContainer
 			{
 				get
 				{
-					StringIndexer.RecordGet(propertyName);
-					if (StringIndexer.OnGet is { } onGet) return onGet(this, propertyName);
-					return default!;
+					IndexerString.RecordGet(propertyName);
+					if (IndexerString.OnGet is { } onGet) return onGet(this, propertyName);
+					return IndexerString.Backing.TryGetValue(propertyName, out var v) ? v : default!;
 				}
 			}
 
@@ -695,9 +698,9 @@ partial class InlineEntityContainer
 			{
 				get
 				{
-					StringIndexer.RecordGet(propertyName);
-					if (StringIndexer.OnGet is { } onGet) return onGet(this, propertyName);
-					return default!;
+					IndexerString.RecordGet(propertyName);
+					if (IndexerString.OnGet is { } onGet) return onGet(this, propertyName);
+					return IndexerString.Backing.TryGetValue(propertyName, out var v) ? v : default!;
 				}
 			}
 

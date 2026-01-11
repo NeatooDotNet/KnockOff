@@ -84,8 +84,8 @@ partial class DataReaderStubTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IDataReader.Int32Indexer.</summary>
-		public sealed class IDataReader_Int32IndexerInterceptor
+		/// <summary>Interceptor for IDataReader.IndexerInt32.</summary>
+		public sealed class IDataReader_IndexerInt32Interceptor
 		{
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
@@ -99,12 +99,15 @@ partial class DataReaderStubTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet(int i) { GetCount++; LastGetKey = i; }
 
+			/// <summary>Backing storage for this indexer.</summary>
+			public global::System.Collections.Generic.Dictionary<int, object> Backing { get; } = new();
+
 			/// <summary>Resets all tracking state.</summary>
 			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
 		}
 
-		/// <summary>Interceptor for IDataReader.StringIndexer.</summary>
-		public sealed class IDataReader_StringIndexerInterceptor
+		/// <summary>Interceptor for IDataReader.IndexerString.</summary>
+		public sealed class IDataReader_IndexerStringInterceptor
 		{
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
@@ -117,6 +120,9 @@ partial class DataReaderStubTests
 
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet(string name) { GetCount++; LastGetKey = name; }
+
+			/// <summary>Backing storage for this indexer.</summary>
+			public global::System.Collections.Generic.Dictionary<string, object> Backing { get; } = new();
 
 			/// <summary>Resets all tracking state.</summary>
 			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
@@ -662,11 +668,11 @@ partial class DataReaderStubTests
 			/// <summary>Interceptor for FieldCount.</summary>
 			public IDataReader_FieldCountInterceptor FieldCount { get; } = new();
 
-			/// <summary>Interceptor for Int32Indexer.</summary>
-			public IDataReader_Int32IndexerInterceptor Int32Indexer { get; } = new();
+			/// <summary>Interceptor for IndexerInt32.</summary>
+			public IDataReader_IndexerInt32Interceptor IndexerInt32 { get; } = new();
 
-			/// <summary>Interceptor for StringIndexer.</summary>
-			public IDataReader_StringIndexerInterceptor StringIndexer { get; } = new();
+			/// <summary>Interceptor for IndexerString.</summary>
+			public IDataReader_IndexerStringInterceptor IndexerString { get; } = new();
 
 			/// <summary>Interceptor for Close.</summary>
 			public IDataReader_CloseInterceptor Close { get; } = new();
@@ -974,9 +980,9 @@ partial class DataReaderStubTests
 			{
 				get
 				{
-					Int32Indexer.RecordGet(i);
-					if (Int32Indexer.OnGet is { } onGet) return onGet(this, i);
-					return default!;
+					IndexerInt32.RecordGet(i);
+					if (IndexerInt32.OnGet is { } onGet) return onGet(this, i);
+					return IndexerInt32.Backing.TryGetValue(i, out var v) ? v : new object();
 				}
 			}
 
@@ -984,9 +990,9 @@ partial class DataReaderStubTests
 			{
 				get
 				{
-					StringIndexer.RecordGet(name);
-					if (StringIndexer.OnGet is { } onGet) return onGet(this, name);
-					return default!;
+					IndexerString.RecordGet(name);
+					if (IndexerString.OnGet is { } onGet) return onGet(this, name);
+					return IndexerString.Backing.TryGetValue(name, out var v) ? v : new object();
 				}
 			}
 

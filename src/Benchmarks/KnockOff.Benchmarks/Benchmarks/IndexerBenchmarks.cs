@@ -25,8 +25,8 @@ public class IndexerInvocationBenchmarks
         _moq = mock.Object;
 
         var stub = new CacheStub();
-        stub.StringIndexer.OnGet = (ko, key) => "value";
-        stub.Int32Indexer.OnGet = (ko, index) => 42;
+        stub.IndexerString.OnGet = (ko, key) => "value";
+        stub.IndexerInt32.OnGet = (ko, index) => 42;
         _knockOff = stub;
     }
 
@@ -69,8 +69,8 @@ public class IndexerSetupBenchmarks
     public CacheStub KnockOff_SetupIndexers()
     {
         var stub = new CacheStub();
-        stub.StringIndexer.OnGet = (ko, key) => "value";
-        stub.Int32Indexer.OnGet = (ko, index) => 42;
+        stub.IndexerString.OnGet = (ko, key) => "value";
+        stub.IndexerInt32.OnGet = (ko, index) => 42;
         return stub;
     }
 }
@@ -94,7 +94,7 @@ public class IndexerVerificationBenchmarks
         _moq = _moqMock.Object;
 
         _knockOffStub = new CacheStub();
-        _knockOffStub.StringIndexer.OnGet = (ko, key) => "value";
+        _knockOffStub.IndexerString.OnGet = (ko, key) => "value";
 
         // Trigger accesses
         _ = _moq["key"];
@@ -110,7 +110,7 @@ public class IndexerVerificationBenchmarks
     [Benchmark]
     public bool KnockOff_VerifyIndexerAccess()
     {
-        return _knockOffStub.StringIndexer.GetCount > 0
-            && _knockOffStub.StringIndexer.LastGetKey == "key";
+        return _knockOffStub.IndexerString.GetCount > 0
+            && _knockOffStub.IndexerString.LastGetKey == "key";
     }
 }
