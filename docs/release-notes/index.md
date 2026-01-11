@@ -21,6 +21,7 @@ Releases with notable changes.
 
 ## All Releases
 
+- [v10.13.1](v10.13.1.md) - 2026-01-10 - Best practices guide, generator refactoring
 - [v10.13.0](v10.13.0.md) - 2026-01-10 - Property `Value` pattern prioritization
 - [v10.12.0](v10.12.0.md) - 2026-01-09 - BCL interface compatibility (117 interfaces tested)
 - [v10.11.1](v10.11.1.md) - 2026-01-09 - BCL interface compatibility improvements

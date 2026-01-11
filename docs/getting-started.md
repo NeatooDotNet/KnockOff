@@ -373,19 +373,22 @@ This works for any nesting depth—just ensure every class in the hierarchy is `
 
 ## Next Steps
 
+- [Best Practices](guides/best-practices.md) — Guidelines for effective KnockOff usage
 - [Customization Patterns](concepts/customization-patterns.md) — Deep dive into user methods vs callbacks
 - [Interceptor API Reference](reference/interceptor-api.md) — Complete API for tracking and callbacks
 - [KnockOff vs Moq](knockoff-vs-moq.md) — Comparison with Moq patterns
 - [Migration from Moq](migration-from-moq.md) — Step-by-step migration guide
 
-## Guides by Member Type
+## Guides
 
+- [Best Practices](guides/best-practices.md)
 - [Properties](guides/properties.md)
 - [Methods](guides/methods.md)
-- [Method Overloads](guides/method-overloads.md)
 - [Async Methods](guides/async-methods.md)
 - [Generic Interfaces](guides/generics.md)
 - [Multiple Interfaces](guides/multiple-interfaces.md)
 - [Interface Inheritance](guides/interface-inheritance.md)
 - [Indexers](guides/indexers.md)
 - [Events](guides/events.md)
+- [Inline Stubs](guides/inline-stubs.md)
+- [Delegates](guides/delegates.md)
