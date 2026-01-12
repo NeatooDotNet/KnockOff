@@ -207,16 +207,16 @@ public class VerificationUsageExample
         service.GetDescription(2);
         service.GetDescription(42);
 
-        // Check invocation
-        var wasCalled = stub.GetDescription.WasCalled;     // true
-        var callCount = stub.GetDescription.CallCount;     // 3
-        var lastArg = stub.GetDescription.LastCallArg;     // 42
+        // Assert method calls
+        System.Diagnostics.Debug.Assert(stub.GetDescription.WasCalled);
+        System.Diagnostics.Debug.Assert(stub.GetDescription.CallCount == 3);
+        System.Diagnostics.Debug.Assert(stub.GetDescription.LastCallArg == 42);
 
-        // Check properties
+        // Assert property access
         service.Name = "First";
         service.Name = "Second";
-        var setCount = stub.Name.SetCount;                 // 2
-        var lastSetValue = stub.Name.LastSetValue;         // "Second"
+        System.Diagnostics.Debug.Assert(stub.Name.SetCount == 2);
+        System.Diagnostics.Debug.Assert(stub.Name.LastSetValue == "Second");
     }
 }
 #endregion
