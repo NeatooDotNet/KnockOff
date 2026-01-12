@@ -415,7 +415,7 @@ public class IValidatePropertyStandaloneTests
         var stub = new ValidatePropertyStub();
         IValidateProperty property = stub;
 
-        stub.Name.OnGet = (ko) => "StandaloneName";
+        stub.Name.Value = "StandaloneName";
 
         Assert.Equal("StandaloneName", property.Name);
     }
@@ -426,7 +426,7 @@ public class IValidatePropertyStandaloneTests
         var stub = new ValidatePropertyStub();
         IValidateProperty property = stub;
 
-        stub.IsBusy.OnGet = (ko) => true;
+        stub.IsBusy.Value = true;
 
         Assert.True(property.IsBusy);
     }

@@ -249,7 +249,7 @@ public class IRequiredRuleStandaloneTests
         var stub = new RequiredRuleStub();
         IRequiredRule rule = stub;
 
-        stub.ErrorMessage.OnGet = (ko) => "Required field";
+        stub.ErrorMessage.Value = "Required field";
 
         Assert.Equal("Required field", rule.ErrorMessage);
     }
@@ -260,7 +260,7 @@ public class IRequiredRuleStandaloneTests
         var stub = new RequiredRuleStub();
         IRule rule = stub;
 
-        stub.Executed.OnGet = (ko) => true;
+        stub.Executed.Value = true;
 
         Assert.True(rule.Executed);
     }

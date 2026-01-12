@@ -351,7 +351,7 @@ public class IEntityPropertyManagerStandaloneTests
         var stub = new EntityPropertyManagerStub();
         IEntityPropertyManager manager = stub;
 
-        stub.IsModified.OnGet = (ko) => true;
+        stub.IsModified.Value = true;
 
         Assert.True(manager.IsModified);
     }

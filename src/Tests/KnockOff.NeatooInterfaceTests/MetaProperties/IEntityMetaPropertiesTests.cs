@@ -248,7 +248,7 @@ public class IEntityMetaPropertiesStandaloneTests
         var stub = new EntityMetaPropertiesStub();
         IEntityMetaProperties meta = stub;
 
-        stub.IsChild.OnGet = (ko) => true;
+        stub.IsChild.Value = true;
 
         Assert.True(meta.IsChild);
     }
@@ -259,7 +259,7 @@ public class IEntityMetaPropertiesStandaloneTests
         var stub = new EntityMetaPropertiesStub();
         IEntityMetaProperties meta = stub;
 
-        stub.IsDeleted.OnGet = (ko) => true;
+        stub.IsDeleted.Value = true;
 
         Assert.True(meta.IsDeleted);
     }
@@ -270,7 +270,7 @@ public class IEntityMetaPropertiesStandaloneTests
         var stub = new EntityMetaPropertiesStub();
         IEntityMetaProperties meta = stub;
 
-        stub.IsNew.OnGet = (ko) => true;
+        stub.IsNew.Value = true;
 
         Assert.True(meta.IsNew);
     }

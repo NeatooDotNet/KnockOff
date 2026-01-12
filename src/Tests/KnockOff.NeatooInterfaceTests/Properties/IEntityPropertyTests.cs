@@ -297,7 +297,7 @@ public class IEntityPropertyStandaloneTests
         var stub = new EntityPropertyStub();
         IEntityProperty property = stub;
 
-        stub.IsModified.OnGet = (ko) => true;
+        stub.IsModified.Value = true;
 
         Assert.True(property.IsModified);
     }
@@ -308,7 +308,7 @@ public class IEntityPropertyStandaloneTests
         var stub = new EntityPropertyStub();
         IEntityProperty property = stub;
 
-        stub.DisplayName.OnGet = (ko) => "Standalone Display Name";
+        stub.DisplayName.Value = "Standalone Display Name";
 
         Assert.Equal("Standalone Display Name", property.DisplayName);
     }

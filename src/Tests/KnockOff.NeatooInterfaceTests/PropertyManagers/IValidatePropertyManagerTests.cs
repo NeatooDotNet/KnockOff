@@ -353,7 +353,7 @@ public class IValidatePropertyManagerStandaloneTests
         var stub = new ValidatePropertyManagerStub();
         IValidatePropertyManager<IValidateProperty> manager = stub;
 
-        stub.IsBusy.OnGet = (ko) => true;
+        stub.IsBusy.Value = true;
 
         Assert.True(manager.IsBusy);
     }

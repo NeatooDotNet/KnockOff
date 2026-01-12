@@ -62,28 +62,36 @@ For interface properties: `T Prop { get; }`, `T Prop { set; }`, `T Prop { get; s
 
 | Property | Type | Description |
 |----------|------|-------------|
+| `Value` | `T` | Backing value returned by getter (when `OnGet` not set) |
 | `GetCount` | `int` | Number of getter invocations |
 | `SetCount` | `int` | Number of setter invocations |
 | `LastSetValue` | `T?` | Last value passed to setter |
-| `OnGet` | `Func<TKnockOff, T>?` | Getter callback |
-| `OnSet` | `Action<TKnockOff, T>?` | Setter callback |
+| `OnGet` | `Func<TKnockOff, T>?` | Getter callback (overrides `Value`) |
+| `OnSet` | `Action<TKnockOff, T>?` | Setter callback (overrides writing to `Value`) |
 
 ### Methods
 
 | Method | Description |
 |--------|-------------|
-| `Reset()` | Clears counts, `LastSetValue`, `OnGet`, and `OnSet` |
+| `Reset()` | Clears counts, `LastSetValue`, `Value`, `OnGet`, and `OnSet` |
+
+### Setting Property Values
+
+**Prefer `.Value` for simple cases:**
+
+```csharp
+// Simple - just set the value
+stub.Name.Value = "Test User";
+
+// Verbose - only needed for dynamic behavior
+stub.Name.OnGet = (ko) => "Test User";
+```
 
 ### Behavior
 
-- When `OnGet` is set, backing field is NOT read
-- When `OnSet` is set, backing field is NOT written
-- `Reset()` does NOT clear backing field
-
-### Backing Field
-
-Each property has a backing field accessible directly on the stub:
-- `stub.NameBacking` for `Name` property
+- Getter returns `OnGet` result if set, otherwise `Value`
+- Setter calls `OnSet` if set, otherwise writes to `Value`
+- `Reset()` clears `Value` to `default`
 
 ### Examples
 
@@ -256,7 +264,7 @@ snippet: skill-interceptor-api-ref-param-tracking
 | Interceptor Type | Reset Clears | Reset Does NOT Clear |
 |-----------------|--------------|----------------------|
 | Method | `CallCount`, `LastCallArg`/`LastCallArgs`, `OnCall` | - |
-| Property | `GetCount`, `SetCount`, `LastSetValue`, `OnGet`, `OnSet` | Backing field |
+| Property | `GetCount`, `SetCount`, `LastSetValue`, `Value`, `OnGet`, `OnSet` | - |
 | Indexer | `GetCount`, `SetCount`, `LastGetKey`, `LastSetEntry`, `OnGet`, `OnSet` | Backing dictionary |
 | Event | `SubscribeCount`, `UnsubscribeCount`, `RaiseCount`, `AllRaises` | Handlers (use `Clear()` to remove) |
 | Generic Method | All typed interceptors, `CalledTypeArguments` | - |

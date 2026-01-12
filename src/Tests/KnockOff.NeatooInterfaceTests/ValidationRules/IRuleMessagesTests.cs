@@ -327,7 +327,7 @@ public class IRuleMessagesStandaloneTests
         var stub = new RuleMessagesStub();
         IRuleMessages messages = stub;
 
-        stub.Count.OnGet = (ko) => 10;
+        stub.Count.Value = 10;
 
         Assert.Equal(10, messages.Count);
     }

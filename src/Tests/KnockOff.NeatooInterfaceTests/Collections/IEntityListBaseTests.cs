@@ -285,7 +285,7 @@ public class IEntityListBaseStandaloneTests
         var stub = new EntityListBaseStub();
         IEntityListBase list = stub;
 
-        stub.IsModified.OnGet = (ko) => true;
+        stub.IsModified.Value = true;
 
         Assert.True(list.IsModified);
     }

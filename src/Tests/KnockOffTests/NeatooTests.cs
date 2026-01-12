@@ -61,7 +61,7 @@ public class EntityBaseStandaloneTests
         var stub = new EntityBaseStub();
         IEntityBase entity = stub;
 
-        stub.IsDeleted.OnGet = (ko) => false;
+        stub.IsDeleted.Value = false;
 
         _ = entity.IsDeleted;
         _ = entity.IsDeleted;
@@ -76,7 +76,7 @@ public class EntityBaseStandaloneTests
         var stub = new EntityBaseStub();
         IEntityBase entity = stub;
 
-        stub.IsModified.OnGet = (ko) => true;
+        stub.IsModified.Value = true;
 
         Assert.True(entity.IsModified);
     }
@@ -87,7 +87,7 @@ public class EntityBaseStandaloneTests
         var stub = new EntityBaseStub();
         IEntityBase entity = stub;
 
-        stub.IsSelfModified.OnGet = (ko) => true;
+        stub.IsSelfModified.Value = true;
 
         Assert.True(entity.IsSelfModified);
     }
@@ -98,7 +98,7 @@ public class EntityBaseStandaloneTests
         var stub = new EntityBaseStub();
         IEntityBase entity = stub;
 
-        stub.IsChild.OnGet = (ko) => true;
+        stub.IsChild.Value = true;
 
         Assert.True(entity.IsChild);
     }
@@ -109,7 +109,7 @@ public class EntityBaseStandaloneTests
         var stub = new EntityBaseStub();
         IEntityBase entity = stub;
 
-        stub.IsSavable.OnGet = (ko) => true;
+        stub.IsSavable.Value = true;
 
         Assert.True(entity.IsSavable);
     }
@@ -227,7 +227,7 @@ public class EntityBaseStandaloneTests
         IEntityBase entity = stub;
 
         // IsBusy is now on IValidateMetaProperties
-        stub.IsBusy.OnGet = (ko) => true;
+        stub.IsBusy.Value = true;
 
         Assert.True(entity.IsBusy);
     }
@@ -238,7 +238,7 @@ public class EntityBaseStandaloneTests
         var stub = new EntityBaseStub();
         IEntityBase entity = stub;
 
-        stub.IsNew.OnGet = (ko) => true;
+        stub.IsNew.Value = true;
 
         // Perform some operations
         _ = entity.IsNew;
@@ -275,7 +275,7 @@ public class ValidateBaseStandaloneTests
         var stub = new ValidateBaseStub();
         IValidateBase validate = stub;
 
-        stub.IsValid.OnGet = (ko) => true;
+        stub.IsValid.Value = true;
 
         Assert.True(validate.IsValid);
     }
@@ -286,7 +286,7 @@ public class ValidateBaseStandaloneTests
         var stub = new ValidateBaseStub();
         IValidateBase validate = stub;
 
-        stub.IsSelfValid.OnGet = (ko) => false;
+        stub.IsSelfValid.Value = false;
 
         Assert.False(validate.IsSelfValid);
     }
@@ -297,7 +297,7 @@ public class ValidateBaseStandaloneTests
         var stub = new ValidateBaseStub();
         IValidateBase validate = stub;
 
-        stub.IsPaused.OnGet = (ko) => true;
+        stub.IsPaused.Value = true;
 
         Assert.True(validate.IsPaused);
     }
@@ -873,7 +873,7 @@ public partial class NestedClassTests
         var stub = new NestedEntityStub();
         IEntityBase entity = stub;
 
-        stub.IsNew.OnGet = (ko) => true;
+        stub.IsNew.Value = true;
 
         Assert.True(entity.IsNew);
     }
@@ -884,7 +884,7 @@ public partial class NestedClassTests
         var stub = new NestedValidateStub();
         IValidateBase validate = stub;
 
-        stub.IsValid.OnGet = (ko) => true;
+        stub.IsValid.Value = true;
 
         Assert.True(validate.IsValid);
     }

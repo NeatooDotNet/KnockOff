@@ -171,7 +171,7 @@ public class ITriggerPropertyStandaloneTests
         var stub = new TriggerPropertyStub();
         ITriggerProperty trigger = stub;
 
-        stub.PropertyName.OnGet = (ko) => "ConfiguredName";
+        stub.PropertyName.Value = "ConfiguredName";
 
         Assert.Equal("ConfiguredName", trigger.PropertyName);
     }

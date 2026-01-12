@@ -80,7 +80,7 @@ public class IMaxLengthRuleStandaloneTests
         var stub = new MaxLengthRuleStub();
         IMaxLengthRule rule = stub;
 
-        stub.Length.OnGet = (ko) => 50;
+        stub.Length.Value = 50;
 
         Assert.Equal(50, rule.Length);
     }

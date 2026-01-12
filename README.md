@@ -10,7 +10,7 @@ KnockOff has the benefits of source generation—no runtime reflection, no Castl
 |----------|-----|----------|---------|
 | Method invocation | 216 ns | 0.4 ns | **500x faster** |
 | Create 1000 stubs | 745 μs | 5.6 μs | **133x faster** |
-| Typical unit test | 72 μs | 31 ns | **2,300x faster** |
+| Typical unit test | 230 μs | 76 ns | **3,000x faster** |
 
 **Zero allocations on invocations.** Moq allocates 288-408 bytes per call for its interception machinery. KnockOff generates direct method calls—no allocations, no GC pressure.
 
@@ -70,53 +70,30 @@ With Moq, you're stepping through Castle.Core proxy internals.
 
 ### Scenario 1: Order Processing
 
-A business scenario with payment processing, inventory management, and notifications.
-
-#### Successful Order
+A typical unit test with a single dependency.
 
 **Moq**
 
 ```csharp
 [Fact]
-public void OrderProcessing_Success_Moq()
+public void OrderProcessor_ProcessesValidOrder_Moq()
 {
     // Arrange
-    var order = new FcOrder
-    {
-        Id = 1,
-        CustomerId = 100,
-        Amount = 99.99m,
-        Items = [new FcOrderItem { ProductId = 1, Quantity = 2, UnitPrice = 49.99m }]
-    };
+    var mock = new Mock<IOrderService>();
+    mock.Setup(x => x.GetOrder(It.IsAny<int>()))
+        .Returns((int id) => new Order { Id = id, CustomerId = 1 });
+    mock.Setup(x => x.ValidateOrder(It.IsAny<Order>())).Returns(true);
+    mock.Setup(x => x.CalculateTotal(It.IsAny<Order>())).Returns(100m);
 
-    var orderRepo = new Mock<IFcOrderRepository>();
-    orderRepo.Setup(x => x.GetById(1)).Returns(order);
-
-    var paymentService = new Mock<IFcPaymentService>();
-    paymentService
-        .Setup(x => x.ProcessPayment(100, 99.99m))
-        .Returns(new FcPaymentResult { Success = true, TransactionId = "TXN-123" });
-
-    var notificationService = new Mock<IFcNotificationService>();
-    var inventoryService = new Mock<IFcInventoryService>();
-    inventoryService
-        .Setup(x => x.ReserveItems(It.IsAny<IEnumerable<FcOrderItem>>()))
-        .Returns(true);
-
-    var processor = new FcOrderProcessor(
-        orderRepo.Object,
-        paymentService.Object,
-        notificationService.Object,
-        inventoryService.Object);
+    var sut = new OrderProcessor(mock.Object);
 
     // Act
-    var result = processor.ProcessOrder(1);
+    sut.Process(1);
 
     // Assert
-    Assert.True(result);
-    orderRepo.Verify(x => x.Save(It.Is<FcOrder>(o => o.Status == "Completed")), Times.Once);
-    notificationService.Verify(x => x.SendOrderConfirmation(100, 1), Times.Once);
-    inventoryService.Verify(x => x.ReleaseItems(It.IsAny<IEnumerable<FcOrderItem>>()), Times.Never);
+    mock.Verify(x => x.GetOrder(1), Times.Once);
+    mock.Verify(x => x.ValidateOrder(It.IsAny<Order>()), Times.Once);
+    mock.Verify(x => x.SaveOrder(It.IsAny<Order>()), Times.Once);
 }
 ```
 
@@ -124,143 +101,23 @@ public void OrderProcessing_Success_Moq()
 
 ```csharp
 [Fact]
-public void OrderProcessing_Success_KnockOff()
+public void OrderProcessor_ProcessesValidOrder_KnockOff()
 {
     // Arrange
-    var order = new FcOrder
-    {
-        Id = 1,
-        CustomerId = 100,
-        Amount = 99.99m,
-        Items = [new FcOrderItem { ProductId = 1, Quantity = 2, UnitPrice = 49.99m }]
-    };
+    var stub = new OrderServiceStub();
+    stub.GetOrder.OnCall = (ko, id) => new Order { Id = id, CustomerId = 1 };
+    stub.ValidateOrder.OnCall = (ko, _) => true;
+    stub.CalculateTotal.OnCall = (ko, _) => 100m;
 
-    var orderRepo = new FcOrderRepositoryStub();
-    orderRepo.GetById.OnCall = (ko, id) => order;
-
-    var paymentService = new FcPaymentServiceStub();
-    paymentService.ProcessPayment.OnCall = (ko, customerId, amount) =>
-        new FcPaymentResult { Success = true, TransactionId = "TXN-123" };
-
-    var notificationService = new FcNotificationServiceStub();
-
-    var inventoryService = new FcInventoryServiceStub();
-    inventoryService.ReserveItems.OnCall = (ko, items) => true;
-
-    var processor = new FcOrderProcessor(
-        orderRepo,
-        paymentService,
-        notificationService,
-        inventoryService);
+    var sut = new OrderProcessor(stub);
 
     // Act
-    var result = processor.ProcessOrder(1);
+    sut.Process(1);
 
     // Assert
-    Assert.True(result);
-    Assert.Equal(1, orderRepo.Save.CallCount);
-    Assert.Equal("Completed", orderRepo.Save.LastCallArg?.Status);
-    Assert.Equal(1, notificationService.SendOrderConfirmation.CallCount);
-    Assert.Equal(0, inventoryService.ReleaseItems.CallCount);
-}
-```
-
-#### Payment Failure Handling
-
-**Moq**
-
-```csharp
-[Fact]
-public void OrderProcessing_PaymentFailure_Moq()
-{
-    // Arrange
-    var order = new FcOrder
-    {
-        Id = 1,
-        CustomerId = 100,
-        Amount = 99.99m,
-        Items = [new FcOrderItem { ProductId = 1, Quantity = 2, UnitPrice = 49.99m }]
-    };
-
-    var orderRepo = new Mock<IFcOrderRepository>();
-    orderRepo.Setup(x => x.GetById(1)).Returns(order);
-
-    var paymentService = new Mock<IFcPaymentService>();
-    paymentService
-        .Setup(x => x.ProcessPayment(It.IsAny<int>(), It.IsAny<decimal>()))
-        .Returns(new FcPaymentResult { Success = false, ErrorMessage = "Insufficient funds" });
-
-    var notificationService = new Mock<IFcNotificationService>();
-    var inventoryService = new Mock<IFcInventoryService>();
-    inventoryService
-        .Setup(x => x.ReserveItems(It.IsAny<IEnumerable<FcOrderItem>>()))
-        .Returns(true);
-
-    var processor = new FcOrderProcessor(
-        orderRepo.Object,
-        paymentService.Object,
-        notificationService.Object,
-        inventoryService.Object);
-
-    // Act
-    var result = processor.ProcessOrder(1);
-
-    // Assert
-    Assert.False(result);
-    notificationService.Verify(
-        x => x.SendPaymentFailure(100, "Insufficient funds"),
-        Times.Once);
-    inventoryService.Verify(
-        x => x.ReleaseItems(It.IsAny<IEnumerable<FcOrderItem>>()),
-        Times.Once);
-    orderRepo.Verify(
-        x => x.Save(It.Is<FcOrder>(o => o.Status == "PaymentFailed")),
-        Times.Once);
-}
-```
-
-**KnockOff**
-
-```csharp
-[Fact]
-public void OrderProcessing_PaymentFailure_KnockOff()
-{
-    // Arrange
-    var order = new FcOrder
-    {
-        Id = 1,
-        CustomerId = 100,
-        Amount = 99.99m,
-        Items = [new FcOrderItem { ProductId = 1, Quantity = 2, UnitPrice = 49.99m }]
-    };
-
-    var orderRepo = new FcOrderRepositoryStub();
-    orderRepo.GetById.OnCall = (ko, id) => order;
-
-    var paymentService = new FcPaymentServiceStub();
-    paymentService.ProcessPayment.OnCall = (ko, customerId, amount) =>
-        new FcPaymentResult { Success = false, ErrorMessage = "Insufficient funds" };
-
-    var notificationService = new FcNotificationServiceStub();
-
-    var inventoryService = new FcInventoryServiceStub();
-    inventoryService.ReserveItems.OnCall = (ko, items) => true;
-
-    var processor = new FcOrderProcessor(
-        orderRepo,
-        paymentService,
-        notificationService,
-        inventoryService);
-
-    // Act
-    var result = processor.ProcessOrder(1);
-
-    // Assert
-    Assert.False(result);
-    Assert.Equal(1, notificationService.SendPaymentFailure.CallCount);
-    Assert.Equal((100, "Insufficient funds"), notificationService.SendPaymentFailure.LastCallArgs);
-    Assert.Equal(1, inventoryService.ReleaseItems.CallCount);
-    Assert.Equal("PaymentFailed", orderRepo.Save.LastCallArg?.Status);
+    Assert.Equal(1, stub.GetOrder.CallCount);
+    Assert.Equal(1, stub.ValidateOrder.CallCount);
+    Assert.Equal(1, stub.SaveOrder.CallCount);
 }
 ```
 
@@ -400,7 +257,7 @@ public async Task CachedRepository_CacheMiss_KnockOff()
 
 ## Performance Benchmarks
 
-Benchmarks run on the exact scenarios shown above, measuring realistic multi-dependency test patterns.
+Benchmarks run on the exact scenarios shown above, measuring realistic test patterns.
 
 ```
 BenchmarkDotNet v0.14.0, Ubuntu 24.04.3 LTS (WSL)
@@ -408,9 +265,9 @@ Intel Core i7-11800H 2.30GHz, .NET 9.0.11
 
 | Method                              | Mean         | Allocated |
 |------------------------------------ |-------------:|----------:|
-| OrderProcessing_Success_Moq         | 339,693.0 ns |   44,646 B |
-| OrderProcessing_Success_KnockOff    |     115.3 ns |      736 B |
-| OrderProcessing_Success_Rocks       |     750.2 ns |    3,048 B |
+| Moq_TypicalUnitTest                 | 229,806.0 ns |   38,303 B |
+| KnockOff_TypicalUnitTest            |      76.0 ns |      400 B |
+| Rocks_TypicalUnitTest               |     727.0 ns |    2,448 B |
 | CachedRepository_CacheMiss_Moq      | 436,504.9 ns |   45,180 B |
 | CachedRepository_CacheMiss_KnockOff |     385.2 ns |    1,576 B |
 | CachedRepository_CacheMiss_Rocks    |     781.2 ns |    3,112 B |
@@ -420,7 +277,7 @@ Intel Core i7-11800H 2.30GHz, .NET 9.0.11
 
 | Scenario | KnockOff vs Moq | Rocks vs Moq |
 |----------|-----------------|--------------|
-| Order Processing | **2,945x faster**, 60x less memory | 453x faster, 15x less memory |
+| Typical Unit Test | **3,024x faster**, 96x less memory | 316x faster, 16x less memory |
 | Cached Repository | **1,133x faster**, 29x less memory | 559x faster, 15x less memory |
 
 **Why the difference?**

@@ -278,7 +278,7 @@ public class IRuleStandaloneTests
         var stub = new RuleStub();
         IRule rule = stub;
 
-        stub.Executed.OnGet = (ko) => true;
+        stub.Executed.Value = true;
 
         Assert.True(rule.Executed);
     }

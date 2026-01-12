@@ -247,7 +247,7 @@ public class IValidateMetaPropertiesStandaloneTests
         var stub = new ValidateMetaPropertiesStub();
         IValidateMetaProperties meta = stub;
 
-        stub.IsBusy.OnGet = (ko) => true;
+        stub.IsBusy.Value = true;
 
         Assert.True(meta.IsBusy);
     }

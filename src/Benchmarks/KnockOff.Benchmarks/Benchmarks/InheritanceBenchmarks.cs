@@ -47,9 +47,9 @@ public class InheritanceInvocationBenchmarks
         _moq = mock.Object;
 
         var stub = new TimestampedEntityStub();
-        stub.Id.OnGet = (ko) => 1;
-        stub.CreatedAt.OnGet = (ko) => _testDate;
-        stub.UpdatedAt.OnGet = (ko) => _testDate;
+        stub.Id.Value = 1;
+        stub.CreatedAt.Value = _testDate;
+        stub.UpdatedAt.Value = _testDate;
         _knockOff = stub;
     }
 
@@ -98,9 +98,9 @@ public class InheritanceSetupBenchmarks
     public TimestampedEntityStub KnockOff_SetupInheritedInterface()
     {
         var stub = new TimestampedEntityStub();
-        stub.Id.OnGet = (ko) => 1;
-        stub.CreatedAt.OnGet = (ko) => _testDate;
-        stub.UpdatedAt.OnGet = (ko) => _testDate;
+        stub.Id.Value = 1;
+        stub.CreatedAt.Value = _testDate;
+        stub.UpdatedAt.Value = _testDate;
         return stub;
     }
 }

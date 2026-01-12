@@ -237,7 +237,7 @@ public class IPropertyInfoStandaloneTests
         var stub = new PropertyInfoStub();
         IPropertyInfo propertyInfo = stub;
 
-        stub.Name.OnGet = (ko) => "StandaloneName";
+        stub.Name.Value = "StandaloneName";
 
         Assert.Equal("StandaloneName", propertyInfo.Name);
     }

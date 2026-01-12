@@ -26,8 +26,8 @@ public class PropertyBenchmarks
         _moq = mock.Object;
 
         _knockOffStub = new PropertyServiceStub();
-        _knockOffStub.Name.OnGet = (ko) => "Test";
-        _knockOffStub.ReadOnlyValue.OnGet = (ko) => 42;
+        _knockOffStub.Name.Value = "Test";
+        _knockOffStub.ReadOnlyValue.Value = 42;
         _knockOff = _knockOffStub;
     }
 
@@ -83,8 +83,7 @@ public class PropertySetupBenchmarks
     public PropertyServiceStub KnockOff_SetupProperty()
     {
         var stub = new PropertyServiceStub();
-        stub.Name.OnGet = (ko) => "Test";
-        stub.Name.OnSet = (ko, v) => { };
+        stub.Name.Value = "Test";
         return stub;
     }
 
@@ -100,7 +99,7 @@ public class PropertySetupBenchmarks
     public PropertyServiceStub KnockOff_SetupReadOnlyProperty()
     {
         var stub = new PropertyServiceStub();
-        stub.ReadOnlyValue.OnGet = (ko) => 42;
+        stub.ReadOnlyValue.Value = 42;
         return stub;
     }
 }

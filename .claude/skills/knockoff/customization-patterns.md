@@ -48,7 +48,16 @@ Use `OnCall =` property assignment:
 
 snippet: skill-customization-patterns-callback-method
 
-### Property Callbacks
+### Property Values
+
+**Prefer `.Value` for simple cases:**
+
+```csharp
+stub.Name.Value = "Test User";
+stub.IsActive.Value = true;
+```
+
+Use `OnGet`/`OnSet` callbacks only when you need dynamic behavior:
 
 snippet: skill-customization-patterns-callback-property
 
@@ -78,12 +87,13 @@ snippet: skill-customization-patterns-callback-ref-params
 
 ### Callback Signatures
 
-| Member | Callback | Signature |
+| Member | Assignment | Signature |
 |--------|----------|-----------|
 | Method (no params) | `OnCall =` | `Action<TKnockOff>` or `Func<TKnockOff, R>` |
 | Method (with params) | `OnCall =` | `Action<TKnockOff, T1, T2, ...>` or `Func<TKnockOff, T1, T2, ..., R>` |
-| Property getter | `OnGet =` | `Func<TKnockOff, T>` |
-| Property setter | `OnSet =` | `Action<TKnockOff, T>` |
+| Property (simple) | `.Value =` | `T` (direct value assignment) |
+| Property getter | `OnGet =` | `Func<TKnockOff, T>` (overrides `.Value`) |
+| Property setter | `OnSet =` | `Action<TKnockOff, T>` (overrides writing to `.Value`) |
 | Indexer getter | `OnGet =` | `Func<TKnockOff, TKey, TValue>` |
 | Indexer setter | `OnSet =` | `Action<TKnockOff, TKey, TValue>` |
 
@@ -106,7 +116,7 @@ snippet: skill-customization-patterns-callback-ref-params
 |    -> Methods only, stops here              |
 +---------------------------------------------+
 | 3. DEFAULT                                  |
-|    -> Properties: backing field             |
+|    -> Properties: .Value                    |
 |    -> Methods: null (nullable) or           |
 |               throw (non-nullable) or       |
 |               silent (void)                 |
@@ -123,9 +133,9 @@ snippet: skill-customization-patterns-priority-in-action
 `Reset()` clears:
 - Call tracking (`CallCount`, `LastCallArg`/`LastCallArgs`)
 - Callbacks (`OnCall`, `OnGet`, `OnSet`)
+- Property `.Value` (reset to `default`)
 
 Does NOT clear:
-- Backing fields for properties
 - Backing dictionaries for indexers
 
 snippet: skill-customization-patterns-reset-behavior
@@ -139,9 +149,10 @@ snippet: skill-customization-patterns-combining-patterns
 | Question | Recommendation |
 |----------|----------------|
 | Same behavior in all tests? | User method |
-| Different per test? | Callback |
+| Different per test? | Callback or `.Value` |
 | Need to capture call info? | Either (tracking always available) |
 | Shared across test classes? | User method |
 | Complex conditional logic? | Callback |
-| Just static value? | User method (simpler) |
+| Just static property value? | `.Value` (simplest) |
+| Just static method return? | User method |
 | Need to verify side effects? | Callback |
