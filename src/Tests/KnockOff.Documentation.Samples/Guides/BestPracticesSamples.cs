@@ -14,6 +14,7 @@
 /// - docs:best-practices:standalone-stub
 /// - docs:best-practices:inline-stubs
 /// - best-practices-reset-clear-backing
+/// - best-practices-complex-interface-ok
 ///
 /// Corresponding tests: BestPracticesSamplesTests.cs
 /// </summary>
@@ -318,6 +319,71 @@ public partial class BpInlineTests
         var userStub = new Stubs.IBpInlineUserService();
         var loggerStub = new Stubs.IBpInlineLogger();
         // Configure via callbacks only
+    }
+}
+#endregion
+
+// ============================================================================
+// Complex Interfaces - KnockOff handles them fine
+// ============================================================================
+
+// Interface with many members - demonstrates that size doesn't matter
+public interface IBpEditBase
+{
+    // Validation
+    bool IsValid { get; }
+    bool IsSelfValid { get; }
+    bool IsDirty { get; }
+    bool IsSelfDirty { get; }
+    bool IsDeleted { get; }
+    bool IsNew { get; }
+    bool IsSavable { get; }
+
+    // Identity
+    int Id { get; set; }
+    string Name { get; set; }
+
+    // Lifecycle
+    void BeginEdit();
+    void CancelEdit();
+    void ApplyEdit();
+    void MarkDeleted();
+    void MarkNew();
+    void MarkOld();
+
+    // Validation rules
+    void AddRule(string property, Func<bool> rule);
+    void RemoveRule(string property);
+    IEnumerable<string> GetBrokenRules();
+
+    // Child management
+    void AddChild(object child);
+    void RemoveChild(object child);
+    IEnumerable<object> GetChildren();
+
+    // Events
+    event EventHandler? PropertyChanged;
+    event EventHandler? Saving;
+    event EventHandler? Saved;
+}
+
+#region best-practices-complex-interface-ok
+[KnockOff<IBpEditBase>]
+public partial class BpComplexInterfaceTests
+{
+    public void TestsOnlyConfigureWhatTheyNeed()
+    {
+        var stub = new Stubs.IBpEditBase();
+
+        // Configure only what this test needs
+        stub.IsValid.Value = true;
+        stub.IsDirty.Value = false;
+
+        // The other 20+ members work with smart defaults
+        IBpEditBase entity = stub;
+        var isValid = entity.IsValid;   // true (from Value)
+        var isNew = entity.IsNew;       // false (default)
+        entity.BeginEdit();             // no-op (no callback set)
     }
 }
 #endregion

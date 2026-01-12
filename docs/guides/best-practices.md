@@ -20,50 +20,25 @@ The answer is almost always **yes**.
 
 ### Complex Interfaces Are Fine
 
-<!-- pseudo:complex-interface-ok -->
-```csharp
-// IEditBase has 50+ members? Doesn't matter.
-[KnockOff<IEditBase>]
-public partial class MyTests
-{
-    // Generator creates everything. Configure only what you need:
-    // stub.IsValid.OnGet = (ko) => true;
-    // stub.IsDirty.OnGet = (ko) => false;
-    // The other 48 members work with smart defaults.
-}
-```
-<!-- /snippet -->
-
-### Anti-Pattern: Manual Test Doubles
-
-**Never** create hand-written test doubles when KnockOff would work:
-
-<!-- invalid:manual-test-double -->
-```csharp
-// WRONG - Don't do this
-public class FakeEditBase : IEditBase
-{
-    public bool IsValid => true;
-    public bool IsDirty => false;
-    // ... 48 more manual implementations
-}
-```
-<!-- /snippet -->
-
-This defeats the purpose of having a source generator. Use `[KnockOff<IEditBase>]` instead.
-
-## Stub Minimalism
-
-**Only stub what the test needs.** Don't implement every interface member—let smart defaults handle the rest.
-
-<!-- snippet: best-practices-stub-minimalism -->
+<!-- snippet: best-practices-complex-interface-ok -->
 ```cs
-[KnockOff]
-public partial class BpUserServiceKnockOff : IBpUserService
+[KnockOff<IBpEditBase>]
+public partial class BpComplexInterfaceTests
 {
-    // Only define methods needing custom behavior
-    protected User? GetUser(int id) => new User { Id = id };
-    // GetCount() returns 0, GetUsers() returns empty list, etc.
+    public void TestsOnlyConfigureWhatTheyNeed()
+    {
+        var stub = new Stubs.IBpEditBase();
+
+        // Configure only what this test needs
+        stub.IsValid.Value = true;
+        stub.IsDirty.Value = false;
+
+        // The other 20+ members work with smart defaults
+        IBpEditBase entity = stub;
+        var isValid = entity.IsValid;   // true (from Value)
+        var isNew = entity.IsNew;       // false (default)
+        entity.BeginEdit();             // no-op (no callback set)
+    }
 }
 ```
 <!-- endSnippet -->

@@ -64,63 +64,31 @@ Each stub tracks invocations independently.
 
 When multiple `[KnockOff<T>]` attributes use the same interface name with different type arguments, the generator appends a type suffix to avoid naming collisions:
 
-<!-- pseudo:collision-naming-pattern -->
-```csharp
+<!-- snippet: inline-stubs-collision-naming-pattern -->
+```cs
 [KnockOff<IList<string>>]
 [KnockOff<IList<int>>]
 public partial class MultiListTests
 {
-    // Generates suffixed stub classes:
-    // - Stubs.IListString
-    // - Stubs.IListInt32
-}
-```
-<!-- /snippet -->
+	public void CollisionNamingGeneratesSuffixedNames()
+	{
+		// When same interface name with different type args:
+		// Generator appends type suffix to avoid collision
+		var stringList = new Stubs.IListString();
+		var intList = new Stubs.IListInt32();
 
-**Single generic interface uses simple name:**
+		// Configure each independently
+		stringList.Count.Value = 5;
+		intList.Count.Value = 10;
 
-<!-- pseudo:no-collision-naming -->
-```csharp
-[KnockOff<IList<string>>]
-public partial class SingleListTests
-{
-    // No collision - simple name:
-    // - Stubs.IList
-}
-```
-<!-- /snippet -->
+		IList<string> strings = stringList;
+		IList<int> ints = intList;
 
-**Type suffix rules:**
+		var stringCount = strings.Count;  // 5
+		var intCount = ints.Count;        // 10
 
-| Generic Type | Stub Name |
-|--------------|-----------|
-| `IList<string>` | `IListString` |
-| `IList<int>` | `IListInt32` |
-| `IDictionary<string, int>` | `IDictionaryStringInt32` |
-| `IList<string[]>` | `IListStringArray` |
-| `IList<int?>` | `IListNullableInt32` |
-
-This collision detection applies only to inline stubs within the same class. Different type arguments on the same interface trigger suffixed names.
-
-## Instantiation Options
-
-### Partial Properties (C# 13 / .NET 9+)
-
-Declare partial properties for auto-instantiation:
-
-<!-- snippet: inline-stubs-partial-property -->
-```cs
-[KnockOff<IInUserService>]
-[KnockOff<IInLogger>]
-public partial class PartialPropertyTests
-{
-	// Partial properties are auto-instantiated by the generator
-	public partial Stubs.IInUserService UserService { get; }
-	protected partial Stubs.IInLogger Logger { get; }
-
-	// Use directly in tests - no instantiation needed:
-	// UserService.GetUser.OnCall = (ko, id) => new InUser { Id = id };
-	// Logger.Log.OnCall = (ko, msg) => Console.WriteLine(msg);
+		_ = (stringCount, intCount);
+	}
 }
 ```
 <!-- endSnippet -->

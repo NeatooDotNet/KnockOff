@@ -11,6 +11,8 @@
 /// - docs:inline-stubs:nested-stubs-usage
 /// - docs:inline-stubs:interceptor-api
 /// - docs:inline-stubs:test-isolation-reset
+/// - inline-stubs-collision-naming-pattern
+/// - inline-stubs-no-collision-naming
 ///
 /// Corresponding tests: InlineStubsSamplesTests.cs
 /// </summary>
@@ -358,3 +360,52 @@ public static class ClassStubUsageExamples
 	}
 	#endregion
 }
+
+// ============================================================================
+// Generic Type Collision Naming
+// ============================================================================
+
+#region inline-stubs-collision-naming-pattern
+[KnockOff<IList<string>>]
+[KnockOff<IList<int>>]
+public partial class MultiListTests
+{
+	public void CollisionNamingGeneratesSuffixedNames()
+	{
+		// When same interface name with different type args:
+		// Generator appends type suffix to avoid collision
+		var stringList = new Stubs.IListString();
+		var intList = new Stubs.IListInt32();
+
+		// Configure each independently
+		stringList.Count.Value = 5;
+		intList.Count.Value = 10;
+
+		IList<string> strings = stringList;
+		IList<int> ints = intList;
+
+		var stringCount = strings.Count;  // 5
+		var intCount = ints.Count;        // 10
+
+		_ = (stringCount, intCount);
+	}
+}
+#endregion
+
+#region inline-stubs-no-collision-naming
+[KnockOff<IList<string>>]
+public partial class SingleListTests
+{
+	public void SingleGenericUsesSimpleName()
+	{
+		// No collision - simple name without suffix
+		var list = new Stubs.IList();
+
+		list.Count.Value = 3;
+		IList<string> strings = list;
+
+		var count = strings.Count;  // 3
+		_ = count;
+	}
+}
+#endregion
