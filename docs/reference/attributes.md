@@ -19,16 +19,14 @@ public sealed class KnockOffAttribute : Attribute
 
 ### Usage
 
-<!-- pseudo:knockoff-attribute-usage -->
-```csharp
-using KnockOff;
-
+<!-- snippet: attributes-knockoff-usage -->
+```cs
 [KnockOff]
-public partial class MyServiceKnockOff : IMyService
+public partial class AttrMyServiceKnockOff : IAttrService
 {
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Requirements
 
@@ -39,36 +37,32 @@ public partial class MyServiceKnockOff : IMyService
 
 ### Valid Examples
 
-<!-- pseudo:knockoff-valid-examples -->
-```csharp
+<!-- snippet: attributes-valid-examples -->
+```cs
 // Basic usage
 [KnockOff]
-public partial class ServiceKnockOff : IService { }
-
-// Multiple interfaces
-[KnockOff]
-public partial class DataContextKnockOff : IRepository, IUnitOfWork { }
+public partial class AttrServiceKnockOff : IAttrService { }
 
 // Generic interface (with concrete type)
 [KnockOff]
-public partial class UserRepoKnockOff : IRepository<User> { }
+public partial class AttrUserRepoKnockOff : IAttrRepository<AttrUser> { }
 
 // Interface inheritance
 [KnockOff]
-public partial class AuditableKnockOff : IAuditableEntity { }
+public partial class AttrAuditableKnockOff : IAttrAuditableEntity { }
 
 // Internal class
 [KnockOff]
-internal partial class InternalServiceKnockOff : IService { }
+internal partial class AttrInternalServiceKnockOff : IAttrService { }
 
 // Nested class
-public class TestFixture
+public partial class AttrTestFixture
 {
     [KnockOff]
-    public partial class NestedKnockOff : IService { }
+    public partial class NestedKnockOff : IAttrService { }
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Invalid Examples
 
@@ -108,12 +102,12 @@ using KnockOff;
 
 Or use fully qualified:
 
-<!-- pseudo:knockoff-namespace-qualified -->
-```csharp
+<!-- snippet: attributes-namespace-qualified -->
+```cs
 [KnockOff.KnockOff]
-public partial class ServiceKnockOff : IService { }
+public partial class AttrQualifiedServiceKnockOff : IAttrService { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Future Attribute Options
 

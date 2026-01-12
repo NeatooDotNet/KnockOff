@@ -146,6 +146,20 @@ public partial class PatternCombinedRepositoryKnockOff : IPatternCombinedReposit
 #endregion
 
 // ============================================================================
+// Callback Ko Access Example
+// ============================================================================
+
+public interface IPatternKoAccessService
+{
+    PatternUser GetUser(int id);
+    void Initialize();
+    string Name { get; set; }
+}
+
+[KnockOff]
+public partial class PatternKoAccessServiceKnockOff : IPatternKoAccessService { }
+
+// ============================================================================
 // Usage Examples
 // ============================================================================
 
@@ -216,8 +230,102 @@ public static class CustomizationPatternsUsageExamples
         #endregion
     }
 
-    // NOTE: Priority/Reset/Combining examples are left inline in docs.
-    // The documentation describes callback > user method priority, but
-    // current generator implementation always calls user methods directly
-    // when they're defined, ignoring OnCall callbacks.
+    public static void CallbackKoAccessExample()
+    {
+        var knockOff = new PatternKoAccessServiceKnockOff();
+        IPatternKoAccessService service = knockOff;
+
+        #region customization-patterns-callback-ko-access
+        knockOff.GetUser.OnCall = (ko, id) =>
+        {
+            // Access other interceptors
+            if (ko.Initialize.WasCalled)
+                return new PatternUser { Id = id, Name = "Initialized" };
+
+            // Access backing fields via interceptor
+            return new PatternUser { Id = id, Name = ko.Name.Value };
+        };
+        #endregion
+    }
+
+    public static void PriorityExampleUsage()
+    {
+        #region customization-patterns-priority-example-usage
+        // Test
+        var knockOff = new PatternServiceKnockOff();
+        IPatternService service = knockOff;
+
+        // No callback set → uses user method
+        var result1 = service.Calculate(5);  // Returns 10 (5 * 2)
+
+        // Set callback → overrides user method
+        // Note: Interceptor has "2" suffix because user method "Calculate" exists
+        knockOff.Calculate2.OnCall = (ko, input) => input * 100;
+        var result2 = service.Calculate(5);  // Returns 500 (callback)
+
+        // Reset clears callback → back to user method
+        knockOff.Calculate2.Reset();
+        var result3 = service.Calculate(5);  // Returns 10 (user method)
+        #endregion
+    }
+
+    public static void ResetBehaviorExample()
+    {
+        var knockOff = new PatternKoAccessServiceKnockOff();
+        IPatternKoAccessService service = knockOff;
+
+        #region customization-patterns-reset-behavior
+        // Set up state
+        knockOff.GetUser.OnCall = (ko, id) => new PatternUser { Name = "Callback" };
+        service.GetUser(1);
+        service.GetUser(2);
+
+        Assert.Equal(2, knockOff.GetUser.CallCount);
+
+        // Reset
+        knockOff.GetUser.Reset();
+
+        Assert.Equal(0, knockOff.GetUser.CallCount);  // Tracking cleared
+        Assert.Null(knockOff.GetUser.OnCall);  // Callback cleared
+
+        // Now uses default (no user method defined)
+        var user = service.GetUser(3);
+        #endregion
+    }
+
+    public static void CombiningPatternsUsageExample()
+    {
+        #region customization-patterns-combining-patterns-usage
+        // Test 1: Uses default (null)
+        var knockOff = new PatternCombinedRepositoryKnockOff();
+        IPatternCombinedRepository repo = knockOff;
+        Assert.Null(repo.GetById(999));
+
+        // Test 2: Override for specific IDs
+        // Note: Interceptor has "2" suffix because user method "GetById" exists
+        knockOff.GetById2.OnCall = (ko, id) => id switch
+        {
+            1 => new PatternUser { Id = 1, Name = "Admin" },
+            2 => new PatternUser { Id = 2, Name = "Guest" },
+            _ => null  // Fall through to "not found"
+        };
+
+        Assert.Equal("Admin", repo.GetById(1)?.Name);
+        Assert.Null(repo.GetById(999));  // Still null
+
+        // Test 3: Reset and use different callback
+        knockOff.GetById2.Reset();
+        knockOff.GetById2.OnCall = (ko, id) =>
+            new PatternUser { Id = id, Name = $"User-{id}" };
+
+        Assert.Equal("User-999", repo.GetById(999)?.Name);
+        #endregion
+    }
+}
+
+// Minimal Assert class for compilation (tests use xUnit)
+file static class Assert
+{
+    public static void Equal<T>(T expected, T actual) { }
+    public static void Null(object? value) { }
 }

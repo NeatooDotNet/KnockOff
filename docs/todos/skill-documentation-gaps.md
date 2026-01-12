@@ -51,8 +51,65 @@ Skills are currently at `~/.claude/skills/knockoff/` (shared location) but shoul
 - MarkdownSnippets can process skills in repo
 - Shared location (`~/.claude/skills/`) gets updated on commit
 
+## Gap 4: API Changes (10.2.0 → 10.3.0+)
+
+**Status:** Not Started
+
+**Source:** `NeatooATM/docs/todos/knockoff-limitations-investigation.md`
+
+These gaps were discovered during NeatooATM implementation (2026-01-11).
+
+### Task List
+
+- [ ] **Update tracking API documentation**: `Spy` property no longer exists, replaced with `ExecutionInfo`:
+  | Feature | 10.2.0 (documented) | 10.3.0+ (actual) |
+  |---------|---------------------|------------------|
+  | Tracking API | `Spy.Method.CallCount` | `ExecutionInfo.Method.CallCount` |
+  | Runtime callbacks | `OnCall = (ko, args) => ...` | **NOT AVAILABLE** |
+  | Cast helper | Direct cast | `AsInterfaceName()` method |
+
+- [ ] **Document ExecutionInfo API**: The new tracking structure:
+  ```csharp
+  // Per-method execution details
+  stub.ExecutionInfo.Method.CallCount      // int
+  stub.ExecutionInfo.Method.WasCalled      // bool
+  stub.ExecutionInfo.Method.LastCallArgs   // Named tuple (nullable)
+  stub.ExecutionInfo.Method.AllCalls       // IReadOnlyList<tuple>
+  stub.ExecutionInfo.Method.Reset()        // Clears tracking
+  ```
+
+- [ ] **Document removal of runtime callbacks**: `OnCall` is no longer available in 10.3.0+. All behavior must be defined at compile-time via user methods.
+
+- [ ] **Document mutable state pattern for per-test behavior**: Since `OnCall` doesn't exist, use mutable fields:
+  ```csharp
+  [KnockOff]
+  public partial class ServiceKnockOff : IService
+  {
+      // Test-controllable state
+      public bool ShouldSucceed { get; set; } = true;  // Happy path default
+
+      protected Task<bool> DoWorkAsync(...)
+      {
+          return Task.FromResult(ShouldSucceed);
+      }
+  }
+
+  // In test:
+  var stub = new ServiceKnockOff();
+  stub.ShouldSucceed = false;  // Override for this test
+  ```
+
+- [ ] **Document compile-time only behavior limitation**: Cannot configure behavior per-test using callbacks like Moq. Must use mutable state or separate stub classes.
+
+- [ ] **Document method overload type confusion**: With method overloads, KnockOff may generate incorrect tuple field types (e.g., `EmployeeId` instead of `Guid`). Workaround: access via tuple index instead of named field.
+
+- [ ] **Add migration guide from 10.2.0 to 10.3.0+**: Breaking changes require test code updates.
+
+---
+
 ## Priority
 
 1. ~~**High:** Class stubs documentation~~ - DONE
 2. ~~**Medium:** Delegate stubs enhancements~~ - DONE
 3. **Medium:** Move skills into repo (enables proper snippet sync)
+4. **Medium:** API 10.2.0 → 10.3.0+ documentation updates

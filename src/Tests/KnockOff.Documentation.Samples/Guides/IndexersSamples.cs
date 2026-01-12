@@ -12,6 +12,8 @@
 /// - docs:indexers:reset
 /// - docs:indexers:entity-property
 /// - docs:indexers:integer-indexer
+/// - indexers-single-interceptor-access
+/// - indexers-multiple-interceptor-access
 ///
 /// Corresponding tests: IndexersSamplesTests.cs
 /// </summary>
@@ -107,6 +109,19 @@ public interface IIdxList
 [KnockOff]
 public partial class IdxListKnockOff : IIdxList { }
 #endregion
+
+// ============================================================================
+// Multiple Indexers (different key types)
+// ============================================================================
+
+public interface IIdxMultiStore
+{
+    object? this[string key] { get; set; }
+    object? this[int index] { get; set; }
+}
+
+[KnockOff]
+public partial class IdxMultiStoreKnockOff : IIdxMultiStore { }
 
 // ============================================================================
 // Usage Examples
@@ -260,5 +275,27 @@ public static class IndexersUsageExamples
         #endregion
 
         _ = (first, second, lastGetIndex);
+    }
+
+    public static void SingleIndexerAccess()
+    {
+        var knockOff = new IdxPropertyStoreKnockOff();
+
+        #region indexers-single-interceptor-access
+        _ = knockOff.Indexer;          // for this[string key]
+        _ = knockOff.Indexer.Backing;  // Dictionary backing storage
+        #endregion
+    }
+
+    public static void MultipleIndexerAccess()
+    {
+        var knockOff = new IdxMultiStoreKnockOff();
+
+        #region indexers-multiple-interceptor-access
+        _ = knockOff.IndexerString;          // for this[string key]
+        _ = knockOff.IndexerInt32;           // for this[int index]
+        _ = knockOff.IndexerString.Backing;
+        _ = knockOff.IndexerInt32.Backing;
+        #endregion
     }
 }

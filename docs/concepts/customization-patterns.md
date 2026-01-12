@@ -153,19 +153,19 @@ Each method gets a generated delegate type. The callback signature varies by mem
 
 All callbacks receive the KnockOff instance (`ko`) as the first parameter. This allows:
 
-<!-- pseudo:callback-ko-access -->
-```csharp
+<!-- snippet: customization-patterns-callback-ko-access -->
+```cs
 knockOff.GetUser.OnCall = (ko, id) =>
 {
     // Access other interceptors
-    if (ko.IsInitialized.WasCalled)
-        return new User { Id = id, Name = "Initialized" };
+    if (ko.Initialize.WasCalled)
+        return new PatternUser { Id = id, Name = "Initialized" };
 
-    // Access backing fields
-    return new User { Id = id, Name = ko.NameBacking };
+    // Access backing fields via interceptor
+    return new PatternUser { Id = id, Name = ko.Name.Value };
 };
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### When to Use Callbacks
 
@@ -216,8 +216,8 @@ public partial class PatternServiceKnockOff : IPatternService
 ```
 <!-- endSnippet -->
 
-<!-- pseudo:priority-example-usage -->
-```csharp
+<!-- snippet: customization-patterns-priority-example-usage -->
+```cs
 // Test
 var knockOff = new PatternServiceKnockOff();
 IPatternService service = knockOff;
@@ -226,14 +226,15 @@ IPatternService service = knockOff;
 var result1 = service.Calculate(5);  // Returns 10 (5 * 2)
 
 // Set callback → overrides user method
-knockOff.Calculate.OnCall = (ko, input) => input * 100;
+// Note: Interceptor has "2" suffix because user method "Calculate" exists
+knockOff.Calculate2.OnCall = (ko, input) => input * 100;
 var result2 = service.Calculate(5);  // Returns 500 (callback)
 
 // Reset clears callback → back to user method
-knockOff.Calculate.Reset();
+knockOff.Calculate2.Reset();
 var result3 = service.Calculate(5);  // Returns 10 (user method)
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Reset Behavior
 
@@ -245,10 +246,10 @@ It does **NOT** clear:
 - Backing fields for properties
 - Backing dictionaries for indexers
 
-<!-- pseudo:reset-behavior -->
-```csharp
+<!-- snippet: customization-patterns-reset-behavior -->
+```cs
 // Set up state
-knockOff.GetUser.OnCall = (ko, id) => new User { Name = "Callback" };
+knockOff.GetUser.OnCall = (ko, id) => new PatternUser { Name = "Callback" };
 service.GetUser(1);
 service.GetUser(2);
 
@@ -260,10 +261,10 @@ knockOff.GetUser.Reset();
 Assert.Equal(0, knockOff.GetUser.CallCount);  // Tracking cleared
 Assert.Null(knockOff.GetUser.OnCall);  // Callback cleared
 
-// Now uses user method (or default if no user method)
+// Now uses default (no user method defined)
 var user = service.GetUser(3);
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Combining Both Patterns
 
@@ -285,31 +286,33 @@ public partial class PatternCombinedRepositoryKnockOff : IPatternCombinedReposit
 ```
 <!-- endSnippet -->
 
-<!-- pseudo:combining-patterns-usage -->
-```csharp
+<!-- snippet: customization-patterns-combining-patterns-usage -->
+```cs
 // Test 1: Uses default (null)
 var knockOff = new PatternCombinedRepositoryKnockOff();
-Assert.Null(knockOff.AsIPatternCombinedRepository().GetById(999));
+IPatternCombinedRepository repo = knockOff;
+Assert.Null(repo.GetById(999));
 
 // Test 2: Override for specific IDs
-knockOff.GetById.OnCall = (ko, id) => id switch
+// Note: Interceptor has "2" suffix because user method "GetById" exists
+knockOff.GetById2.OnCall = (ko, id) => id switch
 {
     1 => new PatternUser { Id = 1, Name = "Admin" },
     2 => new PatternUser { Id = 2, Name = "Guest" },
     _ => null  // Fall through to "not found"
 };
 
-Assert.Equal("Admin", knockOff.AsIPatternCombinedRepository().GetById(1)?.Name);
-Assert.Null(knockOff.AsIPatternCombinedRepository().GetById(999));  // Still null
+Assert.Equal("Admin", repo.GetById(1)?.Name);
+Assert.Null(repo.GetById(999));  // Still null
 
 // Test 3: Reset and use different callback
-knockOff.GetById.Reset();
-knockOff.GetById.OnCall = (ko, id) =>
+knockOff.GetById2.Reset();
+knockOff.GetById2.OnCall = (ko, id) =>
     new PatternUser { Id = id, Name = $"User-{id}" };
 
-Assert.Equal("User-999", knockOff.AsIPatternCombinedRepository().GetById(999)?.Name);
+Assert.Equal("User-999", repo.GetById(999)?.Name);
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Decision Guide
 

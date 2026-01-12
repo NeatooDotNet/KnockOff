@@ -256,12 +256,14 @@ public interface ITryParser
 
 Only named delegate types can be stubbed. For `Func<>` or `Action<>`, define a named delegate:
 
-<!-- pseudo:named-delegate-workaround -->
-```csharp
+<!-- snippet: delegates-named-delegate-workaround -->
+```cs
 // Instead of: Func<int, string>
 public delegate string IntToStringConverter(int value);
 
 [KnockOff<IntToStringConverter>]
-public partial class Tests { }
+public partial class NamedDelegateWorkaroundTests
+{
+}
 ```
-<!-- /snippet -->
+<!-- endSnippet -->

@@ -64,6 +64,7 @@ Each stub tracks invocations independently.
 
 When multiple `[KnockOff<T>]` attributes use the same interface name with different type arguments, the generator appends a type suffix to avoid naming collisions:
 
+<!-- pseudo:collision-naming-pattern -->
 ```csharp
 [KnockOff<IList<string>>]
 [KnockOff<IList<int>>]
@@ -74,8 +75,11 @@ public partial class MultiListTests
     // - Stubs.IListInt32
 }
 ```
+<!-- /snippet -->
 
 **Single generic interface uses simple name:**
+
+<!-- pseudo:no-collision-naming -->
 ```csharp
 [KnockOff<IList<string>>]
 public partial class SingleListTests
@@ -84,6 +88,7 @@ public partial class SingleListTests
     // - Stubs.IList
 }
 ```
+<!-- /snippet -->
 
 **Type suffix rules:**
 

@@ -192,4 +192,22 @@ public class DelegateStubsSamplesTests : SamplesTestBase
 		// Need to create a test class for multi-param delegate
 		// This is handled by the Formatter delegate defined in the samples
 	}
+
+	// ========================================================================
+	// delegates-named-delegate-workaround
+	// ========================================================================
+
+	[Fact]
+	public void DelegateStub_NamedDelegateWorkaround_StubGenerated()
+	{
+		// Demonstrates workaround for Func<>/Action<> - use named delegate
+		var stub = new NamedDelegateWorkaroundTests.Stubs.IntToStringConverter();
+		stub.Interceptor.OnCall = (ko, value) => $"Value: {value}";
+
+		IntToStringConverter converter = stub;
+		var result = converter(42);
+
+		Assert.Equal("Value: 42", result);
+		Assert.Equal(42, stub.Interceptor.LastCallArg);
+	}
 }

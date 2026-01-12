@@ -53,15 +53,15 @@ For interface methods: `void M()`, `T M()`, `void M(args)`, `T M(args)`
 
 ### Examples
 
-<!-- pseudo:method-interceptor-examples -->
-```csharp
+<!-- snippet: interceptor-api-method-interceptor-examples -->
+```cs
 // Void method, no params
 Assert.True(knockOff.Initialize.WasCalled);
 knockOff.Initialize.OnCall = (ko) => { /* custom */ };
 
 // Return method, single param
 Assert.Equal(42, knockOff.GetById.LastCallArg);
-knockOff.GetById.OnCall = (ko, id) => new User { Id = id };
+knockOff.GetById.OnCall = (ko, id) => new ApiUser { Id = id };
 
 // Void method, multiple params
 var args = knockOff.Log.LastCallArgs;
@@ -73,7 +73,7 @@ knockOff.Log.OnCall = (ko, level, message) =>
     Console.WriteLine($"[{level}] {message}");
 };
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Property Interceptor
 
@@ -110,8 +110,8 @@ For interface properties: `T Prop { get; }`, `T Prop { set; }`, `T Prop { get; s
 
 ### Examples
 
-<!-- pseudo:property-interceptor-examples -->
-```csharp
+<!-- snippet: interceptor-api-property-interceptor-examples -->
+```cs
 // Track property access
 Assert.Equal(3, knockOff.Name.GetCount);
 Assert.Equal(2, knockOff.Name.SetCount);
@@ -131,7 +131,7 @@ knockOff.Name.OnSet = (ko, value) =>
 knockOff.Name.Reset();
 Assert.Equal(0, knockOff.Name.GetCount);
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Indexer Interceptor
 
@@ -188,37 +188,37 @@ When **`OnGet` is set**:
 
 ### Examples
 
-<!-- pseudo:indexer-interceptor-examples -->
-```csharp
+<!-- snippet: interceptor-api-indexer-interceptor-examples -->
+```cs
 // Pre-populate backing
-knockOff.StringIndexerBacking["Key1"] = value1;
-knockOff.StringIndexerBacking["Key2"] = value2;
+knockOff.Indexer.Backing["Key1"] = value1;
+knockOff.Indexer.Backing["Key2"] = value2;
 
 // Track access
 _ = store["Key1"];
 _ = store["Key2"];
-Assert.Equal(2, knockOff.StringIndexer.GetCount);
-Assert.Equal("Key2", knockOff.StringIndexer.LastGetKey);
+Assert.Equal(2, knockOff.Indexer.GetCount);
+Assert.Equal("Key2", knockOff.Indexer.LastGetKey);
 
 // Dynamic getter
-knockOff.StringIndexer.OnGet = (ko, key) =>
+knockOff.Indexer.OnGet = (ko, key) =>
 {
     if (key == "special") return specialValue;
-    return ko.StringIndexerBacking.GetValueOrDefault(key);
+    return ko.Indexer.Backing.GetValueOrDefault(key);
 };
 
 // Track setter
 store["NewKey"] = newValue;
-Assert.Equal("NewKey", knockOff.StringIndexer.LastSetEntry?.Key);
+Assert.Equal("NewKey", knockOff.Indexer.LastSetEntry?.Key);
 
 // Interceptor setter
-knockOff.StringIndexer.OnSet = (ko, key, value) =>
+knockOff.Indexer.OnSet = (ko, key, value) =>
 {
     // Custom logic
     // Value does NOT go to backing dictionary
 };
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Event Interceptor
 
@@ -258,8 +258,8 @@ For interface events: `event EventHandler E`, `event EventHandler<T> E`, `event 
 
 ### Examples
 
-<!-- pseudo:event-interceptor-examples -->
-```csharp
+<!-- snippet: interceptor-api-event-interceptor-examples -->
+```cs
 // Subscribe tracking
 source.DataReceived += handler;
 Assert.Equal(1, knockOff.DataReceived.AddCount);
@@ -285,7 +285,7 @@ knockOff.DataReceived.Reset();
 Assert.Equal(0, knockOff.DataReceived.AddCount);
 Assert.Equal(0, knockOff.DataReceived.RemoveCount);
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Reset Behavior Summary
 
@@ -309,15 +309,15 @@ Async methods use the same interceptor structure as sync methods. The `OnCall` c
 | `ValueTask` | `ValueTask` |
 | `ValueTask<T>` | `ValueTask<T>` |
 
-<!-- pseudo:async-method-examples -->
-```csharp
+<!-- snippet: interceptor-api-async-method-examples -->
+```cs
 knockOff.GetByIdAsync.OnCall = (ko, id) =>
-    Task.FromResult<User?>(new User { Id = id });
+    Task.FromResult<ApiUser?>(new ApiUser { Id = id });
 
 knockOff.SaveAsync.OnCall = (ko, entity) =>
     Task.FromException<int>(new DbException("Failed"));
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Generic Method Interceptors
 
@@ -371,15 +371,15 @@ Accessed via `.Of<T>()`:
 
 ### Examples
 
-<!-- pseudo:generic-method-interceptor-examples -->
-```csharp
+<!-- snippet: interceptor-api-generic-method-interceptor-examples -->
+```cs
 // Configure per type
-knockOff.Deserialize.Of<User>().OnCall = (ko, json) =>
-    JsonSerializer.Deserialize<User>(json)!;
+knockOff.Deserialize.Of<ApiUser>().OnCall = (ko, json) =>
+    JsonSerializer.Deserialize<ApiUser>(json)!;
 
 // Per-type tracking
-Assert.Equal(2, knockOff.Deserialize.Of<User>().CallCount);
-Assert.Equal("{...}", knockOff.Deserialize.Of<User>().LastCallArg);
+Assert.Equal(2, knockOff.Deserialize.Of<ApiUser>().CallCount);
+Assert.Equal("{\"Id\":2}", knockOff.Deserialize.Of<ApiUser>().LastCallArg);
 
 // Aggregate tracking
 Assert.Equal(5, knockOff.Deserialize.TotalCallCount);
@@ -387,18 +387,18 @@ Assert.True(knockOff.Deserialize.WasCalled);
 
 // See which types were called
 var types = knockOff.Deserialize.CalledTypeArguments;
-// [typeof(User), typeof(Order)]
+// [typeof(ApiUser), typeof(ApiOrder)]
 
 // Multiple type parameters
 knockOff.Convert.Of<string, int>().OnCall = (ko, s) => s.Length;
 
 // Reset single type
-knockOff.Deserialize.Of<User>().Reset();
+knockOff.Deserialize.Of<ApiUser>().Reset();
 
 // Reset all types
 knockOff.Deserialize.Reset();
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Smart Defaults
 

@@ -230,18 +230,28 @@ public class BpResetBehaviorExample
         // Assert.Null(knockOff.Name.OnGet);         // Callback cleared
         // Assert.Equal("Jane", knockOff.Name.Value); // Value preserved!
     }
+
+    public void ResetAndClearBacking()
+    {
+        var knockOff = new BpResetServiceKnockOff();
+
+        knockOff.Name.Value = "John";
+
+        knockOff.Name.Reset();
+        knockOff.Name.Value = default!;  // Clear backing value
+    }
 }
 ```
 <!-- endSnippet -->
 
 If you need to clear backing storage, set it explicitly:
 
-<!-- pseudo:reset-clear-backing -->
-```csharp
+<!-- snippet: best-practices-reset-clear-backing -->
+```cs
 knockOff.Name.Reset();
-knockOff.Name.Value = default;  // Clear backing value
+knockOff.Name.Value = default!;  // Clear backing value
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Handle Out/Ref Parameters Correctly
 

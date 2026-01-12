@@ -38,7 +38,7 @@ Get-ChildItem -Path $DocsPath -Recurse -Include "*.md" -Exclude "*.source.md" | 
     # MarkdownSnippets format: snippet: {id}
     $stats.CompiledSnippets += ([regex]'(?m)^snippet:\s+\S+').Matches($content).Count
     # Also count generated snippets: <!-- snippet: {id} --> (output from mdsnippets)
-    $generatedSnippets = ([regex]'<!-- snippet: [^:]+[^/]-->').Matches($content)
+    $generatedSnippets = ([regex]'<!-- snippet: .+ -->').Matches($content)
     $stats.CompiledSnippets += $generatedSnippets.Count
 
     # Count manual markers

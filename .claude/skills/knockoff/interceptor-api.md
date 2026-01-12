@@ -8,7 +8,8 @@ Every interface member gets a dedicated Interceptor class. Access interceptors d
 |------------------|-----------------|----------------|
 | Method | `{MethodName}Interceptor` | `stub.MethodName` |
 | Property | `{PropertyName}Interceptor` | `stub.PropertyName` |
-| Indexer | `{KeyType}IndexerInterceptor` | `stub.StringIndexer`, `stub.IntIndexer`, etc. |
+| Indexer (single) | `IndexerInterceptor` | `stub.Indexer` |
+| Indexer (multiple) | `Indexer{KeyType}Interceptor` | `stub.IndexerString`, `stub.IndexerInt32`, etc. |
 | Event | `{EventName}Interceptor` | `stub.EventNameInterceptor` |
 | Generic Method | `{MethodName}Interceptor` | `stub.MethodName.Of<T>()` |
 
@@ -90,7 +91,7 @@ snippet: skill-interceptor-api-property-interceptor-example
 
 ## Indexer Interceptor
 
-For interface indexers. Named by key type: `StringIndexer`, `IntIndexer`, etc.
+For interface indexers. Single indexer uses `Indexer`; multiple indexers use type suffix: `IndexerString`, `IndexerInt32`, etc.
 
 ### Properties
 
@@ -111,9 +112,10 @@ For interface indexers. Named by key type: `StringIndexer`, `IntIndexer`, etc.
 
 ### Backing Dictionary
 
-Each indexer has a backing dictionary accessible directly on the stub:
-- `stub.StringIndexerBacking` for `this[string key]`
-- `stub.IntIndexerBacking` for `this[int index]`
+Each indexer has a backing dictionary accessible via the `Backing` property on the interceptor:
+- `stub.Indexer.Backing` for single indexer
+- `stub.IndexerString.Backing` for `this[string key]` (when multiple indexers)
+- `stub.IndexerInt32.Backing` for `this[int index]` (when multiple indexers)
 
 ### Getter Behavior
 

@@ -56,6 +56,33 @@ public partial class GuideDataServiceKnockOff : IGuideDataService { }
 #endregion
 
 // ============================================================================
+// ViewModel for Event Testing
+// ============================================================================
+
+/// <summary>
+/// Example ViewModel that subscribes to events. Used in documentation examples.
+/// </summary>
+public class GuideViewModel : IDisposable
+{
+    private readonly IGuideDataService _dataService;
+    private readonly EventHandler<DataChangedEventArgs> _handler;
+
+    public int CurrentValue { get; private set; }
+
+    public GuideViewModel(IGuideDataService dataService)
+    {
+        _dataService = dataService;
+        _handler = (sender, e) => CurrentValue = e.NewValue;
+        _dataService.DataChanged += _handler;
+    }
+
+    public void Dispose()
+    {
+        _dataService.DataChanged -= _handler;
+    }
+}
+
+// ============================================================================
 // Progress Reporting
 // ============================================================================
 
@@ -275,4 +302,48 @@ public static class EventsUsageExamples
 
         _ = progressValues;
     }
+
+    // ========================================================================
+    // ViewModel Event Testing Examples
+    // ========================================================================
+
+    public static void ViewModelEventTests()
+    {
+        #region events-viewmodel-event-tests
+        var knockOff = new GuideDataServiceKnockOff();
+        IGuideDataService service = knockOff;
+        var viewModel = new GuideViewModel(service);
+
+        // ViewModel should have subscribed
+        Assert.True(knockOff.DataChanged.HasSubscribers);
+        Assert.Equal(1, knockOff.DataChanged.AddCount);
+
+        // Simulate data change
+        knockOff.DataChanged.Raise(null, new DataChangedEventArgs { NewValue = 42 });
+
+        Assert.Equal(42, viewModel.CurrentValue);
+        #endregion
+    }
+
+    public static void ViewModelUnsubscribeTest()
+    {
+        #region events-viewmodel-unsubscribe-test
+        var knockOff = new GuideDataServiceKnockOff();
+        IGuideDataService service = knockOff;
+        var viewModel = new GuideViewModel(service);
+
+        Assert.Equal(1, knockOff.DataChanged.AddCount);
+
+        viewModel.Dispose();
+
+        Assert.Equal(1, knockOff.DataChanged.RemoveCount);
+        #endregion
+    }
+}
+
+// Minimal Assert class for compilation (tests use xUnit)
+file static class Assert
+{
+    public static void True(bool condition) { }
+    public static void Equal<T>(T expected, T actual) { }
 }

@@ -16,6 +16,7 @@ These diagnostics apply to inline stubs using `[KnockOff<T>]`.
 
 **Solution:** Use an interface, unsealed class, or named delegate type:
 
+<!-- invalid:ko1001-example -->
 ```csharp
 // Error: struct not supported
 [KnockOff<MyStruct>]  // KO1001
@@ -29,6 +30,7 @@ These diagnostics apply to inline stubs using `[KnockOff<T>]`.
 // Correct: delegate
 [KnockOff<MyCallback>]
 ```
+<!-- /snippet -->
 
 ### KO1002: Name collision
 
@@ -40,6 +42,7 @@ These diagnostics apply to inline stubs using `[KnockOff<T>]`.
 
 **Solution:** Use the explicit standalone stub pattern instead:
 
+<!-- invalid:ko1002-example -->
 ```csharp
 // Error: same name from different namespaces
 [KnockOff<Namespace1.IService>]
@@ -53,6 +56,7 @@ public partial class Service1Stub : Namespace1.IService { }
 [KnockOff]
 public partial class Service2Stub : Namespace2.IService { }
 ```
+<!-- /snippet -->
 
 ### KO1003: Stubs type conflict
 
@@ -64,6 +68,7 @@ public partial class Service2Stub : Namespace2.IService { }
 
 **Solution:** Rename the existing `Stubs` type or use standalone stubs:
 
+<!-- invalid:ko1003-example -->
 ```csharp
 // Error: existing Stubs type
 [KnockOff<IService>]
@@ -79,6 +84,7 @@ public partial class MyTests
     public class TestStubs { }  // Renamed
 }
 ```
+<!-- /snippet -->
 
 ## Standalone Stub Diagnostics (KO0xxx)
 
@@ -94,6 +100,7 @@ These diagnostics apply to standalone stubs using `[KnockOff]` on a class that i
 
 **Solution:** Ensure the stub class has the same number of type parameters as the interface:
 
+<!-- invalid:ko0008-example -->
 ```csharp
 public interface IRepository<T> { }
 
@@ -105,6 +112,7 @@ public partial class BadStub<T, TExtra> : IRepository<T> { }  // KO0008: 2 vs 1
 [KnockOff]
 public partial class GoodStub<T> : IRepository<T> { }
 ```
+<!-- /snippet -->
 
 ### KO0010: Multiple interfaces on standalone stub
 
@@ -116,6 +124,7 @@ public partial class GoodStub<T> : IRepository<T> { }
 
 **Solution:** Create separate stub classes for each interface:
 
+<!-- invalid:ko0010-example -->
 ```csharp
 // Error: multiple interfaces
 [KnockOff]
@@ -128,6 +137,7 @@ public partial class ServiceStub : IService { }
 [KnockOff]
 public partial class RepositoryStub : IRepository { }
 ```
+<!-- /snippet -->
 
 ## Class Stub Diagnostics (KO2xxx)
 
@@ -143,6 +153,7 @@ These diagnostics apply to class stubs using `[KnockOff<T>]` where `T` is a clas
 
 **Solution:** The class must be unsealed to create a stub. If you control the class, remove the `sealed` modifier. Otherwise, extract an interface.
 
+<!-- invalid:ko2001-example -->
 ```csharp
 public sealed class SealedService { }  // Cannot stub
 
@@ -154,6 +165,7 @@ public interface IService { }
 public sealed class SealedService : IService { }
 // Then stub the interface instead
 ```
+<!-- /snippet -->
 
 ### KO2002: No accessible constructors
 
@@ -165,6 +177,7 @@ public sealed class SealedService : IService { }
 
 **Solution:** Add an accessible constructor or extract an interface:
 
+<!-- invalid:ko2002-example -->
 ```csharp
 public class NoConstructor
 {
@@ -177,6 +190,7 @@ public class WithConstructor
     protected WithConstructor() { }  // Accessible to stub
 }
 ```
+<!-- /snippet -->
 
 ### KO2003: Non-virtual member skipped
 
@@ -188,6 +202,7 @@ public class WithConstructor
 
 **Resolution:** This is informational only. Non-virtual members are accessible through `.Object` but cannot have callbacks configured. To intercept, make the member virtual:
 
+<!-- invalid:ko2003-example -->
 ```csharp
 public class MyService
 {
@@ -195,6 +210,7 @@ public class MyService
     public virtual void Virtual() { }   // Intercepted
 }
 ```
+<!-- /snippet -->
 
 ### KO2004: No virtual members
 

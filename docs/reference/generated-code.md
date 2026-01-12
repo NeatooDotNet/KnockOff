@@ -39,21 +39,21 @@ Add to your project file:
 
 Given this input:
 
-<!-- pseudo:generated-code-input-example -->
-```csharp
-public interface IUserService
+<!-- snippet: generated-code-input-example -->
+```cs
+public interface IGenUserService
 {
     string Name { get; set; }
-    User? GetUser(int id);
+    GenUser? GetUser(int id);
 }
 
 [KnockOff]
-public partial class UserServiceKnockOff : IUserService
+public partial class GenUserServiceKnockOff : IGenUserService
 {
-    protected User? GetUser(int id) => new User { Id = id };
+    protected GenUser? GetUser(int id) => new GenUser { Id = id };
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 KnockOff generates:
 
@@ -176,7 +176,7 @@ public partial class UserServiceKnockOff
 
 The generator looks for protected methods matching interface signatures:
 
-<!-- pseudo:user-method-detection -->
+<!-- invalid:user-method-detection -->
 ```csharp
 [KnockOff]
 public partial class ServiceKnockOff : IService
@@ -213,31 +213,40 @@ Indexer interceptors use the key type name:
 
 For methods with 2+ parameters, tracking uses named tuples:
 
-<!-- pseudo:multiple-parameters-tracking -->
-```csharp
-// Interface: void Log(string level, string message, int code)
-
-// Generated tracking
-public int CallCount { get; private set; }
-public bool WasCalled => CallCount > 0;
-public (string level, string message, int code)? LastCallArgs { get; private set; }
-
-// Generated callback signature - individual parameters
-public Action<LoggerKnockOff, string, string, int>? OnCall { get; set; }
-
-// Usage
-knockOff.Log.OnCall = (ko, level, message, code) =>
+<!-- snippet: generated-code-multiple-parameters -->
+```cs
+public static class MultipleParametersExample
 {
-    Console.WriteLine($"[{level}] {message} ({code})");
-};
+    public static void TrackingUsage()
+    {
+        var knockOff = new GenLoggerKnockOff();
+        IGenLogger logger = knockOff;
+
+        // Callback receives individual parameters
+        knockOff.Log.OnCall = (ko, level, message, code) =>
+        {
+            Console.WriteLine($"[{level}] {message} ({code})");
+        };
+
+        logger.Log("INFO", "Started", 100);
+
+        // Tracking uses LastCallArgs tuple
+        var args = knockOff.Log.LastCallArgs;
+        var level = args?.level;    // "INFO"
+        var message = args?.message; // "Started"
+        var code = args?.code;      // 100
+
+        _ = (level, message, code);
+    }
+}
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Interface Constraint
 
 Standalone `[KnockOff]` stubs implement exactly one interface. Attempting to implement multiple unrelated interfaces emits diagnostic `KO0010`:
 
-<!-- pseudo:interface-constraint-valid -->
+<!-- invalid:interface-constraint-examples -->
 ```csharp
 // VALID - single interface
 [KnockOff]
@@ -255,19 +264,28 @@ public partial class BadKnockOff : ILogger, IAuditor { }  // Error!
 
 If you need multiple unrelated interfaces, use separate stubs:
 
-<!-- pseudo:interface-constraint-separate -->
-```csharp
+<!-- snippet: generated-code-interface-constraint-separate -->
+```cs
 [KnockOff]
-public partial class LoggerKnockOff : ILogger { }
+public partial class GenAuditLoggerKnockOff : IGenAuditLogger { }
 
 [KnockOff]
-public partial class AuditorKnockOff : IAuditor { }
+public partial class GenAuditorKnockOff : IGenAuditor { }
 
-// In test
-var logger = new LoggerKnockOff();
-var auditor = new AuditorKnockOff();
+public static class SeparateStubsExample
+{
+    public static void Usage()
+    {
+        // In test - use separate stubs
+        var logger = new GenAuditLoggerKnockOff();
+        var auditor = new GenAuditorKnockOff();
+
+        logger.Log.OnCall = (ko, msg) => Console.WriteLine(msg);
+        auditor.Audit.OnCall = (ko, action) => Console.WriteLine($"Audit: {action}");
+    }
+}
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 For **inline stubs** within a test class, multiple interfaces are supported - see the inline stubs documentation.
 

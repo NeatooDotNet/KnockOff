@@ -13,6 +13,7 @@
 /// - docs:best-practices:partial-container
 /// - docs:best-practices:standalone-stub
 /// - docs:best-practices:inline-stubs
+/// - best-practices-reset-clear-backing
 ///
 /// Corresponding tests: BestPracticesSamplesTests.cs
 /// </summary>
@@ -181,6 +182,18 @@ public class BpResetBehaviorExample
         // Assert.Equal(0, knockOff.Name.SetCount);  // Tracking cleared
         // Assert.Null(knockOff.Name.OnGet);         // Callback cleared
         // Assert.Equal("Jane", knockOff.Name.Value); // Value preserved!
+    }
+
+    public void ResetAndClearBacking()
+    {
+        var knockOff = new BpResetServiceKnockOff();
+
+        knockOff.Name.Value = "John";
+
+        #region best-practices-reset-clear-backing
+        knockOff.Name.Reset();
+        knockOff.Name.Value = default!;  // Clear backing value
+        #endregion
     }
 }
 #endregion

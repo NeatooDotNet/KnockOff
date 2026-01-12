@@ -28,39 +28,30 @@ public partial class DataContextKnockOff : IRepository, IUnitOfWork { }  // Erro
 
 Create separate stub classes for each interface:
 
-<!-- pseudo:separate-standalone-stubs -->
-```csharp
+<!-- snippet: multiple-interfaces-separate-standalone-stubs -->
+```cs
 [KnockOff]
-public partial class RepositoryKnockOff : IRepository { }
+public partial class MultiRepositoryKnockOff : IMultiRepository { }
 
 [KnockOff]
-public partial class UnitOfWorkKnockOff : IUnitOfWork { }
-
-// Usage
-var repo = new RepositoryKnockOff();
-var uow = new UnitOfWorkKnockOff();
-
-// Configure each independently
-repo.GetById.OnCall = (ko, id) => new User { Id = id };
-uow.SaveChangesAsync.OnCall = (ko, ct) => Task.FromResult(1);
+public partial class MultiUnitOfWorkKnockOff : IMultiUnitOfWork { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Option 2: Inline Stubs
 
 For tests that need multiple interfaces, use inline stubs with `[KnockOff<T>]` attributes on the test class:
 
-<!-- pseudo:inline-stubs-multiple -->
-```csharp
-[KnockOff<IRepository>]
-[KnockOff<IUnitOfWork>]
-public partial class DataContextTests
+<!-- snippet: multiple-interfaces-inline-stubs-multiple -->
+```cs
+[KnockOff<IMultiRepository>]
+[KnockOff<IMultiUnitOfWork>]
+public partial class MultiDataContextTests
 {
-    [Fact]
-    public async Task SaveChanges_ReturnsAddCount()
+    public void SaveChanges_ReturnsAddCount_Example()
     {
-        var repo = new Stubs.IRepository();
-        var uow = new Stubs.IUnitOfWork();
+        var repo = new Stubs.IMultiRepository();
+        var uow = new Stubs.IMultiUnitOfWork();
 
         // Configure via flat API
         uow.SaveChangesAsync.OnCall = (ko, ct) => Task.FromResult(repo.Add.CallCount);
@@ -68,18 +59,17 @@ public partial class DataContextTests
         repo.Add.OnCall = (ko, user) => { };
 
         // Use in test
-        IRepository repoService = repo;
-        IUnitOfWork uowService = uow;
+        IMultiRepository repoService = repo;
+        IMultiUnitOfWork uowService = uow;
 
-        repoService.Add(new User { Name = "New" });
-        repoService.Add(new User { Name = "Another" });
-        var saved = await uowService.SaveChangesAsync();
-
-        Assert.Equal(2, saved);
+        repoService.Add(new MultiUser { Name = "New" });
+        repoService.Add(new MultiUser { Name = "Another" });
+        // var saved = await uowService.SaveChangesAsync();
+        // Assert.Equal(2, saved);
     }
 }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 See [Inline Stubs Guide](inline-stubs.md) for more details.
 
@@ -97,25 +87,21 @@ The single interface constraint exists because:
 
 If you have existing stubs implementing multiple interfaces:
 
-<!-- pseudo:migration-from-multiple -->
-```csharp
-// v10 - worked but now deprecated
-[KnockOff]
-public partial class DataContextKnockOff : IRepository, IUnitOfWork { }
-
+<!-- snippet: multiple-interfaces-migration-from-multiple -->
+```cs
 // v10.9 - Option A: Separate stubs
-[KnockOff]
-public partial class RepositoryKnockOff : IRepository { }
+var repo = new MultiRepositoryKnockOff();
+var uow = new MultiUnitOfWorkKnockOff();
 
-[KnockOff]
-public partial class UnitOfWorkKnockOff : IUnitOfWork { }
+// Configure independently
+repo.GetById.OnCall = (ko, id) => new MultiUser { Id = id };
+uow.SaveChangesAsync.OnCall = (ko, ct) => Task.FromResult(1);
 
 // v10.9 - Option B: Inline stubs on test class
-[KnockOff<IRepository>]
-[KnockOff<IUnitOfWork>]
-public partial class DataContextTests { }
+// Use [KnockOff<IMultiRepository>] and [KnockOff<IMultiUnitOfWork>]
+// on your test class (see MultiDataContextTests)
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Related Guides
 

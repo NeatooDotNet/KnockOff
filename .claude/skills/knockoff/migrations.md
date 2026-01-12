@@ -4,6 +4,65 @@ Breaking changes and recommended practice updates across KnockOff versions.
 
 ## v10.14.0
 
+### BREAKING: Unified Indexer API
+
+Indexer naming simplified. Single indexer uses `Indexer`; multiple indexers use type suffix.
+
+| Before | After (single indexer) | After (multiple indexers) |
+|--------|------------------------|---------------------------|
+| `knockOff.StringIndexer` | `knockOff.Indexer` | `knockOff.IndexerString` |
+| `knockOff.Int32Indexer` | `knockOff.Indexer` | `knockOff.IndexerInt32` |
+| `knockOff.StringIndexerBacking` | `knockOff.Indexer.Backing` | `knockOff.IndexerString.Backing` |
+
+**Before:**
+```csharp
+knockOff.StringIndexer.OnGet = (ko, key) => values[key];
+knockOff.StringIndexerBacking["config"] = defaultValue;
+```
+
+**After (single indexer):**
+```csharp
+knockOff.Indexer.OnGet = (ko, key) => values[key];
+knockOff.Indexer.Backing["config"] = defaultValue;
+```
+
+**After (multiple indexers):**
+```csharp
+knockOff.IndexerString.OnGet = (ko, key) => stringValues[key];
+knockOff.IndexerInt32.OnGet = (ko, idx) => intValues[idx];
+knockOff.IndexerString.Backing["config"] = defaultValue;
+```
+
+### BREAKING: Inline Generic Stub Collision Detection
+
+When multiple `[KnockOff<T>]` attributes use the same interface with different type arguments, stub classes now get type-suffixed names.
+
+**Single generic (no change):**
+```csharp
+[KnockOff<IList<string>>]
+public partial class Tests { }
+// Generates: Stubs.IList
+```
+
+**Collision (type suffix added):**
+```csharp
+[KnockOff<IList<string>>]
+[KnockOff<IList<int>>]
+public partial class Tests { }
+// Before: Stubs.IList (ambiguous - which one?)
+// After:  Stubs.IListString, Stubs.IListInt32
+```
+
+**Type suffix rules:**
+
+| Generic Type | Stub Name |
+|--------------|-----------|
+| `IList<string>` | `IListString` |
+| `IList<int>` | `IListInt32` |
+| `IDictionary<string, int>` | `IDictionaryStringInt32` |
+| `IList<string[]>` | `IListStringArray` |
+| `IList<int?>` | `IListNullableInt32` |
+
 ### New Feature: Generic Standalone Stubs
 
 v10.14.0 adds support for **generic standalone stubs** - stub classes with their own type parameters that implement generic interfaces.
@@ -68,9 +127,19 @@ public partial class GoodStub<T> : IRepository<T> { }
 
 ### v10.14.0 Checklist
 
-1. [ ] Consider converting repeated concrete stubs to generic stubs
-2. [ ] Ensure constraint compatibility when creating generic stubs
-3. [ ] No breaking changes - existing concrete stubs continue to work
+**Indexer API:**
+1. [ ] Search for `StringIndexer` → replace with `Indexer` (single) or `IndexerString` (multiple)
+2. [ ] Search for `Int32Indexer` → replace with `Indexer` (single) or `IndexerInt32` (multiple)
+3. [ ] Search for `StringIndexerBacking` → replace with `Indexer.Backing` or `IndexerString.Backing`
+4. [ ] Search for `Int32IndexerBacking` → replace with `Indexer.Backing` or `IndexerInt32.Backing`
+
+**Inline Generic Stubs (only if using same interface with different type args):**
+5. [ ] Search for `Stubs.IList` when `IList<string>` and `IList<int>` both exist → use `Stubs.IListString`, `Stubs.IListInt32`
+6. [ ] Apply same pattern to other colliding generic interfaces
+
+**Generic Standalone Stubs (new feature):**
+7. [ ] Consider converting repeated concrete stubs to generic stubs
+8. [ ] Ensure constraint compatibility when creating generic stubs
 
 ---
 

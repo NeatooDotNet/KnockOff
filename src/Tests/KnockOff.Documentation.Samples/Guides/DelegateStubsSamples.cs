@@ -10,6 +10,7 @@
 /// - docs:delegates:interceptor-api
 /// - docs:delegates:closed-generics
 /// - docs:delegates:validation-pattern
+/// - delegates-named-delegate-workaround
 ///
 /// Corresponding tests: DelegateStubsSamplesTests.cs
 /// </summary>
@@ -190,6 +191,21 @@ public partial class ValidationPatternTests
 //
 // entity.Name = "duplicate";  // Triggers validation error
 // Assert.True(entity.HasErrors);
+#endregion
+
+// ============================================================================
+// Named Delegate Workaround
+// ============================================================================
+
+// Only named delegate types can be stubbed. For Func<>/Action<>, define a named delegate:
+#region delegates-named-delegate-workaround
+// Instead of: Func<int, string>
+public delegate string IntToStringConverter(int value);
+
+[KnockOff<IntToStringConverter>]
+public partial class NamedDelegateWorkaroundTests
+{
+}
 #endregion
 
 // ============================================================================

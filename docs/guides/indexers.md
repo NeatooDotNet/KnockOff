@@ -29,22 +29,22 @@ public partial class IdxReadWriteStoreKnockOff : IIdxReadWriteStore { }
 Indexer interceptors are named based on whether there are multiple indexers:
 
 **Single indexer:**
-<!-- pseudo:indexer-single -->
-```csharp
-knockOff.Indexer         // for this[string key] or this[int index]
-knockOff.Indexer.Backing // Dictionary backing storage
+<!-- snippet: indexers-single-interceptor-access -->
+```cs
+_ = knockOff.Indexer;          // for this[string key]
+_ = knockOff.Indexer.Backing;  // Dictionary backing storage
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 **Multiple indexers (type suffix for disambiguation):**
-<!-- pseudo:indexer-multiple -->
-```csharp
-knockOff.IndexerString       // for this[string key]
-knockOff.IndexerInt32        // for this[int index]
-knockOff.IndexerString.Backing
-knockOff.IndexerInt32.Backing
+<!-- snippet: indexers-multiple-interceptor-access -->
+```cs
+_ = knockOff.IndexerString;          // for this[string key]
+_ = knockOff.IndexerInt32;           // for this[int index]
+_ = knockOff.IndexerString.Backing;
+_ = knockOff.IndexerInt32.Backing;
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ## Tracking
 

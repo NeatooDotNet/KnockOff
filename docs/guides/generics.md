@@ -190,47 +190,47 @@ KnockOff supports generic methods using the `.Of<T>()` pattern. This allows type
 
 ### Basic Usage
 
-<!-- pseudo:generic-method-interface -->
-```csharp
-public interface ISerializer
+<!-- snippet: generics-generic-method-interface -->
+```cs
+public interface IGenSerializer
 {
     T Deserialize<T>(string json);
     void Process<T>(T value);
 }
 
 [KnockOff]
-public partial class SerializerKnockOff : ISerializer { }
+public partial class GenSerializerKnockOff : IGenSerializer { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 Configure behavior per type argument:
 
-<!-- pseudo:generic-method-config -->
-```csharp
-var knockOff = new SerializerKnockOff();
+<!-- snippet: generics-generic-method-config -->
+```cs
+var knockOff = new GenSerializerKnockOff();
 
 // Configure for specific type using Of<T>()
-knockOff.Deserialize.Of<User>().OnCall = (ko, json) =>
-    JsonSerializer.Deserialize<User>(json)!;
+knockOff.Deserialize.Of<GenUser>().OnCall = (ko, json) =>
+    new GenUser { Id = 1, Name = "FromJson" };
 
-knockOff.Deserialize.Of<Order>().OnCall = (ko, json) =>
-    new Order { Id = 123 };
+knockOff.Deserialize.Of<GenOrder>().OnCall = (ko, json) =>
+    new GenOrder { Id = 123 };
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Per-Type Call Tracking
 
-<!-- pseudo:generic-method-tracking -->
-```csharp
-ISerializer service = knockOff;
+<!-- snippet: generics-generic-method-tracking -->
+```cs
+IGenSerializer service = knockOff;
 
-service.Deserialize<User>("{...}");
-service.Deserialize<User>("{...}");
-service.Deserialize<Order>("{...}");
+service.Deserialize<GenUser>("{...}");
+service.Deserialize<GenUser>("{...}");
+service.Deserialize<GenOrder>("{...}");
 
 // Per-type tracking
-Assert.Equal(2, knockOff.Deserialize.Of<User>().CallCount);
-Assert.Equal(1, knockOff.Deserialize.Of<Order>().CallCount);
+Assert.Equal(2, knockOff.Deserialize.Of<GenUser>().CallCount);
+Assert.Equal(1, knockOff.Deserialize.Of<GenOrder>().CallCount);
 
 // Aggregate tracking across all type arguments
 Assert.Equal(3, knockOff.Deserialize.TotalCallCount);
@@ -238,50 +238,53 @@ Assert.True(knockOff.Deserialize.WasCalled);
 
 // See which types were used
 var types = knockOff.Deserialize.CalledTypeArguments;
-// Returns: [typeof(User), typeof(Order)]
+// Returns: [typeof(GenUser), typeof(GenOrder)]
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Multiple Type Parameters
 
-<!-- pseudo:generic-method-multi-param -->
-```csharp
-public interface IConverter
+<!-- snippet: generics-generic-method-multi-param -->
+```cs
+public interface IGenConverter
 {
     TOut Convert<TIn, TOut>(TIn input);
 }
 
 [KnockOff]
-public partial class ConverterKnockOff : IConverter { }
+public partial class GenConverterKnockOff : IGenConverter { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
-<!-- pseudo:generic-method-multi-usage -->
-```csharp
+<!-- snippet: generics-generic-method-multi-usage -->
+```cs
 knockOff.Convert.Of<string, int>().OnCall = (ko, s) => s.Length;
 knockOff.Convert.Of<int, string>().OnCall = (ko, i) => i.ToString();
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Constrained Generic Methods
 
 Type constraints are preserved on the `.Of<T>()` method:
 
-<!-- pseudo:generic-method-constrained -->
-```csharp
-public interface IEntityFactory
+<!-- snippet: generics-generic-method-constrained -->
+```cs
+public interface IGenEntityFactory
 {
-    T Create<T>() where T : class, IEntity, new();
+    T Create<T>() where T : class, IGenEntity, new();
 }
-```
-<!-- /snippet -->
 
-<!-- pseudo:generic-method-constrained-usage -->
-```csharp
-// Constraints enforced at compile time
-knockOff.Create.Of<Employee>().OnCall = (ko) => new Employee();
+[KnockOff]
+public partial class GenEntityFactoryKnockOff : IGenEntityFactory { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
+
+<!-- snippet: generics-generic-method-constrained-usage -->
+```cs
+// Constraints enforced at compile time
+knockOff.Create.Of<GenEmployee>().OnCall = (ko) => new GenEmployee();
+```
+<!-- endSnippet -->
 
 ### Smart Defaults
 
@@ -398,6 +401,7 @@ public partial class GenericEntityRepoStub<T> : IGenericEntityRepo<T>
 
 The stub class must have the **same number of type parameters** as the interface. Mismatched arity produces diagnostic `KO0008`:
 
+<!-- invalid:generics-ko0008 -->
 ```csharp
 // Error KO0008: Type parameter count mismatch
 [KnockOff]
@@ -407,6 +411,7 @@ public partial class BadStub<T, TExtra> : IRepository<T> { }  // 2 vs 1
 [KnockOff]
 public partial class GoodStub<T> : IRepository<T> { }  // 1 vs 1
 ```
+<!-- /snippet -->
 
 ## Choosing Between Patterns
 

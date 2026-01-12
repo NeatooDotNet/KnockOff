@@ -172,51 +172,38 @@ public partial class GuideDataServiceKnockOff : IGuideDataService { }
 ```
 <!-- endSnippet -->
 
-<!-- pseudo:viewmodel-event-tests -->
-```csharp
-[Fact]
-public void ViewModel_SubscribesToDataService_Events()
-{
-    var knockOff = new GuideDataServiceKnockOff();
-    var viewModel = new MyViewModel(knockOff.AsIGuideDataService());
+<!-- snippet: events-viewmodel-event-tests -->
+```cs
+var knockOff = new GuideDataServiceKnockOff();
+IGuideDataService service = knockOff;
+var viewModel = new GuideViewModel(service);
 
-    // ViewModel should have subscribed
-    Assert.True(knockOff.DataChanged.HasSubscribers);
-    Assert.Equal(1, knockOff.DataChanged.AddCount);
-}
+// ViewModel should have subscribed
+Assert.True(knockOff.DataChanged.HasSubscribers);
+Assert.Equal(1, knockOff.DataChanged.AddCount);
 
-[Fact]
-public void ViewModel_UpdatesOnDataChanged()
-{
-    var knockOff = new GuideDataServiceKnockOff();
-    var viewModel = new MyViewModel(knockOff.AsIGuideDataService());
+// Simulate data change
+knockOff.DataChanged.Raise(null, new DataChangedEventArgs { NewValue = 42 });
 
-    // Simulate data change
-    knockOff.DataChanged.Raise(null, new DataChangedEventArgs { NewValue = 42 });
-
-    Assert.Equal(42, viewModel.CurrentValue);
-}
+Assert.Equal(42, viewModel.CurrentValue);
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Testing Event Unsubscription
 
-<!-- pseudo:viewmodel-unsubscribe-test -->
-```csharp
-[Fact]
-public void ViewModel_Dispose_UnsubscribesFromEvents()
-{
-    var knockOff = new GuideDataServiceKnockOff();
-    var viewModel = new MyViewModel(knockOff.AsIGuideDataService());
+<!-- snippet: events-viewmodel-unsubscribe-test -->
+```cs
+var knockOff = new GuideDataServiceKnockOff();
+IGuideDataService service = knockOff;
+var viewModel = new GuideViewModel(service);
 
-    Assert.Equal(1, knockOff.DataChanged.AddCount);
+Assert.Equal(1, knockOff.DataChanged.AddCount);
 
-    viewModel.Dispose();
+viewModel.Dispose();
 
-    Assert.Equal(1, knockOff.DataChanged.RemoveCount);
-}
+Assert.Equal(1, knockOff.DataChanged.RemoveCount);
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 ### Progress Reporting
 

@@ -11,6 +11,7 @@
 /// - docs:properties:computed-property
 /// - docs:properties:tracking-changes
 /// - docs:properties:throwing-on-access
+/// - properties-set-only-property-interface
 ///
 /// Corresponding tests: PropertiesSamplesTests.cs
 /// </summary>
@@ -43,6 +44,20 @@ public interface IPropConfig
 
 [KnockOff]
 public partial class PropConfigKnockOff : IPropConfig { }
+#endregion
+
+// ============================================================================
+// Set-Only Properties
+// ============================================================================
+
+#region properties-set-only-property-interface
+public interface IPropLogger
+{
+    string Output { set; }
+}
+
+[KnockOff]
+public partial class PropLoggerKnockOff : IPropLogger { }
 #endregion
 
 // ============================================================================

@@ -64,14 +64,17 @@ knockOff.ConnectionString.OnGet = (ko) => Environment.GetEnvironmentVariable("DB
 
 ### Set-Only Properties
 
-<!-- pseudo:set-only-property-interface -->
-```csharp
-public interface ILogger
+<!-- snippet: properties-set-only-property-interface -->
+```cs
+public interface IPropLogger
 {
     string Output { set; }
 }
+
+[KnockOff]
+public partial class PropLoggerKnockOff : IPropLogger { }
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 For set-only properties:
 - Only `OnSet` callback and `SetCount`/`LastSetValue` are available

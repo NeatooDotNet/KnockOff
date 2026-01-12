@@ -189,6 +189,41 @@ public partial class GenericEntityRepoStub<T> : IGenericEntityRepo<T>
 #endregion
 
 // ============================================================================
+// Generic Methods (Of<T>() pattern)
+// ============================================================================
+
+#region generics-generic-method-interface
+public interface IGenSerializer
+{
+    T Deserialize<T>(string json);
+    void Process<T>(T value);
+}
+
+[KnockOff]
+public partial class GenSerializerKnockOff : IGenSerializer { }
+#endregion
+
+#region generics-generic-method-multi-param
+public interface IGenConverter
+{
+    TOut Convert<TIn, TOut>(TIn input);
+}
+
+[KnockOff]
+public partial class GenConverterKnockOff : IGenConverter { }
+#endregion
+
+#region generics-generic-method-constrained
+public interface IGenEntityFactory
+{
+    T Create<T>() where T : class, IGenEntity, new();
+}
+
+[KnockOff]
+public partial class GenEntityFactoryKnockOff : IGenEntityFactory { }
+#endregion
+
+// ============================================================================
 // Usage Examples
 // ============================================================================
 
@@ -340,4 +375,78 @@ public static class GenericsUsageExamples
 
         _ = result;
     }
+
+    // ========================================================================
+    // Generic Method Examples (Of<T>() pattern)
+    // ========================================================================
+
+    public static void GenericMethodConfig()
+    {
+        #region generics-generic-method-config
+        var knockOff = new GenSerializerKnockOff();
+
+        // Configure for specific type using Of<T>()
+        knockOff.Deserialize.Of<GenUser>().OnCall = (ko, json) =>
+            new GenUser { Id = 1, Name = "FromJson" };
+
+        knockOff.Deserialize.Of<GenOrder>().OnCall = (ko, json) =>
+            new GenOrder { Id = 123 };
+        #endregion
+    }
+
+    public static void GenericMethodTracking()
+    {
+        var knockOff = new GenSerializerKnockOff();
+        knockOff.Deserialize.Of<GenUser>().OnCall = (ko, json) => new GenUser();
+        knockOff.Deserialize.Of<GenOrder>().OnCall = (ko, json) => new GenOrder();
+
+        #region generics-generic-method-tracking
+        IGenSerializer service = knockOff;
+
+        service.Deserialize<GenUser>("{...}");
+        service.Deserialize<GenUser>("{...}");
+        service.Deserialize<GenOrder>("{...}");
+
+        // Per-type tracking
+        Assert.Equal(2, knockOff.Deserialize.Of<GenUser>().CallCount);
+        Assert.Equal(1, knockOff.Deserialize.Of<GenOrder>().CallCount);
+
+        // Aggregate tracking across all type arguments
+        Assert.Equal(3, knockOff.Deserialize.TotalCallCount);
+        Assert.True(knockOff.Deserialize.WasCalled);
+
+        // See which types were used
+        var types = knockOff.Deserialize.CalledTypeArguments;
+        // Returns: [typeof(GenUser), typeof(GenOrder)]
+        #endregion
+
+        _ = types;
+    }
+
+    public static void GenericMethodMultiUsage()
+    {
+        var knockOff = new GenConverterKnockOff();
+
+        #region generics-generic-method-multi-usage
+        knockOff.Convert.Of<string, int>().OnCall = (ko, s) => s.Length;
+        knockOff.Convert.Of<int, string>().OnCall = (ko, i) => i.ToString();
+        #endregion
+    }
+
+    public static void GenericMethodConstrainedUsage()
+    {
+        var knockOff = new GenEntityFactoryKnockOff();
+
+        #region generics-generic-method-constrained-usage
+        // Constraints enforced at compile time
+        knockOff.Create.Of<GenEmployee>().OnCall = (ko) => new GenEmployee();
+        #endregion
+    }
+}
+
+// Minimal Assert class for compilation (tests use xUnit)
+file static class Assert
+{
+    public static void Equal<T>(T expected, T actual) { }
+    public static void True(bool condition) { }
 }

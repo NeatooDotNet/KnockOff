@@ -146,6 +146,54 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
     }
 
     // ========================================================================
+    // docs:customization-patterns:callback-ko-access
+    // ========================================================================
+
+    [Fact]
+    public void CallbackKoAccess_CanAccessOtherInterceptors()
+    {
+        var knockOff = new PatternKoAccessServiceKnockOff();
+        IPatternKoAccessService service = knockOff;
+
+        knockOff.GetUser.OnCall = (ko, id) =>
+        {
+            // Access other interceptors
+            if (ko.Initialize.WasCalled)
+                return new PatternUser { Id = id, Name = "Initialized" };
+
+            return new PatternUser { Id = id, Name = "Not Initialized" };
+        };
+
+        // Before Initialize is called
+        var user1 = service.GetUser(1);
+        Assert.Equal("Not Initialized", user1.Name);
+
+        // After Initialize is called
+        service.Initialize();
+        var user2 = service.GetUser(2);
+        Assert.Equal("Initialized", user2.Name);
+    }
+
+    [Fact]
+    public void CallbackKoAccess_CanAccessBackingFields()
+    {
+        var knockOff = new PatternKoAccessServiceKnockOff();
+        IPatternKoAccessService service = knockOff;
+
+        // Set up backing field value
+        knockOff.Name.Value = "Test Name";
+
+        knockOff.GetUser.OnCall = (ko, id) =>
+        {
+            // Access backing fields via interceptor
+            return new PatternUser { Id = id, Name = ko.Name.Value };
+        };
+
+        var user = service.GetUser(1);
+        Assert.Equal("Test Name", user.Name);
+    }
+
+    // ========================================================================
     // docs:customization-patterns:callback-indexer
     // ========================================================================
 
