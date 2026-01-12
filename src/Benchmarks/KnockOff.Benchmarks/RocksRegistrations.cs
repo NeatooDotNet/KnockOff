@@ -16,11 +16,7 @@ using Rocks;
 [assembly: Rock(typeof(ILargeService), BuildType.Make)]
 [assembly: Rock(typeof(IOrderService), BuildType.Make)]
 
-// Framework Comparison Benchmark interfaces (matches docs/framework-comparison.md)
-[assembly: Rock(typeof(IFcBenchOrderRepository), BuildType.Create)]
-[assembly: Rock(typeof(IFcBenchPaymentService), BuildType.Create)]
-[assembly: Rock(typeof(IFcBenchNotificationService), BuildType.Create)]
-[assembly: Rock(typeof(IFcBenchInventoryService), BuildType.Create)]
+// Framework Comparison Benchmark interfaces (matches README Scenario 2: Cached Repository)
 [assembly: Rock(typeof(IFcBenchProductRepository), BuildType.Create)]
 [assembly: Rock(typeof(IFcBenchCacheService), BuildType.Create)]
 [assembly: Rock(typeof(IFcBenchLogger), BuildType.Create)]

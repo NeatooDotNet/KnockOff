@@ -24,19 +24,9 @@ namespace KnockOff.Benchmarks.Interfaces
 			{
 			}
 			
-			public global::KnockOff.Benchmarks.Interfaces.Order? GetOrder(int @orderId)
+			public global::KnockOff.Benchmarks.Interfaces.Order GetOrder(int @id)
 			{
 				return default!;
-			}
-			public global::System.Collections.Generic.IEnumerable<global::KnockOff.Benchmarks.Interfaces.Order> GetOrdersByCustomer(int @customerId)
-			{
-				return default!;
-			}
-			public void SaveOrder(global::KnockOff.Benchmarks.Interfaces.Order @order)
-			{
-			}
-			public void DeleteOrder(int @orderId)
-			{
 			}
 			public bool ValidateOrder(global::KnockOff.Benchmarks.Interfaces.Order @order)
 			{
@@ -45,6 +35,9 @@ namespace KnockOff.Benchmarks.Interfaces
 			public decimal CalculateTotal(global::KnockOff.Benchmarks.Interfaces.Order @order)
 			{
 				return default!;
+			}
+			public void SaveOrder(global::KnockOff.Benchmarks.Interfaces.Order @order)
+			{
 			}
 		}
 	}

@@ -1,5 +1,7 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
+using KnockOff.Benchmarks.Interfaces;
+using KnockOff.Benchmarks.Stubs;
 using Moq;
 using Rocks;
 
@@ -10,147 +12,81 @@ using Rocks;
 namespace KnockOff.Benchmarks.Benchmarks;
 
 /// <summary>
-/// Benchmarks matching the exact scenarios from docs/framework-comparison.md.
-/// These measure realistic multi-dependency test scenarios.
+/// Benchmarks matching the exact scenarios from README.md.
+/// These measure realistic test scenarios as shown in the documentation.
 /// </summary>
 [MemoryDiagnoser]
 [SimpleJob(RuntimeMoniker.Net90)]
 public class FrameworkComparisonBenchmarks
 {
     // ========================================================================
-    // Scenario 1: Order Processing - Success Path
-    // 4 dependencies: order repo, payment service, notification, inventory
+    // Scenario 1: Order Processing (matches README "Scenario 1: Order Processing")
+    // Single IOrderService dependency with GetOrder, ValidateOrder, CalculateTotal, SaveOrder
     // ========================================================================
 
     [Benchmark(Baseline = true)]
-    public bool OrderProcessing_Success_Moq()
+    public void Moq_TypicalUnitTest()
     {
         // Arrange
-        var order = new FcBenchOrder
-        {
-            Id = 1,
-            CustomerId = 100,
-            Amount = 99.99m,
-            Items = [new FcBenchOrderItem { ProductId = 1, Quantity = 2, UnitPrice = 49.99m }]
-        };
+        var mock = new Mock<IOrderService>();
+        mock.Setup(x => x.GetOrder(It.IsAny<int>()))
+            .Returns((int id) => new Order { Id = id, CustomerId = 1 });
+        mock.Setup(x => x.ValidateOrder(It.IsAny<Order>())).Returns(true);
+        mock.Setup(x => x.CalculateTotal(It.IsAny<Order>())).Returns(100m);
 
-        var orderRepo = new Mock<IFcBenchOrderRepository>();
-        orderRepo.Setup(x => x.GetById(1)).Returns(order);
-
-        var paymentService = new Mock<IFcBenchPaymentService>();
-        paymentService
-            .Setup(x => x.ProcessPayment(100, 99.99m))
-            .Returns(new FcBenchPaymentResult { Success = true, TransactionId = "TXN-123" });
-
-        var notificationService = new Mock<IFcBenchNotificationService>();
-        var inventoryService = new Mock<IFcBenchInventoryService>();
-        inventoryService
-            .Setup(x => x.ReserveItems(It.IsAny<IEnumerable<FcBenchOrderItem>>()))
-            .Returns(true);
-
-        var processor = new FcBenchOrderProcessor(
-            orderRepo.Object,
-            paymentService.Object,
-            notificationService.Object,
-            inventoryService.Object);
+        var sut = new OrderProcessor(mock.Object);
 
         // Act
-        var result = processor.ProcessOrder(1);
+        sut.Process(1);
 
         // Assert
-        orderRepo.Verify(x => x.Save(It.Is<FcBenchOrder>(o => o.Status == "Completed")), Times.Once);
-        notificationService.Verify(x => x.SendOrderConfirmation(100, 1), Times.Once);
-        inventoryService.Verify(x => x.ReleaseItems(It.IsAny<IEnumerable<FcBenchOrderItem>>()), Times.Never);
-
-        return result;
+        mock.Verify(x => x.GetOrder(1), Times.Once);
+        mock.Verify(x => x.ValidateOrder(It.IsAny<Order>()), Times.Once);
+        mock.Verify(x => x.SaveOrder(It.IsAny<Order>()), Times.Once);
     }
 
     [Benchmark]
-    public bool OrderProcessing_Success_KnockOff()
+    public void KnockOff_TypicalUnitTest()
     {
         // Arrange
-        var order = new FcBenchOrder
-        {
-            Id = 1,
-            CustomerId = 100,
-            Amount = 99.99m,
-            Items = [new FcBenchOrderItem { ProductId = 1, Quantity = 2, UnitPrice = 49.99m }]
-        };
+        var stub = new OrderServiceStub();
+        stub.GetOrder.OnCall = (ko, id) => new Order { Id = id, CustomerId = 1 };
+        stub.ValidateOrder.OnCall = (ko, _) => true;
+        stub.CalculateTotal.OnCall = (ko, _) => 100m;
 
-        var orderRepo = new FcBenchOrderRepositoryStub();
-        orderRepo.GetById.OnCall = (ko, id) => order;
-
-        var paymentService = new FcBenchPaymentServiceStub();
-        paymentService.ProcessPayment.OnCall = (ko, customerId, amount) =>
-            new FcBenchPaymentResult { Success = true, TransactionId = "TXN-123" };
-
-        var notificationService = new FcBenchNotificationServiceStub();
-
-        var inventoryService = new FcBenchInventoryServiceStub();
-        inventoryService.ReserveItems.OnCall = (ko, items) => true;
-
-        var processor = new FcBenchOrderProcessor(
-            orderRepo,
-            paymentService,
-            notificationService,
-            inventoryService);
+        var sut = new OrderProcessor(stub);
 
         // Act
-        var result = processor.ProcessOrder(1);
+        sut.Process(1);
 
         // Assert
-        _ = orderRepo.Save.CallCount == 1;
-        _ = orderRepo.Save.LastCallArg?.Status == "Completed";
-        _ = notificationService.SendOrderConfirmation.CallCount == 1;
-        _ = inventoryService.ReleaseItems.CallCount == 0;
-
-        return result;
+        _ = stub.GetOrder.CallCount == 1;
+        _ = stub.ValidateOrder.CallCount == 1;
+        _ = stub.SaveOrder.CallCount == 1;
     }
 
     [Benchmark]
-    public bool OrderProcessing_Success_Rocks()
+    public void Rocks_TypicalUnitTest()
     {
         // Arrange
-        var order = new FcBenchOrder
-        {
-            Id = 1,
-            CustomerId = 100,
-            Amount = 99.99m,
-            Items = [new FcBenchOrderItem { ProductId = 1, Quantity = 2, UnitPrice = 49.99m }]
-        };
+        var expectations = new IOrderServiceCreateExpectations();
+        expectations.Methods.GetOrder(Arg.Any<int>())
+            .Callback((int id) => new Order { Id = id, CustomerId = 1 });
+        expectations.Methods.ValidateOrder(Arg.Any<Order>()).ReturnValue(true);
+        expectations.Methods.CalculateTotal(Arg.Any<Order>()).ReturnValue(100m);
+        expectations.Methods.SaveOrder(Arg.Any<Order>());
 
-        var orderRepoExpectations = new IFcBenchOrderRepositoryCreateExpectations();
-        orderRepoExpectations.Methods.GetById(Arg.Any<int>()).ReturnValue(order);
-        orderRepoExpectations.Methods.Save(Arg.Any<FcBenchOrder>()).ExpectedCallCount(1);
-
-        var paymentExpectations = new IFcBenchPaymentServiceCreateExpectations();
-        paymentExpectations.Methods.ProcessPayment(Arg.Any<int>(), Arg.Any<decimal>())
-            .ReturnValue(new FcBenchPaymentResult { Success = true, TransactionId = "TXN-123" });
-
-        var notificationExpectations = new IFcBenchNotificationServiceCreateExpectations();
-        notificationExpectations.Methods.SendOrderConfirmation(Arg.Any<int>(), Arg.Any<int>()).ExpectedCallCount(1);
-
-        var inventoryExpectations = new IFcBenchInventoryServiceCreateExpectations();
-        inventoryExpectations.Methods.ReserveItems(Arg.Any<IEnumerable<FcBenchOrderItem>>()).ReturnValue(true);
-
-        var processor = new FcBenchOrderProcessor(
-            orderRepoExpectations.Instance(),
-            paymentExpectations.Instance(),
-            notificationExpectations.Instance(),
-            inventoryExpectations.Instance());
+        var sut = new OrderProcessor(expectations.Instance());
 
         // Act
-        var result = processor.ProcessOrder(1);
+        sut.Process(1);
 
         // Assert
-        orderRepoExpectations.Verify();
-        notificationExpectations.Verify();
-
-        return result;
+        expectations.Verify();
     }
 
     // ========================================================================
-    // Scenario 2: Cached Repository - Cache Miss (more complex path)
+    // Scenario 2: Cached Repository - Cache Miss (matches README "Scenario 2")
     // 3 dependencies: repository, cache, logger
     // ========================================================================
 
@@ -246,133 +182,7 @@ public class FrameworkComparisonBenchmarks
 }
 
 // ============================================================================
-// Domain Types - Order Processing (matches framework-comparison samples)
-// ============================================================================
-
-public class FcBenchOrder
-{
-    public int Id { get; set; }
-    public int CustomerId { get; set; }
-    public decimal Amount { get; set; }
-    public string? Status { get; set; }
-    public List<FcBenchOrderItem> Items { get; set; } = [];
-}
-
-public class FcBenchOrderItem
-{
-    public int ProductId { get; set; }
-    public int Quantity { get; set; }
-    public decimal UnitPrice { get; set; }
-}
-
-public class FcBenchPaymentResult
-{
-    public bool Success { get; set; }
-    public string? TransactionId { get; set; }
-    public string? ErrorMessage { get; set; }
-}
-
-// ============================================================================
-// Interfaces - Order Processing
-// ============================================================================
-
-public interface IFcBenchOrderRepository
-{
-    FcBenchOrder? GetById(int id);
-    void Save(FcBenchOrder order);
-}
-
-public interface IFcBenchPaymentService
-{
-    FcBenchPaymentResult ProcessPayment(int customerId, decimal amount);
-}
-
-public interface IFcBenchNotificationService
-{
-    void SendOrderConfirmation(int customerId, int orderId);
-    void SendPaymentFailure(int customerId, string reason);
-}
-
-public interface IFcBenchInventoryService
-{
-    bool ReserveItems(IEnumerable<FcBenchOrderItem> items);
-    void ReleaseItems(IEnumerable<FcBenchOrderItem> items);
-}
-
-// ============================================================================
-// KnockOff Stubs - Order Processing
-// ============================================================================
-
-[KnockOff]
-public partial class FcBenchOrderRepositoryStub : IFcBenchOrderRepository { }
-
-[KnockOff]
-public partial class FcBenchPaymentServiceStub : IFcBenchPaymentService { }
-
-[KnockOff]
-public partial class FcBenchNotificationServiceStub : IFcBenchNotificationService { }
-
-[KnockOff]
-public partial class FcBenchInventoryServiceStub : IFcBenchInventoryService { }
-
-// ============================================================================
-// System Under Test - Order Processing
-// ============================================================================
-
-public class FcBenchOrderProcessor
-{
-    private readonly IFcBenchOrderRepository _orderRepository;
-    private readonly IFcBenchPaymentService _paymentService;
-    private readonly IFcBenchNotificationService _notificationService;
-    private readonly IFcBenchInventoryService _inventoryService;
-
-    public FcBenchOrderProcessor(
-        IFcBenchOrderRepository orderRepository,
-        IFcBenchPaymentService paymentService,
-        IFcBenchNotificationService notificationService,
-        IFcBenchInventoryService inventoryService)
-    {
-        _orderRepository = orderRepository;
-        _paymentService = paymentService;
-        _notificationService = notificationService;
-        _inventoryService = inventoryService;
-    }
-
-    public bool ProcessOrder(int orderId)
-    {
-        var order = _orderRepository.GetById(orderId);
-        if (order == null)
-            return false;
-
-        // Reserve inventory
-        if (!_inventoryService.ReserveItems(order.Items))
-        {
-            order.Status = "InventoryUnavailable";
-            _orderRepository.Save(order);
-            return false;
-        }
-
-        // Process payment
-        var paymentResult = _paymentService.ProcessPayment(order.CustomerId, order.Amount);
-        if (!paymentResult.Success)
-        {
-            _inventoryService.ReleaseItems(order.Items);
-            _notificationService.SendPaymentFailure(order.CustomerId, paymentResult.ErrorMessage ?? "Unknown error");
-            order.Status = "PaymentFailed";
-            _orderRepository.Save(order);
-            return false;
-        }
-
-        // Success
-        order.Status = "Completed";
-        _orderRepository.Save(order);
-        _notificationService.SendOrderConfirmation(order.CustomerId, order.Id);
-        return true;
-    }
-}
-
-// ============================================================================
-// Domain Types - Repository with Caching
+// Domain Types - Repository with Caching (matches README Scenario 2)
 // ============================================================================
 
 public class FcBenchProduct

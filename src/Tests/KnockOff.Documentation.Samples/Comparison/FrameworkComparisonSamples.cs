@@ -14,7 +14,47 @@ using Rocks;
 namespace KnockOff.Documentation.Samples.Comparison;
 
 // ============================================================================
-// Scenario 1: Order Processing
+// README Side-by-Side Example (Simple)
+// A minimal example for the README introduction
+// ============================================================================
+
+#region readme-side-by-side-types
+public class Order
+{
+    public int Id { get; set; }
+    public int CustomerId { get; set; }
+    public decimal Total { get; set; }
+}
+
+public interface IOrderService
+{
+    Order GetOrder(int id);
+    bool ValidateOrder(Order order);
+    decimal CalculateTotal(Order order);
+    void SaveOrder(Order order);
+}
+
+public class OrderProcessor(IOrderService orderService)
+{
+    public void Process(int orderId)
+    {
+        var order = orderService.GetOrder(orderId);
+        if (orderService.ValidateOrder(order))
+        {
+            order.Total = orderService.CalculateTotal(order);
+            orderService.SaveOrder(order);
+        }
+    }
+}
+#endregion
+
+#region readme-side-by-side-knockoff-stub
+[KnockOff]
+public partial class OrderServiceStub : IOrderService { }
+#endregion
+
+// ============================================================================
+// Scenario 1: Order Processing (Complex)
 // A business scenario with validation, payment, and notification services
 // ============================================================================
 

@@ -1,6 +1,8 @@
 # KnockOff
 
-A Roslyn Source Generator for creating unit test stubs. Unlike Moq's fluent runtime configuration, KnockOff uses partial classes for compile-time setup—trading flexibility for readability and performance.
+KnockOff uses a Roslyn Source Generator for creating unit test stubs. The generated code fully implements all interface members automatically. Then you customize their behavior per stub or per test. KnockOff supports interfaces, classes, and delegates via [two approaches](#quick-example): inline stubs with `[KnockOff<T>]` or stand-alone stubs implementing the target type.
+
+This entire repository—code and documentation—was written by Claude Code AI with my ideas and guidance. A working version took a couple of weeks. This was an idea I carried for years. It's an exciting new era!
 
 ## Why KnockOff? Your Tests Run Faster
 
@@ -10,71 +12,129 @@ KnockOff has the benefits of source generation—no runtime reflection, no Castl
 |----------|-----|----------|---------|
 | Method invocation | 216 ns | 0.4 ns | **500x faster** |
 | Create 1000 stubs | 745 μs | 5.6 μs | **133x faster** |
-| Typical unit test | 230 μs | 76 ns | **3,000x faster** |
-
-**Zero allocations on invocations.** Moq allocates 288-408 bytes per call for its interception machinery. KnockOff generates direct method calls—no allocations, no GC pressure.
+| Typical unit test | 226 μs | 50 ns | **4,500x faster** |
 
 **What this means for your test suite:**
 - A project with 5,000 tests using mocks could see test runs drop from minutes to seconds
 - CI/CD pipelines complete faster, giving you quicker feedback
 - Local test runs feel instant, encouraging you to run tests more often
 
-## Compile-Time Advantages
+## Performance Benchmarks
 
-KnockOff generates real C# code. This unlocks benefits that runtime mocking frameworks can't provide.
+Benchmarks compare KnockOff against [Moq](https://github.com/moq/moq), the industry-standard mocking framework, and [Rocks](https://github.com/JasonBock/Rocks), another source-generated alternative. KnockOff has [limitations vs Moq](#limitations-vs-moq), but for many test scenarios the tradeoff is worth it.
 
-### Compile-Time Safety
+```
+BenchmarkDotNet v0.14.0, Ubuntu 24.04.3 LTS (WSL)
+Intel Core i7-11800H 2.30GHz, .NET 9.0.11
 
-When an interface changes, KnockOff fails at compile time. Moq fails at runtime.
-
-```csharp
-// IUserService adds a new method: Task<User> GetUserAsync(int id);
-
-// Moq: Compiles fine, fails at runtime in CI
-var mock = new Mock<IUserService>();
-mock.Setup(x => x.GetUser(1)).Returns(new User());  // Oops, missed GetUserAsync
-
-// KnockOff: Compiler error immediately
-[KnockOff]
-public partial class UserServiceKnockOff : IUserService { }
-// CS0535: 'UserServiceKnockOff' does not implement interface member 'IUserService.GetUserAsync(int)'
+| Method                              | Mean         | Allocated |
+|------------------------------------ |-------------:|----------:|
+| Moq_TypicalUnitTest                 | 225,992.6 ns |   38,159 B |
+| KnockOff_TypicalUnitTest            |      49.7 ns |      232 B |
+| Rocks_TypicalUnitTest               |     663.0 ns |    2,360 B |
+| CachedRepository_CacheMiss_Moq      | 475,506.4 ns |   45,004 B |
+| CachedRepository_CacheMiss_KnockOff |     408.7 ns |    1,576 B |
+| CachedRepository_CacheMiss_Rocks    |     903.2 ns |    3,112 B |
 ```
 
-### Full IDE Support
+### Analysis
 
-Source-generated code means full IntelliSense, Ctrl+Click navigation, and refactoring:
+| Scenario | KnockOff vs Moq | Rocks vs Moq |
+|----------|-----------------|--------------|
+| Typical Unit Test | **4,549x faster**, 165x less memory | 341x faster, 16x less memory |
+| Cached Repository | **1,163x faster**, 29x less memory | 527x faster, 14x less memory |
 
-- **Rename a method?** All stubs update automatically
-- **Find all references?** Includes stub usages
-- **Hover for docs?** Shows parameter names and types
+### Generated Code Size
 
-### Debuggable Stubs
+Source generators add code to your project. Less generated code means faster builds.
 
-Set breakpoints in your user-defined methods. Step through your stub logic like normal code.
+| Scenario | KnockOff | Rocks |
+|----------|----------|-------|
+| Typical Unit Test (1 interface) | 141 lines | 324 lines |
+| Cached Repository (3 interfaces) | 451 lines | 880 lines |
 
-```csharp
-[KnockOff]
-public partial class RepositoryKnockOff : IRepository
+KnockOff generates ~2x less code than Rocks for equivalent functionality.
+
+**Why the difference?**
+
+- **Moq** uses runtime reflection, expression tree compilation, and Castle.Core dynamic proxy generation
+- **Rocks** generates code at compile-time but creates expectation tracking infrastructure per-test
+- **KnockOff** generates minimal stub classes with direct delegate invocation and no verification overhead
+
+For large test suites (1000+ tests), these differences compound significantly. A test suite taking *30 seconds* with Moq might complete in under *1 second* with KnockOff.
+
+## At a Glance: Moq vs KnockOff vs Rocks
+
+### Setup Style
+
+| Framework | Pattern |
+|-----------|---------|
+| Moq | `mock.Setup(x => x.Method()).Returns(value)` |
+| KnockOff | `stub.Method.OnCall = (ko, args) => value` |
+| Rocks | `expectations.Methods.Method().ReturnValue(value)` |
+
+### Verification Style
+
+| Framework | Pattern |
+|-----------|---------|
+| Moq | `mock.Verify(x => x.Method(), Times.Once)` |
+| KnockOff | `Assert.Equal(1, stub.Method.CallCount)` |
+| Rocks | `expectations.Verify()` (checks all expectations) |
+
+### Argument Access
+
+| Framework | Pattern |
+|-----------|---------|
+| Moq | Callback capture: `Callback<T>(x => captured = x)` |
+| KnockOff | Automatic: `stub.Method.LastCallArg` or `LastCallArgs` |
+| Rocks | Callback capture in handler |
+
+### Property Setup
+
+| Framework | Pattern |
+|-----------|---------|
+| Moq | `mock.Setup(x => x.Prop).Returns(10)` |
+| KnockOff | `stub.Prop.Value = 10` |
+| Rocks | `expectations.Properties.Getters.Prop().ReturnValue(10)` |
+
+## Side-by-Side Example
+
+<!-- snippet: readme-side-by-side-types -->
+```cs
+public class Order
 {
-    protected User? GetById(int id)
+    public int Id { get; set; }
+    public int CustomerId { get; set; }
+    public decimal Total { get; set; }
+}
+
+public interface IOrderService
+{
+    Order GetOrder(int id);
+    bool ValidateOrder(Order order);
+    decimal CalculateTotal(Order order);
+    void SaveOrder(Order order);
+}
+
+public class OrderProcessor(IOrderService orderService)
+{
+    public void Process(int orderId)
     {
-        // Set a breakpoint here — it works!
-        return _testUsers.FirstOrDefault(u => u.Id == id);
+        var order = orderService.GetOrder(orderId);
+        if (orderService.ValidateOrder(order))
+        {
+            order.Total = orderService.CalculateTotal(order);
+            orderService.SaveOrder(order);
+        }
     }
 }
 ```
-
-With Moq, you're stepping through Castle.Core proxy internals.
-
-## Side-by-Side Examples
-
-### Scenario 1: Order Processing
-
-A typical unit test with a single dependency.
+<!-- endSnippet -->
 
 **Moq**
 
-```csharp
+<!-- snippet: readme-side-by-side-moq -->
+```cs
 [Fact]
 public void OrderProcessor_ProcessesValidOrder_Moq()
 {
@@ -96,10 +156,12 @@ public void OrderProcessor_ProcessesValidOrder_Moq()
     mock.Verify(x => x.SaveOrder(It.IsAny<Order>()), Times.Once);
 }
 ```
+<!-- endSnippet -->
 
 **KnockOff**
 
-```csharp
+<!-- snippet: readme-side-by-side-knockoff -->
+```cs
 [Fact]
 public void OrderProcessor_ProcessesValidOrder_KnockOff()
 {
@@ -120,207 +182,7 @@ public void OrderProcessor_ProcessesValidOrder_KnockOff()
     Assert.Equal(1, stub.SaveOrder.CallCount);
 }
 ```
-
-### Scenario 2: Cached Repository
-
-A data access scenario with async operations and caching.
-
-#### Cache Hit
-
-**Moq**
-
-```csharp
-[Fact]
-public async Task CachedRepository_CacheHit_Moq()
-{
-    // Arrange
-    var cachedProduct = new FcProduct { Id = 1, Name = "Widget", Price = 19.99m };
-
-    var repository = new Mock<IFcProductRepository>();
-    var cache = new Mock<IFcCacheService>();
-    cache.Setup(x => x.Get<FcProduct>("product:1")).Returns(cachedProduct);
-
-    var logger = new Mock<IFcLogger>();
-
-    var service = new FcCachedProductService(
-        repository.Object,
-        cache.Object,
-        logger.Object);
-
-    // Act
-    var result = await service.GetProductAsync(1);
-
-    // Assert
-    Assert.Equal("Widget", result?.Name);
-    repository.Verify(x => x.GetByIdAsync(It.IsAny<int>()), Times.Never);
-    logger.Verify(x => x.LogInfo(It.Is<string>(s => s.Contains("Cache hit"))), Times.Once);
-}
-```
-
-**KnockOff**
-
-```csharp
-[Fact]
-public async Task CachedRepository_CacheHit_KnockOff()
-{
-    // Arrange
-    var cachedProduct = new FcProduct { Id = 1, Name = "Widget", Price = 19.99m };
-
-    var repository = new FcProductRepositoryStub();
-
-    var cache = new FcCacheServiceStub();
-    cache.Get.Of<FcProduct>().OnCall = (ko, key) => cachedProduct;
-
-    var logger = new FcLoggerStub();
-
-    var service = new FcCachedProductService(repository, cache, logger);
-
-    // Act
-    var result = await service.GetProductAsync(1);
-
-    // Assert
-    Assert.Equal("Widget", result?.Name);
-    Assert.Equal(0, repository.GetByIdAsync.CallCount);
-    Assert.True(logger.LogInfo.LastCallArg?.Contains("Cache hit"));
-}
-```
-
-#### Cache Miss
-
-**Moq**
-
-```csharp
-[Fact]
-public async Task CachedRepository_CacheMiss_Moq()
-{
-    // Arrange
-    var product = new FcProduct { Id = 1, Name = "Widget", Price = 19.99m };
-
-    var repository = new Mock<IFcProductRepository>();
-    repository.Setup(x => x.GetByIdAsync(1)).ReturnsAsync(product);
-
-    var cache = new Mock<IFcCacheService>();
-    cache.Setup(x => x.Get<FcProduct>("product:1")).Returns((FcProduct?)null);
-
-    var logger = new Mock<IFcLogger>();
-
-    var service = new FcCachedProductService(
-        repository.Object,
-        cache.Object,
-        logger.Object);
-
-    // Act
-    var result = await service.GetProductAsync(1);
-
-    // Assert
-    Assert.Equal("Widget", result?.Name);
-    repository.Verify(x => x.GetByIdAsync(1), Times.Once);
-    cache.Verify(
-        x => x.Set("product:1", product, It.IsAny<TimeSpan>()),
-        Times.Once);
-    logger.Verify(
-        x => x.LogInfo(It.Is<string>(s => s.Contains("Cache miss"))),
-        Times.Once);
-}
-```
-
-**KnockOff**
-
-```csharp
-[Fact]
-public async Task CachedRepository_CacheMiss_KnockOff()
-{
-    // Arrange
-    var product = new FcProduct { Id = 1, Name = "Widget", Price = 19.99m };
-
-    var repository = new FcProductRepositoryStub();
-    repository.GetByIdAsync.OnCall = (ko, id) => Task.FromResult<FcProduct?>(product);
-
-    var cache = new FcCacheServiceStub();
-    cache.Get.Of<FcProduct>().OnCall = (ko, key) => null;
-
-    var logger = new FcLoggerStub();
-
-    var service = new FcCachedProductService(repository, cache, logger);
-
-    // Act
-    var result = await service.GetProductAsync(1);
-
-    // Assert
-    Assert.Equal("Widget", result?.Name);
-    Assert.Equal(1, repository.GetByIdAsync.CallCount);
-    Assert.Equal(1, cache.Set.Of<FcProduct>().CallCount);
-    Assert.Equal("product:1", cache.Set.Of<FcProduct>().LastCallArg);
-    Assert.True(logger.LogInfo.LastCallArg?.Contains("Cache miss"));
-}
-```
-
-## Performance Benchmarks
-
-Benchmarks run on the exact scenarios shown above, measuring realistic test patterns.
-
-```
-BenchmarkDotNet v0.14.0, Ubuntu 24.04.3 LTS (WSL)
-Intel Core i7-11800H 2.30GHz, .NET 9.0.11
-
-| Method                              | Mean         | Allocated |
-|------------------------------------ |-------------:|----------:|
-| Moq_TypicalUnitTest                 | 229,806.0 ns |   38,303 B |
-| KnockOff_TypicalUnitTest            |      76.0 ns |      400 B |
-| Rocks_TypicalUnitTest               |     727.0 ns |    2,448 B |
-| CachedRepository_CacheMiss_Moq      | 436,504.9 ns |   45,180 B |
-| CachedRepository_CacheMiss_KnockOff |     385.2 ns |    1,576 B |
-| CachedRepository_CacheMiss_Rocks    |     781.2 ns |    3,112 B |
-```
-
-### Analysis
-
-| Scenario | KnockOff vs Moq | Rocks vs Moq |
-|----------|-----------------|--------------|
-| Typical Unit Test | **3,024x faster**, 96x less memory | 316x faster, 16x less memory |
-| Cached Repository | **1,133x faster**, 29x less memory | 559x faster, 15x less memory |
-
-**Why the difference?**
-
-- **Moq** uses runtime reflection, expression tree compilation, and Castle.Core dynamic proxy generation
-- **Rocks** generates code at compile-time but creates expectation tracking infrastructure per-test
-- **KnockOff** generates minimal stub classes with direct delegate invocation and no verification overhead
-
-For large test suites (1000+ tests), these differences compound significantly. A test suite taking 30 seconds with Moq might complete in under 1 second with KnockOff.
-
-### No Lambda Ceremony
-
-Define behavior with normal methods, not expression trees:
-
-```csharp
-// Moq
-mock.Setup(x => x.GetUser(It.IsAny<int>())).Returns((int id) => new User { Id = id });
-mock.Setup(x => x.IsActive).Returns(true);
-mock.Setup(x => x.SaveAsync(It.IsAny<User>())).ReturnsAsync(true);
-
-// KnockOff — just write methods
-protected User GetUser(int id) => new User { Id = id };
-protected bool IsActive => true;
-protected Task<bool> SaveAsync(User user) => Task.FromResult(true);
-```
-
-## Documentation
-
-- [Getting Started](docs/getting-started.md) - Installation and first steps
-- [Customization Patterns](docs/concepts/customization-patterns.md) - The two ways to customize stub behavior
-- [Generic Interfaces](docs/guides/generics.md) - Generic interfaces and standalone stubs
-- [KnockOff vs Moq Comparison](docs/knockoff-vs-moq.md) - Side-by-side comparison for supported scenarios
-- [Migration from Moq](docs/migration-from-moq.md) - Step-by-step migration guide
-- [Diagnostics](docs/diagnostics.md) - Compiler diagnostics and how to resolve them
-- [Release Notes](docs/release-notes/index.md) - Version history
-
-## Concept
-
-Mark a partial class with `[KnockOff]` that implements an interface. The source generator:
-1. Generates explicit interface implementations for all interface members
-2. Tracks invocations via interface-named properties for test verification
-3. Detects user-defined methods in the partial class and calls them from the generated intercepts
-4. Provides `OnCall`/`OnGet`/`OnSet` callbacks for runtime customization
+<!-- endSnippet -->
 
 ## Quick Example
 
@@ -328,12 +190,12 @@ Mark a partial class with `[KnockOff]` that implements an interface. The source 
 
 Add `[KnockOff<T>]` to your test class. Works with interfaces and unsealed classes:
 
-```csharp
-[KnockOff<IUserService>]        // Interface
-[KnockOff<EmailService>]        // Unsealed class (virtual members only)
+<!-- snippet: readme-inline-stubs -->
+```cs
+[KnockOff<IUserService>]
+[KnockOff<EmailService>]
 public partial class UserTests
 {
-    [Fact]
     public void NotifiesUser_WhenOrderShipped()
     {
         // Create stubs
@@ -349,93 +211,184 @@ public partial class UserTests
         service.ShipOrder(orderId: 42, userId: 1);
 
         // Verify
-        Assert.True(userStub.GetUser.WasCalled);
-        Assert.Equal(1, userStub.GetUser.LastCallArg);
-        Assert.Equal("test@example.com", emailStub.Send.LastCallArgs?.to);
+        System.Diagnostics.Debug.Assert(userStub.GetUser.WasCalled);
+        System.Diagnostics.Debug.Assert(userStub.GetUser.LastCallArg == 1);
+        System.Diagnostics.Debug.Assert(emailStub.Send.LastCallArgs?.to == "test@example.com");
     }
 }
 ```
+<!-- endSnippet -->
 
-**Class stubs use composition** — access the target class via `.Object`. Virtual/abstract members are intercepted; non-virtual members accessed through `.Object`.
+**Class stubs use composition** — access the target class via `.Object`. Virtual/abstract members are intercepted; non-virtual members accessed through `.Object`. Constructor parameters are passed through to the base class.
 
 ### Reusable Stubs with Default Behavior
 
 For stubs shared across test files, use the explicit pattern with user-defined methods:
 
-```csharp
+<!-- snippet: readme-reusable-stubs -->
+```cs
 [KnockOff]
 public partial class CalculatorKnockOff : ICalculator
 {
-    // User-defined method — called by generated code
+    // User-defined method - called by generated code
     protected int Add(int a, int b) => a + b;
 
-    // Multiply not defined — returns default(int) = 0
-}
-
-// Every test gets the same behavior
-[Fact]
-public void Test1()
-{
-    var calc = new CalculatorKnockOff();
-    Assert.Equal(5, calc.AsCalculator().Add(2, 3));  // Uses your method
-    Assert.Equal(1, calc.ICalculator.Add.CallCount);
-}
-
-[Fact]
-public void Test2_OverrideForThisTest()
-{
-    var calc = new CalculatorKnockOff();
-    calc.ICalculator.Add.OnCall = (ko, a, b) => 999;  // Override just here
-    Assert.Equal(999, calc.AsCalculator().Add(2, 3));
+    // Multiply not defined - returns default(int) = 0
 }
 ```
+<!-- endSnippet -->
+
+<!-- snippet: readme-reusable-stubs-usage -->
+```cs
+public class CalculatorUsageExample
+{
+    public void Test1()
+    {
+        var calc = new CalculatorKnockOff();
+        ICalculator calculator = calc;
+
+        var result = calculator.Add(2, 3);      // Returns 5 (uses your method)
+        var callCount = calc.Add2.CallCount;    // 1 (Add2: renamed to avoid collision)
+    }
+
+    public void Test2_OverrideForThisTest()
+    {
+        var calc = new CalculatorKnockOff();
+        calc.Add2.OnCall = (ko, a, b) => 999;   // Override just here
+        var result = ((ICalculator)calc).Add(2, 3);  // Returns 999
+    }
+}
+```
+<!-- endSnippet -->
 
 ### Delegate Stubs
 
 Stub named delegates for validation rules, factories, and callbacks:
 
-```csharp
+<!-- snippet: readme-delegate-stubs -->
+```cs
 public delegate bool IsUniqueRule(string value);
 
 [KnockOff<IsUniqueRule>]
 public partial class ValidationTests
 {
-    [Fact]
     public void RejectsNonUniqueName()
     {
         var uniqueCheck = new Stubs.IsUniqueRule();
         uniqueCheck.Interceptor.OnCall = (ko, value) => value != "duplicate";
 
         IsUniqueRule rule = uniqueCheck;  // Implicit conversion
-        Assert.False(rule("duplicate"));
-        Assert.True(uniqueCheck.Interceptor.WasCalled);
+        var result = rule("duplicate");   // Returns false
+        var wasCalled = uniqueCheck.Interceptor.WasCalled;  // true
     }
 }
 ```
+<!-- endSnippet -->
 
-## Verification
+### Properties
 
-```csharp
-var knockOff = new DataServiceKnockOff();
-IDataService service = knockOff;
+Use `.Value` to set a property's return value. Use `OnGet` and `OnSet` when you need dynamic behavior or want to track setter calls:
 
-service.GetDescription(1);
-service.GetDescription(2);
-service.GetDescription(42);
+<!-- snippet: readme-properties -->
+```cs
+public class PropertiesUsageExample
+{
+    public void ConfigureGettersAndSetters()
+    {
+        var stub = new ConfigServiceStub();
+        IConfigService config = stub;
 
-// Check invocation
-Assert.True(knockOff.IDataService.GetDescription.WasCalled);
-Assert.Equal(3, knockOff.IDataService.GetDescription.CallCount);
+        // Simple value - most common pattern
+        stub.ConnectionString.Value = "Server=localhost;Database=test";
 
-// Check arguments
-Assert.Equal(42, knockOff.IDataService.GetDescription.LastCallArg);
+        // Dynamic getter
+        stub.LogLevel.OnGet = (ko) =>
+            Environment.GetEnvironmentVariable("LOG_LEVEL") ?? "Info";
 
-// Check properties
-service.Name = "First";
-service.Name = "Second";
-Assert.Equal(2, knockOff.IDataService.Name.SetCount);
-Assert.Equal("Second", knockOff.IDataService.Name.LastSetValue);
+        // Setter tracking
+        config.LogLevel = "Debug";
+
+        // Verify property access
+        _ = config.ConnectionString;
+        var getCount = stub.ConnectionString.GetCount;     // 1
+        var setCount = stub.LogLevel.SetCount;             // 1
+        var lastValue = stub.LogLevel.LastSetValue;        // "Debug"
+    }
+}
 ```
+<!-- endSnippet -->
+
+### Verification
+
+<!-- snippet: readme-verification -->
+```cs
+public class VerificationUsageExample
+{
+    public void TracksCallsAndArguments()
+    {
+        var stub = new DataServiceStub();
+        stub.GetDescription.OnCall = (ko, id) => $"Item {id}";
+        IDataService service = stub;
+
+        service.GetDescription(1);
+        service.GetDescription(2);
+        service.GetDescription(42);
+
+        // Check invocation
+        var wasCalled = stub.GetDescription.WasCalled;     // true
+        var callCount = stub.GetDescription.CallCount;     // 3
+        var lastArg = stub.GetDescription.LastCallArg;     // 42
+
+        // Check properties
+        service.Name = "First";
+        service.Name = "Second";
+        var setCount = stub.Name.SetCount;                 // 2
+        var lastSetValue = stub.Name.LastSetValue;         // "Second"
+    }
+}
+```
+<!-- endSnippet -->
+
+## Documentation
+
+- [Getting Started](docs/getting-started.md) - Installation and first steps
+- [Customization Patterns](docs/concepts/customization-patterns.md) - The two ways to customize stub behavior
+- [Generic Interfaces](docs/guides/generics.md) - Generic interfaces and standalone stubs
+- [KnockOff vs Moq Comparison](docs/knockoff-vs-moq.md) - Side-by-side comparison for supported scenarios
+- [Migration from Moq](docs/migration-from-moq.md) - Step-by-step migration guide
+- [Diagnostics](docs/diagnostics.md) - Compiler diagnostics and how to resolve them
+- [Release Notes](docs/release-notes/index.md) - Version history
+
+## Compile-Time Advantages
+
+KnockOff generates real C# code. This unlocks benefits that runtime mocking frameworks can't provide.
+
+### Compile-Time Safety
+
+When an interface changes, KnockOff fails at compile time. Moq fails at runtime.
+
+<!-- invalid:readme-compile-time-safety -->
+```csharp
+// IUserService adds a new method: Task<User> GetUserAsync(int id);
+
+// Moq: Compiles fine, fails at runtime in CI
+var mock = new Mock<IUserService>();
+mock.Setup(x => x.GetUser(1)).Returns(new User());  // Oops, missed GetUserAsync
+
+// KnockOff: Compiler error immediately
+[KnockOff]
+public partial class UserServiceKnockOff : IUserService { }
+// CS0535: 'UserServiceKnockOff' does not implement interface member 'IUserService.GetUserAsync(int)'
+```
+<!-- /snippet -->
+
+### Full IDE Support
+
+Source-generated code means full IntelliSense, Ctrl+Click navigation, and refactoring:
+
+- **Rename a method?** All stubs update automatically
+- **Find all references?** Includes stub usages
+- **Hover for docs?** Shows parameter names and types
 
 ## Features
 
@@ -459,10 +412,17 @@ Assert.Equal("Second", knockOff.IDataService.Name.LastSetValue);
 | Generic methods | Supported |
 | ref/out parameters | Supported |
 
+## Limitations vs Moq
+
+KnockOff doesn't support: argument matchers (`It.IsAny<T>`, `It.Is<T>(predicate)`), `SetupSequence`, strict mode, `VerifyNoOtherCalls`, `InSequence` call ordering, `LINQ to Mocks`, `As<T>()` interface addition, recursive auto-mocking, protected member mocking, or `MockRepository`.
+
+**Covered differently:** Moq's `Callback` → `OnCall`; `Returns` → `OnCall` return or `.Value`; `Times.Once` → `Assert.Equal(1, stub.Method.CallCount)`.
+
 ## Limitation: Interfaces with Internal Members
 
 KnockOff **cannot stub interfaces with `internal` members from external assemblies**. This is a C# language constraint, not a tooling limitation.
 
+<!-- pseudo:readme-internal-members -->
 ```csharp
 // In ExternalLibrary.dll
 public interface IEntity
@@ -471,6 +431,7 @@ public interface IEntity
     internal void MarkModified();  // internal - impossible to implement externally
 }
 ```
+<!-- /snippet -->
 
 Internal members are invisible to external assemblies. No C# syntax—implicit or explicit interface implementation—can reference an invisible member. The compiler errors are CS0122 ("inaccessible due to protection level") and CS9044 ("cannot implicitly implement inaccessible member").
 
@@ -485,6 +446,8 @@ For each interface member, KnockOff generates:
 - **`AsXYZ()` helper** for typed interface access
 
 Example generated structure:
+
+<!-- pseudo:readme-generated-code -->
 ```csharp
 public partial class UserServiceKnockOff
 {
@@ -506,6 +469,7 @@ public partial class UserServiceKnockOff
     }
 }
 ```
+<!-- /snippet -->
 
 ## Installation
 

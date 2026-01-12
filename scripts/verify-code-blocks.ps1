@@ -18,7 +18,12 @@ $stats = @{
     Unmarked = 0
 }
 
-Get-ChildItem -Path $DocsPath -Recurse -Include "*.md" -Exclude "*.source.md" | Where-Object {
+# Get all markdown files: README.md in root + docs folder
+$mdFiles = @()
+if (Test-Path "README.md") {
+    $mdFiles += Get-Item "README.md"
+}
+$mdFiles += Get-ChildItem -Path $DocsPath -Recurse -Include "*.md" -Exclude "*.source.md" | Where-Object {
     $path = $_.FullName
     $excluded = $false
     foreach ($dir in $excludeDirs) {
@@ -28,7 +33,9 @@ Get-ChildItem -Path $DocsPath -Recurse -Include "*.md" -Exclude "*.source.md" | 
         }
     }
     -not $excluded
-} | ForEach-Object {
+}
+
+$mdFiles | ForEach-Object {
     $file = $_
     $stats.Files++
     $content = Get-Content $file.FullName -Raw

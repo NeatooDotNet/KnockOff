@@ -13,7 +13,57 @@ namespace KnockOff.Documentation.Samples.Tests.Comparison;
 public class FrameworkComparisonSamplesTests
 {
     // ========================================================================
-    // Scenario 1: Order Processing - Successful Order
+    // README Side-by-Side Example
+    // Simple example for the README introduction
+    // ========================================================================
+
+    #region readme-side-by-side-moq
+    [Fact]
+    public void OrderProcessor_ProcessesValidOrder_Moq()
+    {
+        // Arrange
+        var mock = new Mock<IOrderService>();
+        mock.Setup(x => x.GetOrder(It.IsAny<int>()))
+            .Returns((int id) => new Order { Id = id, CustomerId = 1 });
+        mock.Setup(x => x.ValidateOrder(It.IsAny<Order>())).Returns(true);
+        mock.Setup(x => x.CalculateTotal(It.IsAny<Order>())).Returns(100m);
+
+        var sut = new OrderProcessor(mock.Object);
+
+        // Act
+        sut.Process(1);
+
+        // Assert
+        mock.Verify(x => x.GetOrder(1), Times.Once);
+        mock.Verify(x => x.ValidateOrder(It.IsAny<Order>()), Times.Once);
+        mock.Verify(x => x.SaveOrder(It.IsAny<Order>()), Times.Once);
+    }
+    #endregion
+
+    #region readme-side-by-side-knockoff
+    [Fact]
+    public void OrderProcessor_ProcessesValidOrder_KnockOff()
+    {
+        // Arrange
+        var stub = new OrderServiceStub();
+        stub.GetOrder.OnCall = (ko, id) => new Order { Id = id, CustomerId = 1 };
+        stub.ValidateOrder.OnCall = (ko, _) => true;
+        stub.CalculateTotal.OnCall = (ko, _) => 100m;
+
+        var sut = new OrderProcessor(stub);
+
+        // Act
+        sut.Process(1);
+
+        // Assert
+        Assert.Equal(1, stub.GetOrder.CallCount);
+        Assert.Equal(1, stub.ValidateOrder.CallCount);
+        Assert.Equal(1, stub.SaveOrder.CallCount);
+    }
+    #endregion
+
+    // ========================================================================
+    // Scenario 1: Order Processing - Successful Order (Complex)
     // Tests a happy path where order processing succeeds
     // ========================================================================
 
