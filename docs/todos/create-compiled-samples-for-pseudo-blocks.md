@@ -33,26 +33,27 @@ All 18 blocks converted:
 
 ---
 
-## Phase 3: Reference Documentation (7 remaining)
+## Phase 3: Reference Documentation ✅ Analyzed
 
-#### docs/reference/attributes.md (5 blocks)
+Most Phase 3 blocks are legitimately pseudo (API reference, hypothetical features, XML config).
 
-- [ ] `knockoff-attribute-declaration` (line 9) - Attribute source code
-  - Consider syncing from actual `KnockOffAttribute.cs`
-- [ ] `knockoff-namespace-using` (line 97) - Using statement example
-- [ ] `knockoff-future-naming` (line 118) - Future naming options
-- [ ] `knockoff-future-strict` (line 129) - Future strict mode option
-- [ ] `knockoff-future-exclude` (line 140) - Future exclude option
+#### Converted to `generated:` marker:
+- [x] `generated-code-full-structure` - Now points to actual `GenUserServiceKnockOff.g.cs`
 
-#### docs/reference/generated-code.md (2 blocks)
+#### Legitimately pseudo (API reference / incomplete fragments):
+- `knockoff-attribute-declaration` - Library internal source code
+- `knockoff-namespace-using` - Just a using statement
+- `emit-generated-files-csproj` - XML/MSBuild config, not C#
 
-- [ ] `emit-generated-files-csproj` (line 29) - MSBuild properties
-- [ ] `generated-code-full-structure` (line 60) - Full generated structure
-  - Consider syncing from actual Generated/ file
+#### Legitimately pseudo (hypothetical features):
+- `knockoff-future-naming` - Not yet implemented
+- `knockoff-future-strict` - Not yet implemented (see strict-mode.md todo)
+- `knockoff-future-exclude` - Not yet implemented
 
-#### Completed in Phase 3:
+#### Already compiled:
 - [x] `generated-code-input-example`
-- [x] `interface-constraint-separate`
+- [x] `generated-code-multiple-parameters`
+- [x] `generated-code-interface-constraint-separate`
 
 ---
 
