@@ -3,7 +3,7 @@
 
 namespace KnockOff.Benchmarks.Stubs;
 
-partial class MediumServiceStub
+partial class MediumServiceStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Method1.</summary>
 	public sealed class Method1Interceptor

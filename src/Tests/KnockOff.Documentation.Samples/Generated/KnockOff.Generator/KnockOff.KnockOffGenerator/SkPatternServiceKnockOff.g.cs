@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class SkPatternServiceKnockOff
+partial class SkPatternServiceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetUser.</summary>
 	public sealed class GetUserInterceptor

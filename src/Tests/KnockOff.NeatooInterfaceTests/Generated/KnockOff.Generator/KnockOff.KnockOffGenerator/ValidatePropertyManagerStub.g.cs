@@ -3,7 +3,7 @@
 
 namespace KnockOff.NeatooInterfaceTests.PropertyManagers;
 
-partial class ValidatePropertyManagerStub
+partial class ValidatePropertyManagerStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for IsBusy.</summary>
 	public sealed class IsBusyInterceptor

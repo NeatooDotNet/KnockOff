@@ -303,7 +303,7 @@ partial class InlineValidateBaseTests
 		}
 
 		/// <summary>Stub implementation of global::Neatoo.IValidateBase.</summary>
-		public class IValidateBase : global::Neatoo.IValidateBase
+		public class IValidateBase : global::Neatoo.IValidateBase, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Parent.</summary>
 			public IValidateBase_ParentInterceptor Parent { get; } = new();
@@ -354,7 +354,7 @@ partial class InlineValidateBaseTests
 			{
 				GetProperty.RecordCall(propertyName);
 				if (GetProperty.OnCall is { } onCall) return onCall(this, propertyName);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "GetProperty");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "GetProperty");
 				throw new global::System.InvalidOperationException("No implementation provided for GetProperty. Set GetProperty.OnCall.");
 			}
 
@@ -363,7 +363,7 @@ partial class InlineValidateBaseTests
 				validateProperty = default!;
 				TryGetProperty.RecordCall(propertyName);
 				if (TryGetProperty.OnCall is { } onCall) return onCall(this, propertyName);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "TryGetProperty");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "TryGetProperty");
 				return default!;
 			}
 
@@ -373,7 +373,7 @@ partial class InlineValidateBaseTests
 				{
 					Parent.RecordGet();
 					if (Parent.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "Parent");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "Parent");
 					return Parent.Value;
 				}
 			}
@@ -384,7 +384,7 @@ partial class InlineValidateBaseTests
 				{
 					IsPaused.RecordGet();
 					if (IsPaused.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "IsPaused");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "IsPaused");
 					return IsPaused.Value;
 				}
 			}
@@ -395,7 +395,7 @@ partial class InlineValidateBaseTests
 				{
 					Indexer.RecordGet(propertyName);
 					if (Indexer.OnGet is { } onGet) return onGet(this, propertyName);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "this[]");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "this[]");
 					return Indexer.Backing.TryGetValue(propertyName, out var v) ? v : default!;
 				}
 			}
@@ -404,7 +404,7 @@ partial class InlineValidateBaseTests
 			{
 				WaitForTasks.RecordCall(null);
 				if (WaitForTasks.OnCall is { } onCall) return onCall(this, null);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "WaitForTasks");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -412,7 +412,7 @@ partial class InlineValidateBaseTests
 			{
 				WaitForTasks.RecordCall(token);
 				if (WaitForTasks.OnCall is { } onCall) return onCall(this, token);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "WaitForTasks");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -420,7 +420,7 @@ partial class InlineValidateBaseTests
 			{
 				RunRules.RecordCall(propertyName, token, null);
 				if (RunRules.OnCall is { } onCall) return onCall(this, propertyName, token, null);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "RunRules");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -428,7 +428,7 @@ partial class InlineValidateBaseTests
 			{
 				RunRules.RecordCall(null, token, runRules);
 				if (RunRules.OnCall is { } onCall) return onCall(this, null, token, runRules);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "RunRules");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -436,14 +436,14 @@ partial class InlineValidateBaseTests
 			{
 				ClearAllMessages.RecordCall();
 				if (ClearAllMessages.OnCall is { } onCall) { onCall(this); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "ClearAllMessages");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "ClearAllMessages");
 			}
 
 			void global::Neatoo.IValidateMetaProperties.ClearSelfMessages()
 			{
 				ClearSelfMessages.RecordCall();
 				if (ClearSelfMessages.OnCall is { } onCall) { onCall(this); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "ClearSelfMessages");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "ClearSelfMessages");
 			}
 
 			bool global::Neatoo.IValidateMetaProperties.IsBusy
@@ -452,7 +452,7 @@ partial class InlineValidateBaseTests
 				{
 					IsBusy.RecordGet();
 					if (IsBusy.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsBusy");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsBusy");
 					return IsBusy.Value;
 				}
 			}
@@ -463,7 +463,7 @@ partial class InlineValidateBaseTests
 				{
 					IsValid.RecordGet();
 					if (IsValid.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsValid");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsValid");
 					return IsValid.Value;
 				}
 			}
@@ -474,7 +474,7 @@ partial class InlineValidateBaseTests
 				{
 					IsSelfValid.RecordGet();
 					if (IsSelfValid.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsSelfValid");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsSelfValid");
 					return IsSelfValid.Value;
 				}
 			}
@@ -485,7 +485,7 @@ partial class InlineValidateBaseTests
 				{
 					PropertyMessages.RecordGet();
 					if (PropertyMessages.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "PropertyMessages");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "PropertyMessages");
 					return PropertyMessages.Value;
 				}
 			}
@@ -506,13 +506,13 @@ partial class InlineValidateBaseTests
 			public global::Neatoo.IValidateBase Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IValidateBase(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

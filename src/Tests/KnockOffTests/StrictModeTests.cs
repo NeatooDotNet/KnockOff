@@ -22,8 +22,7 @@ public class StrictModeTests
 	[Fact]
 	public void StandaloneStub_Strict_Method_ThrowsStubException()
 	{
-		var stub = new StrictModeTestStub();
-		stub.Strict = true; // Enable strict mode
+		var stub = new StrictModeTestStub().Strict();
 		IStrictModeTest service = stub;
 
 		// Strict mode - throws StubException
@@ -34,8 +33,7 @@ public class StrictModeTests
 	[Fact]
 	public void StandaloneStub_Strict_VoidMethod_ThrowsStubException()
 	{
-		var stub = new StrictModeTestStub();
-		stub.Strict = true;
+		var stub = new StrictModeTestStub().Strict();
 		IStrictModeTest service = stub;
 
 		var ex = Assert.Throws<StubException>(() => service.DoSomething());
@@ -45,8 +43,7 @@ public class StrictModeTests
 	[Fact]
 	public void StandaloneStub_Strict_PropertyGetter_ThrowsStubException()
 	{
-		var stub = new StrictModeTestStub();
-		stub.Strict = true;
+		var stub = new StrictModeTestStub().Strict();
 		IStrictModeTest service = stub;
 
 		var ex = Assert.Throws<StubException>(() => _ = service.Name);
@@ -56,8 +53,7 @@ public class StrictModeTests
 	[Fact]
 	public void StandaloneStub_Strict_PropertySetter_ThrowsStubException()
 	{
-		var stub = new StrictModeTestStub();
-		stub.Strict = true;
+		var stub = new StrictModeTestStub().Strict();
 		IStrictModeTest service = stub;
 
 		var ex = Assert.Throws<StubException>(() => service.Name = "test");
@@ -67,8 +63,7 @@ public class StrictModeTests
 	[Fact]
 	public void StandaloneStub_Strict_WithOnCall_DoesNotThrow()
 	{
-		var stub = new StrictModeTestStub();
-		stub.Strict = true;
+		var stub = new StrictModeTestStub().Strict();
 		stub.GetValue.OnCall = (ko, x) => x * 2;
 		IStrictModeTest service = stub;
 
@@ -81,8 +76,7 @@ public class StrictModeTests
 	[Fact]
 	public void StandaloneStub_Strict_WithOnGet_DoesNotThrow()
 	{
-		var stub = new StrictModeTestStub();
-		stub.Strict = true;
+		var stub = new StrictModeTestStub().Strict();
 		stub.Name.OnGet = ko => "configured";
 		IStrictModeTest service = stub;
 
@@ -200,6 +194,78 @@ public class StrictModeTests
 		// Should not throw - strict overridden to false
 		var result = service.GetData();
 		Assert.Equal(0, result);
+	}
+
+	#endregion
+
+	#region Extension Method Tests
+
+	[Fact]
+	public void StrictExtension_StandaloneStub_EnablesStrictMode()
+	{
+		var stub = new StrictModeTestStub().Strict();
+		IStrictModeTest service = stub;
+
+		Assert.True(stub.Strict);
+		Assert.Throws<StubException>(() => service.GetValue(42));
+	}
+
+	[Fact]
+	public void StrictExtension_StandaloneStub_ReturnsSameInstance()
+	{
+		var stub = new StrictModeTestStub();
+		var result = stub.Strict();
+
+		Assert.Same(stub, result);
+	}
+
+	[Fact]
+	public void StrictExtension_InlineStub_EnablesStrictMode()
+	{
+		var stub = new StrictModeInlineTests.Stubs.IStrictModeTest().Strict();
+		IStrictModeTest service = stub;
+
+		Assert.True(stub.Strict);
+		Assert.Throws<StubException>(() => service.GetValue(42));
+	}
+
+	[Fact]
+	public void StrictExtension_InlineStub_ReturnsSameInstance()
+	{
+		var stub = new StrictModeInlineTests.Stubs.IStrictModeTest();
+		var result = stub.Strict();
+
+		Assert.Same(stub, result);
+	}
+
+	[Fact]
+	public void StrictExtension_FluentChaining_Works()
+	{
+		// Test that .Strict() can be used in a fluent chain
+		var stub = new StrictModeTestStub().Strict();
+		stub.GetValue.OnCall = (ko, x) => x * 2;
+		IStrictModeTest service = stub;
+
+		// Should not throw because OnCall is configured
+		var result = service.GetValue(5);
+		Assert.Equal(10, result);
+
+		// But unconfigured members should throw
+		Assert.Throws<StubException>(() => service.DoSomething());
+	}
+
+	[Fact]
+	public void IKnockOffStub_StandaloneStub_ImplementsInterface()
+	{
+		var stub = new StrictModeTestStub();
+		Assert.IsAssignableFrom<IKnockOffStub>(stub);
+	}
+
+	[Fact]
+	public void IKnockOffStub_InlineStub_ImplementsInterface()
+	{
+		var stub = new StrictModeInlineTests.Stubs.IStrictModeTest();
+		Assert.IsAssignableFrom<IKnockOffStub>(stub);
 	}
 
 	#endregion

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class MmRepositoryKnockOff
+partial class MmRepositoryKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Save.</summary>
 	public sealed class SaveInterceptor

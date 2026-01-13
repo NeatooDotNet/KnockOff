@@ -29,7 +29,7 @@ partial class CustomFormatterStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.ICustomFormatter.</summary>
-		public class ICustomFormatter : global::System.ICustomFormatter
+		public class ICustomFormatter : global::System.ICustomFormatter, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Format.</summary>
 			public ICustomFormatter_FormatInterceptor Format { get; } = new();
@@ -38,7 +38,7 @@ partial class CustomFormatterStubTests
 			{
 				Format.RecordCall(format, arg, formatProvider);
 				if (Format.OnCall is { } onCall) return onCall(this, format, arg, formatProvider);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("ICustomFormatter", "Format");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("ICustomFormatter", "Format");
 				throw new global::System.InvalidOperationException("No implementation provided for Format. Set Format.OnCall.");
 			}
 
@@ -46,13 +46,13 @@ partial class CustomFormatterStubTests
 			public global::System.ICustomFormatter Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public ICustomFormatter(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

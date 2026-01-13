@@ -5,7 +5,7 @@ namespace KnockOff.Tests;
 
 public partial class NestedClassTests
 {
-partial class NestedEntityStub
+partial class NestedEntityStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Root.</summary>
 	public sealed class RootInterceptor

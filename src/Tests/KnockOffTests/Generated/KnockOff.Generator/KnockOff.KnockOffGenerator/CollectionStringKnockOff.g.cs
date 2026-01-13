@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class CollectionStringKnockOff
+partial class CollectionStringKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Count.</summary>
 	public sealed class CountInterceptor

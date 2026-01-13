@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class MmRefProcessorKnockOff
+partial class MmRefProcessorKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Increment.</summary>
 	public sealed class IncrementInterceptor

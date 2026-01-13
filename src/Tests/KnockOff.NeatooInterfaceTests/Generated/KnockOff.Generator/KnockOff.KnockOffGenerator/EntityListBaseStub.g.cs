@@ -3,7 +3,7 @@
 
 namespace KnockOff.NeatooInterfaceTests.Collections;
 
-partial class EntityListBaseStub
+partial class EntityListBaseStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Root.</summary>
 	public sealed class RootInterceptor

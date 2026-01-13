@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Concepts;
 
-partial class PatternServiceKnockOff
+partial class PatternServiceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Calculate.</summary>
 	public sealed class Calculate2Interceptor

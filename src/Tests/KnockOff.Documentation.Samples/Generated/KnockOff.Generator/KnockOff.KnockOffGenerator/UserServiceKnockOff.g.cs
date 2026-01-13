@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.GettingStarted;
 
-partial class UserServiceKnockOff
+partial class UserServiceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameInterceptor

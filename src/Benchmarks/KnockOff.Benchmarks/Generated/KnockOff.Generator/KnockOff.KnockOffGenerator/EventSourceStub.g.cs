@@ -3,7 +3,7 @@
 
 namespace KnockOff.Benchmarks.Stubs;
 
-partial class EventSourceStub
+partial class EventSourceStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Interceptor for MessageReceived event.</summary>
 	public sealed class MessageReceivedInterceptor

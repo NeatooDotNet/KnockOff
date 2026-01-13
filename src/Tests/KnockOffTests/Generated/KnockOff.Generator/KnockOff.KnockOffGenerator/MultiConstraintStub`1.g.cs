@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class MultiConstraintStub<T> where T : class, global::KnockOff.Tests.IEntity
+partial class MultiConstraintStub<T> : global::KnockOff.IKnockOffStub where T : class, global::KnockOff.Tests.IEntity
 {
 	/// <summary>Tracks and configures behavior for Save.</summary>
 	public sealed class SaveInterceptor

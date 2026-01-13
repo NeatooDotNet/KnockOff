@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Concepts;
 
-partial class PatternPropertyServiceKnockOff
+partial class PatternPropertyServiceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameInterceptor

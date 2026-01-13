@@ -5,7 +5,7 @@ namespace KnockOff.Documentation.Samples.Reference;
 
 public partial class AttrTestFixture
 {
-partial class NestedKnockOff
+partial class NestedKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for DoWork.</summary>
 	public sealed class DoWorkInterceptor

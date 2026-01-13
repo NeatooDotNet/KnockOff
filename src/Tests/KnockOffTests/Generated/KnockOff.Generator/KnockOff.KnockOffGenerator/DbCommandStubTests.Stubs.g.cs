@@ -336,7 +336,7 @@ partial class DbCommandStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.Data.IDbCommand.</summary>
-		public class IDbCommand : global::System.Data.IDbCommand
+		public class IDbCommand : global::System.Data.IDbCommand, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for CommandText.</summary>
 			public IDbCommand_CommandTextInterceptor CommandText { get; } = new();
@@ -384,14 +384,14 @@ partial class DbCommandStubTests
 			{
 				Cancel.RecordCall();
 				if (Cancel.OnCall is { } onCall) { onCall(this); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "Cancel");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "Cancel");
 			}
 
 			global::System.Data.IDbDataParameter global::System.Data.IDbCommand.CreateParameter()
 			{
 				CreateParameter.RecordCall();
 				if (CreateParameter.OnCall is { } onCall) return onCall(this);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "CreateParameter");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "CreateParameter");
 				throw new global::System.InvalidOperationException("No implementation provided for CreateParameter. Set CreateParameter.OnCall.");
 			}
 
@@ -399,7 +399,7 @@ partial class DbCommandStubTests
 			{
 				ExecuteNonQuery.RecordCall();
 				if (ExecuteNonQuery.OnCall is { } onCall) return onCall(this);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "ExecuteNonQuery");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "ExecuteNonQuery");
 				return default!;
 			}
 
@@ -407,7 +407,7 @@ partial class DbCommandStubTests
 			{
 				ExecuteReader.RecordCall(null);
 				if (ExecuteReader.OnCall is { } onCall) return onCall(this, null);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "ExecuteReader");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "ExecuteReader");
 				throw new global::System.InvalidOperationException("No implementation provided for ExecuteReader. Set ExecuteReader.OnCall.");
 			}
 
@@ -415,7 +415,7 @@ partial class DbCommandStubTests
 			{
 				ExecuteReader.RecordCall(behavior);
 				if (ExecuteReader.OnCall is { } onCall) return onCall(this, behavior);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "ExecuteReader");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "ExecuteReader");
 				throw new global::System.InvalidOperationException("No implementation provided for ExecuteReader. Set ExecuteReader.OnCall.");
 			}
 
@@ -423,7 +423,7 @@ partial class DbCommandStubTests
 			{
 				ExecuteScalar.RecordCall();
 				if (ExecuteScalar.OnCall is { } onCall) return onCall(this);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "ExecuteScalar");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "ExecuteScalar");
 				return default!;
 			}
 
@@ -431,7 +431,7 @@ partial class DbCommandStubTests
 			{
 				Prepare.RecordCall();
 				if (Prepare.OnCall is { } onCall) { onCall(this); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "Prepare");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "Prepare");
 			}
 
 			string global::System.Data.IDbCommand.CommandText
@@ -440,7 +440,7 @@ partial class DbCommandStubTests
 				{
 					CommandText.RecordGet();
 					if (CommandText.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "CommandText");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "CommandText");
 					return CommandText.Value;
 				}
 #pragma warning disable CS8769
@@ -448,7 +448,7 @@ partial class DbCommandStubTests
 				{
 					CommandText.RecordSet(value);
 					if (CommandText.OnSet is { } onSet) { onSet(this, value); return; }
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "CommandText");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "CommandText");
 					CommandText.Value = value;
 				}
 
@@ -461,14 +461,14 @@ partial class DbCommandStubTests
 				{
 					CommandTimeout.RecordGet();
 					if (CommandTimeout.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "CommandTimeout");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "CommandTimeout");
 					return CommandTimeout.Value;
 				}
 				set
 				{
 					CommandTimeout.RecordSet(value);
 					if (CommandTimeout.OnSet is { } onSet) { onSet(this, value); return; }
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "CommandTimeout");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "CommandTimeout");
 					CommandTimeout.Value = value;
 				}
 			}
@@ -479,14 +479,14 @@ partial class DbCommandStubTests
 				{
 					CommandType.RecordGet();
 					if (CommandType.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "CommandType");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "CommandType");
 					return CommandType.Value;
 				}
 				set
 				{
 					CommandType.RecordSet(value);
 					if (CommandType.OnSet is { } onSet) { onSet(this, value); return; }
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "CommandType");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "CommandType");
 					CommandType.Value = value;
 				}
 			}
@@ -497,14 +497,14 @@ partial class DbCommandStubTests
 				{
 					Connection.RecordGet();
 					if (Connection.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "Connection");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "Connection");
 					return Connection.Value;
 				}
 				set
 				{
 					Connection.RecordSet(value);
 					if (Connection.OnSet is { } onSet) { onSet(this, value); return; }
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "Connection");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "Connection");
 					Connection.Value = value;
 				}
 			}
@@ -515,7 +515,7 @@ partial class DbCommandStubTests
 				{
 					Parameters.RecordGet();
 					if (Parameters.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "Parameters");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "Parameters");
 					return Parameters.Value;
 				}
 			}
@@ -526,14 +526,14 @@ partial class DbCommandStubTests
 				{
 					Transaction.RecordGet();
 					if (Transaction.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "Transaction");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "Transaction");
 					return Transaction.Value;
 				}
 				set
 				{
 					Transaction.RecordSet(value);
 					if (Transaction.OnSet is { } onSet) { onSet(this, value); return; }
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "Transaction");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "Transaction");
 					Transaction.Value = value;
 				}
 			}
@@ -544,14 +544,14 @@ partial class DbCommandStubTests
 				{
 					UpdatedRowSource.RecordGet();
 					if (UpdatedRowSource.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "UpdatedRowSource");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "UpdatedRowSource");
 					return UpdatedRowSource.Value;
 				}
 				set
 				{
 					UpdatedRowSource.RecordSet(value);
 					if (UpdatedRowSource.OnSet is { } onSet) { onSet(this, value); return; }
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "UpdatedRowSource");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "UpdatedRowSource");
 					UpdatedRowSource.Value = value;
 				}
 			}
@@ -560,20 +560,20 @@ partial class DbCommandStubTests
 			{
 				Dispose.RecordCall();
 				if (Dispose.OnCall is { } onCall) { onCall(this); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDisposable", "Dispose");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IDisposable", "Dispose");
 			}
 
 			/// <summary>The global::System.Data.IDbCommand instance. Use for passing to code expecting the interface.</summary>
 			public global::System.Data.IDbCommand Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IDbCommand(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Benchmarks.Stubs;
 
-partial class OrderServiceStub
+partial class OrderServiceStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetOrder.</summary>
 	public sealed class GetOrderInterceptor

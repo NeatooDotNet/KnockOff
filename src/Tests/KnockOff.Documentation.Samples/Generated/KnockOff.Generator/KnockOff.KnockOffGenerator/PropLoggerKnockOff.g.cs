@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class PropLoggerKnockOff
+partial class PropLoggerKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Output.</summary>
 	public sealed class OutputInterceptor

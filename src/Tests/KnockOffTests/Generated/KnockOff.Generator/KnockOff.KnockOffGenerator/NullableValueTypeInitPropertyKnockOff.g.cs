@@ -3,7 +3,7 @@
 
 namespace KnockOffTests;
 
-partial class NullableValueTypeInitPropertyKnockOff
+partial class NullableValueTypeInitPropertyKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Revision.</summary>
 	public sealed class RevisionInterceptor

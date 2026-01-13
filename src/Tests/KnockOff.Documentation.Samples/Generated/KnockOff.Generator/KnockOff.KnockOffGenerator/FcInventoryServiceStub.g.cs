@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Comparison;
 
-partial class FcInventoryServiceStub
+partial class FcInventoryServiceStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for ReserveItems.</summary>
 	public sealed class ReserveItemsInterceptor

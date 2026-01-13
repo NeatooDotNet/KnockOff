@@ -29,7 +29,7 @@ partial class FormatProviderStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.IFormatProvider.</summary>
-		public class IFormatProvider : global::System.IFormatProvider
+		public class IFormatProvider : global::System.IFormatProvider, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for GetFormat.</summary>
 			public IFormatProvider_GetFormatInterceptor GetFormat { get; } = new();
@@ -38,7 +38,7 @@ partial class FormatProviderStubTests
 			{
 				GetFormat.RecordCall(formatType);
 				if (GetFormat.OnCall is { } onCall) return onCall(this, formatType);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IFormatProvider", "GetFormat");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IFormatProvider", "GetFormat");
 				return default!;
 			}
 
@@ -46,13 +46,13 @@ partial class FormatProviderStubTests
 			public global::System.IFormatProvider Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IFormatProvider(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

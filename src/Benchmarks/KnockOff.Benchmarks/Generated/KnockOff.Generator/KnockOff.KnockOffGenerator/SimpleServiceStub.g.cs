@@ -3,7 +3,7 @@
 
 namespace KnockOff.Benchmarks.Stubs;
 
-partial class SimpleServiceStub
+partial class SimpleServiceStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for DoWork.</summary>
 	public sealed class DoWorkInterceptor

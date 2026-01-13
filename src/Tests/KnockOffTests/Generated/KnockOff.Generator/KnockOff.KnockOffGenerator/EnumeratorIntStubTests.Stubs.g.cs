@@ -79,7 +79,7 @@ partial class EnumeratorIntStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.Collections.Generic.IEnumerator<int>.</summary>
-		public class IEnumerator : global::System.Collections.Generic.IEnumerator<int>
+		public class IEnumerator : global::System.Collections.Generic.IEnumerator<int>, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Current.</summary>
 			public IEnumerator_CurrentInterceptor Current { get; } = new();
@@ -99,7 +99,7 @@ partial class EnumeratorIntStubTests
 				{
 					Current.RecordGet();
 					if (Current.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerator<int>", "Current");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerator<int>", "Current");
 					return Current.Value;
 				}
 			}
@@ -108,7 +108,7 @@ partial class EnumeratorIntStubTests
 			{
 				MoveNext.RecordCall();
 				if (MoveNext.OnCall is { } onCall) return onCall(this);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerator", "MoveNext");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerator", "MoveNext");
 				return default!;
 			}
 
@@ -116,7 +116,7 @@ partial class EnumeratorIntStubTests
 			{
 				Reset.RecordCall();
 				if (Reset.OnCall is { } onCall) { onCall(this); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerator", "Reset");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerator", "Reset");
 			}
 
 			object global::System.Collections.IEnumerator.Current
@@ -128,20 +128,20 @@ partial class EnumeratorIntStubTests
 			{
 				Dispose.RecordCall();
 				if (Dispose.OnCall is { } onCall) { onCall(this); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDisposable", "Dispose");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IDisposable", "Dispose");
 			}
 
 			/// <summary>The global::System.Collections.Generic.IEnumerator<int> instance. Use for passing to code expecting the interface.</summary>
 			public global::System.Collections.Generic.IEnumerator<int> Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IEnumerator(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

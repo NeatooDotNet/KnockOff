@@ -29,7 +29,7 @@ partial class SerializableStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.Runtime.Serialization.ISerializable.</summary>
-		public class ISerializable : global::System.Runtime.Serialization.ISerializable
+		public class ISerializable : global::System.Runtime.Serialization.ISerializable, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for GetObjectData.</summary>
 			public ISerializable_GetObjectDataInterceptor GetObjectData { get; } = new();
@@ -38,20 +38,20 @@ partial class SerializableStubTests
 			{
 				GetObjectData.RecordCall(info, context);
 				if (GetObjectData.OnCall is { } onCall) { onCall(this, info, context); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("ISerializable", "GetObjectData");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("ISerializable", "GetObjectData");
 			}
 
 			/// <summary>The global::System.Runtime.Serialization.ISerializable instance. Use for passing to code expecting the interface.</summary>
 			public global::System.Runtime.Serialization.ISerializable Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public ISerializable(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

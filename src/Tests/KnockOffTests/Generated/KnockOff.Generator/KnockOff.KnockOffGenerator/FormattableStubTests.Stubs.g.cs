@@ -29,7 +29,7 @@ partial class FormattableStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.IFormattable.</summary>
-		public class IFormattable : global::System.IFormattable
+		public class IFormattable : global::System.IFormattable, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for ToString.</summary>
 			public new IFormattable_ToStringInterceptor ToString { get; } = new();
@@ -38,7 +38,7 @@ partial class FormattableStubTests
 			{
 				ToString.RecordCall(format, formatProvider);
 				if (ToString.OnCall is { } onCall) return onCall(this, format, formatProvider);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IFormattable", "ToString");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IFormattable", "ToString");
 				throw new global::System.InvalidOperationException("No implementation provided for ToString. Set ToString.OnCall.");
 			}
 
@@ -46,13 +46,13 @@ partial class FormattableStubTests
 			public global::System.IFormattable Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IFormattable(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

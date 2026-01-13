@@ -3,7 +3,7 @@
 
 namespace KnockOff.Benchmarks.Stubs;
 
-partial class CalculatorStub
+partial class CalculatorStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Add.</summary>
 	public sealed class AddInterceptor

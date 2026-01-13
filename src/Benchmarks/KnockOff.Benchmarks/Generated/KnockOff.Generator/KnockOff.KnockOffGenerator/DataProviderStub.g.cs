@@ -3,7 +3,7 @@
 
 namespace KnockOff.Benchmarks.Stubs;
 
-partial class DataProviderStub
+partial class DataProviderStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Count.</summary>
 	public sealed class CountInterceptor

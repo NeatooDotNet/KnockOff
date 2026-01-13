@@ -3,7 +3,7 @@
 
 namespace KnockOff.Benchmarks.Stubs;
 
-partial class BaseEntityStub
+partial class BaseEntityStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Id.</summary>
 	public sealed class IdInterceptor

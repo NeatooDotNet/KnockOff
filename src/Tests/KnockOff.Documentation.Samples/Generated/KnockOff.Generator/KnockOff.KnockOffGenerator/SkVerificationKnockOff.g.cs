@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class SkVerificationKnockOff
+partial class SkVerificationKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameInterceptor

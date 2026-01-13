@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class GenStringCacheKnockOff
+partial class GenStringCacheKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Get.</summary>
 	public sealed class GetInterceptor

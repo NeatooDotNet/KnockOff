@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Reference;
 
-partial class GenAuditorKnockOff
+partial class GenAuditorKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Audit.</summary>
 	public sealed class AuditInterceptor

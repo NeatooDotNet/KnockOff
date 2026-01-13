@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class MethodMultiParamKnockOff
+partial class MethodMultiParamKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Process.</summary>
 	public sealed class ProcessInterceptor

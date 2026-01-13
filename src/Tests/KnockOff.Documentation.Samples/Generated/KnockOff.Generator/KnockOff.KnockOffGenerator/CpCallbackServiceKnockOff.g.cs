@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class CpCallbackServiceKnockOff
+partial class CpCallbackServiceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Initialize.</summary>
 	public sealed class InitializeInterceptor

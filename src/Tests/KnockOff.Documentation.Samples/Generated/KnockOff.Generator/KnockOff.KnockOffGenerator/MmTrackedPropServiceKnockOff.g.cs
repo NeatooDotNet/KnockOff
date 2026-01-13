@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class MmTrackedPropServiceKnockOff
+partial class MmTrackedPropServiceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Active.</summary>
 	public sealed class ActiveInterceptor

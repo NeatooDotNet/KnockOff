@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class MethodSingleParamKnockOff
+partial class MethodSingleParamKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetUser.</summary>
 	public sealed class GetUserInterceptor

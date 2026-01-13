@@ -98,7 +98,7 @@ partial class DbTransactionStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.Data.IDbTransaction.</summary>
-		public class IDbTransaction : global::System.Data.IDbTransaction
+		public class IDbTransaction : global::System.Data.IDbTransaction, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Connection.</summary>
 			public IDbTransaction_ConnectionInterceptor Connection { get; } = new();
@@ -119,14 +119,14 @@ partial class DbTransactionStubTests
 			{
 				Commit.RecordCall();
 				if (Commit.OnCall is { } onCall) { onCall(this); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbTransaction", "Commit");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbTransaction", "Commit");
 			}
 
 			void global::System.Data.IDbTransaction.Rollback()
 			{
 				Rollback.RecordCall();
 				if (Rollback.OnCall is { } onCall) { onCall(this); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbTransaction", "Rollback");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbTransaction", "Rollback");
 			}
 
 			global::System.Data.IDbConnection? global::System.Data.IDbTransaction.Connection
@@ -135,7 +135,7 @@ partial class DbTransactionStubTests
 				{
 					Connection.RecordGet();
 					if (Connection.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbTransaction", "Connection");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbTransaction", "Connection");
 					return Connection.Value;
 				}
 			}
@@ -146,7 +146,7 @@ partial class DbTransactionStubTests
 				{
 					IsolationLevel.RecordGet();
 					if (IsolationLevel.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbTransaction", "IsolationLevel");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbTransaction", "IsolationLevel");
 					return IsolationLevel.Value;
 				}
 			}
@@ -155,20 +155,20 @@ partial class DbTransactionStubTests
 			{
 				Dispose.RecordCall();
 				if (Dispose.OnCall is { } onCall) { onCall(this); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDisposable", "Dispose");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IDisposable", "Dispose");
 			}
 
 			/// <summary>The global::System.Data.IDbTransaction instance. Use for passing to code expecting the interface.</summary>
 			public global::System.Data.IDbTransaction Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IDbTransaction(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

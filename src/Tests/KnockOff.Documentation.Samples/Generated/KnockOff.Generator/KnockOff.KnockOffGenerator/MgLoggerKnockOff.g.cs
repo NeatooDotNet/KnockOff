@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class MgLoggerKnockOff
+partial class MgLoggerKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Log.</summary>
 	public sealed class LogInterceptor

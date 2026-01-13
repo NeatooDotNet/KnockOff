@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class AsyncFetchKnockOff
+partial class AsyncFetchKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for FetchAsync.</summary>
 	public sealed class FetchAsyncInterceptor

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class MethodFailureKnockOff
+partial class MethodFailureKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Save.</summary>
 	public sealed class SaveInterceptor

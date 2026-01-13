@@ -5,7 +5,7 @@ namespace KnockOff.Tests;
 
 public partial class NestedClassTests
 {
-partial class NestedValidateStub
+partial class NestedValidateStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Parent.</summary>
 	public sealed class ParentInterceptor

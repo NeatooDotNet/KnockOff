@@ -3,7 +3,7 @@
 
 namespace KnockOff.NeatooInterfaceTests.MetaProperties;
 
-partial class ValidateMetaPropertiesStub
+partial class ValidateMetaPropertiesStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for IsBusy.</summary>
 	public sealed class IsBusyInterceptor

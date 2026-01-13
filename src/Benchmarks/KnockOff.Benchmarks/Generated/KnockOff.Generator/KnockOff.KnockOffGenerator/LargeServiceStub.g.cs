@@ -3,7 +3,7 @@
 
 namespace KnockOff.Benchmarks.Stubs;
 
-partial class LargeServiceStub
+partial class LargeServiceStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for VoidMethod01.</summary>
 	public sealed class VoidMethod01Interceptor

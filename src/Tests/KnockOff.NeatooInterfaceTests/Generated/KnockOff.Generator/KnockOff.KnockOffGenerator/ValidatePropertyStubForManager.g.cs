@@ -3,7 +3,7 @@
 
 namespace KnockOff.NeatooInterfaceTests.PropertyManagers;
 
-partial class ValidatePropertyStubForManager
+partial class ValidatePropertyStubForManager : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameInterceptor

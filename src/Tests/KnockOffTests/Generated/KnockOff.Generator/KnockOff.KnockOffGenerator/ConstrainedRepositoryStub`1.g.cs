@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class ConstrainedRepositoryStub<T> where T : class
+partial class ConstrainedRepositoryStub<T> : global::KnockOff.IKnockOffStub where T : class
 {
 	/// <summary>Tracks and configures behavior for GetById.</summary>
 	public sealed class GetByIdInterceptor

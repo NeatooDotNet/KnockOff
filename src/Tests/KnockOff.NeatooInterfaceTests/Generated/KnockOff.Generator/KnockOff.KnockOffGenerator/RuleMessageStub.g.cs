@@ -3,7 +3,7 @@
 
 namespace KnockOff.NeatooInterfaceTests.ValidationRules;
 
-partial class RuleMessageStub
+partial class RuleMessageStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for RuleIndex.</summary>
 	public sealed class RuleIndexInterceptor

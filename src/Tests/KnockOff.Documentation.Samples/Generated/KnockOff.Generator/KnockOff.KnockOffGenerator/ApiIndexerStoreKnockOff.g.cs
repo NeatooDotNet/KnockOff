@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Reference;
 
-partial class ApiIndexerStoreKnockOff
+partial class ApiIndexerStoreKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Indexer.</summary>
 	public sealed class IndexerInterceptor

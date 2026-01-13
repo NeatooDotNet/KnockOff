@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Comparison;
 
-partial class VsPropertyStoreKnockOff
+partial class VsPropertyStoreKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Indexer.</summary>
 	public sealed class IndexerInterceptor

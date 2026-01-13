@@ -346,7 +346,7 @@ partial class ConvertibleStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.IConvertible.</summary>
-		public class IConvertible : global::System.IConvertible
+		public class IConvertible : global::System.IConvertible, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for GetTypeCode.</summary>
 			public IConvertible_GetTypeCodeInterceptor GetTypeCode { get; } = new();
@@ -403,7 +403,7 @@ partial class ConvertibleStubTests
 			{
 				GetTypeCode.RecordCall();
 				if (GetTypeCode.OnCall is { } onCall) return onCall(this);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "GetTypeCode");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "GetTypeCode");
 				return default!;
 			}
 
@@ -411,7 +411,7 @@ partial class ConvertibleStubTests
 			{
 				ToBoolean.RecordCall(provider);
 				if (ToBoolean.OnCall is { } onCall) return onCall(this, provider);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToBoolean");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToBoolean");
 				return default!;
 			}
 
@@ -419,7 +419,7 @@ partial class ConvertibleStubTests
 			{
 				ToByte.RecordCall(provider);
 				if (ToByte.OnCall is { } onCall) return onCall(this, provider);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToByte");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToByte");
 				return default!;
 			}
 
@@ -427,7 +427,7 @@ partial class ConvertibleStubTests
 			{
 				ToChar.RecordCall(provider);
 				if (ToChar.OnCall is { } onCall) return onCall(this, provider);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToChar");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToChar");
 				return default!;
 			}
 
@@ -435,7 +435,7 @@ partial class ConvertibleStubTests
 			{
 				ToDateTime.RecordCall(provider);
 				if (ToDateTime.OnCall is { } onCall) return onCall(this, provider);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToDateTime");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToDateTime");
 				return default!;
 			}
 
@@ -443,7 +443,7 @@ partial class ConvertibleStubTests
 			{
 				ToDecimal.RecordCall(provider);
 				if (ToDecimal.OnCall is { } onCall) return onCall(this, provider);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToDecimal");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToDecimal");
 				return default!;
 			}
 
@@ -451,7 +451,7 @@ partial class ConvertibleStubTests
 			{
 				ToDouble.RecordCall(provider);
 				if (ToDouble.OnCall is { } onCall) return onCall(this, provider);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToDouble");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToDouble");
 				return default!;
 			}
 
@@ -459,7 +459,7 @@ partial class ConvertibleStubTests
 			{
 				ToInt16.RecordCall(provider);
 				if (ToInt16.OnCall is { } onCall) return onCall(this, provider);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToInt16");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToInt16");
 				return default!;
 			}
 
@@ -467,7 +467,7 @@ partial class ConvertibleStubTests
 			{
 				ToInt32.RecordCall(provider);
 				if (ToInt32.OnCall is { } onCall) return onCall(this, provider);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToInt32");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToInt32");
 				return default!;
 			}
 
@@ -475,7 +475,7 @@ partial class ConvertibleStubTests
 			{
 				ToInt64.RecordCall(provider);
 				if (ToInt64.OnCall is { } onCall) return onCall(this, provider);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToInt64");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToInt64");
 				return default!;
 			}
 
@@ -483,7 +483,7 @@ partial class ConvertibleStubTests
 			{
 				ToSByte.RecordCall(provider);
 				if (ToSByte.OnCall is { } onCall) return onCall(this, provider);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToSByte");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToSByte");
 				return default!;
 			}
 
@@ -491,7 +491,7 @@ partial class ConvertibleStubTests
 			{
 				ToSingle.RecordCall(provider);
 				if (ToSingle.OnCall is { } onCall) return onCall(this, provider);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToSingle");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToSingle");
 				return default!;
 			}
 
@@ -499,7 +499,7 @@ partial class ConvertibleStubTests
 			{
 				ToString.RecordCall(provider);
 				if (ToString.OnCall is { } onCall) return onCall(this, provider);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToString");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToString");
 				throw new global::System.InvalidOperationException("No implementation provided for ToString. Set ToString.OnCall.");
 			}
 
@@ -507,7 +507,7 @@ partial class ConvertibleStubTests
 			{
 				ToType.RecordCall(conversionType, provider);
 				if (ToType.OnCall is { } onCall) return onCall(this, conversionType, provider);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToType");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToType");
 				return new object();
 			}
 
@@ -515,7 +515,7 @@ partial class ConvertibleStubTests
 			{
 				ToUInt16.RecordCall(provider);
 				if (ToUInt16.OnCall is { } onCall) return onCall(this, provider);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToUInt16");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToUInt16");
 				return default!;
 			}
 
@@ -523,7 +523,7 @@ partial class ConvertibleStubTests
 			{
 				ToUInt32.RecordCall(provider);
 				if (ToUInt32.OnCall is { } onCall) return onCall(this, provider);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToUInt32");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToUInt32");
 				return default!;
 			}
 
@@ -531,7 +531,7 @@ partial class ConvertibleStubTests
 			{
 				ToUInt64.RecordCall(provider);
 				if (ToUInt64.OnCall is { } onCall) return onCall(this, provider);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToUInt64");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IConvertible", "ToUInt64");
 				return default!;
 			}
 
@@ -539,13 +539,13 @@ partial class ConvertibleStubTests
 			public global::System.IConvertible Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IConvertible(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

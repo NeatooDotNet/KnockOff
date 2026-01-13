@@ -29,7 +29,7 @@ partial class UserTests
 		}
 
 		/// <summary>Stub implementation of global::KnockOff.Documentation.Samples.ReadMe.IUserService.</summary>
-		public class IUserService : global::KnockOff.Documentation.Samples.ReadMe.IUserService
+		public class IUserService : global::KnockOff.Documentation.Samples.ReadMe.IUserService, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for GetUser.</summary>
 			public IUserService_GetUserInterceptor GetUser { get; } = new();
@@ -38,7 +38,7 @@ partial class UserTests
 			{
 				GetUser.RecordCall(id);
 				if (GetUser.OnCall is { } onCall) return onCall(this, id);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IUserService", "GetUser");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserService", "GetUser");
 				return new global::KnockOff.Documentation.Samples.ReadMe.User();
 			}
 
@@ -46,13 +46,13 @@ partial class UserTests
 			public global::KnockOff.Documentation.Samples.ReadMe.IUserService Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IUserService(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}
@@ -78,8 +78,11 @@ partial class UserTests
 		}
 
 		/// <summary>Stub for global::KnockOff.Documentation.Samples.ReadMe.EmailService via composition.</summary>
-		public class EmailService
+		public class EmailService : global::KnockOff.IKnockOffStub
 		{
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for class stubs.</summary>
+			public bool Strict { get; set; }
+
 			/// <summary>Interceptor for Send.</summary>
 			public EmailService_SendInterceptor Send { get; } = new();
 

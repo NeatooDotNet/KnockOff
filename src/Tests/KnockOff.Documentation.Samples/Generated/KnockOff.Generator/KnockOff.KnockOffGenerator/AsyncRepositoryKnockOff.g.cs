@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class AsyncRepositoryKnockOff
+partial class AsyncRepositoryKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for InitializeAsync.</summary>
 	public sealed class InitializeAsyncInterceptor

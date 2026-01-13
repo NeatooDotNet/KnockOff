@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class IhUserWriteRepositoryKnockOff
+partial class IhUserWriteRepositoryKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Add.</summary>
 	public sealed class AddInterceptor

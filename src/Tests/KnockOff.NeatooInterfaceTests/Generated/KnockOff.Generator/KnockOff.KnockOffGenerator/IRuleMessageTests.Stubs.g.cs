@@ -66,7 +66,7 @@ partial class IRuleMessageTests
 		}
 
 		/// <summary>Stub implementation of global::Neatoo.Rules.IRuleMessage.</summary>
-		public class IRuleMessage : global::Neatoo.Rules.IRuleMessage
+		public class IRuleMessage : global::Neatoo.Rules.IRuleMessage, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for RuleIndex.</summary>
 			public IRuleMessage_RuleIndexInterceptor RuleIndex { get; } = new();
@@ -83,7 +83,7 @@ partial class IRuleMessageTests
 				{
 					RuleIndex.RecordGet();
 					if (RuleIndex.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage", "RuleIndex");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage", "RuleIndex");
 					return RuleIndex.Value;
 				}
 			}
@@ -94,7 +94,7 @@ partial class IRuleMessageTests
 				{
 					PropertyName.RecordGet();
 					if (PropertyName.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage", "PropertyName");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage", "PropertyName");
 					return PropertyName.Value;
 				}
 			}
@@ -105,7 +105,7 @@ partial class IRuleMessageTests
 				{
 					Message.RecordGet();
 					if (Message.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage", "Message");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage", "Message");
 					return Message.Value;
 				}
 			}
@@ -114,13 +114,13 @@ partial class IRuleMessageTests
 			public global::Neatoo.Rules.IRuleMessage Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IRuleMessage(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

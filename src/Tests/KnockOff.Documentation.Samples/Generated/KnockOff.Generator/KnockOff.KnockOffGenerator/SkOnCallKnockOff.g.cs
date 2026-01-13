@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class SkOnCallKnockOff
+partial class SkOnCallKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Clear.</summary>
 	public sealed class ClearInterceptor

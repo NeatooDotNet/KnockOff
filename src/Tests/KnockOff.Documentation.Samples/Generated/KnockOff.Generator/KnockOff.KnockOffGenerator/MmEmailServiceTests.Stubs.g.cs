@@ -29,8 +29,11 @@ partial class MmEmailServiceTests
 		}
 
 		/// <summary>Stub for global::KnockOff.Documentation.Samples.Skills.MmEmailService via composition.</summary>
-		public class MmEmailService
+		public class MmEmailService : global::KnockOff.IKnockOffStub
 		{
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for class stubs.</summary>
+			public bool Strict { get; set; }
+
 			/// <summary>Interceptor for Send.</summary>
 			public MmEmailService_SendInterceptor Send { get; } = new();
 

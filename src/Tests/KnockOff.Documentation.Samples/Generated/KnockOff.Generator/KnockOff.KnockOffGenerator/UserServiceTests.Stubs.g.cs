@@ -80,7 +80,7 @@ partial class UserServiceTests
 		}
 
 		/// <summary>Stub implementation of global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService.</summary>
-		public class IInUserService : global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService
+		public class IInUserService : global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for ConnectionString.</summary>
 			public IInUserService_ConnectionStringInterceptor ConnectionString { get; } = new();
@@ -95,7 +95,7 @@ partial class UserServiceTests
 			{
 				GetUser.RecordCall(id);
 				if (GetUser.OnCall is { } onCall) return onCall(this, id);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IInUserService", "GetUser");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IInUserService", "GetUser");
 				return default!;
 			}
 
@@ -103,7 +103,7 @@ partial class UserServiceTests
 			{
 				SaveUser.RecordCall(user);
 				if (SaveUser.OnCall is { } onCall) { onCall(this, user); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IInUserService", "SaveUser");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IInUserService", "SaveUser");
 			}
 
 			string global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService.ConnectionString
@@ -112,14 +112,14 @@ partial class UserServiceTests
 				{
 					ConnectionString.RecordGet();
 					if (ConnectionString.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IInUserService", "ConnectionString");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IInUserService", "ConnectionString");
 					return ConnectionString.Value;
 				}
 				set
 				{
 					ConnectionString.RecordSet(value);
 					if (ConnectionString.OnSet is { } onSet) { onSet(this, value); return; }
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IInUserService", "ConnectionString");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IInUserService", "ConnectionString");
 					ConnectionString.Value = value;
 				}
 			}
@@ -128,13 +128,13 @@ partial class UserServiceTests
 			public global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IInUserService(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

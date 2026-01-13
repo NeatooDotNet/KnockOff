@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Reference;
 
-partial class ApiEventSourceKnockOff
+partial class ApiEventSourceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Interceptor for DataReceived event.</summary>
 	public sealed class DataReceivedInterceptor

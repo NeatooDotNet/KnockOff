@@ -77,7 +77,7 @@ partial class MultiInterfaceInlineTest
 		}
 
 		/// <summary>Stub implementation of global::KnockOff.Tests.ISimpleService.</summary>
-		public class ISimpleService : global::KnockOff.Tests.ISimpleService
+		public class ISimpleService : global::KnockOff.Tests.ISimpleService, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Name.</summary>
 			public ISimpleService_NameInterceptor Name { get; } = new();
@@ -94,14 +94,14 @@ partial class MultiInterfaceInlineTest
 				{
 					Name.RecordGet();
 					if (Name.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("ISimpleService", "Name");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("ISimpleService", "Name");
 					return Name.Value;
 				}
 				set
 				{
 					Name.RecordSet(value);
 					if (Name.OnSet is { } onSet) { onSet(this, value); return; }
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("ISimpleService", "Name");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("ISimpleService", "Name");
 					Name.Value = value;
 				}
 			}
@@ -110,14 +110,14 @@ partial class MultiInterfaceInlineTest
 			{
 				DoSomething.RecordCall();
 				if (DoSomething.OnCall is { } onCall) { onCall(this); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("ISimpleService", "DoSomething");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("ISimpleService", "DoSomething");
 			}
 
 			int global::KnockOff.Tests.ISimpleService.GetValue(int input)
 			{
 				GetValue.RecordCall(input);
 				if (GetValue.OnCall is { } onCall) return onCall(this, input);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("ISimpleService", "GetValue");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("ISimpleService", "GetValue");
 				return default!;
 			}
 
@@ -125,13 +125,13 @@ partial class MultiInterfaceInlineTest
 			public global::KnockOff.Tests.ISimpleService Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public ISimpleService(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}
@@ -157,7 +157,7 @@ partial class MultiInterfaceInlineTest
 		}
 
 		/// <summary>Stub implementation of global::KnockOff.Tests.ISimpleLogger.</summary>
-		public class ISimpleLogger : global::KnockOff.Tests.ISimpleLogger
+		public class ISimpleLogger : global::KnockOff.Tests.ISimpleLogger, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Log.</summary>
 			public ISimpleLogger_LogInterceptor Log { get; } = new();
@@ -166,20 +166,20 @@ partial class MultiInterfaceInlineTest
 			{
 				Log.RecordCall(message);
 				if (Log.OnCall is { } onCall) { onCall(this, message); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("ISimpleLogger", "Log");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("ISimpleLogger", "Log");
 			}
 
 			/// <summary>The global::KnockOff.Tests.ISimpleLogger instance. Use for passing to code expecting the interface.</summary>
 			public global::KnockOff.Tests.ISimpleLogger Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public ISimpleLogger(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

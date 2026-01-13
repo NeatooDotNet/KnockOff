@@ -66,7 +66,7 @@ partial class ObserverStringStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.IObserver<string>.</summary>
-		public class IObserver : global::System.IObserver<string>
+		public class IObserver : global::System.IObserver<string>, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for OnCompleted.</summary>
 			public IObserver_OnCompletedInterceptor OnCompleted { get; } = new();
@@ -81,34 +81,34 @@ partial class ObserverStringStubTests
 			{
 				OnCompleted.RecordCall();
 				if (OnCompleted.OnCall is { } onCall) { onCall(this); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IObserver<string>", "OnCompleted");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IObserver<string>", "OnCompleted");
 			}
 
 			void global::System.IObserver<string>.OnError(global::System.Exception error)
 			{
 				OnError.RecordCall(error);
 				if (OnError.OnCall is { } onCall) { onCall(this, error); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IObserver<string>", "OnError");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IObserver<string>", "OnError");
 			}
 
 			void global::System.IObserver<string>.OnNext(string value)
 			{
 				OnNext.RecordCall(value);
 				if (OnNext.OnCall is { } onCall) { onCall(this, value); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IObserver<string>", "OnNext");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IObserver<string>", "OnNext");
 			}
 
 			/// <summary>The global::System.IObserver<string> instance. Use for passing to code expecting the interface.</summary>
 			public global::System.IObserver<string> Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IObserver(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

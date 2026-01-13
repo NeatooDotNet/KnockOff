@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Comparison;
 
-partial class MigConfigServiceKnockOff
+partial class MigConfigServiceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetConfig.</summary>
 	public sealed class GetConfig2Interceptor

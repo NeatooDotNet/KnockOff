@@ -26,7 +26,7 @@ partial class DisposableStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.IDisposable.</summary>
-		public class IDisposable : global::System.IDisposable
+		public class IDisposable : global::System.IDisposable, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Dispose.</summary>
 			public IDisposable_DisposeInterceptor Dispose { get; } = new();
@@ -35,20 +35,20 @@ partial class DisposableStubTests
 			{
 				Dispose.RecordCall();
 				if (Dispose.OnCall is { } onCall) { onCall(this); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDisposable", "Dispose");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IDisposable", "Dispose");
 			}
 
 			/// <summary>The global::System.IDisposable instance. Use for passing to code expecting the interface.</summary>
 			public global::System.IDisposable Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IDisposable(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

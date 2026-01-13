@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class PropSecureKnockOff
+partial class PropSecureKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for SecretKey.</summary>
 	public sealed class SecretKeyInterceptor

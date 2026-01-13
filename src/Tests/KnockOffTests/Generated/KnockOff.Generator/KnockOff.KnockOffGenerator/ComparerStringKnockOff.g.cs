@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class ComparerStringKnockOff
+partial class ComparerStringKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Compare.</summary>
 	public sealed class CompareInterceptor

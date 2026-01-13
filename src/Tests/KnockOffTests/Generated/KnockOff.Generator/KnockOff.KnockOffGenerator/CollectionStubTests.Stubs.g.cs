@@ -103,7 +103,7 @@ partial class CollectionStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.Collections.ICollection.</summary>
-		public class ICollection : global::System.Collections.ICollection
+		public class ICollection : global::System.Collections.ICollection, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Count.</summary>
 			public ICollection_CountInterceptor Count { get; } = new();
@@ -124,7 +124,7 @@ partial class CollectionStubTests
 			{
 				CopyTo.RecordCall(array, index);
 				if (CopyTo.OnCall is { } onCall) { onCall(this, array, index); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("ICollection", "CopyTo");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection", "CopyTo");
 			}
 
 			int global::System.Collections.ICollection.Count
@@ -133,7 +133,7 @@ partial class CollectionStubTests
 				{
 					Count.RecordGet();
 					if (Count.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("ICollection", "Count");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection", "Count");
 					return Count.Value;
 				}
 			}
@@ -144,7 +144,7 @@ partial class CollectionStubTests
 				{
 					IsSynchronized.RecordGet();
 					if (IsSynchronized.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("ICollection", "IsSynchronized");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection", "IsSynchronized");
 					return IsSynchronized.Value;
 				}
 			}
@@ -155,7 +155,7 @@ partial class CollectionStubTests
 				{
 					SyncRoot.RecordGet();
 					if (SyncRoot.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("ICollection", "SyncRoot");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection", "SyncRoot");
 					return SyncRoot.Value;
 				}
 			}
@@ -164,7 +164,7 @@ partial class CollectionStubTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
@@ -172,13 +172,13 @@ partial class CollectionStubTests
 			public global::System.Collections.ICollection Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public ICollection(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

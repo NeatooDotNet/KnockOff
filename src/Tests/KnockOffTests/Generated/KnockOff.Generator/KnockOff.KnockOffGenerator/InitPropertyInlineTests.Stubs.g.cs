@@ -40,7 +40,7 @@ partial class InitPropertyInlineTests
 		}
 
 		/// <summary>Stub implementation of global::KnockOffTests.IEntityWithInitProperty.</summary>
-		public class IEntityWithInitProperty : global::KnockOffTests.IEntityWithInitProperty
+		public class IEntityWithInitProperty : global::KnockOffTests.IEntityWithInitProperty, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Id.</summary>
 			public IEntityWithInitProperty_IdInterceptor Id { get; } = new();
@@ -51,14 +51,14 @@ partial class InitPropertyInlineTests
 				{
 					Id.RecordGet();
 					if (Id.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityWithInitProperty", "Id");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityWithInitProperty", "Id");
 					return Id.Value;
 				}
 				init
 				{
 					Id.RecordSet(value);
 					if (Id.OnSet is { } onSet) { onSet(this, value); return; }
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityWithInitProperty", "Id");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityWithInitProperty", "Id");
 					Id.Value = value;
 				}
 			}
@@ -67,13 +67,13 @@ partial class InitPropertyInlineTests
 			public global::KnockOffTests.IEntityWithInitProperty Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IEntityWithInitProperty(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}
@@ -160,7 +160,7 @@ partial class InitPropertyInlineTests
 		}
 
 		/// <summary>Stub implementation of global::KnockOffTests.IDocumentWithMixedProperties.</summary>
-		public class IDocumentWithMixedProperties : global::KnockOffTests.IDocumentWithMixedProperties
+		public class IDocumentWithMixedProperties : global::KnockOffTests.IDocumentWithMixedProperties, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Id.</summary>
 			public IDocumentWithMixedProperties_IdInterceptor Id { get; } = new();
@@ -177,14 +177,14 @@ partial class InitPropertyInlineTests
 				{
 					Id.RecordGet();
 					if (Id.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDocumentWithMixedProperties", "Id");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDocumentWithMixedProperties", "Id");
 					return Id.Value;
 				}
 				init
 				{
 					Id.RecordSet(value);
 					if (Id.OnSet is { } onSet) { onSet(this, value); return; }
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDocumentWithMixedProperties", "Id");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDocumentWithMixedProperties", "Id");
 					Id.Value = value;
 				}
 			}
@@ -195,14 +195,14 @@ partial class InitPropertyInlineTests
 				{
 					Title.RecordGet();
 					if (Title.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDocumentWithMixedProperties", "Title");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDocumentWithMixedProperties", "Title");
 					return Title.Value;
 				}
 				set
 				{
 					Title.RecordSet(value);
 					if (Title.OnSet is { } onSet) { onSet(this, value); return; }
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDocumentWithMixedProperties", "Title");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDocumentWithMixedProperties", "Title");
 					Title.Value = value;
 				}
 			}
@@ -213,7 +213,7 @@ partial class InitPropertyInlineTests
 				{
 					Version.RecordGet();
 					if (Version.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDocumentWithMixedProperties", "Version");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDocumentWithMixedProperties", "Version");
 					return Version.Value;
 				}
 			}
@@ -222,13 +222,13 @@ partial class InitPropertyInlineTests
 			public global::KnockOffTests.IDocumentWithMixedProperties Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IDocumentWithMixedProperties(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}
@@ -265,7 +265,7 @@ partial class InitPropertyInlineTests
 		}
 
 		/// <summary>Stub implementation of global::KnockOffTests.INullableInitProperty.</summary>
-		public class INullableInitProperty : global::KnockOffTests.INullableInitProperty
+		public class INullableInitProperty : global::KnockOffTests.INullableInitProperty, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Name.</summary>
 			public INullableInitProperty_NameInterceptor Name { get; } = new();
@@ -276,14 +276,14 @@ partial class InitPropertyInlineTests
 				{
 					Name.RecordGet();
 					if (Name.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("INullableInitProperty", "Name");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("INullableInitProperty", "Name");
 					return Name.Value;
 				}
 				init
 				{
 					Name.RecordSet(value);
 					if (Name.OnSet is { } onSet) { onSet(this, value); return; }
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("INullableInitProperty", "Name");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("INullableInitProperty", "Name");
 					Name.Value = value;
 				}
 			}
@@ -292,13 +292,13 @@ partial class InitPropertyInlineTests
 			public global::KnockOffTests.INullableInitProperty Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public INullableInitProperty(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class CpCalculatorKnockOff
+partial class CpCalculatorKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Add.</summary>
 	public sealed class Add2Interceptor

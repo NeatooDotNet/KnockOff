@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.ReadMe;
 
-partial class CalculatorKnockOff
+partial class CalculatorKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Add.</summary>
 	public sealed class Add2Interceptor

@@ -29,7 +29,7 @@ partial class ComparableStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.IComparable.</summary>
-		public class IComparable : global::System.IComparable
+		public class IComparable : global::System.IComparable, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for CompareTo.</summary>
 			public IComparable_CompareToInterceptor CompareTo { get; } = new();
@@ -38,7 +38,7 @@ partial class ComparableStubTests
 			{
 				CompareTo.RecordCall(obj);
 				if (CompareTo.OnCall is { } onCall) return onCall(this, obj);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IComparable", "CompareTo");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IComparable", "CompareTo");
 				return default!;
 			}
 
@@ -46,13 +46,13 @@ partial class ComparableStubTests
 			public global::System.IComparable Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IComparable(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

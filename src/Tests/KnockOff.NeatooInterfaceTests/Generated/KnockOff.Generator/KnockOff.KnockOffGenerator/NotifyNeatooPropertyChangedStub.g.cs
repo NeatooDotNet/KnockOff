@@ -3,7 +3,7 @@
 
 namespace KnockOff.NeatooInterfaceTests.Notifications;
 
-partial class NotifyNeatooPropertyChangedStub
+partial class NotifyNeatooPropertyChangedStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Interceptor for NeatooPropertyChanged event.</summary>
 	public sealed class NeatooPropertyChangedInterceptor

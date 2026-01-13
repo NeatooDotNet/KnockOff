@@ -29,7 +29,7 @@ partial class StructuralComparableStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.Collections.IStructuralComparable.</summary>
-		public class IStructuralComparable : global::System.Collections.IStructuralComparable
+		public class IStructuralComparable : global::System.Collections.IStructuralComparable, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for CompareTo.</summary>
 			public IStructuralComparable_CompareToInterceptor CompareTo { get; } = new();
@@ -38,7 +38,7 @@ partial class StructuralComparableStubTests
 			{
 				CompareTo.RecordCall(other, comparer);
 				if (CompareTo.OnCall is { } onCall) return onCall(this, other, comparer);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IStructuralComparable", "CompareTo");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IStructuralComparable", "CompareTo");
 				return default!;
 			}
 
@@ -46,13 +46,13 @@ partial class StructuralComparableStubTests
 			public global::System.Collections.IStructuralComparable Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IStructuralComparable(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

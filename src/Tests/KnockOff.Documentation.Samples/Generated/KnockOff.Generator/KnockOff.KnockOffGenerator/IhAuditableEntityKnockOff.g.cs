@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class IhAuditableEntityKnockOff
+partial class IhAuditableEntityKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for ModifiedAt.</summary>
 	public sealed class ModifiedAtInterceptor

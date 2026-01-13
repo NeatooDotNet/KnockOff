@@ -31,7 +31,7 @@ partial class NotifyPropertyChangingStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.ComponentModel.INotifyPropertyChanging.</summary>
-		public class INotifyPropertyChanging : global::System.ComponentModel.INotifyPropertyChanging
+		public class INotifyPropertyChanging : global::System.ComponentModel.INotifyPropertyChanging, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for PropertyChanging event.</summary>
 			public INotifyPropertyChanging_PropertyChangingInterceptor PropertyChangingInterceptor { get; } = new();
@@ -46,13 +46,13 @@ partial class NotifyPropertyChangingStubTests
 			public global::System.ComponentModel.INotifyPropertyChanging Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public INotifyPropertyChanging(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

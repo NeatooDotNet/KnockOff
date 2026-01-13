@@ -3,7 +3,7 @@
 
 namespace KnockOff.Benchmarks.Stubs;
 
-partial class TimestampedEntityStub
+partial class TimestampedEntityStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for CreatedAt.</summary>
 	public sealed class CreatedAtInterceptor

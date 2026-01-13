@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class IdxMultiStoreKnockOff
+partial class IdxMultiStoreKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Indexer.</summary>
 	public sealed class IndexerStringInterceptor

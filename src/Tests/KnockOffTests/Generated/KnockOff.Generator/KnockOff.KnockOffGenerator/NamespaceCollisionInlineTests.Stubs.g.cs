@@ -49,7 +49,7 @@ partial class NamespaceCollisionInlineTests
 		}
 
 		/// <summary>Stub implementation of global::Person.Ef.IPersonDbContext.</summary>
-		public class IPersonDbContext : global::Person.Ef.IPersonDbContext
+		public class IPersonDbContext : global::Person.Ef.IPersonDbContext, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for SavePerson.</summary>
 			public IPersonDbContext_SavePersonInterceptor SavePerson { get; } = new();
@@ -61,14 +61,14 @@ partial class NamespaceCollisionInlineTests
 			{
 				SavePerson.RecordCall(person);
 				if (SavePerson.OnCall is { } onCall) { onCall(this, person); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IPersonDbContext", "SavePerson");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IPersonDbContext", "SavePerson");
 			}
 
 			global::DomainModel.Person? global::Person.Ef.IPersonDbContext.GetPerson(int id)
 			{
 				GetPerson.RecordCall(id);
 				if (GetPerson.OnCall is { } onCall) return onCall(this, id);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IPersonDbContext", "GetPerson");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IPersonDbContext", "GetPerson");
 				return default!;
 			}
 
@@ -76,13 +76,13 @@ partial class NamespaceCollisionInlineTests
 			public global::Person.Ef.IPersonDbContext Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IPersonDbContext(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

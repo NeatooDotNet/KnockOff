@@ -490,7 +490,7 @@ partial class IValidateListBaseOfTTests
 		}
 
 		/// <summary>Stub implementation of global::Neatoo.IValidateListBase<global::Neatoo.IValidateBase>.</summary>
-		public class IValidateListBase : global::Neatoo.IValidateListBase<global::Neatoo.IValidateBase>
+		public class IValidateListBase : global::Neatoo.IValidateListBase<global::Neatoo.IValidateBase>, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Parent.</summary>
 			public IValidateListBase_ParentInterceptor Parent { get; } = new();
@@ -570,7 +570,7 @@ partial class IValidateListBaseOfTTests
 				{
 					Parent.RecordGet();
 					if (Parent.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "Parent");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "Parent");
 					return Parent.Value;
 				}
 			}
@@ -579,7 +579,7 @@ partial class IValidateListBaseOfTTests
 			{
 				IndexOf.RecordCall(item);
 				if (IndexOf.OnCall is { } onCall) return onCall(this, item);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "IndexOf");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "IndexOf");
 				return default!;
 			}
 
@@ -587,14 +587,14 @@ partial class IValidateListBaseOfTTests
 			{
 				Insert.RecordCall(index, item);
 				if (Insert.OnCall is { } onCall) { onCall(this, index, item); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "Insert");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "Insert");
 			}
 
 			void global::System.Collections.Generic.IList<global::Neatoo.IValidateBase>.RemoveAt(int index)
 			{
 				RemoveAt.RecordCall(index);
 				if (RemoveAt.OnCall is { } onCall) { onCall(this, index); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "RemoveAt");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "RemoveAt");
 			}
 
 			global::Neatoo.IValidateBase global::System.Collections.Generic.IList<global::Neatoo.IValidateBase>.this[int index]
@@ -603,14 +603,14 @@ partial class IValidateListBaseOfTTests
 				{
 					Indexer.RecordGet(index);
 					if (Indexer.OnGet is { } onGet) return onGet(this, index);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "this[]");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "this[]");
 					return Indexer.Backing.TryGetValue(index, out var v) ? v : default!;
 				}
 				set
 				{
 					Indexer.RecordSet(index, value);
 					if (Indexer.OnSet is { } onSet) { onSet(this, index, value); return; }
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "this[]");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "this[]");
 					Indexer.Backing[index] = value;
 				}
 			}
@@ -619,21 +619,21 @@ partial class IValidateListBaseOfTTests
 			{
 				Add.RecordCall(item);
 				if (Add.OnCall is { } onCall) { onCall(this, item); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "Add");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "Add");
 			}
 
 			void global::System.Collections.Generic.ICollection<global::Neatoo.IValidateBase>.Clear()
 			{
 				Clear.RecordCall();
 				if (Clear.OnCall is { } onCall) { onCall(this); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "Clear");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "Clear");
 			}
 
 			bool global::System.Collections.Generic.ICollection<global::Neatoo.IValidateBase>.Contains(global::Neatoo.IValidateBase item)
 			{
 				Contains.RecordCall(item);
 				if (Contains.OnCall is { } onCall) return onCall(this, item);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "Contains");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "Contains");
 				return default!;
 			}
 
@@ -641,14 +641,14 @@ partial class IValidateListBaseOfTTests
 			{
 				CopyTo.RecordCall(array, arrayIndex);
 				if (CopyTo.OnCall is { } onCall) { onCall(this, array, arrayIndex); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "CopyTo");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "CopyTo");
 			}
 
 			bool global::System.Collections.Generic.ICollection<global::Neatoo.IValidateBase>.Remove(global::Neatoo.IValidateBase item)
 			{
 				Remove.RecordCall(item);
 				if (Remove.OnCall is { } onCall) return onCall(this, item);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "Remove");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "Remove");
 				return default!;
 			}
 
@@ -658,7 +658,7 @@ partial class IValidateListBaseOfTTests
 				{
 					Count.RecordGet();
 					if (Count.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "Count");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "Count");
 					return Count.Value;
 				}
 			}
@@ -669,7 +669,7 @@ partial class IValidateListBaseOfTTests
 				{
 					IsReadOnly.RecordGet();
 					if (IsReadOnly.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "IsReadOnly");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "IsReadOnly");
 					return IsReadOnly.Value;
 				}
 			}
@@ -678,7 +678,7 @@ partial class IValidateListBaseOfTTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "GetEnumerator");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
@@ -686,7 +686,7 @@ partial class IValidateListBaseOfTTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
@@ -694,7 +694,7 @@ partial class IValidateListBaseOfTTests
 			{
 				WaitForTasks.RecordCall(null);
 				if (WaitForTasks.OnCall is { } onCall) return onCall(this, null);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "WaitForTasks");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -702,7 +702,7 @@ partial class IValidateListBaseOfTTests
 			{
 				WaitForTasks.RecordCall(token);
 				if (WaitForTasks.OnCall is { } onCall) return onCall(this, token);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "WaitForTasks");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -710,7 +710,7 @@ partial class IValidateListBaseOfTTests
 			{
 				RunRules.RecordCall(propertyName, token, null);
 				if (RunRules.OnCall is { } onCall) return onCall(this, propertyName, token, null);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "RunRules");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -718,7 +718,7 @@ partial class IValidateListBaseOfTTests
 			{
 				RunRules.RecordCall(null, token, runRules);
 				if (RunRules.OnCall is { } onCall) return onCall(this, null, token, runRules);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "RunRules");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -726,14 +726,14 @@ partial class IValidateListBaseOfTTests
 			{
 				ClearAllMessages.RecordCall();
 				if (ClearAllMessages.OnCall is { } onCall) { onCall(this); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "ClearAllMessages");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "ClearAllMessages");
 			}
 
 			void global::Neatoo.IValidateMetaProperties.ClearSelfMessages()
 			{
 				ClearSelfMessages.RecordCall();
 				if (ClearSelfMessages.OnCall is { } onCall) { onCall(this); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "ClearSelfMessages");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "ClearSelfMessages");
 			}
 
 			bool global::Neatoo.IValidateMetaProperties.IsBusy
@@ -742,7 +742,7 @@ partial class IValidateListBaseOfTTests
 				{
 					IsBusy.RecordGet();
 					if (IsBusy.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsBusy");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsBusy");
 					return IsBusy.Value;
 				}
 			}
@@ -753,7 +753,7 @@ partial class IValidateListBaseOfTTests
 				{
 					IsValid.RecordGet();
 					if (IsValid.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsValid");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsValid");
 					return IsValid.Value;
 				}
 			}
@@ -764,7 +764,7 @@ partial class IValidateListBaseOfTTests
 				{
 					IsSelfValid.RecordGet();
 					if (IsSelfValid.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsSelfValid");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsSelfValid");
 					return IsSelfValid.Value;
 				}
 			}
@@ -775,7 +775,7 @@ partial class IValidateListBaseOfTTests
 				{
 					PropertyMessages.RecordGet();
 					if (PropertyMessages.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "PropertyMessages");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "PropertyMessages");
 					return PropertyMessages.Value;
 				}
 			}
@@ -802,13 +802,13 @@ partial class IValidateListBaseOfTTests
 			public global::Neatoo.IValidateListBase<global::Neatoo.IValidateBase> Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IValidateListBase(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

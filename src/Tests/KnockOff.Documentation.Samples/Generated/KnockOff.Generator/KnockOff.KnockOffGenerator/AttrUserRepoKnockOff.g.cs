@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Reference;
 
-partial class AttrUserRepoKnockOff
+partial class AttrUserRepoKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetById.</summary>
 	public sealed class GetByIdInterceptor

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class CpResetRepositoryKnockOff
+partial class CpResetRepositoryKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetUser.</summary>
 	public sealed class GetUserInterceptor

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class SkCallbackIndexerKnockOff
+partial class SkCallbackIndexerKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Indexer.</summary>
 	public sealed class IndexerInterceptor

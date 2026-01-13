@@ -77,7 +77,7 @@ partial class StrictModeInlineTests
 		}
 
 		/// <summary>Stub implementation of global::KnockOff.Tests.IStrictModeTest.</summary>
-		public class IStrictModeTest : global::KnockOff.Tests.IStrictModeTest
+		public class IStrictModeTest : global::KnockOff.Tests.IStrictModeTest, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Name.</summary>
 			public IStrictModeTest_NameInterceptor Name { get; } = new();
@@ -94,14 +94,14 @@ partial class StrictModeInlineTests
 				{
 					Name.RecordGet();
 					if (Name.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IStrictModeTest", "Name");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IStrictModeTest", "Name");
 					return Name.Value;
 				}
 				set
 				{
 					Name.RecordSet(value);
 					if (Name.OnSet is { } onSet) { onSet(this, value); return; }
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IStrictModeTest", "Name");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IStrictModeTest", "Name");
 					Name.Value = value;
 				}
 			}
@@ -110,7 +110,7 @@ partial class StrictModeInlineTests
 			{
 				GetValue.RecordCall(x);
 				if (GetValue.OnCall is { } onCall) return onCall(this, x);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IStrictModeTest", "GetValue");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IStrictModeTest", "GetValue");
 				return default!;
 			}
 
@@ -118,20 +118,20 @@ partial class StrictModeInlineTests
 			{
 				DoSomething.RecordCall();
 				if (DoSomething.OnCall is { } onCall) { onCall(this); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IStrictModeTest", "DoSomething");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IStrictModeTest", "DoSomething");
 			}
 
 			/// <summary>The global::KnockOff.Tests.IStrictModeTest instance. Use for passing to code expecting the interface.</summary>
 			public global::KnockOff.Tests.IStrictModeTest Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IStrictModeTest(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}
@@ -154,7 +154,7 @@ partial class StrictModeInlineTests
 		}
 
 		/// <summary>Stub implementation of global::KnockOff.Tests.IStrictByDefault.</summary>
-		public class IStrictByDefault : global::KnockOff.Tests.IStrictByDefault
+		public class IStrictByDefault : global::KnockOff.Tests.IStrictByDefault, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for GetData.</summary>
 			public IStrictByDefault_GetDataInterceptor GetData { get; } = new();
@@ -163,7 +163,7 @@ partial class StrictModeInlineTests
 			{
 				GetData.RecordCall();
 				if (GetData.OnCall is { } onCall) return onCall(this);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IStrictByDefault", "GetData");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IStrictByDefault", "GetData");
 				return default!;
 			}
 
@@ -171,13 +171,13 @@ partial class StrictModeInlineTests
 			public global::KnockOff.Tests.IStrictByDefault Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = true;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IStrictByDefault(bool strict = true)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

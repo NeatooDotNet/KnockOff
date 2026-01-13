@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class SkSingleMethodServiceKnockOff
+partial class SkSingleMethodServiceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for SendEmail.</summary>
 	public sealed class SendEmailInterceptor

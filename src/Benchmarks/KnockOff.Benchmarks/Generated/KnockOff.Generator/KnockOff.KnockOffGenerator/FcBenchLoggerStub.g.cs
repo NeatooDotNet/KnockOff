@@ -3,7 +3,7 @@
 
 namespace KnockOff.Benchmarks.Benchmarks;
 
-partial class FcBenchLoggerStub
+partial class FcBenchLoggerStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for LogInfo.</summary>
 	public sealed class LogInfoInterceptor

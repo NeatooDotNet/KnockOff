@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class MmProcessorKnockOff
+partial class MmProcessorKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Process.</summary>
 	public sealed class Process1Interceptor

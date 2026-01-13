@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.GettingStarted;
 
-partial class RepositoryKnockOff
+partial class RepositoryKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Save.</summary>
 	public sealed class SaveInterceptor

@@ -26,8 +26,11 @@ partial class GenericDelegateInlineTest
 		}
 
 		/// <summary>Stub for global::KnockOff.Tests.Factory<string> delegate.</summary>
-		public sealed class Factory
+		public sealed class Factory : global::KnockOff.IKnockOffStub
 		{
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for delegate stubs.</summary>
+			public bool Strict { get; set; }
+
 			/// <summary>Interceptor for tracking and configuring delegate behavior.</summary>
 			public FactoryInterceptor Interceptor { get; } = new();
 
@@ -63,8 +66,11 @@ partial class GenericDelegateInlineTest
 		}
 
 		/// <summary>Stub for global::KnockOff.Tests.Converter<int, string> delegate.</summary>
-		public sealed class Converter
+		public sealed class Converter : global::KnockOff.IKnockOffStub
 		{
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for delegate stubs.</summary>
+			public bool Strict { get; set; }
+
 			/// <summary>Interceptor for tracking and configuring delegate behavior.</summary>
 			public ConverterInterceptor Interceptor { get; } = new();
 

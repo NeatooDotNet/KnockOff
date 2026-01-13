@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class MethodCallOrderKnockOff
+partial class MethodCallOrderKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Initialize.</summary>
 	public sealed class InitializeInterceptor

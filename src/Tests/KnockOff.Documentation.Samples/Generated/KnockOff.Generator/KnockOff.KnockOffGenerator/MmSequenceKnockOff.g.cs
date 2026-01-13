@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class MmSequenceKnockOff
+partial class MmSequenceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetNext.</summary>
 	public sealed class GetNextInterceptor

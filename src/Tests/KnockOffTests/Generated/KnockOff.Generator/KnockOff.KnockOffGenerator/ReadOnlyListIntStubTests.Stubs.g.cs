@@ -67,7 +67,7 @@ partial class ReadOnlyListIntStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.Collections.Generic.IReadOnlyList<int>.</summary>
-		public class IReadOnlyList : global::System.Collections.Generic.IReadOnlyList<int>
+		public class IReadOnlyList : global::System.Collections.Generic.IReadOnlyList<int>, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Indexer.</summary>
 			public IReadOnlyList_IndexerInterceptor Indexer { get; } = new();
@@ -84,7 +84,7 @@ partial class ReadOnlyListIntStubTests
 				{
 					Indexer.RecordGet(index);
 					if (Indexer.OnGet is { } onGet) return onGet(this, index);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IReadOnlyList<int>", "this[]");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IReadOnlyList<int>", "this[]");
 					return Indexer.Backing.TryGetValue(index, out var v) ? v : default!;
 				}
 			}
@@ -95,7 +95,7 @@ partial class ReadOnlyListIntStubTests
 				{
 					Count.RecordGet();
 					if (Count.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IReadOnlyCollection<int>", "Count");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IReadOnlyCollection<int>", "Count");
 					return Count.Value;
 				}
 			}
@@ -104,7 +104,7 @@ partial class ReadOnlyListIntStubTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable<int>", "GetEnumerator");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable<int>", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
@@ -112,7 +112,7 @@ partial class ReadOnlyListIntStubTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
@@ -120,13 +120,13 @@ partial class ReadOnlyListIntStubTests
 			public global::System.Collections.Generic.IReadOnlyList<int> Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IReadOnlyList(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

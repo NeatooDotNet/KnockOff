@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class HaAsyncRepositoryKnockOff
+partial class HaAsyncRepositoryKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetByIdAsync.</summary>
 	public sealed class GetByIdAsyncInterceptor

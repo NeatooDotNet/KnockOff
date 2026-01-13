@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class NestedTypeParamStub<T>
+partial class NestedTypeParamStub<T> : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetItems.</summary>
 	public sealed class GetItemsInterceptor

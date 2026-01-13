@@ -49,7 +49,7 @@ partial class StructuralEquatableStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.Collections.IStructuralEquatable.</summary>
-		public class IStructuralEquatable : global::System.Collections.IStructuralEquatable
+		public class IStructuralEquatable : global::System.Collections.IStructuralEquatable, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Equals.</summary>
 			public new IStructuralEquatable_EqualsInterceptor Equals { get; } = new();
@@ -61,7 +61,7 @@ partial class StructuralEquatableStubTests
 			{
 				Equals.RecordCall(other, comparer);
 				if (Equals.OnCall is { } onCall) return onCall(this, other, comparer);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IStructuralEquatable", "Equals");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IStructuralEquatable", "Equals");
 				return default!;
 			}
 
@@ -69,7 +69,7 @@ partial class StructuralEquatableStubTests
 			{
 				GetHashCode.RecordCall(comparer);
 				if (GetHashCode.OnCall is { } onCall) return onCall(this, comparer);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IStructuralEquatable", "GetHashCode");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IStructuralEquatable", "GetHashCode");
 				return default!;
 			}
 
@@ -77,13 +77,13 @@ partial class StructuralEquatableStubTests
 			public global::System.Collections.IStructuralEquatable Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IStructuralEquatable(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

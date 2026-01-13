@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class ProgressIntKnockOff
+partial class ProgressIntKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Report.</summary>
 	public sealed class ReportInterceptor

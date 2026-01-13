@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class GuideDownloaderKnockOff
+partial class GuideDownloaderKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Interceptor for ProgressChanged event.</summary>
 	public sealed class ProgressChangedInterceptor

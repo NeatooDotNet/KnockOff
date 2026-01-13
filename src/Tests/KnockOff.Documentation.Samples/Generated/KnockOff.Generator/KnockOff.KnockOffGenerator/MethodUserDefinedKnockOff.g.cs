@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class MethodUserDefinedKnockOff
+partial class MethodUserDefinedKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetById.</summary>
 	public sealed class GetById2Interceptor

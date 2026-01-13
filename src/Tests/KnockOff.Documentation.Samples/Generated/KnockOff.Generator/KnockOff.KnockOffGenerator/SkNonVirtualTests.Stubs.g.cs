@@ -37,8 +37,11 @@ partial class SkNonVirtualTests
 		}
 
 		/// <summary>Stub for global::KnockOff.Documentation.Samples.Skills.SkNonVirtualService via composition.</summary>
-		public class SkNonVirtualService
+		public class SkNonVirtualService : global::KnockOff.IKnockOffStub
 		{
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for class stubs.</summary>
+			public bool Strict { get; set; }
+
 			/// <summary>Interceptor for VirtualProperty.</summary>
 			public SkNonVirtualService_VirtualPropertyInterceptor VirtualProperty { get; } = new();
 

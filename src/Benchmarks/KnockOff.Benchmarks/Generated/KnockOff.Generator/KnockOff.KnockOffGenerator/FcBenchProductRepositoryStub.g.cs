@@ -3,7 +3,7 @@
 
 namespace KnockOff.Benchmarks.Benchmarks;
 
-partial class FcBenchProductRepositoryStub
+partial class FcBenchProductRepositoryStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetByIdAsync.</summary>
 	public sealed class GetByIdAsyncInterceptor

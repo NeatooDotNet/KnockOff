@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace KnockOff.Tests;
 
-partial class GenericMethodWithUserMethodKnockOff
+partial class GenericMethodWithUserMethodKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Marker interface for generic method call tracking.</summary>
 	private interface IGenericMethodCallTracker { int CallCount { get; } bool WasCalled { get; } }

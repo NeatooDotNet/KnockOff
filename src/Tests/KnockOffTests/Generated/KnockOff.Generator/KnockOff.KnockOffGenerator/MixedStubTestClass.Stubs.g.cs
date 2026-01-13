@@ -54,8 +54,11 @@ partial class MixedStubTestClass
 		}
 
 		/// <summary>Stub for global::KnockOff.Tests.MixedService via composition.</summary>
-		public class MixedService
+		public class MixedService : global::KnockOff.IKnockOffStub
 		{
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for class stubs.</summary>
+			public bool Strict { get; set; }
+
 			/// <summary>Interceptor for VirtualProperty.</summary>
 			public MixedService_VirtualPropertyInterceptor VirtualProperty { get; } = new();
 			/// <summary>Interceptor for VirtualMethod.</summary>

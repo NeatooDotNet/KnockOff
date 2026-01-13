@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.GettingStarted;
 
-partial class EntityKnockOff
+partial class EntityKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Id.</summary>
 	public sealed class IdInterceptor

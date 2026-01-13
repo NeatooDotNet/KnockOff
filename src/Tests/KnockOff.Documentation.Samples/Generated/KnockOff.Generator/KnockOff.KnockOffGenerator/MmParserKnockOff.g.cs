@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class MmParserKnockOff
+partial class MmParserKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for TryParse.</summary>
 	public sealed class TryParseInterceptor

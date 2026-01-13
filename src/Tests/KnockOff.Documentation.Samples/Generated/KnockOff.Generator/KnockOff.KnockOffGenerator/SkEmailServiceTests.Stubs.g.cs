@@ -57,8 +57,11 @@ partial class SkEmailServiceTests
 		}
 
 		/// <summary>Stub for global::KnockOff.Documentation.Samples.Skills.SkEmailService via composition.</summary>
-		public class SkEmailService
+		public class SkEmailService : global::KnockOff.IKnockOffStub
 		{
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for class stubs.</summary>
+			public bool Strict { get; set; }
+
 			/// <summary>Interceptor for ServerName.</summary>
 			public SkEmailService_ServerNameInterceptor ServerName { get; } = new();
 			/// <summary>Interceptor for Send.</summary>

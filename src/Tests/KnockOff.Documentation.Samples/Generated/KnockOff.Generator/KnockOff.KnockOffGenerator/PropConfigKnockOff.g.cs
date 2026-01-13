@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class PropConfigKnockOff
+partial class PropConfigKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for ConnectionString.</summary>
 	public sealed class ConnectionStringInterceptor

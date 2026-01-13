@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Comparison;
 
-partial class FcOrderRepositoryStub
+partial class FcOrderRepositoryStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetById.</summary>
 	public sealed class GetByIdInterceptor

@@ -29,7 +29,7 @@ partial class ComparerStringStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.Collections.Generic.IComparer<string>.</summary>
-		public class IComparer : global::System.Collections.Generic.IComparer<string>
+		public class IComparer : global::System.Collections.Generic.IComparer<string>, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Compare.</summary>
 			public IComparer_CompareInterceptor Compare { get; } = new();
@@ -38,7 +38,7 @@ partial class ComparerStringStubTests
 			{
 				Compare.RecordCall(x, y);
 				if (Compare.OnCall is { } onCall) return onCall(this, x, y);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IComparer<string>", "Compare");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IComparer<string>", "Compare");
 				return default!;
 			}
 
@@ -46,13 +46,13 @@ partial class ComparerStringStubTests
 			public global::System.Collections.Generic.IComparer<string> Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IComparer(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

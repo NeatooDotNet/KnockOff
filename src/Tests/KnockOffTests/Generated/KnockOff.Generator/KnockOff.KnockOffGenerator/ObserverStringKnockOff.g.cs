@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class ObserverStringKnockOff
+partial class ObserverStringKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for OnCompleted.</summary>
 	public sealed class OnCompletedInterceptor

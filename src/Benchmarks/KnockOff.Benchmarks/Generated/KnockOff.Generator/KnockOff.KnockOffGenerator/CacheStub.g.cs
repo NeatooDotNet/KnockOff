@@ -3,7 +3,7 @@
 
 namespace KnockOff.Benchmarks.Stubs;
 
-partial class CacheStub
+partial class CacheStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Indexer.</summary>
 	public sealed class IndexerStringInterceptor

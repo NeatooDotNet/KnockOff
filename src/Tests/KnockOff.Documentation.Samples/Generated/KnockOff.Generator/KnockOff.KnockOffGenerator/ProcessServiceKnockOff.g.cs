@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.GettingStarted;
 
-partial class ProcessServiceKnockOff
+partial class ProcessServiceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Process.</summary>
 	public sealed class Process1Interceptor

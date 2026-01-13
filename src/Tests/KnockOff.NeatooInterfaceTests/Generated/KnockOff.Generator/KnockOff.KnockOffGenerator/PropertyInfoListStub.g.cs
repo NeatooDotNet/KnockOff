@@ -3,7 +3,7 @@
 
 namespace KnockOff.NeatooInterfaceTests.Properties;
 
-partial class PropertyInfoListStub
+partial class PropertyInfoListStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetPropertyInfo.</summary>
 	public sealed class GetPropertyInfoInterceptor

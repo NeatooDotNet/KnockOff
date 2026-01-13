@@ -3,7 +3,7 @@
 
 namespace KnockOffTests;
 
-partial class EntityWithInitPropertyKnockOff
+partial class EntityWithInitPropertyKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Id.</summary>
 	public sealed class IdInterceptor

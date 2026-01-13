@@ -142,7 +142,7 @@ partial class IEntityMetaPropertiesTests
 		}
 
 		/// <summary>Stub implementation of global::Neatoo.IEntityMetaProperties.</summary>
-		public class IEntityMetaProperties : global::Neatoo.IEntityMetaProperties
+		public class IEntityMetaProperties : global::Neatoo.IEntityMetaProperties, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for IsChild.</summary>
 			public IEntityMetaProperties_IsChildInterceptor IsChild { get; } = new();
@@ -171,7 +171,7 @@ partial class IEntityMetaPropertiesTests
 				{
 					IsChild.RecordGet();
 					if (IsChild.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsChild");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsChild");
 					return IsChild.Value;
 				}
 			}
@@ -182,7 +182,7 @@ partial class IEntityMetaPropertiesTests
 				{
 					IsModified.RecordGet();
 					if (IsModified.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsModified");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsModified");
 					return IsModified.Value;
 				}
 			}
@@ -193,7 +193,7 @@ partial class IEntityMetaPropertiesTests
 				{
 					IsSelfModified.RecordGet();
 					if (IsSelfModified.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsSelfModified");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsSelfModified");
 					return IsSelfModified.Value;
 				}
 			}
@@ -204,7 +204,7 @@ partial class IEntityMetaPropertiesTests
 				{
 					IsMarkedModified.RecordGet();
 					if (IsMarkedModified.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsMarkedModified");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsMarkedModified");
 					return IsMarkedModified.Value;
 				}
 			}
@@ -215,7 +215,7 @@ partial class IEntityMetaPropertiesTests
 				{
 					IsSavable.RecordGet();
 					if (IsSavable.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsSavable");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsSavable");
 					return IsSavable.Value;
 				}
 			}
@@ -226,7 +226,7 @@ partial class IEntityMetaPropertiesTests
 				{
 					IsDeleted.RecordGet();
 					if (IsDeleted.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IFactorySaveMeta", "IsDeleted");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IFactorySaveMeta", "IsDeleted");
 					return IsDeleted.Value;
 				}
 			}
@@ -237,7 +237,7 @@ partial class IEntityMetaPropertiesTests
 				{
 					IsNew.RecordGet();
 					if (IsNew.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IFactorySaveMeta", "IsNew");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IFactorySaveMeta", "IsNew");
 					return IsNew.Value;
 				}
 			}
@@ -246,13 +246,13 @@ partial class IEntityMetaPropertiesTests
 			public global::Neatoo.IEntityMetaProperties Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IEntityMetaProperties(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

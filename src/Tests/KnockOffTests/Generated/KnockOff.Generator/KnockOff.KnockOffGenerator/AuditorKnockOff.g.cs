@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class AuditorKnockOff
+partial class AuditorKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Log.</summary>
 	public sealed class LogInterceptor

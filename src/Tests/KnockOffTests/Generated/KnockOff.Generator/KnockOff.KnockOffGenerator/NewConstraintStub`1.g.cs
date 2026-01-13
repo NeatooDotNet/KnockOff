@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class NewConstraintStub<T> where T : new()
+partial class NewConstraintStub<T> : global::KnockOff.IKnockOffStub where T : new()
 {
 	/// <summary>Tracks and configures behavior for Create.</summary>
 	public sealed class CreateInterceptor

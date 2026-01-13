@@ -49,7 +49,7 @@ partial class MultiDataContextTests
 		}
 
 		/// <summary>Stub implementation of global::KnockOff.Documentation.Samples.Guides.IMultiRepository.</summary>
-		public class IMultiRepository : global::KnockOff.Documentation.Samples.Guides.IMultiRepository
+		public class IMultiRepository : global::KnockOff.Documentation.Samples.Guides.IMultiRepository, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for GetById.</summary>
 			public IMultiRepository_GetByIdInterceptor GetById { get; } = new();
@@ -61,7 +61,7 @@ partial class MultiDataContextTests
 			{
 				GetById.RecordCall(id);
 				if (GetById.OnCall is { } onCall) return onCall(this, id);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IMultiRepository", "GetById");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IMultiRepository", "GetById");
 				return default!;
 			}
 
@@ -69,20 +69,20 @@ partial class MultiDataContextTests
 			{
 				Add.RecordCall(user);
 				if (Add.OnCall is { } onCall) { onCall(this, user); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IMultiRepository", "Add");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IMultiRepository", "Add");
 			}
 
 			/// <summary>The global::KnockOff.Documentation.Samples.Guides.IMultiRepository instance. Use for passing to code expecting the interface.</summary>
 			public global::KnockOff.Documentation.Samples.Guides.IMultiRepository Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IMultiRepository(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}
@@ -108,7 +108,7 @@ partial class MultiDataContextTests
 		}
 
 		/// <summary>Stub implementation of global::KnockOff.Documentation.Samples.Guides.IMultiUnitOfWork.</summary>
-		public class IMultiUnitOfWork : global::KnockOff.Documentation.Samples.Guides.IMultiUnitOfWork
+		public class IMultiUnitOfWork : global::KnockOff.Documentation.Samples.Guides.IMultiUnitOfWork, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for SaveChangesAsync.</summary>
 			public IMultiUnitOfWork_SaveChangesAsyncInterceptor SaveChangesAsync { get; } = new();
@@ -117,7 +117,7 @@ partial class MultiDataContextTests
 			{
 				SaveChangesAsync.RecordCall(ct);
 				if (SaveChangesAsync.OnCall is { } onCall) return onCall(this, ct);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IMultiUnitOfWork", "SaveChangesAsync");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IMultiUnitOfWork", "SaveChangesAsync");
 				return global::System.Threading.Tasks.Task.FromResult<int>(default!);
 			}
 
@@ -125,13 +125,13 @@ partial class MultiDataContextTests
 			public global::KnockOff.Documentation.Samples.Guides.IMultiUnitOfWork Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IMultiUnitOfWork(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

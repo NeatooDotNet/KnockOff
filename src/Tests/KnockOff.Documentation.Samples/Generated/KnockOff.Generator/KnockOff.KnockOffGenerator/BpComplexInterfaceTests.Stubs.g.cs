@@ -486,7 +486,7 @@ partial class BpComplexInterfaceTests
 		}
 
 		/// <summary>Stub implementation of global::KnockOff.Documentation.Samples.Guides.IBpEditBase.</summary>
-		public class IBpEditBase : global::KnockOff.Documentation.Samples.Guides.IBpEditBase
+		public class IBpEditBase : global::KnockOff.Documentation.Samples.Guides.IBpEditBase, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for IsValid.</summary>
 			public IBpEditBase_IsValidInterceptor IsValid { get; } = new();
@@ -566,7 +566,7 @@ partial class BpComplexInterfaceTests
 				{
 					IsValid.RecordGet();
 					if (IsValid.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "IsValid");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "IsValid");
 					return IsValid.Value;
 				}
 			}
@@ -577,7 +577,7 @@ partial class BpComplexInterfaceTests
 				{
 					IsSelfValid.RecordGet();
 					if (IsSelfValid.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "IsSelfValid");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "IsSelfValid");
 					return IsSelfValid.Value;
 				}
 			}
@@ -588,7 +588,7 @@ partial class BpComplexInterfaceTests
 				{
 					IsDirty.RecordGet();
 					if (IsDirty.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "IsDirty");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "IsDirty");
 					return IsDirty.Value;
 				}
 			}
@@ -599,7 +599,7 @@ partial class BpComplexInterfaceTests
 				{
 					IsSelfDirty.RecordGet();
 					if (IsSelfDirty.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "IsSelfDirty");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "IsSelfDirty");
 					return IsSelfDirty.Value;
 				}
 			}
@@ -610,7 +610,7 @@ partial class BpComplexInterfaceTests
 				{
 					IsDeleted.RecordGet();
 					if (IsDeleted.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "IsDeleted");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "IsDeleted");
 					return IsDeleted.Value;
 				}
 			}
@@ -621,7 +621,7 @@ partial class BpComplexInterfaceTests
 				{
 					IsNew.RecordGet();
 					if (IsNew.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "IsNew");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "IsNew");
 					return IsNew.Value;
 				}
 			}
@@ -632,7 +632,7 @@ partial class BpComplexInterfaceTests
 				{
 					IsSavable.RecordGet();
 					if (IsSavable.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "IsSavable");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "IsSavable");
 					return IsSavable.Value;
 				}
 			}
@@ -643,14 +643,14 @@ partial class BpComplexInterfaceTests
 				{
 					Id.RecordGet();
 					if (Id.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "Id");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "Id");
 					return Id.Value;
 				}
 				set
 				{
 					Id.RecordSet(value);
 					if (Id.OnSet is { } onSet) { onSet(this, value); return; }
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "Id");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "Id");
 					Id.Value = value;
 				}
 			}
@@ -661,14 +661,14 @@ partial class BpComplexInterfaceTests
 				{
 					Name.RecordGet();
 					if (Name.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "Name");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "Name");
 					return Name.Value;
 				}
 				set
 				{
 					Name.RecordSet(value);
 					if (Name.OnSet is { } onSet) { onSet(this, value); return; }
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "Name");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "Name");
 					Name.Value = value;
 				}
 			}
@@ -677,63 +677,63 @@ partial class BpComplexInterfaceTests
 			{
 				BeginEdit.RecordCall();
 				if (BeginEdit.OnCall is { } onCall) { onCall(this); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "BeginEdit");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "BeginEdit");
 			}
 
 			void global::KnockOff.Documentation.Samples.Guides.IBpEditBase.CancelEdit()
 			{
 				CancelEdit.RecordCall();
 				if (CancelEdit.OnCall is { } onCall) { onCall(this); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "CancelEdit");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "CancelEdit");
 			}
 
 			void global::KnockOff.Documentation.Samples.Guides.IBpEditBase.ApplyEdit()
 			{
 				ApplyEdit.RecordCall();
 				if (ApplyEdit.OnCall is { } onCall) { onCall(this); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "ApplyEdit");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "ApplyEdit");
 			}
 
 			void global::KnockOff.Documentation.Samples.Guides.IBpEditBase.MarkDeleted()
 			{
 				MarkDeleted.RecordCall();
 				if (MarkDeleted.OnCall is { } onCall) { onCall(this); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "MarkDeleted");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "MarkDeleted");
 			}
 
 			void global::KnockOff.Documentation.Samples.Guides.IBpEditBase.MarkNew()
 			{
 				MarkNew.RecordCall();
 				if (MarkNew.OnCall is { } onCall) { onCall(this); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "MarkNew");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "MarkNew");
 			}
 
 			void global::KnockOff.Documentation.Samples.Guides.IBpEditBase.MarkOld()
 			{
 				MarkOld.RecordCall();
 				if (MarkOld.OnCall is { } onCall) { onCall(this); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "MarkOld");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "MarkOld");
 			}
 
 			void global::KnockOff.Documentation.Samples.Guides.IBpEditBase.AddRule(string property, global::System.Func<bool> rule)
 			{
 				AddRule.RecordCall(property, rule);
 				if (AddRule.OnCall is { } onCall) { onCall(this, property, rule); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "AddRule");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "AddRule");
 			}
 
 			void global::KnockOff.Documentation.Samples.Guides.IBpEditBase.RemoveRule(string property)
 			{
 				RemoveRule.RecordCall(property);
 				if (RemoveRule.OnCall is { } onCall) { onCall(this, property); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "RemoveRule");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "RemoveRule");
 			}
 
 			global::System.Collections.Generic.IEnumerable<string> global::KnockOff.Documentation.Samples.Guides.IBpEditBase.GetBrokenRules()
 			{
 				GetBrokenRules.RecordCall();
 				if (GetBrokenRules.OnCall is { } onCall) return onCall(this);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "GetBrokenRules");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "GetBrokenRules");
 				return new global::System.Collections.Generic.List<string>();
 			}
 
@@ -741,21 +741,21 @@ partial class BpComplexInterfaceTests
 			{
 				AddChild.RecordCall(child);
 				if (AddChild.OnCall is { } onCall) { onCall(this, child); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "AddChild");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "AddChild");
 			}
 
 			void global::KnockOff.Documentation.Samples.Guides.IBpEditBase.RemoveChild(object child)
 			{
 				RemoveChild.RecordCall(child);
 				if (RemoveChild.OnCall is { } onCall) { onCall(this, child); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "RemoveChild");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "RemoveChild");
 			}
 
 			global::System.Collections.Generic.IEnumerable<object> global::KnockOff.Documentation.Samples.Guides.IBpEditBase.GetChildren()
 			{
 				GetChildren.RecordCall();
 				if (GetChildren.OnCall is { } onCall) return onCall(this);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "GetChildren");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "GetChildren");
 				return new global::System.Collections.Generic.List<object>();
 			}
 
@@ -781,13 +781,13 @@ partial class BpComplexInterfaceTests
 			public global::KnockOff.Documentation.Samples.Guides.IBpEditBase Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IBpEditBase(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

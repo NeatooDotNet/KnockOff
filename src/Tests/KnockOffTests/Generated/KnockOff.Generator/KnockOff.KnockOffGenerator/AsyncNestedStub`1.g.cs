@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class AsyncNestedStub<T> where T : class
+partial class AsyncNestedStub<T> : global::KnockOff.IKnockOffStub where T : class
 {
 	/// <summary>Tracks and configures behavior for GetAsync.</summary>
 	public sealed class GetAsyncInterceptor

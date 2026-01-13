@@ -3,7 +3,7 @@
 
 namespace KnockOff.NeatooInterfaceTests.ValidationRules;
 
-partial class TriggerPropertyOfTStub
+partial class TriggerPropertyOfTStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for PropertyName.</summary>
 	public sealed class PropertyNameInterceptor

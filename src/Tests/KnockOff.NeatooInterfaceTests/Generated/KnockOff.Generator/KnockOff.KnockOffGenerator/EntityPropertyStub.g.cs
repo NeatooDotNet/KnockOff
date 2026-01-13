@@ -3,7 +3,7 @@
 
 namespace KnockOff.NeatooInterfaceTests.Properties;
 
-partial class EntityPropertyStub
+partial class EntityPropertyStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for IsPaused.</summary>
 	public sealed class IsPausedInterceptor

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class OverloadedServiceKnockOff
+partial class OverloadedServiceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetByIdAsync.</summary>
 	public sealed class GetByIdAsync1Interceptor

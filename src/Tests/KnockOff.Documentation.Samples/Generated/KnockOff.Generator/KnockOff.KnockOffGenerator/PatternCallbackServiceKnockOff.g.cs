@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Concepts;
 
-partial class PatternCallbackServiceKnockOff
+partial class PatternCallbackServiceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for DoSomething.</summary>
 	public sealed class DoSomethingInterceptor

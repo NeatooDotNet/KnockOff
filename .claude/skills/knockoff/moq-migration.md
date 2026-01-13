@@ -183,18 +183,20 @@ KnockOff supports the same behavior:
 
 <!-- pseudo:moq-migration-strict-knockoff -->
 ```csharp
-// Standalone stub - set Strict property
+// Extension method (recommended) - works with any stub type
+var stub = new UserServiceKnockOff().Strict();
+var stub = new Stubs.IUserService().Strict();
+
+// Property setter
 var stub = new UserServiceKnockOff();
 stub.Strict = true;
-stub.GetUser.OnCall = (ko, id) => id == 1 ? new User() : throw new ArgumentException();
 
-// Or use attribute default
+// Constructor parameter (inline stubs only)
+var stub = new Stubs.IUserService(strict: true);
+
+// Attribute default
 [KnockOff(Strict = true)]
 public partial class UserServiceKnockOff : IUserService { }
-
-// Inline stub - use constructor parameter
-var stub = new Stubs.IUserService(strict: true);
-stub.GetUser.OnCall = (ko, id) => new User();
 ```
 <!-- /snippet -->
 
@@ -202,9 +204,9 @@ Unconfigured calls throw `StubException`:
 
 <!-- pseudo:moq-migration-strict-throws -->
 ```csharp
-stub.Strict = true;
+var stub = new UserServiceKnockOff().Strict();
 // stub.GetUser.OnCall not set
-service.GetUser(1);  // Throws StubException!
+stub.Object.GetUser(1);  // Throws StubException!
 ```
 <!-- /snippet -->
 

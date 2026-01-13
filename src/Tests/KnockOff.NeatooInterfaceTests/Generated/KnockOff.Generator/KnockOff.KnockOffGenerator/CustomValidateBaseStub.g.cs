@@ -3,7 +3,7 @@
 
 namespace KnockOff.NeatooInterfaceTests.ValidationRules;
 
-partial class CustomValidateBaseStub
+partial class CustomValidateBaseStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for CustomProperty.</summary>
 	public sealed class CustomPropertyInterceptor

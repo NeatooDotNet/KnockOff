@@ -159,7 +159,7 @@ partial class IValidateMetaPropertiesTests
 		}
 
 		/// <summary>Stub implementation of global::Neatoo.IValidateMetaProperties.</summary>
-		public class IValidateMetaProperties : global::Neatoo.IValidateMetaProperties
+		public class IValidateMetaProperties : global::Neatoo.IValidateMetaProperties, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for IsBusy.</summary>
 			public IValidateMetaProperties_IsBusyInterceptor IsBusy { get; } = new();
@@ -189,7 +189,7 @@ partial class IValidateMetaPropertiesTests
 			{
 				WaitForTasks.RecordCall(null);
 				if (WaitForTasks.OnCall is { } onCall) return onCall(this, null);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "WaitForTasks");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -197,7 +197,7 @@ partial class IValidateMetaPropertiesTests
 			{
 				WaitForTasks.RecordCall(token);
 				if (WaitForTasks.OnCall is { } onCall) return onCall(this, token);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "WaitForTasks");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -205,7 +205,7 @@ partial class IValidateMetaPropertiesTests
 			{
 				RunRules.RecordCall(propertyName, token, null);
 				if (RunRules.OnCall is { } onCall) return onCall(this, propertyName, token, null);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "RunRules");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -213,7 +213,7 @@ partial class IValidateMetaPropertiesTests
 			{
 				RunRules.RecordCall(null, token, runRules);
 				if (RunRules.OnCall is { } onCall) return onCall(this, null, token, runRules);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "RunRules");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -221,14 +221,14 @@ partial class IValidateMetaPropertiesTests
 			{
 				ClearAllMessages.RecordCall();
 				if (ClearAllMessages.OnCall is { } onCall) { onCall(this); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "ClearAllMessages");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "ClearAllMessages");
 			}
 
 			void global::Neatoo.IValidateMetaProperties.ClearSelfMessages()
 			{
 				ClearSelfMessages.RecordCall();
 				if (ClearSelfMessages.OnCall is { } onCall) { onCall(this); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "ClearSelfMessages");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "ClearSelfMessages");
 			}
 
 			bool global::Neatoo.IValidateMetaProperties.IsBusy
@@ -237,7 +237,7 @@ partial class IValidateMetaPropertiesTests
 				{
 					IsBusy.RecordGet();
 					if (IsBusy.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsBusy");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsBusy");
 					return IsBusy.Value;
 				}
 			}
@@ -248,7 +248,7 @@ partial class IValidateMetaPropertiesTests
 				{
 					IsValid.RecordGet();
 					if (IsValid.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsValid");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsValid");
 					return IsValid.Value;
 				}
 			}
@@ -259,7 +259,7 @@ partial class IValidateMetaPropertiesTests
 				{
 					IsSelfValid.RecordGet();
 					if (IsSelfValid.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsSelfValid");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsSelfValid");
 					return IsSelfValid.Value;
 				}
 			}
@@ -270,7 +270,7 @@ partial class IValidateMetaPropertiesTests
 				{
 					PropertyMessages.RecordGet();
 					if (PropertyMessages.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "PropertyMessages");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "PropertyMessages");
 					return PropertyMessages.Value;
 				}
 			}
@@ -279,13 +279,13 @@ partial class IValidateMetaPropertiesTests
 			public global::Neatoo.IValidateMetaProperties Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IValidateMetaProperties(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}
@@ -353,7 +353,7 @@ partial class IValidateMetaPropertiesTests
 		}
 
 		/// <summary>Stub implementation of global::Neatoo.IPropertyMessage.</summary>
-		public class IPropertyMessage : global::Neatoo.IPropertyMessage
+		public class IPropertyMessage : global::Neatoo.IPropertyMessage, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Property.</summary>
 			public IPropertyMessage_PropertyInterceptor Property { get; } = new();
@@ -367,14 +367,14 @@ partial class IValidateMetaPropertiesTests
 				{
 					Property.RecordGet();
 					if (Property.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IPropertyMessage", "Property");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyMessage", "Property");
 					return Property.Value;
 				}
 				set
 				{
 					Property.RecordSet(value);
 					if (Property.OnSet is { } onSet) { onSet(this, value); return; }
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IPropertyMessage", "Property");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyMessage", "Property");
 					Property.Value = value;
 				}
 			}
@@ -385,14 +385,14 @@ partial class IValidateMetaPropertiesTests
 				{
 					Message.RecordGet();
 					if (Message.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IPropertyMessage", "Message");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyMessage", "Message");
 					return Message.Value;
 				}
 				set
 				{
 					Message.RecordSet(value);
 					if (Message.OnSet is { } onSet) { onSet(this, value); return; }
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IPropertyMessage", "Message");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyMessage", "Message");
 					Message.Value = value;
 				}
 			}
@@ -401,13 +401,13 @@ partial class IValidateMetaPropertiesTests
 			public global::Neatoo.IPropertyMessage Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IPropertyMessage(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

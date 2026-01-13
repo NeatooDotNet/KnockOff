@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class PropConnectionKnockOff
+partial class PropConnectionKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for IsConnected.</summary>
 	public sealed class IsConnectedInterceptor

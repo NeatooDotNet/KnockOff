@@ -5,7 +5,7 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 public partial class BpMyTests
 {
-partial class BpServiceKnockOff
+partial class BpServiceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for DoWork.</summary>
 	public sealed class DoWorkInterceptor

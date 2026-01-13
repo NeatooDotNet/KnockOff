@@ -255,7 +255,7 @@ partial class ListUserStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.Collections.Generic.IList<global::KnockOff.Tests.User>.</summary>
-		public class IList : global::System.Collections.Generic.IList<global::KnockOff.Tests.User>
+		public class IList : global::System.Collections.Generic.IList<global::KnockOff.Tests.User>, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Indexer.</summary>
 			public IList_IndexerInterceptor Indexer { get; } = new();
@@ -297,7 +297,7 @@ partial class ListUserStubTests
 			{
 				IndexOf.RecordCall(item);
 				if (IndexOf.OnCall is { } onCall) return onCall(this, item);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("User>", "IndexOf");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("User>", "IndexOf");
 				return default!;
 			}
 
@@ -305,14 +305,14 @@ partial class ListUserStubTests
 			{
 				Insert.RecordCall(index, item);
 				if (Insert.OnCall is { } onCall) { onCall(this, index, item); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("User>", "Insert");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("User>", "Insert");
 			}
 
 			void global::System.Collections.Generic.IList<global::KnockOff.Tests.User>.RemoveAt(int index)
 			{
 				RemoveAt.RecordCall(index);
 				if (RemoveAt.OnCall is { } onCall) { onCall(this, index); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("User>", "RemoveAt");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("User>", "RemoveAt");
 			}
 
 			global::KnockOff.Tests.User global::System.Collections.Generic.IList<global::KnockOff.Tests.User>.this[int index]
@@ -321,14 +321,14 @@ partial class ListUserStubTests
 				{
 					Indexer.RecordGet(index);
 					if (Indexer.OnGet is { } onGet) return onGet(this, index);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("User>", "this[]");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("User>", "this[]");
 					return Indexer.Backing.TryGetValue(index, out var v) ? v : new global::KnockOff.Tests.User();
 				}
 				set
 				{
 					Indexer.RecordSet(index, value);
 					if (Indexer.OnSet is { } onSet) { onSet(this, index, value); return; }
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("User>", "this[]");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("User>", "this[]");
 					Indexer.Backing[index] = value;
 				}
 			}
@@ -337,21 +337,21 @@ partial class ListUserStubTests
 			{
 				Add.RecordCall(item);
 				if (Add.OnCall is { } onCall) { onCall(this, item); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("User>", "Add");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("User>", "Add");
 			}
 
 			void global::System.Collections.Generic.ICollection<global::KnockOff.Tests.User>.Clear()
 			{
 				Clear.RecordCall();
 				if (Clear.OnCall is { } onCall) { onCall(this); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("User>", "Clear");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("User>", "Clear");
 			}
 
 			bool global::System.Collections.Generic.ICollection<global::KnockOff.Tests.User>.Contains(global::KnockOff.Tests.User item)
 			{
 				Contains.RecordCall(item);
 				if (Contains.OnCall is { } onCall) return onCall(this, item);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("User>", "Contains");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("User>", "Contains");
 				return default!;
 			}
 
@@ -359,14 +359,14 @@ partial class ListUserStubTests
 			{
 				CopyTo.RecordCall(array, arrayIndex);
 				if (CopyTo.OnCall is { } onCall) { onCall(this, array, arrayIndex); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("User>", "CopyTo");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("User>", "CopyTo");
 			}
 
 			bool global::System.Collections.Generic.ICollection<global::KnockOff.Tests.User>.Remove(global::KnockOff.Tests.User item)
 			{
 				Remove.RecordCall(item);
 				if (Remove.OnCall is { } onCall) return onCall(this, item);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("User>", "Remove");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("User>", "Remove");
 				return default!;
 			}
 
@@ -376,7 +376,7 @@ partial class ListUserStubTests
 				{
 					Count.RecordGet();
 					if (Count.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("User>", "Count");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("User>", "Count");
 					return Count.Value;
 				}
 			}
@@ -387,7 +387,7 @@ partial class ListUserStubTests
 				{
 					IsReadOnly.RecordGet();
 					if (IsReadOnly.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("User>", "IsReadOnly");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("User>", "IsReadOnly");
 					return IsReadOnly.Value;
 				}
 			}
@@ -396,7 +396,7 @@ partial class ListUserStubTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("User>", "GetEnumerator");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("User>", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
@@ -404,7 +404,7 @@ partial class ListUserStubTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
@@ -412,13 +412,13 @@ partial class ListUserStubTests
 			public global::System.Collections.Generic.IList<global::KnockOff.Tests.User> Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IList(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

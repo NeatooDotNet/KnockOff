@@ -29,7 +29,7 @@ partial class ProgressIntStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.IProgress<int>.</summary>
-		public class IProgress : global::System.IProgress<int>
+		public class IProgress : global::System.IProgress<int>, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Report.</summary>
 			public IProgress_ReportInterceptor Report { get; } = new();
@@ -38,20 +38,20 @@ partial class ProgressIntStubTests
 			{
 				Report.RecordCall(value);
 				if (Report.OnCall is { } onCall) { onCall(this, value); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IProgress<int>", "Report");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IProgress<int>", "Report");
 			}
 
 			/// <summary>The global::System.IProgress<int> instance. Use for passing to code expecting the interface.</summary>
 			public global::System.IProgress<int> Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IProgress(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

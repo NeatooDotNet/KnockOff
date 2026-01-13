@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class BpDynamicServiceKnockOff
+partial class BpDynamicServiceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for RequestId.</summary>
 	public sealed class RequestIdInterceptor

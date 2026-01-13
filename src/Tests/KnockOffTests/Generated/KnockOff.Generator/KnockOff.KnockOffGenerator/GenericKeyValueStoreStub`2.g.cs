@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class GenericKeyValueStoreStub<TKey, TValue>
+partial class GenericKeyValueStoreStub<TKey, TValue> : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Get.</summary>
 	public sealed class GetInterceptor

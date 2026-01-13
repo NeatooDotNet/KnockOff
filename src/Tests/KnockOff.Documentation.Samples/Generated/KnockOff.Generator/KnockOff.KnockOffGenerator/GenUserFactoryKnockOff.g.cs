@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class GenUserFactoryKnockOff
+partial class GenUserFactoryKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Create.</summary>
 	public sealed class CreateInterceptor

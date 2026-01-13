@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class ContravariantStub<T>
+partial class ContravariantStub<T> : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Process.</summary>
 	public sealed class ProcessInterceptor

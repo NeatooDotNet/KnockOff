@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class IhFullEntityKnockOff
+partial class IhFullEntityKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for CreatedBy.</summary>
 	public sealed class CreatedByInterceptor

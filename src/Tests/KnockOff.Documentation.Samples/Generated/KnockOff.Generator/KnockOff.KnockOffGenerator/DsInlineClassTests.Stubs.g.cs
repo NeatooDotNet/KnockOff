@@ -91,8 +91,11 @@ partial class DsInlineClassTests
 		}
 
 		/// <summary>Stub for global::KnockOff.Documentation.Samples.Design.DsEmailService via composition.</summary>
-		public class DsEmailService
+		public class DsEmailService : global::KnockOff.IKnockOffStub
 		{
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for class stubs.</summary>
+			public bool Strict { get; set; }
+
 			/// <summary>Interceptor for ServerName.</summary>
 			public DsEmailService_ServerNameInterceptor ServerName { get; } = new();
 			/// <summary>Interceptor for Indexer.</summary>

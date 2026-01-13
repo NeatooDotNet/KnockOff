@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Concepts;
 
-partial class PatternIndexerServiceKnockOff
+partial class PatternIndexerServiceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Indexer.</summary>
 	public sealed class IndexerInterceptor

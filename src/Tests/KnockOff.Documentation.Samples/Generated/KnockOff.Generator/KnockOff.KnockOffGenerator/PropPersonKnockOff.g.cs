@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class PropPersonKnockOff
+partial class PropPersonKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for FirstName.</summary>
 	public sealed class FirstNameInterceptor

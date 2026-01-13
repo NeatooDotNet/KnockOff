@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class RefParameterServiceKnockOff
+partial class RefParameterServiceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Increment.</summary>
 	public sealed class IncrementInterceptor

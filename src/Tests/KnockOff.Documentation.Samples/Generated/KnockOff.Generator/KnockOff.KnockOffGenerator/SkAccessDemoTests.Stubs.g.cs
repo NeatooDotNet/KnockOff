@@ -29,8 +29,11 @@ partial class SkAccessDemoTests
 		}
 
 		/// <summary>Stub for global::KnockOff.Documentation.Samples.Skills.SkAccessDemoEmailService via composition.</summary>
-		public class SkAccessDemoEmailService
+		public class SkAccessDemoEmailService : global::KnockOff.IKnockOffStub
 		{
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for class stubs.</summary>
+			public bool Strict { get; set; }
+
 			/// <summary>Interceptor for Send.</summary>
 			public SkAccessDemoEmailService_SendInterceptor Send { get; } = new();
 

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Sandbox;
 
-partial class OverloadedServiceKnockOff
+partial class OverloadedServiceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Format.</summary>
 	public sealed class Format1Interceptor

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Reference;
 
-partial class AttrInternalServiceKnockOff
+partial class AttrInternalServiceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for DoWork.</summary>
 	public sealed class DoWorkInterceptor

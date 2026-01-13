@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class HaDefaultsServiceKnockOff
+partial class HaDefaultsServiceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetCount.</summary>
 	public sealed class GetCountInterceptor

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class AsyncUserDefinedKnockOff
+partial class AsyncUserDefinedKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetByIdAsync.</summary>
 	public sealed class GetByIdAsync2Interceptor

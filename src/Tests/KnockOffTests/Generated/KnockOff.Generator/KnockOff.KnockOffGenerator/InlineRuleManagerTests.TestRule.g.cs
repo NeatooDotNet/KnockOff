@@ -5,7 +5,7 @@ namespace KnockOff.Tests;
 
 public partial class InlineRuleManagerTests
 {
-partial class TestRule
+partial class TestRule : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Executed.</summary>
 	public sealed class ExecutedInterceptor

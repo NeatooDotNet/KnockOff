@@ -29,7 +29,7 @@ partial class ObservableStringStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.IObservable<string>.</summary>
-		public class IObservable : global::System.IObservable<string>
+		public class IObservable : global::System.IObservable<string>, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Subscribe.</summary>
 			public IObservable_SubscribeInterceptor Subscribe { get; } = new();
@@ -38,7 +38,7 @@ partial class ObservableStringStubTests
 			{
 				Subscribe.RecordCall(observer);
 				if (Subscribe.OnCall is { } onCall) return onCall(this, observer);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IObservable<string>", "Subscribe");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IObservable<string>", "Subscribe");
 				throw new global::System.InvalidOperationException("No implementation provided for Subscribe. Set Subscribe.OnCall.");
 			}
 
@@ -46,13 +46,13 @@ partial class ObservableStringStubTests
 			public global::System.IObservable<string> Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IObservable(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

@@ -37,8 +37,11 @@ partial class ClassInitPropertyTests
 		}
 
 		/// <summary>Stub for global::KnockOffTests.EntityBaseWithVirtualInit via composition.</summary>
-		public class EntityBaseWithVirtualInit
+		public class EntityBaseWithVirtualInit : global::KnockOff.IKnockOffStub
 		{
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for class stubs.</summary>
+			public bool Strict { get; set; }
+
 			/// <summary>Interceptor for Id.</summary>
 			public EntityBaseWithVirtualInit_IdInterceptor Id { get; } = new();
 
@@ -115,8 +118,11 @@ partial class ClassInitPropertyTests
 		}
 
 		/// <summary>Stub for global::KnockOffTests.EntityBaseWithAbstractInit via composition.</summary>
-		public class EntityBaseWithAbstractInit
+		public class EntityBaseWithAbstractInit : global::KnockOff.IKnockOffStub
 		{
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for class stubs.</summary>
+			public bool Strict { get; set; }
+
 			/// <summary>Interceptor for Id.</summary>
 			public EntityBaseWithAbstractInit_IdInterceptor Id { get; } = new();
 
@@ -248,8 +254,11 @@ partial class ClassInitPropertyTests
 		}
 
 		/// <summary>Stub for global::KnockOffTests.EntityBaseWithMixedInit via composition.</summary>
-		public class EntityBaseWithMixedInit
+		public class EntityBaseWithMixedInit : global::KnockOff.IKnockOffStub
 		{
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for class stubs.</summary>
+			public bool Strict { get; set; }
+
 			/// <summary>Interceptor for Id.</summary>
 			public EntityBaseWithMixedInit_IdInterceptor Id { get; } = new();
 			/// <summary>Interceptor for Name.</summary>
@@ -365,8 +374,11 @@ partial class ClassInitPropertyTests
 		}
 
 		/// <summary>Stub for global::KnockOffTests.EntityBaseWithRequiredProperty via composition.</summary>
-		public class EntityBaseWithRequiredProperty
+		public class EntityBaseWithRequiredProperty : global::KnockOff.IKnockOffStub
 		{
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for class stubs.</summary>
+			public bool Strict { get; set; }
+
 			/// <summary>Interceptor for Id.</summary>
 			public EntityBaseWithRequiredProperty_IdInterceptor Id { get; } = new();
 
@@ -447,8 +459,11 @@ partial class ClassInitPropertyTests
 		}
 
 		/// <summary>Stub for global::KnockOffTests.EntityBaseWithRequiredInit via composition.</summary>
-		public class EntityBaseWithRequiredInit
+		public class EntityBaseWithRequiredInit : global::KnockOff.IKnockOffStub
 		{
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for class stubs.</summary>
+			public bool Strict { get; set; }
+
 			/// <summary>Interceptor for Id.</summary>
 			public EntityBaseWithRequiredInit_IdInterceptor Id { get; } = new();
 
@@ -585,8 +600,11 @@ partial class ClassInitPropertyTests
 		}
 
 		/// <summary>Stub for global::KnockOffTests.EntityBaseWithMultipleRequired via composition.</summary>
-		public class EntityBaseWithMultipleRequired
+		public class EntityBaseWithMultipleRequired : global::KnockOff.IKnockOffStub
 		{
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for class stubs.</summary>
+			public bool Strict { get; set; }
+
 			/// <summary>Interceptor for Id.</summary>
 			public EntityBaseWithMultipleRequired_IdInterceptor Id { get; } = new();
 			/// <summary>Interceptor for Name.</summary>

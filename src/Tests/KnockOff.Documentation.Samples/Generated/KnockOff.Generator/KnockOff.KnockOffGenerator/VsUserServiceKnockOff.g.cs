@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Comparison;
 
-partial class VsUserServiceKnockOff
+partial class VsUserServiceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for CurrentUser.</summary>
 	public sealed class CurrentUserInterceptor

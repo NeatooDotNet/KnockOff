@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class GuideDataServiceKnockOff
+partial class GuideDataServiceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Interceptor for DataChanged event.</summary>
 	public sealed class DataChangedInterceptor

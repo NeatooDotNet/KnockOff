@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class CpPropertyServiceKnockOff
+partial class CpPropertyServiceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for CurrentUser.</summary>
 	public sealed class CurrentUserInterceptor

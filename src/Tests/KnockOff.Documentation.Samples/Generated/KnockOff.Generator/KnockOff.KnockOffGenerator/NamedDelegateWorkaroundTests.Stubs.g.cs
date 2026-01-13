@@ -29,8 +29,11 @@ partial class NamedDelegateWorkaroundTests
 		}
 
 		/// <summary>Stub for global::KnockOff.Documentation.Samples.Guides.Delegates.IntToStringConverter delegate.</summary>
-		public sealed class IntToStringConverter
+		public sealed class IntToStringConverter : global::KnockOff.IKnockOffStub
 		{
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for delegate stubs.</summary>
+			public bool Strict { get; set; }
+
 			/// <summary>Interceptor for tracking and configuring delegate behavior.</summary>
 			public IntToStringConverterInterceptor Interceptor { get; } = new();
 

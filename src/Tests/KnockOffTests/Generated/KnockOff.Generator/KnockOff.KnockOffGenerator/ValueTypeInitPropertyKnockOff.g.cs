@@ -3,7 +3,7 @@
 
 namespace KnockOffTests;
 
-partial class ValueTypeInitPropertyKnockOff
+partial class ValueTypeInitPropertyKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Count.</summary>
 	public sealed class CountInterceptor

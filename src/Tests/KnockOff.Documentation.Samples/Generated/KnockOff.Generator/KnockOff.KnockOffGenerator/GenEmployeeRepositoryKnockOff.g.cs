@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class GenEmployeeRepositoryKnockOff
+partial class GenEmployeeRepositoryKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for FindById.</summary>
 	public sealed class FindByIdInterceptor

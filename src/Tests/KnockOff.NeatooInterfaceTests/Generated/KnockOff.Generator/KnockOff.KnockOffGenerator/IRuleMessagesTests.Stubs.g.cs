@@ -255,7 +255,7 @@ partial class IRuleMessagesTests
 		}
 
 		/// <summary>Stub implementation of global::Neatoo.Rules.IRuleMessages.</summary>
-		public class IRuleMessages : global::Neatoo.Rules.IRuleMessages
+		public class IRuleMessages : global::Neatoo.Rules.IRuleMessages, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Indexer.</summary>
 			public IRuleMessages_IndexerInterceptor Indexer { get; } = new();
@@ -297,14 +297,14 @@ partial class IRuleMessagesTests
 			{
 				Add.RecordCall(propertyName, message, null);
 				if (Add.OnCall is { } onCall) { onCall(this, propertyName, message, null); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessages", "Add");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessages", "Add");
 			}
 
 			int global::System.Collections.Generic.IList<global::Neatoo.Rules.IRuleMessage>.IndexOf(global::Neatoo.Rules.IRuleMessage item)
 			{
 				IndexOf.RecordCall(item);
 				if (IndexOf.OnCall is { } onCall) return onCall(this, item);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "IndexOf");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "IndexOf");
 				return default!;
 			}
 
@@ -312,14 +312,14 @@ partial class IRuleMessagesTests
 			{
 				Insert.RecordCall(index, item);
 				if (Insert.OnCall is { } onCall) { onCall(this, index, item); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "Insert");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "Insert");
 			}
 
 			void global::System.Collections.Generic.IList<global::Neatoo.Rules.IRuleMessage>.RemoveAt(int index)
 			{
 				RemoveAt.RecordCall(index);
 				if (RemoveAt.OnCall is { } onCall) { onCall(this, index); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "RemoveAt");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "RemoveAt");
 			}
 
 			global::Neatoo.Rules.IRuleMessage global::System.Collections.Generic.IList<global::Neatoo.Rules.IRuleMessage>.this[int index]
@@ -328,14 +328,14 @@ partial class IRuleMessagesTests
 				{
 					Indexer.RecordGet(index);
 					if (Indexer.OnGet is { } onGet) return onGet(this, index);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "this[]");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "this[]");
 					return Indexer.Backing.TryGetValue(index, out var v) ? v : default!;
 				}
 				set
 				{
 					Indexer.RecordSet(index, value);
 					if (Indexer.OnSet is { } onSet) { onSet(this, index, value); return; }
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "this[]");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "this[]");
 					Indexer.Backing[index] = value;
 				}
 			}
@@ -344,21 +344,21 @@ partial class IRuleMessagesTests
 			{
 				Add.RecordCall(null, null, item);
 				if (Add.OnCall is { } onCall) { onCall(this, null, null, item); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "Add");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "Add");
 			}
 
 			void global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>.Clear()
 			{
 				Clear.RecordCall();
 				if (Clear.OnCall is { } onCall) { onCall(this); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "Clear");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "Clear");
 			}
 
 			bool global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>.Contains(global::Neatoo.Rules.IRuleMessage item)
 			{
 				Contains.RecordCall(item);
 				if (Contains.OnCall is { } onCall) return onCall(this, item);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "Contains");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "Contains");
 				return default!;
 			}
 
@@ -366,14 +366,14 @@ partial class IRuleMessagesTests
 			{
 				CopyTo.RecordCall(array, arrayIndex);
 				if (CopyTo.OnCall is { } onCall) { onCall(this, array, arrayIndex); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "CopyTo");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "CopyTo");
 			}
 
 			bool global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>.Remove(global::Neatoo.Rules.IRuleMessage item)
 			{
 				Remove.RecordCall(item);
 				if (Remove.OnCall is { } onCall) return onCall(this, item);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "Remove");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "Remove");
 				return default!;
 			}
 
@@ -383,7 +383,7 @@ partial class IRuleMessagesTests
 				{
 					Count.RecordGet();
 					if (Count.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "Count");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "Count");
 					return Count.Value;
 				}
 			}
@@ -394,7 +394,7 @@ partial class IRuleMessagesTests
 				{
 					IsReadOnly.RecordGet();
 					if (IsReadOnly.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "IsReadOnly");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "IsReadOnly");
 					return IsReadOnly.Value;
 				}
 			}
@@ -403,7 +403,7 @@ partial class IRuleMessagesTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "GetEnumerator");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
@@ -411,7 +411,7 @@ partial class IRuleMessagesTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
@@ -419,13 +419,13 @@ partial class IRuleMessagesTests
 			public global::Neatoo.Rules.IRuleMessages Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IRuleMessages(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

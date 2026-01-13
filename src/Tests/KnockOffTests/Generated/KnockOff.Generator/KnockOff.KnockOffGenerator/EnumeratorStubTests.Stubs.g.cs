@@ -62,7 +62,7 @@ partial class EnumeratorStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.Collections.IEnumerator.</summary>
-		public class IEnumerator : global::System.Collections.IEnumerator
+		public class IEnumerator : global::System.Collections.IEnumerator, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Current.</summary>
 			public IEnumerator_CurrentInterceptor Current { get; } = new();
@@ -77,7 +77,7 @@ partial class EnumeratorStubTests
 			{
 				MoveNext.RecordCall();
 				if (MoveNext.OnCall is { } onCall) return onCall(this);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerator", "MoveNext");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerator", "MoveNext");
 				return default!;
 			}
 
@@ -85,7 +85,7 @@ partial class EnumeratorStubTests
 			{
 				Reset.RecordCall();
 				if (Reset.OnCall is { } onCall) { onCall(this); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerator", "Reset");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerator", "Reset");
 			}
 
 			object global::System.Collections.IEnumerator.Current
@@ -94,7 +94,7 @@ partial class EnumeratorStubTests
 				{
 					Current.RecordGet();
 					if (Current.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerator", "Current");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerator", "Current");
 					return Current.Value;
 				}
 			}
@@ -103,13 +103,13 @@ partial class EnumeratorStubTests
 			public global::System.Collections.IEnumerator Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IEnumerator(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

@@ -59,7 +59,7 @@ partial class PropertyStoreKnockOff
 		}
 
 		/// <summary>Stub implementation of global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo.</summary>
-		public class IInPropertyInfo : global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo
+		public class IInPropertyInfo : global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Name.</summary>
 			public IInPropertyInfo_NameInterceptor Name { get; } = new();
@@ -73,7 +73,7 @@ partial class PropertyStoreKnockOff
 				{
 					Name.RecordGet();
 					if (Name.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IInPropertyInfo", "Name");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IInPropertyInfo", "Name");
 					return Name.Value;
 				}
 			}
@@ -84,14 +84,14 @@ partial class PropertyStoreKnockOff
 				{
 					Value.RecordGet();
 					if (Value.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IInPropertyInfo", "Value");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IInPropertyInfo", "Value");
 					return Value.Value;
 				}
 				set
 				{
 					Value.RecordSet(value);
 					if (Value.OnSet is { } onSet) { onSet(this, value); return; }
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IInPropertyInfo", "Value");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IInPropertyInfo", "Value");
 					Value.Value = value;
 				}
 			}
@@ -100,13 +100,13 @@ partial class PropertyStoreKnockOff
 			public global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IInPropertyInfo(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

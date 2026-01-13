@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class SampleKnockOff
+partial class SampleKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameInterceptor

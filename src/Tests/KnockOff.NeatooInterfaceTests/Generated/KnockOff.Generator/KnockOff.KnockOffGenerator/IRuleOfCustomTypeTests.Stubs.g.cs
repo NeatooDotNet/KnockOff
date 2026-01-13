@@ -144,7 +144,7 @@ partial class IRuleOfCustomTypeTests
 		}
 
 		/// <summary>Stub implementation of global::Neatoo.Rules.IRule<global::KnockOff.NeatooInterfaceTests.ValidationRules.ICustomValidateBase>.</summary>
-		public class IRule : global::Neatoo.Rules.IRule<global::KnockOff.NeatooInterfaceTests.ValidationRules.ICustomValidateBase>
+		public class IRule : global::Neatoo.Rules.IRule<global::KnockOff.NeatooInterfaceTests.ValidationRules.ICustomValidateBase>, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Executed.</summary>
 			public IRule_ExecutedInterceptor Executed { get; } = new();
@@ -171,7 +171,7 @@ partial class IRuleOfCustomTypeTests
 			{
 				RunRule.RecordCall(target, token);
 				if (RunRule.OnCall is { } onCall) return onCall(this, target, token);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("ICustomValidateBase>", "RunRule");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("ICustomValidateBase>", "RunRule");
 				throw new global::System.InvalidOperationException("No implementation provided for RunRule. Set RunRule.OnCall.");
 			}
 
@@ -184,7 +184,7 @@ partial class IRuleOfCustomTypeTests
 			{
 				OnRuleAdded.RecordCall(ruleManager, uniqueIndex);
 				if (OnRuleAdded.OnCall is { } onCall) { onCall(this, ruleManager, uniqueIndex); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "OnRuleAdded");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "OnRuleAdded");
 			}
 
 			bool global::Neatoo.Rules.IRule.Executed
@@ -193,7 +193,7 @@ partial class IRuleOfCustomTypeTests
 				{
 					Executed.RecordGet();
 					if (Executed.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "Executed");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "Executed");
 					return Executed.Value;
 				}
 			}
@@ -204,7 +204,7 @@ partial class IRuleOfCustomTypeTests
 				{
 					RuleOrder.RecordGet();
 					if (RuleOrder.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "RuleOrder");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "RuleOrder");
 					return RuleOrder.Value;
 				}
 			}
@@ -215,7 +215,7 @@ partial class IRuleOfCustomTypeTests
 				{
 					UniqueIndex.RecordGet();
 					if (UniqueIndex.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "UniqueIndex");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "UniqueIndex");
 					return UniqueIndex.Value;
 				}
 			}
@@ -226,7 +226,7 @@ partial class IRuleOfCustomTypeTests
 				{
 					Messages.RecordGet();
 					if (Messages.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "Messages");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "Messages");
 					return Messages.Value;
 				}
 			}
@@ -237,7 +237,7 @@ partial class IRuleOfCustomTypeTests
 				{
 					TriggerProperties.RecordGet();
 					if (TriggerProperties.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "TriggerProperties");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "TriggerProperties");
 					return TriggerProperties.Value;
 				}
 			}
@@ -246,13 +246,13 @@ partial class IRuleOfCustomTypeTests
 			public global::Neatoo.Rules.IRule<global::KnockOff.NeatooInterfaceTests.ValidationRules.ICustomValidateBase> Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IRule(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

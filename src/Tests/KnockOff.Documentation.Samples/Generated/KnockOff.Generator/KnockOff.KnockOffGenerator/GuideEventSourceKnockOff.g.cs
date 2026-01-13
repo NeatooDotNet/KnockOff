@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class GuideEventSourceKnockOff
+partial class GuideEventSourceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Interceptor for MessageReceived event.</summary>
 	public sealed class MessageReceivedInterceptor

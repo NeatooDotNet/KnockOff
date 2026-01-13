@@ -48,7 +48,7 @@ partial class ITriggerPropertyTests
 		}
 
 		/// <summary>Stub implementation of global::Neatoo.Rules.ITriggerProperty.</summary>
-		public class ITriggerProperty : global::Neatoo.Rules.ITriggerProperty
+		public class ITriggerProperty : global::Neatoo.Rules.ITriggerProperty, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for PropertyName.</summary>
 			public ITriggerProperty_PropertyNameInterceptor PropertyName { get; } = new();
@@ -60,7 +60,7 @@ partial class ITriggerPropertyTests
 			{
 				IsMatch.RecordCall(propertyName);
 				if (IsMatch.OnCall is { } onCall) return onCall(this, propertyName);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("ITriggerProperty", "IsMatch");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("ITriggerProperty", "IsMatch");
 				return default!;
 			}
 
@@ -70,7 +70,7 @@ partial class ITriggerPropertyTests
 				{
 					PropertyName.RecordGet();
 					if (PropertyName.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("ITriggerProperty", "PropertyName");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("ITriggerProperty", "PropertyName");
 					return PropertyName.Value;
 				}
 			}
@@ -79,13 +79,13 @@ partial class ITriggerPropertyTests
 			public global::Neatoo.Rules.ITriggerProperty Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public ITriggerProperty(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

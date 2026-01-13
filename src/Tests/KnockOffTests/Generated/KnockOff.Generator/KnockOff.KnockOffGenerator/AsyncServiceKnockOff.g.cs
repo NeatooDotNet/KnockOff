@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class AsyncServiceKnockOff
+partial class AsyncServiceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for DoWorkAsync.</summary>
 	public sealed class DoWorkAsyncInterceptor

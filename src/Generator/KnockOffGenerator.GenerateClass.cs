@@ -48,8 +48,13 @@ public partial class KnockOffGenerator
 
 		// Generate the wrapper stub class (no inheritance from target)
 		sb.AppendLine($"\t\t/// <summary>Stub for {cls.FullName} via composition.</summary>");
-		sb.AppendLine($"\t\tpublic class {stubClassName}");
+		sb.AppendLine($"\t\tpublic class {stubClassName} : global::KnockOff.IKnockOffStub");
 		sb.AppendLine("\t\t{");
+
+		// Strict property for IKnockOffStub (class stubs don't have strict mode behavior yet)
+		sb.AppendLine("\t\t\t/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for class stubs.</summary>");
+		sb.AppendLine("\t\t\tpublic bool Strict { get; set; }");
+		sb.AppendLine();
 
 		// Direct interceptor properties on wrapper (no container)
 		foreach (var member in cls.Members)

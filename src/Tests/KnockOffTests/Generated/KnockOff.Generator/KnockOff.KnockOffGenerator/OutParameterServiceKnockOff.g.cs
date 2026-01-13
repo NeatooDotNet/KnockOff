@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class OutParameterServiceKnockOff
+partial class OutParameterServiceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for TryGetValue.</summary>
 	public sealed class TryGetValueInterceptor

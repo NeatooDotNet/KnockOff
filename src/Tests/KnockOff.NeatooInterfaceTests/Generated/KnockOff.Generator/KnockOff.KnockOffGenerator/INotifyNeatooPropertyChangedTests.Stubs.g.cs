@@ -31,7 +31,7 @@ partial class INotifyNeatooPropertyChangedTests
 		}
 
 		/// <summary>Stub implementation of global::Neatoo.INotifyNeatooPropertyChanged.</summary>
-		public class INotifyNeatooPropertyChanged : global::Neatoo.INotifyNeatooPropertyChanged
+		public class INotifyNeatooPropertyChanged : global::Neatoo.INotifyNeatooPropertyChanged, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for NeatooPropertyChanged event.</summary>
 			public INotifyNeatooPropertyChanged_NeatooPropertyChangedInterceptor NeatooPropertyChangedInterceptor { get; } = new();
@@ -46,13 +46,13 @@ partial class INotifyNeatooPropertyChangedTests
 			public global::Neatoo.INotifyNeatooPropertyChanged Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public INotifyNeatooPropertyChanged(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

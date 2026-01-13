@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Comparison;
 
-partial class VsEventSourceKnockOff
+partial class VsEventSourceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Interceptor for DataReceived event.</summary>
 	public sealed class DataReceivedInterceptor

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Concepts;
 
-partial class PatternCombinedRepositoryKnockOff
+partial class PatternCombinedRepositoryKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetById.</summary>
 	public sealed class GetById2Interceptor

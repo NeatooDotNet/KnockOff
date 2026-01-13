@@ -93,8 +93,11 @@ partial class DsRequiredPropertyTests
 		}
 
 		/// <summary>Stub for global::KnockOff.Documentation.Samples.Design.DsAuditableEntity via composition.</summary>
-		public class DsAuditableEntity
+		public class DsAuditableEntity : global::KnockOff.IKnockOffStub
 		{
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for class stubs.</summary>
+			public bool Strict { get; set; }
+
 			/// <summary>Interceptor for Id.</summary>
 			public DsAuditableEntity_IdInterceptor Id { get; } = new();
 			/// <summary>Interceptor for CreatedBy.</summary>
@@ -272,8 +275,11 @@ partial class DsRequiredPropertyTests
 		}
 
 		/// <summary>Stub for global::KnockOff.Documentation.Samples.Design.DsImmutableEntity via composition.</summary>
-		public class DsImmutableEntity
+		public class DsImmutableEntity : global::KnockOff.IKnockOffStub
 		{
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for class stubs.</summary>
+			public bool Strict { get; set; }
+
 			/// <summary>Interceptor for Id.</summary>
 			public DsImmutableEntity_IdInterceptor Id { get; } = new();
 			/// <summary>Interceptor for Name.</summary>

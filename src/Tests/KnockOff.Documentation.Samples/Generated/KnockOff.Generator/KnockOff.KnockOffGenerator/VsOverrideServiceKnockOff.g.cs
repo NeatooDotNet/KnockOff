@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Comparison;
 
-partial class VsOverrideServiceKnockOff
+partial class VsOverrideServiceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetUser.</summary>
 	public sealed class GetUser2Interceptor

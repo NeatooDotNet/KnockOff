@@ -83,7 +83,7 @@ partial class OrderedQueryableUserStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.Linq.IOrderedQueryable<global::KnockOff.Tests.User>.</summary>
-		public class IOrderedQueryable : global::System.Linq.IOrderedQueryable<global::KnockOff.Tests.User>
+		public class IOrderedQueryable : global::System.Linq.IOrderedQueryable<global::KnockOff.Tests.User>, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for ElementType.</summary>
 			public IOrderedQueryable_ElementTypeInterceptor ElementType { get; } = new();
@@ -101,7 +101,7 @@ partial class OrderedQueryableUserStubTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("User>", "GetEnumerator");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("User>", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
@@ -111,7 +111,7 @@ partial class OrderedQueryableUserStubTests
 				{
 					ElementType.RecordGet();
 					if (ElementType.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IQueryable", "ElementType");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IQueryable", "ElementType");
 					return ElementType.Value;
 				}
 			}
@@ -122,7 +122,7 @@ partial class OrderedQueryableUserStubTests
 				{
 					Expression.RecordGet();
 					if (Expression.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IQueryable", "Expression");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IQueryable", "Expression");
 					return Expression.Value;
 				}
 			}
@@ -133,7 +133,7 @@ partial class OrderedQueryableUserStubTests
 				{
 					Provider.RecordGet();
 					if (Provider.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IQueryable", "Provider");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IQueryable", "Provider");
 					return Provider.Value;
 				}
 			}
@@ -142,7 +142,7 @@ partial class OrderedQueryableUserStubTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
@@ -150,13 +150,13 @@ partial class OrderedQueryableUserStubTests
 			public global::System.Linq.IOrderedQueryable<global::KnockOff.Tests.User> Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IOrderedQueryable(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

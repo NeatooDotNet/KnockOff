@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class SkAccessDemoServiceKnockOff
+partial class SkAccessDemoServiceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetData.</summary>
 	public sealed class GetDataInterceptor

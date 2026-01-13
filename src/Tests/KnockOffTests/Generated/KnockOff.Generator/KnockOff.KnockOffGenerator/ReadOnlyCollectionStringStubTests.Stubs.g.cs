@@ -45,7 +45,7 @@ partial class ReadOnlyCollectionStringStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.Collections.Generic.IReadOnlyCollection<string>.</summary>
-		public class IReadOnlyCollection : global::System.Collections.Generic.IReadOnlyCollection<string>
+		public class IReadOnlyCollection : global::System.Collections.Generic.IReadOnlyCollection<string>, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Count.</summary>
 			public IReadOnlyCollection_CountInterceptor Count { get; } = new();
@@ -59,7 +59,7 @@ partial class ReadOnlyCollectionStringStubTests
 				{
 					Count.RecordGet();
 					if (Count.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IReadOnlyCollection<string>", "Count");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IReadOnlyCollection<string>", "Count");
 					return Count.Value;
 				}
 			}
@@ -68,7 +68,7 @@ partial class ReadOnlyCollectionStringStubTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable<string>", "GetEnumerator");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable<string>", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
@@ -76,7 +76,7 @@ partial class ReadOnlyCollectionStringStubTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
@@ -84,13 +84,13 @@ partial class ReadOnlyCollectionStringStubTests
 			public global::System.Collections.Generic.IReadOnlyCollection<string> Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IReadOnlyCollection(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

@@ -62,7 +62,7 @@ partial class AsyncEnumeratorStringStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.Collections.Generic.IAsyncEnumerator<string>.</summary>
-		public class IAsyncEnumerator : global::System.Collections.Generic.IAsyncEnumerator<string>
+		public class IAsyncEnumerator : global::System.Collections.Generic.IAsyncEnumerator<string>, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Current.</summary>
 			public IAsyncEnumerator_CurrentInterceptor Current { get; } = new();
@@ -77,7 +77,7 @@ partial class AsyncEnumeratorStringStubTests
 			{
 				MoveNextAsync.RecordCall();
 				if (MoveNextAsync.OnCall is { } onCall) return onCall(this);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IAsyncEnumerator<string>", "MoveNextAsync");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncEnumerator<string>", "MoveNextAsync");
 				return default;
 			}
 
@@ -87,7 +87,7 @@ partial class AsyncEnumeratorStringStubTests
 				{
 					Current.RecordGet();
 					if (Current.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IAsyncEnumerator<string>", "Current");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncEnumerator<string>", "Current");
 					return Current.Value;
 				}
 			}
@@ -96,7 +96,7 @@ partial class AsyncEnumeratorStringStubTests
 			{
 				DisposeAsync.RecordCall();
 				if (DisposeAsync.OnCall is { } onCall) return onCall(this);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IAsyncDisposable", "DisposeAsync");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncDisposable", "DisposeAsync");
 				return default;
 			}
 
@@ -104,13 +104,13 @@ partial class AsyncEnumeratorStringStubTests
 			public global::System.Collections.Generic.IAsyncEnumerator<string> Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IAsyncEnumerator(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace KnockOff.Benchmarks.Benchmarks;
 
-partial class FcBenchCacheServiceStub
+partial class FcBenchCacheServiceStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Marker interface for generic method call tracking.</summary>
 	private interface IGenericMethodCallTracker { int CallCount { get; } bool WasCalled { get; } }

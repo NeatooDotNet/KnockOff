@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace KnockOff.NeatooInterfaceTests.Properties;
 
-partial class PropertyInfoStub
+partial class PropertyInfoStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Marker interface for generic method call tracking.</summary>
 	private interface IGenericMethodCallTracker { int CallCount { get; } bool WasCalled { get; } }

@@ -80,7 +80,7 @@ partial class MultiServiceTests
 		}
 
 		/// <summary>Stub implementation of global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService.</summary>
-		public class IInUserService : global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService
+		public class IInUserService : global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for ConnectionString.</summary>
 			public IInUserService_ConnectionStringInterceptor ConnectionString { get; } = new();
@@ -95,7 +95,7 @@ partial class MultiServiceTests
 			{
 				GetUser.RecordCall(id);
 				if (GetUser.OnCall is { } onCall) return onCall(this, id);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IInUserService", "GetUser");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IInUserService", "GetUser");
 				return default!;
 			}
 
@@ -103,7 +103,7 @@ partial class MultiServiceTests
 			{
 				SaveUser.RecordCall(user);
 				if (SaveUser.OnCall is { } onCall) { onCall(this, user); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IInUserService", "SaveUser");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IInUserService", "SaveUser");
 			}
 
 			string global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService.ConnectionString
@@ -112,14 +112,14 @@ partial class MultiServiceTests
 				{
 					ConnectionString.RecordGet();
 					if (ConnectionString.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IInUserService", "ConnectionString");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IInUserService", "ConnectionString");
 					return ConnectionString.Value;
 				}
 				set
 				{
 					ConnectionString.RecordSet(value);
 					if (ConnectionString.OnSet is { } onSet) { onSet(this, value); return; }
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IInUserService", "ConnectionString");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IInUserService", "ConnectionString");
 					ConnectionString.Value = value;
 				}
 			}
@@ -128,13 +128,13 @@ partial class MultiServiceTests
 			public global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IInUserService(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}
@@ -180,7 +180,7 @@ partial class MultiServiceTests
 		}
 
 		/// <summary>Stub implementation of global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInLogger.</summary>
-		public class IInLogger : global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInLogger
+		public class IInLogger : global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInLogger, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Log.</summary>
 			public IInLogger_LogInterceptor Log { get; } = new();
@@ -192,27 +192,27 @@ partial class MultiServiceTests
 			{
 				Log.RecordCall(message);
 				if (Log.OnCall is { } onCall) { onCall(this, message); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IInLogger", "Log");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IInLogger", "Log");
 			}
 
 			void global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInLogger.LogError(string message, global::System.Exception? ex)
 			{
 				LogError.RecordCall(message, ex);
 				if (LogError.OnCall is { } onCall) { onCall(this, message, ex); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IInLogger", "LogError");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IInLogger", "LogError");
 			}
 
 			/// <summary>The global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInLogger instance. Use for passing to code expecting the interface.</summary>
 			public global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInLogger Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IInLogger(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}
@@ -258,7 +258,7 @@ partial class MultiServiceTests
 		}
 
 		/// <summary>Stub implementation of global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInRepository.</summary>
-		public class IInRepository : global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInRepository
+		public class IInRepository : global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInRepository, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Save.</summary>
 			public IInRepository_SaveInterceptor Save { get; } = new();
@@ -270,14 +270,14 @@ partial class MultiServiceTests
 			{
 				Save.RecordCall(entity);
 				if (Save.OnCall is { } onCall) { onCall(this, entity); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IInRepository", "Save");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IInRepository", "Save");
 			}
 
 			global::KnockOff.Documentation.Samples.Guides.InlineStubs.InUser? global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInRepository.FindById(int id)
 			{
 				FindById.RecordCall(id);
 				if (FindById.OnCall is { } onCall) return onCall(this, id);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IInRepository", "FindById");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IInRepository", "FindById");
 				return default!;
 			}
 
@@ -285,13 +285,13 @@ partial class MultiServiceTests
 			public global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInRepository Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IInRepository(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

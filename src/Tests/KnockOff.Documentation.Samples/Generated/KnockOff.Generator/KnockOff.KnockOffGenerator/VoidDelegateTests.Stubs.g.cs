@@ -29,8 +29,11 @@ partial class VoidDelegateTests
 		}
 
 		/// <summary>Stub for global::KnockOff.Documentation.Samples.Guides.Delegates.LogAction delegate.</summary>
-		public sealed class LogAction
+		public sealed class LogAction : global::KnockOff.IKnockOffStub
 		{
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for delegate stubs.</summary>
+			public bool Strict { get; set; }
+
 			/// <summary>Interceptor for tracking and configuring delegate behavior.</summary>
 			public LogActionInterceptor Interceptor { get; } = new();
 

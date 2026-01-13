@@ -26,7 +26,7 @@ partial class AsyncDisposableStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.IAsyncDisposable.</summary>
-		public class IAsyncDisposable : global::System.IAsyncDisposable
+		public class IAsyncDisposable : global::System.IAsyncDisposable, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for DisposeAsync.</summary>
 			public IAsyncDisposable_DisposeAsyncInterceptor DisposeAsync { get; } = new();
@@ -35,7 +35,7 @@ partial class AsyncDisposableStubTests
 			{
 				DisposeAsync.RecordCall();
 				if (DisposeAsync.OnCall is { } onCall) return onCall(this);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IAsyncDisposable", "DisposeAsync");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncDisposable", "DisposeAsync");
 				return default;
 			}
 
@@ -43,13 +43,13 @@ partial class AsyncDisposableStubTests
 			public global::System.IAsyncDisposable Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IAsyncDisposable(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

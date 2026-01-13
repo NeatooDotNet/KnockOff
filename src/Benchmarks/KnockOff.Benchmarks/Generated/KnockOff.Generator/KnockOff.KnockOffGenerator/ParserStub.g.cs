@@ -3,7 +3,7 @@
 
 namespace KnockOff.Benchmarks.Stubs;
 
-partial class ParserStub
+partial class ParserStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for TryParse.</summary>
 	public sealed class TryParseInterceptor

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class GenericRepositoryStub<T> where T : class
+partial class GenericRepositoryStub<T> : global::KnockOff.IKnockOffStub where T : class
 {
 	/// <summary>Tracks and configures behavior for Count.</summary>
 	public sealed class CountInterceptor

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class GenProductRepositoryKnockOff
+partial class GenProductRepositoryKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetAll.</summary>
 	public sealed class GetAllInterceptor

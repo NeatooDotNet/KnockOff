@@ -29,8 +29,11 @@ partial class NeatooPropertyChangedDelegateTests
 		}
 
 		/// <summary>Stub for global::Neatoo.NeatooPropertyChanged delegate.</summary>
-		public sealed class NeatooPropertyChanged
+		public sealed class NeatooPropertyChanged : global::KnockOff.IKnockOffStub
 		{
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for delegate stubs.</summary>
+			public bool Strict { get; set; }
+
 			/// <summary>Interceptor for tracking and configuring delegate behavior.</summary>
 			public NeatooPropertyChangedInterceptor Interceptor { get; } = new();
 

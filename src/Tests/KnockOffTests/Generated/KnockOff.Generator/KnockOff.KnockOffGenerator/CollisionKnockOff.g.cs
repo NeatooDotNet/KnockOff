@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class CollisionKnockOff
+partial class CollisionKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for ICollision.</summary>
 	public sealed class ICollisionInterceptor

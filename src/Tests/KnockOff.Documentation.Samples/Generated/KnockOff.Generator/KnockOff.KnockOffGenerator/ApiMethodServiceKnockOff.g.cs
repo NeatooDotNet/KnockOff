@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Reference;
 
-partial class ApiMethodServiceKnockOff
+partial class ApiMethodServiceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Initialize.</summary>
 	public sealed class InitializeInterceptor

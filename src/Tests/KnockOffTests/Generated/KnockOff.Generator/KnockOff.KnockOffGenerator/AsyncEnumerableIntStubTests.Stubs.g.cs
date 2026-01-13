@@ -29,7 +29,7 @@ partial class AsyncEnumerableIntStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.Collections.Generic.IAsyncEnumerable<int>.</summary>
-		public class IAsyncEnumerable : global::System.Collections.Generic.IAsyncEnumerable<int>
+		public class IAsyncEnumerable : global::System.Collections.Generic.IAsyncEnumerable<int>, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for GetAsyncEnumerator.</summary>
 			public IAsyncEnumerable_GetAsyncEnumeratorInterceptor GetAsyncEnumerator { get; } = new();
@@ -38,7 +38,7 @@ partial class AsyncEnumerableIntStubTests
 			{
 				GetAsyncEnumerator.RecordCall(cancellationToken);
 				if (GetAsyncEnumerator.OnCall is { } onCall) return onCall(this, cancellationToken);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IAsyncEnumerable<int>", "GetAsyncEnumerator");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncEnumerable<int>", "GetAsyncEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetAsyncEnumerator. Set GetAsyncEnumerator.OnCall.");
 			}
 
@@ -46,13 +46,13 @@ partial class AsyncEnumerableIntStubTests
 			public global::System.Collections.Generic.IAsyncEnumerable<int> Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IAsyncEnumerable(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

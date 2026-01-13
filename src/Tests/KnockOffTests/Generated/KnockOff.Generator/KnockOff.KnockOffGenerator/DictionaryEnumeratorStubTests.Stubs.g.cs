@@ -119,7 +119,7 @@ partial class DictionaryEnumeratorStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.Collections.IDictionaryEnumerator.</summary>
-		public class IDictionaryEnumerator : global::System.Collections.IDictionaryEnumerator
+		public class IDictionaryEnumerator : global::System.Collections.IDictionaryEnumerator, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Entry.</summary>
 			public IDictionaryEnumerator_EntryInterceptor Entry { get; } = new();
@@ -145,7 +145,7 @@ partial class DictionaryEnumeratorStubTests
 				{
 					Entry.RecordGet();
 					if (Entry.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDictionaryEnumerator", "Entry");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionaryEnumerator", "Entry");
 					return Entry.Value;
 				}
 			}
@@ -156,7 +156,7 @@ partial class DictionaryEnumeratorStubTests
 				{
 					Key.RecordGet();
 					if (Key.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDictionaryEnumerator", "Key");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionaryEnumerator", "Key");
 					return Key.Value;
 				}
 			}
@@ -167,7 +167,7 @@ partial class DictionaryEnumeratorStubTests
 				{
 					Value.RecordGet();
 					if (Value.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDictionaryEnumerator", "Value");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionaryEnumerator", "Value");
 					return Value.Value;
 				}
 			}
@@ -176,7 +176,7 @@ partial class DictionaryEnumeratorStubTests
 			{
 				MoveNext.RecordCall();
 				if (MoveNext.OnCall is { } onCall) return onCall(this);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerator", "MoveNext");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerator", "MoveNext");
 				return default!;
 			}
 
@@ -184,7 +184,7 @@ partial class DictionaryEnumeratorStubTests
 			{
 				Reset.RecordCall();
 				if (Reset.OnCall is { } onCall) { onCall(this); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerator", "Reset");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerator", "Reset");
 			}
 
 			object global::System.Collections.IEnumerator.Current
@@ -193,7 +193,7 @@ partial class DictionaryEnumeratorStubTests
 				{
 					Current.RecordGet();
 					if (Current.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerator", "Current");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerator", "Current");
 					return Current.Value;
 				}
 			}
@@ -202,13 +202,13 @@ partial class DictionaryEnumeratorStubTests
 			public global::System.Collections.IDictionaryEnumerator Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IDictionaryEnumerator(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

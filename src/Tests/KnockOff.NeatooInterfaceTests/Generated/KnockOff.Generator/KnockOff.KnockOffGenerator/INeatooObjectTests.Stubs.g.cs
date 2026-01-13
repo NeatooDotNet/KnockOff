@@ -9,19 +9,19 @@ partial class INeatooObjectTests
 	public static class Stubs
 	{
 		/// <summary>Stub implementation of global::Neatoo.INeatooObject.</summary>
-		public class INeatooObject : global::Neatoo.INeatooObject
+		public class INeatooObject : global::Neatoo.INeatooObject, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>The global::Neatoo.INeatooObject instance. Use for passing to code expecting the interface.</summary>
 			public global::Neatoo.INeatooObject Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public INeatooObject(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

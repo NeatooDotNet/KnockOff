@@ -29,7 +29,7 @@ partial class EquatableIntStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.IEquatable<int>.</summary>
-		public class IEquatable : global::System.IEquatable<int>
+		public class IEquatable : global::System.IEquatable<int>, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Equals.</summary>
 			public new IEquatable_EqualsInterceptor Equals { get; } = new();
@@ -38,7 +38,7 @@ partial class EquatableIntStubTests
 			{
 				Equals.RecordCall(other);
 				if (Equals.OnCall is { } onCall) return onCall(this, other);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEquatable<int>", "Equals");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IEquatable<int>", "Equals");
 				return default!;
 			}
 
@@ -46,13 +46,13 @@ partial class EquatableIntStubTests
 			public global::System.IEquatable<int> Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IEquatable(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

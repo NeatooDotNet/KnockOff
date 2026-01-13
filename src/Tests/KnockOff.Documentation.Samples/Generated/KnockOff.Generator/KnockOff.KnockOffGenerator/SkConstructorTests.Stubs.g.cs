@@ -29,8 +29,11 @@ partial class SkConstructorTests
 		}
 
 		/// <summary>Stub for global::KnockOff.Documentation.Samples.Skills.SkRepository via composition.</summary>
-		public class SkRepository
+		public class SkRepository : global::KnockOff.IKnockOffStub
 		{
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for class stubs.</summary>
+			public bool Strict { get; set; }
+
 			/// <summary>Interceptor for Save.</summary>
 			public SkRepository_SaveInterceptor Save { get; } = new();
 

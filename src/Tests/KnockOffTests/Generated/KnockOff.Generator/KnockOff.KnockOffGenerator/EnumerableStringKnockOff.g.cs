@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class EnumerableStringKnockOff
+partial class EnumerableStringKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetEnumerator.</summary>
 	public sealed class GetEnumeratorInterceptor

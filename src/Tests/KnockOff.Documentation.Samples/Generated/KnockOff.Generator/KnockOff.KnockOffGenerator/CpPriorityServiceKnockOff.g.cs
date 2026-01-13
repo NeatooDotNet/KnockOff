@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class CpPriorityServiceKnockOff
+partial class CpPriorityServiceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Calculate.</summary>
 	public sealed class Calculate2Interceptor

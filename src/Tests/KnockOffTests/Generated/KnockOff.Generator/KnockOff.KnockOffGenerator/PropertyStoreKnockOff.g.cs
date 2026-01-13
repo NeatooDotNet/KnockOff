@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class PropertyStoreKnockOff
+partial class PropertyStoreKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Indexer.</summary>
 	public sealed class IndexerInterceptor

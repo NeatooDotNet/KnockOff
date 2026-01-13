@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.GettingStarted;
 
-partial class EmailServiceWithValidation
+partial class EmailServiceWithValidation : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for IsConnected.</summary>
 	public sealed class IsConnectedInterceptor

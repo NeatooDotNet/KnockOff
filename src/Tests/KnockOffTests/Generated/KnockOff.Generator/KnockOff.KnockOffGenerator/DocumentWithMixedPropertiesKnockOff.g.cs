@@ -3,7 +3,7 @@
 
 namespace KnockOffTests;
 
-partial class DocumentWithMixedPropertiesKnockOff
+partial class DocumentWithMixedPropertiesKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Id.</summary>
 	public sealed class IdInterceptor

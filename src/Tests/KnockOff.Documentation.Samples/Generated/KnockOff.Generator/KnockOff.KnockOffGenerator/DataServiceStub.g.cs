@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.ReadMe;
 
-partial class DataServiceStub
+partial class DataServiceStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameInterceptor

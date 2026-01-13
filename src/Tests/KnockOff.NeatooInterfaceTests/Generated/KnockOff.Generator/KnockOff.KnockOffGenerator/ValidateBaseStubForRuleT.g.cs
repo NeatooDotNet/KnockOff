@@ -3,7 +3,7 @@
 
 namespace KnockOff.NeatooInterfaceTests.ValidationRules;
 
-partial class ValidateBaseStubForRuleT
+partial class ValidateBaseStubForRuleT : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Parent.</summary>
 	public sealed class ParentInterceptor

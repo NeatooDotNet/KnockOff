@@ -29,7 +29,7 @@ partial class SkPartialPropertyTests
 		}
 
 		/// <summary>Stub implementation of global::KnockOff.Documentation.Samples.Skills.ISkInlineUserService.</summary>
-		public class ISkInlineUserService : global::KnockOff.Documentation.Samples.Skills.ISkInlineUserService
+		public class ISkInlineUserService : global::KnockOff.Documentation.Samples.Skills.ISkInlineUserService, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for GetUser.</summary>
 			public ISkInlineUserService_GetUserInterceptor GetUser { get; } = new();
@@ -38,7 +38,7 @@ partial class SkPartialPropertyTests
 			{
 				GetUser.RecordCall(id);
 				if (GetUser.OnCall is { } onCall) return onCall(this, id);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("ISkInlineUserService", "GetUser");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkInlineUserService", "GetUser");
 				return default!;
 			}
 
@@ -46,13 +46,13 @@ partial class SkPartialPropertyTests
 			public global::KnockOff.Documentation.Samples.Skills.ISkInlineUserService Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public ISkInlineUserService(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

@@ -117,7 +117,7 @@ Same field, same runtime check. Attribute-level is free once constructor exists.
 - [x] Create `KnockOff.StubException` class
 - [x] Add `Strict` property to `KnockOffAttribute` and `KnockOffAttribute<T>`
 - [x] Generate `Strict` property for standalone stubs (public, settable, uses attribute default)
-- [x] Generate `_strict` field + constructor parameter for inline stubs
+- [x] Generate `Strict` property + constructor parameter for inline stubs
 - [x] Update method implementations to check strict before returning default
 - [x] Update property getter/setter implementations similarly
 - [x] Update void method implementations to throw in strict mode
@@ -127,25 +127,32 @@ Same field, same runtime check. Attribute-level is free once constructor exists.
 - [x] Update moq-migration.md skill with MockBehavior.Strict mapping
 - [x] Update README: remove "strict mode" from Limitations vs Moq section
 
+### v10.17.0 - Extension Method Enhancement
+
+- [x] Create `IKnockOffStub` interface with `Strict` property
+- [x] Create `StubExtensions.Strict<T>()` extension method for fluent API
+- [x] Update generator to implement `IKnockOffStub` on all stub types (standalone, inline interface, inline class, inline delegate)
+- [x] Change inline stubs from readonly `_strict` field to settable `Strict` property (for extension method compatibility)
+- [x] Add `Strict` property to class and delegate stubs (no-op for now, enables future strict mode support)
+- [x] Add 7 tests for extension method and interface implementation
+- [x] Update documentation with `.Strict()` extension method usage
+
 ## Implementation Notes
 
-**Standalone stubs** use a public `Strict` property (not a constructor) to avoid conflicts with user-defined constructors:
+**All stubs** implement `IKnockOffStub` interface and have a settable `Strict` property:
+
 ```csharp
-[KnockOff(Strict = true)]
-public partial class UserServiceStub : IUserService { }
+// Standalone stub
+var stub = new UserServiceStub().Strict(); // fluent API
+// or
+var stub = new UserServiceStub { Strict = true }; // property initializer
 
-// Generated:
-public bool Strict { get; set; } = true;
-
-// Usage:
-var stub = new UserServiceStub();
-stub.Strict = false; // Override if needed
+// Inline stub - constructor parameter (backwards compatible) or extension method
+var stub = new Stubs.IUserService(strict: true); // constructor
+var stub = new Stubs.IUserService().Strict(); // extension method
 ```
 
-**Inline stubs** use a constructor parameter (no user-defined constructors to conflict with):
-```csharp
-var stub = new Stubs.IUserService(strict: true);
-```
+The `IKnockOffStub` interface enables the `.Strict()` extension method to work with any KnockOff stub type.
 
 ## Resolved Decisions
 

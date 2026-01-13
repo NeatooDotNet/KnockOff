@@ -299,11 +299,11 @@ By default, stubs return smart defaults for unconfigured methods. **Strict mode*
 
 <!-- pseudo:skill-strict-mode-quick -->
 ```csharp
-// Standalone - set property
-var stub = new UserServiceKnockOff();
-stub.Strict = true;
+// Fluent API (recommended)
+var stub = new UserServiceKnockOff().Strict();
+var stub = new Stubs.IUserService().Strict();
 
-// Inline - constructor parameter
+// Constructor parameter (inline only)
 var stub = new Stubs.IUserService(strict: true);
 
 // Attribute default

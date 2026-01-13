@@ -66,7 +66,7 @@ partial class XmlSerializableStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.Xml.Serialization.IXmlSerializable.</summary>
-		public class IXmlSerializable : global::System.Xml.Serialization.IXmlSerializable
+		public class IXmlSerializable : global::System.Xml.Serialization.IXmlSerializable, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for GetSchema.</summary>
 			public IXmlSerializable_GetSchemaInterceptor GetSchema { get; } = new();
@@ -81,7 +81,7 @@ partial class XmlSerializableStubTests
 			{
 				GetSchema.RecordCall();
 				if (GetSchema.OnCall is { } onCall) return onCall(this);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IXmlSerializable", "GetSchema");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IXmlSerializable", "GetSchema");
 				return default!;
 			}
 
@@ -89,27 +89,27 @@ partial class XmlSerializableStubTests
 			{
 				ReadXml.RecordCall(reader);
 				if (ReadXml.OnCall is { } onCall) { onCall(this, reader); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IXmlSerializable", "ReadXml");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IXmlSerializable", "ReadXml");
 			}
 
 			void global::System.Xml.Serialization.IXmlSerializable.WriteXml(global::System.Xml.XmlWriter writer)
 			{
 				WriteXml.RecordCall(writer);
 				if (WriteXml.OnCall is { } onCall) { onCall(this, writer); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IXmlSerializable", "WriteXml");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IXmlSerializable", "WriteXml");
 			}
 
 			/// <summary>The global::System.Xml.Serialization.IXmlSerializable instance. Use for passing to code expecting the interface.</summary>
 			public global::System.Xml.Serialization.IXmlSerializable Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IXmlSerializable(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

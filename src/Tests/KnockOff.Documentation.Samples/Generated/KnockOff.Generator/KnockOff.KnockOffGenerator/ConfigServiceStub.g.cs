@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.ReadMe;
 
-partial class ConfigServiceStub
+partial class ConfigServiceStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for ConnectionString.</summary>
 	public sealed class ConnectionStringInterceptor

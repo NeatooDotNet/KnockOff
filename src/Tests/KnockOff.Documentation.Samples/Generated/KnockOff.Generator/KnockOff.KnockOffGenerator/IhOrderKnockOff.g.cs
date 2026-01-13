@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class IhOrderKnockOff
+partial class IhOrderKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Total.</summary>
 	public sealed class TotalInterceptor

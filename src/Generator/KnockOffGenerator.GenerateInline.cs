@@ -733,7 +733,7 @@ public partial class KnockOffGenerator
 		var stubClassName = iface.StubClassName;
 
 		sb.AppendLine($"\t\t/// <summary>Stub implementation of {iface.FullName}.</summary>");
-		sb.AppendLine($"\t\tpublic class {stubClassName} : {iface.FullName}");
+		sb.AppendLine($"\t\tpublic class {stubClassName} : {iface.FullName}, global::KnockOff.IKnockOffStub");
 		sb.AppendLine("\t\t{");
 
 		// Generate interceptor properties (using deduplicated members to avoid duplicates)
@@ -838,16 +838,16 @@ public partial class KnockOffGenerator
 		sb.AppendLine($"\t\t\tpublic {iface.FullName} Object => this;");
 		sb.AppendLine();
 
-		// Generate _strict field and constructor for strict mode support
+		// Generate Strict property and constructor for strict mode support
 		var strictDefault = iface.Strict ? "true" : "false";
 		sb.AppendLine("\t\t\t/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>");
-		sb.AppendLine("\t\t\tprivate readonly bool _strict;");
+		sb.AppendLine($"\t\t\tpublic bool Strict {{ get; set; }} = {strictDefault};");
 		sb.AppendLine();
 		sb.AppendLine($"\t\t\t/// <summary>Creates a new instance of the stub.</summary>");
 		sb.AppendLine($"\t\t\t/// <param name=\"strict\">When true, unconfigured method calls throw StubException.</param>");
 		sb.AppendLine($"\t\t\tpublic {stubClassName}(bool strict = {strictDefault})");
 		sb.AppendLine("\t\t\t{");
-		sb.AppendLine("\t\t\t\t_strict = strict;");
+		sb.AppendLine("\t\t\t\tStrict = strict;");
 		sb.AppendLine("\t\t\t}");
 		sb.AppendLine();
 
@@ -960,8 +960,13 @@ public partial class KnockOffGenerator
 
 		// Generate stub class
 		sb.AppendLine($"\t\t/// <summary>Stub for {del.FullName} delegate.</summary>");
-		sb.AppendLine($"\t\tpublic sealed class {stubClassName}");
+		sb.AppendLine($"\t\tpublic sealed class {stubClassName} : global::KnockOff.IKnockOffStub");
 		sb.AppendLine("\t\t{");
+
+		// Strict property for IKnockOffStub (delegate stubs don't have strict mode behavior yet)
+		sb.AppendLine("\t\t\t/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for delegate stubs.</summary>");
+		sb.AppendLine("\t\t\tpublic bool Strict { get; set; }");
+		sb.AppendLine();
 
 		// Interceptor property
 		sb.AppendLine($"\t\t\t/// <summary>Interceptor for tracking and configuring delegate behavior.</summary>");
@@ -1044,7 +1049,7 @@ public partial class KnockOffGenerator
 			sb.AppendLine("\t\t\t\t{");
 			sb.AppendLine($"\t\t\t\t\t{interceptorName}.RecordGet();");
 			sb.AppendLine($"\t\t\t\t\tif ({interceptorName}.OnGet is {{ }} onGet) return onGet(this);");
-			sb.AppendLine($"\t\t\t\t\tif (_strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"{member.Name}\");");
+			sb.AppendLine($"\t\t\t\t\tif (Strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"{member.Name}\");");
 			sb.AppendLine($"\t\t\t\t\treturn {interceptorName}.Value;");
 			sb.AppendLine("\t\t\t\t}");
 		}
@@ -1060,7 +1065,7 @@ public partial class KnockOffGenerator
 			sb.AppendLine("\t\t\t\t{");
 			sb.AppendLine($"\t\t\t\t\t{interceptorName}.RecordSet(value);");
 			sb.AppendLine($"\t\t\t\t\tif ({interceptorName}.OnSet is {{ }} onSet) {{ onSet(this, value); return; }}");
-			sb.AppendLine($"\t\t\t\t\tif (_strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"{member.Name}\");");
+			sb.AppendLine($"\t\t\t\t\tif (Strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"{member.Name}\");");
 			sb.AppendLine($"\t\t\t\t\t{interceptorName}.Value = value;");
 			sb.AppendLine("\t\t\t\t}");
 			if (!string.IsNullOrEmpty(pragmaRestore))
@@ -1102,7 +1107,7 @@ public partial class KnockOffGenerator
 			sb.AppendLine("\t\t\t\t{");
 			sb.AppendLine($"\t\t\t\t\t{interceptorName}.RecordGet({argList});");
 			sb.AppendLine($"\t\t\t\t\tif ({interceptorName}.OnGet is {{ }} onGet) return onGet(this, {argList});");
-			sb.AppendLine($"\t\t\t\t\tif (_strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"this[]\");");
+			sb.AppendLine($"\t\t\t\t\tif (Strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"this[]\");");
 			sb.AppendLine($"\t\t\t\t\treturn {interceptorName}.Backing.TryGetValue({keyArg}, out var v) ? v : {defaultExpr};");
 			sb.AppendLine("\t\t\t\t}");
 		}
@@ -1113,7 +1118,7 @@ public partial class KnockOffGenerator
 			sb.AppendLine("\t\t\t\t{");
 			sb.AppendLine($"\t\t\t\t\t{interceptorName}.RecordSet({argList}, value);");
 			sb.AppendLine($"\t\t\t\t\tif ({interceptorName}.OnSet is {{ }} onSet) {{ onSet(this, {argList}, value); return; }}");
-			sb.AppendLine($"\t\t\t\t\tif (_strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"this[]\");");
+			sb.AppendLine($"\t\t\t\t\tif (Strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"this[]\");");
 			sb.AppendLine($"\t\t\t\t\t{interceptorName}.Backing[{keyArg}] = value;");
 			sb.AppendLine("\t\t\t\t}");
 		}
@@ -1726,12 +1731,12 @@ public partial class KnockOffGenerator
 		if (isVoid)
 		{
 			sb.AppendLine($"\t\t\t\tif ({group.Name}.OnCall is {{ }} onCall) {{ onCall({onCallArgs}); return; }}");
-			sb.AppendLine($"\t\t\t\tif (_strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"{member.Name}\");");
+			sb.AppendLine($"\t\t\t\tif (Strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"{member.Name}\");");
 		}
 		else if (isAsync)
 		{
 			sb.AppendLine($"\t\t\t\tif ({group.Name}.OnCall is {{ }} onCall) return onCall({onCallArgs});");
-			sb.AppendLine($"\t\t\t\tif (_strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"{member.Name}\");");
+			sb.AppendLine($"\t\t\t\tif (Strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"{member.Name}\");");
 			// Return completed task for async methods
 			if (isTask && member.ReturnType == "global::System.Threading.Tasks.Task")
 			{
@@ -1756,13 +1761,13 @@ public partial class KnockOffGenerator
 		else if (member.DefaultStrategy == DefaultValueStrategy.ThrowException)
 		{
 			sb.AppendLine($"\t\t\t\tif ({group.Name}.OnCall is {{ }} onCall) return onCall({onCallArgs});");
-			sb.AppendLine($"\t\t\t\tif (_strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"{member.Name}\");");
+			sb.AppendLine($"\t\t\t\tif (Strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"{member.Name}\");");
 			sb.AppendLine($"\t\t\t\tthrow new global::System.InvalidOperationException(\"No implementation provided for {member.Name}. Set {group.Name}.OnCall.\");");
 		}
 		else
 		{
 			sb.AppendLine($"\t\t\t\tif ({group.Name}.OnCall is {{ }} onCall) return onCall({onCallArgs});");
-			sb.AppendLine($"\t\t\t\tif (_strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"{member.Name}\");");
+			sb.AppendLine($"\t\t\t\tif (Strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"{member.Name}\");");
 			var defaultExpr = GetDefaultForType(member.ReturnType, member.DefaultStrategy, member.ConcreteTypeForNew);
 			sb.AppendLine($"\t\t\t\treturn {defaultExpr};");
 		}
@@ -1859,7 +1864,7 @@ public partial class KnockOffGenerator
 		}
 
 		// Strict mode check before default behavior
-		sb.AppendLine($"\t\t\t\tif (_strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"{member.Name}\");");
+		sb.AppendLine($"\t\t\t\tif (Strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"{member.Name}\");");
 
 		// Default behavior
 		if (isVoid)

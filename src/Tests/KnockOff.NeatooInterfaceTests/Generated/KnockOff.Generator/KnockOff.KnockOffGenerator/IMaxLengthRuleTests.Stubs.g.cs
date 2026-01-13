@@ -182,7 +182,7 @@ partial class IMaxLengthRuleTests
 		}
 
 		/// <summary>Stub implementation of global::Neatoo.Rules.Rules.IMaxLengthRule.</summary>
-		public class IMaxLengthRule : global::Neatoo.Rules.Rules.IMaxLengthRule
+		public class IMaxLengthRule : global::Neatoo.Rules.Rules.IMaxLengthRule, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for ErrorMessage.</summary>
 			public IMaxLengthRule_ErrorMessageInterceptor ErrorMessage { get; } = new();
@@ -217,7 +217,7 @@ partial class IMaxLengthRuleTests
 				{
 					ErrorMessage.RecordGet();
 					if (ErrorMessage.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IMaxLengthRule", "ErrorMessage");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IMaxLengthRule", "ErrorMessage");
 					return ErrorMessage.Value;
 				}
 			}
@@ -228,7 +228,7 @@ partial class IMaxLengthRuleTests
 				{
 					Length.RecordGet();
 					if (Length.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IMaxLengthRule", "Length");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IMaxLengthRule", "Length");
 					return Length.Value;
 				}
 			}
@@ -237,7 +237,7 @@ partial class IMaxLengthRuleTests
 			{
 				RunRule.RecordCall(target, token);
 				if (RunRule.OnCall is { } onCall) return onCall(this, target, token);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "RunRule");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "RunRule");
 				throw new global::System.InvalidOperationException("No implementation provided for RunRule. Set RunRule.OnCall.");
 			}
 
@@ -245,7 +245,7 @@ partial class IMaxLengthRuleTests
 			{
 				OnRuleAdded.RecordCall(ruleManager, uniqueIndex);
 				if (OnRuleAdded.OnCall is { } onCall) { onCall(this, ruleManager, uniqueIndex); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "OnRuleAdded");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "OnRuleAdded");
 			}
 
 			bool global::Neatoo.Rules.IRule.Executed
@@ -254,7 +254,7 @@ partial class IMaxLengthRuleTests
 				{
 					Executed.RecordGet();
 					if (Executed.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "Executed");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "Executed");
 					return Executed.Value;
 				}
 			}
@@ -265,7 +265,7 @@ partial class IMaxLengthRuleTests
 				{
 					RuleOrder.RecordGet();
 					if (RuleOrder.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "RuleOrder");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "RuleOrder");
 					return RuleOrder.Value;
 				}
 			}
@@ -276,7 +276,7 @@ partial class IMaxLengthRuleTests
 				{
 					UniqueIndex.RecordGet();
 					if (UniqueIndex.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "UniqueIndex");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "UniqueIndex");
 					return UniqueIndex.Value;
 				}
 			}
@@ -287,7 +287,7 @@ partial class IMaxLengthRuleTests
 				{
 					Messages.RecordGet();
 					if (Messages.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "Messages");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "Messages");
 					return Messages.Value;
 				}
 			}
@@ -298,7 +298,7 @@ partial class IMaxLengthRuleTests
 				{
 					TriggerProperties.RecordGet();
 					if (TriggerProperties.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "TriggerProperties");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "TriggerProperties");
 					return TriggerProperties.Value;
 				}
 			}
@@ -307,13 +307,13 @@ partial class IMaxLengthRuleTests
 			public global::Neatoo.Rules.Rules.IMaxLengthRule Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IMaxLengthRule(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

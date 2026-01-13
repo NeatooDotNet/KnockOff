@@ -45,7 +45,7 @@ partial class GroupingStringIntStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.Linq.IGrouping<string, int>.</summary>
-		public class IGrouping : global::System.Linq.IGrouping<string, int>
+		public class IGrouping : global::System.Linq.IGrouping<string, int>, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Key.</summary>
 			public IGrouping_KeyInterceptor Key { get; } = new();
@@ -59,7 +59,7 @@ partial class GroupingStringIntStubTests
 				{
 					Key.RecordGet();
 					if (Key.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IGrouping<string, int>", "Key");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IGrouping<string, int>", "Key");
 					return Key.Value;
 				}
 			}
@@ -68,7 +68,7 @@ partial class GroupingStringIntStubTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable<int>", "GetEnumerator");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable<int>", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
@@ -76,7 +76,7 @@ partial class GroupingStringIntStubTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
@@ -84,13 +84,13 @@ partial class GroupingStringIntStubTests
 			public global::System.Linq.IGrouping<string, int> Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IGrouping(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

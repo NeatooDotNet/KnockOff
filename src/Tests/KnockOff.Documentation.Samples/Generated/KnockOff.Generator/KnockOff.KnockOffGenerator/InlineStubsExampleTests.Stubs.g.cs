@@ -29,7 +29,7 @@ partial class InlineStubsExampleTests
 		}
 
 		/// <summary>Stub implementation of global::KnockOff.Documentation.Samples.GettingStarted.IRepository.</summary>
-		public class IRepository : global::KnockOff.Documentation.Samples.GettingStarted.IRepository
+		public class IRepository : global::KnockOff.Documentation.Samples.GettingStarted.IRepository, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Save.</summary>
 			public IRepository_SaveInterceptor Save { get; } = new();
@@ -38,20 +38,20 @@ partial class InlineStubsExampleTests
 			{
 				Save.RecordCall(entity);
 				if (Save.OnCall is { } onCall) { onCall(this, entity); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IRepository", "Save");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IRepository", "Save");
 			}
 
 			/// <summary>The global::KnockOff.Documentation.Samples.GettingStarted.IRepository instance. Use for passing to code expecting the interface.</summary>
 			public global::KnockOff.Documentation.Samples.GettingStarted.IRepository Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IRepository(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}
@@ -74,7 +74,7 @@ partial class InlineStubsExampleTests
 		}
 
 		/// <summary>Stub implementation of global::KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork.</summary>
-		public class IUnitOfWork : global::KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork
+		public class IUnitOfWork : global::KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Commit.</summary>
 			public IUnitOfWork_CommitInterceptor Commit { get; } = new();
@@ -83,20 +83,20 @@ partial class InlineStubsExampleTests
 			{
 				Commit.RecordCall();
 				if (Commit.OnCall is { } onCall) { onCall(this); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IUnitOfWork", "Commit");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IUnitOfWork", "Commit");
 			}
 
 			/// <summary>The global::KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork instance. Use for passing to code expecting the interface.</summary>
 			public global::KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IUnitOfWork(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

@@ -5,7 +5,7 @@ namespace KnockOff.Documentation.Samples.GettingStarted;
 
 public partial class UserServiceTests
 {
-partial class UserRepositoryKnockOff
+partial class UserRepositoryKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetUser.</summary>
 	public sealed class GetUserInterceptor

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Comparison;
 
-partial class VsEmployeeRepoKnockOff
+partial class VsEmployeeRepoKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetEmployee.</summary>
 	public sealed class GetEmployeeInterceptor

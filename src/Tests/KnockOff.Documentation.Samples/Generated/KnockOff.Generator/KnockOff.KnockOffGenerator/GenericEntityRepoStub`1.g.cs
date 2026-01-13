@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class GenericEntityRepoStub<T> where T : class, global::KnockOff.Documentation.Samples.Guides.IGenEntity
+partial class GenericEntityRepoStub<T> : global::KnockOff.IKnockOffStub where T : class, global::KnockOff.Documentation.Samples.Guides.IGenEntity
 {
 	/// <summary>Tracks and configures behavior for FindById.</summary>
 	public sealed class FindByIdInterceptor

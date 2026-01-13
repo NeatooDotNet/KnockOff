@@ -29,7 +29,7 @@ partial class ServiceProviderStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.IServiceProvider.</summary>
-		public class IServiceProvider : global::System.IServiceProvider
+		public class IServiceProvider : global::System.IServiceProvider, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for GetService.</summary>
 			public IServiceProvider_GetServiceInterceptor GetService { get; } = new();
@@ -38,7 +38,7 @@ partial class ServiceProviderStubTests
 			{
 				GetService.RecordCall(serviceType);
 				if (GetService.OnCall is { } onCall) return onCall(this, serviceType);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IServiceProvider", "GetService");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IServiceProvider", "GetService");
 				return default!;
 			}
 
@@ -46,13 +46,13 @@ partial class ServiceProviderStubTests
 			public global::System.IServiceProvider Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IServiceProvider(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

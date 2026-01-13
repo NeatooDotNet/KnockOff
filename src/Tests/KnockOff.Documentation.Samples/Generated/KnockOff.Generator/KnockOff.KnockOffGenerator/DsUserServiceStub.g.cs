@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Design;
 
-partial class DsUserServiceStub
+partial class DsUserServiceStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameInterceptor

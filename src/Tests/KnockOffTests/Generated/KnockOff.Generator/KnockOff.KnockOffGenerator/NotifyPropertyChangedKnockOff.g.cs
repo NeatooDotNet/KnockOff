@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class NotifyPropertyChangedKnockOff
+partial class NotifyPropertyChangedKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Interceptor for PropertyChanged event.</summary>
 	public sealed class PropertyChangedInterceptor

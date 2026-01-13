@@ -5,7 +5,7 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 public partial class SkUserServiceTests
 {
-partial class SkRepoNestedKnockOff
+partial class SkRepoNestedKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Save.</summary>
 	public sealed class SaveInterceptor

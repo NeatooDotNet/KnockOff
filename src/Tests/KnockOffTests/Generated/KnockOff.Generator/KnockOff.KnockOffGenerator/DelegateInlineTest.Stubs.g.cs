@@ -26,8 +26,11 @@ partial class DelegateInlineTest
 		}
 
 		/// <summary>Stub for global::KnockOff.Tests.VoidNoParamDelegate delegate.</summary>
-		public sealed class VoidNoParamDelegate
+		public sealed class VoidNoParamDelegate : global::KnockOff.IKnockOffStub
 		{
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for delegate stubs.</summary>
+			public bool Strict { get; set; }
+
 			/// <summary>Interceptor for tracking and configuring delegate behavior.</summary>
 			public VoidNoParamDelegateInterceptor Interceptor { get; } = new();
 
@@ -62,8 +65,11 @@ partial class DelegateInlineTest
 		}
 
 		/// <summary>Stub for global::KnockOff.Tests.VoidOneParamDelegate delegate.</summary>
-		public sealed class VoidOneParamDelegate
+		public sealed class VoidOneParamDelegate : global::KnockOff.IKnockOffStub
 		{
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for delegate stubs.</summary>
+			public bool Strict { get; set; }
+
 			/// <summary>Interceptor for tracking and configuring delegate behavior.</summary>
 			public VoidOneParamDelegateInterceptor Interceptor { get; } = new();
 
@@ -98,8 +104,11 @@ partial class DelegateInlineTest
 		}
 
 		/// <summary>Stub for global::KnockOff.Tests.ReturnOneParamDelegate delegate.</summary>
-		public sealed class ReturnOneParamDelegate
+		public sealed class ReturnOneParamDelegate : global::KnockOff.IKnockOffStub
 		{
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for delegate stubs.</summary>
+			public bool Strict { get; set; }
+
 			/// <summary>Interceptor for tracking and configuring delegate behavior.</summary>
 			public ReturnOneParamDelegateInterceptor Interceptor { get; } = new();
 
@@ -135,8 +144,11 @@ partial class DelegateInlineTest
 		}
 
 		/// <summary>Stub for global::KnockOff.Tests.MultiParamDelegate delegate.</summary>
-		public sealed class MultiParamDelegate
+		public sealed class MultiParamDelegate : global::KnockOff.IKnockOffStub
 		{
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for delegate stubs.</summary>
+			public bool Strict { get; set; }
+
 			/// <summary>Interceptor for tracking and configuring delegate behavior.</summary>
 			public MultiParamDelegateInterceptor Interceptor { get; } = new();
 

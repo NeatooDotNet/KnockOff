@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class AsyncSaveKnockOff
+partial class AsyncSaveKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for SaveAsync.</summary>
 	public sealed class SaveAsyncInterceptor

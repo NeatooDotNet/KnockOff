@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.GettingStarted;
 
-partial class UnitOfWorkKnockOff
+partial class UnitOfWorkKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Commit.</summary>
 	public sealed class CommitInterceptor

@@ -71,7 +71,7 @@ partial class DsInitPropertyTests
 		}
 
 		/// <summary>Stub implementation of global::KnockOff.Documentation.Samples.Design.IDsEntity.</summary>
-		public class IDsEntity : global::KnockOff.Documentation.Samples.Design.IDsEntity
+		public class IDsEntity : global::KnockOff.Documentation.Samples.Design.IDsEntity, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Id.</summary>
 			public IDsEntity_IdInterceptor Id { get; } = new();
@@ -85,14 +85,14 @@ partial class DsInitPropertyTests
 				{
 					Id.RecordGet();
 					if (Id.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDsEntity", "Id");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsEntity", "Id");
 					return Id.Value;
 				}
 				init
 				{
 					Id.RecordSet(value);
 					if (Id.OnSet is { } onSet) { onSet(this, value); return; }
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDsEntity", "Id");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsEntity", "Id");
 					Id.Value = value;
 				}
 			}
@@ -103,14 +103,14 @@ partial class DsInitPropertyTests
 				{
 					Name.RecordGet();
 					if (Name.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDsEntity", "Name");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsEntity", "Name");
 					return Name.Value;
 				}
 				init
 				{
 					Name.RecordSet(value);
 					if (Name.OnSet is { } onSet) { onSet(this, value); return; }
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDsEntity", "Name");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsEntity", "Name");
 					Name.Value = value;
 				}
 			}
@@ -119,13 +119,13 @@ partial class DsInitPropertyTests
 			public global::KnockOff.Documentation.Samples.Design.IDsEntity Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IDsEntity(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}
@@ -212,7 +212,7 @@ partial class DsInitPropertyTests
 		}
 
 		/// <summary>Stub implementation of global::KnockOff.Documentation.Samples.Design.IDsDocument.</summary>
-		public class IDsDocument : global::KnockOff.Documentation.Samples.Design.IDsDocument
+		public class IDsDocument : global::KnockOff.Documentation.Samples.Design.IDsDocument, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Id.</summary>
 			public IDsDocument_IdInterceptor Id { get; } = new();
@@ -229,14 +229,14 @@ partial class DsInitPropertyTests
 				{
 					Id.RecordGet();
 					if (Id.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDsDocument", "Id");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsDocument", "Id");
 					return Id.Value;
 				}
 				init
 				{
 					Id.RecordSet(value);
 					if (Id.OnSet is { } onSet) { onSet(this, value); return; }
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDsDocument", "Id");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsDocument", "Id");
 					Id.Value = value;
 				}
 			}
@@ -247,14 +247,14 @@ partial class DsInitPropertyTests
 				{
 					Title.RecordGet();
 					if (Title.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDsDocument", "Title");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsDocument", "Title");
 					return Title.Value;
 				}
 				set
 				{
 					Title.RecordSet(value);
 					if (Title.OnSet is { } onSet) { onSet(this, value); return; }
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDsDocument", "Title");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsDocument", "Title");
 					Title.Value = value;
 				}
 			}
@@ -265,7 +265,7 @@ partial class DsInitPropertyTests
 				{
 					Version.RecordGet();
 					if (Version.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDsDocument", "Version");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsDocument", "Version");
 					return Version.Value;
 				}
 			}
@@ -274,13 +274,13 @@ partial class DsInitPropertyTests
 			public global::KnockOff.Documentation.Samples.Design.IDsDocument Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IDsDocument(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}
@@ -342,8 +342,11 @@ partial class DsInitPropertyTests
 		}
 
 		/// <summary>Stub for global::KnockOff.Documentation.Samples.Design.DsEntityBase via composition.</summary>
-		public class DsEntityBase
+		public class DsEntityBase : global::KnockOff.IKnockOffStub
 		{
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for class stubs.</summary>
+			public bool Strict { get; set; }
+
 			/// <summary>Interceptor for Id.</summary>
 			public DsEntityBase_IdInterceptor Id { get; } = new();
 			/// <summary>Interceptor for CreatedBy.</summary>

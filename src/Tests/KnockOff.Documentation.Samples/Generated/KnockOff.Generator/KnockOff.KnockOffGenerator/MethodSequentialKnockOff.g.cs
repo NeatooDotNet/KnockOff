@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class MethodSequentialKnockOff
+partial class MethodSequentialKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetNext.</summary>
 	public sealed class GetNextInterceptor

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class ServiceProviderKnockOff
+partial class ServiceProviderKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetService.</summary>
 	public sealed class GetServiceInterceptor

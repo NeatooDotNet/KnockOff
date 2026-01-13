@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class DisposableKnockOff
+partial class DisposableKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Dispose.</summary>
 	public sealed class DisposeInterceptor

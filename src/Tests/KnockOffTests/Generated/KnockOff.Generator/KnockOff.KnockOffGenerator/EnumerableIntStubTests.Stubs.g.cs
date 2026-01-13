@@ -26,7 +26,7 @@ partial class EnumerableIntStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.Collections.Generic.IEnumerable<int>.</summary>
-		public class IEnumerable : global::System.Collections.Generic.IEnumerable<int>
+		public class IEnumerable : global::System.Collections.Generic.IEnumerable<int>, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for GetEnumerator.</summary>
 			public IEnumerable_GetEnumeratorInterceptor GetEnumerator { get; } = new();
@@ -35,7 +35,7 @@ partial class EnumerableIntStubTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable<int>", "GetEnumerator");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable<int>", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
@@ -48,13 +48,13 @@ partial class EnumerableIntStubTests
 			public global::System.Collections.Generic.IEnumerable<int> Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IEnumerable(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

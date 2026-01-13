@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Comparison;
 
-partial class VsSequenceKnockOff
+partial class VsSequenceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetNext.</summary>
 	public sealed class GetNextInterceptor

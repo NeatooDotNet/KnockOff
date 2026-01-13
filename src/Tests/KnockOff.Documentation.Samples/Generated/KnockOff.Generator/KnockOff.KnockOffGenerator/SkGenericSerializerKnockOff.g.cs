@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class SkGenericSerializerKnockOff
+partial class SkGenericSerializerKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Marker interface for generic method call tracking.</summary>
 	private interface IGenericMethodCallTracker { int CallCount { get; } bool WasCalled { get; } }

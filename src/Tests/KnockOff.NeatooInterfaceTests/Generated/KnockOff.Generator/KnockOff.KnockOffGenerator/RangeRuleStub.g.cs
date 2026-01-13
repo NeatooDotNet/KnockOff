@@ -3,7 +3,7 @@
 
 namespace KnockOff.NeatooInterfaceTests.BuiltInRules;
 
-partial class RangeRuleStub
+partial class RangeRuleStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for ErrorMessage.</summary>
 	public sealed class ErrorMessageInterceptor

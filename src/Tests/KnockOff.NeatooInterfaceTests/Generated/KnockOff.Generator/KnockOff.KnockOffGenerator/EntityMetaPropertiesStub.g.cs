@@ -3,7 +3,7 @@
 
 namespace KnockOff.NeatooInterfaceTests.MetaProperties;
 
-partial class EntityMetaPropertiesStub
+partial class EntityMetaPropertiesStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for IsChild.</summary>
 	public sealed class IsChildInterceptor

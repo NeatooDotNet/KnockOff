@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class GenericRepoStub<T> where T : class
+partial class GenericRepoStub<T> : global::KnockOff.IKnockOffStub where T : class
 {
 	/// <summary>Tracks and configures behavior for GetById.</summary>
 	public sealed class GetByIdInterceptor

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class SkEventSourceKnockOff
+partial class SkEventSourceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Interceptor for DataReceived event.</summary>
 	public sealed class DataReceivedInterceptor

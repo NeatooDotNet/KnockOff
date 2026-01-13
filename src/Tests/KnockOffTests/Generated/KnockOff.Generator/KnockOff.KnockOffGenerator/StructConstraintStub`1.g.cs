@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class StructConstraintStub<T> where T : struct
+partial class StructConstraintStub<T> : global::KnockOff.IKnockOffStub where T : struct
 {
 	/// <summary>Tracks and configures behavior for GetDefault.</summary>
 	public sealed class GetDefaultInterceptor

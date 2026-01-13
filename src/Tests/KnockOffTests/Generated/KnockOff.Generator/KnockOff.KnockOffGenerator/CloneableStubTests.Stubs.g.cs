@@ -26,7 +26,7 @@ partial class CloneableStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.ICloneable.</summary>
-		public class ICloneable : global::System.ICloneable
+		public class ICloneable : global::System.ICloneable, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Clone.</summary>
 			public ICloneable_CloneInterceptor Clone { get; } = new();
@@ -35,7 +35,7 @@ partial class CloneableStubTests
 			{
 				Clone.RecordCall();
 				if (Clone.OnCall is { } onCall) return onCall(this);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("ICloneable", "Clone");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("ICloneable", "Clone");
 				return new object();
 			}
 
@@ -43,13 +43,13 @@ partial class CloneableStubTests
 			public global::System.ICloneable Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public ICloneable(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Comparison;
 
-partial class MigConnectionKnockOff
+partial class MigConnectionKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Connect.</summary>
 	public sealed class ConnectInterceptor

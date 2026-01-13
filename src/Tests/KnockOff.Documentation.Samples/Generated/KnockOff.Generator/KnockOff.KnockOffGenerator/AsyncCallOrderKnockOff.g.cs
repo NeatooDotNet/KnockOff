@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class AsyncCallOrderKnockOff
+partial class AsyncCallOrderKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for StartAsync.</summary>
 	public sealed class StartAsyncInterceptor

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class HaEventSourceKnockOff
+partial class HaEventSourceKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Interceptor for DataReceived event.</summary>
 	public sealed class DataReceivedInterceptor

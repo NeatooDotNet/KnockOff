@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Reference;
 
-partial class AttrAuditableKnockOff
+partial class AttrAuditableKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for CreatedAt.</summary>
 	public sealed class CreatedAtInterceptor

@@ -201,7 +201,7 @@ partial class IStringLengthRuleTests
 		}
 
 		/// <summary>Stub implementation of global::Neatoo.Rules.Rules.IStringLengthRule.</summary>
-		public class IStringLengthRule : global::Neatoo.Rules.Rules.IStringLengthRule
+		public class IStringLengthRule : global::Neatoo.Rules.Rules.IStringLengthRule, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for ErrorMessage.</summary>
 			public IStringLengthRule_ErrorMessageInterceptor ErrorMessage { get; } = new();
@@ -239,7 +239,7 @@ partial class IStringLengthRuleTests
 				{
 					ErrorMessage.RecordGet();
 					if (ErrorMessage.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IStringLengthRule", "ErrorMessage");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IStringLengthRule", "ErrorMessage");
 					return ErrorMessage.Value;
 				}
 			}
@@ -250,7 +250,7 @@ partial class IStringLengthRuleTests
 				{
 					MinimumLength.RecordGet();
 					if (MinimumLength.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IStringLengthRule", "MinimumLength");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IStringLengthRule", "MinimumLength");
 					return MinimumLength.Value;
 				}
 			}
@@ -261,7 +261,7 @@ partial class IStringLengthRuleTests
 				{
 					MaximumLength.RecordGet();
 					if (MaximumLength.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IStringLengthRule", "MaximumLength");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IStringLengthRule", "MaximumLength");
 					return MaximumLength.Value;
 				}
 			}
@@ -270,7 +270,7 @@ partial class IStringLengthRuleTests
 			{
 				RunRule.RecordCall(target, token);
 				if (RunRule.OnCall is { } onCall) return onCall(this, target, token);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "RunRule");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "RunRule");
 				throw new global::System.InvalidOperationException("No implementation provided for RunRule. Set RunRule.OnCall.");
 			}
 
@@ -278,7 +278,7 @@ partial class IStringLengthRuleTests
 			{
 				OnRuleAdded.RecordCall(ruleManager, uniqueIndex);
 				if (OnRuleAdded.OnCall is { } onCall) { onCall(this, ruleManager, uniqueIndex); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "OnRuleAdded");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "OnRuleAdded");
 			}
 
 			bool global::Neatoo.Rules.IRule.Executed
@@ -287,7 +287,7 @@ partial class IStringLengthRuleTests
 				{
 					Executed.RecordGet();
 					if (Executed.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "Executed");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "Executed");
 					return Executed.Value;
 				}
 			}
@@ -298,7 +298,7 @@ partial class IStringLengthRuleTests
 				{
 					RuleOrder.RecordGet();
 					if (RuleOrder.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "RuleOrder");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "RuleOrder");
 					return RuleOrder.Value;
 				}
 			}
@@ -309,7 +309,7 @@ partial class IStringLengthRuleTests
 				{
 					UniqueIndex.RecordGet();
 					if (UniqueIndex.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "UniqueIndex");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "UniqueIndex");
 					return UniqueIndex.Value;
 				}
 			}
@@ -320,7 +320,7 @@ partial class IStringLengthRuleTests
 				{
 					Messages.RecordGet();
 					if (Messages.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "Messages");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "Messages");
 					return Messages.Value;
 				}
 			}
@@ -331,7 +331,7 @@ partial class IStringLengthRuleTests
 				{
 					TriggerProperties.RecordGet();
 					if (TriggerProperties.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "TriggerProperties");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "TriggerProperties");
 					return TriggerProperties.Value;
 				}
 			}
@@ -340,13 +340,13 @@ partial class IStringLengthRuleTests
 			public global::Neatoo.Rules.Rules.IStringLengthRule Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IStringLengthRule(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

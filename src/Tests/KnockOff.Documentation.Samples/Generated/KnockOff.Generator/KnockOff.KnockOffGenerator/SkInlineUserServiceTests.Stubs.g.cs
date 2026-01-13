@@ -29,7 +29,7 @@ partial class SkInlineUserServiceTests
 		}
 
 		/// <summary>Stub implementation of global::KnockOff.Documentation.Samples.Skills.ISkInlineUserService.</summary>
-		public class ISkInlineUserService : global::KnockOff.Documentation.Samples.Skills.ISkInlineUserService
+		public class ISkInlineUserService : global::KnockOff.Documentation.Samples.Skills.ISkInlineUserService, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for GetUser.</summary>
 			public ISkInlineUserService_GetUserInterceptor GetUser { get; } = new();
@@ -38,7 +38,7 @@ partial class SkInlineUserServiceTests
 			{
 				GetUser.RecordCall(id);
 				if (GetUser.OnCall is { } onCall) return onCall(this, id);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("ISkInlineUserService", "GetUser");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkInlineUserService", "GetUser");
 				return default!;
 			}
 
@@ -46,13 +46,13 @@ partial class SkInlineUserServiceTests
 			public global::KnockOff.Documentation.Samples.Skills.ISkInlineUserService Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public ISkInlineUserService(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}
@@ -78,7 +78,7 @@ partial class SkInlineUserServiceTests
 		}
 
 		/// <summary>Stub implementation of global::KnockOff.Documentation.Samples.Skills.ISkInlineLogger.</summary>
-		public class ISkInlineLogger : global::KnockOff.Documentation.Samples.Skills.ISkInlineLogger
+		public class ISkInlineLogger : global::KnockOff.Documentation.Samples.Skills.ISkInlineLogger, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Log.</summary>
 			public ISkInlineLogger_LogInterceptor Log { get; } = new();
@@ -87,20 +87,20 @@ partial class SkInlineUserServiceTests
 			{
 				Log.RecordCall(message);
 				if (Log.OnCall is { } onCall) { onCall(this, message); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("ISkInlineLogger", "Log");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkInlineLogger", "Log");
 			}
 
 			/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkInlineLogger instance. Use for passing to code expecting the interface.</summary>
 			public global::KnockOff.Documentation.Samples.Skills.ISkInlineLogger Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public ISkInlineLogger(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

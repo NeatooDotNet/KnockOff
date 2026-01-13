@@ -3,7 +3,7 @@
 
 namespace KnockOff.NeatooInterfaceTests.BuiltInRules;
 
-partial class RuleStubForAttr
+partial class RuleStubForAttr : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Executed.</summary>
 	public sealed class ExecutedInterceptor

@@ -29,8 +29,11 @@ partial class ValidationPatternTests
 		}
 
 		/// <summary>Stub for global::KnockOff.Documentation.Samples.Guides.Delegates.IsUniqueRule delegate.</summary>
-		public sealed class IsUniqueRule
+		public sealed class IsUniqueRule : global::KnockOff.IKnockOffStub
 		{
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for delegate stubs.</summary>
+			public bool Strict { get; set; }
+
 			/// <summary>Interceptor for tracking and configuring delegate behavior.</summary>
 			public IsUniqueRuleInterceptor Interceptor { get; } = new();
 

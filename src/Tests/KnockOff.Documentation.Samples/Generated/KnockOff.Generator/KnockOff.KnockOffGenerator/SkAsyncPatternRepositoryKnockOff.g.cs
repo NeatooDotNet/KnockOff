@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class SkAsyncPatternRepositoryKnockOff
+partial class SkAsyncPatternRepositoryKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetUserAsync.</summary>
 	public sealed class GetUserAsyncInterceptor

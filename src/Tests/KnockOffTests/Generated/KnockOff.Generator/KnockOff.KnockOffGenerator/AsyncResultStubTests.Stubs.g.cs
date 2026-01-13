@@ -85,7 +85,7 @@ partial class AsyncResultStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.IAsyncResult.</summary>
-		public class IAsyncResult : global::System.IAsyncResult
+		public class IAsyncResult : global::System.IAsyncResult, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for AsyncState.</summary>
 			public IAsyncResult_AsyncStateInterceptor AsyncState { get; } = new();
@@ -105,7 +105,7 @@ partial class AsyncResultStubTests
 				{
 					AsyncState.RecordGet();
 					if (AsyncState.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IAsyncResult", "AsyncState");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncResult", "AsyncState");
 					return AsyncState.Value;
 				}
 			}
@@ -116,7 +116,7 @@ partial class AsyncResultStubTests
 				{
 					AsyncWaitHandle.RecordGet();
 					if (AsyncWaitHandle.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IAsyncResult", "AsyncWaitHandle");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncResult", "AsyncWaitHandle");
 					return AsyncWaitHandle.Value;
 				}
 			}
@@ -127,7 +127,7 @@ partial class AsyncResultStubTests
 				{
 					CompletedSynchronously.RecordGet();
 					if (CompletedSynchronously.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IAsyncResult", "CompletedSynchronously");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncResult", "CompletedSynchronously");
 					return CompletedSynchronously.Value;
 				}
 			}
@@ -138,7 +138,7 @@ partial class AsyncResultStubTests
 				{
 					IsCompleted.RecordGet();
 					if (IsCompleted.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IAsyncResult", "IsCompleted");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncResult", "IsCompleted");
 					return IsCompleted.Value;
 				}
 			}
@@ -147,13 +147,13 @@ partial class AsyncResultStubTests
 			public global::System.IAsyncResult Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IAsyncResult(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

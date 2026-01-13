@@ -4,36 +4,50 @@ By default, KnockOff stubs return smart defaults for unconfigured methods. **Str
 
 ## Enabling Strict Mode
 
-### Standalone Stubs
+### Extension Method (Recommended)
 
-Set the `Strict` property:
+Use the fluent `.Strict()` extension method:
+
+<!-- pseudo:strict-mode-extension -->
+```csharp
+// Standalone stub
+var stub = new UserServiceKnockOff().Strict();
+
+// Inline stub
+var stub = new Stubs.IUserService().Strict();
+
+// Works with any stub type - returns same instance for chaining
+```
+<!-- /snippet -->
+
+### Standalone Stubs
 
 <!-- pseudo:strict-mode-standalone -->
 ```csharp
-[KnockOff]
-public partial class UserServiceKnockOff : IUserService { }
-
-// In test:
-var stub = new UserServiceKnockOff();
-stub.Strict = true;  // Enable strict mode
+var stub = new UserServiceKnockOff().Strict();
 
 IUserService service = stub;
-service.GetUser(1);  // Throws StubException - no OnCall configured!
+// service.GetUser(1);  // Would throw StubException - no OnCall configured!
 ```
 <!-- /snippet -->
 
 ### Inline Stubs
 
-Use constructor parameter:
+Use constructor parameter or extension method:
 
 <!-- pseudo:strict-mode-inline -->
 ```csharp
+// Constructor parameter
 var stub = new Stubs.IUserService(strict: true);
+
+// Or extension method
+var stub = new Stubs.IUserService().Strict();
+
 stub.GetUser.OnCall = (ko, id) => new User { Id = id };  // Configure what you expect
 
 IUserService service = stub;
-service.GetUser(1);     // OK - OnCall configured
-service.DeleteUser(1);  // Throws StubException - no OnCall configured!
+_ = service.GetUser(1);     // OK - OnCall configured
+// service.DeleteUser(1);  // Would throw StubException - no OnCall configured!
 ```
 <!-- /snippet -->
 
@@ -94,17 +108,16 @@ Moq's `MockBehavior.Strict` maps directly to KnockOff's strict mode:
 
 <!-- pseudo:strict-mode-moq-migration -->
 ```csharp
-// Moq
-var mock = new Mock<IUserService>(MockBehavior.Strict);
-mock.Setup(x => x.GetUser(1)).Returns(new User());
+// Moq equivalent:
+// var mock = new Mock<IUserService>(MockBehavior.Strict);
+// mock.Setup(x => x.GetUser(1)).Returns(new User());
 
 // KnockOff - standalone
-var stub = new UserServiceKnockOff();
-stub.Strict = true;
+var stub = new UserServiceKnockOff().Strict();
 stub.GetUser.OnCall = (ko, id) => new User();
 
 // KnockOff - inline
-var stub = new Stubs.IUserService(strict: true);
+var stub = new Stubs.IUserService().Strict();
 stub.GetUser.OnCall = (ko, id) => new User();
 ```
 <!-- /snippet -->

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class SkSmartDefaultKnockOff
+partial class SkSmartDefaultKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetCount.</summary>
 	public sealed class GetCountInterceptor

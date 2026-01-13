@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class MultiUnitOfWorkKnockOff
+partial class MultiUnitOfWorkKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for SaveChangesAsync.</summary>
 	public sealed class SaveChangesAsyncInterceptor

@@ -3,7 +3,7 @@
 
 namespace KnockOff.NeatooInterfaceTests.Properties;
 
-partial class ValidatePropertyOfStringStub
+partial class ValidatePropertyOfStringStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Value.</summary>
 	public sealed class ValueInterceptor

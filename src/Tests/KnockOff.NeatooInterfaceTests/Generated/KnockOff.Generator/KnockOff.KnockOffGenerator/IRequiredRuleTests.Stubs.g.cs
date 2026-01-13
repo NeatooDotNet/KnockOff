@@ -163,7 +163,7 @@ partial class IRequiredRuleTests
 		}
 
 		/// <summary>Stub implementation of global::Neatoo.Rules.Rules.IRequiredRule.</summary>
-		public class IRequiredRule : global::Neatoo.Rules.Rules.IRequiredRule
+		public class IRequiredRule : global::Neatoo.Rules.Rules.IRequiredRule, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for ErrorMessage.</summary>
 			public IRequiredRule_ErrorMessageInterceptor ErrorMessage { get; } = new();
@@ -195,7 +195,7 @@ partial class IRequiredRuleTests
 				{
 					ErrorMessage.RecordGet();
 					if (ErrorMessage.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRequiredRule", "ErrorMessage");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRequiredRule", "ErrorMessage");
 					return ErrorMessage.Value;
 				}
 			}
@@ -204,7 +204,7 @@ partial class IRequiredRuleTests
 			{
 				RunRule.RecordCall(target, token);
 				if (RunRule.OnCall is { } onCall) return onCall(this, target, token);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "RunRule");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "RunRule");
 				throw new global::System.InvalidOperationException("No implementation provided for RunRule. Set RunRule.OnCall.");
 			}
 
@@ -212,7 +212,7 @@ partial class IRequiredRuleTests
 			{
 				OnRuleAdded.RecordCall(ruleManager, uniqueIndex);
 				if (OnRuleAdded.OnCall is { } onCall) { onCall(this, ruleManager, uniqueIndex); return; }
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "OnRuleAdded");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "OnRuleAdded");
 			}
 
 			bool global::Neatoo.Rules.IRule.Executed
@@ -221,7 +221,7 @@ partial class IRequiredRuleTests
 				{
 					Executed.RecordGet();
 					if (Executed.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "Executed");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "Executed");
 					return Executed.Value;
 				}
 			}
@@ -232,7 +232,7 @@ partial class IRequiredRuleTests
 				{
 					RuleOrder.RecordGet();
 					if (RuleOrder.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "RuleOrder");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "RuleOrder");
 					return RuleOrder.Value;
 				}
 			}
@@ -243,7 +243,7 @@ partial class IRequiredRuleTests
 				{
 					UniqueIndex.RecordGet();
 					if (UniqueIndex.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "UniqueIndex");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "UniqueIndex");
 					return UniqueIndex.Value;
 				}
 			}
@@ -254,7 +254,7 @@ partial class IRequiredRuleTests
 				{
 					Messages.RecordGet();
 					if (Messages.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "Messages");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "Messages");
 					return Messages.Value;
 				}
 			}
@@ -265,7 +265,7 @@ partial class IRequiredRuleTests
 				{
 					TriggerProperties.RecordGet();
 					if (TriggerProperties.OnGet is { } onGet) return onGet(this);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "TriggerProperties");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "TriggerProperties");
 					return TriggerProperties.Value;
 				}
 			}
@@ -274,13 +274,13 @@ partial class IRequiredRuleTests
 			public global::Neatoo.Rules.Rules.IRequiredRule Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IRequiredRule(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Comparison;
 
-partial class FcLoggerStub
+partial class FcLoggerStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for LogInfo.</summary>
 	public sealed class LogInfoInterceptor

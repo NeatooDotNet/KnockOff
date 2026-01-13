@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace KnockOff.NeatooInterfaceTests.ValidationRules;
 
-partial class RuleManagerStubForRule
+partial class RuleManagerStubForRule : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Marker interface for generic method call tracking.</summary>
 	private interface IGenericMethodCallTracker { int CallCount { get; } bool WasCalled { get; } }

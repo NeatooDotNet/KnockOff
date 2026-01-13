@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Comparison;
 
-partial class FcPaymentServiceStub
+partial class FcPaymentServiceStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for ProcessPayment.</summary>
 	public sealed class ProcessPaymentInterceptor

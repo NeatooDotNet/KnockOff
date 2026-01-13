@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class MethodPriorityKnockOff
+partial class MethodPriorityKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Calculate.</summary>
 	public sealed class Calculate2Interceptor

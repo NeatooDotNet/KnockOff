@@ -327,7 +327,7 @@ public partial class KnockOffGenerator : IIncrementalGenerator
 		var typeParamList = SymbolHelpers.FormatTypeParameterList(typeInfo.TypeParameters);
 		var constraints = SymbolHelpers.FormatTypeConstraints(typeInfo.TypeParameters);
 		var constraintClause = string.IsNullOrEmpty(constraints) ? "" : $" {constraints}";
-		sb.AppendLine($"partial class {typeInfo.ClassName}{typeParamList}{constraintClause}");
+		sb.AppendLine($"partial class {typeInfo.ClassName}{typeParamList} : global::KnockOff.IKnockOffStub{constraintClause}");
 		sb.AppendLine("{");
 
 		// Class name with type parameters for use in delegate signatures (e.g., "RepositoryStub<T>")

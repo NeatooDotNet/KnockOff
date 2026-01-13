@@ -3,7 +3,7 @@
 
 namespace KnockOff.NeatooInterfaceTests.PropertyManagers;
 
-partial class EntityPropertyManagerStub
+partial class EntityPropertyManagerStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for IsModified.</summary>
 	public sealed class IsModifiedInterceptor

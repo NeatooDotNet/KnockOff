@@ -3,7 +3,7 @@
 
 namespace DomainModel.Tests;
 
-partial class PersonDbContextKnockOff
+partial class PersonDbContextKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for SavePerson.</summary>
 	public sealed class SavePersonInterceptor

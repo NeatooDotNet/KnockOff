@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class NestedDictStub<TKey, TValue> where TKey : notnull
+partial class NestedDictStub<TKey, TValue> : global::KnockOff.IKnockOffStub where TKey : notnull
 {
 	/// <summary>Tracks and configures behavior for GetMapping.</summary>
 	public sealed class GetMappingInterceptor

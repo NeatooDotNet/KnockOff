@@ -49,7 +49,7 @@ partial class EqualityComparerStubTests
 		}
 
 		/// <summary>Stub implementation of global::System.Collections.IEqualityComparer.</summary>
-		public class IEqualityComparer : global::System.Collections.IEqualityComparer
+		public class IEqualityComparer : global::System.Collections.IEqualityComparer, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Equals.</summary>
 			public new IEqualityComparer_EqualsInterceptor Equals { get; } = new();
@@ -61,7 +61,7 @@ partial class EqualityComparerStubTests
 			{
 				Equals.RecordCall(x, y);
 				if (Equals.OnCall is { } onCall) return onCall(this, x, y);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEqualityComparer", "Equals");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IEqualityComparer", "Equals");
 				return default!;
 			}
 
@@ -69,7 +69,7 @@ partial class EqualityComparerStubTests
 			{
 				GetHashCode.RecordCall(obj);
 				if (GetHashCode.OnCall is { } onCall) return onCall(this, obj);
-				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEqualityComparer", "GetHashCode");
+				if (Strict) throw global::KnockOff.StubException.NotConfigured("IEqualityComparer", "GetHashCode");
 				return default!;
 			}
 
@@ -77,13 +77,13 @@ partial class EqualityComparerStubTests
 			public global::System.Collections.IEqualityComparer Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IEqualityComparer(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

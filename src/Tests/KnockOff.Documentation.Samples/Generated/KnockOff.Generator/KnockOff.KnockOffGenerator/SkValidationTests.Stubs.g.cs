@@ -29,8 +29,11 @@ partial class SkValidationTests
 		}
 
 		/// <summary>Stub for global::KnockOff.Documentation.Samples.Skills.SkIsUniqueRule delegate.</summary>
-		public sealed class SkIsUniqueRule
+		public sealed class SkIsUniqueRule : global::KnockOff.IKnockOffStub
 		{
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for delegate stubs.</summary>
+			public bool Strict { get; set; }
+
 			/// <summary>Interceptor for tracking and configuring delegate behavior.</summary>
 			public SkIsUniqueRuleInterceptor Interceptor { get; } = new();
 
@@ -66,8 +69,11 @@ partial class SkValidationTests
 		}
 
 		/// <summary>Stub for global::KnockOff.Documentation.Samples.Skills.SkUserFactory delegate.</summary>
-		public sealed class SkUserFactory
+		public sealed class SkUserFactory : global::KnockOff.IKnockOffStub
 		{
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for delegate stubs.</summary>
+			public bool Strict { get; set; }
+
 			/// <summary>Interceptor for tracking and configuring delegate behavior.</summary>
 			public SkUserFactoryInterceptor Interceptor { get; } = new();
 

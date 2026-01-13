@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class CloneableKnockOff
+partial class CloneableKnockOff : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Clone.</summary>
 	public sealed class CloneInterceptor

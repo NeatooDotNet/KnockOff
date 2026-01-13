@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class GenericKeyValueStub<TKey, TValue> where TKey : notnull where TValue : class
+partial class GenericKeyValueStub<TKey, TValue> : global::KnockOff.IKnockOffStub where TKey : notnull where TValue : class
 {
 	/// <summary>Tracks and configures behavior for Get.</summary>
 	public sealed class GetInterceptor

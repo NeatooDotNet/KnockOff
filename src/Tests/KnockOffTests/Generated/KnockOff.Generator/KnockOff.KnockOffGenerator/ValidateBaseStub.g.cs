@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class ValidateBaseStub
+partial class ValidateBaseStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Parent.</summary>
 	public sealed class ParentInterceptor

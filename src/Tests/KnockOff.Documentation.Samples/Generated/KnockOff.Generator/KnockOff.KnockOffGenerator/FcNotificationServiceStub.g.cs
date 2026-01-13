@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Comparison;
 
-partial class FcNotificationServiceStub
+partial class FcNotificationServiceStub : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for SendOrderConfirmation.</summary>
 	public sealed class SendOrderConfirmationInterceptor

@@ -43,7 +43,7 @@ partial class DsIndexerTests
 		}
 
 		/// <summary>Stub implementation of global::KnockOff.Documentation.Samples.Design.IDsCache.</summary>
-		public class IDsCache : global::KnockOff.Documentation.Samples.Design.IDsCache
+		public class IDsCache : global::KnockOff.Documentation.Samples.Design.IDsCache, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for Indexer.</summary>
 			public IDsCache_IndexerInterceptor Indexer { get; } = new();
@@ -54,14 +54,14 @@ partial class DsIndexerTests
 				{
 					Indexer.RecordGet(key);
 					if (Indexer.OnGet is { } onGet) return onGet(this, key);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDsCache", "this[]");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsCache", "this[]");
 					return Indexer.Backing.TryGetValue(key, out var v) ? v : default;
 				}
 				set
 				{
 					Indexer.RecordSet(key, value);
 					if (Indexer.OnSet is { } onSet) { onSet(this, key, value); return; }
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDsCache", "this[]");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsCache", "this[]");
 					Indexer.Backing[key] = value;
 				}
 			}
@@ -70,13 +70,13 @@ partial class DsIndexerTests
 			public global::KnockOff.Documentation.Samples.Design.IDsCache Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IDsCache(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}
@@ -150,7 +150,7 @@ partial class DsIndexerTests
 		}
 
 		/// <summary>Stub implementation of global::KnockOff.Documentation.Samples.Design.IDsMultiIndexer.</summary>
-		public class IDsMultiIndexer : global::KnockOff.Documentation.Samples.Design.IDsMultiIndexer
+		public class IDsMultiIndexer : global::KnockOff.Documentation.Samples.Design.IDsMultiIndexer, global::KnockOff.IKnockOffStub
 		{
 			/// <summary>Interceptor for IndexerString.</summary>
 			public IDsMultiIndexer_IndexerStringInterceptor IndexerString { get; } = new();
@@ -164,14 +164,14 @@ partial class DsIndexerTests
 				{
 					IndexerString.RecordGet(key);
 					if (IndexerString.OnGet is { } onGet) return onGet(this, key);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDsMultiIndexer", "this[]");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsMultiIndexer", "this[]");
 					return IndexerString.Backing.TryGetValue(key, out var v) ? v : default;
 				}
 				set
 				{
 					IndexerString.RecordSet(key, value);
 					if (IndexerString.OnSet is { } onSet) { onSet(this, key, value); return; }
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDsMultiIndexer", "this[]");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsMultiIndexer", "this[]");
 					IndexerString.Backing[key] = value;
 				}
 			}
@@ -182,14 +182,14 @@ partial class DsIndexerTests
 				{
 					IndexerInt32.RecordGet(index);
 					if (IndexerInt32.OnGet is { } onGet) return onGet(this, index);
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDsMultiIndexer", "this[]");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsMultiIndexer", "this[]");
 					return IndexerInt32.Backing.TryGetValue(index, out var v) ? v : default;
 				}
 				set
 				{
 					IndexerInt32.RecordSet(index, value);
 					if (IndexerInt32.OnSet is { } onSet) { onSet(this, index, value); return; }
-					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDsMultiIndexer", "this[]");
+					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsMultiIndexer", "this[]");
 					IndexerInt32.Backing[index] = value;
 				}
 			}
@@ -198,13 +198,13 @@ partial class DsIndexerTests
 			public global::KnockOff.Documentation.Samples.Design.IDsMultiIndexer Object => this;
 
 			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-			private readonly bool _strict;
+			public bool Strict { get; set; } = false;
 
 			/// <summary>Creates a new instance of the stub.</summary>
 			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
 			public IDsMultiIndexer(bool strict = false)
 			{
-				_strict = strict;
+				Strict = strict;
 			}
 
 		}

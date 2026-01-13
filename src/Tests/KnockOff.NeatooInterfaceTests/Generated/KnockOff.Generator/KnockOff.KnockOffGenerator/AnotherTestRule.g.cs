@@ -3,7 +3,7 @@
 
 namespace KnockOff.NeatooInterfaceTests.ValidationRules;
 
-partial class AnotherTestRule
+partial class AnotherTestRule : global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Executed.</summary>
 	public sealed class ExecutedInterceptor
