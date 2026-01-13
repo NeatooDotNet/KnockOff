@@ -124,7 +124,7 @@ public class InterceptorApiSamplesTests
     // ========================================================================
 
     [Fact]
-    public void IndexerInterceptor_Backing_PrePopulates()
+    public void Indexer_Backing_PrePopulates()
     {
         var knockOff = new ApiIndexerStoreKnockOff();
         IApiIndexerStore store = knockOff;
@@ -137,7 +137,7 @@ public class InterceptorApiSamplesTests
     }
 
     [Fact]
-    public void IndexerInterceptor_TracksGetAccess()
+    public void Indexer_TracksGetAccess()
     {
         var knockOff = new ApiIndexerStoreKnockOff();
         IApiIndexerStore store = knockOff;
@@ -150,7 +150,7 @@ public class InterceptorApiSamplesTests
     }
 
     [Fact]
-    public void IndexerInterceptor_OnGet_OverridesGetter()
+    public void Indexer_OnGet_OverridesGetter()
     {
         var knockOff = new ApiIndexerStoreKnockOff();
         IApiIndexerStore store = knockOff;
@@ -162,7 +162,7 @@ public class InterceptorApiSamplesTests
     }
 
     [Fact]
-    public void IndexerInterceptor_TracksSetAccess()
+    public void Indexer_TracksSetAccess()
     {
         var knockOff = new ApiIndexerStoreKnockOff();
         IApiIndexerStore store = knockOff;

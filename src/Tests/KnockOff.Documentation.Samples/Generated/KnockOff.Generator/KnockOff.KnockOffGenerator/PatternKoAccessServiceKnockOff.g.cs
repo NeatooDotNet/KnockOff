@@ -80,7 +80,7 @@ partial class PatternKoAccessServiceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Name.</summary>
+	/// <summary>Interceptor for Name. Configure callbacks and track access.</summary>
 	public NameInterceptor Name { get; } = new();
 
 	/// <summary>Interceptor for GetUser.</summary>
@@ -88,6 +88,9 @@ partial class PatternKoAccessServiceKnockOff
 
 	/// <summary>Interceptor for Initialize.</summary>
 	public InitializeInterceptor Initialize { get; } = new();
+
+	/// <summary>The global::KnockOff.Documentation.Samples.Concepts.IPatternKoAccessService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Concepts.IPatternKoAccessService Object => this;
 
 	global::KnockOff.Documentation.Samples.Concepts.PatternUser global::KnockOff.Documentation.Samples.Concepts.IPatternKoAccessService.GetUser(int id)
 	{

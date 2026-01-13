@@ -270,6 +270,9 @@ partial class IPropertyInfoTests
 				}
 			}
 
+			/// <summary>The global::Neatoo.IPropertyInfo instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.IPropertyInfo Object => this;
+
 			/// <summary>Gets a smart default value for a generic type at runtime.</summary>
 			private static T SmartDefault<T>(string methodName)
 			{

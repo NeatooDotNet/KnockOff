@@ -33,6 +33,9 @@ partial class AsyncFetchKnockOff
 	/// <summary>Interceptor for FetchAsync.</summary>
 	public FetchAsyncInterceptor FetchAsync { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IAsyncFetch instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IAsyncFetch Object => this;
+
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.AsyncData> global::KnockOff.Documentation.Samples.Guides.IAsyncFetch.FetchAsync(int id, global::System.Threading.CancellationToken ct)
 	{
 		FetchAsync.RecordCall(id, ct);

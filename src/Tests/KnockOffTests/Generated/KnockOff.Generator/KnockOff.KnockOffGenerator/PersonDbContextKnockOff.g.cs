@@ -58,6 +58,9 @@ partial class PersonDbContextKnockOff
 	/// <summary>Interceptor for GetPerson.</summary>
 	public GetPersonInterceptor GetPerson { get; } = new();
 
+	/// <summary>The global::Person.Ef.IPersonDbContext instance. Use for passing to code expecting the interface.</summary>
+	public global::Person.Ef.IPersonDbContext Object => this;
+
 	void global::Person.Ef.IPersonDbContext.SavePerson(global::DomainModel.Person person)
 	{
 		SavePerson.RecordCall(person);

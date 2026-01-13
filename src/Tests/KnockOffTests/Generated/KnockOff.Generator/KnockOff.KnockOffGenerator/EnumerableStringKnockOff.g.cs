@@ -30,6 +30,9 @@ partial class EnumerableStringKnockOff
 	/// <summary>Interceptor for GetEnumerator.</summary>
 	public GetEnumeratorInterceptor GetEnumerator { get; } = new();
 
+	/// <summary>The global::System.Collections.Generic.IEnumerable<string> instance. Use for passing to code expecting the interface.</summary>
+	public global::System.Collections.Generic.IEnumerable<string> Object => this;
+
 	global::System.Collections.Generic.IEnumerator<string> global::System.Collections.Generic.IEnumerable<string>.GetEnumerator()
 	{
 		GetEnumerator.RecordCall();

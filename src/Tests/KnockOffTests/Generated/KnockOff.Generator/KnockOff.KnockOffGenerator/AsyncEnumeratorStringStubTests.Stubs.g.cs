@@ -97,6 +97,9 @@ partial class AsyncEnumeratorStringStubTests
 				return default;
 			}
 
+			/// <summary>The global::System.Collections.Generic.IAsyncEnumerator<string> instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Collections.Generic.IAsyncEnumerator<string> Object => this;
+
 		}
 
 	}

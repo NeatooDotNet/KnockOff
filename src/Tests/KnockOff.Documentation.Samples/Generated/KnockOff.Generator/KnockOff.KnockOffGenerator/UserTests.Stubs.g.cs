@@ -41,6 +41,9 @@ partial class UserTests
 				return new global::KnockOff.Documentation.Samples.ReadMe.User();
 			}
 
+			/// <summary>The global::KnockOff.Documentation.Samples.ReadMe.IUserService instance. Use for passing to code expecting the interface.</summary>
+			public global::KnockOff.Documentation.Samples.ReadMe.IUserService Object => this;
+
 		}
 
 		/// <summary>Interceptor for EmailService.Send.</summary>

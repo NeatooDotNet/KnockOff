@@ -33,6 +33,9 @@ partial class BpCallbackRepoKnockOff
 	/// <summary>Interceptor for GetById.</summary>
 	public GetByIdInterceptor GetById { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IBpCallbackRepo instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IBpCallbackRepo Object => this;
+
 	global::KnockOff.Documentation.Samples.SampleDomain.User? global::KnockOff.Documentation.Samples.Guides.IBpCallbackRepo.GetById(int id)
 	{
 		GetById.RecordCall(id);

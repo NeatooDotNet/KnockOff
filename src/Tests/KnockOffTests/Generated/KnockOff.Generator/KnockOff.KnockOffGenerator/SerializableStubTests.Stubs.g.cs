@@ -40,6 +40,9 @@ partial class SerializableStubTests
 				if (GetObjectData.OnCall is { } onCall) onCall(this, info, context);
 			}
 
+			/// <summary>The global::System.Runtime.Serialization.ISerializable instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Runtime.Serialization.ISerializable Object => this;
+
 		}
 
 	}

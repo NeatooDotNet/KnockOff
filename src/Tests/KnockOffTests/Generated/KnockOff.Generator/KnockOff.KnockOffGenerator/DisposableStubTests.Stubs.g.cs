@@ -37,6 +37,9 @@ partial class DisposableStubTests
 				if (Dispose.OnCall is { } onCall) onCall(this);
 			}
 
+			/// <summary>The global::System.IDisposable instance. Use for passing to code expecting the interface.</summary>
+			public global::System.IDisposable Object => this;
+
 		}
 
 	}

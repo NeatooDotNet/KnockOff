@@ -130,6 +130,9 @@ partial class HaDefaultsServiceKnockOff
 	/// <summary>Interceptor for GetDisposable.</summary>
 	public GetDisposableInterceptor GetDisposable { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IHaDefaultsService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.IHaDefaultsService Object => this;
+
 	int global::KnockOff.Documentation.Samples.Skills.IHaDefaultsService.GetCount()
 	{
 		GetCount.RecordCall();

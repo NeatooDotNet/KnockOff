@@ -41,6 +41,9 @@ partial class ComparerStubTests
 				return default!;
 			}
 
+			/// <summary>The global::System.Collections.IComparer instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Collections.IComparer Object => this;
+
 		}
 
 	}

@@ -61,11 +61,14 @@ partial class KeyLookupKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Count.</summary>
+	/// <summary>Interceptor for Count. Configure callbacks and track access.</summary>
 	public CountInterceptor Count { get; } = new();
 
 	/// <summary>Interceptor for GetData.</summary>
 	public GetData2Interceptor GetData2 { get; } = new();
+
+	/// <summary>The global::KnockOff.Tests.IKeyLookup instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Tests.IKeyLookup Object => this;
 
 	int global::KnockOff.Tests.IKeyLookup.GetData(string key)
 	{

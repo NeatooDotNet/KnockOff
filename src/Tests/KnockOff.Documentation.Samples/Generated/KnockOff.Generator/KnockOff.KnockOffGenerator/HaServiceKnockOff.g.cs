@@ -83,6 +83,9 @@ partial class HaServiceKnockOff
 	/// <summary>Interceptor for Create.</summary>
 	public CreateInterceptor Create { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IHaService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.IHaService Object => this;
+
 	void global::KnockOff.Documentation.Samples.Skills.IHaService.Initialize()
 	{
 		Initialize.RecordCall();

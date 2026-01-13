@@ -41,6 +41,9 @@ partial class EquatableUserStubTests
 				return default!;
 			}
 
+			/// <summary>The global::System.IEquatable<global::KnockOff.Tests.User> instance. Use for passing to code expecting the interface.</summary>
+			public global::System.IEquatable<global::KnockOff.Tests.User> Object => this;
+
 		}
 
 	}

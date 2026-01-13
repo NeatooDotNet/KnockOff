@@ -42,6 +42,9 @@ partial class CpPropertyStoreKnockOff
 	/// <summary>Interceptor for Indexer.</summary>
 	public IndexerInterceptor Indexer { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ICpPropertyStore instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ICpPropertyStore Object => this;
+
 	object? global::KnockOff.Documentation.Samples.Skills.ICpPropertyStore.this[string key]
 	{
 		get { Indexer.RecordGet(key); if (Indexer.OnGet != null) return Indexer.OnGet(this, key); return Indexer.Backing.TryGetValue(key, out var v) ? v : default; }

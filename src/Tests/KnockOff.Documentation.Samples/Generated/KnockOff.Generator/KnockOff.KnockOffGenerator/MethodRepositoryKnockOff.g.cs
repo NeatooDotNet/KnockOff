@@ -58,6 +58,9 @@ partial class MethodRepositoryKnockOff
 	/// <summary>Interceptor for Count.</summary>
 	public CountInterceptor Count { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IMethodRepository instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IMethodRepository Object => this;
+
 	global::KnockOff.Documentation.Samples.Guides.MethodUser? global::KnockOff.Documentation.Samples.Guides.IMethodRepository.GetById(int id)
 	{
 		GetById.RecordCall(id);

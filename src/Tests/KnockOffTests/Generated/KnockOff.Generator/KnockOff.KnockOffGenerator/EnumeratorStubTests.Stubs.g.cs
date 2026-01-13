@@ -96,6 +96,9 @@ partial class EnumeratorStubTests
 				}
 			}
 
+			/// <summary>The global::System.Collections.IEnumerator instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Collections.IEnumerator Object => this;
+
 		}
 
 	}

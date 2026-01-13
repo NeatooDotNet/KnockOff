@@ -29,6 +29,9 @@ partial class BpServiceKnockOff
 	/// <summary>Interceptor for DoWork.</summary>
 	public DoWorkInterceptor DoWork { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IBpService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IBpService Object => this;
+
 	void global::KnockOff.Documentation.Samples.Guides.IBpService.DoWork()
 	{
 		DoWork.RecordCall();

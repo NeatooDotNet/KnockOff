@@ -43,6 +43,9 @@ partial class EnumerableUserStubTests
 				return ((global::System.Collections.Generic.IEnumerable<global::KnockOff.Tests.User>)this).GetEnumerator();
 			}
 
+			/// <summary>The global::System.Collections.Generic.IEnumerable<global::KnockOff.Tests.User> instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Collections.Generic.IEnumerable<global::KnockOff.Tests.User> Object => this;
+
 		}
 
 	}

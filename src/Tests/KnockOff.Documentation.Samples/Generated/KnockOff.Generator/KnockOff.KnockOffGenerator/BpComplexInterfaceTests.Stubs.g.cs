@@ -754,6 +754,9 @@ partial class BpComplexInterfaceTests
 				remove => SavedInterceptor.RecordRemove(value);
 			}
 
+			/// <summary>The global::KnockOff.Documentation.Samples.Guides.IBpEditBase instance. Use for passing to code expecting the interface.</summary>
+			public global::KnockOff.Documentation.Samples.Guides.IBpEditBase Object => this;
+
 		}
 
 	}

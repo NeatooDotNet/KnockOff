@@ -33,6 +33,9 @@ partial class FcPaymentServiceStub
 	/// <summary>Interceptor for ProcessPayment.</summary>
 	public ProcessPaymentInterceptor ProcessPayment { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IFcPaymentService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Comparison.IFcPaymentService Object => this;
+
 	global::KnockOff.Documentation.Samples.Comparison.FcPaymentResult global::KnockOff.Documentation.Samples.Comparison.IFcPaymentService.ProcessPayment(int customerId, decimal amount)
 	{
 		ProcessPayment.RecordCall(customerId, amount);

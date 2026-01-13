@@ -158,6 +158,9 @@ partial class GenSerializerKnockOff
 	/// <summary>Interceptor for Process (use .Of&lt;T&gt;() to access typed handler).</summary>
 	public ProcessInterceptor Process { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IGenSerializer instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IGenSerializer Object => this;
+
 	T global::KnockOff.Documentation.Samples.Guides.IGenSerializer.Deserialize<T>(string json)
 	{
 		Deserialize.Of<T>().RecordCall(json);

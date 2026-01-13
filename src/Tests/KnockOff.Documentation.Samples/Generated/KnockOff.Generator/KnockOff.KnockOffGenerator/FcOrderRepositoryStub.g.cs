@@ -58,6 +58,9 @@ partial class FcOrderRepositoryStub
 	/// <summary>Interceptor for Save.</summary>
 	public SaveInterceptor Save { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IFcOrderRepository instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Comparison.IFcOrderRepository Object => this;
+
 	global::KnockOff.Documentation.Samples.Comparison.FcOrder? global::KnockOff.Documentation.Samples.Comparison.IFcOrderRepository.GetById(int id)
 	{
 		GetById.RecordCall(id);

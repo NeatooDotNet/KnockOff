@@ -866,6 +866,9 @@ partial class InlineEntityContainer
 				remove => NeatooPropertyChangedInterceptor.RecordRemove(value);
 			}
 
+			/// <summary>The global::Neatoo.IEntityBase instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.IEntityBase Object => this;
+
 		}
 
 	}

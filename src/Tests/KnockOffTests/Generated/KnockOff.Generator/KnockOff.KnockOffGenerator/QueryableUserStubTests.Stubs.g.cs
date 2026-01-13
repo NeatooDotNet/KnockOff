@@ -141,6 +141,9 @@ partial class QueryableUserStubTests
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
+			/// <summary>The global::System.Linq.IQueryable<global::KnockOff.Tests.User> instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Linq.IQueryable<global::KnockOff.Tests.User> Object => this;
+
 		}
 
 	}

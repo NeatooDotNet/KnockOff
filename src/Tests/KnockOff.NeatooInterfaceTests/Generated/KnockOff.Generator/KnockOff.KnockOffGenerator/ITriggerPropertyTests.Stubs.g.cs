@@ -73,6 +73,9 @@ partial class ITriggerPropertyTests
 				}
 			}
 
+			/// <summary>The global::Neatoo.Rules.ITriggerProperty instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.Rules.ITriggerProperty Object => this;
+
 		}
 
 	}

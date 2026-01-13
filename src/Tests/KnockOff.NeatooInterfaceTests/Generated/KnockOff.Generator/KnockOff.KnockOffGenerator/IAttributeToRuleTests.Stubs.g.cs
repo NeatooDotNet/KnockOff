@@ -86,6 +86,9 @@ partial class IAttributeToRuleTests
 				return default!;
 			}
 
+			/// <summary>The global::Neatoo.Rules.Rules.IAttributeToRule instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.Rules.Rules.IAttributeToRule Object => this;
+
 			/// <summary>Gets a smart default value for a generic type at runtime.</summary>
 			private static T SmartDefault<T>(string methodName)
 			{

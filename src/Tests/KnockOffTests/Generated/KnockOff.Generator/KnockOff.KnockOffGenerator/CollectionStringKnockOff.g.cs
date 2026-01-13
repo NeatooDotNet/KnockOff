@@ -178,10 +178,10 @@ partial class CollectionStringKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Count.</summary>
+	/// <summary>Interceptor for Count. Configure callbacks and track access.</summary>
 	public CountInterceptor Count { get; } = new();
 
-	/// <summary>Interceptor for IsReadOnly.</summary>
+	/// <summary>Interceptor for IsReadOnly. Configure callbacks and track access.</summary>
 	public IsReadOnlyInterceptor IsReadOnly { get; } = new();
 
 	/// <summary>Interceptor for Add.</summary>
@@ -201,6 +201,9 @@ partial class CollectionStringKnockOff
 
 	/// <summary>Interceptor for GetEnumerator.</summary>
 	public GetEnumeratorInterceptor GetEnumerator { get; } = new();
+
+	/// <summary>The global::System.Collections.Generic.ICollection<string> instance. Use for passing to code expecting the interface.</summary>
+	public global::System.Collections.Generic.ICollection<string> Object => this;
 
 	void global::System.Collections.Generic.ICollection<string>.Add(string item)
 	{

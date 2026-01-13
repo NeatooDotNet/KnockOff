@@ -294,6 +294,9 @@ partial class IMinLengthRuleTests
 				}
 			}
 
+			/// <summary>The global::Neatoo.Rules.Rules.IMinLengthRule instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.Rules.Rules.IMinLengthRule Object => this;
+
 		}
 
 	}

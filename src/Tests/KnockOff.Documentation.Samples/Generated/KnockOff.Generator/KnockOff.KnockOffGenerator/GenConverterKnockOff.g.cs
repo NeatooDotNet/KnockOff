@@ -95,6 +95,9 @@ partial class GenConverterKnockOff
 	/// <summary>Interceptor for Convert (use .Of&lt;T&gt;() to access typed handler).</summary>
 	public ConvertInterceptor Convert { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IGenConverter instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IGenConverter Object => this;
+
 	TOut global::KnockOff.Documentation.Samples.Guides.IGenConverter.Convert<TIn, TOut>(TIn input)
 	{
 		Convert.Of<TIn, TOut>().RecordCall();

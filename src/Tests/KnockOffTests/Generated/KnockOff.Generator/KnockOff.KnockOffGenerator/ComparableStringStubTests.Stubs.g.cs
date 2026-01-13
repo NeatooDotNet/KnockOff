@@ -41,6 +41,9 @@ partial class ComparableStringStubTests
 				return default!;
 			}
 
+			/// <summary>The global::System.IComparable<string> instance. Use for passing to code expecting the interface.</summary>
+			public global::System.IComparable<string> Object => this;
+
 		}
 
 	}

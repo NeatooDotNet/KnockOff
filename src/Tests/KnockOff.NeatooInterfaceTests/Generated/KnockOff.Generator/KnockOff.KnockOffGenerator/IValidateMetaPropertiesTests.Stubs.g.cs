@@ -265,6 +265,9 @@ partial class IValidateMetaPropertiesTests
 				}
 			}
 
+			/// <summary>The global::Neatoo.IValidateMetaProperties instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.IValidateMetaProperties Object => this;
+
 		}
 
 		/// <summary>Interceptor for IPropertyMessage.Property.</summary>
@@ -369,6 +372,9 @@ partial class IValidateMetaPropertiesTests
 					else Message.Value = value;
 				}
 			}
+
+			/// <summary>The global::Neatoo.IPropertyMessage instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.IPropertyMessage Object => this;
 
 		}
 

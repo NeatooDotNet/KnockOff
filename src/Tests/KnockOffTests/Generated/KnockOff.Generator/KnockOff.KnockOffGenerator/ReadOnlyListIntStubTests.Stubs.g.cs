@@ -112,6 +112,9 @@ partial class ReadOnlyListIntStubTests
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
+			/// <summary>The global::System.Collections.Generic.IReadOnlyList<int> instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Collections.Generic.IReadOnlyList<int> Object => this;
+
 		}
 
 	}

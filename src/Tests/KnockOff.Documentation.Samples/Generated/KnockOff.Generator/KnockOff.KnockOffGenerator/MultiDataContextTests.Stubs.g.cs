@@ -70,6 +70,9 @@ partial class MultiDataContextTests
 				if (Add.OnCall is { } onCall) onCall(this, user);
 			}
 
+			/// <summary>The global::KnockOff.Documentation.Samples.Guides.IMultiRepository instance. Use for passing to code expecting the interface.</summary>
+			public global::KnockOff.Documentation.Samples.Guides.IMultiRepository Object => this;
+
 		}
 
 		/// <summary>Interceptor for IMultiUnitOfWork.SaveChangesAsync.</summary>
@@ -104,6 +107,9 @@ partial class MultiDataContextTests
 				if (SaveChangesAsync.OnCall is { } onCall) return onCall(this, ct);
 				return global::System.Threading.Tasks.Task.FromResult<int>(default!);
 			}
+
+			/// <summary>The global::KnockOff.Documentation.Samples.Guides.IMultiUnitOfWork instance. Use for passing to code expecting the interface.</summary>
+			public global::KnockOff.Documentation.Samples.Guides.IMultiUnitOfWork Object => this;
 
 		}
 

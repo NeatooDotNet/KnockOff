@@ -463,6 +463,9 @@ partial class DictionaryStubTests
 				return ((global::System.Collections.IDictionary)this).GetEnumerator();
 			}
 
+			/// <summary>The global::System.Collections.IDictionary instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Collections.IDictionary Object => this;
+
 		}
 
 	}

@@ -36,8 +36,11 @@ partial class CpPropertyServiceKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for CurrentUser.</summary>
+	/// <summary>Interceptor for CurrentUser. Configure callbacks and track access.</summary>
 	public CurrentUserInterceptor CurrentUser { get; } = new();
+
+	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ICpPropertyService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ICpPropertyService Object => this;
 
 	global::KnockOff.Documentation.Samples.Skills.CpUser? global::KnockOff.Documentation.Samples.Skills.ICpPropertyService.CurrentUser
 	{

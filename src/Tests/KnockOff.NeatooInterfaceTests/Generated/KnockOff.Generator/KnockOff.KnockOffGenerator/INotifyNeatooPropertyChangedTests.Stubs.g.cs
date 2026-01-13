@@ -42,6 +42,9 @@ partial class INotifyNeatooPropertyChangedTests
 				remove => NeatooPropertyChangedInterceptor.RecordRemove(value);
 			}
 
+			/// <summary>The global::Neatoo.INotifyNeatooPropertyChanged instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.INotifyNeatooPropertyChanged Object => this;
+
 		}
 
 	}

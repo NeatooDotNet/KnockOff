@@ -204,28 +204,28 @@ partial class StringLengthRuleStub
 		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for ErrorMessage.</summary>
+	/// <summary>Interceptor for ErrorMessage. Configure callbacks and track access.</summary>
 	public ErrorMessageInterceptor ErrorMessage { get; } = new();
 
-	/// <summary>Interceptor for MinimumLength.</summary>
+	/// <summary>Interceptor for MinimumLength. Configure callbacks and track access.</summary>
 	public MinimumLengthInterceptor MinimumLength { get; } = new();
 
-	/// <summary>Interceptor for MaximumLength.</summary>
+	/// <summary>Interceptor for MaximumLength. Configure callbacks and track access.</summary>
 	public MaximumLengthInterceptor MaximumLength { get; } = new();
 
-	/// <summary>Interceptor for Executed.</summary>
+	/// <summary>Interceptor for Executed. Configure callbacks and track access.</summary>
 	public ExecutedInterceptor Executed { get; } = new();
 
-	/// <summary>Interceptor for RuleOrder.</summary>
+	/// <summary>Interceptor for RuleOrder. Configure callbacks and track access.</summary>
 	public RuleOrderInterceptor RuleOrder { get; } = new();
 
-	/// <summary>Interceptor for UniqueIndex.</summary>
+	/// <summary>Interceptor for UniqueIndex. Configure callbacks and track access.</summary>
 	public UniqueIndexInterceptor UniqueIndex { get; } = new();
 
-	/// <summary>Interceptor for Messages.</summary>
+	/// <summary>Interceptor for Messages. Configure callbacks and track access.</summary>
 	public MessagesInterceptor Messages { get; } = new();
 
-	/// <summary>Interceptor for TriggerProperties.</summary>
+	/// <summary>Interceptor for TriggerProperties. Configure callbacks and track access.</summary>
 	public TriggerPropertiesInterceptor TriggerProperties { get; } = new();
 
 	/// <summary>Interceptor for RunRule.</summary>
@@ -233,6 +233,9 @@ partial class StringLengthRuleStub
 
 	/// <summary>Interceptor for OnRuleAdded.</summary>
 	public OnRuleAddedInterceptor OnRuleAdded { get; } = new();
+
+	/// <summary>The global::Neatoo.Rules.Rules.IStringLengthRule instance. Use for passing to code expecting the interface.</summary>
+	public global::Neatoo.Rules.Rules.IStringLengthRule Object => this;
 
 	string global::Neatoo.Rules.Rules.IStringLengthRule.ErrorMessage
 	{

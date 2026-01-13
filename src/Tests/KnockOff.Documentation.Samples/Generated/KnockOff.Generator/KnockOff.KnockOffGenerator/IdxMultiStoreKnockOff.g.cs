@@ -79,6 +79,9 @@ partial class IdxMultiStoreKnockOff
 	/// <summary>Interceptor for Indexer.</summary>
 	public IndexerInt32Interceptor IndexerInt32 { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IIdxMultiStore instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IIdxMultiStore Object => this;
+
 	object? global::KnockOff.Documentation.Samples.Guides.IIdxMultiStore.this[string key]
 	{
 		get { IndexerString.RecordGet(key); if (IndexerString.OnGet != null) return IndexerString.OnGet(this, key); return IndexerString.Backing.TryGetValue(key, out var v) ? v : default; }

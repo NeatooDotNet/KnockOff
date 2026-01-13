@@ -30,6 +30,9 @@ partial class PropertyStoreKnockOff
 	/// <summary>Interceptor for Indexer.</summary>
 	public IndexerInterceptor Indexer { get; } = new();
 
+	/// <summary>The global::KnockOff.Tests.IPropertyStore instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Tests.IPropertyStore Object => this;
+
 	global::KnockOff.Tests.PropertyInfo? global::KnockOff.Tests.IPropertyStore.this[string key]
 	{
 		get { Indexer.RecordGet(key); if (Indexer.OnGet != null) return Indexer.OnGet(this, key); return Indexer.Backing.TryGetValue(key, out var v) ? v : default; }

@@ -61,6 +61,9 @@ partial class SkRepoKnockOff
 	/// <summary>Interceptor for GetByIdAsync.</summary>
 	public GetByIdAsync2Interceptor GetByIdAsync2 { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkRepoService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkRepoService Object => this;
+
 	global::KnockOff.Documentation.Samples.Skills.SkUser? global::KnockOff.Documentation.Samples.Skills.ISkRepoService.GetById(int id)
 	{
 		GetById2.RecordCall(id);

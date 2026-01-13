@@ -41,6 +41,9 @@ partial class AsyncEnumerableIntStubTests
 				throw new global::System.InvalidOperationException("No implementation provided for GetAsyncEnumerator. Set GetAsyncEnumerator.OnCall.");
 			}
 
+			/// <summary>The global::System.Collections.Generic.IAsyncEnumerable<int> instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Collections.Generic.IAsyncEnumerable<int> Object => this;
+
 		}
 
 	}

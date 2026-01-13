@@ -58,6 +58,9 @@ partial class HaParserKnockOff
 	/// <summary>Interceptor for GetData.</summary>
 	public GetDataInterceptor GetData { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IHaParser instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.IHaParser Object => this;
+
 	bool global::KnockOff.Documentation.Samples.Skills.IHaParser.TryParse(string input, out int result)
 	{
 		result = default!;

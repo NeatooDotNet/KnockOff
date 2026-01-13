@@ -235,6 +235,9 @@ partial class IEntityMetaPropertiesTests
 				}
 			}
 
+			/// <summary>The global::Neatoo.IEntityMetaProperties instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.IEntityMetaProperties Object => this;
+
 		}
 
 	}

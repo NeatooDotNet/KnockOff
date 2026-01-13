@@ -33,6 +33,9 @@ partial class MmUnitOfWorkKnockOff
 	/// <summary>Interceptor for SaveChangesAsync.</summary>
 	public SaveChangesAsyncInterceptor SaveChangesAsync { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IMmUnitOfWork instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.IMmUnitOfWork Object => this;
+
 	global::System.Threading.Tasks.Task<int> global::KnockOff.Documentation.Samples.Skills.IMmUnitOfWork.SaveChangesAsync(global::System.Threading.CancellationToken ct)
 	{
 		SaveChangesAsync.RecordCall(ct);

@@ -8,6 +8,7 @@ Releases with notable changes.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| [v10.15.0](v10.15.0.md) | 2026-01-12 | stub.Object property, advanced features docs |
 | [v10.14.0](v10.14.0.md) | 2026-01-11 | Generic standalone stubs |
 | [v10.13.0](v10.13.0.md) | 2026-01-10 | Property `Value` pattern prioritization |
 | [v10.12.0](v10.12.0.md) | 2026-01-09 | BCL interface compatibility (117 interfaces tested) |
@@ -22,6 +23,7 @@ Releases with notable changes.
 
 ## All Releases
 
+- [v10.15.0](v10.15.0.md) - 2026-01-12 - stub.Object property, advanced features docs
 - [v10.14.0](v10.14.0.md) - 2026-01-11 - Generic standalone stubs
 - [v10.13.1](v10.13.1.md) - 2026-01-10 - Best practices guide, generator refactoring
 - [v10.13.0](v10.13.0.md) - 2026-01-10 - Property `Value` pattern prioritization

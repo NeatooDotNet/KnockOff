@@ -80,6 +80,9 @@ partial class SkOverloadedServiceKnockOff
 	/// <summary>Interceptor for Process.</summary>
 	public Process3Interceptor Process3 { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkOverloadedService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkOverloadedService Object => this;
+
 	void global::KnockOff.Documentation.Samples.Skills.ISkOverloadedService.Process(string data)
 	{
 		Process1.RecordCall(data);

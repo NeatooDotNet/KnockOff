@@ -58,6 +58,9 @@ partial class VsRepositoryKnockOff
 	/// <summary>Interceptor for Save.</summary>
 	public SaveInterceptor Save { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IVsRepository instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Comparison.IVsRepository Object => this;
+
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Comparison.VsEntity?> global::KnockOff.Documentation.Samples.Comparison.IVsRepository.GetByIdAsync(int id)
 	{
 		GetByIdAsync2.RecordCall(id);

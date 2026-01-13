@@ -42,6 +42,9 @@ partial class IdxListKnockOff
 	/// <summary>Interceptor for Indexer.</summary>
 	public IndexerInterceptor Indexer { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IIdxList instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IIdxList Object => this;
+
 	object? global::KnockOff.Documentation.Samples.Guides.IIdxList.this[int index]
 	{
 		get { Indexer.RecordGet(index); if (Indexer.OnGet != null) return Indexer.OnGet(this, index); return Indexer.Backing.TryGetValue(index, out var v) ? v : default; }

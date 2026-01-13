@@ -98,6 +98,9 @@ partial class IPropertyInfoListOfTTests
 				return default!;
 			}
 
+			/// <summary>The global::Neatoo.IPropertyInfoList<global::Neatoo.IValidateBase> instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.IPropertyInfoList<global::Neatoo.IValidateBase> Object => this;
+
 		}
 
 	}

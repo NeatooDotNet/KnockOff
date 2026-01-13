@@ -33,6 +33,9 @@ partial class PatternServiceKnockOff
 	/// <summary>Interceptor for Calculate.</summary>
 	public Calculate2Interceptor Calculate2 { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Concepts.IPatternService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Concepts.IPatternService Object => this;
+
 	int global::KnockOff.Documentation.Samples.Concepts.IPatternService.Calculate(int input)
 	{
 		Calculate2.RecordCall(input);

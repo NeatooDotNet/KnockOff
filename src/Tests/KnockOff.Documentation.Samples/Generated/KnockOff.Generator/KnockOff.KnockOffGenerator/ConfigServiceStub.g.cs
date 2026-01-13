@@ -55,11 +55,14 @@ partial class ConfigServiceStub
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for ConnectionString.</summary>
+	/// <summary>Interceptor for ConnectionString. Configure callbacks and track access.</summary>
 	public ConnectionStringInterceptor ConnectionString { get; } = new();
 
-	/// <summary>Interceptor for LogLevel.</summary>
+	/// <summary>Interceptor for LogLevel. Configure callbacks and track access.</summary>
 	public LogLevelInterceptor LogLevel { get; } = new();
+
+	/// <summary>The global::KnockOff.Documentation.Samples.ReadMe.IConfigService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.ReadMe.IConfigService Object => this;
 
 	string global::KnockOff.Documentation.Samples.ReadMe.IConfigService.ConnectionString
 	{

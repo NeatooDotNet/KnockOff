@@ -114,6 +114,9 @@ partial class OrderServiceStub
 	/// <summary>Interceptor for SaveOrder.</summary>
 	public SaveOrderInterceptor SaveOrder { get; } = new();
 
+	/// <summary>The global::KnockOff.Benchmarks.Interfaces.IOrderService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Benchmarks.Interfaces.IOrderService Object => this;
+
 	global::KnockOff.Benchmarks.Interfaces.Order global::KnockOff.Benchmarks.Interfaces.IOrderService.GetOrder(int id)
 	{
 		GetOrder.RecordCall(id);

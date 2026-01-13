@@ -30,6 +30,9 @@ partial class GenLoggerKnockOff
 	/// <summary>Interceptor for Log.</summary>
 	public LogInterceptor Log { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Reference.IGenLogger instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Reference.IGenLogger Object => this;
+
 	void global::KnockOff.Documentation.Samples.Reference.IGenLogger.Log(string level, string message, int code)
 	{
 		Log.RecordCall(level, message, code);

@@ -30,6 +30,9 @@ partial class MigConfigServiceKnockOff
 	/// <summary>Interceptor for GetConfig.</summary>
 	public GetConfig2Interceptor GetConfig2 { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IMigConfigService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Comparison.IMigConfigService Object => this;
+
 	global::KnockOff.Documentation.Samples.Comparison.MigConfig global::KnockOff.Documentation.Samples.Comparison.IMigConfigService.GetConfig()
 	{
 		GetConfig2.RecordCall();

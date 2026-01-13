@@ -518,6 +518,9 @@ partial class ConvertibleStubTests
 				return default!;
 			}
 
+			/// <summary>The global::System.IConvertible instance. Use for passing to code expecting the interface.</summary>
+			public global::System.IConvertible Object => this;
+
 		}
 
 	}

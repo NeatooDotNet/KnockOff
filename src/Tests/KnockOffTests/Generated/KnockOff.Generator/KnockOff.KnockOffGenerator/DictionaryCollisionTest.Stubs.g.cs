@@ -444,6 +444,9 @@ partial class DictionaryCollisionTest
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
+			/// <summary>The global::System.Collections.Generic.IDictionary<string, int> instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Collections.Generic.IDictionary<string, int> Object => this;
+
 		}
 
 		/// <summary>Interceptor for IDictionaryInt32String.Indexer.</summary>
@@ -881,6 +884,9 @@ partial class DictionaryCollisionTest
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
+
+			/// <summary>The global::System.Collections.Generic.IDictionary<int, string> instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Collections.Generic.IDictionary<int, string> Object => this;
 
 		}
 

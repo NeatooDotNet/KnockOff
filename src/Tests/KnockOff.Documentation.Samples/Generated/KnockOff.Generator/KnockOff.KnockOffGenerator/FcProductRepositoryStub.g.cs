@@ -114,6 +114,9 @@ partial class FcProductRepositoryStub
 	/// <summary>Interceptor for DeleteAsync.</summary>
 	public DeleteAsyncInterceptor DeleteAsync { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IFcProductRepository instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Comparison.IFcProductRepository Object => this;
+
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Comparison.FcProduct?> global::KnockOff.Documentation.Samples.Comparison.IFcProductRepository.GetByIdAsync(int id)
 	{
 		GetByIdAsync.RecordCall(id);

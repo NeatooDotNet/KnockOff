@@ -24,8 +24,11 @@ partial class PropConfigKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for ConnectionString.</summary>
+	/// <summary>Interceptor for ConnectionString. Configure callbacks and track access.</summary>
 	public ConnectionStringInterceptor ConnectionString { get; } = new();
+
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IPropConfig instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IPropConfig Object => this;
 
 	string global::KnockOff.Documentation.Samples.Guides.IPropConfig.ConnectionString
 	{

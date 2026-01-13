@@ -98,6 +98,9 @@ partial class IPropertyInfoListTests
 				return default!;
 			}
 
+			/// <summary>The global::Neatoo.IPropertyInfoList instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.IPropertyInfoList Object => this;
+
 		}
 
 	}

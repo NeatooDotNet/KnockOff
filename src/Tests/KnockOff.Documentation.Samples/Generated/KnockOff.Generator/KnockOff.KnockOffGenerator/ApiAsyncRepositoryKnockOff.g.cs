@@ -61,6 +61,9 @@ partial class ApiAsyncRepositoryKnockOff
 	/// <summary>Interceptor for SaveAsync.</summary>
 	public SaveAsyncInterceptor SaveAsync { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Reference.IApiAsyncRepository instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Reference.IApiAsyncRepository Object => this;
+
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Reference.ApiUser?> global::KnockOff.Documentation.Samples.Reference.IApiAsyncRepository.GetByIdAsync(int id)
 	{
 		GetByIdAsync.RecordCall(id);

@@ -83,6 +83,9 @@ partial class CpCallbackServiceKnockOff
 	/// <summary>Interceptor for Search.</summary>
 	public SearchInterceptor Search { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ICpCallbackService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ICpCallbackService Object => this;
+
 	void global::KnockOff.Documentation.Samples.Skills.ICpCallbackService.Initialize()
 	{
 		Initialize.RecordCall();

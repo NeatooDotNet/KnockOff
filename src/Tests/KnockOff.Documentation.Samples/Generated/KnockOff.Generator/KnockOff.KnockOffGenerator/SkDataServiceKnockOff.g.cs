@@ -83,7 +83,7 @@ partial class SkDataServiceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Name.</summary>
+	/// <summary>Interceptor for Name. Configure callbacks and track access.</summary>
 	public NameInterceptor Name { get; } = new();
 
 	/// <summary>Interceptor for GetDescription.</summary>
@@ -91,6 +91,9 @@ partial class SkDataServiceKnockOff
 
 	/// <summary>Interceptor for GetCount.</summary>
 	public GetCount2Interceptor GetCount2 { get; } = new();
+
+	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkDataService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkDataService Object => this;
 
 	string global::KnockOff.Documentation.Samples.Skills.ISkDataService.Name
 	{

@@ -61,11 +61,14 @@ partial class UserServiceKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Name.</summary>
+	/// <summary>Interceptor for Name. Configure callbacks and track access.</summary>
 	public NameInterceptor Name { get; } = new();
 
 	/// <summary>Interceptor for GetUser.</summary>
 	public GetUser2Interceptor GetUser2 { get; } = new();
+
+	/// <summary>The global::KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple Object => this;
 
 	global::KnockOff.Documentation.Samples.GettingStarted.User global::KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple.GetUser(int id)
 	{

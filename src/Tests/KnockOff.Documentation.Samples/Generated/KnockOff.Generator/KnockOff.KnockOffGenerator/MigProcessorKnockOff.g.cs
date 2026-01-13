@@ -30,6 +30,9 @@ partial class MigProcessorKnockOff
 	/// <summary>Interceptor for Process.</summary>
 	public ProcessInterceptor Process { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IMigProcessor instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Comparison.IMigProcessor Object => this;
+
 	void global::KnockOff.Documentation.Samples.Comparison.IMigProcessor.Process(string data)
 	{
 		Process.RecordCall(data);

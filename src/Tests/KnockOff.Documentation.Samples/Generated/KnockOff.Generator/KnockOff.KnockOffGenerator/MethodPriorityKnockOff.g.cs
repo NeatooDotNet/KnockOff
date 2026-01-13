@@ -33,6 +33,9 @@ partial class MethodPriorityKnockOff
 	/// <summary>Interceptor for Calculate.</summary>
 	public Calculate2Interceptor Calculate2 { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IMethodPriority instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IMethodPriority Object => this;
+
 	int global::KnockOff.Documentation.Samples.Guides.IMethodPriority.Calculate(int x)
 	{
 		Calculate2.RecordCall(x);

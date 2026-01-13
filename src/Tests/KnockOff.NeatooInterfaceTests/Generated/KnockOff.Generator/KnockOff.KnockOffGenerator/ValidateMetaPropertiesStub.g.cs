@@ -216,16 +216,16 @@ partial class ValidateMetaPropertiesStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for IsBusy.</summary>
+	/// <summary>Interceptor for IsBusy. Configure callbacks and track access.</summary>
 	public IsBusyInterceptor IsBusy { get; } = new();
 
-	/// <summary>Interceptor for IsValid.</summary>
+	/// <summary>Interceptor for IsValid. Configure callbacks and track access.</summary>
 	public IsValidInterceptor IsValid { get; } = new();
 
-	/// <summary>Interceptor for IsSelfValid.</summary>
+	/// <summary>Interceptor for IsSelfValid. Configure callbacks and track access.</summary>
 	public IsSelfValidInterceptor IsSelfValid { get; } = new();
 
-	/// <summary>Interceptor for PropertyMessages.</summary>
+	/// <summary>Interceptor for PropertyMessages. Configure callbacks and track access.</summary>
 	public PropertyMessagesInterceptor PropertyMessages { get; } = new();
 
 	/// <summary>Interceptor for WaitForTasks.</summary>
@@ -245,6 +245,9 @@ partial class ValidateMetaPropertiesStub
 
 	/// <summary>Interceptor for ClearSelfMessages.</summary>
 	public ClearSelfMessagesInterceptor ClearSelfMessages { get; } = new();
+
+	/// <summary>The global::Neatoo.IValidateMetaProperties instance. Use for passing to code expecting the interface.</summary>
+	public global::Neatoo.IValidateMetaProperties Object => this;
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.WaitForTasks()
 	{

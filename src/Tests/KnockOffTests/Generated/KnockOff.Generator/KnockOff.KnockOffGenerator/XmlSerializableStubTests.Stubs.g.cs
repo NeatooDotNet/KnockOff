@@ -96,6 +96,9 @@ partial class XmlSerializableStubTests
 				if (WriteXml.OnCall is { } onCall) onCall(this, writer);
 			}
 
+			/// <summary>The global::System.Xml.Serialization.IXmlSerializable instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Xml.Serialization.IXmlSerializable Object => this;
+
 		}
 
 	}

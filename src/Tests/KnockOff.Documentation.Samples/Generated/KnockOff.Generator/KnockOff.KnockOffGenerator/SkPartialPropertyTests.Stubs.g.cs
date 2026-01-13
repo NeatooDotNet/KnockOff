@@ -41,6 +41,9 @@ partial class SkPartialPropertyTests
 				return default!;
 			}
 
+			/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkInlineUserService instance. Use for passing to code expecting the interface.</summary>
+			public global::KnockOff.Documentation.Samples.Skills.ISkInlineUserService Object => this;
+
 		}
 
 	}

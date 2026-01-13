@@ -117,6 +117,9 @@ partial class PartialPropertyTest
 				return default!;
 			}
 
+			/// <summary>The global::KnockOff.Tests.ISimpleService instance. Use for passing to code expecting the interface.</summary>
+			public global::KnockOff.Tests.ISimpleService Object => this;
+
 		}
 
 	}

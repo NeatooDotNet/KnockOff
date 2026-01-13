@@ -43,11 +43,14 @@ partial class AttrAuditableKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for CreatedAt.</summary>
+	/// <summary>Interceptor for CreatedAt. Configure callbacks and track access.</summary>
 	public CreatedAtInterceptor CreatedAt { get; } = new();
 
-	/// <summary>Interceptor for CreatedBy.</summary>
+	/// <summary>Interceptor for CreatedBy. Configure callbacks and track access.</summary>
 	public CreatedByInterceptor CreatedBy { get; } = new();
+
+	/// <summary>The global::KnockOff.Documentation.Samples.Reference.IAttrAuditableEntity instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Reference.IAttrAuditableEntity Object => this;
 
 	global::System.DateTime global::KnockOff.Documentation.Samples.Reference.IAttrAuditableEntity.CreatedAt
 	{

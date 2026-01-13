@@ -41,6 +41,9 @@ partial class StructuralComparableStubTests
 				return default!;
 			}
 
+			/// <summary>The global::System.Collections.IStructuralComparable instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Collections.IStructuralComparable Object => this;
+
 		}
 
 	}

@@ -30,6 +30,9 @@ partial class AsyncNestedStub<T> where T : class
 	/// <summary>Interceptor for GetAsync.</summary>
 	public GetAsyncInterceptor GetAsync { get; } = new();
 
+	/// <summary>The global::KnockOff.Tests.IAsyncNestedService<T> instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Tests.IAsyncNestedService<T> Object => this;
+
 	global::System.Threading.Tasks.Task<T?> global::KnockOff.Tests.IAsyncNestedService<T>.GetAsync()
 	{
 		GetAsync.RecordCall();

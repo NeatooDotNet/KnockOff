@@ -46,11 +46,14 @@ partial class EmailServiceKnockOff
 		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for IsConnected.</summary>
+	/// <summary>Interceptor for IsConnected. Configure callbacks and track access.</summary>
 	public IsConnectedInterceptor IsConnected { get; } = new();
 
 	/// <summary>Interceptor for SendEmail.</summary>
 	public SendEmailInterceptor SendEmail { get; } = new();
+
+	/// <summary>The global::KnockOff.Documentation.Samples.GettingStarted.IEmailService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.GettingStarted.IEmailService Object => this;
 
 	void global::KnockOff.Documentation.Samples.GettingStarted.IEmailService.SendEmail(string to, string subject, string body)
 	{

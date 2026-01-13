@@ -136,6 +136,9 @@ partial class OverloadedServiceStub
 	/// <summary>Interceptor for Calculate.</summary>
 	public Calculate2Interceptor Calculate2 { get; } = new();
 
+	/// <summary>The global::KnockOff.Benchmarks.Interfaces.IOverloadedService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Benchmarks.Interfaces.IOverloadedService Object => this;
+
 	void global::KnockOff.Benchmarks.Interfaces.IOverloadedService.Process(int @value)
 	{
 		Process1.RecordCall(@value);

@@ -30,6 +30,9 @@ partial class SkAccessDemoServiceKnockOff
 	/// <summary>Interceptor for GetData.</summary>
 	public GetDataInterceptor GetData { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkAccessDemoService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkAccessDemoService Object => this;
+
 	string global::KnockOff.Documentation.Samples.Skills.ISkAccessDemoService.GetData()
 	{
 		GetData.RecordCall();

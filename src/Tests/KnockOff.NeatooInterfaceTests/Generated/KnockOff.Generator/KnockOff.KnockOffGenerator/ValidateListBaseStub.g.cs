@@ -649,37 +649,37 @@ partial class ValidateListBaseStub
 		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
 	}
 
-	/// <summary>Interceptor for Parent.</summary>
+	/// <summary>Interceptor for Parent. Configure callbacks and track access.</summary>
 	public ParentInterceptor Parent { get; } = new();
 
-	/// <summary>Interceptor for IsFixedSize.</summary>
+	/// <summary>Interceptor for IsFixedSize. Configure callbacks and track access.</summary>
 	public IsFixedSizeInterceptor IsFixedSize { get; } = new();
 
-	/// <summary>Interceptor for IsReadOnly.</summary>
+	/// <summary>Interceptor for IsReadOnly. Configure callbacks and track access.</summary>
 	public IsReadOnlyInterceptor IsReadOnly { get; } = new();
 
 	/// <summary>Interceptor for Indexer.</summary>
 	public IndexerInterceptor Indexer { get; } = new();
 
-	/// <summary>Interceptor for Count.</summary>
+	/// <summary>Interceptor for Count. Configure callbacks and track access.</summary>
 	public CountInterceptor Count { get; } = new();
 
-	/// <summary>Interceptor for IsSynchronized.</summary>
+	/// <summary>Interceptor for IsSynchronized. Configure callbacks and track access.</summary>
 	public IsSynchronizedInterceptor IsSynchronized { get; } = new();
 
-	/// <summary>Interceptor for SyncRoot.</summary>
+	/// <summary>Interceptor for SyncRoot. Configure callbacks and track access.</summary>
 	public SyncRootInterceptor SyncRoot { get; } = new();
 
-	/// <summary>Interceptor for IsBusy.</summary>
+	/// <summary>Interceptor for IsBusy. Configure callbacks and track access.</summary>
 	public IsBusyInterceptor IsBusy { get; } = new();
 
-	/// <summary>Interceptor for IsValid.</summary>
+	/// <summary>Interceptor for IsValid. Configure callbacks and track access.</summary>
 	public IsValidInterceptor IsValid { get; } = new();
 
-	/// <summary>Interceptor for IsSelfValid.</summary>
+	/// <summary>Interceptor for IsSelfValid. Configure callbacks and track access.</summary>
 	public IsSelfValidInterceptor IsSelfValid { get; } = new();
 
-	/// <summary>Interceptor for PropertyMessages.</summary>
+	/// <summary>Interceptor for PropertyMessages. Configure callbacks and track access.</summary>
 	public PropertyMessagesInterceptor PropertyMessages { get; } = new();
 
 	/// <summary>Interceptor for Add.</summary>
@@ -735,6 +735,9 @@ partial class ValidateListBaseStub
 
 	/// <summary>Interceptor for NeatooPropertyChanged event.</summary>
 	public NeatooPropertyChangedInterceptor NeatooPropertyChanged { get; } = new();
+
+	/// <summary>The global::Neatoo.IValidateListBase instance. Use for passing to code expecting the interface.</summary>
+	public global::Neatoo.IValidateListBase Object => this;
 
 	global::Neatoo.IValidateBase? global::Neatoo.IValidateListBase.Parent
 	{

@@ -230,6 +230,9 @@ partial class IRuleTests
 				}
 			}
 
+			/// <summary>The global::Neatoo.Rules.IRule instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.Rules.IRule Object => this;
+
 		}
 
 	}

@@ -35,6 +35,9 @@ partial class SkEventSourceKnockOff
 	/// <summary>Interceptor for DataReceived event.</summary>
 	public DataReceivedInterceptor DataReceived { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkEventSource instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkEventSource Object => this;
+
 	event global::System.EventHandler<string>? global::KnockOff.Documentation.Samples.Skills.ISkEventSource.DataReceived
 	{
 		add => DataReceived.RecordAdd(value);

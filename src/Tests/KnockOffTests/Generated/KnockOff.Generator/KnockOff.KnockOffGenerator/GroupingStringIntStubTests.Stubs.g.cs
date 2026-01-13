@@ -77,6 +77,9 @@ partial class GroupingStringIntStubTests
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
+			/// <summary>The global::System.Linq.IGrouping<string, int> instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Linq.IGrouping<string, int> Object => this;
+
 		}
 
 	}

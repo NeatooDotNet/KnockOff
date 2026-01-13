@@ -24,8 +24,11 @@ partial class BaseEntityStub
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for Id.</summary>
+	/// <summary>Interceptor for Id. Configure callbacks and track access.</summary>
 	public IdInterceptor Id { get; } = new();
+
+	/// <summary>The global::KnockOff.Benchmarks.Interfaces.IBaseEntity instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Benchmarks.Interfaces.IBaseEntity Object => this;
 
 	int global::KnockOff.Benchmarks.Interfaces.IBaseEntity.Id
 	{

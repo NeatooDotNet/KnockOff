@@ -394,6 +394,9 @@ partial class MultiListTests
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
+			/// <summary>The global::System.Collections.Generic.IList<string> instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Collections.Generic.IList<string> Object => this;
+
 		}
 
 		/// <summary>Interceptor for IListInt32.Indexer.</summary>
@@ -781,6 +784,9 @@ partial class MultiListTests
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
+
+			/// <summary>The global::System.Collections.Generic.IList<int> instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Collections.Generic.IList<int> Object => this;
 
 		}
 

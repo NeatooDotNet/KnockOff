@@ -49,8 +49,11 @@ partial class IdxEntityBaseKnockOff
 	/// <summary>Interceptor for Indexer.</summary>
 	public IndexerInterceptor Indexer { get; } = new();
 
-	/// <summary>Interceptor for IsNew.</summary>
+	/// <summary>Interceptor for IsNew. Configure callbacks and track access.</summary>
 	public IsNewInterceptor IsNew { get; } = new();
+
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IIdxEntityBase instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IIdxEntityBase Object => this;
 
 	global::KnockOff.Documentation.Samples.Guides.IIdxEntityProperty? global::KnockOff.Documentation.Samples.Guides.IIdxEntityBase.this[string propertyName]
 	{

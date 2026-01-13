@@ -33,6 +33,9 @@ partial class AttrUserRepoKnockOff
 	/// <summary>Interceptor for GetById.</summary>
 	public GetByIdInterceptor GetById { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Reference.IAttrRepository<global::KnockOff.Documentation.Samples.Reference.AttrUser> instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Reference.IAttrRepository<global::KnockOff.Documentation.Samples.Reference.AttrUser> Object => this;
+
 	global::KnockOff.Documentation.Samples.Reference.AttrUser? global::KnockOff.Documentation.Samples.Reference.IAttrRepository<global::KnockOff.Documentation.Samples.Reference.AttrUser>.GetById(int id)
 	{
 		GetById.RecordCall(id);

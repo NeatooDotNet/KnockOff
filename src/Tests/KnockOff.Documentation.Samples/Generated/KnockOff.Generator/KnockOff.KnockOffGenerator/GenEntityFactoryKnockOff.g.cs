@@ -95,6 +95,9 @@ partial class GenEntityFactoryKnockOff
 	/// <summary>Interceptor for Create (use .Of&lt;T&gt;() to access typed handler).</summary>
 	public CreateInterceptor Create { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IGenEntityFactory instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IGenEntityFactory Object => this;
+
 	T global::KnockOff.Documentation.Samples.Guides.IGenEntityFactory.Create<T>() where T : class
 	{
 		Create.Of<T>().RecordCall();

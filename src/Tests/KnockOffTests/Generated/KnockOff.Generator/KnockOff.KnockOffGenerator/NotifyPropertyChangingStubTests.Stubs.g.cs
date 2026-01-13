@@ -42,6 +42,9 @@ partial class NotifyPropertyChangingStubTests
 				remove => PropertyChangingInterceptor.RecordRemove(value);
 			}
 
+			/// <summary>The global::System.ComponentModel.INotifyPropertyChanging instance. Use for passing to code expecting the interface.</summary>
+			public global::System.ComponentModel.INotifyPropertyChanging Object => this;
+
 		}
 
 	}

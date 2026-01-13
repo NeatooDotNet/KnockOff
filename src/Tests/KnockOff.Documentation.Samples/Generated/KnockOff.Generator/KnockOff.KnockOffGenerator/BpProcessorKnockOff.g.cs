@@ -55,6 +55,9 @@ partial class BpProcessorKnockOff
 	/// <summary>Interceptor for Process.</summary>
 	public Process2Interceptor Process2 { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IBpProcessor instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IBpProcessor Object => this;
+
 	void global::KnockOff.Documentation.Samples.Guides.IBpProcessor.Process(string data)
 	{
 		Process1.RecordCall(data);

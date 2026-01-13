@@ -67,11 +67,14 @@ partial class BpPropertyServiceKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for Name.</summary>
+	/// <summary>Interceptor for Name. Configure callbacks and track access.</summary>
 	public NameInterceptor Name { get; } = new();
 
-	/// <summary>Interceptor for IsActive.</summary>
+	/// <summary>Interceptor for IsActive. Configure callbacks and track access.</summary>
 	public IsActiveInterceptor IsActive { get; } = new();
+
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IBpPropertyService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IBpPropertyService Object => this;
 
 	string global::KnockOff.Documentation.Samples.Guides.IBpPropertyService.Name
 	{

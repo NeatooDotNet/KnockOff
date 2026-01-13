@@ -30,6 +30,9 @@ partial class MethodSequentialKnockOff
 	/// <summary>Interceptor for GetNext.</summary>
 	public GetNextInterceptor GetNext { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IMethodSequential instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IMethodSequential Object => this;
+
 	int global::KnockOff.Documentation.Samples.Guides.IMethodSequential.GetNext()
 	{
 		GetNext.RecordCall();

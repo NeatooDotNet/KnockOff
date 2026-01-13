@@ -95,6 +95,9 @@ partial class ObserverIntStubTests
 				if (OnNext.OnCall is { } onCall) onCall(this, value);
 			}
 
+			/// <summary>The global::System.IObserver<int> instance. Use for passing to code expecting the interface.</summary>
+			public global::System.IObserver<int> Object => this;
+
 		}
 
 	}

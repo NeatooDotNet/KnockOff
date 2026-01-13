@@ -24,8 +24,11 @@ partial class EntityKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for Id.</summary>
+	/// <summary>Interceptor for Id. Configure callbacks and track access.</summary>
 	public IdInterceptor Id { get; } = new();
+
+	/// <summary>The global::KnockOff.Documentation.Samples.GettingStarted.IEntity instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.GettingStarted.IEntity Object => this;
 
 	int global::KnockOff.Documentation.Samples.GettingStarted.IEntity.Id
 	{

@@ -40,6 +40,9 @@ partial class InlineStubsExampleTests
 				if (Save.OnCall is { } onCall) onCall(this, entity);
 			}
 
+			/// <summary>The global::KnockOff.Documentation.Samples.GettingStarted.IRepository instance. Use for passing to code expecting the interface.</summary>
+			public global::KnockOff.Documentation.Samples.GettingStarted.IRepository Object => this;
+
 		}
 
 		/// <summary>Interceptor for IUnitOfWork.Commit.</summary>
@@ -70,6 +73,9 @@ partial class InlineStubsExampleTests
 				Commit.RecordCall();
 				if (Commit.OnCall is { } onCall) onCall(this);
 			}
+
+			/// <summary>The global::KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork instance. Use for passing to code expecting the interface.</summary>
+			public global::KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork Object => this;
 
 		}
 

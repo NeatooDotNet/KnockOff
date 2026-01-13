@@ -30,6 +30,9 @@ partial class CloneableKnockOff
 	/// <summary>Interceptor for Clone.</summary>
 	public CloneInterceptor Clone { get; } = new();
 
+	/// <summary>The global::System.ICloneable instance. Use for passing to code expecting the interface.</summary>
+	public global::System.ICloneable Object => this;
+
 	object global::System.ICloneable.Clone()
 	{
 		Clone.RecordCall();

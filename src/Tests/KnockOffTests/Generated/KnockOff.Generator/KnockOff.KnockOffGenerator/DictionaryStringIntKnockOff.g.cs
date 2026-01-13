@@ -350,16 +350,16 @@ partial class DictionaryStringIntKnockOff
 	/// <summary>Interceptor for Indexer.</summary>
 	public IndexerInterceptor Indexer { get; } = new();
 
-	/// <summary>Interceptor for Keys.</summary>
+	/// <summary>Interceptor for Keys. Configure callbacks and track access.</summary>
 	public KeysInterceptor Keys { get; } = new();
 
-	/// <summary>Interceptor for Values.</summary>
+	/// <summary>Interceptor for Values. Configure callbacks and track access.</summary>
 	public ValuesInterceptor Values { get; } = new();
 
-	/// <summary>Interceptor for Count.</summary>
+	/// <summary>Interceptor for Count. Configure callbacks and track access.</summary>
 	public CountInterceptor Count { get; } = new();
 
-	/// <summary>Interceptor for IsReadOnly.</summary>
+	/// <summary>Interceptor for IsReadOnly. Configure callbacks and track access.</summary>
 	public IsReadOnlyInterceptor IsReadOnly { get; } = new();
 
 	/// <summary>Interceptor for Add.</summary>
@@ -391,6 +391,9 @@ partial class DictionaryStringIntKnockOff
 
 	/// <summary>Interceptor for GetEnumerator.</summary>
 	public GetEnumeratorInterceptor GetEnumerator { get; } = new();
+
+	/// <summary>The global::System.Collections.Generic.IDictionary<string, int> instance. Use for passing to code expecting the interface.</summary>
+	public global::System.Collections.Generic.IDictionary<string, int> Object => this;
 
 	void global::System.Collections.Generic.IDictionary<string, int>.Add(string key, int @value)
 	{

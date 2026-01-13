@@ -160,20 +160,23 @@ partial class MmTrackedPropServiceKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for Active.</summary>
+	/// <summary>Interceptor for Active. Configure callbacks and track access.</summary>
 	public ActiveInterceptor Active { get; } = new();
 
-	/// <summary>Interceptor for NewDate.</summary>
+	/// <summary>Interceptor for NewDate. Configure callbacks and track access.</summary>
 	public NewDateInterceptor NewDate { get; } = new();
 
-	/// <summary>Interceptor for VisitId.</summary>
+	/// <summary>Interceptor for VisitId. Configure callbacks and track access.</summary>
 	public VisitIdInterceptor VisitId { get; } = new();
 
-	/// <summary>Interceptor for VisitLabel.</summary>
+	/// <summary>Interceptor for VisitLabel. Configure callbacks and track access.</summary>
 	public VisitLabelInterceptor VisitLabel { get; } = new();
 
-	/// <summary>Interceptor for PreviousVisitDate.</summary>
+	/// <summary>Interceptor for PreviousVisitDate. Configure callbacks and track access.</summary>
 	public PreviousVisitDateInterceptor PreviousVisitDate { get; } = new();
+
+	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IMmTrackedPropService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.IMmTrackedPropService Object => this;
 
 	bool global::KnockOff.Documentation.Samples.Skills.IMmTrackedPropService.Active
 	{

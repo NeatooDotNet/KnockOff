@@ -58,6 +58,9 @@ partial class AsyncUserDefinedKnockOff
 	/// <summary>Interceptor for CountAsync.</summary>
 	public CountAsync2Interceptor CountAsync2 { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IAsyncUserDefined instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IAsyncUserDefined Object => this;
+
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.AsyncUser?> global::KnockOff.Documentation.Samples.Guides.IAsyncUserDefined.GetByIdAsync(int id)
 	{
 		GetByIdAsync2.RecordCall(id);

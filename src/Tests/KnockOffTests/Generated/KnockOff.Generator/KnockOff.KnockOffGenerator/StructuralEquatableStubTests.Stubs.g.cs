@@ -71,6 +71,9 @@ partial class StructuralEquatableStubTests
 				return default!;
 			}
 
+			/// <summary>The global::System.Collections.IStructuralEquatable instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Collections.IStructuralEquatable Object => this;
+
 		}
 
 	}

@@ -65,7 +65,7 @@ partial class DataProviderStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Count.</summary>
+	/// <summary>Interceptor for Count. Configure callbacks and track access.</summary>
 	public CountInterceptor Count { get; } = new();
 
 	/// <summary>Interceptor for GetEnumerator.</summary>
@@ -73,6 +73,9 @@ partial class DataProviderStub
 
 	/// <summary>Interceptor for Dispose.</summary>
 	public DisposeInterceptor Dispose { get; } = new();
+
+	/// <summary>The global::KnockOff.Benchmarks.Interfaces.IDataProvider instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Benchmarks.Interfaces.IDataProvider Object => this;
 
 	int global::KnockOff.Benchmarks.Interfaces.IDataProvider.Count
 	{

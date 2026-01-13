@@ -71,11 +71,14 @@ partial class ReadOnlyListStringKnockOff
 	/// <summary>Interceptor for Indexer.</summary>
 	public IndexerInterceptor Indexer { get; } = new();
 
-	/// <summary>Interceptor for Count.</summary>
+	/// <summary>Interceptor for Count. Configure callbacks and track access.</summary>
 	public CountInterceptor Count { get; } = new();
 
 	/// <summary>Interceptor for GetEnumerator.</summary>
 	public GetEnumeratorInterceptor GetEnumerator { get; } = new();
+
+	/// <summary>The global::System.Collections.Generic.IReadOnlyList<string> instance. Use for passing to code expecting the interface.</summary>
+	public global::System.Collections.Generic.IReadOnlyList<string> Object => this;
 
 	string global::System.Collections.Generic.IReadOnlyList<string>.this[int index]
 	{

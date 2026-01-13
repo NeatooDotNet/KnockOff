@@ -30,6 +30,9 @@ partial class AsyncDisposableKnockOff
 	/// <summary>Interceptor for DisposeAsync.</summary>
 	public DisposeAsyncInterceptor DisposeAsync { get; } = new();
 
+	/// <summary>The global::System.IAsyncDisposable instance. Use for passing to code expecting the interface.</summary>
+	public global::System.IAsyncDisposable Object => this;
+
 	global::System.Threading.Tasks.ValueTask global::System.IAsyncDisposable.DisposeAsync()
 	{
 		DisposeAsync.RecordCall();

@@ -41,6 +41,9 @@ partial class FormattableStubTests
 				throw new global::System.InvalidOperationException("No implementation provided for ToString. Set ToString.OnCall.");
 			}
 
+			/// <summary>The global::System.IFormattable instance. Use for passing to code expecting the interface.</summary>
+			public global::System.IFormattable Object => this;
+
 		}
 
 	}

@@ -41,6 +41,9 @@ partial class FormatProviderStubTests
 				return default!;
 			}
 
+			/// <summary>The global::System.IFormatProvider instance. Use for passing to code expecting the interface.</summary>
+			public global::System.IFormatProvider Object => this;
+
 		}
 
 	}

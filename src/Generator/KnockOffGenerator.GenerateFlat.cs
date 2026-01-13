@@ -169,7 +169,7 @@ public partial class KnockOffGenerator
 	}
 
 	/// <summary>
-	/// Generate a flat interceptor class for property/indexer with custom name
+	/// Generate a flat interceptor class for property/indexer with custom name.
 	/// </summary>
 	private static void GenerateFlatMemberInterceptorClass(
 		System.Text.StringBuilder sb,
@@ -185,63 +185,20 @@ public partial class KnockOffGenerator
 
 		if (member.IsIndexer)
 		{
-			GenerateFlatIndexerInterceptorContent(sb, member, knockOffClassName);
+			GenerateFlatIndexerContent(sb, member, knockOffClassName);
 		}
 		else if (member.IsProperty)
 		{
-			if (member.HasGetter)
+			// Init-only properties get a minimal interceptor (just GetCount)
+			// because you provide the value via object initializer - nothing to mock
+			if (member.IsInitOnly)
 			{
-				sb.AppendLine("\t\t/// <summary>Number of times the getter was accessed.</summary>");
-				sb.AppendLine("\t\tpublic int GetCount { get; private set; }");
-				sb.AppendLine();
-
-				sb.AppendLine("\t\t/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>");
-				sb.AppendLine($"\t\tpublic global::System.Func<{knockOffClassName}, {member.ReturnType}>? OnGet {{ get; set; }}");
-				sb.AppendLine();
+				GenerateFlatInitPropertyInterceptorContent(sb, member);
 			}
-
-			if (member.HasSetter)
+			else
 			{
-				sb.AppendLine("\t\t/// <summary>Number of times the setter was accessed.</summary>");
-				sb.AppendLine("\t\tpublic int SetCount { get; private set; }");
-				sb.AppendLine();
-
-				var nullableType = MakeNullable(member.ReturnType);
-				sb.AppendLine("\t\t/// <summary>The value from the most recent setter call.</summary>");
-				sb.AppendLine($"\t\tpublic {nullableType} LastSetValue {{ get; private set; }}");
-				sb.AppendLine();
-
-				sb.AppendLine("\t\t/// <summary>Callback invoked when the setter is accessed.</summary>");
-				sb.AppendLine($"\t\tpublic global::System.Action<{knockOffClassName}, {member.ReturnType}>? OnSet {{ get; set; }}");
-				sb.AppendLine();
+				GenerateFlatRegularPropertyInterceptorContent(sb, member, knockOffClassName);
 			}
-
-			// Value property for backing storage (matches inline stub pattern)
-			sb.AppendLine("\t\t/// <summary>Value returned by getter when OnGet is not set.</summary>");
-			sb.AppendLine($"\t\tpublic {member.ReturnType} Value {{ get; set; }}{GetDefaultValueForProperty(member)}");
-			sb.AppendLine();
-
-			if (member.HasGetter)
-			{
-				sb.AppendLine("\t\t/// <summary>Records a getter access.</summary>");
-				sb.AppendLine("\t\tpublic void RecordGet() => GetCount++;");
-				sb.AppendLine();
-			}
-
-			if (member.HasSetter)
-			{
-				var nullableType = MakeNullable(member.ReturnType);
-				sb.AppendLine("\t\t/// <summary>Records a setter access.</summary>");
-				sb.AppendLine($"\t\tpublic void RecordSet({nullableType} value) {{ SetCount++; LastSetValue = value; }}");
-				sb.AppendLine();
-			}
-
-			sb.AppendLine("\t\t/// <summary>Resets all tracking state.</summary>");
-			sb.Append("\t\tpublic void Reset() { ");
-			if (member.HasGetter) sb.Append("GetCount = 0; OnGet = null; ");
-			if (member.HasSetter) sb.Append("SetCount = 0; LastSetValue = default; OnSet = null; ");
-			sb.Append("Value = default!; ");
-			sb.AppendLine("}");
 		}
 
 		sb.AppendLine("\t}");
@@ -249,9 +206,133 @@ public partial class KnockOffGenerator
 	}
 
 	/// <summary>
+	/// Generate interceptor content for init-only properties.
+	/// Init properties have Value for configuration and GetCount for tracking.
+	/// </summary>
+	private static void GenerateFlatInitPropertyInterceptorContent(
+		System.Text.StringBuilder sb,
+		InterfaceMemberInfo member)
+	{
+		sb.AppendLine($"\t\t/// <summary>The configured value for {member.Name}.</summary>");
+		sb.AppendLine($"\t\tpublic {member.ReturnType} Value {{ get; set; }} = default!;");
+		sb.AppendLine();
+
+		sb.AppendLine("\t\t/// <summary>Number of times the getter was accessed.</summary>");
+		sb.AppendLine("\t\tpublic int GetCount { get; private set; }");
+		sb.AppendLine();
+
+		sb.AppendLine("\t\t/// <summary>Records a getter access.</summary>");
+		sb.AppendLine("\t\tpublic void RecordGet() => GetCount++;");
+		sb.AppendLine();
+
+		sb.AppendLine("\t\t/// <summary>Resets all tracking state.</summary>");
+		sb.AppendLine("\t\tpublic void Reset() { GetCount = 0; Value = default!; }");
+	}
+
+	/// <summary>
+	/// Generate interceptor property for init-only properties.
+	/// For init-only properties: value is configured via stub.PropertyName.Value, tracks read access.
+	/// </summary>
+	private static void GenerateFlatInitPropertyWithInterceptor(
+		System.Text.StringBuilder sb,
+		InterfaceMemberInfo member,
+		string baseName,
+		string knockOffClassName)
+	{
+		var interceptorClassName = $"{baseName}Interceptor";
+
+		// Interceptor property - has Value for configuration and GetCount for tracking
+		sb.AppendLine($"\t/// <summary>Interceptor for {member.Name}. Configure via .Value, track via .GetCount.</summary>");
+		sb.AppendLine($"\tpublic {interceptorClassName} {baseName} {{ get; }} = new();");
+		sb.AppendLine();
+	}
+
+	/// <summary>
+	/// Generate interceptor property for regular (non-init) properties.
+	/// For regular properties: value is accessed via stub.Object, interceptor via stub.PropertyName.
+	/// </summary>
+	private static void GenerateFlatRegularPropertyWithInterceptor(
+		System.Text.StringBuilder sb,
+		InterfaceMemberInfo member,
+		string baseName,
+		string knockOffClassName)
+	{
+		var interceptorClassName = $"{baseName}Interceptor";
+
+		// Interceptor property - named same as property for stub.PropertyName access
+		sb.AppendLine($"\t/// <summary>Interceptor for {member.Name}. Configure callbacks and track access.</summary>");
+		sb.AppendLine($"\tpublic {interceptorClassName} {baseName} {{ get; }} = new();");
+		sb.AppendLine();
+	}
+
+	/// <summary>
+	/// Generate interceptor content for regular (non-init) properties.
+	/// Full functionality: Value, OnGet, OnSet, counts.
+	/// </summary>
+	private static void GenerateFlatRegularPropertyInterceptorContent(
+		System.Text.StringBuilder sb,
+		InterfaceMemberInfo member,
+		string knockOffClassName)
+	{
+		if (member.HasGetter)
+		{
+			sb.AppendLine("\t\t/// <summary>Number of times the getter was accessed.</summary>");
+			sb.AppendLine("\t\tpublic int GetCount { get; private set; }");
+			sb.AppendLine();
+
+			sb.AppendLine("\t\t/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>");
+			sb.AppendLine($"\t\tpublic global::System.Func<{knockOffClassName}, {member.ReturnType}>? OnGet {{ get; set; }}");
+			sb.AppendLine();
+		}
+
+		if (member.HasSetter)
+		{
+			sb.AppendLine("\t\t/// <summary>Number of times the setter was accessed.</summary>");
+			sb.AppendLine("\t\tpublic int SetCount { get; private set; }");
+			sb.AppendLine();
+
+			var nullableType = MakeNullable(member.ReturnType);
+			sb.AppendLine("\t\t/// <summary>The value from the most recent setter call.</summary>");
+			sb.AppendLine($"\t\tpublic {nullableType} LastSetValue {{ get; private set; }}");
+			sb.AppendLine();
+
+			sb.AppendLine("\t\t/// <summary>Callback invoked when the setter is accessed.</summary>");
+			sb.AppendLine($"\t\tpublic global::System.Action<{knockOffClassName}, {member.ReturnType}>? OnSet {{ get; set; }}");
+			sb.AppendLine();
+		}
+
+		// Value property for backing storage
+		sb.AppendLine("\t\t/// <summary>Value returned by getter when OnGet is not set.</summary>");
+		sb.AppendLine($"\t\tpublic {member.ReturnType} Value {{ get; set; }}{GetDefaultValueForProperty(member)}");
+		sb.AppendLine();
+
+		if (member.HasGetter)
+		{
+			sb.AppendLine("\t\t/// <summary>Records a getter access.</summary>");
+			sb.AppendLine("\t\tpublic void RecordGet() => GetCount++;");
+			sb.AppendLine();
+		}
+
+		if (member.HasSetter)
+		{
+			var nullableType = MakeNullable(member.ReturnType);
+			sb.AppendLine("\t\t/// <summary>Records a setter access.</summary>");
+			sb.AppendLine($"\t\tpublic void RecordSet({nullableType} value) {{ SetCount++; LastSetValue = value; }}");
+			sb.AppendLine();
+		}
+
+		sb.AppendLine("\t\t/// <summary>Resets all tracking state.</summary>");
+		sb.Append("\t\tpublic void Reset() { ");
+		if (member.HasGetter) sb.Append("GetCount = 0; OnGet = null; ");
+		if (member.HasSetter) sb.Append("SetCount = 0; LastSetValue = default; OnSet = null; ");
+		sb.Append("Value = default!; ");
+		sb.AppendLine("}");
+	}
+
+	/// <summary>
 	/// Generate flat indexer interceptor content
 	/// </summary>
-	private static void GenerateFlatIndexerInterceptorContent(
+	private static void GenerateFlatIndexerContent(
 		System.Text.StringBuilder sb,
 		InterfaceMemberInfo member,
 		string knockOffClassName)
@@ -638,11 +719,12 @@ public partial class KnockOffGenerator
 
 		if (member.HasSetter)
 		{
+			var setterKeyword = member.IsInitOnly ? "init" : "set";
 			var pragmaDisable = GetSetterNullabilityAttribute(member);
 			var pragmaRestore = GetSetterNullabilityRestore(member);
 			if (!string.IsNullOrEmpty(pragmaDisable))
 				sb.Append(pragmaDisable);
-			sb.AppendLine($"\t\tset {{ {interceptorName}.RecordSet(value); if ({interceptorName}.OnSet != null) {interceptorName}.OnSet(this, value); else {backingName} = value; }}");
+			sb.AppendLine($"\t\t{setterKeyword} {{ {interceptorName}.RecordSet(value); if ({interceptorName}.OnSet != null) {interceptorName}.OnSet(this, value); else {backingName} = value; }}");
 			if (!string.IsNullOrEmpty(pragmaRestore))
 				sb.AppendLine(pragmaRestore);
 		}
@@ -802,27 +884,38 @@ public partial class KnockOffGenerator
 	/// <summary>
 	/// Generate flat property explicit interface implementation with custom name
 	/// </summary>
-	private static void GenerateFlatPropertyImplementationWithName(System.Text.StringBuilder sb, InterfaceMemberInfo member, string interceptorName)
+	private static void GenerateFlatPropertyImplementationWithName(System.Text.StringBuilder sb, InterfaceMemberInfo member, string baseName)
 	{
 		var ifaceName = member.DeclaringInterfaceFullName;
 
 		sb.AppendLine($"\t{member.ReturnType} {ifaceName}.{member.Name}");
 		sb.AppendLine("\t{");
 
-		if (member.HasGetter)
+		if (member.IsInitOnly)
 		{
-			sb.AppendLine($"\t\tget {{ {interceptorName}.RecordGet(); return {interceptorName}.OnGet?.Invoke(this) ?? {interceptorName}.Value; }}");
+			// Init-only: read from interceptor's Value, record access
+			// The init accessor stores to interceptor's Value
+			sb.AppendLine($"\t\tget {{ {baseName}.RecordGet(); return {baseName}.Value; }}");
+			sb.AppendLine($"\t\tinit {{ {baseName}.Value = value; }}");
 		}
-
-		if (member.HasSetter)
+		else
 		{
-			var pragmaDisable = GetSetterNullabilityAttribute(member);
-			var pragmaRestore = GetSetterNullabilityRestore(member);
-			if (!string.IsNullOrEmpty(pragmaDisable))
-				sb.Append(pragmaDisable);
-			sb.AppendLine($"\t\tset {{ {interceptorName}.RecordSet(value); if ({interceptorName}.OnSet != null) {interceptorName}.OnSet(this, value); else {interceptorName}.Value = value; }}");
-			if (!string.IsNullOrEmpty(pragmaRestore))
-				sb.AppendLine(pragmaRestore);
+			// Regular property: delegate to interceptor's Value property
+			if (member.HasGetter)
+			{
+				sb.AppendLine($"\t\tget {{ {baseName}.RecordGet(); return {baseName}.OnGet?.Invoke(this) ?? {baseName}.Value; }}");
+			}
+
+			if (member.HasSetter)
+			{
+				var pragmaDisable = GetSetterNullabilityAttribute(member);
+				var pragmaRestore = GetSetterNullabilityRestore(member);
+				if (!string.IsNullOrEmpty(pragmaDisable))
+					sb.Append(pragmaDisable);
+				sb.AppendLine($"\t\tset {{ {baseName}.RecordSet(value); if ({baseName}.OnSet != null) {baseName}.OnSet(this, value); else {baseName}.Value = value; }}");
+				if (!string.IsNullOrEmpty(pragmaRestore))
+					sb.AppendLine(pragmaRestore);
+			}
 		}
 
 		sb.AppendLine("\t}");

@@ -125,6 +125,9 @@ partial class HaEventSourceKnockOff
 	/// <summary>Interceptor for DataUpdated event.</summary>
 	public DataUpdatedInterceptor DataUpdated { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IHaEventSource instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.IHaEventSource Object => this;
+
 	event global::System.EventHandler<string>? global::KnockOff.Documentation.Samples.Skills.IHaEventSource.DataReceived
 	{
 		add => DataReceived.RecordAdd(value);

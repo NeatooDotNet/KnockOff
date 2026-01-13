@@ -83,6 +83,9 @@ partial class GenericRepoStub<T> where T : class
 	/// <summary>Interceptor for GetAll.</summary>
 	public GetAllInterceptor GetAll { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IGenericRepo<T> instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IGenericRepo<T> Object => this;
+
 	T? global::KnockOff.Documentation.Samples.Guides.IGenericRepo<T>.GetById(int id)
 	{
 		GetById.RecordCall(id);

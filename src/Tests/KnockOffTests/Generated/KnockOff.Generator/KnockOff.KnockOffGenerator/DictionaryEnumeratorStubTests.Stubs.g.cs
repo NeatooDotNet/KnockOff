@@ -192,6 +192,9 @@ partial class DictionaryEnumeratorStubTests
 				}
 			}
 
+			/// <summary>The global::System.Collections.IDictionaryEnumerator instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Collections.IDictionaryEnumerator Object => this;
+
 		}
 
 	}

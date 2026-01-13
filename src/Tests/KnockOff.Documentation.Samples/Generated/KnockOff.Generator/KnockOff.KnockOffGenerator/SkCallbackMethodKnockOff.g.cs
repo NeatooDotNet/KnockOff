@@ -136,10 +136,10 @@ partial class SkCallbackMethodKnockOff
 		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Name.</summary>
+	/// <summary>Interceptor for Name. Configure callbacks and track access.</summary>
 	public NameInterceptor Name { get; } = new();
 
-	/// <summary>Interceptor for CurrentUser.</summary>
+	/// <summary>Interceptor for CurrentUser. Configure callbacks and track access.</summary>
 	public CurrentUserInterceptor CurrentUser { get; } = new();
 
 	/// <summary>Interceptor for DoWork.</summary>
@@ -150,6 +150,9 @@ partial class SkCallbackMethodKnockOff
 
 	/// <summary>Interceptor for Search.</summary>
 	public SearchInterceptor Search { get; } = new();
+
+	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkCallbackService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkCallbackService Object => this;
 
 	void global::KnockOff.Documentation.Samples.Skills.ISkCallbackService.DoWork()
 	{

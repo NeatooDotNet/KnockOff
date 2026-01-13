@@ -294,6 +294,9 @@ partial class IMaxLengthRuleTests
 				}
 			}
 
+			/// <summary>The global::Neatoo.Rules.Rules.IMaxLengthRule instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.Rules.Rules.IMaxLengthRule Object => this;
+
 		}
 
 	}

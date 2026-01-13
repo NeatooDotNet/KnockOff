@@ -38,6 +38,9 @@ partial class AsyncDisposableStubTests
 				return default;
 			}
 
+			/// <summary>The global::System.IAsyncDisposable instance. Use for passing to code expecting the interface.</summary>
+			public global::System.IAsyncDisposable Object => this;
+
 		}
 
 	}

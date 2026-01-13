@@ -86,6 +86,9 @@ partial class GenOrderRepositoryKnockOff
 	/// <summary>Interceptor for GetByIdAsync.</summary>
 	public GetByIdAsyncInterceptor GetByIdAsync { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IGenRepository<global::KnockOff.Documentation.Samples.Guides.GenOrder> instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IGenRepository<global::KnockOff.Documentation.Samples.Guides.GenOrder> Object => this;
+
 	global::KnockOff.Documentation.Samples.Guides.GenOrder? global::KnockOff.Documentation.Samples.Guides.IGenRepository<global::KnockOff.Documentation.Samples.Guides.GenOrder>.GetById(int id)
 	{
 		GetById.RecordCall(id);

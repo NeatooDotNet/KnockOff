@@ -108,6 +108,9 @@ partial class IhUserWriteRepositoryKnockOff
 	/// <summary>Interceptor for GetAll.</summary>
 	public GetAllInterceptor GetAll { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IIhWriteRepository<global::KnockOff.Documentation.Samples.Guides.IhUser> instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IIhWriteRepository<global::KnockOff.Documentation.Samples.Guides.IhUser> Object => this;
+
 	void global::KnockOff.Documentation.Samples.Guides.IIhWriteRepository<global::KnockOff.Documentation.Samples.Guides.IhUser>.Add(global::KnockOff.Documentation.Samples.Guides.IhUser entity)
 	{
 		Add.RecordCall(entity);

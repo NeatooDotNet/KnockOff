@@ -62,14 +62,17 @@ partial class BpDynamicServiceKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for RequestId.</summary>
+	/// <summary>Interceptor for RequestId. Configure callbacks and track access.</summary>
 	public RequestIdInterceptor RequestId { get; } = new();
 
-	/// <summary>Interceptor for IsReady.</summary>
+	/// <summary>Interceptor for IsReady. Configure callbacks and track access.</summary>
 	public IsReadyInterceptor IsReady { get; } = new();
 
 	/// <summary>Interceptor for Initialize.</summary>
 	public InitializeInterceptor Initialize { get; } = new();
+
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IBpDynamicService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IBpDynamicService Object => this;
 
 	string global::KnockOff.Documentation.Samples.Guides.IBpDynamicService.RequestId
 	{

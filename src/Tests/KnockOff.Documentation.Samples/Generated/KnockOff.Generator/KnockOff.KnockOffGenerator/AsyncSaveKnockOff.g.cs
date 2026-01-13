@@ -33,6 +33,9 @@ partial class AsyncSaveKnockOff
 	/// <summary>Interceptor for SaveAsync.</summary>
 	public SaveAsyncInterceptor SaveAsync { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IAsyncSave instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IAsyncSave Object => this;
+
 	global::System.Threading.Tasks.Task<int> global::KnockOff.Documentation.Samples.Guides.IAsyncSave.SaveAsync(global::KnockOff.Documentation.Samples.Guides.AsyncData entity)
 	{
 		SaveAsync.RecordCall(entity);

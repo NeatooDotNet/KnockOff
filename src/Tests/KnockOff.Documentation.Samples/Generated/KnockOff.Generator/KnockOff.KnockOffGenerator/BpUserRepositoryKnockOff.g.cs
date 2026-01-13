@@ -33,6 +33,9 @@ partial class BpUserRepositoryKnockOff
 	/// <summary>Interceptor for GetById.</summary>
 	public GetById2Interceptor GetById2 { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IBpUserRepository instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IBpUserRepository Object => this;
+
 	global::KnockOff.Documentation.Samples.SampleDomain.User? global::KnockOff.Documentation.Samples.Guides.IBpUserRepository.GetById(int id)
 	{
 		GetById2.RecordCall(id);

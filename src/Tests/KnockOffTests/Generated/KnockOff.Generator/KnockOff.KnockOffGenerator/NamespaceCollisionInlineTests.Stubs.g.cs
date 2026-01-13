@@ -70,6 +70,9 @@ partial class NamespaceCollisionInlineTests
 				return default!;
 			}
 
+			/// <summary>The global::Person.Ef.IPersonDbContext instance. Use for passing to code expecting the interface.</summary>
+			public global::Person.Ef.IPersonDbContext Object => this;
+
 		}
 
 	}

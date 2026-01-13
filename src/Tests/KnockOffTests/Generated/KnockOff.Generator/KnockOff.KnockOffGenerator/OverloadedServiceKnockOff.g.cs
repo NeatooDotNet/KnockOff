@@ -192,6 +192,9 @@ partial class OverloadedServiceKnockOff
 	/// <summary>Interceptor for Calculate.</summary>
 	public Calculate2Interceptor Calculate2 { get; } = new();
 
+	/// <summary>The global::KnockOff.Tests.IOverloadedService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Tests.IOverloadedService Object => this;
+
 	global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> global::KnockOff.Tests.IOverloadedService.GetByIdAsync(int id)
 	{
 		GetByIdAsync1.RecordCall(id);

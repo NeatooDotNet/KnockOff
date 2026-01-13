@@ -86,6 +86,9 @@ partial class UserRepositoryKnockOff
 	/// <summary>Interceptor for GetByIdAsync.</summary>
 	public GetByIdAsyncInterceptor GetByIdAsync { get; } = new();
 
+	/// <summary>The global::KnockOff.Tests.IRepository<global::KnockOff.Tests.User> instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Tests.IRepository<global::KnockOff.Tests.User> Object => this;
+
 	global::KnockOff.Tests.User? global::KnockOff.Tests.IRepository<global::KnockOff.Tests.User>.GetById(int id)
 	{
 		GetById.RecordCall(id);

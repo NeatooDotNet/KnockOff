@@ -93,17 +93,20 @@ partial class IhFullEntityKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for CreatedBy.</summary>
+	/// <summary>Interceptor for CreatedBy. Configure callbacks and track access.</summary>
 	public CreatedByInterceptor CreatedBy { get; } = new();
 
-	/// <summary>Interceptor for ModifiedBy.</summary>
+	/// <summary>Interceptor for ModifiedBy. Configure callbacks and track access.</summary>
 	public ModifiedByInterceptor ModifiedBy { get; } = new();
 
-	/// <summary>Interceptor for CreatedAt.</summary>
+	/// <summary>Interceptor for CreatedAt. Configure callbacks and track access.</summary>
 	public CreatedAtInterceptor CreatedAt { get; } = new();
 
-	/// <summary>Interceptor for Id.</summary>
+	/// <summary>Interceptor for Id. Configure callbacks and track access.</summary>
 	public IdInterceptor Id { get; } = new();
+
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IIhFullAuditableEntity instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IIhFullAuditableEntity Object => this;
 
 	string global::KnockOff.Documentation.Samples.Guides.IIhFullAuditableEntity.CreatedBy
 	{

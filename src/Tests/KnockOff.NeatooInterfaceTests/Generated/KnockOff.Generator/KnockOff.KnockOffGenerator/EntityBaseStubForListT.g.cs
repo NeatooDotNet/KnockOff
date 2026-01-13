@@ -611,52 +611,52 @@ partial class EntityBaseStubForListT
 		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
 	}
 
-	/// <summary>Interceptor for Root.</summary>
+	/// <summary>Interceptor for Root. Configure callbacks and track access.</summary>
 	public RootInterceptor Root { get; } = new();
 
-	/// <summary>Interceptor for ModifiedProperties.</summary>
+	/// <summary>Interceptor for ModifiedProperties. Configure callbacks and track access.</summary>
 	public ModifiedPropertiesInterceptor ModifiedProperties { get; } = new();
 
 	/// <summary>Interceptor for Indexer.</summary>
 	public IndexerInterceptor Indexer { get; } = new();
 
-	/// <summary>Interceptor for Parent.</summary>
+	/// <summary>Interceptor for Parent. Configure callbacks and track access.</summary>
 	public ParentInterceptor Parent { get; } = new();
 
-	/// <summary>Interceptor for IsPaused.</summary>
+	/// <summary>Interceptor for IsPaused. Configure callbacks and track access.</summary>
 	public IsPausedInterceptor IsPaused { get; } = new();
 
-	/// <summary>Interceptor for IsBusy.</summary>
+	/// <summary>Interceptor for IsBusy. Configure callbacks and track access.</summary>
 	public IsBusyInterceptor IsBusy { get; } = new();
 
-	/// <summary>Interceptor for IsValid.</summary>
+	/// <summary>Interceptor for IsValid. Configure callbacks and track access.</summary>
 	public IsValidInterceptor IsValid { get; } = new();
 
-	/// <summary>Interceptor for IsSelfValid.</summary>
+	/// <summary>Interceptor for IsSelfValid. Configure callbacks and track access.</summary>
 	public IsSelfValidInterceptor IsSelfValid { get; } = new();
 
-	/// <summary>Interceptor for PropertyMessages.</summary>
+	/// <summary>Interceptor for PropertyMessages. Configure callbacks and track access.</summary>
 	public PropertyMessagesInterceptor PropertyMessages { get; } = new();
 
-	/// <summary>Interceptor for IsChild.</summary>
+	/// <summary>Interceptor for IsChild. Configure callbacks and track access.</summary>
 	public IsChildInterceptor IsChild { get; } = new();
 
-	/// <summary>Interceptor for IsModified.</summary>
+	/// <summary>Interceptor for IsModified. Configure callbacks and track access.</summary>
 	public IsModifiedInterceptor IsModified { get; } = new();
 
-	/// <summary>Interceptor for IsSelfModified.</summary>
+	/// <summary>Interceptor for IsSelfModified. Configure callbacks and track access.</summary>
 	public IsSelfModifiedInterceptor IsSelfModified { get; } = new();
 
-	/// <summary>Interceptor for IsMarkedModified.</summary>
+	/// <summary>Interceptor for IsMarkedModified. Configure callbacks and track access.</summary>
 	public IsMarkedModifiedInterceptor IsMarkedModified { get; } = new();
 
-	/// <summary>Interceptor for IsSavable.</summary>
+	/// <summary>Interceptor for IsSavable. Configure callbacks and track access.</summary>
 	public IsSavableInterceptor IsSavable { get; } = new();
 
-	/// <summary>Interceptor for IsDeleted.</summary>
+	/// <summary>Interceptor for IsDeleted. Configure callbacks and track access.</summary>
 	public IsDeletedInterceptor IsDeleted { get; } = new();
 
-	/// <summary>Interceptor for IsNew.</summary>
+	/// <summary>Interceptor for IsNew. Configure callbacks and track access.</summary>
 	public IsNewInterceptor IsNew { get; } = new();
 
 	/// <summary>Interceptor for Delete.</summary>
@@ -697,6 +697,9 @@ partial class EntityBaseStubForListT
 
 	/// <summary>Interceptor for NeatooPropertyChanged event.</summary>
 	public NeatooPropertyChangedInterceptor NeatooPropertyChanged { get; } = new();
+
+	/// <summary>The global::Neatoo.IEntityBase instance. Use for passing to code expecting the interface.</summary>
+	public global::Neatoo.IEntityBase Object => this;
 
 	void global::Neatoo.IEntityBase.Delete()
 	{

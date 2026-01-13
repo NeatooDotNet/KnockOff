@@ -27,8 +27,11 @@ partial class PropLoggerKnockOff
 		public void Reset() { SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for Output.</summary>
+	/// <summary>Interceptor for Output. Configure callbacks and track access.</summary>
 	public OutputInterceptor Output { get; } = new();
+
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IPropLogger instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IPropLogger Object => this;
 
 	string global::KnockOff.Documentation.Samples.Guides.IPropLogger.Output
 	{

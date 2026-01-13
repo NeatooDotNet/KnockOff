@@ -337,16 +337,283 @@ public class VerificationUsageExample
         service.GetDescription(42);
 
         // Assert method calls
-        System.Diagnostics.Debug.Assert(stub.GetDescription.WasCalled);
-        System.Diagnostics.Debug.Assert(stub.GetDescription.CallCount == 3);
-        System.Diagnostics.Debug.Assert(stub.GetDescription.LastCallArg == 42);
+        Assert.True(stub.GetDescription.WasCalled);
+        Assert.Equal(3, stub.GetDescription.CallCount);
+        Assert.Equal(42, stub.GetDescription.LastCallArg);
 
         // Assert property access
         service.Name = "First";
         service.Name = "Second";
-        System.Diagnostics.Debug.Assert(stub.Name.SetCount == 2);
-        System.Diagnostics.Debug.Assert(stub.Name.LastSetValue == "Second");
+        Assert.Equal(2, stub.Name.SetCount);
+        Assert.Equal("Second", stub.Name.LastSetValue);
     }
+}
+```
+<!-- endSnippet -->
+
+## API Design
+
+KnockOff supports three stub patterns, all with the same consistent API:
+
+| Access | What You Get |
+|--------|--------------|
+| `stub.Member` | Interceptor (tracking, callbacks) |
+| `stub.Object.Member` | Actual value (interface/class instance) |
+
+### Pattern 1: Inline Interface Stub
+
+<!-- snippet: docs:design:inline-interface-definition -->
+```cs
+/// <summary>
+/// Pattern 1: Inline Interface Stub
+/// Apply [KnockOff&lt;T&gt;] to generate nested stub class.
+/// </summary>
+[KnockOff<IDsUserService>]
+public partial class DsInlineInterfaceTests { }
+```
+<!-- endSnippet -->
+
+<!-- snippet: docs:design:inline-interface-usage -->
+```cs
+public static void InlineInterfaceStubUsage()
+{
+    // Create stub
+    var stub = new DsInlineInterfaceTests.Stubs.IDsUserService();
+    IDsUserService service = stub.Object;
+
+    // METHOD: Configure and verify
+    stub.GetUser.OnCall = (ko, id) => new DsUser { Id = id };
+    var user = service.GetUser(42);
+    // Verify: stub.GetUser.CallCount, stub.GetUser.LastCallArg
+
+    // PROPERTY: Configure and verify
+    stub.Name.Value = "Test";
+    var name = service.Name;
+    // Verify: stub.Name.GetCount, stub.Name.SetCount
+
+    // INDEXER: Configure and verify
+    stub.Indexer.Backing["key"] = "value";
+    var val = service["key"];
+    // Verify: stub.Indexer.GetCount, stub.Indexer.LastGetKey
+}
+```
+<!-- endSnippet -->
+
+### Pattern 2: Inline Class Stub
+
+<!-- snippet: docs:design:inline-class-definition -->
+```cs
+/// <summary>
+/// Pattern 2: Inline Class Stub
+/// Apply [KnockOff&lt;T&gt;] with a class to stub virtual members.
+/// </summary>
+[KnockOff<DsEmailService>]
+public partial class DsInlineClassTests { }
+```
+<!-- endSnippet -->
+
+<!-- snippet: docs:design:inline-class-usage -->
+```cs
+public static void InlineClassStubUsage()
+{
+    // Create stub
+    var stub = new DsInlineClassTests.Stubs.DsEmailService();
+    DsEmailService service = stub.Object;
+
+    // METHOD: Configure and verify
+    stub.Send.OnCall = (ko, to, body) => { /* custom behavior */ };
+    service.Send("test@example.com", "Hello");
+    // Verify: stub.Send.CallCount, stub.Send.LastCallArgs
+
+    // PROPERTY: Configure and verify
+    stub.ServerName.OnGet = (ko) => "smtp.test.com";
+    var server = service.ServerName;
+    // Verify: stub.ServerName.GetCount
+
+    // INDEXER: Configure and verify
+    stub.Indexer.Backing[0] = "value";
+    var val = service[0];
+    // Verify: stub.Indexer.GetCount
+}
+```
+<!-- endSnippet -->
+
+### Pattern 3: Stand-Alone Interface Stub
+
+<!-- snippet: docs:design:standalone-interface-definition -->
+```cs
+/// <summary>
+/// Pattern 3: Stand-Alone Interface Stub
+/// Apply [KnockOff] to a partial class that implements the interface.
+/// </summary>
+[KnockOff]
+public partial class DsUserServiceStub : IDsUserService { }
+```
+<!-- endSnippet -->
+
+<!-- snippet: docs:design:standalone-interface-usage -->
+```cs
+public static void StandaloneInterfaceStubUsage()
+{
+    // Create stub
+    var stub = new DsUserServiceStub();
+    IDsUserService service = stub.Object;
+
+    // METHOD: Configure and verify
+    stub.GetUser.OnCall = (ko, id) => new DsUser { Id = id };
+    var user = service.GetUser(42);
+    // Verify: stub.GetUser.CallCount, stub.GetUser.LastCallArg
+
+    // PROPERTY: Configure and verify
+    stub.Name.Value = "Test";
+    var name = service.Name;
+    // Verify: stub.Name.GetCount, stub.Name.SetCount
+
+    // INDEXER: Configure and verify
+    stub.Indexer.Backing["key"] = "value";
+    var val = service["key"];
+    // Verify: stub.Indexer.GetCount, stub.Indexer.LastGetKey
+}
+```
+<!-- endSnippet -->
+
+## Advanced Features
+
+### Indexers
+
+Indexers use a backing dictionary for storage and support custom callbacks:
+
+<!-- snippet: docs:design:indexer-basic-usage -->
+```cs
+public static void IndexerBasicUsage()
+{
+    var stub = new DsIndexerTests.Stubs.IDsCache();
+    IDsCache cache = stub.Object;
+
+    // Pre-populate backing dictionary
+    stub.Indexer.Backing["user:1"] = "Alice";
+    stub.Indexer.Backing["user:2"] = "Bob";
+
+    // Access through interface
+    var user1 = cache["user:1"];  // Returns "Alice"
+    cache["user:3"] = "Charlie";  // Adds to backing
+
+    // Verify access
+    // stub.Indexer.GetCount == 1
+    // stub.Indexer.SetCount == 1
+    // stub.Indexer.LastGetKey == "user:1"
+    // stub.Indexer.LastSetEntry == ("user:3", "Charlie")
+}
+```
+<!-- endSnippet -->
+
+For multiple indexers (different key types), each gets a separate interceptor:
+
+<!-- snippet: docs:design:indexer-multiple-usage -->
+```cs
+public static void MultipleIndexersUsage()
+{
+    var stub = new DsIndexerTests.Stubs.IDsMultiIndexer();
+    IDsMultiIndexer multi = stub.Object;
+
+    // Each indexer has its own interceptor named by key type
+    // String-keyed indexer: IndexerString
+    // Int-keyed indexer: IndexerInt32
+    stub.IndexerString.Backing["name"] = "Alice";
+    stub.IndexerInt32.Backing[0] = "First";
+
+    var byName = multi["name"];  // "Alice"
+    var byIndex = multi[0];      // "First"
+
+    // Verify separately
+    // stub.IndexerString.GetCount == 1
+    // stub.IndexerInt32.GetCount == 1
+}
+```
+<!-- endSnippet -->
+
+### Init Properties
+
+Init-only properties (C# 9+) are configured via `.Value` on the interceptor:
+
+<!-- snippet: docs:design:init-property-interface-usage -->
+```cs
+public static void InitPropertyInterfaceUsage()
+{
+    var stub = new DsInitPropertyTests.Stubs.IDsEntity();
+    IDsEntity entity = stub.Object;
+
+    // Configure init properties via interceptor's Value
+    stub.Id.Value = "entity-123";
+    stub.Name.Value = "Test Entity";
+
+    // Read through interface
+    var id = entity.Id;      // "entity-123"
+    var name = entity.Name;  // "Test Entity"
+
+    // Verify read access
+    // stub.Id.GetCount == 1
+    // stub.Name.GetCount == 1
+}
+```
+<!-- endSnippet -->
+
+Mixed init/set properties work together seamlessly:
+
+<!-- snippet: docs:design:init-property-mixed-usage -->
+```cs
+public static void InitPropertyMixedUsage()
+{
+    var stub = new DsInitPropertyTests.Stubs.IDsDocument();
+    IDsDocument doc = stub.Object;
+
+    // Init property: configure via Value
+    stub.Id.Value = "doc-456";
+
+    // Regular property: configure via Value or OnGet/OnSet
+    stub.Title.Value = "My Document";
+
+    // Get-only property: configure via Value
+    stub.Version.Value = 1;
+
+    // Read values
+    var id = doc.Id;         // "doc-456" (init - immutable)
+    doc.Title = "New Title"; // Works (regular setter)
+    var ver = doc.Version;   // 1 (get-only)
+
+    // Init properties track reads, not writes (writes via stub.X.Value)
+    // stub.Id.GetCount == 1
+    // stub.Title.SetCount == 1
+}
+```
+<!-- endSnippet -->
+
+### Required Properties
+
+Required properties (C# 11+) work like regular class properties. The `[SetsRequiredMembers]` attribute is auto-generated:
+
+<!-- snippet: docs:design:required-property-usage -->
+```cs
+public static void RequiredPropertyUsage()
+{
+    // Required properties work like regular properties in stubs
+    // The [SetsRequiredMembers] attribute is auto-generated on constructors
+    var stub = new DsRequiredPropertyTests.Stubs.DsAuditableEntity();
+    DsAuditableEntity entity = stub.Object;
+
+    // Configure via OnGet (class stub pattern)
+    stub.Id.OnGet = _ => "audit-001";
+    stub.CreatedBy.OnGet = _ => "admin";
+    stub.CreatedAt.OnGet = _ => new DateTime(2024, 1, 15);
+
+    // Access through object
+    var id = entity.Id;              // "audit-001"
+    var createdBy = entity.CreatedBy; // "admin"
+    var createdAt = entity.CreatedAt; // 2024-01-15
+
+    // Or set through object (required { get; set; } allows mutation)
+    entity.Id = "audit-002";
+    // stub.Id.SetCount == 1
 }
 ```
 <!-- endSnippet -->

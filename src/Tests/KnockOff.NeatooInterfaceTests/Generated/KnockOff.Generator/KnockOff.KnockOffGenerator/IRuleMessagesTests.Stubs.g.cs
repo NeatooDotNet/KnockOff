@@ -400,6 +400,9 @@ partial class IRuleMessagesTests
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
+			/// <summary>The global::Neatoo.Rules.IRuleMessages instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.Rules.IRuleMessages Object => this;
+
 		}
 
 	}

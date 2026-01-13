@@ -30,6 +30,9 @@ partial class NestedDictStub<TKey, TValue> where TKey : notnull
 	/// <summary>Interceptor for GetMapping.</summary>
 	public GetMappingInterceptor GetMapping { get; } = new();
 
+	/// <summary>The global::KnockOff.Tests.INestedDictService<TKey, TValue> instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Tests.INestedDictService<TKey, TValue> Object => this;
+
 	global::System.Collections.Generic.Dictionary<TKey, TValue> global::KnockOff.Tests.INestedDictService<TKey, TValue>.GetMapping()
 	{
 		GetMapping.RecordCall();

@@ -58,6 +58,9 @@ partial class ConstrainedRepositoryStub<T> where T : class
 	/// <summary>Interceptor for Save.</summary>
 	public SaveInterceptor Save { get; } = new();
 
+	/// <summary>The global::KnockOff.Tests.IConstrainedRepository<T> instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Tests.IConstrainedRepository<T> Object => this;
+
 	T? global::KnockOff.Tests.IConstrainedRepository<T>.GetById(int id)
 	{
 		GetById.RecordCall(id);

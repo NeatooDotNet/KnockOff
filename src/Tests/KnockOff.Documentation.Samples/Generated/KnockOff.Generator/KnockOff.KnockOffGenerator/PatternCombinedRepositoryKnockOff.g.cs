@@ -33,6 +33,9 @@ partial class PatternCombinedRepositoryKnockOff
 	/// <summary>Interceptor for GetById.</summary>
 	public GetById2Interceptor GetById2 { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Concepts.IPatternCombinedRepository instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Concepts.IPatternCombinedRepository Object => this;
+
 	global::KnockOff.Documentation.Samples.Concepts.PatternUser? global::KnockOff.Documentation.Samples.Concepts.IPatternCombinedRepository.GetById(int id)
 	{
 		GetById2.RecordCall(id);

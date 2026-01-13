@@ -38,6 +38,9 @@ partial class CloneableStubTests
 				return new object();
 			}
 
+			/// <summary>The global::System.ICloneable instance. Use for passing to code expecting the interface.</summary>
+			public global::System.ICloneable Object => this;
+
 		}
 
 	}

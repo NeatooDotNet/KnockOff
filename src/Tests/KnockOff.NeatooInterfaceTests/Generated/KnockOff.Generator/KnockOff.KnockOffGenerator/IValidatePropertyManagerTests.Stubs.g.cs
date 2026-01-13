@@ -518,6 +518,9 @@ partial class IValidatePropertyManagerTests
 				remove => PropertyChangedInterceptor.RecordRemove(value);
 			}
 
+			/// <summary>The global::Neatoo.IValidatePropertyManager<global::Neatoo.IValidateProperty> instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.IValidatePropertyManager<global::Neatoo.IValidateProperty> Object => this;
+
 		}
 
 	}

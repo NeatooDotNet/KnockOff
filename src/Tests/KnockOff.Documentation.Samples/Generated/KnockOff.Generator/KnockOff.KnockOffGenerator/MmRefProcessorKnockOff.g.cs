@@ -33,6 +33,9 @@ partial class MmRefProcessorKnockOff
 	/// <summary>Interceptor for Increment.</summary>
 	public IncrementInterceptor Increment { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IMmRefProcessor instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.IMmRefProcessor Object => this;
+
 	void global::KnockOff.Documentation.Samples.Skills.IMmRefProcessor.Increment(ref int @value)
 	{
 		Increment.RecordCall(@value);

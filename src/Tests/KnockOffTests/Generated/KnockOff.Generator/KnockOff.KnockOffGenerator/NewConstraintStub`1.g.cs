@@ -30,6 +30,9 @@ partial class NewConstraintStub<T> where T : new()
 	/// <summary>Interceptor for Create.</summary>
 	public CreateInterceptor Create { get; } = new();
 
+	/// <summary>The global::KnockOff.Tests.INewConstraintService<T> instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Tests.INewConstraintService<T> Object => this;
+
 	T global::KnockOff.Tests.INewConstraintService<T>.Create()
 	{
 		Create.RecordCall();

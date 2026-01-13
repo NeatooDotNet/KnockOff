@@ -139,6 +139,9 @@ partial class AsyncResultStubTests
 				}
 			}
 
+			/// <summary>The global::System.IAsyncResult instance. Use for passing to code expecting the interface.</summary>
+			public global::System.IAsyncResult Object => this;
+
 		}
 
 	}

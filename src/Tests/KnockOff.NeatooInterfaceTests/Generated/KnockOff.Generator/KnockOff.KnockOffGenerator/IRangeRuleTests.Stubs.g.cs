@@ -326,6 +326,9 @@ partial class IRangeRuleTests
 				}
 			}
 
+			/// <summary>The global::Neatoo.Rules.Rules.IRangeRule instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.Rules.Rules.IRangeRule Object => this;
+
 		}
 
 	}

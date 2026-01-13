@@ -77,6 +77,9 @@ partial class GroupingIntUserStubTests
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
+			/// <summary>The global::System.Linq.IGrouping<int, global::KnockOff.Tests.User> instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Linq.IGrouping<int, global::KnockOff.Tests.User> Object => this;
+
 		}
 
 	}

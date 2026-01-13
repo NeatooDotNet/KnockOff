@@ -42,6 +42,9 @@ partial class ReadWriteStoreKnockOff
 	/// <summary>Interceptor for Indexer.</summary>
 	public IndexerInterceptor Indexer { get; } = new();
 
+	/// <summary>The global::KnockOff.Tests.IReadWriteStore instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Tests.IReadWriteStore Object => this;
+
 	global::KnockOff.Tests.PropertyInfo? global::KnockOff.Tests.IReadWriteStore.this[string key]
 	{
 		get { Indexer.RecordGet(key); if (Indexer.OnGet != null) return Indexer.OnGet(this, key); return Indexer.Backing.TryGetValue(key, out var v) ? v : default; }

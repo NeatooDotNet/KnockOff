@@ -30,6 +30,9 @@ partial class IdxConfigStoreKnockOff
 	/// <summary>Interceptor for Indexer.</summary>
 	public IndexerInterceptor Indexer { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IIdxConfigStore instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IIdxConfigStore Object => this;
+
 	global::KnockOff.Documentation.Samples.Guides.IdxConfigValue? global::KnockOff.Documentation.Samples.Guides.IIdxConfigStore.this[string key]
 	{
 		get { Indexer.RecordGet(key); if (Indexer.OnGet != null) return Indexer.OnGet(this, key); return Indexer.Backing.TryGetValue(key, out var v) ? v : default; }

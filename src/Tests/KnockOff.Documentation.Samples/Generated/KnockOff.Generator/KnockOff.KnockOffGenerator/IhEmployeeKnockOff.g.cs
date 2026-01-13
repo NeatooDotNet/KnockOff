@@ -86,14 +86,17 @@ partial class IhEmployeeKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for Name.</summary>
+	/// <summary>Interceptor for Name. Configure callbacks and track access.</summary>
 	public NameInterceptor Name { get; } = new();
 
-	/// <summary>Interceptor for Department.</summary>
+	/// <summary>Interceptor for Department. Configure callbacks and track access.</summary>
 	public DepartmentInterceptor Department { get; } = new();
 
-	/// <summary>Interceptor for Id.</summary>
+	/// <summary>Interceptor for Id. Configure callbacks and track access.</summary>
 	public IdInterceptor Id { get; } = new();
+
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IIhEmployee instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IIhEmployee Object => this;
 
 	string global::KnockOff.Documentation.Samples.Guides.IIhEmployee.Name
 	{

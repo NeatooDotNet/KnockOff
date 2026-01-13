@@ -247,7 +247,7 @@ public class BpOutParamExample
     {
         var knockOff = new BpParserKnockOff();
 
-        // CORRECT - explicit delegate type
+        // CORRECT - explicit delegate type (nested in interceptor class)
         knockOff.TryParse.OnCall =
             (BpParserKnockOff.TryParseInterceptor.TryParseDelegate)((BpParserKnockOff ko, string input, out int result) =>
             {

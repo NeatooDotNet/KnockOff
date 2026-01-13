@@ -58,6 +58,9 @@ partial class GenericKeyValueStub<TKey, TValue> where TKey : notnull where TValu
 	/// <summary>Interceptor for Set.</summary>
 	public SetInterceptor Set { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IGenericKeyValue<TKey, TValue> instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IGenericKeyValue<TKey, TValue> Object => this;
+
 	TValue? global::KnockOff.Documentation.Samples.Guides.IGenericKeyValue<TKey, TValue>.Get(TKey key)
 	{
 		Get.RecordCall(key);

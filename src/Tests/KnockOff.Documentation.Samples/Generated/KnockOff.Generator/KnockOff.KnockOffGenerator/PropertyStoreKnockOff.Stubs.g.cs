@@ -93,6 +93,9 @@ partial class PropertyStoreKnockOff
 				}
 			}
 
+			/// <summary>The global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo instance. Use for passing to code expecting the interface.</summary>
+			public global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo Object => this;
+
 		}
 
 	}

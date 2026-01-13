@@ -108,6 +108,9 @@ partial class BpUserServiceKnockOff
 	/// <summary>Interceptor for Save.</summary>
 	public SaveInterceptor Save { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IBpUserService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IBpUserService Object => this;
+
 	global::KnockOff.Documentation.Samples.SampleDomain.User? global::KnockOff.Documentation.Samples.Guides.IBpUserService.GetUser(int id)
 	{
 		GetUser2.RecordCall(id);

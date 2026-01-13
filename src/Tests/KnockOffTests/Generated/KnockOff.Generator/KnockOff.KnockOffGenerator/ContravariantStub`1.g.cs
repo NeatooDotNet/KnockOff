@@ -30,6 +30,9 @@ partial class ContravariantStub<T>
 	/// <summary>Interceptor for Process.</summary>
 	public ProcessInterceptor Process { get; } = new();
 
+	/// <summary>The global::KnockOff.Tests.IContravariantService<T> instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Tests.IContravariantService<T> Object => this;
+
 	void global::KnockOff.Tests.IContravariantService<T>.Process(T item)
 	{
 		Process.RecordCall(item);

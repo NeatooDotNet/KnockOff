@@ -37,6 +37,9 @@ partial class InlineStubs
 				if (DoWork.OnCall is { } onCall) onCall(this);
 			}
 
+			/// <summary>The global::KnockOff.Benchmarks.Interfaces.ISimpleService instance. Use for passing to code expecting the interface.</summary>
+			public global::KnockOff.Benchmarks.Interfaces.ISimpleService Object => this;
+
 		}
 
 		/// <summary>Interceptor for ICalculator.Add.</summary>
@@ -192,6 +195,9 @@ partial class InlineStubs
 				return default!;
 			}
 
+			/// <summary>The global::KnockOff.Benchmarks.Interfaces.ICalculator instance. Use for passing to code expecting the interface.</summary>
+			public global::KnockOff.Benchmarks.Interfaces.ICalculator Object => this;
+
 		}
 
 		/// <summary>Interceptor for IPropertyService.Name.</summary>
@@ -313,6 +319,9 @@ partial class InlineStubs
 					else WriteOnlyValue.Value = value;
 				}
 			}
+
+			/// <summary>The global::KnockOff.Benchmarks.Interfaces.IPropertyService instance. Use for passing to code expecting the interface.</summary>
+			public global::KnockOff.Benchmarks.Interfaces.IPropertyService Object => this;
 
 		}
 

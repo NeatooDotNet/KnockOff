@@ -65,7 +65,12 @@ internal sealed record InterfaceMemberInfo(
 	/// E.g., "String" for this[string key], "Int32" for this[int index].
 	/// Used to generate names like "IndexerString" or "IndexerInt32" when needed.
 	/// </summary>
-	string? IndexerTypeSuffix = null) : IEquatable<InterfaceMemberInfo>
+	string? IndexerTypeSuffix = null,
+	/// <summary>
+	/// True if the property setter is init-only (C# 9 init accessor).
+	/// When true, the generated setter uses 'init' instead of 'set'.
+	/// </summary>
+	bool IsInitOnly = false) : IEquatable<InterfaceMemberInfo>
 {
 	/// <summary>
 	/// Creates an InterfaceMemberInfo from a property symbol.
@@ -125,6 +130,8 @@ internal sealed record InterfaceMemberInfo(
 			}
 		}
 
+		var isInitOnly = property.SetMethod?.IsInitOnly ?? false;
+
 		return new InterfaceMemberInfo(
 			Name: name,
 			ReturnType: returnType,
@@ -143,7 +150,8 @@ internal sealed record InterfaceMemberInfo(
 			SetterParameterType: setterParameterType,
 			SetterHasDisallowNull: setterHasDisallowNull,
 			SetterHasAllowNull: setterHasAllowNull,
-			IndexerTypeSuffix: indexerTypeSuffix);
+			IndexerTypeSuffix: indexerTypeSuffix,
+			IsInitOnly: isInitOnly);
 	}
 
 	/// <summary>

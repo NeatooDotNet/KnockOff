@@ -65,6 +65,9 @@ partial class SkEventPatternSourceKnockOff
 	/// <summary>Interceptor for ProgressChanged event.</summary>
 	public ProgressChangedInterceptor ProgressChanged { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkEventPatternSource instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkEventPatternSource Object => this;
+
 	event global::System.EventHandler<string>? global::KnockOff.Documentation.Samples.Skills.ISkEventPatternSource.DataReceived
 	{
 		add => DataReceived.RecordAdd(value);

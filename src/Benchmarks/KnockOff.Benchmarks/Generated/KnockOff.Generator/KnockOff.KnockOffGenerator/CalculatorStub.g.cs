@@ -145,6 +145,9 @@ partial class CalculatorStub
 	/// <summary>Interceptor for Square.</summary>
 	public SquareInterceptor Square { get; } = new();
 
+	/// <summary>The global::KnockOff.Benchmarks.Interfaces.ICalculator instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Benchmarks.Interfaces.ICalculator Object => this;
+
 	int global::KnockOff.Benchmarks.Interfaces.ICalculator.Add(int a, int b)
 	{
 		Add.RecordCall(a, b);

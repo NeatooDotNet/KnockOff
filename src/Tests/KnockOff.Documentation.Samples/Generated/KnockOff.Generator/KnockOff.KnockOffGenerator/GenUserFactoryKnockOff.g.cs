@@ -30,6 +30,9 @@ partial class GenUserFactoryKnockOff
 	/// <summary>Interceptor for Create.</summary>
 	public CreateInterceptor Create { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IGenFactory<global::KnockOff.Documentation.Samples.Guides.GenUser> instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IGenFactory<global::KnockOff.Documentation.Samples.Guides.GenUser> Object => this;
+
 	global::KnockOff.Documentation.Samples.Guides.GenUser global::KnockOff.Documentation.Samples.Guides.IGenFactory<global::KnockOff.Documentation.Samples.Guides.GenUser>.Create()
 	{
 		Create.RecordCall();

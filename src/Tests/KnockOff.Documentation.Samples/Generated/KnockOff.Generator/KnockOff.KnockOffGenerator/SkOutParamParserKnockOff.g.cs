@@ -58,6 +58,9 @@ partial class SkOutParamParserKnockOff
 	/// <summary>Interceptor for GetData.</summary>
 	public GetDataInterceptor GetData { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkOutParamParser instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkOutParamParser Object => this;
+
 	bool global::KnockOff.Documentation.Samples.Skills.ISkOutParamParser.TryParse(string input, out int result)
 	{
 		result = default!;

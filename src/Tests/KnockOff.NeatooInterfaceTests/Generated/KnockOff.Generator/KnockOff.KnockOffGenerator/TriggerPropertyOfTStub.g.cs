@@ -74,7 +74,7 @@ partial class TriggerPropertyOfTStub
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for PropertyName.</summary>
+	/// <summary>Interceptor for PropertyName. Configure callbacks and track access.</summary>
 	public PropertyNameInterceptor PropertyName { get; } = new();
 
 	/// <summary>Interceptor for GetValue.</summary>
@@ -82,6 +82,9 @@ partial class TriggerPropertyOfTStub
 
 	/// <summary>Interceptor for IsMatch.</summary>
 	public IsMatchInterceptor IsMatch { get; } = new();
+
+	/// <summary>The global::Neatoo.Rules.ITriggerProperty<global::Neatoo.IValidateBase> instance. Use for passing to code expecting the interface.</summary>
+	public global::Neatoo.Rules.ITriggerProperty<global::Neatoo.IValidateBase> Object => this;
 
 	object? global::Neatoo.Rules.ITriggerProperty<global::Neatoo.IValidateBase>.GetValue(global::Neatoo.IValidateBase target)
 	{

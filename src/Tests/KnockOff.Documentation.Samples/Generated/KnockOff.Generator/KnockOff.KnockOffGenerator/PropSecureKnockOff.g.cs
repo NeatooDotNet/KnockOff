@@ -24,8 +24,11 @@ partial class PropSecureKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for SecretKey.</summary>
+	/// <summary>Interceptor for SecretKey. Configure callbacks and track access.</summary>
 	public SecretKeyInterceptor SecretKey { get; } = new();
+
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IPropSecure instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IPropSecure Object => this;
 
 	string global::KnockOff.Documentation.Samples.Guides.IPropSecure.SecretKey
 	{

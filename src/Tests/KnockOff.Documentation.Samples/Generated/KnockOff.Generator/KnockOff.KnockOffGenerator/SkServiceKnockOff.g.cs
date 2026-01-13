@@ -33,6 +33,9 @@ partial class SkServiceKnockOff
 	/// <summary>Interceptor for GetValue.</summary>
 	public GetValue2Interceptor GetValue2 { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkService Object => this;
+
 	int global::KnockOff.Documentation.Samples.Skills.ISkService.GetValue(int id)
 	{
 		GetValue2.RecordCall(id);

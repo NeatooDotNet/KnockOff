@@ -30,6 +30,9 @@ partial class CovariantStub<T>
 	/// <summary>Interceptor for Get.</summary>
 	public GetInterceptor Get { get; } = new();
 
+	/// <summary>The global::KnockOff.Tests.ICovariantService<T> instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Tests.ICovariantService<T> Object => this;
+
 	T global::KnockOff.Tests.ICovariantService<T>.Get()
 	{
 		Get.RecordCall();

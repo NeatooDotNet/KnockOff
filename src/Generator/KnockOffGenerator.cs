@@ -423,15 +423,30 @@ public partial class KnockOffGenerator : IIncrementalGenerator
 			GenerateFlatEventInterceptorClassWithName(sb, evt, classNameWithTypeParams, interceptorName);
 		}
 
-		// 4. Generate flat interceptor properties directly on stub
+		// 4. Generate public properties and interceptors for properties/indexers
 		foreach (var member in typeInfo.FlatMembers)
 		{
 			if (member.IsProperty || member.IsIndexer)
 			{
-				var interceptorName = flatNameMap[GetMemberKey(member)];
-				sb.AppendLine($"\t/// <summary>Interceptor for {member.Name}.</summary>");
-				sb.AppendLine($"\tpublic {GetNewKeywordIfNeeded(interceptorName)}{interceptorName}Interceptor {interceptorName} {{ get; }} = new();");
-				sb.AppendLine();
+				var baseName = flatNameMap[GetMemberKey(member)];
+
+				if (member.IsIndexer)
+				{
+					// Indexers: class is {baseName}Interceptor, property is {baseName}
+					sb.AppendLine($"\t/// <summary>Interceptor for {member.Name}.</summary>");
+					sb.AppendLine($"\tpublic {GetNewKeywordIfNeeded(baseName)}{baseName}Interceptor {baseName} {{ get; }} = new();");
+					sb.AppendLine();
+				}
+				else if (member.IsInitOnly)
+				{
+					// Init-only: public property with init, backing field, minimal interceptor
+					GenerateFlatInitPropertyWithInterceptor(sb, member, baseName, classNameWithTypeParams);
+				}
+				else
+				{
+					// Regular property: public property delegating to interceptor
+					GenerateFlatRegularPropertyWithInterceptor(sb, member, baseName, classNameWithTypeParams);
+				}
 			}
 		}
 
@@ -483,6 +498,13 @@ public partial class KnockOffGenerator : IIncrementalGenerator
 			sb.AppendLine();
 		}
 
+		// 5. Generate Object property - returns this stub as the primary interface type
+		// Uses the first interface as the primary one (the one directly declared on the stub class)
+		var primaryInterface = typeInfo.Interfaces.GetArray()![0];
+		sb.AppendLine($"\t/// <summary>The {primaryInterface.FullName} instance. Use for passing to code expecting the interface.</summary>");
+		sb.AppendLine($"\tpublic {primaryInterface.FullName} Object => this;");
+		sb.AppendLine();
+
 		// Backing dictionaries for indexers are now inside the interceptor class (Indexer.Backing)
 
 		// 7. Generate explicit interface implementations for ALL members from ALL interfaces
@@ -503,10 +525,11 @@ public partial class KnockOffGenerator : IIncrementalGenerator
 				if (!generatedImplementations.Add(implKey))
 					continue; // Skip duplicates
 
-				var interceptorName = flatNameMap[GetMemberKey(member)];
+				var baseName = flatNameMap[GetMemberKey(member)];
 				if (member.IsIndexer)
 				{
-					GenerateFlatIndexerImplementationWithName(sb, member, interceptorName);
+					// Indexer interceptor property uses same name as baseName
+					GenerateFlatIndexerImplementationWithName(sb, member, baseName);
 				}
 				else if (member.IsProperty)
 				{
@@ -519,7 +542,7 @@ public partial class KnockOffGenerator : IIncrementalGenerator
 					}
 					else
 					{
-						GenerateFlatPropertyImplementationWithName(sb, member, interceptorName);
+						GenerateFlatPropertyImplementationWithName(sb, member, baseName);
 					}
 				}
 				else

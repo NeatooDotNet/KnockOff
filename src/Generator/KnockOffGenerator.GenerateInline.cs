@@ -264,6 +264,9 @@ public partial class KnockOffGenerator
 			}
 
 			// Value property (for stubbing return value)
+			// Note: Value uses { get; set; } even for init properties so it can be assigned from
+			// the explicit interface implementation's init accessor. The init semantics are enforced
+			// at the interface level, not the internal backing storage level.
 			sb.AppendLine($"\t\t\t/// <summary>Value returned by getter when OnGet is not set.</summary>");
 			sb.AppendLine($"\t\t\tpublic {member.ReturnType} Value {{ get; set; }} = default!;");
 			sb.AppendLine();
@@ -733,7 +736,8 @@ public partial class KnockOffGenerator
 		sb.AppendLine($"\t\tpublic class {stubClassName} : {iface.FullName}");
 		sb.AppendLine("\t\t{");
 
-		// Generate intercept properties (using deduplicated members to avoid duplicates)
+		// Generate interceptor properties (using deduplicated members to avoid duplicates)
+		// Property/indexer interceptors use same name: stub.Name, stub.Indexer (no Interceptor suffix)
 		foreach (var member in deduplicatedPropertyMembers)
 		{
 			// For indexers, compute name based on count (single: Indexer, multiple: IndexerString, IndexerInt)
@@ -744,6 +748,7 @@ public partial class KnockOffGenerator
 			sb.AppendLine($"\t\t\tpublic {GetNewKeywordIfNeeded(memberName)}{stubClassName}_{memberName}Interceptor {memberName} {{ get; }} = new();");
 			sb.AppendLine();
 		}
+		// Method interceptors keep method name as property name (no Interceptor suffix)
 		foreach (var group in methodGroups.Values)
 		{
 			if (IsMixedMethodGroup(group))
@@ -765,6 +770,7 @@ public partial class KnockOffGenerator
 				sb.AppendLine();
 			}
 		}
+		// Event interceptors use Interceptor suffix: EventNameInterceptor
 		foreach (var evt in deduplicatedEvents)
 		{
 			sb.AppendLine($"\t\t\t/// <summary>Interceptor for {evt.Name} event.</summary>");
@@ -826,6 +832,11 @@ public partial class KnockOffGenerator
 		{
 			GenerateInlineStubEventImplementation(sb, evt.DeclaringInterfaceFullName, evt, stubClassName);
 		}
+
+		// Generate Object property - returns this stub as the interface type
+		sb.AppendLine($"\t\t\t/// <summary>The {iface.FullName} instance. Use for passing to code expecting the interface.</summary>");
+		sb.AppendLine($"\t\t\tpublic {iface.FullName} Object => this;");
+		sb.AppendLine();
 
 		// Generate SmartDefault helper if interface has generic methods
 		var hasGenericMethods = iface.Members.Any(m => m.IsGenericMethod);
@@ -1008,6 +1019,8 @@ public partial class KnockOffGenerator
 		InterfaceMemberInfo member,
 		string stubClassName)
 	{
+		var interceptorName = member.Name;
+
 		sb.AppendLine($"\t\t\t{member.ReturnType} {interfaceFullName}.{member.Name}");
 		sb.AppendLine("\t\t\t{");
 
@@ -1015,23 +1028,24 @@ public partial class KnockOffGenerator
 		{
 			sb.AppendLine("\t\t\t\tget");
 			sb.AppendLine("\t\t\t\t{");
-			sb.AppendLine($"\t\t\t\t\t{member.Name}.RecordGet();");
-			sb.AppendLine($"\t\t\t\t\tif ({member.Name}.OnGet is {{ }} onGet) return onGet(this);");
-			sb.AppendLine($"\t\t\t\t\treturn {member.Name}.Value;");
+			sb.AppendLine($"\t\t\t\t\t{interceptorName}.RecordGet();");
+			sb.AppendLine($"\t\t\t\t\tif ({interceptorName}.OnGet is {{ }} onGet) return onGet(this);");
+			sb.AppendLine($"\t\t\t\t\treturn {interceptorName}.Value;");
 			sb.AppendLine("\t\t\t\t}");
 		}
 
 		if (member.HasSetter)
 		{
+			var setterKeyword = member.IsInitOnly ? "init" : "set";
 			var pragmaDisable = GetSetterNullabilityAttribute(member);
 			var pragmaRestore = GetSetterNullabilityRestore(member);
 			if (!string.IsNullOrEmpty(pragmaDisable))
 				sb.Append(pragmaDisable);
-			sb.AppendLine("\t\t\t\tset");
+			sb.AppendLine($"\t\t\t\t{setterKeyword}");
 			sb.AppendLine("\t\t\t\t{");
-			sb.AppendLine($"\t\t\t\t\t{member.Name}.RecordSet(value);");
-			sb.AppendLine($"\t\t\t\t\tif ({member.Name}.OnSet is {{ }} onSet) onSet(this, value);");
-			sb.AppendLine($"\t\t\t\t\telse {member.Name}.Value = value;");
+			sb.AppendLine($"\t\t\t\t\t{interceptorName}.RecordSet(value);");
+			sb.AppendLine($"\t\t\t\t\tif ({interceptorName}.OnSet is {{ }} onSet) onSet(this, value);");
+			sb.AppendLine($"\t\t\t\t\telse {interceptorName}.Value = value;");
 			sb.AppendLine("\t\t\t\t}");
 			if (!string.IsNullOrEmpty(pragmaRestore))
 				sb.AppendLine(pragmaRestore);
@@ -1059,6 +1073,7 @@ public partial class KnockOffGenerator
 
 		// Compute indexer name based on count (single: Indexer, multiple: IndexerString, IndexerInt)
 		var indexerName = SymbolHelpers.GetIndexerName(indexerCount, member.IndexerTypeSuffix);
+		var interceptorName = indexerName;
 
 		sb.AppendLine($"\t\t\t{member.ReturnType} {interfaceFullName}.this[{paramList}]");
 		sb.AppendLine("\t\t\t{");
@@ -1068,9 +1083,9 @@ public partial class KnockOffGenerator
 			var defaultExpr = member.IsNullable ? "default" : GetDefaultForType(member.ReturnType, member.DefaultStrategy, member.ConcreteTypeForNew);
 			sb.AppendLine("\t\t\t\tget");
 			sb.AppendLine("\t\t\t\t{");
-			sb.AppendLine($"\t\t\t\t\t{indexerName}.RecordGet({argList});");
-			sb.AppendLine($"\t\t\t\t\tif ({indexerName}.OnGet is {{ }} onGet) return onGet(this, {argList});");
-			sb.AppendLine($"\t\t\t\t\treturn {indexerName}.Backing.TryGetValue({keyArg}, out var v) ? v : {defaultExpr};");
+			sb.AppendLine($"\t\t\t\t\t{interceptorName}.RecordGet({argList});");
+			sb.AppendLine($"\t\t\t\t\tif ({interceptorName}.OnGet is {{ }} onGet) return onGet(this, {argList});");
+			sb.AppendLine($"\t\t\t\t\treturn {interceptorName}.Backing.TryGetValue({keyArg}, out var v) ? v : {defaultExpr};");
 			sb.AppendLine("\t\t\t\t}");
 		}
 
@@ -1078,9 +1093,9 @@ public partial class KnockOffGenerator
 		{
 			sb.AppendLine("\t\t\t\tset");
 			sb.AppendLine("\t\t\t\t{");
-			sb.AppendLine($"\t\t\t\t\t{indexerName}.RecordSet({argList}, value);");
-			sb.AppendLine($"\t\t\t\t\tif ({indexerName}.OnSet is {{ }} onSet) onSet(this, {argList}, value);");
-			sb.AppendLine($"\t\t\t\t\telse {indexerName}.Backing[{keyArg}] = value;");
+			sb.AppendLine($"\t\t\t\t\t{interceptorName}.RecordSet({argList}, value);");
+			sb.AppendLine($"\t\t\t\t\tif ({interceptorName}.OnSet is {{ }} onSet) onSet(this, {argList}, value);");
+			sb.AppendLine($"\t\t\t\t\telse {interceptorName}.Backing[{keyArg}] = value;");
 			sb.AppendLine("\t\t\t\t}");
 		}
 

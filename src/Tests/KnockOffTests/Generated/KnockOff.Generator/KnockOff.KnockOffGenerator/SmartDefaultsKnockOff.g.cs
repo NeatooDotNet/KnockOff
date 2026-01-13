@@ -351,10 +351,10 @@ partial class SmartDefaultsKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Count.</summary>
+	/// <summary>Interceptor for Count. Configure callbacks and track access.</summary>
 	public CountInterceptor Count { get; } = new();
 
-	/// <summary>Interceptor for Items.</summary>
+	/// <summary>Interceptor for Items. Configure callbacks and track access.</summary>
 	public ItemsInterceptor Items { get; } = new();
 
 	/// <summary>Interceptor for GetInt.</summary>
@@ -398,6 +398,9 @@ partial class SmartDefaultsKnockOff
 
 	/// <summary>Interceptor for GetStringAsync.</summary>
 	public GetStringAsyncInterceptor GetStringAsync { get; } = new();
+
+	/// <summary>The global::KnockOff.Tests.ISmartDefaultsService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Tests.ISmartDefaultsService Object => this;
 
 	int global::KnockOff.Tests.ISmartDefaultsService.GetInt()
 	{

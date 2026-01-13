@@ -33,6 +33,9 @@ partial class ComparerStringKnockOff
 	/// <summary>Interceptor for Compare.</summary>
 	public CompareInterceptor Compare { get; } = new();
 
+	/// <summary>The global::System.Collections.Generic.IComparer<string> instance. Use for passing to code expecting the interface.</summary>
+	public global::System.Collections.Generic.IComparer<string> Object => this;
+
 	int global::System.Collections.Generic.IComparer<string>.Compare(string? x, string? y)
 	{
 		Compare.RecordCall(x, y);

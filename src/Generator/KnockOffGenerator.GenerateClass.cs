@@ -152,6 +152,17 @@ public partial class KnockOffGenerator
 		string stubClassName,
 		int indexerCount)
 	{
+		// Check if class has any required properties - need [SetsRequiredMembers] on constructor
+		var requiredMembers = cls.Members.Where(m => m.IsProperty && m.IsRequired).ToList();
+		var hasRequiredMembers = requiredMembers.Count > 0;
+
+		// Suppress CS8618 for classes with required members - the [SetsRequiredMembers] attribute
+		// handles the required constraint, but nullability analysis still complains
+		if (hasRequiredMembers)
+		{
+			sb.AppendLine("#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor");
+		}
+
 		sb.AppendLine($"\t\t\t/// <summary>Internal implementation that inherits from {cls.FullName}.</summary>");
 		sb.AppendLine($"\t\t\tprivate sealed class Impl : {cls.FullName}");
 		sb.AppendLine("\t\t\t{");
@@ -163,7 +174,7 @@ public partial class KnockOffGenerator
 		// Generate constructors that chain to base
 		foreach (var ctor in cls.Constructors)
 		{
-			GenerateClassImplConstructor(sb, ctor, stubClassName, cls.FullName);
+			GenerateClassImplConstructor(sb, ctor, stubClassName, cls.FullName, hasRequiredMembers, requiredMembers);
 		}
 
 		// Generate overrides for properties
@@ -198,6 +209,12 @@ public partial class KnockOffGenerator
 		}
 
 		sb.AppendLine("\t\t\t}");
+
+		// Restore the warning if we disabled it
+		if (hasRequiredMembers)
+		{
+			sb.AppendLine("#pragma warning restore CS8618");
+		}
 	}
 
 	/// <summary>
@@ -255,7 +272,7 @@ public partial class KnockOffGenerator
 
 		if (member.IsIndexer)
 		{
-			GenerateClassIndexerInterceptorMembers(sb, member, stubClassName);
+			GenerateClassIndexerMembers(sb, member, stubClassName);
 		}
 		else
 		{
@@ -314,7 +331,7 @@ public partial class KnockOffGenerator
 	/// <summary>
 	/// Generates indexer interceptor members.
 	/// </summary>
-	private static void GenerateClassIndexerInterceptorMembers(
+	private static void GenerateClassIndexerMembers(
 		System.Text.StringBuilder sb,
 		ClassMemberInfo member,
 		string stubClassName)
@@ -523,15 +540,39 @@ public partial class KnockOffGenerator
 		System.Text.StringBuilder sb,
 		ClassConstructorInfo ctor,
 		string stubClassName,
-		string baseClassName)
+		string baseClassName,
+		bool hasRequiredMembers,
+		IEnumerable<ClassMemberInfo>? requiredMembers = null)
 	{
 		var paramList = ctor.Parameters.Count > 0
 			? $"{stubClassName} stub, " + string.Join(", ", ctor.Parameters.Select(p => $"{p.Type} {p.Name}"))
 			: $"{stubClassName} stub";
 		var argList = string.Join(", ", ctor.Parameters.Select(p => p.Name));
 
+		// Add [SetsRequiredMembers] if the base class has required properties
+		// This allows creating the Impl without providing required values in object initializer
+		if (hasRequiredMembers)
+		{
+			sb.AppendLine("\t\t\t\t[global::System.Diagnostics.CodeAnalysis.SetsRequiredMembers]");
+		}
 		sb.AppendLine($"\t\t\t\tpublic Impl({paramList}) : base({argList})");
 		sb.AppendLine("\t\t\t\t{");
+
+		// Initialize required members FIRST while _stub is still null
+		// This prevents RecordSet from being called during initialization
+		// The [SetsRequiredMembers] attribute tells the compiler we handle them
+		if (requiredMembers != null)
+		{
+			foreach (var member in requiredMembers)
+			{
+				if (member.IsRequired && member.IsProperty && !member.IsIndexer)
+				{
+					sb.AppendLine($"\t\t\t\t\t{member.Name} = default!;");
+				}
+			}
+		}
+
+		// Set _stub AFTER required member initialization so setter recording is skipped
 		sb.AppendLine("\t\t\t\t\t_stub = stub;");
 		sb.AppendLine("\t\t\t\t}");
 		sb.AppendLine();
@@ -546,8 +587,9 @@ public partial class KnockOffGenerator
 		ClassMemberInfo member,
 		string className)
 	{
+		var requiredKeyword = member.IsRequired ? "required " : "";
 		sb.AppendLine($"\t\t\t\t/// <inheritdoc />");
-		sb.AppendLine($"\t\t\t\t{member.AccessModifier} override {member.ReturnType} {member.Name}");
+		sb.AppendLine($"\t\t\t\t{requiredKeyword}{member.AccessModifier} override {member.ReturnType} {member.Name}");
 		sb.AppendLine("\t\t\t\t{");
 
 		if (member.HasGetter)
@@ -570,7 +612,8 @@ public partial class KnockOffGenerator
 
 		if (member.HasSetter)
 		{
-			sb.AppendLine("\t\t\t\t\tset");
+			var setterKeyword = member.IsInitOnly ? "init" : "set";
+			sb.AppendLine($"\t\t\t\t\t{setterKeyword}");
 			sb.AppendLine("\t\t\t\t\t{");
 			// Handle calls from base constructor when _stub is null
 			sb.AppendLine($"\t\t\t\t\t\t_stub?.{member.Name}.RecordSet(value);");

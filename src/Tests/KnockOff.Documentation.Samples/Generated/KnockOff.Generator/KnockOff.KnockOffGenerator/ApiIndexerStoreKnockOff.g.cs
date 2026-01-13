@@ -42,6 +42,9 @@ partial class ApiIndexerStoreKnockOff
 	/// <summary>Interceptor for Indexer.</summary>
 	public IndexerInterceptor Indexer { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Reference.IApiIndexerStore instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Reference.IApiIndexerStore Object => this;
+
 	string? global::KnockOff.Documentation.Samples.Reference.IApiIndexerStore.this[string key]
 	{
 		get { Indexer.RecordGet(key); if (Indexer.OnGet != null) return Indexer.OnGet(this, key); return Indexer.Backing.TryGetValue(key, out var v) ? v : default; }

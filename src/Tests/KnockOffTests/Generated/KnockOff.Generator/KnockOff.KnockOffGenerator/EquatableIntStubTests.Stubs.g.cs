@@ -41,6 +41,9 @@ partial class EquatableIntStubTests
 				return default!;
 			}
 
+			/// <summary>The global::System.IEquatable<int> instance. Use for passing to code expecting the interface.</summary>
+			public global::System.IEquatable<int> Object => this;
+
 		}
 
 	}

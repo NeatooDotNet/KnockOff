@@ -773,6 +773,9 @@ partial class IValidateListBaseOfTTests
 				remove => NeatooPropertyChangedInterceptor.RecordRemove(value);
 			}
 
+			/// <summary>The global::Neatoo.IValidateListBase<global::Neatoo.IValidateBase> instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.IValidateListBase<global::Neatoo.IValidateBase> Object => this;
+
 		}
 
 	}

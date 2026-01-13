@@ -58,6 +58,9 @@ partial class MultiRepositoryKnockOff
 	/// <summary>Interceptor for Add.</summary>
 	public AddInterceptor Add { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IMultiRepository instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IMultiRepository Object => this;
+
 	global::KnockOff.Documentation.Samples.Guides.MultiUser? global::KnockOff.Documentation.Samples.Guides.IMultiRepository.GetById(int id)
 	{
 		GetById.RecordCall(id);

@@ -80,6 +80,9 @@ partial class ApiMethodServiceKnockOff
 	/// <summary>Interceptor for Log.</summary>
 	public LogInterceptor Log { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Reference.IApiMethodService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Reference.IApiMethodService Object => this;
+
 	void global::KnockOff.Documentation.Samples.Reference.IApiMethodService.Initialize()
 	{
 		Initialize.RecordCall();

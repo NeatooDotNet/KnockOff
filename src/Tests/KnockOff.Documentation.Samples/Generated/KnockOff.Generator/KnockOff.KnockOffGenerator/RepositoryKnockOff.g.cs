@@ -30,6 +30,9 @@ partial class RepositoryKnockOff
 	/// <summary>Interceptor for Save.</summary>
 	public SaveInterceptor Save { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.GettingStarted.IRepository instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.GettingStarted.IRepository Object => this;
+
 	void global::KnockOff.Documentation.Samples.GettingStarted.IRepository.Save(object entity)
 	{
 		Save.RecordCall(entity);

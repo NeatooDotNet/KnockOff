@@ -55,6 +55,9 @@ partial class StructConstraintStub<T> where T : struct
 	/// <summary>Interceptor for Set.</summary>
 	public SetInterceptor Set { get; } = new();
 
+	/// <summary>The global::KnockOff.Tests.IStructConstraintService<T> instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Tests.IStructConstraintService<T> Object => this;
+
 	T global::KnockOff.Tests.IStructConstraintService<T>.GetDefault()
 	{
 		GetDefault.RecordCall();

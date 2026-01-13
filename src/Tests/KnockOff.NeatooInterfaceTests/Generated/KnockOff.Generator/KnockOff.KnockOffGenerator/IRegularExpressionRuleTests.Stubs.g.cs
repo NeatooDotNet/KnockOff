@@ -294,6 +294,9 @@ partial class IRegularExpressionRuleTests
 				}
 			}
 
+			/// <summary>The global::Neatoo.Rules.Rules.IRegularExpressionRule instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.Rules.Rules.IRegularExpressionRule Object => this;
+
 		}
 
 	}

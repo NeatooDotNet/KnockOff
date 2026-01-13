@@ -33,6 +33,9 @@ partial class VsEmployeeRepoKnockOff
 	/// <summary>Interceptor for GetEmployee.</summary>
 	public GetEmployeeInterceptor GetEmployee { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IVsEmployeeRepository instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Comparison.IVsEmployeeRepository Object => this;
+
 	global::KnockOff.Documentation.Samples.Comparison.VsUser? global::KnockOff.Documentation.Samples.Comparison.IVsEmployeeRepository.GetEmployee(int id)
 	{
 		GetEmployee.RecordCall(id);

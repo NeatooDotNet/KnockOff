@@ -22,18 +22,13 @@ This guide helps you migrate from Moq to KnockOff for interface stubbing.
 
 **Before (Moq):**
 
-<!-- pseudo:moq-create-mock -->
-```csharp
-var mock = new Mock<IUserService>();
-```
-<!-- /snippet -->
-
-**After (KnockOff):**
-
-<!-- snippet: migration-from-moq-create-knockoff-class -->
+<!-- snippet: moq-create-mock -->
 ```cs
-[KnockOff]
-public partial class MigUserServiceKnockOff : IMigUserService { }
+public void CreateMock()
+{
+    var mock = new Mock<IMoqMigUserService>();
+    _ = mock;
+}
 ```
 <!-- endSnippet -->
 
@@ -47,19 +42,19 @@ public partial class MigUserServiceKnockOff : IMigUserService { }
 
 **Before (Moq):**
 
-<!-- pseudo:moq-mock-object -->
-```csharp
-var service = mock.Object;
-DoSomething(mock.Object);
-```
-<!-- /snippet -->
-
-**After (KnockOff):**
-<!-- snippet: migration-from-moq-replace-mock-object -->
+<!-- snippet: moq-mock-object -->
 ```cs
-// IMigUserService service = knockOff;
-// // or
-// DoSomething(knockOff.AsIMigUserService());
+public void MockObject()
+{
+    var mock = new Mock<IMoqMigUserService>();
+
+    var service = mock.Object;
+    DoSomething(mock.Object);
+
+    _ = service;
+}
+
+private static void DoSomething(IMoqMigUserService service) { }
 ```
 <!-- endSnippet -->
 
@@ -67,18 +62,15 @@ DoSomething(mock.Object);
 
 **Before (Moq):**
 
-<!-- pseudo:moq-setup-returns -->
-```csharp
-mock.Setup(x => x.GetUser(It.IsAny<int>()))
-    .Returns(new User { Id = 1, Name = "Test" });
-```
-<!-- /snippet -->
-
-**After (KnockOff):**
-<!-- snippet: migration-from-moq-convert-setup-returns -->
+<!-- snippet: moq-setup-returns -->
 ```cs
-// knockOff.GetUser.OnCall = (ko, id) =>
-//     new User { Id = id, Name = "Test" };
+public void SetupReturns()
+{
+    var mock = new Mock<IMoqMigUserService>();
+
+    mock.Setup(x => x.GetUser(It.IsAny<int>()))
+        .Returns(new MoqMigUser { Id = 1, Name = "Test" });
+}
 ```
 <!-- endSnippet -->
 
@@ -86,18 +78,15 @@ mock.Setup(x => x.GetUser(It.IsAny<int>()))
 
 **Before (Moq):**
 
-<!-- pseudo:moq-async-returns -->
-```csharp
-mock.Setup(x => x.GetUserAsync(It.IsAny<int>()))
-    .ReturnsAsync(new User { Id = 1 });
-```
-<!-- /snippet -->
-
-**After (KnockOff):**
-<!-- snippet: migration-from-moq-convert-async-returns -->
+<!-- snippet: moq-async-returns -->
 ```cs
-// knockOff.GetUserAsync.OnCall = (ko, id) =>
-//     Task.FromResult<User?>(new User { Id = id });
+public void AsyncReturns()
+{
+    var mock = new Mock<IMoqMigUserService>();
+
+    mock.Setup(x => x.GetUserAsync(It.IsAny<int>()))
+        .ReturnsAsync(new MoqMigUser { Id = 1 });
+}
 ```
 <!-- endSnippet -->
 
@@ -105,22 +94,23 @@ mock.Setup(x => x.GetUserAsync(It.IsAny<int>()))
 
 **Before (Moq):**
 
-<!-- pseudo:moq-verification -->
-```csharp
-mock.Verify(x => x.Save(It.IsAny<User>()), Times.Once);
-mock.Verify(x => x.Delete(It.IsAny<int>()), Times.Never);
-mock.Verify(x => x.GetAll(), Times.AtLeastOnce);
-mock.Verify(x => x.Update(It.IsAny<User>()), Times.Exactly(3));
-```
-<!-- /snippet -->
-
-**After (KnockOff):**
-<!-- snippet: migration-from-moq-convert-verification -->
+<!-- snippet: moq-verification -->
 ```cs
-// Assert.Equal(1, knockOff.Save.CallCount);
-// Assert.Equal(0, knockOff.Delete.CallCount);
-// Assert.True(knockOff.GetAll.WasCalled);
-// Assert.Equal(3, knockOff.Update.CallCount);
+public void Verification()
+{
+    var mock = new Mock<IMoqMigUserService>();
+
+    mock.Object.Save(new MoqMigUser());
+    mock.Object.GetAll();
+    mock.Object.Update(new MoqMigUser());
+    mock.Object.Update(new MoqMigUser());
+    mock.Object.Update(new MoqMigUser());
+
+    mock.Verify(x => x.Save(It.IsAny<MoqMigUser>()), Times.Once);
+    mock.Verify(x => x.Delete(It.IsAny<int>()), Times.Never);
+    mock.Verify(x => x.GetAll(), Times.AtLeastOnce);
+    mock.Verify(x => x.Update(It.IsAny<MoqMigUser>()), Times.Exactly(3));
+}
 ```
 <!-- endSnippet -->
 
@@ -128,25 +118,18 @@ mock.Verify(x => x.Update(It.IsAny<User>()), Times.Exactly(3));
 
 **Before (Moq):**
 
-<!-- pseudo:moq-callback -->
-```csharp
-User? captured = null;
-mock.Setup(x => x.Save(It.IsAny<User>()))
-    .Callback<User>(u => captured = u);
-```
-<!-- /snippet -->
-
-**After (KnockOff):**
-<!-- snippet: migration-from-moq-convert-callback -->
+<!-- snippet: moq-callback -->
 ```cs
-// // Arguments are captured automatically
-// var captured = knockOff.Save.LastCallArg;
-//
-// // Or use callback for custom logic
-// knockOff.Save.OnCall = (ko, user) =>
-// {
-//     customList.Add(user);
-// };
+public void Callback()
+{
+    MoqMigUser? captured = null;
+    var mock = new Mock<IMoqMigUserService>();
+
+    mock.Setup(x => x.Save(It.IsAny<MoqMigUser>()))
+        .Callback<MoqMigUser>(u => captured = u);
+
+    _ = captured;
+}
 ```
 <!-- endSnippet -->
 
@@ -154,21 +137,15 @@ mock.Setup(x => x.Save(It.IsAny<User>()))
 
 **Before (Moq):**
 
-<!-- pseudo:moq-property-setup -->
-```csharp
-mock.Setup(x => x.Name).Returns("Test");
-mock.SetupSet(x => x.Name = It.IsAny<string>()).Verifiable();
-```
-<!-- /snippet -->
-
-**After (KnockOff):**
-<!-- snippet: migration-from-moq-convert-property-setup -->
+<!-- snippet: moq-property-setup -->
 ```cs
-// knockOff.Name.OnGet = (ko) => "Test";
-//
-// // Setter tracking is automatic
-// service.Name = "Value";
-// Assert.Equal("Value", knockOff.Name.LastSetValue);
+public void PropertySetup()
+{
+    var mock = new Mock<IMoqMigUserService>();
+
+    mock.Setup(x => x.Name).Returns("Test");
+    mock.SetupSet(x => x.Name = It.IsAny<string>()).Verifiable();
+}
 ```
 <!-- endSnippet -->
 
@@ -178,20 +155,13 @@ mock.SetupSet(x => x.Name = It.IsAny<string>()).Verifiable();
 
 **Moq:**
 
-<!-- pseudo:moq-static-returns -->
-```csharp
-mock.Setup(x => x.GetConfig()).Returns(new Config { Timeout = 30 });
-```
-<!-- /snippet -->
-
-**KnockOff Option 1 - User Method (compile-time):**
-
-<!-- snippet: migration-from-moq-static-returns-user-method -->
+<!-- snippet: moq-static-returns -->
 ```cs
-[KnockOff]
-public partial class MigConfigServiceKnockOff : IMigConfigService
+public void StaticReturns()
 {
-    protected MigConfig GetConfig() => new MigConfig { Timeout = 30 };
+    var mock = new Mock<IMoqMigConfigService>();
+
+    mock.Setup(x => x.GetConfig()).Returns(new MoqMigConfig { Timeout = 30 });
 }
 ```
 <!-- endSnippet -->
@@ -207,23 +177,16 @@ public partial class MigConfigServiceKnockOff : IMigConfigService
 
 **Moq:**
 
-<!-- pseudo:moq-conditional-returns -->
-```csharp
-mock.Setup(x => x.GetUser(1)).Returns(new User { Name = "Admin" });
-mock.Setup(x => x.GetUser(2)).Returns(new User { Name = "Guest" });
-mock.Setup(x => x.GetUser(It.IsAny<int>())).Returns((User?)null);
-```
-<!-- /snippet -->
-
-**KnockOff:**
-<!-- snippet: migration-from-moq-conditional-returns -->
+<!-- snippet: moq-conditional-returns -->
 ```cs
-// knockOff.GetUser.OnCall = (ko, id) => id switch
-// {
-//     1 => new User { Name = "Admin" },
-//     2 => new User { Name = "Guest" },
-//     _ => null
-// };
+public void ConditionalReturns()
+{
+    var mock = new Mock<IMoqMigUserService>();
+
+    mock.Setup(x => x.GetUser(1)).Returns(new MoqMigUser { Name = "Admin" });
+    mock.Setup(x => x.GetUser(2)).Returns(new MoqMigUser { Name = "Guest" });
+    mock.Setup(x => x.GetUser(It.IsAny<int>())).Returns((MoqMigUser?)null);
+}
 ```
 <!-- endSnippet -->
 
@@ -231,18 +194,14 @@ mock.Setup(x => x.GetUser(It.IsAny<int>())).Returns((User?)null);
 
 **Moq:**
 
-<!-- pseudo:moq-throwing-exceptions -->
-```csharp
-mock.Setup(x => x.Connect()).Throws(new TimeoutException());
-```
-<!-- /snippet -->
-
-**KnockOff:**
-
-<!-- snippet: migration-from-moq-throwing-exceptions -->
+<!-- snippet: moq-throwing-exceptions -->
 ```cs
-[KnockOff]
-public partial class MigConnectionKnockOff : IMigConnection { }
+public void ThrowingExceptions()
+{
+    var mock = new Mock<IMoqMigConnection>();
+
+    mock.Setup(x => x.Connect()).Throws(new TimeoutException());
+}
 ```
 <!-- endSnippet -->
 
@@ -257,21 +216,17 @@ public partial class MigConnectionKnockOff : IMigConnection { }
 
 **Moq:**
 
-<!-- pseudo:moq-setup-sequence -->
-```csharp
-mock.SetupSequence(x => x.GetNext())
-    .Returns(1)
-    .Returns(2)
-    .Returns(3);
-```
-<!-- /snippet -->
-
-**KnockOff:**
-
-<!-- snippet: migration-from-moq-sequential-returns -->
+<!-- snippet: moq-setup-sequence -->
 ```cs
-[KnockOff]
-public partial class MigSequenceKnockOff : IMigSequence { }
+public void SetupSequence()
+{
+    var mock = new Mock<IMoqMigSequence>();
+
+    mock.SetupSequence(x => x.GetNext())
+        .Returns(1)
+        .Returns(2)
+        .Returns(3);
+}
 ```
 <!-- endSnippet -->
 
@@ -286,27 +241,20 @@ public partial class MigSequenceKnockOff : IMigSequence { }
 
 **Moq:**
 
-<!-- pseudo:moq-multiple-interfaces-as -->
-```csharp
-var mock = new Mock<IRepository>();
-mock.As<IUnitOfWork>()
-    .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
-    .ReturnsAsync(1);
-
-var repo = mock.Object;
-var uow = mock.As<IUnitOfWork>().Object;
-```
-<!-- /snippet -->
-
-**KnockOff:**
-
-<!-- snippet: migration-from-moq-multiple-interfaces -->
+<!-- snippet: moq-multiple-interfaces-as -->
 ```cs
-[KnockOff]
-public partial class MigRepositoryKnockOff : IMigRepository { }
+public void MultipleInterfacesAs()
+{
+    var mock = new Mock<IMoqMigRepository>();
+    mock.As<IMoqMigUnitOfWork>()
+        .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+        .ReturnsAsync(1);
 
-[KnockOff]
-public partial class MigUnitOfWorkKnockOff : IMigUnitOfWork { }
+    var repo = mock.Object;
+    var uow = mock.As<IMoqMigUnitOfWork>().Object;
+
+    _ = (repo, uow);
+}
 ```
 <!-- endSnippet -->
 
@@ -326,19 +274,16 @@ public partial class MigUnitOfWorkKnockOff : IMigUnitOfWork { }
 
 **Moq:**
 
-<!-- pseudo:moq-argument-matching -->
-```csharp
-mock.Setup(x => x.Log(It.Is<string>(s => s.Contains("error"))))
-    .Callback<string>(s => errors.Add(s));
-```
-<!-- /snippet -->
-
-**KnockOff:**
-
-<!-- snippet: migration-from-moq-argument-matching -->
+<!-- snippet: moq-argument-matching -->
 ```cs
-[KnockOff]
-public partial class MigLoggerKnockOff : IMigLogger { }
+public void ArgumentMatching()
+{
+    var errors = new List<string>();
+    var mock = new Mock<IMoqMigLogger>();
+
+    mock.Setup(x => x.Log(It.Is<string>(s => s.Contains("error"))))
+        .Callback<string>(s => errors.Add(s));
+}
 ```
 <!-- endSnippet -->
 
@@ -456,14 +401,19 @@ Some features aren't in KnockOff yet. Keep using Moq for:
 
 You can use both in the same project:
 
-<!-- pseudo:gradual-migration -->
-```csharp
-// New tests use KnockOff
-var userKnockOff = new UserServiceKnockOff();
+<!-- snippet: gradual-migration -->
+```cs
+public void GradualMigration()
+{
+    // New tests use KnockOff
+    var userKnockOff = new MigUserServiceKnockOff();
 
-// Legacy tests keep Moq (until migrated)
-var orderMock = new Mock<IOrderService>();
+    // Legacy tests keep Moq (until migrated)
+    var orderMock = new Mock<IMoqMigOrderService>();
+
+    _ = (userKnockOff, orderMock);
+}
 ```
-<!-- /snippet -->
+<!-- endSnippet -->
 
 Migrate incrementally as you touch tests.

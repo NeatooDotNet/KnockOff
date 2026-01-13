@@ -489,6 +489,9 @@ partial class InlineValidateContainer
 				remove => NeatooPropertyChangedInterceptor.RecordRemove(value);
 			}
 
+			/// <summary>The global::Neatoo.IValidateBase instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.IValidateBase Object => this;
+
 		}
 
 	}

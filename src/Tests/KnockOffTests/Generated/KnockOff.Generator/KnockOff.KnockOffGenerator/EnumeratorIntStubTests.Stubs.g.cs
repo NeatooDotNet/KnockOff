@@ -127,6 +127,9 @@ partial class EnumeratorIntStubTests
 				if (Dispose.OnCall is { } onCall) onCall(this);
 			}
 
+			/// <summary>The global::System.Collections.Generic.IEnumerator<int> instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Collections.Generic.IEnumerator<int> Object => this;
+
 		}
 
 	}

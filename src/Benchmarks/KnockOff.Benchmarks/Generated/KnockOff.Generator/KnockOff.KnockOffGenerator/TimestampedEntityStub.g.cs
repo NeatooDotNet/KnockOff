@@ -62,14 +62,17 @@ partial class TimestampedEntityStub
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for CreatedAt.</summary>
+	/// <summary>Interceptor for CreatedAt. Configure callbacks and track access.</summary>
 	public CreatedAtInterceptor CreatedAt { get; } = new();
 
-	/// <summary>Interceptor for UpdatedAt.</summary>
+	/// <summary>Interceptor for UpdatedAt. Configure callbacks and track access.</summary>
 	public UpdatedAtInterceptor UpdatedAt { get; } = new();
 
-	/// <summary>Interceptor for Id.</summary>
+	/// <summary>Interceptor for Id. Configure callbacks and track access.</summary>
 	public IdInterceptor Id { get; } = new();
+
+	/// <summary>The global::KnockOff.Benchmarks.Interfaces.ITimestampedEntity instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Benchmarks.Interfaces.ITimestampedEntity Object => this;
 
 	global::System.DateTime global::KnockOff.Benchmarks.Interfaces.ITimestampedEntity.CreatedAt
 	{

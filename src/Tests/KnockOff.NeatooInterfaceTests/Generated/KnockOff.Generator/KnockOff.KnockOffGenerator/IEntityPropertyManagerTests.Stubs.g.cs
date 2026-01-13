@@ -640,6 +640,9 @@ partial class IEntityPropertyManagerTests
 				remove => PropertyChangedInterceptor.RecordRemove(value);
 			}
 
+			/// <summary>The global::Neatoo.IEntityPropertyManager instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.IEntityPropertyManager Object => this;
+
 		}
 
 	}

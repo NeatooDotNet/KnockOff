@@ -86,14 +86,17 @@ partial class PropPersonKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for FirstName.</summary>
+	/// <summary>Interceptor for FirstName. Configure callbacks and track access.</summary>
 	public FirstNameInterceptor FirstName { get; } = new();
 
-	/// <summary>Interceptor for LastName.</summary>
+	/// <summary>Interceptor for LastName. Configure callbacks and track access.</summary>
 	public LastNameInterceptor LastName { get; } = new();
 
-	/// <summary>Interceptor for FullName.</summary>
+	/// <summary>Interceptor for FullName. Configure callbacks and track access.</summary>
 	public FullNameInterceptor FullName { get; } = new();
+
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IPropPerson instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IPropPerson Object => this;
 
 	string global::KnockOff.Documentation.Samples.Guides.IPropPerson.FirstName
 	{

@@ -77,14 +77,17 @@ partial class PropertyServiceStub
 		public void Reset() { SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for Name.</summary>
+	/// <summary>Interceptor for Name. Configure callbacks and track access.</summary>
 	public NameInterceptor Name { get; } = new();
 
-	/// <summary>Interceptor for ReadOnlyValue.</summary>
+	/// <summary>Interceptor for ReadOnlyValue. Configure callbacks and track access.</summary>
 	public ReadOnlyValueInterceptor ReadOnlyValue { get; } = new();
 
-	/// <summary>Interceptor for WriteOnlyValue.</summary>
+	/// <summary>Interceptor for WriteOnlyValue. Configure callbacks and track access.</summary>
 	public WriteOnlyValueInterceptor WriteOnlyValue { get; } = new();
+
+	/// <summary>The global::KnockOff.Benchmarks.Interfaces.IPropertyService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Benchmarks.Interfaces.IPropertyService Object => this;
 
 	string global::KnockOff.Benchmarks.Interfaces.IPropertyService.Name
 	{

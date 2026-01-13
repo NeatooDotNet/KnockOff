@@ -98,6 +98,9 @@ partial class AttributeToRuleStub
 	/// <summary>Interceptor for GetRule (use .Of&lt;T&gt;() to access typed handler).</summary>
 	public GetRuleInterceptor GetRule { get; } = new();
 
+	/// <summary>The global::Neatoo.Rules.Rules.IAttributeToRule instance. Use for passing to code expecting the interface.</summary>
+	public global::Neatoo.Rules.Rules.IAttributeToRule Object => this;
+
 	global::Neatoo.Rules.IRule? global::Neatoo.Rules.Rules.IAttributeToRule.GetRule<T>(global::Neatoo.IPropertyInfo r, object? attribute) where T : class
 	{
 		GetRule.Of<T>().RecordCall(r, attribute);

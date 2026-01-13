@@ -215,6 +215,9 @@ partial class GenericMethodWithUserMethodKnockOff
 	/// <summary>Interceptor for Convert (use .Of&lt;T&gt;() to access typed handler).</summary>
 	public Convert2Interceptor Convert2 { get; } = new();
 
+	/// <summary>The global::KnockOff.Tests.IGenericMethodWithUserMethod instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Tests.IGenericMethodWithUserMethod Object => this;
+
 	T global::KnockOff.Tests.IGenericMethodWithUserMethod.Create<T>()
 	{
 		Create2.Of<T>().RecordCall();

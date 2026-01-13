@@ -29,6 +29,9 @@ partial class NestedKnockOff
 	/// <summary>Interceptor for DoWork.</summary>
 	public DoWorkInterceptor DoWork { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Reference.IAttrService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Reference.IAttrService Object => this;
+
 	void global::KnockOff.Documentation.Samples.Reference.IAttrService.DoWork()
 	{
 		DoWork.RecordCall();

@@ -27,6 +27,9 @@ partial class DisposableKnockOff
 	/// <summary>Interceptor for Dispose.</summary>
 	public DisposeInterceptor Dispose { get; } = new();
 
+	/// <summary>The global::System.IDisposable instance. Use for passing to code expecting the interface.</summary>
+	public global::System.IDisposable Object => this;
+
 	void global::System.IDisposable.Dispose()
 	{
 		Dispose.RecordCall();

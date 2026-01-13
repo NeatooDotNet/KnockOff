@@ -67,6 +67,9 @@ partial class CacheStub
 	/// <summary>Interceptor for Indexer.</summary>
 	public IndexerInt32Interceptor IndexerInt32 { get; } = new();
 
+	/// <summary>The global::KnockOff.Benchmarks.Interfaces.ICache instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Benchmarks.Interfaces.ICache Object => this;
+
 	object global::KnockOff.Benchmarks.Interfaces.ICache.this[string key]
 	{
 		get { IndexerString.RecordGet(key); if (IndexerString.OnGet != null) return IndexerString.OnGet(this, key); return IndexerString.Backing.TryGetValue(key, out var v) ? v : new object(); }

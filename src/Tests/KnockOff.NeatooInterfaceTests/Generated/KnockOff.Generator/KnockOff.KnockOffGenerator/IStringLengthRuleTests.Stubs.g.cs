@@ -326,6 +326,9 @@ partial class IStringLengthRuleTests
 				}
 			}
 
+			/// <summary>The global::Neatoo.Rules.Rules.IStringLengthRule instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.Rules.Rules.IStringLengthRule Object => this;
+
 		}
 
 	}

@@ -380,25 +380,25 @@ partial class ValidateBaseStubForList
 		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
 	}
 
-	/// <summary>Interceptor for Parent.</summary>
+	/// <summary>Interceptor for Parent. Configure callbacks and track access.</summary>
 	public ParentInterceptor Parent { get; } = new();
 
-	/// <summary>Interceptor for IsPaused.</summary>
+	/// <summary>Interceptor for IsPaused. Configure callbacks and track access.</summary>
 	public IsPausedInterceptor IsPaused { get; } = new();
 
 	/// <summary>Interceptor for Indexer.</summary>
 	public IndexerInterceptor Indexer { get; } = new();
 
-	/// <summary>Interceptor for IsBusy.</summary>
+	/// <summary>Interceptor for IsBusy. Configure callbacks and track access.</summary>
 	public IsBusyInterceptor IsBusy { get; } = new();
 
-	/// <summary>Interceptor for IsValid.</summary>
+	/// <summary>Interceptor for IsValid. Configure callbacks and track access.</summary>
 	public IsValidInterceptor IsValid { get; } = new();
 
-	/// <summary>Interceptor for IsSelfValid.</summary>
+	/// <summary>Interceptor for IsSelfValid. Configure callbacks and track access.</summary>
 	public IsSelfValidInterceptor IsSelfValid { get; } = new();
 
-	/// <summary>Interceptor for PropertyMessages.</summary>
+	/// <summary>Interceptor for PropertyMessages. Configure callbacks and track access.</summary>
 	public PropertyMessagesInterceptor PropertyMessages { get; } = new();
 
 	/// <summary>Interceptor for GetProperty.</summary>
@@ -430,6 +430,9 @@ partial class ValidateBaseStubForList
 
 	/// <summary>Interceptor for NeatooPropertyChanged event.</summary>
 	public NeatooPropertyChangedInterceptor NeatooPropertyChanged { get; } = new();
+
+	/// <summary>The global::Neatoo.IValidateBase instance. Use for passing to code expecting the interface.</summary>
+	public global::Neatoo.IValidateBase Object => this;
 
 	global::Neatoo.IValidateProperty global::Neatoo.IValidateBase.GetProperty(string propertyName)
 	{

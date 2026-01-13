@@ -105,7 +105,7 @@ partial class GenericRepositoryStub<T> where T : class
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Count.</summary>
+	/// <summary>Interceptor for Count. Configure callbacks and track access.</summary>
 	public CountInterceptor Count { get; } = new();
 
 	/// <summary>Interceptor for GetById.</summary>
@@ -116,6 +116,9 @@ partial class GenericRepositoryStub<T> where T : class
 
 	/// <summary>Interceptor for GetAll.</summary>
 	public GetAllInterceptor GetAll { get; } = new();
+
+	/// <summary>The global::KnockOff.Tests.IGenericRepository<T> instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Tests.IGenericRepository<T> Object => this;
 
 	T? global::KnockOff.Tests.IGenericRepository<T>.GetById(int id)
 	{

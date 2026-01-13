@@ -153,6 +153,9 @@ partial class DbTransactionStubTests
 				if (Dispose.OnCall is { } onCall) onCall(this);
 			}
 
+			/// <summary>The global::System.Data.IDbTransaction instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Data.IDbTransaction Object => this;
+
 		}
 
 	}

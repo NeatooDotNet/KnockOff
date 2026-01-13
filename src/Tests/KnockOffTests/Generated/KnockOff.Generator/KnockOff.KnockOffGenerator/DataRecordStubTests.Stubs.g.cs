@@ -773,6 +773,9 @@ partial class DataRecordStubTests
 				}
 			}
 
+			/// <summary>The global::System.Data.IDataRecord instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Data.IDataRecord Object => this;
+
 		}
 
 	}

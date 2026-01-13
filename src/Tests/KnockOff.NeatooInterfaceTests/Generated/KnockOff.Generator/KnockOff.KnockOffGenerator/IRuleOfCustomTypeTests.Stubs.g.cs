@@ -235,6 +235,9 @@ partial class IRuleOfCustomTypeTests
 				}
 			}
 
+			/// <summary>The global::Neatoo.Rules.IRule<global::KnockOff.NeatooInterfaceTests.ValidationRules.ICustomValidateBase> instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.Rules.IRule<global::KnockOff.NeatooInterfaceTests.ValidationRules.ICustomValidateBase> Object => this;
+
 		}
 
 	}

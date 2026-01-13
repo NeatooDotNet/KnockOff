@@ -138,26 +138,29 @@ partial class EntityMetaPropertiesStub
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for IsChild.</summary>
+	/// <summary>Interceptor for IsChild. Configure callbacks and track access.</summary>
 	public IsChildInterceptor IsChild { get; } = new();
 
-	/// <summary>Interceptor for IsModified.</summary>
+	/// <summary>Interceptor for IsModified. Configure callbacks and track access.</summary>
 	public IsModifiedInterceptor IsModified { get; } = new();
 
-	/// <summary>Interceptor for IsSelfModified.</summary>
+	/// <summary>Interceptor for IsSelfModified. Configure callbacks and track access.</summary>
 	public IsSelfModifiedInterceptor IsSelfModified { get; } = new();
 
-	/// <summary>Interceptor for IsMarkedModified.</summary>
+	/// <summary>Interceptor for IsMarkedModified. Configure callbacks and track access.</summary>
 	public IsMarkedModifiedInterceptor IsMarkedModified { get; } = new();
 
-	/// <summary>Interceptor for IsSavable.</summary>
+	/// <summary>Interceptor for IsSavable. Configure callbacks and track access.</summary>
 	public IsSavableInterceptor IsSavable { get; } = new();
 
-	/// <summary>Interceptor for IsDeleted.</summary>
+	/// <summary>Interceptor for IsDeleted. Configure callbacks and track access.</summary>
 	public IsDeletedInterceptor IsDeleted { get; } = new();
 
-	/// <summary>Interceptor for IsNew.</summary>
+	/// <summary>Interceptor for IsNew. Configure callbacks and track access.</summary>
 	public IsNewInterceptor IsNew { get; } = new();
+
+	/// <summary>The global::Neatoo.IEntityMetaProperties instance. Use for passing to code expecting the interface.</summary>
+	public global::Neatoo.IEntityMetaProperties Object => this;
 
 	bool global::Neatoo.IEntityMetaProperties.IsChild
 	{

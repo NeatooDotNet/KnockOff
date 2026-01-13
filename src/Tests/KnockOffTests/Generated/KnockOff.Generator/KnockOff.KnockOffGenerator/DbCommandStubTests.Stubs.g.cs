@@ -542,6 +542,9 @@ partial class DbCommandStubTests
 				if (Dispose.OnCall is { } onCall) onCall(this);
 			}
 
+			/// <summary>The global::System.Data.IDbCommand instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Data.IDbCommand Object => this;
+
 		}
 
 	}

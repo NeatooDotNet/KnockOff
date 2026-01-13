@@ -421,34 +421,34 @@ partial class ValidatePropertyStubForManager
 		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
 	}
 
-	/// <summary>Interceptor for Name.</summary>
+	/// <summary>Interceptor for Name. Configure callbacks and track access.</summary>
 	public NameInterceptor Name { get; } = new();
 
-	/// <summary>Interceptor for Value.</summary>
+	/// <summary>Interceptor for Value. Configure callbacks and track access.</summary>
 	public ValueInterceptor Value { get; } = new();
 
-	/// <summary>Interceptor for Task.</summary>
+	/// <summary>Interceptor for Task. Configure callbacks and track access.</summary>
 	public TaskInterceptor Task { get; } = new();
 
-	/// <summary>Interceptor for IsBusy.</summary>
+	/// <summary>Interceptor for IsBusy. Configure callbacks and track access.</summary>
 	public IsBusyInterceptor IsBusy { get; } = new();
 
-	/// <summary>Interceptor for IsReadOnly.</summary>
+	/// <summary>Interceptor for IsReadOnly. Configure callbacks and track access.</summary>
 	public IsReadOnlyInterceptor IsReadOnly { get; } = new();
 
-	/// <summary>Interceptor for Type.</summary>
+	/// <summary>Interceptor for Type. Configure callbacks and track access.</summary>
 	public TypeInterceptor Type { get; } = new();
 
-	/// <summary>Interceptor for StringValue.</summary>
+	/// <summary>Interceptor for StringValue. Configure callbacks and track access.</summary>
 	public StringValueInterceptor StringValue { get; } = new();
 
-	/// <summary>Interceptor for IsSelfValid.</summary>
+	/// <summary>Interceptor for IsSelfValid. Configure callbacks and track access.</summary>
 	public IsSelfValidInterceptor IsSelfValid { get; } = new();
 
-	/// <summary>Interceptor for IsValid.</summary>
+	/// <summary>Interceptor for IsValid. Configure callbacks and track access.</summary>
 	public IsValidInterceptor IsValid { get; } = new();
 
-	/// <summary>Interceptor for PropertyMessages.</summary>
+	/// <summary>Interceptor for PropertyMessages. Configure callbacks and track access.</summary>
 	public PropertyMessagesInterceptor PropertyMessages { get; } = new();
 
 	/// <summary>Interceptor for SetValue.</summary>
@@ -477,6 +477,9 @@ partial class ValidatePropertyStubForManager
 
 	/// <summary>Interceptor for NeatooPropertyChanged event.</summary>
 	public NeatooPropertyChangedInterceptor NeatooPropertyChanged { get; } = new();
+
+	/// <summary>The global::Neatoo.IValidateProperty instance. Use for passing to code expecting the interface.</summary>
+	public global::Neatoo.IValidateProperty Object => this;
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateProperty.SetValue(object? newValue)
 	{

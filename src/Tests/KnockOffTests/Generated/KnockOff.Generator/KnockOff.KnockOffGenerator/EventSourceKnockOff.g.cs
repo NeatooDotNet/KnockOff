@@ -125,6 +125,9 @@ partial class EventSourceKnockOff
 	/// <summary>Interceptor for OnData event.</summary>
 	public OnDataInterceptor OnData { get; } = new();
 
+	/// <summary>The global::KnockOff.Tests.IEventSource instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Tests.IEventSource Object => this;
+
 	event global::System.EventHandler<string>? global::KnockOff.Tests.IEventSource.MessageReceived
 	{
 		add => MessageReceived.RecordAdd(value);

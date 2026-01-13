@@ -15,6 +15,8 @@
 /// are defined separately to make the code compile.
 /// </summary>
 
+using Xunit;
+
 namespace KnockOff.Documentation.Samples.ReadMe;
 
 // ============================================================================
@@ -208,15 +210,15 @@ public class VerificationUsageExample
         service.GetDescription(42);
 
         // Assert method calls
-        System.Diagnostics.Debug.Assert(stub.GetDescription.WasCalled);
-        System.Diagnostics.Debug.Assert(stub.GetDescription.CallCount == 3);
-        System.Diagnostics.Debug.Assert(stub.GetDescription.LastCallArg == 42);
+        Assert.True(stub.GetDescription.WasCalled);
+        Assert.Equal(3, stub.GetDescription.CallCount);
+        Assert.Equal(42, stub.GetDescription.LastCallArg);
 
         // Assert property access
         service.Name = "First";
         service.Name = "Second";
-        System.Diagnostics.Debug.Assert(stub.Name.SetCount == 2);
-        System.Diagnostics.Debug.Assert(stub.Name.LastSetValue == "Second");
+        Assert.Equal(2, stub.Name.SetCount);
+        Assert.Equal("Second", stub.Name.LastSetValue);
     }
 }
 #endregion

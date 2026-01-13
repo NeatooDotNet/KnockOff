@@ -163,6 +163,9 @@ partial class CollectionStubTests
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
+			/// <summary>The global::System.Collections.ICollection instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Collections.ICollection Object => this;
+
 		}
 
 	}

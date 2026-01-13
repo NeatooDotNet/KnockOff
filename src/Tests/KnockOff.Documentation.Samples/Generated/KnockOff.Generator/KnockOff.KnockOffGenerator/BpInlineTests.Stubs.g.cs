@@ -41,6 +41,9 @@ partial class BpInlineTests
 				return default!;
 			}
 
+			/// <summary>The global::KnockOff.Documentation.Samples.Guides.IBpInlineUserService instance. Use for passing to code expecting the interface.</summary>
+			public global::KnockOff.Documentation.Samples.Guides.IBpInlineUserService Object => this;
+
 		}
 
 		/// <summary>Interceptor for IBpInlineLogger.Log.</summary>
@@ -74,6 +77,9 @@ partial class BpInlineTests
 				Log.RecordCall(message);
 				if (Log.OnCall is { } onCall) onCall(this, message);
 			}
+
+			/// <summary>The global::KnockOff.Documentation.Samples.Guides.IBpInlineLogger instance. Use for passing to code expecting the interface.</summary>
+			public global::KnockOff.Documentation.Samples.Guides.IBpInlineLogger Object => this;
 
 		}
 

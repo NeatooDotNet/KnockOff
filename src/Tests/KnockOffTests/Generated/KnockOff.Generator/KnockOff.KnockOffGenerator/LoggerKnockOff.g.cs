@@ -58,11 +58,14 @@ partial class LoggerKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Name.</summary>
+	/// <summary>Interceptor for Name. Configure callbacks and track access.</summary>
 	public NameInterceptor Name { get; } = new();
 
 	/// <summary>Interceptor for Log.</summary>
 	public LogInterceptor Log { get; } = new();
+
+	/// <summary>The global::KnockOff.Tests.ILogger instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Tests.ILogger Object => this;
 
 	void global::KnockOff.Tests.ILogger.Log(string message)
 	{

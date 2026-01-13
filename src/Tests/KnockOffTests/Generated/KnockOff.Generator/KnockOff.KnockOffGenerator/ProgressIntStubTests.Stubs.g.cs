@@ -40,6 +40,9 @@ partial class ProgressIntStubTests
 				if (Report.OnCall is { } onCall) onCall(this, value);
 			}
 
+			/// <summary>The global::System.IProgress<int> instance. Use for passing to code expecting the interface.</summary>
+			public global::System.IProgress<int> Object => this;
+
 		}
 
 	}

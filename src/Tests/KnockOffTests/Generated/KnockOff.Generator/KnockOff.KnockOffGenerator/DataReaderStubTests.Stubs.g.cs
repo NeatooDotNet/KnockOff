@@ -1002,6 +1002,9 @@ partial class DataReaderStubTests
 				if (Dispose.OnCall is { } onCall) onCall(this);
 			}
 
+			/// <summary>The global::System.Data.IDataReader instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Data.IDataReader Object => this;
+
 		}
 
 	}

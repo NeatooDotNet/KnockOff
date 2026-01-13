@@ -83,6 +83,9 @@ partial class SkMinimalServiceKnockOff
 	/// <summary>Interceptor for GetUsers.</summary>
 	public GetUsersInterceptor GetUsers { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkMinimalService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkMinimalService Object => this;
+
 	global::KnockOff.Documentation.Samples.Skills.SkUser? global::KnockOff.Documentation.Samples.Skills.ISkMinimalService.GetUser(int id)
 	{
 		GetUser2.RecordCall(id);

@@ -152,7 +152,7 @@ partial class VsUserServiceKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for CurrentUser.</summary>
+	/// <summary>Interceptor for CurrentUser. Configure callbacks and track access.</summary>
 	public CurrentUserInterceptor CurrentUser { get; } = new();
 
 	/// <summary>Interceptor for GetUser.</summary>
@@ -169,6 +169,9 @@ partial class VsUserServiceKnockOff
 
 	/// <summary>Interceptor for Update.</summary>
 	public UpdateInterceptor Update { get; } = new();
+
+	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IVsUserService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Comparison.IVsUserService Object => this;
 
 	global::KnockOff.Documentation.Samples.Comparison.VsUser global::KnockOff.Documentation.Samples.Comparison.IVsUserService.GetUser(int id)
 	{

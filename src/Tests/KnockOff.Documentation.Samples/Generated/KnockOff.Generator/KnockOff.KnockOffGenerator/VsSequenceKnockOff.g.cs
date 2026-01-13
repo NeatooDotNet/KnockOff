@@ -30,6 +30,9 @@ partial class VsSequenceKnockOff
 	/// <summary>Interceptor for GetNext.</summary>
 	public GetNextInterceptor GetNext { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IVsSequence instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Comparison.IVsSequence Object => this;
+
 	int global::KnockOff.Documentation.Samples.Comparison.IVsSequence.GetNext()
 	{
 		GetNext.RecordCall();

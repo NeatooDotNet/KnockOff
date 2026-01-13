@@ -61,6 +61,9 @@ partial class ParserStub
 	/// <summary>Interceptor for Increment.</summary>
 	public IncrementInterceptor Increment { get; } = new();
 
+	/// <summary>The global::KnockOff.Benchmarks.Interfaces.IParser instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Benchmarks.Interfaces.IParser Object => this;
+
 	bool global::KnockOff.Benchmarks.Interfaces.IParser.TryParse(string input, out int result)
 	{
 		result = default!;

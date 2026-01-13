@@ -30,6 +30,9 @@ partial class SkSingleMethodServiceKnockOff
 	/// <summary>Interceptor for SendEmail.</summary>
 	public SendEmailInterceptor SendEmail { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkSingleMethodService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkSingleMethodService Object => this;
+
 	void global::KnockOff.Documentation.Samples.Skills.ISkSingleMethodService.SendEmail(string to, string subject)
 	{
 		SendEmail.RecordCall(to, subject);

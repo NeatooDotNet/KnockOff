@@ -117,6 +117,9 @@ partial class MultiInterfaceInlineTest
 				return default!;
 			}
 
+			/// <summary>The global::KnockOff.Tests.ISimpleService instance. Use for passing to code expecting the interface.</summary>
+			public global::KnockOff.Tests.ISimpleService Object => this;
+
 		}
 
 		/// <summary>Interceptor for ISimpleLogger.Log.</summary>
@@ -150,6 +153,9 @@ partial class MultiInterfaceInlineTest
 				Log.RecordCall(message);
 				if (Log.OnCall is { } onCall) onCall(this, message);
 			}
+
+			/// <summary>The global::KnockOff.Tests.ISimpleLogger instance. Use for passing to code expecting the interface.</summary>
+			public global::KnockOff.Tests.ISimpleLogger Object => this;
 
 		}
 

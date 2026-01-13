@@ -186,6 +186,9 @@ partial class FcCacheServiceStub
 	/// <summary>Interceptor for Remove.</summary>
 	public RemoveInterceptor Remove { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IFcCacheService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Comparison.IFcCacheService Object => this;
+
 	T? global::KnockOff.Documentation.Samples.Comparison.IFcCacheService.Get<T>(string key) where T : class
 	{
 		Get.Of<T>().RecordCall(key);

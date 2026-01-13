@@ -61,6 +61,9 @@ partial class RefParameterServiceKnockOff
 	/// <summary>Interceptor for TryUpdate.</summary>
 	public TryUpdateInterceptor TryUpdate { get; } = new();
 
+	/// <summary>The global::KnockOff.Sandbox.IRefParameterService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Sandbox.IRefParameterService Object => this;
+
 	void global::KnockOff.Sandbox.IRefParameterService.Increment(ref int @value)
 	{
 		Increment.RecordCall(@value);

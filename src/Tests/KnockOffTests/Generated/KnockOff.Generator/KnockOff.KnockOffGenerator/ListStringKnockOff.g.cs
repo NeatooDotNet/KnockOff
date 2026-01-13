@@ -284,10 +284,10 @@ partial class ListStringKnockOff
 	/// <summary>Interceptor for Indexer.</summary>
 	public IndexerInterceptor Indexer { get; } = new();
 
-	/// <summary>Interceptor for Count.</summary>
+	/// <summary>Interceptor for Count. Configure callbacks and track access.</summary>
 	public CountInterceptor Count { get; } = new();
 
-	/// <summary>Interceptor for IsReadOnly.</summary>
+	/// <summary>Interceptor for IsReadOnly. Configure callbacks and track access.</summary>
 	public IsReadOnlyInterceptor IsReadOnly { get; } = new();
 
 	/// <summary>Interceptor for IndexOf.</summary>
@@ -316,6 +316,9 @@ partial class ListStringKnockOff
 
 	/// <summary>Interceptor for GetEnumerator.</summary>
 	public GetEnumeratorInterceptor GetEnumerator { get; } = new();
+
+	/// <summary>The global::System.Collections.Generic.IList<string> instance. Use for passing to code expecting the interface.</summary>
+	public global::System.Collections.Generic.IList<string> Object => this;
 
 	int global::System.Collections.Generic.IList<string>.IndexOf(string item)
 	{

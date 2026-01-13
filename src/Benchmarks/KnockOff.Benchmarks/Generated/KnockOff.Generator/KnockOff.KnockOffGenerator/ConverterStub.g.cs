@@ -158,6 +158,9 @@ partial class ConverterStub
 	/// <summary>Interceptor for Transform (use .Of&lt;T&gt;() to access typed handler).</summary>
 	public TransformInterceptor Transform { get; } = new();
 
+	/// <summary>The global::KnockOff.Benchmarks.Interfaces.IConverter instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Benchmarks.Interfaces.IConverter Object => this;
+
 	T global::KnockOff.Benchmarks.Interfaces.IConverter.Convert<T>(object @value)
 	{
 		Convert.Of<T>().RecordCall(@value);

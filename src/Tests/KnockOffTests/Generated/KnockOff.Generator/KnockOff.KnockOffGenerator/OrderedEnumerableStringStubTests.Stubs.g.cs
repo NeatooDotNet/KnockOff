@@ -120,6 +120,9 @@ partial class OrderedEnumerableStringStubTests
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
+			/// <summary>The global::System.Linq.IOrderedEnumerable<string> instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Linq.IOrderedEnumerable<string> Object => this;
+
 			/// <summary>Gets a smart default value for a generic type at runtime.</summary>
 			private static T SmartDefault<T>(string methodName)
 			{

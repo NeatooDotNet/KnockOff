@@ -161,6 +161,9 @@ partial class MmUserServiceKnockOff
 	/// <summary>Interceptor for Update.</summary>
 	public UpdateInterceptor Update { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IMmUserService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.IMmUserService Object => this;
+
 	global::KnockOff.Documentation.Samples.Skills.MmUser? global::KnockOff.Documentation.Samples.Skills.IMmUserService.GetUser(int id)
 	{
 		GetUser.RecordCall(id);

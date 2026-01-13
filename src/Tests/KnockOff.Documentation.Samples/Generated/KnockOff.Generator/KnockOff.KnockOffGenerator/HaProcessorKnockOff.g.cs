@@ -61,6 +61,9 @@ partial class HaProcessorKnockOff
 	/// <summary>Interceptor for TryUpdate.</summary>
 	public TryUpdateInterceptor TryUpdate { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IHaProcessor instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.IHaProcessor Object => this;
+
 	void global::KnockOff.Documentation.Samples.Skills.IHaProcessor.Increment(ref int @value)
 	{
 		Increment.RecordCall(@value);

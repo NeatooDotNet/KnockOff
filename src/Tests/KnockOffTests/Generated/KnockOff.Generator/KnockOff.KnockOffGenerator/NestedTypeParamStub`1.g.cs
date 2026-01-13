@@ -55,6 +55,9 @@ partial class NestedTypeParamStub<T>
 	/// <summary>Interceptor for AddItems.</summary>
 	public AddItemsInterceptor AddItems { get; } = new();
 
+	/// <summary>The global::KnockOff.Tests.INestedTypeParamService<T> instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Tests.INestedTypeParamService<T> Object => this;
+
 	global::System.Collections.Generic.List<T> global::KnockOff.Tests.INestedTypeParamService<T>.GetItems()
 	{
 		GetItems.RecordCall();

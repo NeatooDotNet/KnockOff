@@ -103,6 +103,9 @@ partial class ITriggerPropertyOfTTests
 				}
 			}
 
+			/// <summary>The global::Neatoo.Rules.ITriggerProperty<global::Neatoo.IValidateBase> instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.Rules.ITriggerProperty<global::Neatoo.IValidateBase> Object => this;
+
 		}
 
 	}

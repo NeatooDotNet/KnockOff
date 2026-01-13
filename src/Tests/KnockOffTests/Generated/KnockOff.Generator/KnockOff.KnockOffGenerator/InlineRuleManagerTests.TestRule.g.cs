@@ -149,19 +149,19 @@ partial class TestRule
 		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Executed.</summary>
+	/// <summary>Interceptor for Executed. Configure callbacks and track access.</summary>
 	public ExecutedInterceptor Executed { get; } = new();
 
-	/// <summary>Interceptor for RuleOrder.</summary>
+	/// <summary>Interceptor for RuleOrder. Configure callbacks and track access.</summary>
 	public RuleOrderInterceptor RuleOrder { get; } = new();
 
-	/// <summary>Interceptor for UniqueIndex.</summary>
+	/// <summary>Interceptor for UniqueIndex. Configure callbacks and track access.</summary>
 	public UniqueIndexInterceptor UniqueIndex { get; } = new();
 
-	/// <summary>Interceptor for Messages.</summary>
+	/// <summary>Interceptor for Messages. Configure callbacks and track access.</summary>
 	public MessagesInterceptor Messages { get; } = new();
 
-	/// <summary>Interceptor for TriggerProperties.</summary>
+	/// <summary>Interceptor for TriggerProperties. Configure callbacks and track access.</summary>
 	public TriggerPropertiesInterceptor TriggerProperties { get; } = new();
 
 	/// <summary>Interceptor for RunRule.</summary>
@@ -169,6 +169,9 @@ partial class TestRule
 
 	/// <summary>Interceptor for OnRuleAdded.</summary>
 	public OnRuleAddedInterceptor OnRuleAdded { get; } = new();
+
+	/// <summary>The global::Neatoo.Rules.IRule instance. Use for passing to code expecting the interface.</summary>
+	public global::Neatoo.Rules.IRule Object => this;
 
 	global::System.Threading.Tasks.Task<global::Neatoo.Rules.IRuleMessages> global::Neatoo.Rules.IRule.RunRule(global::Neatoo.IValidateBase target, global::System.Threading.CancellationToken? token)
 	{

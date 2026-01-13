@@ -43,11 +43,14 @@ partial class PropConnectionKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for IsConnected.</summary>
+	/// <summary>Interceptor for IsConnected. Configure callbacks and track access.</summary>
 	public IsConnectedInterceptor IsConnected { get; } = new();
 
 	/// <summary>Interceptor for Connect.</summary>
 	public ConnectInterceptor Connect { get; } = new();
+
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IPropConnection instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IPropConnection Object => this;
 
 	bool global::KnockOff.Documentation.Samples.Guides.IPropConnection.IsConnected
 	{

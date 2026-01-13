@@ -121,10 +121,10 @@ partial class UserServiceKnockOff
 		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Name.</summary>
+	/// <summary>Interceptor for Name. Configure callbacks and track access.</summary>
 	public NameInterceptor Name { get; } = new();
 
-	/// <summary>Interceptor for Count.</summary>
+	/// <summary>Interceptor for Count. Configure callbacks and track access.</summary>
 	public CountInterceptor Count { get; } = new();
 
 	/// <summary>Interceptor for DoWork.</summary>
@@ -135,6 +135,9 @@ partial class UserServiceKnockOff
 
 	/// <summary>Interceptor for Process.</summary>
 	public ProcessInterceptor Process { get; } = new();
+
+	/// <summary>The global::KnockOff.Sandbox.IUserService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Sandbox.IUserService Object => this;
 
 	string global::KnockOff.Sandbox.IUserService.Name
 	{

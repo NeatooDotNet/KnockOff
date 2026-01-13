@@ -331,6 +331,9 @@ partial class DbConnectionStubTests
 				if (Dispose.OnCall is { } onCall) onCall(this);
 			}
 
+			/// <summary>The global::System.Data.IDbConnection instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Data.IDbConnection Object => this;
+
 		}
 
 	}

@@ -71,7 +71,7 @@ partial class EmailServiceWithValidation
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for IsConnected.</summary>
+	/// <summary>Interceptor for IsConnected. Configure callbacks and track access.</summary>
 	public IsConnectedInterceptor IsConnected { get; } = new();
 
 	/// <summary>Interceptor for SendEmail.</summary>
@@ -79,6 +79,9 @@ partial class EmailServiceWithValidation
 
 	/// <summary>Interceptor for IsValidAddress.</summary>
 	public IsValidAddress2Interceptor IsValidAddress2 { get; } = new();
+
+	/// <summary>The global::KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation Object => this;
 
 	void global::KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation.SendEmail(string to, string subject, string body)
 	{

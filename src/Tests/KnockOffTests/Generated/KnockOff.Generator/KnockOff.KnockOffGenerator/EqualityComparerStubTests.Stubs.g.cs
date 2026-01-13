@@ -71,6 +71,9 @@ partial class EqualityComparerStubTests
 				return default!;
 			}
 
+			/// <summary>The global::System.Collections.IEqualityComparer instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Collections.IEqualityComparer Object => this;
+
 		}
 
 	}

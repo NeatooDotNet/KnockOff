@@ -41,6 +41,9 @@ partial class CustomFormatterStubTests
 				throw new global::System.InvalidOperationException("No implementation provided for Format. Set Format.OnCall.");
 			}
 
+			/// <summary>The global::System.ICustomFormatter instance. Use for passing to code expecting the interface.</summary>
+			public global::System.ICustomFormatter Object => this;
+
 		}
 
 	}

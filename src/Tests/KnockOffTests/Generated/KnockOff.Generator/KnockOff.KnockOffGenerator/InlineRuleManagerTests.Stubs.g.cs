@@ -321,6 +321,9 @@ partial class InlineRuleManagerTests
 				}
 			}
 
+			/// <summary>The global::Neatoo.Rules.IRuleManager instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.Rules.IRuleManager Object => this;
+
 			/// <summary>Gets a smart default value for a generic type at runtime.</summary>
 			private static T SmartDefault<T>(string methodName)
 			{

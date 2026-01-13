@@ -487,6 +487,9 @@ partial class MultipleInlineTests
 				remove => NeatooPropertyChangedInterceptor.RecordRemove(value);
 			}
 
+			/// <summary>The global::Neatoo.IValidateBase instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.IValidateBase Object => this;
+
 		}
 
 		/// <summary>Interceptor for INotifyNeatooPropertyChanged.NeatooPropertyChanged event.</summary>
@@ -522,6 +525,9 @@ partial class MultipleInlineTests
 				add => NeatooPropertyChangedInterceptor.RecordAdd(value);
 				remove => NeatooPropertyChangedInterceptor.RecordRemove(value);
 			}
+
+			/// <summary>The global::Neatoo.INotifyNeatooPropertyChanged instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.INotifyNeatooPropertyChanged Object => this;
 
 		}
 

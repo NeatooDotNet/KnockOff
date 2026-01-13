@@ -262,6 +262,9 @@ partial class IEmailAddressRuleTests
 				}
 			}
 
+			/// <summary>The global::Neatoo.Rules.Rules.IEmailAddressRule instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.Rules.Rules.IEmailAddressRule Object => this;
+
 		}
 
 	}

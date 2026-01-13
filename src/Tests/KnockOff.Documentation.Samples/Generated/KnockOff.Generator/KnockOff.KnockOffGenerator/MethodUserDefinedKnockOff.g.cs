@@ -58,6 +58,9 @@ partial class MethodUserDefinedKnockOff
 	/// <summary>Interceptor for Count.</summary>
 	public Count2Interceptor Count2 { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IMethodUserDefined instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IMethodUserDefined Object => this;
+
 	global::KnockOff.Documentation.Samples.Guides.MethodUser? global::KnockOff.Documentation.Samples.Guides.IMethodUserDefined.GetById(int id)
 	{
 		GetById2.RecordCall(id);

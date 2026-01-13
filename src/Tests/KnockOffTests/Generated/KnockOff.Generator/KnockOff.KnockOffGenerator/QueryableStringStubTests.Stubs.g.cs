@@ -141,6 +141,9 @@ partial class QueryableStringStubTests
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
+			/// <summary>The global::System.Linq.IQueryable<string> instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Linq.IQueryable<string> Object => this;
+
 		}
 
 	}

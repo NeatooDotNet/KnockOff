@@ -33,6 +33,9 @@ partial class SkUserServiceKnockOff
 	/// <summary>Interceptor for GetUser.</summary>
 	public GetUserInterceptor GetUser { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkUserService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkUserService Object => this;
+
 	global::KnockOff.Documentation.Samples.Skills.SkUser global::KnockOff.Documentation.Samples.Skills.ISkUserService.GetUser(int id)
 	{
 		GetUser.RecordCall(id);

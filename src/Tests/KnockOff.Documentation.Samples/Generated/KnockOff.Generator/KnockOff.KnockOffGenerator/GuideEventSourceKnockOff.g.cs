@@ -125,6 +125,9 @@ partial class GuideEventSourceKnockOff
 	/// <summary>Interceptor for OnData event.</summary>
 	public OnDataInterceptor OnData { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IGuideEventSource instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IGuideEventSource Object => this;
+
 	event global::System.EventHandler<string>? global::KnockOff.Documentation.Samples.Guides.IGuideEventSource.MessageReceived
 	{
 		add => MessageReceived.RecordAdd(value);

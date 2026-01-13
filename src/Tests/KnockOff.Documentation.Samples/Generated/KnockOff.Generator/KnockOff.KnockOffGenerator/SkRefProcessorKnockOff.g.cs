@@ -61,6 +61,9 @@ partial class SkRefProcessorKnockOff
 	/// <summary>Interceptor for TryUpdate.</summary>
 	public TryUpdateInterceptor TryUpdate { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkRefProcessor instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkRefProcessor Object => this;
+
 	void global::KnockOff.Documentation.Samples.Skills.ISkRefProcessor.Increment(ref int @value)
 	{
 		Increment.RecordCall(@value);

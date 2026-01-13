@@ -107,6 +107,9 @@ partial class IRuleMessageTests
 				}
 			}
 
+			/// <summary>The global::Neatoo.Rules.IRuleMessage instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.Rules.IRuleMessage Object => this;
+
 		}
 
 	}

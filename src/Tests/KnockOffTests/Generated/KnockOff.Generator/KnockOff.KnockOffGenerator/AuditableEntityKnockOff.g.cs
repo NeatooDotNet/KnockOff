@@ -105,17 +105,20 @@ partial class AuditableEntityKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for ModifiedAt.</summary>
+	/// <summary>Interceptor for ModifiedAt. Configure callbacks and track access.</summary>
 	public ModifiedAtInterceptor ModifiedAt { get; } = new();
 
-	/// <summary>Interceptor for ModifiedBy.</summary>
+	/// <summary>Interceptor for ModifiedBy. Configure callbacks and track access.</summary>
 	public ModifiedByInterceptor ModifiedBy { get; } = new();
 
-	/// <summary>Interceptor for Id.</summary>
+	/// <summary>Interceptor for Id. Configure callbacks and track access.</summary>
 	public IdInterceptor Id { get; } = new();
 
-	/// <summary>Interceptor for CreatedAt.</summary>
+	/// <summary>Interceptor for CreatedAt. Configure callbacks and track access.</summary>
 	public CreatedAtInterceptor CreatedAt { get; } = new();
+
+	/// <summary>The global::KnockOff.Tests.IAuditableEntity instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Tests.IAuditableEntity Object => this;
 
 	global::System.DateTime? global::KnockOff.Tests.IAuditableEntity.ModifiedAt
 	{

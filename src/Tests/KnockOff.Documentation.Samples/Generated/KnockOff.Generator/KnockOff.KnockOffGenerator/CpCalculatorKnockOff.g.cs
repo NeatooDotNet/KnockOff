@@ -61,6 +61,9 @@ partial class CpCalculatorKnockOff
 	/// <summary>Interceptor for Divide.</summary>
 	public Divide2Interceptor Divide2 { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ICpCalculator instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ICpCalculator Object => this;
+
 	int global::KnockOff.Documentation.Samples.Skills.ICpCalculator.Add(int a, int b)
 	{
 		Add2.RecordCall(a, b);

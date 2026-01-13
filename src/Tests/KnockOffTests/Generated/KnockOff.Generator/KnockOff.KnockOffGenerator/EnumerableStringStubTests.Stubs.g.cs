@@ -43,6 +43,9 @@ partial class EnumerableStringStubTests
 				return ((global::System.Collections.Generic.IEnumerable<string>)this).GetEnumerator();
 			}
 
+			/// <summary>The global::System.Collections.Generic.IEnumerable<string> instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Collections.Generic.IEnumerable<string> Object => this;
+
 		}
 
 	}

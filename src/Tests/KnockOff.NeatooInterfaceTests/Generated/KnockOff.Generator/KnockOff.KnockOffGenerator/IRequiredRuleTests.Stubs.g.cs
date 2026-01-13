@@ -262,6 +262,9 @@ partial class IRequiredRuleTests
 				}
 			}
 
+			/// <summary>The global::Neatoo.Rules.Rules.IRequiredRule instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.Rules.Rules.IRequiredRule Object => this;
+
 		}
 
 	}

@@ -30,6 +30,9 @@ partial class GenAuditorKnockOff
 	/// <summary>Interceptor for Audit.</summary>
 	public AuditInterceptor Audit { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Reference.IGenAuditor instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Reference.IGenAuditor Object => this;
+
 	void global::KnockOff.Documentation.Samples.Reference.IGenAuditor.Audit(string action)
 	{
 		Audit.RecordCall(action);

@@ -196,7 +196,7 @@ public static class InterceptorApiUsageExamples
         #endregion
     }
 
-    public static void IndexerInterceptorExamples()
+    public static void IndexerExamples()
     {
         var knockOff = new ApiIndexerStoreKnockOff();
         IApiIndexerStore store = knockOff;

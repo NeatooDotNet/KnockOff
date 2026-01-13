@@ -61,6 +61,9 @@ partial class SkAsyncPatternRepositoryKnockOff
 	/// <summary>Interceptor for SaveAsync.</summary>
 	public SaveAsyncInterceptor SaveAsync { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkAsyncPatternRepository instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkAsyncPatternRepository Object => this;
+
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.SkUser?> global::KnockOff.Documentation.Samples.Skills.ISkAsyncPatternRepository.GetUserAsync(int id)
 	{
 		GetUserAsync.RecordCall(id);

@@ -36,8 +36,11 @@ partial class PropStatusKnockOff
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for Status.</summary>
+	/// <summary>Interceptor for Status. Configure callbacks and track access.</summary>
 	public StatusInterceptor Status { get; } = new();
+
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IPropStatus instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IPropStatus Object => this;
 
 	string global::KnockOff.Documentation.Samples.Guides.IPropStatus.Status
 	{

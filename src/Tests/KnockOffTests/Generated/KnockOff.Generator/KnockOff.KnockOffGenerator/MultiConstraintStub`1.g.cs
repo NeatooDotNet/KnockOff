@@ -58,6 +58,9 @@ partial class MultiConstraintStub<T> where T : class, global::KnockOff.Tests.IEn
 	/// <summary>Interceptor for Find.</summary>
 	public FindInterceptor Find { get; } = new();
 
+	/// <summary>The global::KnockOff.Tests.IMultiConstraintService<T> instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Tests.IMultiConstraintService<T> Object => this;
+
 	void global::KnockOff.Tests.IMultiConstraintService<T>.Save(T entity)
 	{
 		Save.RecordCall(entity);

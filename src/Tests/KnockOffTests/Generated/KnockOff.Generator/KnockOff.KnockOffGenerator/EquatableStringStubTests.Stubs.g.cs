@@ -41,6 +41,9 @@ partial class EquatableStringStubTests
 				return default!;
 			}
 
+			/// <summary>The global::System.IEquatable<string> instance. Use for passing to code expecting the interface.</summary>
+			public global::System.IEquatable<string> Object => this;
+
 		}
 
 	}

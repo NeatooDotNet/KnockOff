@@ -49,11 +49,14 @@ partial class TriggerPropertyStub
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for PropertyName.</summary>
+	/// <summary>Interceptor for PropertyName. Configure callbacks and track access.</summary>
 	public PropertyNameInterceptor PropertyName { get; } = new();
 
 	/// <summary>Interceptor for IsMatch.</summary>
 	public IsMatchInterceptor IsMatch { get; } = new();
+
+	/// <summary>The global::Neatoo.Rules.ITriggerProperty instance. Use for passing to code expecting the interface.</summary>
+	public global::Neatoo.Rules.ITriggerProperty Object => this;
 
 	bool global::Neatoo.Rules.ITriggerProperty.IsMatch(string propertyName)
 	{

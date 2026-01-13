@@ -11,6 +11,9 @@ partial class INeatooObjectTests
 		/// <summary>Stub implementation of global::Neatoo.INeatooObject.</summary>
 		public class INeatooObject : global::Neatoo.INeatooObject
 		{
+			/// <summary>The global::Neatoo.INeatooObject instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.INeatooObject Object => this;
+
 		}
 
 	}

@@ -120,6 +120,9 @@ partial class DirectInstantiationTests
 				}
 			}
 
+			/// <summary>The global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService instance. Use for passing to code expecting the interface.</summary>
+			public global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService Object => this;
+
 		}
 
 	}

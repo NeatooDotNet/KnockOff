@@ -444,6 +444,9 @@ partial class DictionaryStringIntStubTests
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
+			/// <summary>The global::System.Collections.Generic.IDictionary<string, int> instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Collections.Generic.IDictionary<string, int> Object => this;
+
 		}
 
 	}

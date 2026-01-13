@@ -209,19 +209,19 @@ partial class PropertyInfoStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for PropertyInfo.</summary>
+	/// <summary>Interceptor for PropertyInfo. Configure callbacks and track access.</summary>
 	public PropertyInfoInterceptor PropertyInfo { get; } = new();
 
-	/// <summary>Interceptor for Name.</summary>
+	/// <summary>Interceptor for Name. Configure callbacks and track access.</summary>
 	public NameInterceptor Name { get; } = new();
 
-	/// <summary>Interceptor for Type.</summary>
+	/// <summary>Interceptor for Type. Configure callbacks and track access.</summary>
 	public TypeInterceptor Type { get; } = new();
 
-	/// <summary>Interceptor for Key.</summary>
+	/// <summary>Interceptor for Key. Configure callbacks and track access.</summary>
 	public KeyInterceptor Key { get; } = new();
 
-	/// <summary>Interceptor for IsPrivateSetter.</summary>
+	/// <summary>Interceptor for IsPrivateSetter. Configure callbacks and track access.</summary>
 	public IsPrivateSetterInterceptor IsPrivateSetter { get; } = new();
 
 	/// <summary>Interceptor for GetCustomAttribute (use .Of&lt;T&gt;() to access typed handler).</summary>
@@ -229,6 +229,9 @@ partial class PropertyInfoStub
 
 	/// <summary>Interceptor for GetCustomAttributes.</summary>
 	public GetCustomAttributesInterceptor GetCustomAttributes { get; } = new();
+
+	/// <summary>The global::Neatoo.IPropertyInfo instance. Use for passing to code expecting the interface.</summary>
+	public global::Neatoo.IPropertyInfo Object => this;
 
 	T? global::Neatoo.IPropertyInfo.GetCustomAttribute<T>() where T : class
 	{

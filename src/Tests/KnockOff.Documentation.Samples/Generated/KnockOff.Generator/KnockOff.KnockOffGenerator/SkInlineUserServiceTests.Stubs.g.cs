@@ -41,6 +41,9 @@ partial class SkInlineUserServiceTests
 				return default!;
 			}
 
+			/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkInlineUserService instance. Use for passing to code expecting the interface.</summary>
+			public global::KnockOff.Documentation.Samples.Skills.ISkInlineUserService Object => this;
+
 		}
 
 		/// <summary>Interceptor for ISkInlineLogger.Log.</summary>
@@ -74,6 +77,9 @@ partial class SkInlineUserServiceTests
 				Log.RecordCall(message);
 				if (Log.OnCall is { } onCall) onCall(this, message);
 			}
+
+			/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkInlineLogger instance. Use for passing to code expecting the interface.</summary>
+			public global::KnockOff.Documentation.Samples.Skills.ISkInlineLogger Object => this;
 
 		}
 

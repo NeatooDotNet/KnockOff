@@ -55,6 +55,9 @@ partial class AuditorKnockOff
 	/// <summary>Interceptor for Audit.</summary>
 	public AuditInterceptor Audit { get; } = new();
 
+	/// <summary>The global::KnockOff.Tests.IAuditor instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Tests.IAuditor Object => this;
+
 	void global::KnockOff.Tests.IAuditor.Log(string message)
 	{
 		Log.RecordCall(message);

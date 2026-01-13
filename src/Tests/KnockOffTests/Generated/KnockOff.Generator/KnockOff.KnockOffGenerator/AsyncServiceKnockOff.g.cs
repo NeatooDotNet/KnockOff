@@ -161,6 +161,9 @@ partial class AsyncServiceKnockOff
 	/// <summary>Interceptor for GetValueValueTaskAsync.</summary>
 	public GetValueValueTaskAsync2Interceptor GetValueValueTaskAsync2 { get; } = new();
 
+	/// <summary>The global::KnockOff.Tests.IAsyncService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Tests.IAsyncService Object => this;
+
 	global::System.Threading.Tasks.Task global::KnockOff.Tests.IAsyncService.DoWorkAsync()
 	{
 		DoWorkAsync.RecordCall();

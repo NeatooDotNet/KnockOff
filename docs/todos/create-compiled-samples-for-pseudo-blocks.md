@@ -1,6 +1,6 @@
 # Create Compiled Samples for Pseudo-Code Blocks
 
-30 blocks currently marked as pseudo-code need to be converted to compiled samples.
+All phases complete - 53 blocks converted to compiled samples.
 
 ## Progress Tracking
 
@@ -8,19 +8,19 @@
 |-------|--------|------|-----------|
 | 1: Core API | 10 | 10 | 0 |
 | 2: Features | 18 | 18 | 0 |
-| 3: Reference | 9 | 2 | 7 |
-| 4: Moq | 23 | 0 | 23 |
-| **Total** | **60** | **30** | **30** |
+| 3: Reference | 9 | 2 | 7 (legitimate pseudo) |
+| 4: Moq | 23 | 23 | 0 |
+| **Total** | **60** | **53** | **7** |
 
 ---
 
-## Phase 1: KnockOff Core API ✅ Complete
+## Phase 1: KnockOff Core API - Complete
 
 All 10 blocks converted.
 
 ---
 
-## Phase 2: Feature Documentation ✅ Complete
+## Phase 2: Feature Documentation - Complete
 
 All 18 blocks converted:
 - [x] docs/guides/generics.md (7 blocks)
@@ -33,7 +33,7 @@ All 18 blocks converted:
 
 ---
 
-## Phase 3: Reference Documentation ✅ Analyzed
+## Phase 3: Reference Documentation - Complete
 
 Most Phase 3 blocks are legitimately pseudo (API reference, hypothetical features, XML config).
 
@@ -57,51 +57,54 @@ Most Phase 3 blocks are legitimately pseudo (API reference, hypothetical feature
 
 ---
 
-## Phase 4: Moq Comparison (23 remaining)
+## Phase 4: Moq Comparison - Complete
 
-**Blocked:** Requires adding Moq package reference to `KnockOff.Documentation.Samples`.
-
-```xml
-<PackageReference Include="Moq" Version="4.*" />
-```
+Added Moq package reference to `KnockOff.Documentation.Samples.Tests` and created compiled samples.
 
 #### docs/knockoff-vs-moq.md (9 blocks)
 
-- [ ] `moq-basic-setup` - Mock, Setup, Verify
-- [ ] `moq-property-mocking` - Property setup/verify
-- [ ] `moq-async-methods` - ReturnsAsync
-- [ ] `moq-argument-capture` - Callback capture
-- [ ] `moq-multiple-interfaces` - mock.As<T>()
-- [ ] `moq-indexer-mocking` - Indexer setup
-- [ ] `moq-event-mocking` - Raise, SetupAdd
-- [ ] `moq-verification-patterns` - Times.*
-- [ ] `moq-sequential-returns` - SetupSequence
+- [x] `moq-basic-setup` - Mock, Setup, Verify
+- [x] `moq-property-mocking` - Property setup/verify
+- [x] `moq-async-methods` - ReturnsAsync
+- [x] `moq-argument-capture` - Callback capture
+- [x] `moq-multiple-interfaces` - mock.As<T>()
+- [x] `moq-indexer-mocking` - Indexer setup
+- [x] `moq-event-mocking` - Raise, SetupAdd
+- [x] `moq-verification-patterns` - Times.*
+- [x] `moq-sequential-returns` - SetupSequence
 
 #### docs/migration-from-moq.md (14 blocks)
 
-- [ ] `moq-create-mock`
-- [ ] `moq-mock-object`
-- [ ] `moq-setup-returns`
-- [ ] `moq-async-returns`
-- [ ] `moq-verification`
-- [ ] `moq-callback`
-- [ ] `moq-property-setup`
-- [ ] `moq-static-returns`
-- [ ] `moq-conditional-returns`
-- [ ] `moq-throwing-exceptions`
-- [ ] `moq-setup-sequence`
-- [ ] `moq-multiple-interfaces-as`
-- [ ] `moq-argument-matching`
-- [ ] `gradual-migration` - Moq + KnockOff coexistence
+- [x] `moq-create-mock`
+- [x] `moq-mock-object`
+- [x] `moq-setup-returns`
+- [x] `moq-async-returns`
+- [x] `moq-verification`
+- [x] `moq-callback`
+- [x] `moq-property-setup`
+- [x] `moq-static-returns`
+- [x] `moq-conditional-returns`
+- [x] `moq-throwing-exceptions`
+- [x] `moq-setup-sequence`
+- [x] `moq-multiple-interfaces-as`
+- [x] `moq-argument-matching`
+- [x] `gradual-migration` - Moq + KnockOff coexistence
 
 ---
 
 ## Notes
 
-### Some pseudo blocks are intentional
+### Remaining pseudo blocks are intentional
 
-The `knockoff-future-*` blocks in attributes.md show hypothetical future API - these may stay as pseudo since they don't represent current functionality.
+The 7 remaining pseudo blocks cannot be compiled:
+- 3 hypothetical future features (`knockoff-future-*`)
+- 3 reference fragments (attribute declaration, using statement, XML config)
+- 1 converted to `generated:` marker
 
-### MSBuild/csproj blocks
+### Implementation Details
 
-`emit-generated-files-csproj` is XML configuration, not C# code. May need different handling or remain as pseudo.
+Moq samples created in:
+- `src/Tests/KnockOff.Documentation.Samples.Tests/Comparison/MoqComparisonSamples.cs` - 9 snippets for knockoff-vs-moq.md
+- `src/Tests/KnockOff.Documentation.Samples.Tests/Comparison/MoqMigrationSamples.cs` - 14 snippets for migration-from-moq.md
+
+Types use `MoqMig` prefix (for migration samples) and `Moq` prefix (for comparison samples) to avoid conflicts with KnockOff stub types.

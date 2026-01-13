@@ -33,6 +33,9 @@ partial class CpPriorityServiceKnockOff
 	/// <summary>Interceptor for Calculate.</summary>
 	public Calculate2Interceptor Calculate2 { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ICpPriorityService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ICpPriorityService Object => this;
+
 	int global::KnockOff.Documentation.Samples.Skills.ICpPriorityService.Calculate(int x)
 	{
 		Calculate2.RecordCall(x);

@@ -41,6 +41,9 @@ partial class ServiceProviderStubTests
 				return default!;
 			}
 
+			/// <summary>The global::System.IServiceProvider instance. Use for passing to code expecting the interface.</summary>
+			public global::System.IServiceProvider Object => this;
+
 		}
 
 	}

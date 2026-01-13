@@ -62,14 +62,17 @@ partial class RuleMessageStub
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for RuleIndex.</summary>
+	/// <summary>Interceptor for RuleIndex. Configure callbacks and track access.</summary>
 	public RuleIndexInterceptor RuleIndex { get; } = new();
 
-	/// <summary>Interceptor for PropertyName.</summary>
+	/// <summary>Interceptor for PropertyName. Configure callbacks and track access.</summary>
 	public PropertyNameInterceptor PropertyName { get; } = new();
 
-	/// <summary>Interceptor for Message.</summary>
+	/// <summary>Interceptor for Message. Configure callbacks and track access.</summary>
 	public MessageInterceptor Message { get; } = new();
+
+	/// <summary>The global::Neatoo.Rules.IRuleMessage instance. Use for passing to code expecting the interface.</summary>
+	public global::Neatoo.Rules.IRuleMessage Object => this;
 
 	uint global::Neatoo.Rules.IRuleMessage.RuleIndex
 	{

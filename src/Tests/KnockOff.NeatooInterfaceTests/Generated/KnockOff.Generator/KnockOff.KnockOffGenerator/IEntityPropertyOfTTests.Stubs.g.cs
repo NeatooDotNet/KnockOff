@@ -819,6 +819,9 @@ partial class IEntityPropertyOfTTests
 				remove => NeatooPropertyChangedInterceptor.RecordRemove(value);
 			}
 
+			/// <summary>The global::Neatoo.IEntityProperty<string> instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.IEntityProperty<string> Object => this;
+
 		}
 
 	}

@@ -120,6 +120,9 @@ partial class MultiServiceTests
 				}
 			}
 
+			/// <summary>The global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService instance. Use for passing to code expecting the interface.</summary>
+			public global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService Object => this;
+
 		}
 
 		/// <summary>Interceptor for IInLogger.Log.</summary>
@@ -182,6 +185,9 @@ partial class MultiServiceTests
 				LogError.RecordCall(message, ex);
 				if (LogError.OnCall is { } onCall) onCall(this, message, ex);
 			}
+
+			/// <summary>The global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInLogger instance. Use for passing to code expecting the interface.</summary>
+			public global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInLogger Object => this;
 
 		}
 
@@ -246,6 +252,9 @@ partial class MultiServiceTests
 				if (FindById.OnCall is { } onCall) return onCall(this, id);
 				return default!;
 			}
+
+			/// <summary>The global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInRepository instance. Use for passing to code expecting the interface.</summary>
+			public global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInRepository Object => this;
 
 		}
 

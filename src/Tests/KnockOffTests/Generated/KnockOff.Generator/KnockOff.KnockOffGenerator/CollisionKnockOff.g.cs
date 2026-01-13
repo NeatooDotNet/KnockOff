@@ -55,11 +55,14 @@ partial class CollisionKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for ICollision.</summary>
+	/// <summary>Interceptor for ICollision. Configure callbacks and track access.</summary>
 	public ICollisionInterceptor ICollision { get; } = new();
 
 	/// <summary>Interceptor for DoWork.</summary>
 	public DoWorkInterceptor DoWork { get; } = new();
+
+	/// <summary>The global::KnockOff.Tests.ICollision instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Tests.ICollision Object => this;
 
 	string global::KnockOff.Tests.ICollision.ICollision
 	{

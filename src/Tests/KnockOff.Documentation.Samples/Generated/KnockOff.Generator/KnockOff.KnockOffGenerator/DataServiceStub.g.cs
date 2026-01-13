@@ -61,11 +61,14 @@ partial class DataServiceStub
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Name.</summary>
+	/// <summary>Interceptor for Name. Configure callbacks and track access.</summary>
 	public NameInterceptor Name { get; } = new();
 
 	/// <summary>Interceptor for GetDescription.</summary>
 	public GetDescriptionInterceptor GetDescription { get; } = new();
+
+	/// <summary>The global::KnockOff.Documentation.Samples.ReadMe.IDataService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.ReadMe.IDataService Object => this;
 
 	string global::KnockOff.Documentation.Samples.ReadMe.IDataService.GetDescription(int id)
 	{

@@ -33,6 +33,9 @@ partial class ServiceProviderKnockOff
 	/// <summary>Interceptor for GetService.</summary>
 	public GetServiceInterceptor GetService { get; } = new();
 
+	/// <summary>The global::System.IServiceProvider instance. Use for passing to code expecting the interface.</summary>
+	public global::System.IServiceProvider Object => this;
+
 	object? global::System.IServiceProvider.GetService(global::System.Type serviceType)
 	{
 		GetService.RecordCall(serviceType);

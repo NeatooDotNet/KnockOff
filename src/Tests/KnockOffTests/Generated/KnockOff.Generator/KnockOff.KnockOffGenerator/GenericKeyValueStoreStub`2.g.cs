@@ -58,6 +58,9 @@ partial class GenericKeyValueStoreStub<TKey, TValue>
 	/// <summary>Interceptor for Set.</summary>
 	public SetInterceptor Set { get; } = new();
 
+	/// <summary>The global::KnockOff.Tests.IGenericKeyValueStore<TKey, TValue> instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Tests.IGenericKeyValueStore<TKey, TValue> Object => this;
+
 	TValue global::KnockOff.Tests.IGenericKeyValueStore<TKey, TValue>.Get(TKey key)
 	{
 		Get.RecordCall(key);

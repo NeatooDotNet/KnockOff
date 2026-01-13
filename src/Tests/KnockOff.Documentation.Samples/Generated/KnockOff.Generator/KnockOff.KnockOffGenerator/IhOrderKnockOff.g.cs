@@ -84,10 +84,10 @@ partial class IhOrderKnockOff
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Total.</summary>
+	/// <summary>Interceptor for Total. Configure callbacks and track access.</summary>
 	public TotalInterceptor Total { get; } = new();
 
-	/// <summary>Interceptor for IsValid.</summary>
+	/// <summary>Interceptor for IsValid. Configure callbacks and track access.</summary>
 	public IsValidInterceptor IsValid { get; } = new();
 
 	/// <summary>Interceptor for Submit.</summary>
@@ -95,6 +95,9 @@ partial class IhOrderKnockOff
 
 	/// <summary>Interceptor for GetErrors.</summary>
 	public GetErrorsInterceptor GetErrors { get; } = new();
+
+	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IIhOrder instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Guides.IIhOrder Object => this;
 
 	decimal global::KnockOff.Documentation.Samples.Guides.IIhOrder.Total
 	{

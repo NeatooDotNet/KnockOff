@@ -83,7 +83,7 @@ partial class SkVerificationKnockOff
 		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Name.</summary>
+	/// <summary>Interceptor for Name. Configure callbacks and track access.</summary>
 	public NameInterceptor Name { get; } = new();
 
 	/// <summary>Interceptor for GetUser.</summary>
@@ -91,6 +91,9 @@ partial class SkVerificationKnockOff
 
 	/// <summary>Interceptor for Create.</summary>
 	public CreateInterceptor Create { get; } = new();
+
+	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkVerificationService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Skills.ISkVerificationService Object => this;
 
 	global::KnockOff.Documentation.Samples.Skills.SkUser global::KnockOff.Documentation.Samples.Skills.ISkVerificationService.GetUser(int id)
 	{

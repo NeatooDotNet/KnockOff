@@ -33,6 +33,9 @@ partial class MigSharedRepositoryKnockOff
 	/// <summary>Interceptor for GetById.</summary>
 	public GetById2Interceptor GetById2 { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IMigSharedRepository instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Comparison.IMigSharedRepository Object => this;
+
 	global::KnockOff.Documentation.Samples.Comparison.MigUser? global::KnockOff.Documentation.Samples.Comparison.IMigSharedRepository.GetById(int id)
 	{
 		GetById2.RecordCall(id);

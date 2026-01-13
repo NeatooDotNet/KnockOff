@@ -1003,6 +1003,9 @@ partial class IEntityListBaseOfTTests
 				remove => NeatooPropertyChangedInterceptor.RecordRemove(value);
 			}
 
+			/// <summary>The global::Neatoo.IEntityListBase<global::Neatoo.IEntityBase> instance. Use for passing to code expecting the interface.</summary>
+			public global::Neatoo.IEntityListBase<global::Neatoo.IEntityBase> Object => this;
+
 		}
 
 	}

@@ -46,11 +46,14 @@ partial class NotifierKnockOff
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Name.</summary>
+	/// <summary>Interceptor for Name. Configure callbacks and track access.</summary>
 	public NameInterceptor Name { get; } = new();
 
 	/// <summary>Interceptor for Notify.</summary>
 	public NotifyInterceptor Notify { get; } = new();
+
+	/// <summary>The global::KnockOff.Tests.INotifier instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Tests.INotifier Object => this;
 
 	void global::KnockOff.Tests.INotifier.Notify(string recipient)
 	{

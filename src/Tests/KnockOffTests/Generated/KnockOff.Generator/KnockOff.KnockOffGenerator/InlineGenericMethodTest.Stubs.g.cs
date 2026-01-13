@@ -432,6 +432,9 @@ partial class InlineGenericMethodTest
 				{ onCallCallback(this, source, destination); return; }
 			}
 
+			/// <summary>The global::KnockOff.Tests.IGenericMethodService instance. Use for passing to code expecting the interface.</summary>
+			public global::KnockOff.Tests.IGenericMethodService Object => this;
+
 			/// <summary>Gets a smart default value for a generic type at runtime.</summary>
 			private static T SmartDefault<T>(string methodName)
 			{

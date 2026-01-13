@@ -300,7 +300,7 @@ partial class RuleManagerStubForRule
 		}
 	}
 
-	/// <summary>Interceptor for Rules.</summary>
+	/// <summary>Interceptor for Rules. Configure callbacks and track access.</summary>
 	public RulesInterceptor Rules { get; } = new();
 
 	/// <summary>Interceptor for RunRules.</summary>
@@ -320,6 +320,9 @@ partial class RuleManagerStubForRule
 
 	/// <summary>Interceptor for RunRule (generic overloads, use .Of&lt;T&gt;()).</summary>
 	public RunRuleGenericInterceptor RunRuleGeneric { get; } = new();
+
+	/// <summary>The global::Neatoo.Rules.IRuleManager instance. Use for passing to code expecting the interface.</summary>
+	public global::Neatoo.Rules.IRuleManager Object => this;
 
 	global::System.Threading.Tasks.Task global::Neatoo.Rules.IRuleManager.RunRules(string propertyName, global::System.Threading.CancellationToken? token)
 	{

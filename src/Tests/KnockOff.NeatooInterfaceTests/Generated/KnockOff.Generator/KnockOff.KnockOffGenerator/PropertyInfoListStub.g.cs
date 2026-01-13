@@ -86,6 +86,9 @@ partial class PropertyInfoListStub
 	/// <summary>Interceptor for HasProperty.</summary>
 	public HasPropertyInterceptor HasProperty { get; } = new();
 
+	/// <summary>The global::Neatoo.IPropertyInfoList instance. Use for passing to code expecting the interface.</summary>
+	public global::Neatoo.IPropertyInfoList Object => this;
+
 	global::Neatoo.IPropertyInfo? global::Neatoo.IPropertyInfoList.GetPropertyInfo(string name)
 	{
 		GetPropertyInfo.RecordCall(name);

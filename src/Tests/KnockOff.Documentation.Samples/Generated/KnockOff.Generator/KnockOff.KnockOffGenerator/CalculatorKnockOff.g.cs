@@ -61,6 +61,9 @@ partial class CalculatorKnockOff
 	/// <summary>Interceptor for Multiply.</summary>
 	public MultiplyInterceptor Multiply { get; } = new();
 
+	/// <summary>The global::KnockOff.Documentation.Samples.ReadMe.ICalculator instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.ReadMe.ICalculator Object => this;
+
 	int global::KnockOff.Documentation.Samples.ReadMe.ICalculator.Add(int a, int b)
 	{
 		Add2.RecordCall(a, b);

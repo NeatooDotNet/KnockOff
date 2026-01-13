@@ -41,6 +41,9 @@ partial class ComparerStringStubTests
 				return default!;
 			}
 
+			/// <summary>The global::System.Collections.Generic.IComparer<string> instance. Use for passing to code expecting the interface.</summary>
+			public global::System.Collections.Generic.IComparer<string> Object => this;
+
 		}
 
 	}

@@ -41,6 +41,9 @@ partial class ObservableIntStubTests
 				throw new global::System.InvalidOperationException("No implementation provided for Subscribe. Set Subscribe.OnCall.");
 			}
 
+			/// <summary>The global::System.IObservable<int> instance. Use for passing to code expecting the interface.</summary>
+			public global::System.IObservable<int> Object => this;
+
 		}
 
 	}
