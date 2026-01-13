@@ -37,11 +37,22 @@ partial class SerializableStubTests
 			void global::System.Runtime.Serialization.ISerializable.GetObjectData(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context)
 			{
 				GetObjectData.RecordCall(info, context);
-				if (GetObjectData.OnCall is { } onCall) onCall(this, info, context);
+				if (GetObjectData.OnCall is { } onCall) { onCall(this, info, context); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("ISerializable", "GetObjectData");
 			}
 
 			/// <summary>The global::System.Runtime.Serialization.ISerializable instance. Use for passing to code expecting the interface.</summary>
 			public global::System.Runtime.Serialization.ISerializable Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public ISerializable(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

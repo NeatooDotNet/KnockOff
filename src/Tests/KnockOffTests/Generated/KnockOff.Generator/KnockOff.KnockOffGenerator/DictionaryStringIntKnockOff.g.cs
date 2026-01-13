@@ -395,22 +395,33 @@ partial class DictionaryStringIntKnockOff
 	/// <summary>The global::System.Collections.Generic.IDictionary<string, int> instance. Use for passing to code expecting the interface.</summary>
 	public global::System.Collections.Generic.IDictionary<string, int> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::System.Collections.Generic.IDictionary<string, int>.Add(string key, int @value)
 	{
 		Add1.RecordCall(key, @value);
-		Add1.OnCall?.Invoke(this, key, @value);
+		if (Add1.OnCall is { } onCallCallback)
+		{ onCallCallback(this, key, @value); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, int>", "Add");
 	}
 
 	bool global::System.Collections.Generic.IDictionary<string, int>.ContainsKey(string key)
 	{
 		ContainsKey.RecordCall(key);
-		return ContainsKey.OnCall?.Invoke(this, key) ?? default!;
+		if (ContainsKey.OnCall is { } callback)
+			return callback(this, key);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, int>", "ContainsKey");
+		return default!;
 	}
 
 	bool global::System.Collections.Generic.IDictionary<string, int>.Remove(string key)
 	{
 		Remove1.RecordCall(key);
-		return Remove1.OnCall?.Invoke(this, key) ?? default!;
+		if (Remove1.OnCall is { } callback)
+			return callback(this, key);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, int>", "Remove");
+		return default!;
 	}
 
 	bool global::System.Collections.Generic.IDictionary<string, int>.TryGetValue(string key, out int @value)
@@ -419,63 +430,76 @@ partial class DictionaryStringIntKnockOff
 		TryGetValue.RecordCall(key);
 		if (TryGetValue.OnCall is { } onCallCallback)
 			return onCallCallback(this, key, out @value);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, int>", "TryGetValue");
 		return default!;
 	}
 
 	int global::System.Collections.Generic.IDictionary<string, int>.this[string key]
 	{
-		get { Indexer.RecordGet(key); if (Indexer.OnGet != null) return Indexer.OnGet(this, key); return Indexer.Backing.TryGetValue(key, out var v) ? v : default!; }
-		set { Indexer.RecordSet(key, value); if (Indexer.OnSet != null) Indexer.OnSet(this, key, value); else Indexer.Backing[key] = value; }
+		get { Indexer.RecordGet(key); if (Indexer.OnGet is { } onGet) return onGet(this, key); if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, int>", "this[]"); return Indexer.Backing.TryGetValue(key, out var v) ? v : default!; }
+		set { Indexer.RecordSet(key, value); if (Indexer.OnSet is { } onSet) { onSet(this, key, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, int>", "this[]"); Indexer.Backing[key] = value; }
 	}
 
 	global::System.Collections.Generic.ICollection<string> global::System.Collections.Generic.IDictionary<string, int>.Keys
 	{
-		get { Keys.RecordGet(); return Keys.OnGet?.Invoke(this) ?? Keys.Value; }
+		get { Keys.RecordGet(); if (Keys.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, int>", "Keys"); return Keys.Value; }
 	}
 
 	global::System.Collections.Generic.ICollection<int> global::System.Collections.Generic.IDictionary<string, int>.Values
 	{
-		get { Values.RecordGet(); return Values.OnGet?.Invoke(this) ?? Values.Value; }
+		get { Values.RecordGet(); if (Values.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, int>", "Values"); return Values.Value; }
 	}
 
 	void global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, int>>.Add(global::System.Collections.Generic.KeyValuePair<string, int> item)
 	{
 		Add2.RecordCall(item);
-		Add2.OnCall?.Invoke(this, item);
+		if (Add2.OnCall is { } onCallCallback)
+		{ onCallCallback(this, item); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, int>>", "Add");
 	}
 
 	void global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, int>>.Clear()
 	{
 		Clear.RecordCall();
-		Clear.OnCall?.Invoke(this);
+		if (Clear.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, int>>", "Clear");
 	}
 
 	bool global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, int>>.Contains(global::System.Collections.Generic.KeyValuePair<string, int> item)
 	{
 		Contains.RecordCall(item);
-		return Contains.OnCall?.Invoke(this, item) ?? default!;
+		if (Contains.OnCall is { } callback)
+			return callback(this, item);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, int>>", "Contains");
+		return default!;
 	}
 
 	void global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, int>>.CopyTo(global::System.Collections.Generic.KeyValuePair<string, int>[] array, int arrayIndex)
 	{
 		CopyTo.RecordCall(array, arrayIndex);
-		CopyTo.OnCall?.Invoke(this, array, arrayIndex);
+		if (CopyTo.OnCall is { } onCallCallback)
+		{ onCallCallback(this, array, arrayIndex); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, int>>", "CopyTo");
 	}
 
 	bool global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, int>>.Remove(global::System.Collections.Generic.KeyValuePair<string, int> item)
 	{
 		Remove2.RecordCall(item);
-		return Remove2.OnCall?.Invoke(this, item) ?? default!;
+		if (Remove2.OnCall is { } callback)
+			return callback(this, item);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, int>>", "Remove");
+		return default!;
 	}
 
 	int global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, int>>.Count
 	{
-		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? Count.Value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, int>>", "Count"); return Count.Value; }
 	}
 
 	bool global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, int>>.IsReadOnly
 	{
-		get { IsReadOnly.RecordGet(); return IsReadOnly.OnGet?.Invoke(this) ?? IsReadOnly.Value; }
+		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, int>>", "IsReadOnly"); return IsReadOnly.Value; }
 	}
 
 	global::System.Collections.Generic.IEnumerator<global::System.Collections.Generic.KeyValuePair<string, int>> global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.KeyValuePair<string, int>>.GetEnumerator()
@@ -483,6 +507,7 @@ partial class DictionaryStringIntKnockOff
 		GetEnumerator.RecordCall();
 		if (GetEnumerator.OnCall is { } callback)
 			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, int>>", "GetEnumerator");
 		throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall or define a protected method 'GetEnumerator' in your partial class.");
 	}
 

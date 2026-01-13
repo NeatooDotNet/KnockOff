@@ -36,10 +36,16 @@ partial class ServiceProviderKnockOff
 	/// <summary>The global::System.IServiceProvider instance. Use for passing to code expecting the interface.</summary>
 	public global::System.IServiceProvider Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	object? global::System.IServiceProvider.GetService(global::System.Type serviceType)
 	{
 		GetService.RecordCall(serviceType);
-		return GetService.OnCall?.Invoke(this, serviceType) ?? default!;
+		if (GetService.OnCall is { } callback)
+			return callback(this, serviceType);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IServiceProvider", "GetService");
+		return default!;
 	}
 
 }

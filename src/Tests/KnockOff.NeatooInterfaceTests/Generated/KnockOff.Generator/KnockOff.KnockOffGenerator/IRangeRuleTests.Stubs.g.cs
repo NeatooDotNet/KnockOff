@@ -239,6 +239,7 @@ partial class IRangeRuleTests
 				{
 					ErrorMessage.RecordGet();
 					if (ErrorMessage.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRangeRule", "ErrorMessage");
 					return ErrorMessage.Value;
 				}
 			}
@@ -249,6 +250,7 @@ partial class IRangeRuleTests
 				{
 					Minimum.RecordGet();
 					if (Minimum.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRangeRule", "Minimum");
 					return Minimum.Value;
 				}
 			}
@@ -259,6 +261,7 @@ partial class IRangeRuleTests
 				{
 					Maximum.RecordGet();
 					if (Maximum.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRangeRule", "Maximum");
 					return Maximum.Value;
 				}
 			}
@@ -267,13 +270,15 @@ partial class IRangeRuleTests
 			{
 				RunRule.RecordCall(target, token);
 				if (RunRule.OnCall is { } onCall) return onCall(this, target, token);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "RunRule");
 				throw new global::System.InvalidOperationException("No implementation provided for RunRule. Set RunRule.OnCall.");
 			}
 
 			void global::Neatoo.Rules.IRule.OnRuleAdded(global::Neatoo.Rules.IRuleManager ruleManager, uint uniqueIndex)
 			{
 				OnRuleAdded.RecordCall(ruleManager, uniqueIndex);
-				if (OnRuleAdded.OnCall is { } onCall) onCall(this, ruleManager, uniqueIndex);
+				if (OnRuleAdded.OnCall is { } onCall) { onCall(this, ruleManager, uniqueIndex); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "OnRuleAdded");
 			}
 
 			bool global::Neatoo.Rules.IRule.Executed
@@ -282,6 +287,7 @@ partial class IRangeRuleTests
 				{
 					Executed.RecordGet();
 					if (Executed.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "Executed");
 					return Executed.Value;
 				}
 			}
@@ -292,6 +298,7 @@ partial class IRangeRuleTests
 				{
 					RuleOrder.RecordGet();
 					if (RuleOrder.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "RuleOrder");
 					return RuleOrder.Value;
 				}
 			}
@@ -302,6 +309,7 @@ partial class IRangeRuleTests
 				{
 					UniqueIndex.RecordGet();
 					if (UniqueIndex.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "UniqueIndex");
 					return UniqueIndex.Value;
 				}
 			}
@@ -312,6 +320,7 @@ partial class IRangeRuleTests
 				{
 					Messages.RecordGet();
 					if (Messages.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "Messages");
 					return Messages.Value;
 				}
 			}
@@ -322,12 +331,23 @@ partial class IRangeRuleTests
 				{
 					TriggerProperties.RecordGet();
 					if (TriggerProperties.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRule", "TriggerProperties");
 					return TriggerProperties.Value;
 				}
 			}
 
 			/// <summary>The global::Neatoo.Rules.Rules.IRangeRule instance. Use for passing to code expecting the interface.</summary>
 			public global::Neatoo.Rules.Rules.IRangeRule Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IRangeRule(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

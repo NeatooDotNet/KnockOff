@@ -95,22 +95,30 @@ partial class SkVerificationKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkVerificationService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ISkVerificationService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Documentation.Samples.Skills.SkUser global::KnockOff.Documentation.Samples.Skills.ISkVerificationService.GetUser(int id)
 	{
 		GetUser.RecordCall(id);
-		return GetUser.OnCall?.Invoke(this, id) ?? new global::KnockOff.Documentation.Samples.Skills.SkUser();
+		if (GetUser.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkVerificationService", "GetUser");
+		return new global::KnockOff.Documentation.Samples.Skills.SkUser();
 	}
 
 	void global::KnockOff.Documentation.Samples.Skills.ISkVerificationService.Create(string name, int @value)
 	{
 		Create.RecordCall(name, @value);
-		Create.OnCall?.Invoke(this, name, @value);
+		if (Create.OnCall is { } onCallCallback)
+		{ onCallCallback(this, name, @value); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkVerificationService", "Create");
 	}
 
 	string global::KnockOff.Documentation.Samples.Skills.ISkVerificationService.Name
 	{
-		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else Name.Value = value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkVerificationService", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkVerificationService", "Name"); Name.Value = value; }
 	}
 
 }

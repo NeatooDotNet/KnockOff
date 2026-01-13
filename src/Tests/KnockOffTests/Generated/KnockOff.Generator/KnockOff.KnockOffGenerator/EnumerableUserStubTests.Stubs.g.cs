@@ -35,6 +35,7 @@ partial class EnumerableUserStubTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("User>", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
@@ -45,6 +46,16 @@ partial class EnumerableUserStubTests
 
 			/// <summary>The global::System.Collections.Generic.IEnumerable<global::KnockOff.Tests.User> instance. Use for passing to code expecting the interface.</summary>
 			public global::System.Collections.Generic.IEnumerable<global::KnockOff.Tests.User> Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IEnumerable(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

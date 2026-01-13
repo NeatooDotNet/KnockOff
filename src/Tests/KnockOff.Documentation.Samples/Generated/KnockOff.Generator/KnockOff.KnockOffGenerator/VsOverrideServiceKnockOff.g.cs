@@ -36,6 +36,9 @@ partial class VsOverrideServiceKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IVsOverrideService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IVsOverrideService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Documentation.Samples.Comparison.VsUser global::KnockOff.Documentation.Samples.Comparison.IVsOverrideService.GetUser(int id)
 	{
 		GetUser2.RecordCall(id);

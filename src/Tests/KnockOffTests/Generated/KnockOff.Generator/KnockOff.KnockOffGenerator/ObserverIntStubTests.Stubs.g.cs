@@ -80,23 +80,36 @@ partial class ObserverIntStubTests
 			void global::System.IObserver<int>.OnCompleted()
 			{
 				OnCompleted.RecordCall();
-				if (OnCompleted.OnCall is { } onCall) onCall(this);
+				if (OnCompleted.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IObserver<int>", "OnCompleted");
 			}
 
 			void global::System.IObserver<int>.OnError(global::System.Exception error)
 			{
 				OnError.RecordCall(error);
-				if (OnError.OnCall is { } onCall) onCall(this, error);
+				if (OnError.OnCall is { } onCall) { onCall(this, error); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IObserver<int>", "OnError");
 			}
 
 			void global::System.IObserver<int>.OnNext(int value)
 			{
 				OnNext.RecordCall(value);
-				if (OnNext.OnCall is { } onCall) onCall(this, value);
+				if (OnNext.OnCall is { } onCall) { onCall(this, value); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IObserver<int>", "OnNext");
 			}
 
 			/// <summary>The global::System.IObserver<int> instance. Use for passing to code expecting the interface.</summary>
 			public global::System.IObserver<int> Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IObserver(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

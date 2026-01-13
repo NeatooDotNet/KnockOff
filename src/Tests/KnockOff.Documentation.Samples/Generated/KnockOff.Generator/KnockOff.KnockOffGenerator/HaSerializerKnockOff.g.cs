@@ -161,11 +161,15 @@ partial class HaSerializerKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IHaSerializer instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.IHaSerializer Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	T global::KnockOff.Documentation.Samples.Skills.IHaSerializer.Deserialize<T>(string json)
 	{
 		Deserialize.Of<T>().RecordCall(json);
 		if (Deserialize.Of<T>().OnCall is { } callback)
 			return callback(this, json);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IHaSerializer", "Deserialize");
 		return SmartDefault<T>("Deserialize");
 	}
 
@@ -174,6 +178,7 @@ partial class HaSerializerKnockOff
 		Convert.Of<TIn, TOut>().RecordCall();
 		if (Convert.Of<TIn, TOut>().OnCall is { } callback)
 			return callback(this, input);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IHaSerializer", "Convert");
 		return SmartDefault<TOut>("Convert");
 	}
 

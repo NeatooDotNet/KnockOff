@@ -61,6 +61,7 @@ partial class StructuralEquatableStubTests
 			{
 				Equals.RecordCall(other, comparer);
 				if (Equals.OnCall is { } onCall) return onCall(this, other, comparer);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IStructuralEquatable", "Equals");
 				return default!;
 			}
 
@@ -68,11 +69,22 @@ partial class StructuralEquatableStubTests
 			{
 				GetHashCode.RecordCall(comparer);
 				if (GetHashCode.OnCall is { } onCall) return onCall(this, comparer);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IStructuralEquatable", "GetHashCode");
 				return default!;
 			}
 
 			/// <summary>The global::System.Collections.IStructuralEquatable instance. Use for passing to code expecting the interface.</summary>
 			public global::System.Collections.IStructuralEquatable Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IStructuralEquatable(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

@@ -317,13 +317,15 @@ partial class DictionaryStringStringStubTests
 			void global::System.Collections.Generic.IDictionary<string, string>.Add(string key, string value)
 			{
 				Add.RecordCall(key, value, null);
-				if (Add.OnCall is { } onCall) onCall(this, key, value, null);
+				if (Add.OnCall is { } onCall) { onCall(this, key, value, null); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, string>", "Add");
 			}
 
 			bool global::System.Collections.Generic.IDictionary<string, string>.ContainsKey(string key)
 			{
 				ContainsKey.RecordCall(key);
 				if (ContainsKey.OnCall is { } onCall) return onCall(this, key);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, string>", "ContainsKey");
 				return default!;
 			}
 
@@ -331,6 +333,7 @@ partial class DictionaryStringStringStubTests
 			{
 				Remove.RecordCall(key, null);
 				if (Remove.OnCall is { } onCall) return onCall(this, key, null);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, string>", "Remove");
 				return default!;
 			}
 
@@ -339,6 +342,7 @@ partial class DictionaryStringStringStubTests
 				value = default!;
 				TryGetValue.RecordCall(key);
 				if (TryGetValue.OnCall is { } onCall) return onCall(this, key);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, string>", "TryGetValue");
 				return default!;
 			}
 
@@ -348,13 +352,15 @@ partial class DictionaryStringStringStubTests
 				{
 					Indexer.RecordGet(key);
 					if (Indexer.OnGet is { } onGet) return onGet(this, key);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, string>", "this[]");
 					return Indexer.Backing.TryGetValue(key, out var v) ? v : default!;
 				}
 				set
 				{
 					Indexer.RecordSet(key, value);
-					if (Indexer.OnSet is { } onSet) onSet(this, key, value);
-					else Indexer.Backing[key] = value;
+					if (Indexer.OnSet is { } onSet) { onSet(this, key, value); return; }
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, string>", "this[]");
+					Indexer.Backing[key] = value;
 				}
 			}
 
@@ -364,6 +370,7 @@ partial class DictionaryStringStringStubTests
 				{
 					Keys.RecordGet();
 					if (Keys.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, string>", "Keys");
 					return Keys.Value;
 				}
 			}
@@ -374,6 +381,7 @@ partial class DictionaryStringStringStubTests
 				{
 					Values.RecordGet();
 					if (Values.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, string>", "Values");
 					return Values.Value;
 				}
 			}
@@ -381,32 +389,37 @@ partial class DictionaryStringStringStubTests
 			void global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, string>>.Add(global::System.Collections.Generic.KeyValuePair<string, string> item)
 			{
 				Add.RecordCall(null, null, item);
-				if (Add.OnCall is { } onCall) onCall(this, null, null, item);
+				if (Add.OnCall is { } onCall) { onCall(this, null, null, item); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, string>>", "Add");
 			}
 
 			void global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, string>>.Clear()
 			{
 				Clear.RecordCall();
-				if (Clear.OnCall is { } onCall) onCall(this);
+				if (Clear.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, string>>", "Clear");
 			}
 
 			bool global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, string>>.Contains(global::System.Collections.Generic.KeyValuePair<string, string> item)
 			{
 				Contains.RecordCall(item);
 				if (Contains.OnCall is { } onCall) return onCall(this, item);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, string>>", "Contains");
 				return default!;
 			}
 
 			void global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, string>>.CopyTo(global::System.Collections.Generic.KeyValuePair<string, string>[] array, int arrayIndex)
 			{
 				CopyTo.RecordCall(array, arrayIndex);
-				if (CopyTo.OnCall is { } onCall) onCall(this, array, arrayIndex);
+				if (CopyTo.OnCall is { } onCall) { onCall(this, array, arrayIndex); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, string>>", "CopyTo");
 			}
 
 			bool global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, string>>.Remove(global::System.Collections.Generic.KeyValuePair<string, string> item)
 			{
 				Remove.RecordCall(null, item);
 				if (Remove.OnCall is { } onCall) return onCall(this, null, item);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, string>>", "Remove");
 				return default!;
 			}
 
@@ -416,6 +429,7 @@ partial class DictionaryStringStringStubTests
 				{
 					Count.RecordGet();
 					if (Count.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, string>>", "Count");
 					return Count.Value;
 				}
 			}
@@ -426,6 +440,7 @@ partial class DictionaryStringStringStubTests
 				{
 					IsReadOnly.RecordGet();
 					if (IsReadOnly.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, string>>", "IsReadOnly");
 					return IsReadOnly.Value;
 				}
 			}
@@ -434,6 +449,7 @@ partial class DictionaryStringStringStubTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, string>>", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
@@ -441,11 +457,22 @@ partial class DictionaryStringStringStubTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
 			/// <summary>The global::System.Collections.Generic.IDictionary<string, string> instance. Use for passing to code expecting the interface.</summary>
 			public global::System.Collections.Generic.IDictionary<string, string> Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IDictionary(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

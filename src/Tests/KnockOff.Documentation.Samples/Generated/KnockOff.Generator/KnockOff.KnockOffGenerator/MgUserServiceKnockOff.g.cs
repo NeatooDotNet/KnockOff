@@ -70,16 +70,22 @@ partial class MgUserServiceKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IMgUserService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.IMgUserService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Documentation.Samples.Skills.MgUser? global::KnockOff.Documentation.Samples.Skills.IMgUserService.GetUser(int id)
 	{
 		GetUser.RecordCall(id);
-		return GetUser.OnCall?.Invoke(this, id) ?? default!;
+		if (GetUser.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMgUserService", "GetUser");
+		return default!;
 	}
 
 	string global::KnockOff.Documentation.Samples.Skills.IMgUserService.Name
 	{
-		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else Name.Value = value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IMgUserService", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IMgUserService", "Name"); Name.Value = value; }
 	}
 
 }

@@ -392,6 +392,7 @@ partial class IValidatePropertyManagerTests
 			{
 				WaitForTasks.RecordCall();
 				if (WaitForTasks.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty>", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -399,6 +400,7 @@ partial class IValidatePropertyManagerTests
 			{
 				HasProperty.RecordCall(propertyName);
 				if (HasProperty.OnCall is { } onCall) return onCall(this, propertyName);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty>", "HasProperty");
 				return default!;
 			}
 
@@ -406,44 +408,51 @@ partial class IValidatePropertyManagerTests
 			{
 				GetProperty.RecordCall(propertyName);
 				if (GetProperty.OnCall is { } onCall) return onCall(this, propertyName);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty>", "GetProperty");
 				throw new global::System.InvalidOperationException("No implementation provided for GetProperty. Set GetProperty.OnCall.");
 			}
 
 			void global::Neatoo.IValidatePropertyManager<global::Neatoo.IValidateProperty>.SetProperties(global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty> properties)
 			{
 				SetProperties.RecordCall(properties);
-				if (SetProperties.OnCall is { } onCall) onCall(this, properties);
+				if (SetProperties.OnCall is { } onCall) { onCall(this, properties); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty>", "SetProperties");
 			}
 
 			global::System.Threading.Tasks.Task global::Neatoo.IValidatePropertyManager<global::Neatoo.IValidateProperty>.RunRules(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
 			{
 				RunRules.RecordCall(runRules, token);
 				if (RunRules.OnCall is { } onCall) return onCall(this, runRules, token);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty>", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
 			void global::Neatoo.IValidatePropertyManager<global::Neatoo.IValidateProperty>.PauseAllActions()
 			{
 				PauseAllActions.RecordCall();
-				if (PauseAllActions.OnCall is { } onCall) onCall(this);
+				if (PauseAllActions.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty>", "PauseAllActions");
 			}
 
 			void global::Neatoo.IValidatePropertyManager<global::Neatoo.IValidateProperty>.ResumeAllActions()
 			{
 				ResumeAllActions.RecordCall();
-				if (ResumeAllActions.OnCall is { } onCall) onCall(this);
+				if (ResumeAllActions.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty>", "ResumeAllActions");
 			}
 
 			void global::Neatoo.IValidatePropertyManager<global::Neatoo.IValidateProperty>.ClearAllMessages()
 			{
 				ClearAllMessages.RecordCall();
-				if (ClearAllMessages.OnCall is { } onCall) onCall(this);
+				if (ClearAllMessages.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty>", "ClearAllMessages");
 			}
 
 			void global::Neatoo.IValidatePropertyManager<global::Neatoo.IValidateProperty>.ClearSelfMessages()
 			{
 				ClearSelfMessages.RecordCall();
-				if (ClearSelfMessages.OnCall is { } onCall) onCall(this);
+				if (ClearSelfMessages.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty>", "ClearSelfMessages");
 			}
 
 			bool global::Neatoo.IValidatePropertyManager<global::Neatoo.IValidateProperty>.IsBusy
@@ -452,6 +461,7 @@ partial class IValidatePropertyManagerTests
 				{
 					IsBusy.RecordGet();
 					if (IsBusy.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty>", "IsBusy");
 					return IsBusy.Value;
 				}
 			}
@@ -462,6 +472,7 @@ partial class IValidatePropertyManagerTests
 				{
 					Indexer.RecordGet(propertyName);
 					if (Indexer.OnGet is { } onGet) return onGet(this, propertyName);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty>", "this[]");
 					return Indexer.Backing.TryGetValue(propertyName, out var v) ? v : default!;
 				}
 			}
@@ -472,6 +483,7 @@ partial class IValidatePropertyManagerTests
 				{
 					IsSelfValid.RecordGet();
 					if (IsSelfValid.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty>", "IsSelfValid");
 					return IsSelfValid.Value;
 				}
 			}
@@ -482,6 +494,7 @@ partial class IValidatePropertyManagerTests
 				{
 					IsValid.RecordGet();
 					if (IsValid.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty>", "IsValid");
 					return IsValid.Value;
 				}
 			}
@@ -492,6 +505,7 @@ partial class IValidatePropertyManagerTests
 				{
 					PropertyMessages.RecordGet();
 					if (PropertyMessages.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty>", "PropertyMessages");
 					return PropertyMessages.Value;
 				}
 			}
@@ -502,6 +516,7 @@ partial class IValidatePropertyManagerTests
 				{
 					IsPaused.RecordGet();
 					if (IsPaused.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty>", "IsPaused");
 					return IsPaused.Value;
 				}
 			}
@@ -520,6 +535,16 @@ partial class IValidatePropertyManagerTests
 
 			/// <summary>The global::Neatoo.IValidatePropertyManager<global::Neatoo.IValidateProperty> instance. Use for passing to code expecting the interface.</summary>
 			public global::Neatoo.IValidatePropertyManager<global::Neatoo.IValidateProperty> Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IValidatePropertyManager(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

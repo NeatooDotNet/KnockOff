@@ -55,14 +55,17 @@ partial class PropertyStoreKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore.this[int index]
 	{
-		get { Indexer.RecordGet(index); if (Indexer.OnGet != null) return Indexer.OnGet(this, index); return Indexer.Backing.TryGetValue(index, out var v) ? v : default!; }
+		get { Indexer.RecordGet(index); if (Indexer.OnGet is { } onGet) return onGet(this, index); if (Strict) throw global::KnockOff.StubException.NotConfigured("IInPropertyStore", "this[]"); return Indexer.Backing.TryGetValue(index, out var v) ? v : default!; }
 	}
 
 	int global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore.Count
 	{
-		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? Count.Value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IInPropertyStore", "Count"); return Count.Value; }
 	}
 
 }

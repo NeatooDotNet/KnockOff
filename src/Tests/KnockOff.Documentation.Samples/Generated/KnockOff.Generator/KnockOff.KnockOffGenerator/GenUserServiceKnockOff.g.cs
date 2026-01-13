@@ -70,10 +70,13 @@ partial class GenUserServiceKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Reference.IGenUserService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Reference.IGenUserService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	string global::KnockOff.Documentation.Samples.Reference.IGenUserService.Name
 	{
-		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else Name.Value = value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenUserService", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenUserService", "Name"); Name.Value = value; }
 	}
 
 	global::KnockOff.Documentation.Samples.Reference.GenUser? global::KnockOff.Documentation.Samples.Reference.IGenUserService.GetUser(int id)

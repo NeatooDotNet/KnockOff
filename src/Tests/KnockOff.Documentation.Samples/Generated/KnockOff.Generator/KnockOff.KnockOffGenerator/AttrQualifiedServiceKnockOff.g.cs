@@ -30,10 +30,15 @@ partial class AttrQualifiedServiceKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Reference.IAttrService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Reference.IAttrService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Documentation.Samples.Reference.IAttrService.DoWork()
 	{
 		DoWork.RecordCall();
-		DoWork.OnCall?.Invoke(this);
+		if (DoWork.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IAttrService", "DoWork");
 	}
 
 }

@@ -70,15 +70,18 @@ partial class CacheStub
 	/// <summary>The global::KnockOff.Benchmarks.Interfaces.ICache instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Interfaces.ICache Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	object global::KnockOff.Benchmarks.Interfaces.ICache.this[string key]
 	{
-		get { IndexerString.RecordGet(key); if (IndexerString.OnGet != null) return IndexerString.OnGet(this, key); return IndexerString.Backing.TryGetValue(key, out var v) ? v : new object(); }
-		set { IndexerString.RecordSet(key, value); if (IndexerString.OnSet != null) IndexerString.OnSet(this, key, value); else IndexerString.Backing[key] = value; }
+		get { IndexerString.RecordGet(key); if (IndexerString.OnGet is { } onGet) return onGet(this, key); if (Strict) throw global::KnockOff.StubException.NotConfigured("ICache", "this[]"); return IndexerString.Backing.TryGetValue(key, out var v) ? v : new object(); }
+		set { IndexerString.RecordSet(key, value); if (IndexerString.OnSet is { } onSet) { onSet(this, key, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ICache", "this[]"); IndexerString.Backing[key] = value; }
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ICache.this[int index]
 	{
-		get { IndexerInt32.RecordGet(index); if (IndexerInt32.OnGet != null) return IndexerInt32.OnGet(this, index); return IndexerInt32.Backing.TryGetValue(index, out var v) ? v : default!; }
+		get { IndexerInt32.RecordGet(index); if (IndexerInt32.OnGet is { } onGet) return onGet(this, index); if (Strict) throw global::KnockOff.StubException.NotConfigured("ICache", "this[]"); return IndexerInt32.Backing.TryGetValue(index, out var v) ? v : default!; }
 	}
 
 }

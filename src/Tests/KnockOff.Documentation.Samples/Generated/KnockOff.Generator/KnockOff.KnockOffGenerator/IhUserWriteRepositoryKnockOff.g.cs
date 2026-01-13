@@ -111,28 +111,41 @@ partial class IhUserWriteRepositoryKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IIhWriteRepository<global::KnockOff.Documentation.Samples.Guides.IhUser> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IIhWriteRepository<global::KnockOff.Documentation.Samples.Guides.IhUser> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Documentation.Samples.Guides.IIhWriteRepository<global::KnockOff.Documentation.Samples.Guides.IhUser>.Add(global::KnockOff.Documentation.Samples.Guides.IhUser entity)
 	{
 		Add.RecordCall(entity);
-		Add.OnCall?.Invoke(this, entity);
+		if (Add.OnCall is { } onCallCallback)
+		{ onCallCallback(this, entity); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IhUser>", "Add");
 	}
 
 	void global::KnockOff.Documentation.Samples.Guides.IIhWriteRepository<global::KnockOff.Documentation.Samples.Guides.IhUser>.Delete(int id)
 	{
 		Delete.RecordCall(id);
-		Delete.OnCall?.Invoke(this, id);
+		if (Delete.OnCall is { } onCallCallback)
+		{ onCallCallback(this, id); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IhUser>", "Delete");
 	}
 
 	global::KnockOff.Documentation.Samples.Guides.IhUser? global::KnockOff.Documentation.Samples.Guides.IIhReadRepository<global::KnockOff.Documentation.Samples.Guides.IhUser>.GetById(int id)
 	{
 		GetById.RecordCall(id);
-		return GetById.OnCall?.Invoke(this, id) ?? default!;
+		if (GetById.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IhUser>", "GetById");
+		return default!;
 	}
 
 	global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Guides.IhUser> global::KnockOff.Documentation.Samples.Guides.IIhReadRepository<global::KnockOff.Documentation.Samples.Guides.IhUser>.GetAll()
 	{
 		GetAll.RecordCall();
-		return GetAll.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Guides.IhUser>();
+		if (GetAll.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IhUser>", "GetAll");
+		return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Guides.IhUser>();
 	}
 
 }

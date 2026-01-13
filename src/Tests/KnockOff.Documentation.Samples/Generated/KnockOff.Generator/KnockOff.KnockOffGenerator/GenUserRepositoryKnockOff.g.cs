@@ -89,22 +89,33 @@ partial class GenUserRepositoryKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IGenRepository<global::KnockOff.Documentation.Samples.Guides.GenUser> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IGenRepository<global::KnockOff.Documentation.Samples.Guides.GenUser> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Documentation.Samples.Guides.GenUser? global::KnockOff.Documentation.Samples.Guides.IGenRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>.GetById(int id)
 	{
 		GetById.RecordCall(id);
-		return GetById.OnCall?.Invoke(this, id) ?? default!;
+		if (GetById.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("GenUser>", "GetById");
+		return default!;
 	}
 
 	void global::KnockOff.Documentation.Samples.Guides.IGenRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>.Save(global::KnockOff.Documentation.Samples.Guides.GenUser entity)
 	{
 		Save.RecordCall(entity);
-		Save.OnCall?.Invoke(this, entity);
+		if (Save.OnCall is { } onCallCallback)
+		{ onCallCallback(this, entity); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("GenUser>", "Save");
 	}
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.GenUser?> global::KnockOff.Documentation.Samples.Guides.IGenRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>.GetByIdAsync(int id)
 	{
 		GetByIdAsync.RecordCall(id);
-		return GetByIdAsync.OnCall?.Invoke(this, id) ?? global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Guides.GenUser?>(default!);
+		if (GetByIdAsync.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("GenUser>", "GetByIdAsync");
+		return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Guides.GenUser?>(default!);
 	}
 
 }

@@ -195,46 +195,67 @@ partial class OverloadedServiceKnockOff
 	/// <summary>The global::KnockOff.Tests.IOverloadedService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IOverloadedService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> global::KnockOff.Tests.IOverloadedService.GetByIdAsync(int id)
 	{
 		GetByIdAsync1.RecordCall(id);
-		return GetByIdAsync1.OnCall?.Invoke(this, id) ?? global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.User?>(default!);
+		if (GetByIdAsync1.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IOverloadedService", "GetByIdAsync");
+		return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.User?>(default!);
 	}
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> global::KnockOff.Tests.IOverloadedService.GetByIdAsync(int id, global::System.Threading.CancellationToken cancellationToken)
 	{
 		GetByIdAsync2.RecordCall(id, cancellationToken);
-		return GetByIdAsync2.OnCall?.Invoke(this, id, cancellationToken) ?? global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.User?>(default!);
+		if (GetByIdAsync2.OnCall is { } callback)
+			return callback(this, id, cancellationToken);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IOverloadedService", "GetByIdAsync");
+		return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.User?>(default!);
 	}
 
 	void global::KnockOff.Tests.IOverloadedService.Process(string data)
 	{
 		Process1.RecordCall(data);
-		Process1.OnCall?.Invoke(this, data);
+		if (Process1.OnCall is { } onCallCallback)
+		{ onCallCallback(this, data); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IOverloadedService", "Process");
 	}
 
 	void global::KnockOff.Tests.IOverloadedService.Process(string data, int priority)
 	{
 		Process2.RecordCall(data, priority);
-		Process2.OnCall?.Invoke(this, data, priority);
+		if (Process2.OnCall is { } onCallCallback)
+		{ onCallCallback(this, data, priority); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IOverloadedService", "Process");
 	}
 
 	void global::KnockOff.Tests.IOverloadedService.Process(string data, int priority, bool async)
 	{
 		Process3.RecordCall(data, priority, async);
-		Process3.OnCall?.Invoke(this, data, priority, async);
+		if (Process3.OnCall is { } onCallCallback)
+		{ onCallCallback(this, data, priority, async); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IOverloadedService", "Process");
 	}
 
 	int global::KnockOff.Tests.IOverloadedService.Calculate(int @value)
 	{
 		Calculate1.RecordCall(@value);
-		return Calculate1.OnCall?.Invoke(this, @value) ?? default!;
+		if (Calculate1.OnCall is { } callback)
+			return callback(this, @value);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IOverloadedService", "Calculate");
+		return default!;
 	}
 
 	int global::KnockOff.Tests.IOverloadedService.Calculate(int a, int b)
 	{
 		Calculate2.RecordCall(a, b);
-		return Calculate2.OnCall?.Invoke(this, a, b) ?? default!;
+		if (Calculate2.OnCall is { } callback)
+			return callback(this, a, b);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IOverloadedService", "Calculate");
+		return default!;
 	}
 
 }

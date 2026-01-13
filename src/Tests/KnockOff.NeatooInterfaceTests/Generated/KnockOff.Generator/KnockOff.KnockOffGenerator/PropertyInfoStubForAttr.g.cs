@@ -233,43 +233,50 @@ partial class PropertyInfoStubForAttr
 	/// <summary>The global::Neatoo.IPropertyInfo instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.IPropertyInfo Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	T? global::Neatoo.IPropertyInfo.GetCustomAttribute<T>() where T : class
 	{
 		GetCustomAttribute.Of<T>().RecordCall();
 		if (GetCustomAttribute.Of<T>().OnCall is { } callback)
 			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "GetCustomAttribute");
 		return default!;
 	}
 
 	global::System.Collections.Generic.IEnumerable<global::System.Attribute> global::Neatoo.IPropertyInfo.GetCustomAttributes()
 	{
 		GetCustomAttributes.RecordCall();
-		return GetCustomAttributes.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<global::System.Attribute>();
+		if (GetCustomAttributes.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "GetCustomAttributes");
+		return new global::System.Collections.Generic.List<global::System.Attribute>();
 	}
 
 	global::System.Reflection.PropertyInfo global::Neatoo.IPropertyInfo.PropertyInfo
 	{
-		get { PropertyInfo.RecordGet(); return PropertyInfo.OnGet?.Invoke(this) ?? PropertyInfo.Value; }
+		get { PropertyInfo.RecordGet(); if (PropertyInfo.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "PropertyInfo"); return PropertyInfo.Value; }
 	}
 
 	string global::Neatoo.IPropertyInfo.Name
 	{
-		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? Name.Value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "Name"); return Name.Value; }
 	}
 
 	global::System.Type global::Neatoo.IPropertyInfo.Type
 	{
-		get { Type.RecordGet(); return Type.OnGet?.Invoke(this) ?? Type.Value; }
+		get { Type.RecordGet(); if (Type.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "Type"); return Type.Value; }
 	}
 
 	string global::Neatoo.IPropertyInfo.Key
 	{
-		get { Key.RecordGet(); return Key.OnGet?.Invoke(this) ?? Key.Value; }
+		get { Key.RecordGet(); if (Key.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "Key"); return Key.Value; }
 	}
 
 	bool global::Neatoo.IPropertyInfo.IsPrivateSetter
 	{
-		get { IsPrivateSetter.RecordGet(); return IsPrivateSetter.OnGet?.Invoke(this) ?? IsPrivateSetter.Value; }
+		get { IsPrivateSetter.RecordGet(); if (IsPrivateSetter.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "IsPrivateSetter"); return IsPrivateSetter.Value; }
 	}
 
 }

@@ -33,11 +33,15 @@ partial class EnumerableStringKnockOff
 	/// <summary>The global::System.Collections.Generic.IEnumerable<string> instance. Use for passing to code expecting the interface.</summary>
 	public global::System.Collections.Generic.IEnumerable<string> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::System.Collections.Generic.IEnumerator<string> global::System.Collections.Generic.IEnumerable<string>.GetEnumerator()
 	{
 		GetEnumerator.RecordCall();
 		if (GetEnumerator.OnCall is { } callback)
 			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable<string>", "GetEnumerator");
 		throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall or define a protected method 'GetEnumerator' in your partial class.");
 	}
 

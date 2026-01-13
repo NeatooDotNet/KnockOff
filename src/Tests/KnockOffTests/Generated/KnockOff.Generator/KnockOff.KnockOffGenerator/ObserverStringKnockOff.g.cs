@@ -80,22 +80,31 @@ partial class ObserverStringKnockOff
 	/// <summary>The global::System.IObserver<string> instance. Use for passing to code expecting the interface.</summary>
 	public global::System.IObserver<string> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::System.IObserver<string>.OnCompleted()
 	{
 		OnCompleted.RecordCall();
-		OnCompleted.OnCall?.Invoke(this);
+		if (OnCompleted.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IObserver<string>", "OnCompleted");
 	}
 
 	void global::System.IObserver<string>.OnError(global::System.Exception error)
 	{
 		OnError.RecordCall(error);
-		OnError.OnCall?.Invoke(this, error);
+		if (OnError.OnCall is { } onCallCallback)
+		{ onCallCallback(this, error); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IObserver<string>", "OnError");
 	}
 
 	void global::System.IObserver<string>.OnNext(string @value)
 	{
 		OnNext.RecordCall(@value);
-		OnNext.OnCall?.Invoke(this, @value);
+		if (OnNext.OnCall is { } onCallCallback)
+		{ onCallCallback(this, @value); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IObserver<string>", "OnNext");
 	}
 
 }

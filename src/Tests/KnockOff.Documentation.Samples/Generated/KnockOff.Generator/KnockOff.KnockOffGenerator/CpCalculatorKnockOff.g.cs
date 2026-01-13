@@ -64,6 +64,9 @@ partial class CpCalculatorKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ICpCalculator instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ICpCalculator Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	int global::KnockOff.Documentation.Samples.Skills.ICpCalculator.Add(int a, int b)
 	{
 		Add2.RecordCall(a, b);

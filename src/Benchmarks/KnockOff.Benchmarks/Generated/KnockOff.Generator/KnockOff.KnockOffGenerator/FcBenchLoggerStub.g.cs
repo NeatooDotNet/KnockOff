@@ -83,22 +83,31 @@ partial class FcBenchLoggerStub
 	/// <summary>The global::KnockOff.Benchmarks.Benchmarks.IFcBenchLogger instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Benchmarks.IFcBenchLogger Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Benchmarks.Benchmarks.IFcBenchLogger.LogInfo(string message)
 	{
 		LogInfo.RecordCall(message);
-		LogInfo.OnCall?.Invoke(this, message);
+		if (LogInfo.OnCall is { } onCallCallback)
+		{ onCallCallback(this, message); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFcBenchLogger", "LogInfo");
 	}
 
 	void global::KnockOff.Benchmarks.Benchmarks.IFcBenchLogger.LogWarning(string message)
 	{
 		LogWarning.RecordCall(message);
-		LogWarning.OnCall?.Invoke(this, message);
+		if (LogWarning.OnCall is { } onCallCallback)
+		{ onCallCallback(this, message); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFcBenchLogger", "LogWarning");
 	}
 
 	void global::KnockOff.Benchmarks.Benchmarks.IFcBenchLogger.LogError(string message, global::System.Exception? exception)
 	{
 		LogError.RecordCall(message, exception);
-		LogError.OnCall?.Invoke(this, message, exception);
+		if (LogError.OnCall is { } onCallCallback)
+		{ onCallCallback(this, message, exception); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFcBenchLogger", "LogError");
 	}
 
 }

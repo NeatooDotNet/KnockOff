@@ -61,6 +61,9 @@ partial class AsyncUserDefinedKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IAsyncUserDefined instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IAsyncUserDefined Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.AsyncUser?> global::KnockOff.Documentation.Samples.Guides.IAsyncUserDefined.GetByIdAsync(int id)
 	{
 		GetByIdAsync2.RecordCall(id);

@@ -27,6 +27,9 @@ partial class EntityWithInitPropertyKnockOff
 	/// <summary>The global::KnockOffTests.IEntityWithInitProperty instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOffTests.IEntityWithInitProperty Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	string global::KnockOffTests.IEntityWithInitProperty.Id
 	{
 		get { Id.RecordGet(); return Id.Value; }

@@ -33,10 +33,15 @@ partial class SkSingleMethodServiceKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkSingleMethodService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ISkSingleMethodService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Documentation.Samples.Skills.ISkSingleMethodService.SendEmail(string to, string subject)
 	{
 		SendEmail.RecordCall(to, subject);
-		SendEmail.OnCall?.Invoke(this, to, subject);
+		if (SendEmail.OnCall is { } onCallCallback)
+		{ onCallCallback(this, to, subject); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkSingleMethodService", "SendEmail");
 	}
 
 }

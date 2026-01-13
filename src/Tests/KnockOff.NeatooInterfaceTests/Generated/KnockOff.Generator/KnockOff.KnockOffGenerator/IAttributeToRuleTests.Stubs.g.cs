@@ -83,11 +83,22 @@ partial class IAttributeToRuleTests
 				typedHandler.RecordCall(r, attribute);
 				if (typedHandler.OnCall is { } onCallCallback)
 					return onCallCallback(this, r, attribute);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IAttributeToRule", "GetRule");
 				return default!;
 			}
 
 			/// <summary>The global::Neatoo.Rules.Rules.IAttributeToRule instance. Use for passing to code expecting the interface.</summary>
 			public global::Neatoo.Rules.Rules.IAttributeToRule Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IAttributeToRule(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 			/// <summary>Gets a smart default value for a generic type at runtime.</summary>
 			private static T SmartDefault<T>(string methodName)

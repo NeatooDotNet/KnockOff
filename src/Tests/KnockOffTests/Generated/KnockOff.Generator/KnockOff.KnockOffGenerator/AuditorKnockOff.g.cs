@@ -58,16 +58,23 @@ partial class AuditorKnockOff
 	/// <summary>The global::KnockOff.Tests.IAuditor instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IAuditor Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Tests.IAuditor.Log(string message)
 	{
 		Log.RecordCall(message);
-		Log.OnCall?.Invoke(this, message);
+		if (Log.OnCall is { } onCallCallback)
+		{ onCallCallback(this, message); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IAuditor", "Log");
 	}
 
 	void global::KnockOff.Tests.IAuditor.Audit(string action, int userId)
 	{
 		Audit.RecordCall(action, userId);
-		Audit.OnCall?.Invoke(this, action, userId);
+		if (Audit.OnCall is { } onCallCallback)
+		{ onCallCallback(this, action, userId); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IAuditor", "Audit");
 	}
 
 }

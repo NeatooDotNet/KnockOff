@@ -594,13 +594,15 @@ partial class IEntityPropertyOfTTests
 			void global::Neatoo.IEntityProperty.MarkSelfUnmodified()
 			{
 				MarkSelfUnmodified.RecordCall();
-				if (MarkSelfUnmodified.OnCall is { } onCall) onCall(this);
+				if (MarkSelfUnmodified.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty", "MarkSelfUnmodified");
 			}
 
 			void global::Neatoo.IEntityProperty.ApplyPropertyInfo(global::Neatoo.IPropertyInfo propertyInfo)
 			{
 				ApplyPropertyInfo.RecordCall(propertyInfo);
-				if (ApplyPropertyInfo.OnCall is { } onCall) onCall(this, propertyInfo);
+				if (ApplyPropertyInfo.OnCall is { } onCall) { onCall(this, propertyInfo); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty", "ApplyPropertyInfo");
 			}
 
 			bool global::Neatoo.IEntityProperty.IsPaused
@@ -609,13 +611,15 @@ partial class IEntityPropertyOfTTests
 				{
 					IsPaused.RecordGet();
 					if (IsPaused.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty", "IsPaused");
 					return IsPaused.Value;
 				}
 				set
 				{
 					IsPaused.RecordSet(value);
-					if (IsPaused.OnSet is { } onSet) onSet(this, value);
-					else IsPaused.Value = value;
+					if (IsPaused.OnSet is { } onSet) { onSet(this, value); return; }
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty", "IsPaused");
+					IsPaused.Value = value;
 				}
 			}
 
@@ -625,6 +629,7 @@ partial class IEntityPropertyOfTTests
 				{
 					IsModified.RecordGet();
 					if (IsModified.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty", "IsModified");
 					return IsModified.Value;
 				}
 			}
@@ -635,6 +640,7 @@ partial class IEntityPropertyOfTTests
 				{
 					IsSelfModified.RecordGet();
 					if (IsSelfModified.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty", "IsSelfModified");
 					return IsSelfModified.Value;
 				}
 			}
@@ -645,6 +651,7 @@ partial class IEntityPropertyOfTTests
 				{
 					DisplayName.RecordGet();
 					if (DisplayName.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty", "DisplayName");
 					return DisplayName.Value;
 				}
 			}
@@ -655,13 +662,15 @@ partial class IEntityPropertyOfTTests
 				{
 					Value.RecordGet();
 					if (Value.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty<string>", "Value");
 					return Value.Value;
 				}
 				set
 				{
 					Value.RecordSet(value);
-					if (Value.OnSet is { } onSet) onSet(this, value);
-					else Value.Value = value;
+					if (Value.OnSet is { } onSet) { onSet(this, value); return; }
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty<string>", "Value");
+					Value.Value = value;
 				}
 			}
 
@@ -669,31 +678,36 @@ partial class IEntityPropertyOfTTests
 			{
 				SetValue.RecordCall(newValue);
 				if (SetValue.OnCall is { } onCall) return onCall(this, newValue);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "SetValue");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
 			void global::Neatoo.IValidateProperty.AddMarkedBusy(long id)
 			{
 				AddMarkedBusy.RecordCall(id);
-				if (AddMarkedBusy.OnCall is { } onCall) onCall(this, id);
+				if (AddMarkedBusy.OnCall is { } onCall) { onCall(this, id); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "AddMarkedBusy");
 			}
 
 			void global::Neatoo.IValidateProperty.RemoveMarkedBusy(long id)
 			{
 				RemoveMarkedBusy.RecordCall(id);
-				if (RemoveMarkedBusy.OnCall is { } onCall) onCall(this, id);
+				if (RemoveMarkedBusy.OnCall is { } onCall) { onCall(this, id); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "RemoveMarkedBusy");
 			}
 
 			void global::Neatoo.IValidateProperty.LoadValue(object? value)
 			{
 				LoadValue.RecordCall(value);
-				if (LoadValue.OnCall is { } onCall) onCall(this, value);
+				if (LoadValue.OnCall is { } onCall) { onCall(this, value); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "LoadValue");
 			}
 
 			global::System.Threading.Tasks.Task global::Neatoo.IValidateProperty.WaitForTasks()
 			{
 				WaitForTasks.RecordCall();
 				if (WaitForTasks.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -701,6 +715,7 @@ partial class IEntityPropertyOfTTests
 			{
 				GetAwaiter.RecordCall();
 				if (GetAwaiter.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "GetAwaiter");
 				return default!;
 			}
 
@@ -708,6 +723,7 @@ partial class IEntityPropertyOfTTests
 			{
 				RunRules.RecordCall(runRules, token);
 				if (RunRules.OnCall is { } onCall) return onCall(this, runRules, token);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -717,6 +733,7 @@ partial class IEntityPropertyOfTTests
 				{
 					Name.RecordGet();
 					if (Name.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "Name");
 					return Name.Value;
 				}
 			}
@@ -733,6 +750,7 @@ partial class IEntityPropertyOfTTests
 				{
 					Task.RecordGet();
 					if (Task.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "Task");
 					return Task.Value;
 				}
 			}
@@ -743,6 +761,7 @@ partial class IEntityPropertyOfTTests
 				{
 					IsBusy.RecordGet();
 					if (IsBusy.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "IsBusy");
 					return IsBusy.Value;
 				}
 			}
@@ -753,6 +772,7 @@ partial class IEntityPropertyOfTTests
 				{
 					IsReadOnly.RecordGet();
 					if (IsReadOnly.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "IsReadOnly");
 					return IsReadOnly.Value;
 				}
 			}
@@ -763,6 +783,7 @@ partial class IEntityPropertyOfTTests
 				{
 					Type.RecordGet();
 					if (Type.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "Type");
 					return Type.Value;
 				}
 			}
@@ -773,6 +794,7 @@ partial class IEntityPropertyOfTTests
 				{
 					StringValue.RecordGet();
 					if (StringValue.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "StringValue");
 					return StringValue.Value;
 				}
 			}
@@ -783,6 +805,7 @@ partial class IEntityPropertyOfTTests
 				{
 					IsSelfValid.RecordGet();
 					if (IsSelfValid.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "IsSelfValid");
 					return IsSelfValid.Value;
 				}
 			}
@@ -793,6 +816,7 @@ partial class IEntityPropertyOfTTests
 				{
 					IsValid.RecordGet();
 					if (IsValid.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "IsValid");
 					return IsValid.Value;
 				}
 			}
@@ -803,6 +827,7 @@ partial class IEntityPropertyOfTTests
 				{
 					PropertyMessages.RecordGet();
 					if (PropertyMessages.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "PropertyMessages");
 					return PropertyMessages.Value;
 				}
 			}
@@ -821,6 +846,16 @@ partial class IEntityPropertyOfTTests
 
 			/// <summary>The global::Neatoo.IEntityProperty<string> instance. Use for passing to code expecting the interface.</summary>
 			public global::Neatoo.IEntityProperty<string> Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IEntityProperty(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

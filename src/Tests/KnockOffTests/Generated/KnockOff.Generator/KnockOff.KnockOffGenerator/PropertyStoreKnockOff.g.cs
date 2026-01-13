@@ -33,9 +33,12 @@ partial class PropertyStoreKnockOff
 	/// <summary>The global::KnockOff.Tests.IPropertyStore instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IPropertyStore Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Tests.PropertyInfo? global::KnockOff.Tests.IPropertyStore.this[string key]
 	{
-		get { Indexer.RecordGet(key); if (Indexer.OnGet != null) return Indexer.OnGet(this, key); return Indexer.Backing.TryGetValue(key, out var v) ? v : default; }
+		get { Indexer.RecordGet(key); if (Indexer.OnGet is { } onGet) return onGet(this, key); if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyStore", "this[]"); return Indexer.Backing.TryGetValue(key, out var v) ? v : default; }
 	}
 
 }

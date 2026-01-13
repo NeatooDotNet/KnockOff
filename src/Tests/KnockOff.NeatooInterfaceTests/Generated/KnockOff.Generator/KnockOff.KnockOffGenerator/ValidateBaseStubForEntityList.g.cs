@@ -434,11 +434,15 @@ partial class ValidateBaseStubForEntityList
 	/// <summary>The global::Neatoo.IValidateBase instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.IValidateBase Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::Neatoo.IValidateProperty global::Neatoo.IValidateBase.GetProperty(string propertyName)
 	{
 		GetProperty.RecordCall(propertyName);
 		if (GetProperty.OnCall is { } callback)
 			return callback(this, propertyName);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "GetProperty");
 		throw new global::System.InvalidOperationException("No implementation provided for GetProperty. Set GetProperty.OnCall or define a protected method 'GetProperty' in your partial class.");
 	}
 
@@ -448,78 +452,95 @@ partial class ValidateBaseStubForEntityList
 		TryGetProperty.RecordCall(propertyName);
 		if (TryGetProperty.OnCall is { } onCallCallback)
 			return onCallCallback(this, propertyName, out validateProperty);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "TryGetProperty");
 		return default!;
 	}
 
 	global::Neatoo.IValidateBase? global::Neatoo.IValidateBase.Parent
 	{
-		get { Parent.RecordGet(); return Parent.OnGet?.Invoke(this) ?? Parent.Value; }
+		get { Parent.RecordGet(); if (Parent.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "Parent"); return Parent.Value; }
 	}
 
 	bool global::Neatoo.IValidateBase.IsPaused
 	{
-		get { IsPaused.RecordGet(); return IsPaused.OnGet?.Invoke(this) ?? IsPaused.Value; }
+		get { IsPaused.RecordGet(); if (IsPaused.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "IsPaused"); return IsPaused.Value; }
 	}
 
 	global::Neatoo.IValidateProperty global::Neatoo.IValidateBase.this[string propertyName]
 	{
-		get { Indexer.RecordGet(propertyName); if (Indexer.OnGet != null) return Indexer.OnGet(this, propertyName); return Indexer.Backing.TryGetValue(propertyName, out var v) ? v : default!; }
+		get { Indexer.RecordGet(propertyName); if (Indexer.OnGet is { } onGet) return onGet(this, propertyName); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "this[]"); return Indexer.Backing.TryGetValue(propertyName, out var v) ? v : default!; }
 	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.WaitForTasks()
 	{
 		WaitForTasks1.RecordCall();
-		return WaitForTasks1.OnCall?.Invoke(this) ?? global::System.Threading.Tasks.Task.CompletedTask;
+		if (WaitForTasks1.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "WaitForTasks");
+		return global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.WaitForTasks(global::System.Threading.CancellationToken token)
 	{
 		WaitForTasks2.RecordCall(token);
-		return WaitForTasks2.OnCall?.Invoke(this, token) ?? global::System.Threading.Tasks.Task.CompletedTask;
+		if (WaitForTasks2.OnCall is { } callback)
+			return callback(this, token);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "WaitForTasks");
+		return global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.RunRules(string propertyName, global::System.Threading.CancellationToken? token)
 	{
 		RunRules1.RecordCall(propertyName, token);
-		return RunRules1.OnCall?.Invoke(this, propertyName, token) ?? global::System.Threading.Tasks.Task.CompletedTask;
+		if (RunRules1.OnCall is { } callback)
+			return callback(this, propertyName, token);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "RunRules");
+		return global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.RunRules(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
 	{
 		RunRules2.RecordCall(runRules, token);
-		return RunRules2.OnCall?.Invoke(this, runRules, token) ?? global::System.Threading.Tasks.Task.CompletedTask;
+		if (RunRules2.OnCall is { } callback)
+			return callback(this, runRules, token);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "RunRules");
+		return global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
 	void global::Neatoo.IValidateMetaProperties.ClearAllMessages()
 	{
 		ClearAllMessages.RecordCall();
-		ClearAllMessages.OnCall?.Invoke(this);
+		if (ClearAllMessages.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "ClearAllMessages");
 	}
 
 	void global::Neatoo.IValidateMetaProperties.ClearSelfMessages()
 	{
 		ClearSelfMessages.RecordCall();
-		ClearSelfMessages.OnCall?.Invoke(this);
+		if (ClearSelfMessages.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "ClearSelfMessages");
 	}
 
 	bool global::Neatoo.IValidateMetaProperties.IsBusy
 	{
-		get { IsBusy.RecordGet(); return IsBusy.OnGet?.Invoke(this) ?? IsBusy.Value; }
+		get { IsBusy.RecordGet(); if (IsBusy.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsBusy"); return IsBusy.Value; }
 	}
 
 	bool global::Neatoo.IValidateMetaProperties.IsValid
 	{
-		get { IsValid.RecordGet(); return IsValid.OnGet?.Invoke(this) ?? IsValid.Value; }
+		get { IsValid.RecordGet(); if (IsValid.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsValid"); return IsValid.Value; }
 	}
 
 	bool global::Neatoo.IValidateMetaProperties.IsSelfValid
 	{
-		get { IsSelfValid.RecordGet(); return IsSelfValid.OnGet?.Invoke(this) ?? IsSelfValid.Value; }
+		get { IsSelfValid.RecordGet(); if (IsSelfValid.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsSelfValid"); return IsSelfValid.Value; }
 	}
 
 	global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> global::Neatoo.IValidateMetaProperties.PropertyMessages
 	{
-		get { PropertyMessages.RecordGet(); return PropertyMessages.OnGet?.Invoke(this) ?? PropertyMessages.Value; }
+		get { PropertyMessages.RecordGet(); if (PropertyMessages.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "PropertyMessages"); return PropertyMessages.Value; }
 	}
 
 	event global::System.ComponentModel.PropertyChangedEventHandler? global::System.ComponentModel.INotifyPropertyChanged.PropertyChanged

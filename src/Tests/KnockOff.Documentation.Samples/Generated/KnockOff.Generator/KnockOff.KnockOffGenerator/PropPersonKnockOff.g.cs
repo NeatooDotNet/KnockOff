@@ -98,21 +98,24 @@ partial class PropPersonKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IPropPerson instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IPropPerson Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	string global::KnockOff.Documentation.Samples.Guides.IPropPerson.FirstName
 	{
-		get { FirstName.RecordGet(); return FirstName.OnGet?.Invoke(this) ?? FirstName.Value; }
-		set { FirstName.RecordSet(value); if (FirstName.OnSet != null) FirstName.OnSet(this, value); else FirstName.Value = value; }
+		get { FirstName.RecordGet(); if (FirstName.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropPerson", "FirstName"); return FirstName.Value; }
+		set { FirstName.RecordSet(value); if (FirstName.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropPerson", "FirstName"); FirstName.Value = value; }
 	}
 
 	string global::KnockOff.Documentation.Samples.Guides.IPropPerson.LastName
 	{
-		get { LastName.RecordGet(); return LastName.OnGet?.Invoke(this) ?? LastName.Value; }
-		set { LastName.RecordSet(value); if (LastName.OnSet != null) LastName.OnSet(this, value); else LastName.Value = value; }
+		get { LastName.RecordGet(); if (LastName.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropPerson", "LastName"); return LastName.Value; }
+		set { LastName.RecordSet(value); if (LastName.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropPerson", "LastName"); LastName.Value = value; }
 	}
 
 	string global::KnockOff.Documentation.Samples.Guides.IPropPerson.FullName
 	{
-		get { FullName.RecordGet(); return FullName.OnGet?.Invoke(this) ?? FullName.Value; }
+		get { FullName.RecordGet(); if (FullName.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropPerson", "FullName"); return FullName.Value; }
 	}
 
 }

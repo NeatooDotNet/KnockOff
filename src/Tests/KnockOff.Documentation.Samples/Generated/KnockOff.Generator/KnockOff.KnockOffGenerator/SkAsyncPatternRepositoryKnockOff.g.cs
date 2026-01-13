@@ -64,16 +64,25 @@ partial class SkAsyncPatternRepositoryKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkAsyncPatternRepository instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ISkAsyncPatternRepository Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.SkUser?> global::KnockOff.Documentation.Samples.Skills.ISkAsyncPatternRepository.GetUserAsync(int id)
 	{
 		GetUserAsync.RecordCall(id);
-		return GetUserAsync.OnCall?.Invoke(this, id) ?? global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Skills.SkUser?>(default!);
+		if (GetUserAsync.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkAsyncPatternRepository", "GetUserAsync");
+		return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Skills.SkUser?>(default!);
 	}
 
 	global::System.Threading.Tasks.Task<int> global::KnockOff.Documentation.Samples.Skills.ISkAsyncPatternRepository.SaveAsync(object entity)
 	{
 		SaveAsync.RecordCall(entity);
-		return SaveAsync.OnCall?.Invoke(this, entity) ?? global::System.Threading.Tasks.Task.FromResult<int>(default!);
+		if (SaveAsync.OnCall is { } callback)
+			return callback(this, entity);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkAsyncPatternRepository", "SaveAsync");
+		return global::System.Threading.Tasks.Task.FromResult<int>(default!);
 	}
 
 }

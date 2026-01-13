@@ -99,26 +99,34 @@ partial class IhOrderKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IIhOrder instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IIhOrder Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	decimal global::KnockOff.Documentation.Samples.Guides.IIhOrder.Total
 	{
-		get { Total.RecordGet(); return Total.OnGet?.Invoke(this) ?? Total.Value; }
+		get { Total.RecordGet(); if (Total.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IIhOrder", "Total"); return Total.Value; }
 	}
 
 	void global::KnockOff.Documentation.Samples.Guides.IIhOrder.Submit()
 	{
 		Submit.RecordCall();
-		Submit.OnCall?.Invoke(this);
+		if (Submit.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IIhOrder", "Submit");
 	}
 
 	bool global::KnockOff.Documentation.Samples.Guides.IIhValidatable.IsValid
 	{
-		get { IsValid.RecordGet(); return IsValid.OnGet?.Invoke(this) ?? IsValid.Value; }
+		get { IsValid.RecordGet(); if (IsValid.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IIhValidatable", "IsValid"); return IsValid.Value; }
 	}
 
 	global::System.Collections.Generic.IEnumerable<string> global::KnockOff.Documentation.Samples.Guides.IIhValidatable.GetErrors()
 	{
 		GetErrors.RecordCall();
-		return GetErrors.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<string>();
+		if (GetErrors.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IIhValidatable", "GetErrors");
+		return new global::System.Collections.Generic.List<string>();
 	}
 
 }

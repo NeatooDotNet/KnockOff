@@ -36,12 +36,16 @@ partial class BpParserKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IBpParser instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IBpParser Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	bool global::KnockOff.Documentation.Samples.Guides.IBpParser.TryParse(string input, out int result)
 	{
 		result = default!;
 		TryParse.RecordCall(input);
 		if (TryParse.OnCall is { } onCallCallback)
 			return onCallCallback(this, input, out result);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpParser", "TryParse");
 		return default!;
 	}
 

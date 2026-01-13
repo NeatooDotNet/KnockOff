@@ -148,34 +148,52 @@ partial class CalculatorStub
 	/// <summary>The global::KnockOff.Benchmarks.Interfaces.ICalculator instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Interfaces.ICalculator Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	int global::KnockOff.Benchmarks.Interfaces.ICalculator.Add(int a, int b)
 	{
 		Add.RecordCall(a, b);
-		return Add.OnCall?.Invoke(this, a, b) ?? default!;
+		if (Add.OnCall is { } callback)
+			return callback(this, a, b);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ICalculator", "Add");
+		return default!;
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ICalculator.Subtract(int a, int b)
 	{
 		Subtract.RecordCall(a, b);
-		return Subtract.OnCall?.Invoke(this, a, b) ?? default!;
+		if (Subtract.OnCall is { } callback)
+			return callback(this, a, b);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ICalculator", "Subtract");
+		return default!;
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ICalculator.Multiply(int a, int b)
 	{
 		Multiply.RecordCall(a, b);
-		return Multiply.OnCall?.Invoke(this, a, b) ?? default!;
+		if (Multiply.OnCall is { } callback)
+			return callback(this, a, b);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ICalculator", "Multiply");
+		return default!;
 	}
 
 	double global::KnockOff.Benchmarks.Interfaces.ICalculator.Divide(double a, double b)
 	{
 		Divide.RecordCall(a, b);
-		return Divide.OnCall?.Invoke(this, a, b) ?? default!;
+		if (Divide.OnCall is { } callback)
+			return callback(this, a, b);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ICalculator", "Divide");
+		return default!;
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ICalculator.Square(int x)
 	{
 		Square.RecordCall(x);
-		return Square.OnCall?.Invoke(this, x) ?? default!;
+		if (Square.OnCall is { } callback)
+			return callback(this, x);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ICalculator", "Square");
+		return default!;
 	}
 
 }

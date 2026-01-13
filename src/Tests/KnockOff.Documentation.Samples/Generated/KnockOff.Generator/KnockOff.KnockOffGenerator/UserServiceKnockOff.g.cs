@@ -70,6 +70,9 @@ partial class UserServiceKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Documentation.Samples.GettingStarted.User global::KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple.GetUser(int id)
 	{
 		GetUser2.RecordCall(id);
@@ -79,8 +82,8 @@ partial class UserServiceKnockOff
 
 	string global::KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple.Name
 	{
-		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else Name.Value = value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserServiceSimple", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserServiceSimple", "Name"); Name.Value = value; }
 	}
 
 }

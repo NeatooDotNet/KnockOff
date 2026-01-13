@@ -74,22 +74,31 @@ partial class MethodCallOrderKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IMethodCallOrder instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IMethodCallOrder Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Documentation.Samples.Guides.IMethodCallOrder.Initialize()
 	{
 		Initialize.RecordCall();
-		Initialize.OnCall?.Invoke(this);
+		if (Initialize.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMethodCallOrder", "Initialize");
 	}
 
 	void global::KnockOff.Documentation.Samples.Guides.IMethodCallOrder.Process()
 	{
 		Process.RecordCall();
-		Process.OnCall?.Invoke(this);
+		if (Process.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMethodCallOrder", "Process");
 	}
 
 	void global::KnockOff.Documentation.Samples.Guides.IMethodCallOrder.Cleanup()
 	{
 		Cleanup.RecordCall();
-		Cleanup.OnCall?.Invoke(this);
+		if (Cleanup.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMethodCallOrder", "Cleanup");
 	}
 
 }

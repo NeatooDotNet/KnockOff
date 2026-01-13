@@ -173,6 +173,9 @@ partial class VsUserServiceKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IVsUserService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IVsUserService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Documentation.Samples.Comparison.VsUser global::KnockOff.Documentation.Samples.Comparison.IVsUserService.GetUser(int id)
 	{
 		GetUser2.RecordCall(id);
@@ -182,32 +185,42 @@ partial class VsUserServiceKnockOff
 
 	global::KnockOff.Documentation.Samples.Comparison.VsUser? global::KnockOff.Documentation.Samples.Comparison.IVsUserService.CurrentUser
 	{
-		get { CurrentUser.RecordGet(); return CurrentUser.OnGet?.Invoke(this) ?? CurrentUser.Value; }
-		set { CurrentUser.RecordSet(value); if (CurrentUser.OnSet != null) CurrentUser.OnSet(this, value); else CurrentUser.Value = value; }
+		get { CurrentUser.RecordGet(); if (CurrentUser.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IVsUserService", "CurrentUser"); return CurrentUser.Value; }
+		set { CurrentUser.RecordSet(value); if (CurrentUser.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IVsUserService", "CurrentUser"); CurrentUser.Value = value; }
 	}
 
 	global::KnockOff.Documentation.Samples.Comparison.VsUser? global::KnockOff.Documentation.Samples.Comparison.IVsUserService.Save(global::KnockOff.Documentation.Samples.Comparison.VsUser user)
 	{
 		Save.RecordCall(user);
-		return Save.OnCall?.Invoke(this, user) ?? default!;
+		if (Save.OnCall is { } callback)
+			return callback(this, user);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IVsUserService", "Save");
+		return default!;
 	}
 
 	void global::KnockOff.Documentation.Samples.Comparison.IVsUserService.Delete(int id)
 	{
 		Delete.RecordCall(id);
-		Delete.OnCall?.Invoke(this, id);
+		if (Delete.OnCall is { } onCallCallback)
+		{ onCallCallback(this, id); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IVsUserService", "Delete");
 	}
 
 	global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Comparison.VsUser> global::KnockOff.Documentation.Samples.Comparison.IVsUserService.GetAll()
 	{
 		GetAll.RecordCall();
-		return GetAll.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Comparison.VsUser>();
+		if (GetAll.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IVsUserService", "GetAll");
+		return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Comparison.VsUser>();
 	}
 
 	void global::KnockOff.Documentation.Samples.Comparison.IVsUserService.Update(global::KnockOff.Documentation.Samples.Comparison.VsUser user)
 	{
 		Update.RecordCall(user);
-		Update.OnCall?.Invoke(this, user);
+		if (Update.OnCall is { } onCallCallback)
+		{ onCallCallback(this, user); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IVsUserService", "Update");
 	}
 
 }

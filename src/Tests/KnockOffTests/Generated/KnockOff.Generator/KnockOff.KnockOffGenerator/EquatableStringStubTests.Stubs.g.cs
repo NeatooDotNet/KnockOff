@@ -38,11 +38,22 @@ partial class EquatableStringStubTests
 			{
 				Equals.RecordCall(other);
 				if (Equals.OnCall is { } onCall) return onCall(this, other);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEquatable<string>", "Equals");
 				return default!;
 			}
 
 			/// <summary>The global::System.IEquatable<string> instance. Use for passing to code expecting the interface.</summary>
 			public global::System.IEquatable<string> Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IEquatable(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

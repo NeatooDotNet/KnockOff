@@ -42,10 +42,13 @@ partial class CpPropertyServiceKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ICpPropertyService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ICpPropertyService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Documentation.Samples.Skills.CpUser? global::KnockOff.Documentation.Samples.Skills.ICpPropertyService.CurrentUser
 	{
-		get { CurrentUser.RecordGet(); return CurrentUser.OnGet?.Invoke(this) ?? CurrentUser.Value; }
-		set { CurrentUser.RecordSet(value); if (CurrentUser.OnSet != null) CurrentUser.OnSet(this, value); else CurrentUser.Value = value; }
+		get { CurrentUser.RecordGet(); if (CurrentUser.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ICpPropertyService", "CurrentUser"); return CurrentUser.Value; }
+		set { CurrentUser.RecordSet(value); if (CurrentUser.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ICpPropertyService", "CurrentUser"); CurrentUser.Value = value; }
 	}
 
 }

@@ -34,11 +34,22 @@ partial class InlineStubs
 			void global::KnockOff.Benchmarks.Interfaces.ISimpleService.DoWork()
 			{
 				DoWork.RecordCall();
-				if (DoWork.OnCall is { } onCall) onCall(this);
+				if (DoWork.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("ISimpleService", "DoWork");
 			}
 
 			/// <summary>The global::KnockOff.Benchmarks.Interfaces.ISimpleService instance. Use for passing to code expecting the interface.</summary>
 			public global::KnockOff.Benchmarks.Interfaces.ISimpleService Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public ISimpleService(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 
@@ -164,6 +175,7 @@ partial class InlineStubs
 			{
 				Add.RecordCall(a, b);
 				if (Add.OnCall is { } onCall) return onCall(this, a, b);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("ICalculator", "Add");
 				return default!;
 			}
 
@@ -171,6 +183,7 @@ partial class InlineStubs
 			{
 				Subtract.RecordCall(a, b);
 				if (Subtract.OnCall is { } onCall) return onCall(this, a, b);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("ICalculator", "Subtract");
 				return default!;
 			}
 
@@ -178,6 +191,7 @@ partial class InlineStubs
 			{
 				Multiply.RecordCall(a, b);
 				if (Multiply.OnCall is { } onCall) return onCall(this, a, b);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("ICalculator", "Multiply");
 				return default!;
 			}
 
@@ -185,6 +199,7 @@ partial class InlineStubs
 			{
 				Divide.RecordCall(a, b);
 				if (Divide.OnCall is { } onCall) return onCall(this, a, b);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("ICalculator", "Divide");
 				return default!;
 			}
 
@@ -192,11 +207,22 @@ partial class InlineStubs
 			{
 				Square.RecordCall(x);
 				if (Square.OnCall is { } onCall) return onCall(this, x);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("ICalculator", "Square");
 				return default!;
 			}
 
 			/// <summary>The global::KnockOff.Benchmarks.Interfaces.ICalculator instance. Use for passing to code expecting the interface.</summary>
 			public global::KnockOff.Benchmarks.Interfaces.ICalculator Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public ICalculator(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 
@@ -290,13 +316,15 @@ partial class InlineStubs
 				{
 					Name.RecordGet();
 					if (Name.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IPropertyService", "Name");
 					return Name.Value;
 				}
 				set
 				{
 					Name.RecordSet(value);
-					if (Name.OnSet is { } onSet) onSet(this, value);
-					else Name.Value = value;
+					if (Name.OnSet is { } onSet) { onSet(this, value); return; }
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IPropertyService", "Name");
+					Name.Value = value;
 				}
 			}
 
@@ -306,6 +334,7 @@ partial class InlineStubs
 				{
 					ReadOnlyValue.RecordGet();
 					if (ReadOnlyValue.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IPropertyService", "ReadOnlyValue");
 					return ReadOnlyValue.Value;
 				}
 			}
@@ -315,13 +344,24 @@ partial class InlineStubs
 				set
 				{
 					WriteOnlyValue.RecordSet(value);
-					if (WriteOnlyValue.OnSet is { } onSet) onSet(this, value);
-					else WriteOnlyValue.Value = value;
+					if (WriteOnlyValue.OnSet is { } onSet) { onSet(this, value); return; }
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IPropertyService", "WriteOnlyValue");
+					WriteOnlyValue.Value = value;
 				}
 			}
 
 			/// <summary>The global::KnockOff.Benchmarks.Interfaces.IPropertyService instance. Use for passing to code expecting the interface.</summary>
 			public global::KnockOff.Benchmarks.Interfaces.IPropertyService Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IPropertyService(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

@@ -107,22 +107,28 @@ partial class DsUserServiceStub
 	/// <summary>The global::KnockOff.Documentation.Samples.Design.IDsUserService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Design.IDsUserService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Documentation.Samples.Design.DsUser? global::KnockOff.Documentation.Samples.Design.IDsUserService.GetUser(int id)
 	{
 		GetUser.RecordCall(id);
-		return GetUser.OnCall?.Invoke(this, id) ?? default!;
+		if (GetUser.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsUserService", "GetUser");
+		return default!;
 	}
 
 	string global::KnockOff.Documentation.Samples.Design.IDsUserService.Name
 	{
-		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else Name.Value = value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsUserService", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsUserService", "Name"); Name.Value = value; }
 	}
 
 	string? global::KnockOff.Documentation.Samples.Design.IDsUserService.this[string key]
 	{
-		get { Indexer.RecordGet(key); if (Indexer.OnGet != null) return Indexer.OnGet(this, key); return Indexer.Backing.TryGetValue(key, out var v) ? v : default; }
-		set { Indexer.RecordSet(key, value); if (Indexer.OnSet != null) Indexer.OnSet(this, key, value); else Indexer.Backing[key] = value; }
+		get { Indexer.RecordGet(key); if (Indexer.OnGet is { } onGet) return onGet(this, key); if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsUserService", "this[]"); return Indexer.Backing.TryGetValue(key, out var v) ? v : default; }
+		set { Indexer.RecordSet(key, value); if (Indexer.OnSet is { } onSet) { onSet(this, key, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsUserService", "this[]"); Indexer.Backing[key] = value; }
 	}
 
 }

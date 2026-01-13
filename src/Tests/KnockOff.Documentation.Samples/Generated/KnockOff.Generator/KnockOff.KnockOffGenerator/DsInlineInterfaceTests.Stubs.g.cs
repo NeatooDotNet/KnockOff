@@ -109,6 +109,7 @@ partial class DsInlineInterfaceTests
 			{
 				GetUser.RecordCall(id);
 				if (GetUser.OnCall is { } onCall) return onCall(this, id);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDsUserService", "GetUser");
 				return default!;
 			}
 
@@ -118,13 +119,15 @@ partial class DsInlineInterfaceTests
 				{
 					Name.RecordGet();
 					if (Name.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDsUserService", "Name");
 					return Name.Value;
 				}
 				set
 				{
 					Name.RecordSet(value);
-					if (Name.OnSet is { } onSet) onSet(this, value);
-					else Name.Value = value;
+					if (Name.OnSet is { } onSet) { onSet(this, value); return; }
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDsUserService", "Name");
+					Name.Value = value;
 				}
 			}
 
@@ -134,18 +137,30 @@ partial class DsInlineInterfaceTests
 				{
 					Indexer.RecordGet(key);
 					if (Indexer.OnGet is { } onGet) return onGet(this, key);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDsUserService", "this[]");
 					return Indexer.Backing.TryGetValue(key, out var v) ? v : default;
 				}
 				set
 				{
 					Indexer.RecordSet(key, value);
-					if (Indexer.OnSet is { } onSet) onSet(this, key, value);
-					else Indexer.Backing[key] = value;
+					if (Indexer.OnSet is { } onSet) { onSet(this, key, value); return; }
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDsUserService", "this[]");
+					Indexer.Backing[key] = value;
 				}
 			}
 
 			/// <summary>The global::KnockOff.Documentation.Samples.Design.IDsUserService instance. Use for passing to code expecting the interface.</summary>
 			public global::KnockOff.Documentation.Samples.Design.IDsUserService Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IDsUserService(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

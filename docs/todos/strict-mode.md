@@ -8,7 +8,7 @@ Some users prefer "strict" behavior where unconfigured method calls throw an exc
 
 ## Proposed Solution
 
-Add a `Strict` option that throws `InvalidOperationException` when a method is called without an `OnCall` configured.
+Add a `Strict` option that throws `StubException` when a method is called without an `OnCall` configured.
 
 ### Implementation Options
 
@@ -28,7 +28,7 @@ User IUserService.GetUser(int id)
 {
     GetUser.RecordCall(id);
     if (GetUser.OnCall is { } onCall) return onCall(this, id);
-    throw new InvalidOperationException("No implementation provided for IUserService.GetUser");
+    throw StubException.NotConfigured("IUserService", "GetUser");
 }
 ```
 
@@ -62,7 +62,7 @@ public class IUserService : global::IUserService
     {
         GetUser.RecordCall(id);
         if (GetUser.OnCall is { } onCall) return onCall(this, id);
-        if (_strict) throw new InvalidOperationException("No implementation provided for IUserService.GetUser");
+        if (_strict) throw StubException.NotConfigured("IUserService", "GetUser");
         return default!;
     }
 }
@@ -114,21 +114,47 @@ Same field, same runtime check. Attribute-level is free once constructor exists.
 
 ## Implementation Tasks
 
-- [ ] Add `strict` constructor parameter to generated stub classes
-- [ ] Add `_strict` backing field
-- [ ] Update method implementations to check `_strict` before returning default
-- [ ] Update property getter implementations similarly
-- [ ] Add tests for strict mode behavior
-- [ ] Update documentation with strict mode usage
-- [ ] Update README: remove "strict mode" from Limitations vs Moq section
-- [ ] Consider: Should `void` methods also throw in strict mode?
+- [x] Create `KnockOff.StubException` class
+- [x] Add `Strict` property to `KnockOffAttribute` and `KnockOffAttribute<T>`
+- [x] Generate `Strict` property for standalone stubs (public, settable, uses attribute default)
+- [x] Generate `_strict` field + constructor parameter for inline stubs
+- [x] Update method implementations to check strict before returning default
+- [x] Update property getter/setter implementations similarly
+- [x] Update void method implementations to throw in strict mode
+- [x] Add tests for strict mode behavior (17 tests in StrictModeTests.cs)
+- [x] Update documentation with strict mode usage
+- [x] Update knockoff skill (SKILL.md) with strict mode section
+- [x] Update moq-migration.md skill with MockBehavior.Strict mapping
+- [x] Update README: remove "strict mode" from Limitations vs Moq section
 
-## Open Questions
+## Implementation Notes
 
-1. **Exception type**: `InvalidOperationException` or custom `StubNotConfiguredException`?
-2. **Void methods**: Should they throw too, or only methods with return values?
-3. **Properties**: Apply to getters? Setters? Both?
-4. **Message format**: `"No implementation provided for {Interface}.{Member}"` or simpler?
+**Standalone stubs** use a public `Strict` property (not a constructor) to avoid conflicts with user-defined constructors:
+```csharp
+[KnockOff(Strict = true)]
+public partial class UserServiceStub : IUserService { }
+
+// Generated:
+public bool Strict { get; set; } = true;
+
+// Usage:
+var stub = new UserServiceStub();
+stub.Strict = false; // Override if needed
+```
+
+**Inline stubs** use a constructor parameter (no user-defined constructors to conflict with):
+```csharp
+var stub = new Stubs.IUserService(strict: true);
+```
+
+## Resolved Decisions
+
+Following Moq's `MockBehavior.Strict` patterns:
+
+1. **Exception type**: `KnockOff.StubException` with factory method `NotConfigured(interfaceName, memberName)`
+2. **Void methods**: Yes, throw if no `OnCall` configured
+3. **Properties**: Both getters and setters throw if not configured
+4. **Message format**: `"{Interface}.{Member} invocation failed with strict behavior. Configure OnCall before invoking."`
 
 ## Related
 

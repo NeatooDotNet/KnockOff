@@ -89,22 +89,34 @@ partial class PropertyInfoListOfTStub
 	/// <summary>The global::Neatoo.IPropertyInfoList<global::Neatoo.IValidateBase> instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.IPropertyInfoList<global::Neatoo.IValidateBase> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::Neatoo.IPropertyInfo? global::Neatoo.IPropertyInfoList.GetPropertyInfo(string name)
 	{
 		GetPropertyInfo.RecordCall(name);
-		return GetPropertyInfo.OnCall?.Invoke(this, name) ?? default!;
+		if (GetPropertyInfo.OnCall is { } callback)
+			return callback(this, name);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfoList", "GetPropertyInfo");
+		return default!;
 	}
 
 	global::System.Collections.Generic.IEnumerable<global::Neatoo.IPropertyInfo> global::Neatoo.IPropertyInfoList.Properties()
 	{
 		Properties.RecordCall();
-		return Properties.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<global::Neatoo.IPropertyInfo>();
+		if (Properties.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfoList", "Properties");
+		return new global::System.Collections.Generic.List<global::Neatoo.IPropertyInfo>();
 	}
 
 	bool global::Neatoo.IPropertyInfoList.HasProperty(string propertyName)
 	{
 		HasProperty.RecordCall(propertyName);
-		return HasProperty.OnCall?.Invoke(this, propertyName) ?? default!;
+		if (HasProperty.OnCall is { } callback)
+			return callback(this, propertyName);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfoList", "HasProperty");
+		return default!;
 	}
 
 }

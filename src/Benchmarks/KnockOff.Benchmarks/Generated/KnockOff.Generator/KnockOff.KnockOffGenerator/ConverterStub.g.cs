@@ -161,11 +161,15 @@ partial class ConverterStub
 	/// <summary>The global::KnockOff.Benchmarks.Interfaces.IConverter instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Interfaces.IConverter Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	T global::KnockOff.Benchmarks.Interfaces.IConverter.Convert<T>(object @value)
 	{
 		Convert.Of<T>().RecordCall(@value);
 		if (Convert.Of<T>().OnCall is { } callback)
 			return callback(this, @value);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IConverter", "Convert");
 		return SmartDefault<T>("Convert");
 	}
 
@@ -174,6 +178,7 @@ partial class ConverterStub
 		Transform.Of<TIn, TOut>().RecordCall();
 		if (Transform.Of<TIn, TOut>().OnCall is { } callback)
 			return callback(this, input);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IConverter", "Transform");
 		return SmartDefault<TOut>("Transform");
 	}
 

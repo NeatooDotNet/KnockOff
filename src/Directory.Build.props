@@ -13,15 +13,15 @@
 		<Nullable>enable</Nullable>
 		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-		<FileVersion>10.15.0</FileVersion>
-		<PackageVersion>10.15.0</PackageVersion>
+		<FileVersion>10.16.0</FileVersion>
+		<PackageVersion>10.16.0</PackageVersion>
 		<PackageTags>Unit Testing Mocking Stubs Source Generator .NET</PackageTags>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<RepositoryUrl>https://github.com/NeatooDotNet/KnockOff</RepositoryUrl>
 		<PackageProjectUrl>https://github.com/NeatooDotNet/KnockOff</PackageProjectUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageReleaseNotes>BREAKING: Unified generic type API - Indexers: StringIndexer→Indexer (single) or IndexerString (multiple), Backing now inside interceptor. Inline stubs: collision detection adds type suffix. Also: Generic standalone stubs (`RepositoryStub&lt;T&gt; : IRepository&lt;T&gt;`), new KO0008 diagnostic.</PackageReleaseNotes>
+		<PackageReleaseNotes>NEW: Strict mode - [KnockOff(Strict = true)] or constructor parameter throws StubException on unconfigured calls. Matches Moq's MockBehavior.Strict behavior.</PackageReleaseNotes>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	</PropertyGroup>
 </Project>

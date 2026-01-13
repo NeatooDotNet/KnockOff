@@ -33,10 +33,16 @@ partial class GenUserFactoryKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IGenFactory<global::KnockOff.Documentation.Samples.Guides.GenUser> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IGenFactory<global::KnockOff.Documentation.Samples.Guides.GenUser> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Documentation.Samples.Guides.GenUser global::KnockOff.Documentation.Samples.Guides.IGenFactory<global::KnockOff.Documentation.Samples.Guides.GenUser>.Create()
 	{
 		Create.RecordCall();
-		return Create.OnCall?.Invoke(this) ?? new global::KnockOff.Documentation.Samples.Guides.GenUser();
+		if (Create.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("GenUser>", "Create");
+		return new global::KnockOff.Documentation.Samples.Guides.GenUser();
 	}
 
 }

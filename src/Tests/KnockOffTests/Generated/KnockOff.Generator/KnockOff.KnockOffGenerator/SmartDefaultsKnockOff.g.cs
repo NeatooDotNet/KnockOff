@@ -402,58 +402,88 @@ partial class SmartDefaultsKnockOff
 	/// <summary>The global::KnockOff.Tests.ISmartDefaultsService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.ISmartDefaultsService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	int global::KnockOff.Tests.ISmartDefaultsService.GetInt()
 	{
 		GetInt.RecordCall();
-		return GetInt.OnCall?.Invoke(this) ?? default!;
+		if (GetInt.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISmartDefaultsService", "GetInt");
+		return default!;
 	}
 
 	bool global::KnockOff.Tests.ISmartDefaultsService.GetBool()
 	{
 		GetBool.RecordCall();
-		return GetBool.OnCall?.Invoke(this) ?? default!;
+		if (GetBool.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISmartDefaultsService", "GetBool");
+		return default!;
 	}
 
 	global::System.DateTime global::KnockOff.Tests.ISmartDefaultsService.GetDateTime()
 	{
 		GetDateTime.RecordCall();
-		return GetDateTime.OnCall?.Invoke(this) ?? default!;
+		if (GetDateTime.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISmartDefaultsService", "GetDateTime");
+		return default!;
 	}
 
 	string? global::KnockOff.Tests.ISmartDefaultsService.GetNullableString()
 	{
 		GetNullableString.RecordCall();
-		return GetNullableString.OnCall?.Invoke(this) ?? default!;
+		if (GetNullableString.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISmartDefaultsService", "GetNullableString");
+		return default!;
 	}
 
 	global::KnockOff.Tests.TestEntity? global::KnockOff.Tests.ISmartDefaultsService.GetNullableEntity()
 	{
 		GetNullableEntity.RecordCall();
-		return GetNullableEntity.OnCall?.Invoke(this) ?? default!;
+		if (GetNullableEntity.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISmartDefaultsService", "GetNullableEntity");
+		return default!;
 	}
 
 	global::System.Collections.Generic.List<string> global::KnockOff.Tests.ISmartDefaultsService.GetList()
 	{
 		GetList.RecordCall();
-		return GetList.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<string>();
+		if (GetList.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISmartDefaultsService", "GetList");
+		return new global::System.Collections.Generic.List<string>();
 	}
 
 	global::System.Collections.Generic.Dictionary<string, int> global::KnockOff.Tests.ISmartDefaultsService.GetDictionary()
 	{
 		GetDictionary.RecordCall();
-		return GetDictionary.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.Dictionary<string, int>();
+		if (GetDictionary.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISmartDefaultsService", "GetDictionary");
+		return new global::System.Collections.Generic.Dictionary<string, int>();
 	}
 
 	global::KnockOff.Tests.TestEntity global::KnockOff.Tests.ISmartDefaultsService.GetEntity()
 	{
 		GetEntity.RecordCall();
-		return GetEntity.OnCall?.Invoke(this) ?? new global::KnockOff.Tests.TestEntity();
+		if (GetEntity.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISmartDefaultsService", "GetEntity");
+		return new global::KnockOff.Tests.TestEntity();
 	}
 
 	global::System.Collections.Generic.IList<string> global::KnockOff.Tests.ISmartDefaultsService.GetIList()
 	{
 		GetIList.RecordCall();
-		return GetIList.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<string>();
+		if (GetIList.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISmartDefaultsService", "GetIList");
+		return new global::System.Collections.Generic.List<string>();
 	}
 
 	string global::KnockOff.Tests.ISmartDefaultsService.GetString()
@@ -461,6 +491,7 @@ partial class SmartDefaultsKnockOff
 		GetString.RecordCall();
 		if (GetString.OnCall is { } callback)
 			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISmartDefaultsService", "GetString");
 		throw new global::System.InvalidOperationException("No implementation provided for GetString. Set GetString.OnCall or define a protected method 'GetString' in your partial class.");
 	}
 
@@ -469,19 +500,26 @@ partial class SmartDefaultsKnockOff
 		GetDisposable.RecordCall();
 		if (GetDisposable.OnCall is { } callback)
 			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISmartDefaultsService", "GetDisposable");
 		throw new global::System.InvalidOperationException("No implementation provided for GetDisposable. Set GetDisposable.OnCall or define a protected method 'GetDisposable' in your partial class.");
 	}
 
 	global::System.Threading.Tasks.Task<int> global::KnockOff.Tests.ISmartDefaultsService.GetIntAsync()
 	{
 		GetIntAsync.RecordCall();
-		return GetIntAsync.OnCall?.Invoke(this) ?? global::System.Threading.Tasks.Task.FromResult<int>(default!);
+		if (GetIntAsync.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISmartDefaultsService", "GetIntAsync");
+		return global::System.Threading.Tasks.Task.FromResult<int>(default!);
 	}
 
 	global::System.Threading.Tasks.Task<global::System.Collections.Generic.List<string>> global::KnockOff.Tests.ISmartDefaultsService.GetListAsync()
 	{
 		GetListAsync.RecordCall();
-		return GetListAsync.OnCall?.Invoke(this) ?? global::System.Threading.Tasks.Task.FromResult<global::System.Collections.Generic.List<string>>(new global::System.Collections.Generic.List<string>());
+		if (GetListAsync.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISmartDefaultsService", "GetListAsync");
+		return global::System.Threading.Tasks.Task.FromResult<global::System.Collections.Generic.List<string>>(new global::System.Collections.Generic.List<string>());
 	}
 
 	global::System.Threading.Tasks.Task<string> global::KnockOff.Tests.ISmartDefaultsService.GetStringAsync()
@@ -489,17 +527,18 @@ partial class SmartDefaultsKnockOff
 		GetStringAsync.RecordCall();
 		if (GetStringAsync.OnCall is { } callback)
 			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISmartDefaultsService", "GetStringAsync");
 		throw new global::System.InvalidOperationException("No implementation provided for GetStringAsync. Set GetStringAsync.OnCall or define a protected method 'GetStringAsync' in your partial class.");
 	}
 
 	int global::KnockOff.Tests.ISmartDefaultsService.Count
 	{
-		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? Count.Value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ISmartDefaultsService", "Count"); return Count.Value; }
 	}
 
 	global::System.Collections.Generic.List<string> global::KnockOff.Tests.ISmartDefaultsService.Items
 	{
-		get { Items.RecordGet(); return Items.OnGet?.Invoke(this) ?? Items.Value; }
+		get { Items.RecordGet(); if (Items.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ISmartDefaultsService", "Items"); return Items.Value; }
 	}
 
 }

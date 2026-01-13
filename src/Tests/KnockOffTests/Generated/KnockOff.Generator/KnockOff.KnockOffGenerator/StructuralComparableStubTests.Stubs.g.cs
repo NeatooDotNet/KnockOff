@@ -38,11 +38,22 @@ partial class StructuralComparableStubTests
 			{
 				CompareTo.RecordCall(other, comparer);
 				if (CompareTo.OnCall is { } onCall) return onCall(this, other, comparer);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IStructuralComparable", "CompareTo");
 				return default!;
 			}
 
 			/// <summary>The global::System.Collections.IStructuralComparable instance. Use for passing to code expecting the interface.</summary>
 			public global::System.Collections.IStructuralComparable Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IStructuralComparable(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

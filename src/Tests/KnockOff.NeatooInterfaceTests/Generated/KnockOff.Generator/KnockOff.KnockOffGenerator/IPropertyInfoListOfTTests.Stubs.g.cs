@@ -81,6 +81,7 @@ partial class IPropertyInfoListOfTTests
 			{
 				GetPropertyInfo.RecordCall(name);
 				if (GetPropertyInfo.OnCall is { } onCall) return onCall(this, name);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfoList", "GetPropertyInfo");
 				return default!;
 			}
 
@@ -88,6 +89,7 @@ partial class IPropertyInfoListOfTTests
 			{
 				Properties.RecordCall();
 				if (Properties.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfoList", "Properties");
 				return new global::System.Collections.Generic.List<global::Neatoo.IPropertyInfo>();
 			}
 
@@ -95,11 +97,22 @@ partial class IPropertyInfoListOfTTests
 			{
 				HasProperty.RecordCall(propertyName);
 				if (HasProperty.OnCall is { } onCall) return onCall(this, propertyName);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfoList", "HasProperty");
 				return default!;
 			}
 
 			/// <summary>The global::Neatoo.IPropertyInfoList<global::Neatoo.IValidateBase> instance. Use for passing to code expecting the interface.</summary>
 			public global::Neatoo.IPropertyInfoList<global::Neatoo.IValidateBase> Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IPropertyInfoList(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

@@ -33,11 +33,15 @@ partial class SkAccessDemoServiceKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkAccessDemoService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ISkAccessDemoService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	string global::KnockOff.Documentation.Samples.Skills.ISkAccessDemoService.GetData()
 	{
 		GetData.RecordCall();
 		if (GetData.OnCall is { } callback)
 			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkAccessDemoService", "GetData");
 		throw new global::System.InvalidOperationException("No implementation provided for GetData. Set GetData.OnCall or define a protected method 'GetData' in your partial class.");
 	}
 

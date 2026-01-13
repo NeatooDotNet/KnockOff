@@ -33,10 +33,16 @@ partial class CloneableKnockOff
 	/// <summary>The global::System.ICloneable instance. Use for passing to code expecting the interface.</summary>
 	public global::System.ICloneable Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	object global::System.ICloneable.Clone()
 	{
 		Clone.RecordCall();
-		return Clone.OnCall?.Invoke(this) ?? new object();
+		if (Clone.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ICloneable", "Clone");
+		return new object();
 	}
 
 }

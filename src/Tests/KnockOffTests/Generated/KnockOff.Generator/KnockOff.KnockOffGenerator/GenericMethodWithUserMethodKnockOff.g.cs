@@ -218,6 +218,9 @@ partial class GenericMethodWithUserMethodKnockOff
 	/// <summary>The global::KnockOff.Tests.IGenericMethodWithUserMethod instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IGenericMethodWithUserMethod Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	T global::KnockOff.Tests.IGenericMethodWithUserMethod.Create<T>()
 	{
 		Create2.Of<T>().RecordCall();

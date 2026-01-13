@@ -36,10 +36,16 @@ partial class FcPaymentServiceStub
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IFcPaymentService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IFcPaymentService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Documentation.Samples.Comparison.FcPaymentResult global::KnockOff.Documentation.Samples.Comparison.IFcPaymentService.ProcessPayment(int customerId, decimal amount)
 	{
 		ProcessPayment.RecordCall(customerId, amount);
-		return ProcessPayment.OnCall?.Invoke(this, customerId, amount) ?? new global::KnockOff.Documentation.Samples.Comparison.FcPaymentResult();
+		if (ProcessPayment.OnCall is { } callback)
+			return callback(this, customerId, amount);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFcPaymentService", "ProcessPayment");
+		return new global::KnockOff.Documentation.Samples.Comparison.FcPaymentResult();
 	}
 
 }

@@ -77,9 +77,12 @@ partial class DataProviderStub
 	/// <summary>The global::KnockOff.Benchmarks.Interfaces.IDataProvider instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Interfaces.IDataProvider Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	int global::KnockOff.Benchmarks.Interfaces.IDataProvider.Count
 	{
-		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? Count.Value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IDataProvider", "Count"); return Count.Value; }
 	}
 
 	global::System.Collections.Generic.IEnumerator<string> global::System.Collections.Generic.IEnumerable<string>.GetEnumerator()
@@ -87,6 +90,7 @@ partial class DataProviderStub
 		GetEnumerator.RecordCall();
 		if (GetEnumerator.OnCall is { } callback)
 			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable<string>", "GetEnumerator");
 		throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall or define a protected method 'GetEnumerator' in your partial class.");
 	}
 
@@ -98,7 +102,9 @@ partial class DataProviderStub
 	void global::System.IDisposable.Dispose()
 	{
 		Dispose.RecordCall();
-		Dispose.OnCall?.Invoke(this);
+		if (Dispose.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IDisposable", "Dispose");
 	}
 
 }

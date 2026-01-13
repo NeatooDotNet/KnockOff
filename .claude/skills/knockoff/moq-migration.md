@@ -164,6 +164,50 @@ snippet: skill-moq-migration-out-params
 
 snippet: skill-moq-migration-ref-params
 
+### Strict Mode (MockBehavior.Strict)
+
+Moq's strict mode throws when unconfigured methods are called:
+
+<!-- pseudo:moq-migration-strict-moq -->
+```csharp
+// Moq - strict mode via constructor
+var mock = new Mock<IUserService>(MockBehavior.Strict);
+mock.Setup(x => x.GetUser(1)).Returns(new User());
+
+// Unconfigured call throws MockException
+mock.Object.GetUser(2);  // Throws!
+```
+<!-- /snippet -->
+
+KnockOff supports the same behavior:
+
+<!-- pseudo:moq-migration-strict-knockoff -->
+```csharp
+// Standalone stub - set Strict property
+var stub = new UserServiceKnockOff();
+stub.Strict = true;
+stub.GetUser.OnCall = (ko, id) => id == 1 ? new User() : throw new ArgumentException();
+
+// Or use attribute default
+[KnockOff(Strict = true)]
+public partial class UserServiceKnockOff : IUserService { }
+
+// Inline stub - use constructor parameter
+var stub = new Stubs.IUserService(strict: true);
+stub.GetUser.OnCall = (ko, id) => new User();
+```
+<!-- /snippet -->
+
+Unconfigured calls throw `StubException`:
+
+<!-- pseudo:moq-migration-strict-throws -->
+```csharp
+stub.Strict = true;
+// stub.GetUser.OnCall not set
+service.GetUser(1);  // Throws StubException!
+```
+<!-- /snippet -->
+
 ## Features Comparison
 
 | Feature | Moq | KnockOff |
@@ -177,12 +221,11 @@ snippet: skill-moq-migration-ref-params
 | Ref parameters | Supported | Supported |
 | Events | Supported | Supported (with Raise/tracking) |
 | Generic methods | Supported | Supported (via `.Of<T>()` pattern) |
-| Strict mode | Supported | Not supported |
+| Strict mode | Supported | Supported |
 | VerifyNoOtherCalls | Supported | Not supported |
 
 ## Keep Using Moq For
 
-- Strict mode requirements
 - `VerifyNoOtherCalls` verification
 
 ## Gradual Migration

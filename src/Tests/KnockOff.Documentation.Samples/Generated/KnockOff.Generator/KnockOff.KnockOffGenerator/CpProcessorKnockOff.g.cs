@@ -64,11 +64,15 @@ partial class CpProcessorKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ICpProcessor instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ICpProcessor Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Documentation.Samples.Skills.ICpProcessor.Increment(ref int @value)
 	{
 		Increment.RecordCall(@value);
 		if (Increment.OnCall is { } onCallCallback)
 		{ onCallCallback(this, ref @value); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ICpProcessor", "Increment");
 	}
 
 	bool global::KnockOff.Documentation.Samples.Skills.ICpProcessor.TryUpdate(string key, ref string @value)
@@ -76,6 +80,7 @@ partial class CpProcessorKnockOff
 		TryUpdate.RecordCall(key, @value);
 		if (TryUpdate.OnCall is { } onCallCallback)
 			return onCallCallback(this, key, ref @value);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ICpProcessor", "TryUpdate");
 		return default!;
 	}
 

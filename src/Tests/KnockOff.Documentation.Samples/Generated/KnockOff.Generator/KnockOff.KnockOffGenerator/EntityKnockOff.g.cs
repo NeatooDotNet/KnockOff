@@ -30,9 +30,12 @@ partial class EntityKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.GettingStarted.IEntity instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.GettingStarted.IEntity Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	int global::KnockOff.Documentation.Samples.GettingStarted.IEntity.Id
 	{
-		get { Id.RecordGet(); return Id.OnGet?.Invoke(this) ?? Id.Value; }
+		get { Id.RecordGet(); if (Id.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntity", "Id"); return Id.Value; }
 	}
 
 }

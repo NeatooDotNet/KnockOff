@@ -505,6 +505,14 @@ public partial class KnockOffGenerator : IIncrementalGenerator
 		sb.AppendLine($"\tpublic {primaryInterface.FullName} Object => this;");
 		sb.AppendLine();
 
+		// 6. Generate Strict property for strict mode support
+		// For standalone stubs, we use a property initializer (not a constructor) to avoid conflicts
+		// with user-defined constructors. Public so tests can easily configure it.
+		var strictDefault = typeInfo.Strict ? "true" : "false";
+		sb.AppendLine("\t/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>");
+		sb.AppendLine($"\tpublic bool Strict {{ get; set; }} = {strictDefault};");
+		sb.AppendLine();
+
 		// Backing dictionaries for indexers are now inside the interceptor class (Indexer.Backing)
 
 		// 7. Generate explicit interface implementations for ALL members from ALL interfaces

@@ -38,11 +38,22 @@ partial class FormatProviderStubTests
 			{
 				GetFormat.RecordCall(formatType);
 				if (GetFormat.OnCall is { } onCall) return onCall(this, formatType);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IFormatProvider", "GetFormat");
 				return default!;
 			}
 
 			/// <summary>The global::System.IFormatProvider instance. Use for passing to code expecting the interface.</summary>
 			public global::System.IFormatProvider Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IFormatProvider(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

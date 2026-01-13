@@ -33,9 +33,12 @@ partial class PropLoggerKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IPropLogger instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IPropLogger Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	string global::KnockOff.Documentation.Samples.Guides.IPropLogger.Output
 	{
-		set { Output.RecordSet(value); if (Output.OnSet != null) Output.OnSet(this, value); else Output.Value = value; }
+		set { Output.RecordSet(value); if (Output.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropLogger", "Output"); Output.Value = value; }
 	}
 
 }

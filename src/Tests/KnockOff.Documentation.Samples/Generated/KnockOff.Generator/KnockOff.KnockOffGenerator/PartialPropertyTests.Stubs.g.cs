@@ -95,13 +95,15 @@ partial class PartialPropertyTests
 			{
 				GetUser.RecordCall(id);
 				if (GetUser.OnCall is { } onCall) return onCall(this, id);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IInUserService", "GetUser");
 				return default!;
 			}
 
 			void global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService.SaveUser(global::KnockOff.Documentation.Samples.Guides.InlineStubs.InUser user)
 			{
 				SaveUser.RecordCall(user);
-				if (SaveUser.OnCall is { } onCall) onCall(this, user);
+				if (SaveUser.OnCall is { } onCall) { onCall(this, user); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IInUserService", "SaveUser");
 			}
 
 			string global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService.ConnectionString
@@ -110,18 +112,30 @@ partial class PartialPropertyTests
 				{
 					ConnectionString.RecordGet();
 					if (ConnectionString.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IInUserService", "ConnectionString");
 					return ConnectionString.Value;
 				}
 				set
 				{
 					ConnectionString.RecordSet(value);
-					if (ConnectionString.OnSet is { } onSet) onSet(this, value);
-					else ConnectionString.Value = value;
+					if (ConnectionString.OnSet is { } onSet) { onSet(this, value); return; }
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IInUserService", "ConnectionString");
+					ConnectionString.Value = value;
 				}
 			}
 
 			/// <summary>The global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService instance. Use for passing to code expecting the interface.</summary>
 			public global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IInUserService(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 
@@ -177,17 +191,29 @@ partial class PartialPropertyTests
 			void global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInLogger.Log(string message)
 			{
 				Log.RecordCall(message);
-				if (Log.OnCall is { } onCall) onCall(this, message);
+				if (Log.OnCall is { } onCall) { onCall(this, message); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IInLogger", "Log");
 			}
 
 			void global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInLogger.LogError(string message, global::System.Exception? ex)
 			{
 				LogError.RecordCall(message, ex);
-				if (LogError.OnCall is { } onCall) onCall(this, message, ex);
+				if (LogError.OnCall is { } onCall) { onCall(this, message, ex); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IInLogger", "LogError");
 			}
 
 			/// <summary>The global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInLogger instance. Use for passing to code expecting the interface.</summary>
 			public global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInLogger Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IInLogger(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

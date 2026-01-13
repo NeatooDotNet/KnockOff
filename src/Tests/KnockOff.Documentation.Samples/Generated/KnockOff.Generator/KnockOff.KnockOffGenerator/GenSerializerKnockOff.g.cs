@@ -161,18 +161,24 @@ partial class GenSerializerKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IGenSerializer instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IGenSerializer Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	T global::KnockOff.Documentation.Samples.Guides.IGenSerializer.Deserialize<T>(string json)
 	{
 		Deserialize.Of<T>().RecordCall(json);
 		if (Deserialize.Of<T>().OnCall is { } callback)
 			return callback(this, json);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenSerializer", "Deserialize");
 		return SmartDefault<T>("Deserialize");
 	}
 
 	void global::KnockOff.Documentation.Samples.Guides.IGenSerializer.Process<T>(T @value)
 	{
 		Process.Of<T>().RecordCall();
-		Process.Of<T>().OnCall?.Invoke(this, @value);
+		if (Process.Of<T>().OnCall is { } onCallCallback)
+		{ onCallCallback(this, @value); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenSerializer", "Process");
 	}
 
 }

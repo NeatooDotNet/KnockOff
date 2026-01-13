@@ -98,11 +98,15 @@ partial class GenConverterKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IGenConverter instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IGenConverter Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	TOut global::KnockOff.Documentation.Samples.Guides.IGenConverter.Convert<TIn, TOut>(TIn input)
 	{
 		Convert.Of<TIn, TOut>().RecordCall();
 		if (Convert.Of<TIn, TOut>().OnCall is { } callback)
 			return callback(this, input);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenConverter", "Convert");
 		return SmartDefault<TOut>("Convert");
 	}
 

@@ -83,16 +83,25 @@ partial class AsyncServiceStub
 	/// <summary>The global::KnockOff.Benchmarks.Interfaces.IAsyncService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Interfaces.IAsyncService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::System.Threading.Tasks.Task global::KnockOff.Benchmarks.Interfaces.IAsyncService.DoWorkAsync()
 	{
 		DoWorkAsync.RecordCall();
-		return DoWorkAsync.OnCall?.Invoke(this) ?? global::System.Threading.Tasks.Task.CompletedTask;
+		if (DoWorkAsync.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncService", "DoWorkAsync");
+		return global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
 	global::System.Threading.Tasks.Task<int> global::KnockOff.Benchmarks.Interfaces.IAsyncService.GetValueAsync()
 	{
 		GetValueAsync.RecordCall();
-		return GetValueAsync.OnCall?.Invoke(this) ?? global::System.Threading.Tasks.Task.FromResult<int>(default!);
+		if (GetValueAsync.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncService", "GetValueAsync");
+		return global::System.Threading.Tasks.Task.FromResult<int>(default!);
 	}
 
 	global::System.Threading.Tasks.ValueTask<string> global::KnockOff.Benchmarks.Interfaces.IAsyncService.GetStringValueAsync()
@@ -100,6 +109,7 @@ partial class AsyncServiceStub
 		GetStringValueAsync.RecordCall();
 		if (GetStringValueAsync.OnCall is { } callback)
 			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncService", "GetStringValueAsync");
 		throw new global::System.InvalidOperationException("No implementation provided for GetStringValueAsync. Set GetStringValueAsync.OnCall or define a protected method 'GetStringValueAsync' in your partial class.");
 	}
 

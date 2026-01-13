@@ -36,10 +36,16 @@ partial class AsyncFetchKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IAsyncFetch instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IAsyncFetch Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.AsyncData> global::KnockOff.Documentation.Samples.Guides.IAsyncFetch.FetchAsync(int id, global::System.Threading.CancellationToken ct)
 	{
 		FetchAsync.RecordCall(id, ct);
-		return FetchAsync.OnCall?.Invoke(this, id, ct) ?? global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Guides.AsyncData>(new global::KnockOff.Documentation.Samples.Guides.AsyncData());
+		if (FetchAsync.OnCall is { } callback)
+			return callback(this, id, ct);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncFetch", "FetchAsync");
+		return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Guides.AsyncData>(new global::KnockOff.Documentation.Samples.Guides.AsyncData());
 	}
 
 }

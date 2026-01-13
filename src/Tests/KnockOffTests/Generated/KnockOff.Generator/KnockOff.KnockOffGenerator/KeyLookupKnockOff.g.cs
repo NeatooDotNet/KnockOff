@@ -70,6 +70,9 @@ partial class KeyLookupKnockOff
 	/// <summary>The global::KnockOff.Tests.IKeyLookup instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IKeyLookup Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	int global::KnockOff.Tests.IKeyLookup.GetData(string key)
 	{
 		GetData2.RecordCall(key);
@@ -79,8 +82,8 @@ partial class KeyLookupKnockOff
 
 	int global::KnockOff.Tests.IKeyLookup.Count
 	{
-		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? Count.Value; }
-		set { Count.RecordSet(value); if (Count.OnSet != null) Count.OnSet(this, value); else Count.Value = value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IKeyLookup", "Count"); return Count.Value; }
+		set { Count.RecordSet(value); if (Count.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IKeyLookup", "Count"); Count.Value = value; }
 	}
 
 }

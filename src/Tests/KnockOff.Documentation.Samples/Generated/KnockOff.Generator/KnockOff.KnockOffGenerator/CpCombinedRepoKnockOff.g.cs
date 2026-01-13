@@ -36,6 +36,9 @@ partial class CpCombinedRepoKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ICpCombinedRepository instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ICpCombinedRepository Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Documentation.Samples.Skills.CpUser? global::KnockOff.Documentation.Samples.Skills.ICpCombinedRepository.GetById(int id)
 	{
 		GetById2.RecordCall(id);

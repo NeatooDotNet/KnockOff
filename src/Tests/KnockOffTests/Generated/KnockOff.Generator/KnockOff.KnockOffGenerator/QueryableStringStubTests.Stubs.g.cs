@@ -101,6 +101,7 @@ partial class QueryableStringStubTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable<string>", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
@@ -110,6 +111,7 @@ partial class QueryableStringStubTests
 				{
 					ElementType.RecordGet();
 					if (ElementType.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IQueryable", "ElementType");
 					return ElementType.Value;
 				}
 			}
@@ -120,6 +122,7 @@ partial class QueryableStringStubTests
 				{
 					Expression.RecordGet();
 					if (Expression.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IQueryable", "Expression");
 					return Expression.Value;
 				}
 			}
@@ -130,6 +133,7 @@ partial class QueryableStringStubTests
 				{
 					Provider.RecordGet();
 					if (Provider.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IQueryable", "Provider");
 					return Provider.Value;
 				}
 			}
@@ -138,11 +142,22 @@ partial class QueryableStringStubTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
 			/// <summary>The global::System.Linq.IQueryable<string> instance. Use for passing to code expecting the interface.</summary>
 			public global::System.Linq.IQueryable<string> Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IQueryable(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

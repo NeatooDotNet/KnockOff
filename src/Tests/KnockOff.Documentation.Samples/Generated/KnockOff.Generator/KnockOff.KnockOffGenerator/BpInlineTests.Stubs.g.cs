@@ -38,11 +38,22 @@ partial class BpInlineTests
 			{
 				GetUser.RecordCall(id);
 				if (GetUser.OnCall is { } onCall) return onCall(this, id);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IBpInlineUserService", "GetUser");
 				return default!;
 			}
 
 			/// <summary>The global::KnockOff.Documentation.Samples.Guides.IBpInlineUserService instance. Use for passing to code expecting the interface.</summary>
 			public global::KnockOff.Documentation.Samples.Guides.IBpInlineUserService Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IBpInlineUserService(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 
@@ -75,11 +86,22 @@ partial class BpInlineTests
 			void global::KnockOff.Documentation.Samples.Guides.IBpInlineLogger.Log(string message)
 			{
 				Log.RecordCall(message);
-				if (Log.OnCall is { } onCall) onCall(this, message);
+				if (Log.OnCall is { } onCall) { onCall(this, message); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IBpInlineLogger", "Log");
 			}
 
 			/// <summary>The global::KnockOff.Documentation.Samples.Guides.IBpInlineLogger instance. Use for passing to code expecting the interface.</summary>
 			public global::KnockOff.Documentation.Samples.Guides.IBpInlineLogger Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IBpInlineLogger(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

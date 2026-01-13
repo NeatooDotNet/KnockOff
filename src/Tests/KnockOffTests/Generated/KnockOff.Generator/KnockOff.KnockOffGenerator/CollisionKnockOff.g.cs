@@ -64,16 +64,21 @@ partial class CollisionKnockOff
 	/// <summary>The global::KnockOff.Tests.ICollision instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.ICollision Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	string global::KnockOff.Tests.ICollision.ICollision
 	{
-		get { ICollision.RecordGet(); return ICollision.OnGet?.Invoke(this) ?? ICollision.Value; }
-		set { ICollision.RecordSet(value); if (ICollision.OnSet != null) ICollision.OnSet(this, value); else ICollision.Value = value; }
+		get { ICollision.RecordGet(); if (ICollision.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollision", "ICollision"); return ICollision.Value; }
+		set { ICollision.RecordSet(value); if (ICollision.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollision", "ICollision"); ICollision.Value = value; }
 	}
 
 	void global::KnockOff.Tests.ICollision.DoWork()
 	{
 		DoWork.RecordCall();
-		DoWork.OnCall?.Invoke(this);
+		if (DoWork.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollision", "DoWork");
 	}
 
 }

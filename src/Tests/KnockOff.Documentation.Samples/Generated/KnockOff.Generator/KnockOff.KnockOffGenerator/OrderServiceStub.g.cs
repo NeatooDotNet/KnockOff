@@ -117,28 +117,42 @@ partial class OrderServiceStub
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IOrderService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IOrderService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Documentation.Samples.Comparison.Order global::KnockOff.Documentation.Samples.Comparison.IOrderService.GetOrder(int id)
 	{
 		GetOrder.RecordCall(id);
-		return GetOrder.OnCall?.Invoke(this, id) ?? new global::KnockOff.Documentation.Samples.Comparison.Order();
+		if (GetOrder.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IOrderService", "GetOrder");
+		return new global::KnockOff.Documentation.Samples.Comparison.Order();
 	}
 
 	bool global::KnockOff.Documentation.Samples.Comparison.IOrderService.ValidateOrder(global::KnockOff.Documentation.Samples.Comparison.Order order)
 	{
 		ValidateOrder.RecordCall(order);
-		return ValidateOrder.OnCall?.Invoke(this, order) ?? default!;
+		if (ValidateOrder.OnCall is { } callback)
+			return callback(this, order);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IOrderService", "ValidateOrder");
+		return default!;
 	}
 
 	decimal global::KnockOff.Documentation.Samples.Comparison.IOrderService.CalculateTotal(global::KnockOff.Documentation.Samples.Comparison.Order order)
 	{
 		CalculateTotal.RecordCall(order);
-		return CalculateTotal.OnCall?.Invoke(this, order) ?? default!;
+		if (CalculateTotal.OnCall is { } callback)
+			return callback(this, order);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IOrderService", "CalculateTotal");
+		return default!;
 	}
 
 	void global::KnockOff.Documentation.Samples.Comparison.IOrderService.SaveOrder(global::KnockOff.Documentation.Samples.Comparison.Order order)
 	{
 		SaveOrder.RecordCall(order);
-		SaveOrder.OnCall?.Invoke(this, order);
+		if (SaveOrder.OnCall is { } onCallCallback)
+		{ onCallCallback(this, order); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IOrderService", "SaveOrder");
 	}
 
 }

@@ -89,20 +89,23 @@ partial class PropertyServiceStub
 	/// <summary>The global::KnockOff.Benchmarks.Interfaces.IPropertyService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Interfaces.IPropertyService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	string global::KnockOff.Benchmarks.Interfaces.IPropertyService.Name
 	{
-		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else Name.Value = value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyService", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyService", "Name"); Name.Value = value; }
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.IPropertyService.ReadOnlyValue
 	{
-		get { ReadOnlyValue.RecordGet(); return ReadOnlyValue.OnGet?.Invoke(this) ?? ReadOnlyValue.Value; }
+		get { ReadOnlyValue.RecordGet(); if (ReadOnlyValue.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyService", "ReadOnlyValue"); return ReadOnlyValue.Value; }
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.IPropertyService.WriteOnlyValue
 	{
-		set { WriteOnlyValue.RecordSet(value); if (WriteOnlyValue.OnSet != null) WriteOnlyValue.OnSet(this, value); else WriteOnlyValue.Value = value; }
+		set { WriteOnlyValue.RecordSet(value); if (WriteOnlyValue.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyService", "WriteOnlyValue"); WriteOnlyValue.Value = value; }
 	}
 
 }

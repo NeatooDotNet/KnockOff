@@ -33,10 +33,15 @@ partial class GenAuditorKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Reference.IGenAuditor instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Reference.IGenAuditor Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Documentation.Samples.Reference.IGenAuditor.Audit(string action)
 	{
 		Audit.RecordCall(action);
-		Audit.OnCall?.Invoke(this, action);
+		if (Audit.OnCall is { } onCallCallback)
+		{ onCallCallback(this, action); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenAuditor", "Audit");
 	}
 
 }

@@ -133,28 +133,43 @@ partial class HaDefaultsServiceKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IHaDefaultsService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.IHaDefaultsService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	int global::KnockOff.Documentation.Samples.Skills.IHaDefaultsService.GetCount()
 	{
 		GetCount.RecordCall();
-		return GetCount.OnCall?.Invoke(this) ?? default!;
+		if (GetCount.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IHaDefaultsService", "GetCount");
+		return default!;
 	}
 
 	global::System.Collections.Generic.List<string> global::KnockOff.Documentation.Samples.Skills.IHaDefaultsService.GetItems()
 	{
 		GetItems.RecordCall();
-		return GetItems.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<string>();
+		if (GetItems.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IHaDefaultsService", "GetItems");
+		return new global::System.Collections.Generic.List<string>();
 	}
 
 	global::System.Collections.Generic.IList<string> global::KnockOff.Documentation.Samples.Skills.IHaDefaultsService.GetIList()
 	{
 		GetIList.RecordCall();
-		return GetIList.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<string>();
+		if (GetIList.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IHaDefaultsService", "GetIList");
+		return new global::System.Collections.Generic.List<string>();
 	}
 
 	string? global::KnockOff.Documentation.Samples.Skills.IHaDefaultsService.GetOptional()
 	{
 		GetOptional.RecordCall();
-		return GetOptional.OnCall?.Invoke(this) ?? default!;
+		if (GetOptional.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IHaDefaultsService", "GetOptional");
+		return default!;
 	}
 
 	global::System.IDisposable global::KnockOff.Documentation.Samples.Skills.IHaDefaultsService.GetDisposable()
@@ -162,6 +177,7 @@ partial class HaDefaultsServiceKnockOff
 		GetDisposable.RecordCall();
 		if (GetDisposable.OnCall is { } callback)
 			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IHaDefaultsService", "GetDisposable");
 		throw new global::System.InvalidOperationException("No implementation provided for GetDisposable. Set GetDisposable.OnCall or define a protected method 'GetDisposable' in your partial class.");
 	}
 

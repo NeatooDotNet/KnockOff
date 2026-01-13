@@ -386,6 +386,7 @@ partial class InlineGenericMethodTest
 				typedHandler.RecordCall();
 				if (typedHandler.OnCall is { } onCallCallback)
 					return onCallCallback(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Create");
 				return SmartDefault<T>("Create");
 			}
 
@@ -395,6 +396,7 @@ partial class InlineGenericMethodTest
 				typedHandler.RecordCall();
 				if (typedHandler.OnCall is { } onCallCallback)
 				{ onCallCallback(this, value); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Process");
 			}
 
 			T global::KnockOff.Tests.IGenericMethodService.Deserialize<T>(string json)
@@ -403,6 +405,7 @@ partial class InlineGenericMethodTest
 				typedHandler.RecordCall(json);
 				if (typedHandler.OnCall is { } onCallCallback)
 					return onCallCallback(this, json);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Deserialize");
 				return SmartDefault<T>("Deserialize");
 			}
 
@@ -412,6 +415,7 @@ partial class InlineGenericMethodTest
 				typedHandler.RecordCall();
 				if (typedHandler.OnCall is { } onCallCallback)
 					return onCallCallback(this, input);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Convert");
 				return SmartDefault<TOut>("Convert");
 			}
 
@@ -421,6 +425,7 @@ partial class InlineGenericMethodTest
 				typedHandler.RecordCall(id);
 				if (typedHandler.OnCall is { } onCallCallback)
 					return onCallCallback(this, id);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Find");
 				return default!;
 			}
 
@@ -430,10 +435,21 @@ partial class InlineGenericMethodTest
 				typedHandler.RecordCall();
 				if (typedHandler.OnCall is { } onCallCallback)
 				{ onCallCallback(this, source, destination); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Transfer");
 			}
 
 			/// <summary>The global::KnockOff.Tests.IGenericMethodService instance. Use for passing to code expecting the interface.</summary>
 			public global::KnockOff.Tests.IGenericMethodService Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IGenericMethodService(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 			/// <summary>Gets a smart default value for a generic type at runtime.</summary>
 			private static T SmartDefault<T>(string methodName)

@@ -36,10 +36,16 @@ partial class AttrUserRepoKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Reference.IAttrRepository<global::KnockOff.Documentation.Samples.Reference.AttrUser> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Reference.IAttrRepository<global::KnockOff.Documentation.Samples.Reference.AttrUser> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Documentation.Samples.Reference.AttrUser? global::KnockOff.Documentation.Samples.Reference.IAttrRepository<global::KnockOff.Documentation.Samples.Reference.AttrUser>.GetById(int id)
 	{
 		GetById.RecordCall(id);
-		return GetById.OnCall?.Invoke(this, id) ?? default!;
+		if (GetById.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("AttrUser>", "GetById");
+		return default!;
 	}
 
 }

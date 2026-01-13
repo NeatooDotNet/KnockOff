@@ -33,10 +33,16 @@ partial class MigSequenceKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IMigSequence instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IMigSequence Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	int global::KnockOff.Documentation.Samples.Comparison.IMigSequence.GetNext()
 	{
 		GetNext.RecordCall();
-		return GetNext.OnCall?.Invoke(this) ?? default!;
+		if (GetNext.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMigSequence", "GetNext");
+		return default!;
 	}
 
 }

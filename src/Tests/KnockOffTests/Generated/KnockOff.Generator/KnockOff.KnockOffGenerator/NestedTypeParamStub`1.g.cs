@@ -58,16 +58,24 @@ partial class NestedTypeParamStub<T>
 	/// <summary>The global::KnockOff.Tests.INestedTypeParamService<T> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.INestedTypeParamService<T> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::System.Collections.Generic.List<T> global::KnockOff.Tests.INestedTypeParamService<T>.GetItems()
 	{
 		GetItems.RecordCall();
-		return GetItems.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<T>();
+		if (GetItems.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("INestedTypeParamService<T>", "GetItems");
+		return new global::System.Collections.Generic.List<T>();
 	}
 
 	void global::KnockOff.Tests.INestedTypeParamService<T>.AddItems(global::System.Collections.Generic.IEnumerable<T> items)
 	{
 		AddItems.RecordCall(items);
-		AddItems.OnCall?.Invoke(this, items);
+		if (AddItems.OnCall is { } onCallCallback)
+		{ onCallCallback(this, items); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("INestedTypeParamService<T>", "AddItems");
 	}
 
 }

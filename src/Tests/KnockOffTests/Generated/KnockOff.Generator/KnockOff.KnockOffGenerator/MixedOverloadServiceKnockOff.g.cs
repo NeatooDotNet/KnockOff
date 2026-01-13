@@ -236,22 +236,31 @@ partial class MixedOverloadServiceKnockOff
 	/// <summary>The global::KnockOff.Tests.IMixedOverloadService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IMixedOverloadService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Tests.IMixedOverloadService.Process(string @value)
 	{
 		Process1.RecordCall(@value);
-		Process1.OnCall?.Invoke(this, @value);
+		if (Process1.OnCall is { } onCallCallback)
+		{ onCallCallback(this, @value); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMixedOverloadService", "Process");
 	}
 
 	void global::KnockOff.Tests.IMixedOverloadService.Process(int @value)
 	{
 		Process2.RecordCall(@value);
-		Process2.OnCall?.Invoke(this, @value);
+		if (Process2.OnCall is { } onCallCallback)
+		{ onCallCallback(this, @value); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMixedOverloadService", "Process");
 	}
 
 	void global::KnockOff.Tests.IMixedOverloadService.Process<T>(T @value)
 	{
 		ProcessGeneric.Of<T>().RecordCall();
-		ProcessGeneric.Of<T>().OnCall?.Invoke(this, @value);
+		if (ProcessGeneric.Of<T>().OnCall is { } onCallCallback)
+		{ onCallCallback(this, @value); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMixedOverloadService", "Process");
 	}
 
 	string global::KnockOff.Tests.IMixedOverloadService.Format(int @value)
@@ -259,6 +268,7 @@ partial class MixedOverloadServiceKnockOff
 		Format.RecordCall(@value);
 		if (Format.OnCall is { } callback)
 			return callback(this, @value);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMixedOverloadService", "Format");
 		throw new global::System.InvalidOperationException("No implementation provided for Format. Set Format.OnCall or define a protected method 'Format' in your partial class.");
 	}
 
@@ -267,6 +277,7 @@ partial class MixedOverloadServiceKnockOff
 		FormatGeneric.Of<T>().RecordCall();
 		if (FormatGeneric.Of<T>().OnCall is { } callback)
 			return callback(this, @value);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMixedOverloadService", "Format");
 		return SmartDefault<string>("Format");
 	}
 

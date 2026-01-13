@@ -60,6 +60,7 @@ partial class ITriggerPropertyTests
 			{
 				IsMatch.RecordCall(propertyName);
 				if (IsMatch.OnCall is { } onCall) return onCall(this, propertyName);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("ITriggerProperty", "IsMatch");
 				return default!;
 			}
 
@@ -69,12 +70,23 @@ partial class ITriggerPropertyTests
 				{
 					PropertyName.RecordGet();
 					if (PropertyName.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("ITriggerProperty", "PropertyName");
 					return PropertyName.Value;
 				}
 			}
 
 			/// <summary>The global::Neatoo.Rules.ITriggerProperty instance. Use for passing to code expecting the interface.</summary>
 			public global::Neatoo.Rules.ITriggerProperty Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public ITriggerProperty(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

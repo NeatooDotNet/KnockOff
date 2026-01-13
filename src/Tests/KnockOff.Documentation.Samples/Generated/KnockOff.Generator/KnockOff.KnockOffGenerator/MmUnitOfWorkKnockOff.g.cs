@@ -36,10 +36,16 @@ partial class MmUnitOfWorkKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IMmUnitOfWork instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.IMmUnitOfWork Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::System.Threading.Tasks.Task<int> global::KnockOff.Documentation.Samples.Skills.IMmUnitOfWork.SaveChangesAsync(global::System.Threading.CancellationToken ct)
 	{
 		SaveChangesAsync.RecordCall(ct);
-		return SaveChangesAsync.OnCall?.Invoke(this, ct) ?? global::System.Threading.Tasks.Task.FromResult<int>(default!);
+		if (SaveChangesAsync.OnCall is { } callback)
+			return callback(this, ct);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmUnitOfWork", "SaveChangesAsync");
+		return global::System.Threading.Tasks.Task.FromResult<int>(default!);
 	}
 
 }

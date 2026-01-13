@@ -65,6 +65,9 @@ partial class MultipleInitPropertiesKnockOff
 	/// <summary>The global::KnockOffTests.IMultipleInitProperties instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOffTests.IMultipleInitProperties Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	string global::KnockOffTests.IMultipleInitProperties.Id
 	{
 		get { Id.RecordGet(); return Id.Value; }

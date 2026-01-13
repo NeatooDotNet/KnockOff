@@ -133,28 +133,43 @@ partial class SkSmartDefaultKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	int global::KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.GetCount()
 	{
 		GetCount.RecordCall();
-		return GetCount.OnCall?.Invoke(this) ?? default!;
+		if (GetCount.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkSmartDefaultService", "GetCount");
+		return default!;
 	}
 
 	global::System.Collections.Generic.List<string> global::KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.GetItems()
 	{
 		GetItems.RecordCall();
-		return GetItems.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<string>();
+		if (GetItems.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkSmartDefaultService", "GetItems");
+		return new global::System.Collections.Generic.List<string>();
 	}
 
 	global::System.Collections.Generic.IList<string> global::KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.GetIList()
 	{
 		GetIList.RecordCall();
-		return GetIList.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<string>();
+		if (GetIList.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkSmartDefaultService", "GetIList");
+		return new global::System.Collections.Generic.List<string>();
 	}
 
 	string? global::KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.GetOptional()
 	{
 		GetOptional.RecordCall();
-		return GetOptional.OnCall?.Invoke(this) ?? default!;
+		if (GetOptional.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkSmartDefaultService", "GetOptional");
+		return default!;
 	}
 
 	global::System.IDisposable global::KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.GetDisposable()
@@ -162,6 +177,7 @@ partial class SkSmartDefaultKnockOff
 		GetDisposable.RecordCall();
 		if (GetDisposable.OnCall is { } callback)
 			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkSmartDefaultService", "GetDisposable");
 		throw new global::System.InvalidOperationException("No implementation provided for GetDisposable. Set GetDisposable.OnCall or define a protected method 'GetDisposable' in your partial class.");
 	}
 

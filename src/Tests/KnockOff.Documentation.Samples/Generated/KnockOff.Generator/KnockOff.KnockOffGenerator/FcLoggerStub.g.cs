@@ -83,22 +83,31 @@ partial class FcLoggerStub
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IFcLogger instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IFcLogger Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Documentation.Samples.Comparison.IFcLogger.LogInfo(string message)
 	{
 		LogInfo.RecordCall(message);
-		LogInfo.OnCall?.Invoke(this, message);
+		if (LogInfo.OnCall is { } onCallCallback)
+		{ onCallCallback(this, message); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFcLogger", "LogInfo");
 	}
 
 	void global::KnockOff.Documentation.Samples.Comparison.IFcLogger.LogWarning(string message)
 	{
 		LogWarning.RecordCall(message);
-		LogWarning.OnCall?.Invoke(this, message);
+		if (LogWarning.OnCall is { } onCallCallback)
+		{ onCallCallback(this, message); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFcLogger", "LogWarning");
 	}
 
 	void global::KnockOff.Documentation.Samples.Comparison.IFcLogger.LogError(string message, global::System.Exception? exception)
 	{
 		LogError.RecordCall(message, exception);
-		LogError.OnCall?.Invoke(this, message, exception);
+		if (LogError.OnCall is { } onCallCallback)
+		{ onCallCallback(this, message, exception); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFcLogger", "LogError");
 	}
 
 }

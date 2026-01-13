@@ -123,7 +123,8 @@ partial class CollectionStubTests
 			void global::System.Collections.ICollection.CopyTo(global::System.Array array, int index)
 			{
 				CopyTo.RecordCall(array, index);
-				if (CopyTo.OnCall is { } onCall) onCall(this, array, index);
+				if (CopyTo.OnCall is { } onCall) { onCall(this, array, index); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("ICollection", "CopyTo");
 			}
 
 			int global::System.Collections.ICollection.Count
@@ -132,6 +133,7 @@ partial class CollectionStubTests
 				{
 					Count.RecordGet();
 					if (Count.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("ICollection", "Count");
 					return Count.Value;
 				}
 			}
@@ -142,6 +144,7 @@ partial class CollectionStubTests
 				{
 					IsSynchronized.RecordGet();
 					if (IsSynchronized.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("ICollection", "IsSynchronized");
 					return IsSynchronized.Value;
 				}
 			}
@@ -152,6 +155,7 @@ partial class CollectionStubTests
 				{
 					SyncRoot.RecordGet();
 					if (SyncRoot.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("ICollection", "SyncRoot");
 					return SyncRoot.Value;
 				}
 			}
@@ -160,11 +164,22 @@ partial class CollectionStubTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
 			/// <summary>The global::System.Collections.ICollection instance. Use for passing to code expecting the interface.</summary>
 			public global::System.Collections.ICollection Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public ICollection(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

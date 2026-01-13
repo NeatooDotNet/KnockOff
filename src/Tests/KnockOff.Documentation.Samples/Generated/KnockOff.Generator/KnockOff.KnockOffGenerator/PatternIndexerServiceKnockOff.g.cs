@@ -45,10 +45,13 @@ partial class PatternIndexerServiceKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Concepts.IPatternIndexerService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Concepts.IPatternIndexerService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Documentation.Samples.Concepts.PatternPropertyInfo? global::KnockOff.Documentation.Samples.Concepts.IPatternIndexerService.this[string key]
 	{
-		get { Indexer.RecordGet(key); if (Indexer.OnGet != null) return Indexer.OnGet(this, key); return Indexer.Backing.TryGetValue(key, out var v) ? v : default; }
-		set { Indexer.RecordSet(key, value); if (Indexer.OnSet != null) Indexer.OnSet(this, key, value); else Indexer.Backing[key] = value; }
+		get { Indexer.RecordGet(key); if (Indexer.OnGet is { } onGet) return onGet(this, key); if (Strict) throw global::KnockOff.StubException.NotConfigured("IPatternIndexerService", "this[]"); return Indexer.Backing.TryGetValue(key, out var v) ? v : default; }
+		set { Indexer.RecordSet(key, value); if (Indexer.OnSet is { } onSet) { onSet(this, key, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IPatternIndexerService", "this[]"); Indexer.Backing[key] = value; }
 	}
 
 }

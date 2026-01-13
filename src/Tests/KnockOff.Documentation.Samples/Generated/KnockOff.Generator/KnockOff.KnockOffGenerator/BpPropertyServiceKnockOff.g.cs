@@ -76,16 +76,19 @@ partial class BpPropertyServiceKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IBpPropertyService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IBpPropertyService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	string global::KnockOff.Documentation.Samples.Guides.IBpPropertyService.Name
 	{
-		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else Name.Value = value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpPropertyService", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpPropertyService", "Name"); Name.Value = value; }
 	}
 
 	bool global::KnockOff.Documentation.Samples.Guides.IBpPropertyService.IsActive
 	{
-		get { IsActive.RecordGet(); return IsActive.OnGet?.Invoke(this) ?? IsActive.Value; }
-		set { IsActive.RecordSet(value); if (IsActive.OnSet != null) IsActive.OnSet(this, value); else IsActive.Value = value; }
+		get { IsActive.RecordGet(); if (IsActive.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpPropertyService", "IsActive"); return IsActive.Value; }
+		set { IsActive.RecordSet(value); if (IsActive.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpPropertyService", "IsActive"); IsActive.Value = value; }
 	}
 
 }

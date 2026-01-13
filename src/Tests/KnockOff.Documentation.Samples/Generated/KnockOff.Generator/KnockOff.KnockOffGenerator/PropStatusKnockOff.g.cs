@@ -42,10 +42,13 @@ partial class PropStatusKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IPropStatus instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IPropStatus Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	string global::KnockOff.Documentation.Samples.Guides.IPropStatus.Status
 	{
-		get { Status.RecordGet(); return Status.OnGet?.Invoke(this) ?? Status.Value; }
-		set { Status.RecordSet(value); if (Status.OnSet != null) Status.OnSet(this, value); else Status.Value = value; }
+		get { Status.RecordGet(); if (Status.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropStatus", "Status"); return Status.Value; }
+		set { Status.RecordSet(value); if (Status.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropStatus", "Status"); Status.Value = value; }
 	}
 
 }

@@ -61,16 +61,24 @@ partial class GenericEntityRepoStub<T> where T : class, global::KnockOff.Documen
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IGenericEntityRepo<T> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IGenericEntityRepo<T> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	T? global::KnockOff.Documentation.Samples.Guides.IGenericEntityRepo<T>.FindById(int id)
 	{
 		FindById.RecordCall(id);
-		return FindById.OnCall?.Invoke(this, id) ?? default!;
+		if (FindById.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericEntityRepo<T>", "FindById");
+		return default!;
 	}
 
 	void global::KnockOff.Documentation.Samples.Guides.IGenericEntityRepo<T>.Save(T entity)
 	{
 		Save.RecordCall(entity);
-		Save.OnCall?.Invoke(this, entity);
+		if (Save.OnCall is { } onCallCallback)
+		{ onCallCallback(this, entity); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericEntityRepo<T>", "Save");
 	}
 
 }

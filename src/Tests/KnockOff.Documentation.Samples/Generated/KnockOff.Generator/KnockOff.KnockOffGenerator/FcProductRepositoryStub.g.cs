@@ -117,28 +117,43 @@ partial class FcProductRepositoryStub
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IFcProductRepository instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IFcProductRepository Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Comparison.FcProduct?> global::KnockOff.Documentation.Samples.Comparison.IFcProductRepository.GetByIdAsync(int id)
 	{
 		GetByIdAsync.RecordCall(id);
-		return GetByIdAsync.OnCall?.Invoke(this, id) ?? global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Comparison.FcProduct?>(default!);
+		if (GetByIdAsync.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFcProductRepository", "GetByIdAsync");
+		return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Comparison.FcProduct?>(default!);
 	}
 
 	global::System.Threading.Tasks.Task<global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Comparison.FcProduct>> global::KnockOff.Documentation.Samples.Comparison.IFcProductRepository.GetAllAsync()
 	{
 		GetAllAsync.RecordCall();
-		return GetAllAsync.OnCall?.Invoke(this) ?? global::System.Threading.Tasks.Task.FromResult<global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Comparison.FcProduct>>(new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Comparison.FcProduct>());
+		if (GetAllAsync.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFcProductRepository", "GetAllAsync");
+		return global::System.Threading.Tasks.Task.FromResult<global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Comparison.FcProduct>>(new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Comparison.FcProduct>());
 	}
 
 	global::System.Threading.Tasks.Task global::KnockOff.Documentation.Samples.Comparison.IFcProductRepository.SaveAsync(global::KnockOff.Documentation.Samples.Comparison.FcProduct product)
 	{
 		SaveAsync.RecordCall(product);
-		return SaveAsync.OnCall?.Invoke(this, product) ?? global::System.Threading.Tasks.Task.CompletedTask;
+		if (SaveAsync.OnCall is { } callback)
+			return callback(this, product);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFcProductRepository", "SaveAsync");
+		return global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
 	global::System.Threading.Tasks.Task global::KnockOff.Documentation.Samples.Comparison.IFcProductRepository.DeleteAsync(int id)
 	{
 		DeleteAsync.RecordCall(id);
-		return DeleteAsync.OnCall?.Invoke(this, id) ?? global::System.Threading.Tasks.Task.CompletedTask;
+		if (DeleteAsync.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFcProductRepository", "DeleteAsync");
+		return global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
 }

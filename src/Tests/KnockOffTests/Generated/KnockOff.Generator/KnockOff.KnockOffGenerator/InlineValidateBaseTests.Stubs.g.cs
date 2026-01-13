@@ -354,6 +354,7 @@ partial class InlineValidateBaseTests
 			{
 				GetProperty.RecordCall(propertyName);
 				if (GetProperty.OnCall is { } onCall) return onCall(this, propertyName);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "GetProperty");
 				throw new global::System.InvalidOperationException("No implementation provided for GetProperty. Set GetProperty.OnCall.");
 			}
 
@@ -362,6 +363,7 @@ partial class InlineValidateBaseTests
 				validateProperty = default!;
 				TryGetProperty.RecordCall(propertyName);
 				if (TryGetProperty.OnCall is { } onCall) return onCall(this, propertyName);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "TryGetProperty");
 				return default!;
 			}
 
@@ -371,6 +373,7 @@ partial class InlineValidateBaseTests
 				{
 					Parent.RecordGet();
 					if (Parent.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "Parent");
 					return Parent.Value;
 				}
 			}
@@ -381,6 +384,7 @@ partial class InlineValidateBaseTests
 				{
 					IsPaused.RecordGet();
 					if (IsPaused.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "IsPaused");
 					return IsPaused.Value;
 				}
 			}
@@ -391,6 +395,7 @@ partial class InlineValidateBaseTests
 				{
 					Indexer.RecordGet(propertyName);
 					if (Indexer.OnGet is { } onGet) return onGet(this, propertyName);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "this[]");
 					return Indexer.Backing.TryGetValue(propertyName, out var v) ? v : default!;
 				}
 			}
@@ -399,6 +404,7 @@ partial class InlineValidateBaseTests
 			{
 				WaitForTasks.RecordCall(null);
 				if (WaitForTasks.OnCall is { } onCall) return onCall(this, null);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -406,6 +412,7 @@ partial class InlineValidateBaseTests
 			{
 				WaitForTasks.RecordCall(token);
 				if (WaitForTasks.OnCall is { } onCall) return onCall(this, token);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -413,6 +420,7 @@ partial class InlineValidateBaseTests
 			{
 				RunRules.RecordCall(propertyName, token, null);
 				if (RunRules.OnCall is { } onCall) return onCall(this, propertyName, token, null);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -420,19 +428,22 @@ partial class InlineValidateBaseTests
 			{
 				RunRules.RecordCall(null, token, runRules);
 				if (RunRules.OnCall is { } onCall) return onCall(this, null, token, runRules);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
 			void global::Neatoo.IValidateMetaProperties.ClearAllMessages()
 			{
 				ClearAllMessages.RecordCall();
-				if (ClearAllMessages.OnCall is { } onCall) onCall(this);
+				if (ClearAllMessages.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "ClearAllMessages");
 			}
 
 			void global::Neatoo.IValidateMetaProperties.ClearSelfMessages()
 			{
 				ClearSelfMessages.RecordCall();
-				if (ClearSelfMessages.OnCall is { } onCall) onCall(this);
+				if (ClearSelfMessages.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "ClearSelfMessages");
 			}
 
 			bool global::Neatoo.IValidateMetaProperties.IsBusy
@@ -441,6 +452,7 @@ partial class InlineValidateBaseTests
 				{
 					IsBusy.RecordGet();
 					if (IsBusy.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsBusy");
 					return IsBusy.Value;
 				}
 			}
@@ -451,6 +463,7 @@ partial class InlineValidateBaseTests
 				{
 					IsValid.RecordGet();
 					if (IsValid.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsValid");
 					return IsValid.Value;
 				}
 			}
@@ -461,6 +474,7 @@ partial class InlineValidateBaseTests
 				{
 					IsSelfValid.RecordGet();
 					if (IsSelfValid.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsSelfValid");
 					return IsSelfValid.Value;
 				}
 			}
@@ -471,6 +485,7 @@ partial class InlineValidateBaseTests
 				{
 					PropertyMessages.RecordGet();
 					if (PropertyMessages.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "PropertyMessages");
 					return PropertyMessages.Value;
 				}
 			}
@@ -489,6 +504,16 @@ partial class InlineValidateBaseTests
 
 			/// <summary>The global::Neatoo.IValidateBase instance. Use for passing to code expecting the interface.</summary>
 			public global::Neatoo.IValidateBase Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IValidateBase(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

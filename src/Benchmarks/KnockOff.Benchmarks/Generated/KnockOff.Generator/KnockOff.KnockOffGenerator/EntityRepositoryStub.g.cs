@@ -86,22 +86,33 @@ partial class EntityRepositoryStub
 	/// <summary>The global::KnockOff.Benchmarks.Interfaces.IRepository<global::KnockOff.Benchmarks.Interfaces.Entity> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Interfaces.IRepository<global::KnockOff.Benchmarks.Interfaces.Entity> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Benchmarks.Interfaces.Entity? global::KnockOff.Benchmarks.Interfaces.IRepository<global::KnockOff.Benchmarks.Interfaces.Entity>.GetById(int id)
 	{
 		GetById.RecordCall(id);
-		return GetById.OnCall?.Invoke(this, id) ?? default!;
+		if (GetById.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("Entity>", "GetById");
+		return default!;
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.IRepository<global::KnockOff.Benchmarks.Interfaces.Entity>.Save(global::KnockOff.Benchmarks.Interfaces.Entity entity)
 	{
 		Save.RecordCall(entity);
-		Save.OnCall?.Invoke(this, entity);
+		if (Save.OnCall is { } onCallCallback)
+		{ onCallCallback(this, entity); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("Entity>", "Save");
 	}
 
 	global::System.Collections.Generic.IEnumerable<global::KnockOff.Benchmarks.Interfaces.Entity> global::KnockOff.Benchmarks.Interfaces.IRepository<global::KnockOff.Benchmarks.Interfaces.Entity>.GetAll()
 	{
 		GetAll.RecordCall();
-		return GetAll.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<global::KnockOff.Benchmarks.Interfaces.Entity>();
+		if (GetAll.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("Entity>", "GetAll");
+		return new global::System.Collections.Generic.List<global::KnockOff.Benchmarks.Interfaces.Entity>();
 	}
 
 }

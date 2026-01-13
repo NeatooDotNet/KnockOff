@@ -61,6 +61,9 @@ partial class VsRepositoryKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IVsRepository instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IVsRepository Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Comparison.VsEntity?> global::KnockOff.Documentation.Samples.Comparison.IVsRepository.GetByIdAsync(int id)
 	{
 		GetByIdAsync2.RecordCall(id);
@@ -71,7 +74,9 @@ partial class VsRepositoryKnockOff
 	void global::KnockOff.Documentation.Samples.Comparison.IVsRepository.Save(global::KnockOff.Documentation.Samples.Comparison.VsEntity entity)
 	{
 		Save.RecordCall(entity);
-		Save.OnCall?.Invoke(this, entity);
+		if (Save.OnCall is { } onCallCallback)
+		{ onCallCallback(this, entity); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IVsRepository", "Save");
 	}
 
 }

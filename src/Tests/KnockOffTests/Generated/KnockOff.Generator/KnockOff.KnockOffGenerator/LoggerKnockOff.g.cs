@@ -67,16 +67,21 @@ partial class LoggerKnockOff
 	/// <summary>The global::KnockOff.Tests.ILogger instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.ILogger Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Tests.ILogger.Log(string message)
 	{
 		Log.RecordCall(message);
-		Log.OnCall?.Invoke(this, message);
+		if (Log.OnCall is { } onCallCallback)
+		{ onCallCallback(this, message); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ILogger", "Log");
 	}
 
 	string global::KnockOff.Tests.ILogger.Name
 	{
-		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else Name.Value = value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ILogger", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ILogger", "Name"); Name.Value = value; }
 	}
 
 }

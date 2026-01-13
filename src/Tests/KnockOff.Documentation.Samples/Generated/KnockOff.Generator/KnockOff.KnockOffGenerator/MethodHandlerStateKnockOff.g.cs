@@ -52,16 +52,23 @@ partial class MethodHandlerStateKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IMethodHandlerState instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IMethodHandlerState Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Documentation.Samples.Guides.IMethodHandlerState.Initialize()
 	{
 		Initialize.RecordCall();
-		Initialize.OnCall?.Invoke(this);
+		if (Initialize.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMethodHandlerState", "Initialize");
 	}
 
 	void global::KnockOff.Documentation.Samples.Guides.IMethodHandlerState.Process()
 	{
 		Process.RecordCall();
-		Process.OnCall?.Invoke(this);
+		if (Process.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMethodHandlerState", "Process");
 	}
 
 }

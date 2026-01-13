@@ -36,11 +36,15 @@ partial class MmRefProcessorKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IMmRefProcessor instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.IMmRefProcessor Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Documentation.Samples.Skills.IMmRefProcessor.Increment(ref int @value)
 	{
 		Increment.RecordCall(@value);
 		if (Increment.OnCall is { } onCallCallback)
 		{ onCallCallback(this, ref @value); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmRefProcessor", "Increment");
 	}
 
 }

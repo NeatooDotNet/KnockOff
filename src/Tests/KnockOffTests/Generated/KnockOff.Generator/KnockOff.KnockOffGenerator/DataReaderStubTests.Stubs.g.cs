@@ -758,13 +758,15 @@ partial class DataReaderStubTests
 			void global::System.Data.IDataReader.Close()
 			{
 				Close.RecordCall();
-				if (Close.OnCall is { } onCall) onCall(this);
+				if (Close.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataReader", "Close");
 			}
 
 			global::System.Data.DataTable? global::System.Data.IDataReader.GetSchemaTable()
 			{
 				GetSchemaTable.RecordCall();
 				if (GetSchemaTable.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataReader", "GetSchemaTable");
 				return default!;
 			}
 
@@ -772,6 +774,7 @@ partial class DataReaderStubTests
 			{
 				NextResult.RecordCall();
 				if (NextResult.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataReader", "NextResult");
 				return default!;
 			}
 
@@ -779,6 +782,7 @@ partial class DataReaderStubTests
 			{
 				Read.RecordCall();
 				if (Read.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataReader", "Read");
 				return default!;
 			}
 
@@ -788,6 +792,7 @@ partial class DataReaderStubTests
 				{
 					Depth.RecordGet();
 					if (Depth.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataReader", "Depth");
 					return Depth.Value;
 				}
 			}
@@ -798,6 +803,7 @@ partial class DataReaderStubTests
 				{
 					IsClosed.RecordGet();
 					if (IsClosed.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataReader", "IsClosed");
 					return IsClosed.Value;
 				}
 			}
@@ -808,6 +814,7 @@ partial class DataReaderStubTests
 				{
 					RecordsAffected.RecordGet();
 					if (RecordsAffected.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataReader", "RecordsAffected");
 					return RecordsAffected.Value;
 				}
 			}
@@ -816,6 +823,7 @@ partial class DataReaderStubTests
 			{
 				GetBoolean.RecordCall(i);
 				if (GetBoolean.OnCall is { } onCall) return onCall(this, i);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "GetBoolean");
 				return default!;
 			}
 
@@ -823,6 +831,7 @@ partial class DataReaderStubTests
 			{
 				GetByte.RecordCall(i);
 				if (GetByte.OnCall is { } onCall) return onCall(this, i);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "GetByte");
 				return default!;
 			}
 
@@ -830,6 +839,7 @@ partial class DataReaderStubTests
 			{
 				GetBytes.RecordCall(i, fieldOffset, buffer, bufferoffset, length);
 				if (GetBytes.OnCall is { } onCall) return onCall(this, i, fieldOffset, buffer, bufferoffset, length);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "GetBytes");
 				return default!;
 			}
 
@@ -837,6 +847,7 @@ partial class DataReaderStubTests
 			{
 				GetChar.RecordCall(i);
 				if (GetChar.OnCall is { } onCall) return onCall(this, i);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "GetChar");
 				return default!;
 			}
 
@@ -844,6 +855,7 @@ partial class DataReaderStubTests
 			{
 				GetChars.RecordCall(i, fieldoffset, buffer, bufferoffset, length);
 				if (GetChars.OnCall is { } onCall) return onCall(this, i, fieldoffset, buffer, bufferoffset, length);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "GetChars");
 				return default!;
 			}
 
@@ -851,6 +863,7 @@ partial class DataReaderStubTests
 			{
 				GetData.RecordCall(i);
 				if (GetData.OnCall is { } onCall) return onCall(this, i);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "GetData");
 				throw new global::System.InvalidOperationException("No implementation provided for GetData. Set GetData.OnCall.");
 			}
 
@@ -858,6 +871,7 @@ partial class DataReaderStubTests
 			{
 				GetDataTypeName.RecordCall(i);
 				if (GetDataTypeName.OnCall is { } onCall) return onCall(this, i);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "GetDataTypeName");
 				throw new global::System.InvalidOperationException("No implementation provided for GetDataTypeName. Set GetDataTypeName.OnCall.");
 			}
 
@@ -865,6 +879,7 @@ partial class DataReaderStubTests
 			{
 				GetDateTime.RecordCall(i);
 				if (GetDateTime.OnCall is { } onCall) return onCall(this, i);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "GetDateTime");
 				return default!;
 			}
 
@@ -872,6 +887,7 @@ partial class DataReaderStubTests
 			{
 				GetDecimal.RecordCall(i);
 				if (GetDecimal.OnCall is { } onCall) return onCall(this, i);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "GetDecimal");
 				return default!;
 			}
 
@@ -879,6 +895,7 @@ partial class DataReaderStubTests
 			{
 				GetDouble.RecordCall(i);
 				if (GetDouble.OnCall is { } onCall) return onCall(this, i);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "GetDouble");
 				return default!;
 			}
 
@@ -886,6 +903,7 @@ partial class DataReaderStubTests
 			{
 				GetFieldType.RecordCall(i);
 				if (GetFieldType.OnCall is { } onCall) return onCall(this, i);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "GetFieldType");
 				throw new global::System.InvalidOperationException("No implementation provided for GetFieldType. Set GetFieldType.OnCall.");
 			}
 
@@ -893,6 +911,7 @@ partial class DataReaderStubTests
 			{
 				GetFloat.RecordCall(i);
 				if (GetFloat.OnCall is { } onCall) return onCall(this, i);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "GetFloat");
 				return default!;
 			}
 
@@ -900,6 +919,7 @@ partial class DataReaderStubTests
 			{
 				GetGuid.RecordCall(i);
 				if (GetGuid.OnCall is { } onCall) return onCall(this, i);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "GetGuid");
 				return default!;
 			}
 
@@ -907,6 +927,7 @@ partial class DataReaderStubTests
 			{
 				GetInt16.RecordCall(i);
 				if (GetInt16.OnCall is { } onCall) return onCall(this, i);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "GetInt16");
 				return default!;
 			}
 
@@ -914,6 +935,7 @@ partial class DataReaderStubTests
 			{
 				GetInt32.RecordCall(i);
 				if (GetInt32.OnCall is { } onCall) return onCall(this, i);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "GetInt32");
 				return default!;
 			}
 
@@ -921,6 +943,7 @@ partial class DataReaderStubTests
 			{
 				GetInt64.RecordCall(i);
 				if (GetInt64.OnCall is { } onCall) return onCall(this, i);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "GetInt64");
 				return default!;
 			}
 
@@ -928,6 +951,7 @@ partial class DataReaderStubTests
 			{
 				GetName.RecordCall(i);
 				if (GetName.OnCall is { } onCall) return onCall(this, i);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "GetName");
 				throw new global::System.InvalidOperationException("No implementation provided for GetName. Set GetName.OnCall.");
 			}
 
@@ -935,6 +959,7 @@ partial class DataReaderStubTests
 			{
 				GetOrdinal.RecordCall(name);
 				if (GetOrdinal.OnCall is { } onCall) return onCall(this, name);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "GetOrdinal");
 				return default!;
 			}
 
@@ -942,6 +967,7 @@ partial class DataReaderStubTests
 			{
 				GetString.RecordCall(i);
 				if (GetString.OnCall is { } onCall) return onCall(this, i);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "GetString");
 				throw new global::System.InvalidOperationException("No implementation provided for GetString. Set GetString.OnCall.");
 			}
 
@@ -949,6 +975,7 @@ partial class DataReaderStubTests
 			{
 				GetValue.RecordCall(i);
 				if (GetValue.OnCall is { } onCall) return onCall(this, i);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "GetValue");
 				return new object();
 			}
 
@@ -956,6 +983,7 @@ partial class DataReaderStubTests
 			{
 				GetValues.RecordCall(values);
 				if (GetValues.OnCall is { } onCall) return onCall(this, values);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "GetValues");
 				return default!;
 			}
 
@@ -963,6 +991,7 @@ partial class DataReaderStubTests
 			{
 				IsDBNull.RecordCall(i);
 				if (IsDBNull.OnCall is { } onCall) return onCall(this, i);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "IsDBNull");
 				return default!;
 			}
 
@@ -972,6 +1001,7 @@ partial class DataReaderStubTests
 				{
 					FieldCount.RecordGet();
 					if (FieldCount.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "FieldCount");
 					return FieldCount.Value;
 				}
 			}
@@ -982,6 +1012,7 @@ partial class DataReaderStubTests
 				{
 					IndexerInt32.RecordGet(i);
 					if (IndexerInt32.OnGet is { } onGet) return onGet(this, i);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "this[]");
 					return IndexerInt32.Backing.TryGetValue(i, out var v) ? v : new object();
 				}
 			}
@@ -992,6 +1023,7 @@ partial class DataReaderStubTests
 				{
 					IndexerString.RecordGet(name);
 					if (IndexerString.OnGet is { } onGet) return onGet(this, name);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "this[]");
 					return IndexerString.Backing.TryGetValue(name, out var v) ? v : new object();
 				}
 			}
@@ -999,11 +1031,22 @@ partial class DataReaderStubTests
 			void global::System.IDisposable.Dispose()
 			{
 				Dispose.RecordCall();
-				if (Dispose.OnCall is { } onCall) onCall(this);
+				if (Dispose.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDisposable", "Dispose");
 			}
 
 			/// <summary>The global::System.Data.IDataReader instance. Use for passing to code expecting the interface.</summary>
 			public global::System.Data.IDataReader Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IDataReader(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

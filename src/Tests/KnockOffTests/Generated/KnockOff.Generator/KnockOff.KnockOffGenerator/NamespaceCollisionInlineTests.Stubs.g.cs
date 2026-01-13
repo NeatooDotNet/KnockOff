@@ -60,18 +60,30 @@ partial class NamespaceCollisionInlineTests
 			void global::Person.Ef.IPersonDbContext.SavePerson(global::DomainModel.Person person)
 			{
 				SavePerson.RecordCall(person);
-				if (SavePerson.OnCall is { } onCall) onCall(this, person);
+				if (SavePerson.OnCall is { } onCall) { onCall(this, person); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IPersonDbContext", "SavePerson");
 			}
 
 			global::DomainModel.Person? global::Person.Ef.IPersonDbContext.GetPerson(int id)
 			{
 				GetPerson.RecordCall(id);
 				if (GetPerson.OnCall is { } onCall) return onCall(this, id);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IPersonDbContext", "GetPerson");
 				return default!;
 			}
 
 			/// <summary>The global::Person.Ef.IPersonDbContext instance. Use for passing to code expecting the interface.</summary>
 			public global::Person.Ef.IPersonDbContext Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IPersonDbContext(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

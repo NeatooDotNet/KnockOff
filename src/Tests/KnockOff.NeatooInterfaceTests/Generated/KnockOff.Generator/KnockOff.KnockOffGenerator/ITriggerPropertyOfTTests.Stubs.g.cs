@@ -83,6 +83,7 @@ partial class ITriggerPropertyOfTTests
 			{
 				GetValue.RecordCall(target);
 				if (GetValue.OnCall is { } onCall) return onCall(this, target);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "GetValue");
 				return default!;
 			}
 
@@ -90,6 +91,7 @@ partial class ITriggerPropertyOfTTests
 			{
 				IsMatch.RecordCall(propertyName);
 				if (IsMatch.OnCall is { } onCall) return onCall(this, propertyName);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("ITriggerProperty", "IsMatch");
 				return default!;
 			}
 
@@ -99,12 +101,23 @@ partial class ITriggerPropertyOfTTests
 				{
 					PropertyName.RecordGet();
 					if (PropertyName.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("ITriggerProperty", "PropertyName");
 					return PropertyName.Value;
 				}
 			}
 
 			/// <summary>The global::Neatoo.Rules.ITriggerProperty<global::Neatoo.IValidateBase> instance. Use for passing to code expecting the interface.</summary>
 			public global::Neatoo.Rules.ITriggerProperty<global::Neatoo.IValidateBase> Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public ITriggerProperty(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

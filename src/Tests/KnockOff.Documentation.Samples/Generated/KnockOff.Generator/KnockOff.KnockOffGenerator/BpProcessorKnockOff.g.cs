@@ -58,16 +58,23 @@ partial class BpProcessorKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IBpProcessor instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IBpProcessor Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Documentation.Samples.Guides.IBpProcessor.Process(string data)
 	{
 		Process1.RecordCall(data);
-		Process1.OnCall?.Invoke(this, data);
+		if (Process1.OnCall is { } onCallCallback)
+		{ onCallCallback(this, data); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpProcessor", "Process");
 	}
 
 	void global::KnockOff.Documentation.Samples.Guides.IBpProcessor.Process(string data, int priority)
 	{
 		Process2.RecordCall(data, priority);
-		Process2.OnCall?.Invoke(this, data, priority);
+		if (Process2.OnCall is { } onCallCallback)
+		{ onCallCallback(this, data, priority); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpProcessor", "Process");
 	}
 
 }

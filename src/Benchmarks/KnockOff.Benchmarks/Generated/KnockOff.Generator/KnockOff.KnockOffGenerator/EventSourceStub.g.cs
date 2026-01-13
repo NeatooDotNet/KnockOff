@@ -68,6 +68,9 @@ partial class EventSourceStub
 	/// <summary>The global::KnockOff.Benchmarks.Interfaces.IEventSource instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Interfaces.IEventSource Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	event global::System.EventHandler<string>? global::KnockOff.Benchmarks.Interfaces.IEventSource.MessageReceived
 	{
 		add => MessageReceived.RecordAdd(value);

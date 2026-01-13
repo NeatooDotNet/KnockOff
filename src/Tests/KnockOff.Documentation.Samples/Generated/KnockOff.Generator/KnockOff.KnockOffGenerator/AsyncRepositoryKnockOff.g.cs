@@ -86,22 +86,34 @@ partial class AsyncRepositoryKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IAsyncRepository instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IAsyncRepository Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::System.Threading.Tasks.Task global::KnockOff.Documentation.Samples.Guides.IAsyncRepository.InitializeAsync()
 	{
 		InitializeAsync.RecordCall();
-		return InitializeAsync.OnCall?.Invoke(this) ?? global::System.Threading.Tasks.Task.CompletedTask;
+		if (InitializeAsync.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncRepository", "InitializeAsync");
+		return global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.AsyncUser?> global::KnockOff.Documentation.Samples.Guides.IAsyncRepository.GetByIdAsync(int id)
 	{
 		GetByIdAsync.RecordCall(id);
-		return GetByIdAsync.OnCall?.Invoke(this, id) ?? global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Guides.AsyncUser?>(default!);
+		if (GetByIdAsync.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncRepository", "GetByIdAsync");
+		return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Guides.AsyncUser?>(default!);
 	}
 
 	global::System.Threading.Tasks.ValueTask<int> global::KnockOff.Documentation.Samples.Guides.IAsyncRepository.CountAsync()
 	{
 		CountAsync.RecordCall();
-		return CountAsync.OnCall?.Invoke(this) ?? default;
+		if (CountAsync.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncRepository", "CountAsync");
+		return default;
 	}
 
 }

@@ -111,28 +111,42 @@ partial class SkPatternServiceKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkPatternService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ISkPatternService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Documentation.Samples.Skills.SkUser? global::KnockOff.Documentation.Samples.Skills.ISkPatternService.GetUser(int id)
 	{
 		GetUser.RecordCall(id);
-		return GetUser.OnCall?.Invoke(this, id) ?? default!;
+		if (GetUser.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkPatternService", "GetUser");
+		return default!;
 	}
 
 	void global::KnockOff.Documentation.Samples.Skills.ISkPatternService.Connect()
 	{
 		Connect.RecordCall();
-		Connect.OnCall?.Invoke(this);
+		if (Connect.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkPatternService", "Connect");
 	}
 
 	global::System.Threading.Tasks.Task<int> global::KnockOff.Documentation.Samples.Skills.ISkPatternService.SaveAsync(object entity)
 	{
 		SaveAsync.RecordCall(entity);
-		return SaveAsync.OnCall?.Invoke(this, entity) ?? global::System.Threading.Tasks.Task.FromResult<int>(default!);
+		if (SaveAsync.OnCall is { } callback)
+			return callback(this, entity);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkPatternService", "SaveAsync");
+		return global::System.Threading.Tasks.Task.FromResult<int>(default!);
 	}
 
 	int global::KnockOff.Documentation.Samples.Skills.ISkPatternService.GetNext()
 	{
 		GetNext.RecordCall();
-		return GetNext.OnCall?.Invoke(this) ?? default!;
+		if (GetNext.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkPatternService", "GetNext");
+		return default!;
 	}
 
 }

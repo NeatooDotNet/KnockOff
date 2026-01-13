@@ -117,28 +117,43 @@ partial class FcBenchProductRepositoryStub
 	/// <summary>The global::KnockOff.Benchmarks.Benchmarks.IFcBenchProductRepository instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Benchmarks.IFcBenchProductRepository Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::System.Threading.Tasks.Task<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct?> global::KnockOff.Benchmarks.Benchmarks.IFcBenchProductRepository.GetByIdAsync(int id)
 	{
 		GetByIdAsync.RecordCall(id);
-		return GetByIdAsync.OnCall?.Invoke(this, id) ?? global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct?>(default!);
+		if (GetByIdAsync.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFcBenchProductRepository", "GetByIdAsync");
+		return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct?>(default!);
 	}
 
 	global::System.Threading.Tasks.Task<global::System.Collections.Generic.IEnumerable<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct>> global::KnockOff.Benchmarks.Benchmarks.IFcBenchProductRepository.GetAllAsync()
 	{
 		GetAllAsync.RecordCall();
-		return GetAllAsync.OnCall?.Invoke(this) ?? global::System.Threading.Tasks.Task.FromResult<global::System.Collections.Generic.IEnumerable<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct>>(new global::System.Collections.Generic.List<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct>());
+		if (GetAllAsync.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFcBenchProductRepository", "GetAllAsync");
+		return global::System.Threading.Tasks.Task.FromResult<global::System.Collections.Generic.IEnumerable<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct>>(new global::System.Collections.Generic.List<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct>());
 	}
 
 	global::System.Threading.Tasks.Task global::KnockOff.Benchmarks.Benchmarks.IFcBenchProductRepository.SaveAsync(global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct product)
 	{
 		SaveAsync.RecordCall(product);
-		return SaveAsync.OnCall?.Invoke(this, product) ?? global::System.Threading.Tasks.Task.CompletedTask;
+		if (SaveAsync.OnCall is { } callback)
+			return callback(this, product);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFcBenchProductRepository", "SaveAsync");
+		return global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
 	global::System.Threading.Tasks.Task global::KnockOff.Benchmarks.Benchmarks.IFcBenchProductRepository.DeleteAsync(int id)
 	{
 		DeleteAsync.RecordCall(id);
-		return DeleteAsync.OnCall?.Invoke(this, id) ?? global::System.Threading.Tasks.Task.CompletedTask;
+		if (DeleteAsync.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFcBenchProductRepository", "DeleteAsync");
+		return global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
 }

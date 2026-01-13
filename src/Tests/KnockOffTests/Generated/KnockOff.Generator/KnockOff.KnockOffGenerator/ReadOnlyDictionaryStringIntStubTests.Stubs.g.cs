@@ -172,6 +172,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			{
 				ContainsKey.RecordCall(key);
 				if (ContainsKey.OnCall is { } onCall) return onCall(this, key);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IReadOnlyDictionary<string, int>", "ContainsKey");
 				return default!;
 			}
 
@@ -180,6 +181,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 				value = default!;
 				TryGetValue.RecordCall(key);
 				if (TryGetValue.OnCall is { } onCall) return onCall(this, key);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IReadOnlyDictionary<string, int>", "TryGetValue");
 				return default!;
 			}
 
@@ -189,6 +191,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 				{
 					Indexer.RecordGet(key);
 					if (Indexer.OnGet is { } onGet) return onGet(this, key);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IReadOnlyDictionary<string, int>", "this[]");
 					return Indexer.Backing.TryGetValue(key, out var v) ? v : default!;
 				}
 			}
@@ -199,6 +202,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 				{
 					Keys.RecordGet();
 					if (Keys.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IReadOnlyDictionary<string, int>", "Keys");
 					return Keys.Value;
 				}
 			}
@@ -209,6 +213,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 				{
 					Values.RecordGet();
 					if (Values.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IReadOnlyDictionary<string, int>", "Values");
 					return Values.Value;
 				}
 			}
@@ -219,6 +224,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 				{
 					Count.RecordGet();
 					if (Count.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, int>>", "Count");
 					return Count.Value;
 				}
 			}
@@ -227,6 +233,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, int>>", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
@@ -234,11 +241,22 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
 			/// <summary>The global::System.Collections.Generic.IReadOnlyDictionary<string, int> instance. Use for passing to code expecting the interface.</summary>
 			public global::System.Collections.Generic.IReadOnlyDictionary<string, int> Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IReadOnlyDictionary(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

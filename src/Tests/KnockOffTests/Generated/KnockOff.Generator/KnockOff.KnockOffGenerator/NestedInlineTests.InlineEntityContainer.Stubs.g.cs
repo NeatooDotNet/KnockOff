@@ -613,19 +613,22 @@ partial class InlineEntityContainer
 			void global::Neatoo.IEntityBase.Delete()
 			{
 				Delete.RecordCall();
-				if (Delete.OnCall is { } onCall) onCall(this);
+				if (Delete.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase", "Delete");
 			}
 
 			void global::Neatoo.IEntityBase.UnDelete()
 			{
 				UnDelete.RecordCall();
-				if (UnDelete.OnCall is { } onCall) onCall(this);
+				if (UnDelete.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase", "UnDelete");
 			}
 
 			global::System.Threading.Tasks.Task<global::Neatoo.IEntityBase> global::Neatoo.IEntityBase.Save()
 			{
 				Save.RecordCall();
 				if (Save.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase", "Save");
 				throw new global::System.InvalidOperationException("No implementation provided for Save. Set Save.OnCall.");
 			}
 
@@ -635,6 +638,7 @@ partial class InlineEntityContainer
 				{
 					Root.RecordGet();
 					if (Root.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase", "Root");
 					return Root.Value;
 				}
 			}
@@ -645,6 +649,7 @@ partial class InlineEntityContainer
 				{
 					ModifiedProperties.RecordGet();
 					if (ModifiedProperties.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase", "ModifiedProperties");
 					return ModifiedProperties.Value;
 				}
 			}
@@ -655,6 +660,7 @@ partial class InlineEntityContainer
 				{
 					IndexerString.RecordGet(propertyName);
 					if (IndexerString.OnGet is { } onGet) return onGet(this, propertyName);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase", "this[]");
 					return IndexerString.Backing.TryGetValue(propertyName, out var v) ? v : default!;
 				}
 			}
@@ -663,6 +669,7 @@ partial class InlineEntityContainer
 			{
 				GetProperty.RecordCall(propertyName);
 				if (GetProperty.OnCall is { } onCall) return onCall(this, propertyName);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "GetProperty");
 				throw new global::System.InvalidOperationException("No implementation provided for GetProperty. Set GetProperty.OnCall.");
 			}
 
@@ -671,6 +678,7 @@ partial class InlineEntityContainer
 				validateProperty = default!;
 				TryGetProperty.RecordCall(propertyName);
 				if (TryGetProperty.OnCall is { } onCall) return onCall(this, propertyName);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "TryGetProperty");
 				return default!;
 			}
 
@@ -680,6 +688,7 @@ partial class InlineEntityContainer
 				{
 					Parent.RecordGet();
 					if (Parent.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "Parent");
 					return Parent.Value;
 				}
 			}
@@ -690,6 +699,7 @@ partial class InlineEntityContainer
 				{
 					IsPaused.RecordGet();
 					if (IsPaused.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "IsPaused");
 					return IsPaused.Value;
 				}
 			}
@@ -700,6 +710,7 @@ partial class InlineEntityContainer
 				{
 					IndexerString.RecordGet(propertyName);
 					if (IndexerString.OnGet is { } onGet) return onGet(this, propertyName);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "this[]");
 					return IndexerString.Backing.TryGetValue(propertyName, out var v) ? v : default!;
 				}
 			}
@@ -708,6 +719,7 @@ partial class InlineEntityContainer
 			{
 				WaitForTasks.RecordCall(null);
 				if (WaitForTasks.OnCall is { } onCall) return onCall(this, null);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -715,6 +727,7 @@ partial class InlineEntityContainer
 			{
 				WaitForTasks.RecordCall(token);
 				if (WaitForTasks.OnCall is { } onCall) return onCall(this, token);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -722,6 +735,7 @@ partial class InlineEntityContainer
 			{
 				RunRules.RecordCall(propertyName, token, null);
 				if (RunRules.OnCall is { } onCall) return onCall(this, propertyName, token, null);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -729,19 +743,22 @@ partial class InlineEntityContainer
 			{
 				RunRules.RecordCall(null, token, runRules);
 				if (RunRules.OnCall is { } onCall) return onCall(this, null, token, runRules);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
 			void global::Neatoo.IValidateMetaProperties.ClearAllMessages()
 			{
 				ClearAllMessages.RecordCall();
-				if (ClearAllMessages.OnCall is { } onCall) onCall(this);
+				if (ClearAllMessages.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "ClearAllMessages");
 			}
 
 			void global::Neatoo.IValidateMetaProperties.ClearSelfMessages()
 			{
 				ClearSelfMessages.RecordCall();
-				if (ClearSelfMessages.OnCall is { } onCall) onCall(this);
+				if (ClearSelfMessages.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "ClearSelfMessages");
 			}
 
 			bool global::Neatoo.IValidateMetaProperties.IsBusy
@@ -750,6 +767,7 @@ partial class InlineEntityContainer
 				{
 					IsBusy.RecordGet();
 					if (IsBusy.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsBusy");
 					return IsBusy.Value;
 				}
 			}
@@ -760,6 +778,7 @@ partial class InlineEntityContainer
 				{
 					IsValid.RecordGet();
 					if (IsValid.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsValid");
 					return IsValid.Value;
 				}
 			}
@@ -770,6 +789,7 @@ partial class InlineEntityContainer
 				{
 					IsSelfValid.RecordGet();
 					if (IsSelfValid.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsSelfValid");
 					return IsSelfValid.Value;
 				}
 			}
@@ -780,6 +800,7 @@ partial class InlineEntityContainer
 				{
 					PropertyMessages.RecordGet();
 					if (PropertyMessages.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "PropertyMessages");
 					return PropertyMessages.Value;
 				}
 			}
@@ -790,6 +811,7 @@ partial class InlineEntityContainer
 				{
 					IsChild.RecordGet();
 					if (IsChild.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsChild");
 					return IsChild.Value;
 				}
 			}
@@ -800,6 +822,7 @@ partial class InlineEntityContainer
 				{
 					IsModified.RecordGet();
 					if (IsModified.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsModified");
 					return IsModified.Value;
 				}
 			}
@@ -810,6 +833,7 @@ partial class InlineEntityContainer
 				{
 					IsSelfModified.RecordGet();
 					if (IsSelfModified.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsSelfModified");
 					return IsSelfModified.Value;
 				}
 			}
@@ -820,6 +844,7 @@ partial class InlineEntityContainer
 				{
 					IsMarkedModified.RecordGet();
 					if (IsMarkedModified.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsMarkedModified");
 					return IsMarkedModified.Value;
 				}
 			}
@@ -830,6 +855,7 @@ partial class InlineEntityContainer
 				{
 					IsSavable.RecordGet();
 					if (IsSavable.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsSavable");
 					return IsSavable.Value;
 				}
 			}
@@ -840,6 +866,7 @@ partial class InlineEntityContainer
 				{
 					IsDeleted.RecordGet();
 					if (IsDeleted.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IFactorySaveMeta", "IsDeleted");
 					return IsDeleted.Value;
 				}
 			}
@@ -850,6 +877,7 @@ partial class InlineEntityContainer
 				{
 					IsNew.RecordGet();
 					if (IsNew.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IFactorySaveMeta", "IsNew");
 					return IsNew.Value;
 				}
 			}
@@ -868,6 +896,16 @@ partial class InlineEntityContainer
 
 			/// <summary>The global::Neatoo.IEntityBase instance. Use for passing to code expecting the interface.</summary>
 			public global::Neatoo.IEntityBase Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IEntityBase(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

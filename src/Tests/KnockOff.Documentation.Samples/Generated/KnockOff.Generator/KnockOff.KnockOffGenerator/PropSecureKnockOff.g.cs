@@ -30,9 +30,12 @@ partial class PropSecureKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IPropSecure instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IPropSecure Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	string global::KnockOff.Documentation.Samples.Guides.IPropSecure.SecretKey
 	{
-		get { SecretKey.RecordGet(); return SecretKey.OnGet?.Invoke(this) ?? SecretKey.Value; }
+		get { SecretKey.RecordGet(); if (SecretKey.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropSecure", "SecretKey"); return SecretKey.Value; }
 	}
 
 }

@@ -38,6 +38,9 @@ partial class NotifyNeatooPropertyChangedStub
 	/// <summary>The global::Neatoo.INotifyNeatooPropertyChanged instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.INotifyNeatooPropertyChanged Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	event global::Neatoo.NeatooPropertyChanged? global::Neatoo.INotifyNeatooPropertyChanged.NeatooPropertyChanged
 	{
 		add => NeatooPropertyChanged.RecordAdd(value);

@@ -33,11 +33,15 @@ partial class NewConstraintStub<T> where T : new()
 	/// <summary>The global::KnockOff.Tests.INewConstraintService<T> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.INewConstraintService<T> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	T global::KnockOff.Tests.INewConstraintService<T>.Create()
 	{
 		Create.RecordCall();
 		if (Create.OnCall is { } callback)
 			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("INewConstraintService<T>", "Create");
 		throw new global::System.InvalidOperationException("No implementation provided for Create. Set Create.OnCall or define a protected method 'Create' in your partial class.");
 	}
 

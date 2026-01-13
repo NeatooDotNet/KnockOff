@@ -145,6 +145,7 @@ partial class DictionaryEnumeratorStubTests
 				{
 					Entry.RecordGet();
 					if (Entry.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDictionaryEnumerator", "Entry");
 					return Entry.Value;
 				}
 			}
@@ -155,6 +156,7 @@ partial class DictionaryEnumeratorStubTests
 				{
 					Key.RecordGet();
 					if (Key.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDictionaryEnumerator", "Key");
 					return Key.Value;
 				}
 			}
@@ -165,6 +167,7 @@ partial class DictionaryEnumeratorStubTests
 				{
 					Value.RecordGet();
 					if (Value.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDictionaryEnumerator", "Value");
 					return Value.Value;
 				}
 			}
@@ -173,13 +176,15 @@ partial class DictionaryEnumeratorStubTests
 			{
 				MoveNext.RecordCall();
 				if (MoveNext.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerator", "MoveNext");
 				return default!;
 			}
 
 			void global::System.Collections.IEnumerator.Reset()
 			{
 				Reset.RecordCall();
-				if (Reset.OnCall is { } onCall) onCall(this);
+				if (Reset.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerator", "Reset");
 			}
 
 			object global::System.Collections.IEnumerator.Current
@@ -188,12 +193,23 @@ partial class DictionaryEnumeratorStubTests
 				{
 					Current.RecordGet();
 					if (Current.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerator", "Current");
 					return Current.Value;
 				}
 			}
 
 			/// <summary>The global::System.Collections.IDictionaryEnumerator instance. Use for passing to code expecting the interface.</summary>
 			public global::System.Collections.IDictionaryEnumerator Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IDictionaryEnumerator(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

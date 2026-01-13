@@ -38,11 +38,22 @@ partial class SkPartialPropertyTests
 			{
 				GetUser.RecordCall(id);
 				if (GetUser.OnCall is { } onCall) return onCall(this, id);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("ISkInlineUserService", "GetUser");
 				return default!;
 			}
 
 			/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkInlineUserService instance. Use for passing to code expecting the interface.</summary>
 			public global::KnockOff.Documentation.Samples.Skills.ISkInlineUserService Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public ISkInlineUserService(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

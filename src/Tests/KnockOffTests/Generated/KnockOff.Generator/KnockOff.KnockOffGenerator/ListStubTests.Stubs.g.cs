@@ -363,19 +363,22 @@ partial class ListStubTests
 			{
 				Add.RecordCall(value);
 				if (Add.OnCall is { } onCall) return onCall(this, value);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IList", "Add");
 				return default!;
 			}
 
 			void global::System.Collections.IList.Clear()
 			{
 				Clear.RecordCall();
-				if (Clear.OnCall is { } onCall) onCall(this);
+				if (Clear.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IList", "Clear");
 			}
 
 			bool global::System.Collections.IList.Contains(object? value)
 			{
 				Contains.RecordCall(value);
 				if (Contains.OnCall is { } onCall) return onCall(this, value);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IList", "Contains");
 				return default!;
 			}
 
@@ -383,25 +386,29 @@ partial class ListStubTests
 			{
 				IndexOf.RecordCall(value);
 				if (IndexOf.OnCall is { } onCall) return onCall(this, value);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IList", "IndexOf");
 				return default!;
 			}
 
 			void global::System.Collections.IList.Insert(int index, object? value)
 			{
 				Insert.RecordCall(index, value);
-				if (Insert.OnCall is { } onCall) onCall(this, index, value);
+				if (Insert.OnCall is { } onCall) { onCall(this, index, value); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IList", "Insert");
 			}
 
 			void global::System.Collections.IList.Remove(object? value)
 			{
 				Remove.RecordCall(value);
-				if (Remove.OnCall is { } onCall) onCall(this, value);
+				if (Remove.OnCall is { } onCall) { onCall(this, value); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IList", "Remove");
 			}
 
 			void global::System.Collections.IList.RemoveAt(int index)
 			{
 				RemoveAt.RecordCall(index);
-				if (RemoveAt.OnCall is { } onCall) onCall(this, index);
+				if (RemoveAt.OnCall is { } onCall) { onCall(this, index); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IList", "RemoveAt");
 			}
 
 			bool global::System.Collections.IList.IsFixedSize
@@ -410,6 +417,7 @@ partial class ListStubTests
 				{
 					IsFixedSize.RecordGet();
 					if (IsFixedSize.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IList", "IsFixedSize");
 					return IsFixedSize.Value;
 				}
 			}
@@ -420,6 +428,7 @@ partial class ListStubTests
 				{
 					IsReadOnly.RecordGet();
 					if (IsReadOnly.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IList", "IsReadOnly");
 					return IsReadOnly.Value;
 				}
 			}
@@ -430,20 +439,23 @@ partial class ListStubTests
 				{
 					Indexer.RecordGet(index);
 					if (Indexer.OnGet is { } onGet) return onGet(this, index);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IList", "this[]");
 					return Indexer.Backing.TryGetValue(index, out var v) ? v : default;
 				}
 				set
 				{
 					Indexer.RecordSet(index, value);
-					if (Indexer.OnSet is { } onSet) onSet(this, index, value);
-					else Indexer.Backing[index] = value;
+					if (Indexer.OnSet is { } onSet) { onSet(this, index, value); return; }
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IList", "this[]");
+					Indexer.Backing[index] = value;
 				}
 			}
 
 			void global::System.Collections.ICollection.CopyTo(global::System.Array array, int index)
 			{
 				CopyTo.RecordCall(array, index);
-				if (CopyTo.OnCall is { } onCall) onCall(this, array, index);
+				if (CopyTo.OnCall is { } onCall) { onCall(this, array, index); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("ICollection", "CopyTo");
 			}
 
 			int global::System.Collections.ICollection.Count
@@ -452,6 +464,7 @@ partial class ListStubTests
 				{
 					Count.RecordGet();
 					if (Count.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("ICollection", "Count");
 					return Count.Value;
 				}
 			}
@@ -462,6 +475,7 @@ partial class ListStubTests
 				{
 					IsSynchronized.RecordGet();
 					if (IsSynchronized.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("ICollection", "IsSynchronized");
 					return IsSynchronized.Value;
 				}
 			}
@@ -472,6 +486,7 @@ partial class ListStubTests
 				{
 					SyncRoot.RecordGet();
 					if (SyncRoot.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("ICollection", "SyncRoot");
 					return SyncRoot.Value;
 				}
 			}
@@ -480,11 +495,22 @@ partial class ListStubTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
 			/// <summary>The global::System.Collections.IList instance. Use for passing to code expecting the interface.</summary>
 			public global::System.Collections.IList Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IList(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

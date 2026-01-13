@@ -33,10 +33,15 @@ partial class MgLoggerKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IMgLogger instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.IMgLogger Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Documentation.Samples.Skills.IMgLogger.Log(string message)
 	{
 		Log.RecordCall(message);
-		Log.OnCall?.Invoke(this, message);
+		if (Log.OnCall is { } onCallCallback)
+		{ onCallCallback(this, message); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMgLogger", "Log");
 	}
 
 }

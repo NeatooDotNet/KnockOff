@@ -33,11 +33,15 @@ partial class CovariantStub<T>
 	/// <summary>The global::KnockOff.Tests.ICovariantService<T> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.ICovariantService<T> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	T global::KnockOff.Tests.ICovariantService<T>.Get()
 	{
 		Get.RecordCall();
 		if (Get.OnCall is { } callback)
 			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ICovariantService<T>", "Get");
 		throw new global::System.InvalidOperationException("No implementation provided for Get. Set Get.OnCall or define a protected method 'Get' in your partial class.");
 	}
 

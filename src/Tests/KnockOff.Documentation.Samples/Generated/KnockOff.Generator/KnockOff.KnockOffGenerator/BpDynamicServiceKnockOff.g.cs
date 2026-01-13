@@ -74,20 +74,25 @@ partial class BpDynamicServiceKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IBpDynamicService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IBpDynamicService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	string global::KnockOff.Documentation.Samples.Guides.IBpDynamicService.RequestId
 	{
-		get { RequestId.RecordGet(); return RequestId.OnGet?.Invoke(this) ?? RequestId.Value; }
+		get { RequestId.RecordGet(); if (RequestId.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpDynamicService", "RequestId"); return RequestId.Value; }
 	}
 
 	bool global::KnockOff.Documentation.Samples.Guides.IBpDynamicService.IsReady
 	{
-		get { IsReady.RecordGet(); return IsReady.OnGet?.Invoke(this) ?? IsReady.Value; }
+		get { IsReady.RecordGet(); if (IsReady.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpDynamicService", "IsReady"); return IsReady.Value; }
 	}
 
 	void global::KnockOff.Documentation.Samples.Guides.IBpDynamicService.Initialize()
 	{
 		Initialize.RecordCall();
-		Initialize.OnCall?.Invoke(this);
+		if (Initialize.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpDynamicService", "Initialize");
 	}
 
 }

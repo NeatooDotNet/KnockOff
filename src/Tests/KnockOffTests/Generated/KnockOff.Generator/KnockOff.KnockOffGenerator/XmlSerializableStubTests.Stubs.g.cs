@@ -81,23 +81,36 @@ partial class XmlSerializableStubTests
 			{
 				GetSchema.RecordCall();
 				if (GetSchema.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IXmlSerializable", "GetSchema");
 				return default!;
 			}
 
 			void global::System.Xml.Serialization.IXmlSerializable.ReadXml(global::System.Xml.XmlReader reader)
 			{
 				ReadXml.RecordCall(reader);
-				if (ReadXml.OnCall is { } onCall) onCall(this, reader);
+				if (ReadXml.OnCall is { } onCall) { onCall(this, reader); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IXmlSerializable", "ReadXml");
 			}
 
 			void global::System.Xml.Serialization.IXmlSerializable.WriteXml(global::System.Xml.XmlWriter writer)
 			{
 				WriteXml.RecordCall(writer);
-				if (WriteXml.OnCall is { } onCall) onCall(this, writer);
+				if (WriteXml.OnCall is { } onCall) { onCall(this, writer); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IXmlSerializable", "WriteXml");
 			}
 
 			/// <summary>The global::System.Xml.Serialization.IXmlSerializable instance. Use for passing to code expecting the interface.</summary>
 			public global::System.Xml.Serialization.IXmlSerializable Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IXmlSerializable(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

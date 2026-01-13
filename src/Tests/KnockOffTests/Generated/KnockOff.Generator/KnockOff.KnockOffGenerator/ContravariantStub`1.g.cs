@@ -33,10 +33,15 @@ partial class ContravariantStub<T>
 	/// <summary>The global::KnockOff.Tests.IContravariantService<T> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IContravariantService<T> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Tests.IContravariantService<T>.Process(T item)
 	{
 		Process.RecordCall(item);
-		Process.OnCall?.Invoke(this, item);
+		if (Process.OnCall is { } onCallCallback)
+		{ onCallCallback(this, item); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IContravariantService<T>", "Process");
 	}
 
 }

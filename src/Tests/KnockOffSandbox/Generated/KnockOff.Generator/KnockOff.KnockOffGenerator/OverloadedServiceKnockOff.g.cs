@@ -92,11 +92,15 @@ partial class OverloadedServiceKnockOff
 	/// <summary>The global::KnockOff.Sandbox.IOverloadedService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Sandbox.IOverloadedService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	string global::KnockOff.Sandbox.IOverloadedService.Format(string input)
 	{
 		Format1.RecordCall(input);
 		if (Format1.OnCall is { } callback)
 			return callback(this, input);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IOverloadedService", "Format");
 		throw new global::System.InvalidOperationException("No implementation provided for Format. Set Format1.OnCall or define a protected method 'Format' in your partial class.");
 	}
 
@@ -105,6 +109,7 @@ partial class OverloadedServiceKnockOff
 		Format2.RecordCall(input, uppercase);
 		if (Format2.OnCall is { } callback)
 			return callback(this, input, uppercase);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IOverloadedService", "Format");
 		throw new global::System.InvalidOperationException("No implementation provided for Format. Set Format2.OnCall or define a protected method 'Format' in your partial class.");
 	}
 
@@ -113,6 +118,7 @@ partial class OverloadedServiceKnockOff
 		Format3.RecordCall(input, maxLength);
 		if (Format3.OnCall is { } callback)
 			return callback(this, input, maxLength);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IOverloadedService", "Format");
 		throw new global::System.InvalidOperationException("No implementation provided for Format. Set Format3.OnCall or define a protected method 'Format' in your partial class.");
 	}
 

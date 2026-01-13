@@ -30,10 +30,15 @@ partial class SimpleServiceStub
 	/// <summary>The global::KnockOff.Benchmarks.Interfaces.ISimpleService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Interfaces.ISimpleService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Benchmarks.Interfaces.ISimpleService.DoWork()
 	{
 		DoWork.RecordCall();
-		DoWork.OnCall?.Invoke(this);
+		if (DoWork.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISimpleService", "DoWork");
 	}
 
 }

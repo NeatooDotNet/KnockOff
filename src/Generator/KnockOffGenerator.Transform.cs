@@ -74,6 +74,17 @@ public partial class KnockOffGenerator
 			var attrLocation = attributeData.ApplicationSyntaxReference?.GetSyntax()?.GetLocation();
 			var attrLineSpan = attrLocation?.GetLineSpan() ?? default;
 
+			// Extract Strict property from attribute (default false)
+			var strict = false;
+			foreach (var namedArg in attributeData.NamedArguments)
+			{
+				if (namedArg.Key == "Strict" && namedArg.Value.Value is bool strictValue)
+				{
+					strict = strictValue;
+					break;
+				}
+			}
+
 			// Check if type argument is an interface, class, or delegate (KO1001)
 			if (typeArg.TypeKind != TypeKind.Interface && typeArg.TypeKind != TypeKind.Delegate && typeArg.TypeKind != TypeKind.Class)
 			{
@@ -105,7 +116,7 @@ public partial class KnockOffGenerator
 			// Get interface info
 			if (typeArg.TypeKind == TypeKind.Interface && typeArg is INamedTypeSymbol namedInterface)
 			{
-				var interfaceInfo = ExtractInterfaceInfo(namedInterface, classSymbol.ContainingAssembly, typeSuffix);
+				var interfaceInfo = ExtractInterfaceInfo(namedInterface, classSymbol.ContainingAssembly, typeSuffix, strict);
 				interfaceEntries.Add((namedInterface, interfaceInfo));
 				stubTypeNames.Add(namedInterface.Name); // e.g., "IUserService"
 			}
@@ -268,7 +279,7 @@ public partial class KnockOffGenerator
 	/// <summary>
 	/// Extracts interface info for inline stubs (reuses same InterfaceInfo as explicit pattern).
 	/// </summary>
-	private static InterfaceInfo ExtractInterfaceInfo(INamedTypeSymbol iface, IAssemblySymbol knockOffAssembly, string typeSuffix = "")
+	private static InterfaceInfo ExtractInterfaceInfo(INamedTypeSymbol iface, IAssemblySymbol knockOffAssembly, string typeSuffix = "", bool strict = false)
 	{
 		var members = new List<InterfaceMemberInfo>();
 		var events = new List<EventMemberInfo>();
@@ -326,7 +337,8 @@ public partial class KnockOffGenerator
 			simpleName,
 			new EquatableArray<InterfaceMemberInfo>(members.ToArray()),
 			new EquatableArray<EventMemberInfo>(events.ToArray()),
-			TypeSuffix: typeSuffix);
+			TypeSuffix: typeSuffix,
+			Strict: strict);
 	}
 
 	/// <summary>
@@ -548,6 +560,20 @@ public partial class KnockOffGenerator
 		if (classSymbol is null)
 			return null;
 
+		// Extract Strict property from [KnockOff] attribute (default false)
+		var strict = false;
+		foreach (var attributeData in context.Attributes)
+		{
+			foreach (var namedArg in attributeData.NamedArguments)
+			{
+				if (namedArg.Key == "Strict" && namedArg.Value.Value is bool strictValue)
+				{
+					strict = strictValue;
+					break;
+				}
+			}
+		}
+
 		// Get namespace
 		var ns = classSymbol.ContainingNamespace;
 		var namespaceName = ns.IsGlobalNamespace ? "" : ns.ToDisplayString();
@@ -591,7 +617,8 @@ public partial class KnockOffGenerator
 				UserMethods: new EquatableArray<UserMethodInfo>(Array.Empty<UserMethodInfo>()),
 				Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
 				FlatMembers: new EquatableArray<InterfaceMemberInfo>(Array.Empty<InterfaceMemberInfo>()),
-				FlatEvents: new EquatableArray<EventMemberInfo>(Array.Empty<EventMemberInfo>()));
+				FlatEvents: new EquatableArray<EventMemberInfo>(Array.Empty<EventMemberInfo>()),
+				Strict: strict);
 		}
 
 		// For generic standalone stubs, validate type parameter arity matches interface (KO0008)
@@ -627,7 +654,8 @@ public partial class KnockOffGenerator
 					UserMethods: new EquatableArray<UserMethodInfo>(Array.Empty<UserMethodInfo>()),
 					Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
 					FlatMembers: new EquatableArray<InterfaceMemberInfo>(Array.Empty<InterfaceMemberInfo>()),
-					FlatEvents: new EquatableArray<EventMemberInfo>(Array.Empty<EventMemberInfo>()));
+					FlatEvents: new EquatableArray<EventMemberInfo>(Array.Empty<EventMemberInfo>()),
+					Strict: strict);
 			}
 		}
 
@@ -719,7 +747,8 @@ public partial class KnockOffGenerator
 			UserMethods: userMethods,
 			Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
 			FlatMembers: new EquatableArray<InterfaceMemberInfo>(flatMembers),
-			FlatEvents: new EquatableArray<EventMemberInfo>(flatEvents));
+			FlatEvents: new EquatableArray<EventMemberInfo>(flatEvents),
+			Strict: strict);
 	}
 
 	/// <summary>
@@ -910,6 +939,25 @@ public partial class KnockOffGenerator
 			return interfaceName.Substring(1);
 		}
 		return interfaceName;
+	}
+
+	/// <summary>
+	/// Extracts the simple type name from a fully qualified name.
+	/// E.g., "global::MyNamespace.IUserService" -> "IUserService"
+	/// </summary>
+	private static string ExtractSimpleTypeName(string fullName)
+	{
+		// Remove global:: prefix if present
+		var name = fullName;
+		if (name.StartsWith("global::"))
+			name = name.Substring(8);
+
+		// Find the last dot to get the simple name
+		var lastDot = name.LastIndexOf('.');
+		if (lastDot >= 0)
+			return name.Substring(lastDot + 1);
+
+		return name;
 	}
 
 	/// <summary>

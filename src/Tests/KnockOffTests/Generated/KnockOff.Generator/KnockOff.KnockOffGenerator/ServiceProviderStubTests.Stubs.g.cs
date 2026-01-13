@@ -38,11 +38,22 @@ partial class ServiceProviderStubTests
 			{
 				GetService.RecordCall(serviceType);
 				if (GetService.OnCall is { } onCall) return onCall(this, serviceType);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IServiceProvider", "GetService");
 				return default!;
 			}
 
 			/// <summary>The global::System.IServiceProvider instance. Use for passing to code expecting the interface.</summary>
 			public global::System.IServiceProvider Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IServiceProvider(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

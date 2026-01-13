@@ -345,74 +345,98 @@ partial class RuleMessagesStub
 	/// <summary>The global::Neatoo.Rules.IRuleMessages instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.Rules.IRuleMessages Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::Neatoo.Rules.IRuleMessages.Add(string propertyName, string message)
 	{
 		Add1.RecordCall(propertyName, message);
-		Add1.OnCall?.Invoke(this, propertyName, message);
+		if (Add1.OnCall is { } onCallCallback)
+		{ onCallCallback(this, propertyName, message); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessages", "Add");
 	}
 
 	int global::System.Collections.Generic.IList<global::Neatoo.Rules.IRuleMessage>.IndexOf(global::Neatoo.Rules.IRuleMessage item)
 	{
 		IndexOf.RecordCall(item);
-		return IndexOf.OnCall?.Invoke(this, item) ?? default!;
+		if (IndexOf.OnCall is { } callback)
+			return callback(this, item);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "IndexOf");
+		return default!;
 	}
 
 	void global::System.Collections.Generic.IList<global::Neatoo.Rules.IRuleMessage>.Insert(int index, global::Neatoo.Rules.IRuleMessage item)
 	{
 		Insert.RecordCall(index, item);
-		Insert.OnCall?.Invoke(this, index, item);
+		if (Insert.OnCall is { } onCallCallback)
+		{ onCallCallback(this, index, item); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "Insert");
 	}
 
 	void global::System.Collections.Generic.IList<global::Neatoo.Rules.IRuleMessage>.RemoveAt(int index)
 	{
 		RemoveAt.RecordCall(index);
-		RemoveAt.OnCall?.Invoke(this, index);
+		if (RemoveAt.OnCall is { } onCallCallback)
+		{ onCallCallback(this, index); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "RemoveAt");
 	}
 
 	global::Neatoo.Rules.IRuleMessage global::System.Collections.Generic.IList<global::Neatoo.Rules.IRuleMessage>.this[int index]
 	{
-		get { Indexer.RecordGet(index); if (Indexer.OnGet != null) return Indexer.OnGet(this, index); return Indexer.Backing.TryGetValue(index, out var v) ? v : default!; }
-		set { Indexer.RecordSet(index, value); if (Indexer.OnSet != null) Indexer.OnSet(this, index, value); else Indexer.Backing[index] = value; }
+		get { Indexer.RecordGet(index); if (Indexer.OnGet is { } onGet) return onGet(this, index); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "this[]"); return Indexer.Backing.TryGetValue(index, out var v) ? v : default!; }
+		set { Indexer.RecordSet(index, value); if (Indexer.OnSet is { } onSet) { onSet(this, index, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "this[]"); Indexer.Backing[index] = value; }
 	}
 
 	void global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>.Add(global::Neatoo.Rules.IRuleMessage item)
 	{
 		Add2.RecordCall(item);
-		Add2.OnCall?.Invoke(this, item);
+		if (Add2.OnCall is { } onCallCallback)
+		{ onCallCallback(this, item); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "Add");
 	}
 
 	void global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>.Clear()
 	{
 		Clear.RecordCall();
-		Clear.OnCall?.Invoke(this);
+		if (Clear.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "Clear");
 	}
 
 	bool global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>.Contains(global::Neatoo.Rules.IRuleMessage item)
 	{
 		Contains.RecordCall(item);
-		return Contains.OnCall?.Invoke(this, item) ?? default!;
+		if (Contains.OnCall is { } callback)
+			return callback(this, item);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "Contains");
+		return default!;
 	}
 
 	void global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>.CopyTo(global::Neatoo.Rules.IRuleMessage[] array, int arrayIndex)
 	{
 		CopyTo.RecordCall(array, arrayIndex);
-		CopyTo.OnCall?.Invoke(this, array, arrayIndex);
+		if (CopyTo.OnCall is { } onCallCallback)
+		{ onCallCallback(this, array, arrayIndex); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "CopyTo");
 	}
 
 	bool global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>.Remove(global::Neatoo.Rules.IRuleMessage item)
 	{
 		Remove.RecordCall(item);
-		return Remove.OnCall?.Invoke(this, item) ?? default!;
+		if (Remove.OnCall is { } callback)
+			return callback(this, item);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "Remove");
+		return default!;
 	}
 
 	int global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>.Count
 	{
-		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? Count.Value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "Count"); return Count.Value; }
 	}
 
 	bool global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>.IsReadOnly
 	{
-		get { IsReadOnly.RecordGet(); return IsReadOnly.OnGet?.Invoke(this) ?? IsReadOnly.Value; }
+		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "IsReadOnly"); return IsReadOnly.Value; }
 	}
 
 	global::System.Collections.Generic.IEnumerator<global::Neatoo.Rules.IRuleMessage> global::System.Collections.Generic.IEnumerable<global::Neatoo.Rules.IRuleMessage>.GetEnumerator()
@@ -420,6 +444,7 @@ partial class RuleMessagesStub
 		GetEnumerator.RecordCall();
 		if (GetEnumerator.OnCall is { } callback)
 			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "GetEnumerator");
 		throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall or define a protected method 'GetEnumerator' in your partial class.");
 	}
 

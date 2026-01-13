@@ -36,10 +36,16 @@ partial class AsyncSaveKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IAsyncSave instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IAsyncSave Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::System.Threading.Tasks.Task<int> global::KnockOff.Documentation.Samples.Guides.IAsyncSave.SaveAsync(global::KnockOff.Documentation.Samples.Guides.AsyncData entity)
 	{
 		SaveAsync.RecordCall(entity);
-		return SaveAsync.OnCall?.Invoke(this, entity) ?? global::System.Threading.Tasks.Task.FromResult<int>(default!);
+		if (SaveAsync.OnCall is { } callback)
+			return callback(this, entity);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncSave", "SaveAsync");
+		return global::System.Threading.Tasks.Task.FromResult<int>(default!);
 	}
 
 }

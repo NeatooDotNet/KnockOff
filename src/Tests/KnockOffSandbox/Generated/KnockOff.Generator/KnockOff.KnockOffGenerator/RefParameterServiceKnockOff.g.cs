@@ -64,11 +64,15 @@ partial class RefParameterServiceKnockOff
 	/// <summary>The global::KnockOff.Sandbox.IRefParameterService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Sandbox.IRefParameterService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Sandbox.IRefParameterService.Increment(ref int @value)
 	{
 		Increment.RecordCall(@value);
 		if (Increment.OnCall is { } onCallCallback)
 		{ onCallCallback(this, ref @value); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IRefParameterService", "Increment");
 	}
 
 	bool global::KnockOff.Sandbox.IRefParameterService.TryUpdate(string key, ref string @value)
@@ -76,6 +80,7 @@ partial class RefParameterServiceKnockOff
 		TryUpdate.RecordCall(key, @value);
 		if (TryUpdate.OnCall is { } onCallCallback)
 			return onCallCallback(this, key, ref @value);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IRefParameterService", "TryUpdate");
 		return default!;
 	}
 

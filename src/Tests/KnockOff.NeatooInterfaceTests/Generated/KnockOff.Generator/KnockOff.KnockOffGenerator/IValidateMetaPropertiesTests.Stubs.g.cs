@@ -189,6 +189,7 @@ partial class IValidateMetaPropertiesTests
 			{
 				WaitForTasks.RecordCall(null);
 				if (WaitForTasks.OnCall is { } onCall) return onCall(this, null);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -196,6 +197,7 @@ partial class IValidateMetaPropertiesTests
 			{
 				WaitForTasks.RecordCall(token);
 				if (WaitForTasks.OnCall is { } onCall) return onCall(this, token);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -203,6 +205,7 @@ partial class IValidateMetaPropertiesTests
 			{
 				RunRules.RecordCall(propertyName, token, null);
 				if (RunRules.OnCall is { } onCall) return onCall(this, propertyName, token, null);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -210,19 +213,22 @@ partial class IValidateMetaPropertiesTests
 			{
 				RunRules.RecordCall(null, token, runRules);
 				if (RunRules.OnCall is { } onCall) return onCall(this, null, token, runRules);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
 			void global::Neatoo.IValidateMetaProperties.ClearAllMessages()
 			{
 				ClearAllMessages.RecordCall();
-				if (ClearAllMessages.OnCall is { } onCall) onCall(this);
+				if (ClearAllMessages.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "ClearAllMessages");
 			}
 
 			void global::Neatoo.IValidateMetaProperties.ClearSelfMessages()
 			{
 				ClearSelfMessages.RecordCall();
-				if (ClearSelfMessages.OnCall is { } onCall) onCall(this);
+				if (ClearSelfMessages.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "ClearSelfMessages");
 			}
 
 			bool global::Neatoo.IValidateMetaProperties.IsBusy
@@ -231,6 +237,7 @@ partial class IValidateMetaPropertiesTests
 				{
 					IsBusy.RecordGet();
 					if (IsBusy.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsBusy");
 					return IsBusy.Value;
 				}
 			}
@@ -241,6 +248,7 @@ partial class IValidateMetaPropertiesTests
 				{
 					IsValid.RecordGet();
 					if (IsValid.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsValid");
 					return IsValid.Value;
 				}
 			}
@@ -251,6 +259,7 @@ partial class IValidateMetaPropertiesTests
 				{
 					IsSelfValid.RecordGet();
 					if (IsSelfValid.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsSelfValid");
 					return IsSelfValid.Value;
 				}
 			}
@@ -261,12 +270,23 @@ partial class IValidateMetaPropertiesTests
 				{
 					PropertyMessages.RecordGet();
 					if (PropertyMessages.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "PropertyMessages");
 					return PropertyMessages.Value;
 				}
 			}
 
 			/// <summary>The global::Neatoo.IValidateMetaProperties instance. Use for passing to code expecting the interface.</summary>
 			public global::Neatoo.IValidateMetaProperties Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IValidateMetaProperties(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 
@@ -347,13 +367,15 @@ partial class IValidateMetaPropertiesTests
 				{
 					Property.RecordGet();
 					if (Property.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IPropertyMessage", "Property");
 					return Property.Value;
 				}
 				set
 				{
 					Property.RecordSet(value);
-					if (Property.OnSet is { } onSet) onSet(this, value);
-					else Property.Value = value;
+					if (Property.OnSet is { } onSet) { onSet(this, value); return; }
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IPropertyMessage", "Property");
+					Property.Value = value;
 				}
 			}
 
@@ -363,18 +385,30 @@ partial class IValidateMetaPropertiesTests
 				{
 					Message.RecordGet();
 					if (Message.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IPropertyMessage", "Message");
 					return Message.Value;
 				}
 				set
 				{
 					Message.RecordSet(value);
-					if (Message.OnSet is { } onSet) onSet(this, value);
-					else Message.Value = value;
+					if (Message.OnSet is { } onSet) { onSet(this, value); return; }
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IPropertyMessage", "Message");
+					Message.Value = value;
 				}
 			}
 
 			/// <summary>The global::Neatoo.IPropertyMessage instance. Use for passing to code expecting the interface.</summary>
 			public global::Neatoo.IPropertyMessage Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IPropertyMessage(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

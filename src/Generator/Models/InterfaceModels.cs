@@ -20,7 +20,12 @@ internal sealed record InterfaceInfo(
 	/// True when this interface needs a suffix to avoid collision with another
 	/// interface of the same simple name but different type arguments.
 	/// </summary>
-	bool NeedsSuffix = false) : IEquatable<InterfaceInfo>
+	bool NeedsSuffix = false,
+	/// <summary>
+	/// When true, the generated constructor defaults to strict mode (throws on unconfigured calls).
+	/// From [KnockOff&lt;T&gt;(Strict = true)].
+	/// </summary>
+	bool Strict = false) : IEquatable<InterfaceInfo>
 {
 	/// <summary>
 	/// Gets the stub class name, including type suffix when needed for collision avoidance.

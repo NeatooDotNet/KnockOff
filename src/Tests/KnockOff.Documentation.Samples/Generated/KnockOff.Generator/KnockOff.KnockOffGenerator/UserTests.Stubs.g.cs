@@ -38,11 +38,22 @@ partial class UserTests
 			{
 				GetUser.RecordCall(id);
 				if (GetUser.OnCall is { } onCall) return onCall(this, id);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IUserService", "GetUser");
 				return new global::KnockOff.Documentation.Samples.ReadMe.User();
 			}
 
 			/// <summary>The global::KnockOff.Documentation.Samples.ReadMe.IUserService instance. Use for passing to code expecting the interface.</summary>
 			public global::KnockOff.Documentation.Samples.ReadMe.IUserService Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IUserService(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

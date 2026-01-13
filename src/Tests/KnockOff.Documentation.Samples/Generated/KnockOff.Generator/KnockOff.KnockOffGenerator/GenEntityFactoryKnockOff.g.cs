@@ -98,11 +98,15 @@ partial class GenEntityFactoryKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IGenEntityFactory instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IGenEntityFactory Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	T global::KnockOff.Documentation.Samples.Guides.IGenEntityFactory.Create<T>() where T : class
 	{
 		Create.Of<T>().RecordCall();
 		if (Create.Of<T>().OnCall is { } callback)
 			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenEntityFactory", "Create");
 		return SmartDefault<T>("Create");
 	}
 

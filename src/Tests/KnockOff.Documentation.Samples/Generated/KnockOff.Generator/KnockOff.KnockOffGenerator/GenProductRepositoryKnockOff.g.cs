@@ -61,16 +61,25 @@ partial class GenProductRepositoryKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<global::KnockOff.Documentation.Samples.Guides.GenProduct> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<global::KnockOff.Documentation.Samples.Guides.GenProduct> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Guides.GenProduct> global::KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<global::KnockOff.Documentation.Samples.Guides.GenProduct>.GetAll()
 	{
 		GetAll.RecordCall();
-		return GetAll.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Guides.GenProduct>();
+		if (GetAll.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("GenProduct>", "GetAll");
+		return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Guides.GenProduct>();
 	}
 
 	global::KnockOff.Documentation.Samples.Guides.GenProduct? global::KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<global::KnockOff.Documentation.Samples.Guides.GenProduct>.FindFirst(global::System.Func<global::KnockOff.Documentation.Samples.Guides.GenProduct, bool> predicate)
 	{
 		FindFirst.RecordCall(predicate);
-		return FindFirst.OnCall?.Invoke(this, predicate) ?? default!;
+		if (FindFirst.OnCall is { } callback)
+			return callback(this, predicate);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("GenProduct>", "FindFirst");
+		return default!;
 	}
 
 }

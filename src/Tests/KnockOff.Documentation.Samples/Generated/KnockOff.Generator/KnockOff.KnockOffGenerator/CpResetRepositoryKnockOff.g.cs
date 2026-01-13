@@ -36,10 +36,16 @@ partial class CpResetRepositoryKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ICpResetRepository instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ICpResetRepository Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Documentation.Samples.Skills.CpUser? global::KnockOff.Documentation.Samples.Skills.ICpResetRepository.GetUser(int id)
 	{
 		GetUser.RecordCall(id);
-		return GetUser.OnCall?.Invoke(this, id) ?? default!;
+		if (GetUser.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ICpResetRepository", "GetUser");
+		return default!;
 	}
 
 }

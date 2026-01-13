@@ -61,16 +61,25 @@ partial class MethodRepositoryKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IMethodRepository instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IMethodRepository Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Documentation.Samples.Guides.MethodUser? global::KnockOff.Documentation.Samples.Guides.IMethodRepository.GetById(int id)
 	{
 		GetById.RecordCall(id);
-		return GetById.OnCall?.Invoke(this, id) ?? default!;
+		if (GetById.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMethodRepository", "GetById");
+		return default!;
 	}
 
 	int global::KnockOff.Documentation.Samples.Guides.IMethodRepository.Count()
 	{
 		Count.RecordCall();
-		return Count.OnCall?.Invoke(this) ?? default!;
+		if (Count.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMethodRepository", "Count");
+		return default!;
 	}
 
 }

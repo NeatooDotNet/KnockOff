@@ -9,6 +9,15 @@ namespace KnockOff;
 [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
 public sealed class KnockOffAttribute : Attribute
 {
+    /// <summary>
+    /// When true, unconfigured method calls throw <see cref="StubException"/> instead of returning default.
+    /// This catches unexpected interactions during tests.
+    /// </summary>
+    /// <remarks>
+    /// Sets the default value for the generated constructor's <c>strict</c> parameter.
+    /// Can be overridden per-instance at construction time.
+    /// </remarks>
+    public bool Strict { get; set; }
 }
 
 /// <summary>
@@ -36,4 +45,13 @@ public sealed class KnockOffAttribute : Attribute
 [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
 public sealed class KnockOffAttribute<T> : Attribute
 {
+    /// <summary>
+    /// When true, unconfigured method calls throw <see cref="StubException"/> instead of returning default.
+    /// This catches unexpected interactions during tests.
+    /// </summary>
+    /// <remarks>
+    /// Sets the default value for the generated constructor's <c>strict</c> parameter.
+    /// Can be overridden per-instance at construction time.
+    /// </remarks>
+    public bool Strict { get; set; }
 }

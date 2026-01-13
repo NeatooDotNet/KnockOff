@@ -38,6 +38,9 @@ partial class NotifyPropertyChangedKnockOff
 	/// <summary>The global::System.ComponentModel.INotifyPropertyChanged instance. Use for passing to code expecting the interface.</summary>
 	public global::System.ComponentModel.INotifyPropertyChanged Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	event global::System.ComponentModel.PropertyChangedEventHandler? global::System.ComponentModel.INotifyPropertyChanged.PropertyChanged
 	{
 		add => PropertyChanged.RecordAdd(value);

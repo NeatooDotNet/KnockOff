@@ -320,68 +320,90 @@ partial class ListStringKnockOff
 	/// <summary>The global::System.Collections.Generic.IList<string> instance. Use for passing to code expecting the interface.</summary>
 	public global::System.Collections.Generic.IList<string> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	int global::System.Collections.Generic.IList<string>.IndexOf(string item)
 	{
 		IndexOf.RecordCall(item);
-		return IndexOf.OnCall?.Invoke(this, item) ?? default!;
+		if (IndexOf.OnCall is { } callback)
+			return callback(this, item);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IList<string>", "IndexOf");
+		return default!;
 	}
 
 	void global::System.Collections.Generic.IList<string>.Insert(int index, string item)
 	{
 		Insert.RecordCall(index, item);
-		Insert.OnCall?.Invoke(this, index, item);
+		if (Insert.OnCall is { } onCallCallback)
+		{ onCallCallback(this, index, item); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IList<string>", "Insert");
 	}
 
 	void global::System.Collections.Generic.IList<string>.RemoveAt(int index)
 	{
 		RemoveAt.RecordCall(index);
-		RemoveAt.OnCall?.Invoke(this, index);
+		if (RemoveAt.OnCall is { } onCallCallback)
+		{ onCallCallback(this, index); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IList<string>", "RemoveAt");
 	}
 
 	string global::System.Collections.Generic.IList<string>.this[int index]
 	{
-		get { Indexer.RecordGet(index); if (Indexer.OnGet != null) return Indexer.OnGet(this, index); return Indexer.Backing.TryGetValue(index, out var v) ? v : default!; }
-		set { Indexer.RecordSet(index, value); if (Indexer.OnSet != null) Indexer.OnSet(this, index, value); else Indexer.Backing[index] = value; }
+		get { Indexer.RecordGet(index); if (Indexer.OnGet is { } onGet) return onGet(this, index); if (Strict) throw global::KnockOff.StubException.NotConfigured("IList<string>", "this[]"); return Indexer.Backing.TryGetValue(index, out var v) ? v : default!; }
+		set { Indexer.RecordSet(index, value); if (Indexer.OnSet is { } onSet) { onSet(this, index, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IList<string>", "this[]"); Indexer.Backing[index] = value; }
 	}
 
 	void global::System.Collections.Generic.ICollection<string>.Add(string item)
 	{
 		Add.RecordCall(item);
-		Add.OnCall?.Invoke(this, item);
+		if (Add.OnCall is { } onCallCallback)
+		{ onCallCallback(this, item); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "Add");
 	}
 
 	void global::System.Collections.Generic.ICollection<string>.Clear()
 	{
 		Clear.RecordCall();
-		Clear.OnCall?.Invoke(this);
+		if (Clear.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "Clear");
 	}
 
 	bool global::System.Collections.Generic.ICollection<string>.Contains(string item)
 	{
 		Contains.RecordCall(item);
-		return Contains.OnCall?.Invoke(this, item) ?? default!;
+		if (Contains.OnCall is { } callback)
+			return callback(this, item);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "Contains");
+		return default!;
 	}
 
 	void global::System.Collections.Generic.ICollection<string>.CopyTo(string[] array, int arrayIndex)
 	{
 		CopyTo.RecordCall(array, arrayIndex);
-		CopyTo.OnCall?.Invoke(this, array, arrayIndex);
+		if (CopyTo.OnCall is { } onCallCallback)
+		{ onCallCallback(this, array, arrayIndex); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "CopyTo");
 	}
 
 	bool global::System.Collections.Generic.ICollection<string>.Remove(string item)
 	{
 		Remove.RecordCall(item);
-		return Remove.OnCall?.Invoke(this, item) ?? default!;
+		if (Remove.OnCall is { } callback)
+			return callback(this, item);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "Remove");
+		return default!;
 	}
 
 	int global::System.Collections.Generic.ICollection<string>.Count
 	{
-		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? Count.Value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "Count"); return Count.Value; }
 	}
 
 	bool global::System.Collections.Generic.ICollection<string>.IsReadOnly
 	{
-		get { IsReadOnly.RecordGet(); return IsReadOnly.OnGet?.Invoke(this) ?? IsReadOnly.Value; }
+		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "IsReadOnly"); return IsReadOnly.Value; }
 	}
 
 	global::System.Collections.Generic.IEnumerator<string> global::System.Collections.Generic.IEnumerable<string>.GetEnumerator()
@@ -389,6 +411,7 @@ partial class ListStringKnockOff
 		GetEnumerator.RecordCall();
 		if (GetEnumerator.OnCall is { } callback)
 			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable<string>", "GetEnumerator");
 		throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall or define a protected method 'GetEnumerator' in your partial class.");
 	}
 

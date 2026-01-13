@@ -838,6 +838,19 @@ public partial class KnockOffGenerator
 		sb.AppendLine($"\t\t\tpublic {iface.FullName} Object => this;");
 		sb.AppendLine();
 
+		// Generate _strict field and constructor for strict mode support
+		var strictDefault = iface.Strict ? "true" : "false";
+		sb.AppendLine("\t\t\t/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>");
+		sb.AppendLine("\t\t\tprivate readonly bool _strict;");
+		sb.AppendLine();
+		sb.AppendLine($"\t\t\t/// <summary>Creates a new instance of the stub.</summary>");
+		sb.AppendLine($"\t\t\t/// <param name=\"strict\">When true, unconfigured method calls throw StubException.</param>");
+		sb.AppendLine($"\t\t\tpublic {stubClassName}(bool strict = {strictDefault})");
+		sb.AppendLine("\t\t\t{");
+		sb.AppendLine("\t\t\t\t_strict = strict;");
+		sb.AppendLine("\t\t\t}");
+		sb.AppendLine();
+
 		// Generate SmartDefault helper if interface has generic methods
 		var hasGenericMethods = iface.Members.Any(m => m.IsGenericMethod);
 		if (hasGenericMethods)
@@ -1020,6 +1033,7 @@ public partial class KnockOffGenerator
 		string stubClassName)
 	{
 		var interceptorName = member.Name;
+		var simpleIfaceName = ExtractSimpleTypeName(interfaceFullName);
 
 		sb.AppendLine($"\t\t\t{member.ReturnType} {interfaceFullName}.{member.Name}");
 		sb.AppendLine("\t\t\t{");
@@ -1030,6 +1044,7 @@ public partial class KnockOffGenerator
 			sb.AppendLine("\t\t\t\t{");
 			sb.AppendLine($"\t\t\t\t\t{interceptorName}.RecordGet();");
 			sb.AppendLine($"\t\t\t\t\tif ({interceptorName}.OnGet is {{ }} onGet) return onGet(this);");
+			sb.AppendLine($"\t\t\t\t\tif (_strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"{member.Name}\");");
 			sb.AppendLine($"\t\t\t\t\treturn {interceptorName}.Value;");
 			sb.AppendLine("\t\t\t\t}");
 		}
@@ -1044,8 +1059,9 @@ public partial class KnockOffGenerator
 			sb.AppendLine($"\t\t\t\t{setterKeyword}");
 			sb.AppendLine("\t\t\t\t{");
 			sb.AppendLine($"\t\t\t\t\t{interceptorName}.RecordSet(value);");
-			sb.AppendLine($"\t\t\t\t\tif ({interceptorName}.OnSet is {{ }} onSet) onSet(this, value);");
-			sb.AppendLine($"\t\t\t\t\telse {interceptorName}.Value = value;");
+			sb.AppendLine($"\t\t\t\t\tif ({interceptorName}.OnSet is {{ }} onSet) {{ onSet(this, value); return; }}");
+			sb.AppendLine($"\t\t\t\t\tif (_strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"{member.Name}\");");
+			sb.AppendLine($"\t\t\t\t\t{interceptorName}.Value = value;");
 			sb.AppendLine("\t\t\t\t}");
 			if (!string.IsNullOrEmpty(pragmaRestore))
 				sb.AppendLine(pragmaRestore);
@@ -1074,6 +1090,7 @@ public partial class KnockOffGenerator
 		// Compute indexer name based on count (single: Indexer, multiple: IndexerString, IndexerInt)
 		var indexerName = SymbolHelpers.GetIndexerName(indexerCount, member.IndexerTypeSuffix);
 		var interceptorName = indexerName;
+		var simpleIfaceName = ExtractSimpleTypeName(interfaceFullName);
 
 		sb.AppendLine($"\t\t\t{member.ReturnType} {interfaceFullName}.this[{paramList}]");
 		sb.AppendLine("\t\t\t{");
@@ -1085,6 +1102,7 @@ public partial class KnockOffGenerator
 			sb.AppendLine("\t\t\t\t{");
 			sb.AppendLine($"\t\t\t\t\t{interceptorName}.RecordGet({argList});");
 			sb.AppendLine($"\t\t\t\t\tif ({interceptorName}.OnGet is {{ }} onGet) return onGet(this, {argList});");
+			sb.AppendLine($"\t\t\t\t\tif (_strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"this[]\");");
 			sb.AppendLine($"\t\t\t\t\treturn {interceptorName}.Backing.TryGetValue({keyArg}, out var v) ? v : {defaultExpr};");
 			sb.AppendLine("\t\t\t\t}");
 		}
@@ -1094,8 +1112,9 @@ public partial class KnockOffGenerator
 			sb.AppendLine("\t\t\t\tset");
 			sb.AppendLine("\t\t\t\t{");
 			sb.AppendLine($"\t\t\t\t\t{interceptorName}.RecordSet({argList}, value);");
-			sb.AppendLine($"\t\t\t\t\tif ({interceptorName}.OnSet is {{ }} onSet) onSet(this, {argList}, value);");
-			sb.AppendLine($"\t\t\t\t\telse {interceptorName}.Backing[{keyArg}] = value;");
+			sb.AppendLine($"\t\t\t\t\tif ({interceptorName}.OnSet is {{ }} onSet) {{ onSet(this, {argList}, value); return; }}");
+			sb.AppendLine($"\t\t\t\t\tif (_strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"this[]\");");
+			sb.AppendLine($"\t\t\t\t\t{interceptorName}.Backing[{keyArg}] = value;");
 			sb.AppendLine("\t\t\t\t}");
 		}
 
@@ -1688,6 +1707,9 @@ public partial class KnockOffGenerator
 		var recordArgs = string.Join(", ", mappedArgs);
 		var onCallArgs = mappedArgs.Length > 0 ? $"this, {recordArgs}" : "this";
 
+		// Extract simple interface name for StubException message
+		var simpleIfaceName = ExtractSimpleTypeName(interfaceFullName);
+
 		sb.AppendLine($"\t\t\t{member.ReturnType} {interfaceFullName}.{member.Name}({paramList})");
 		sb.AppendLine("\t\t\t{");
 
@@ -1703,11 +1725,13 @@ public partial class KnockOffGenerator
 		// Call OnCall if set
 		if (isVoid)
 		{
-			sb.AppendLine($"\t\t\t\tif ({group.Name}.OnCall is {{ }} onCall) onCall({onCallArgs});");
+			sb.AppendLine($"\t\t\t\tif ({group.Name}.OnCall is {{ }} onCall) {{ onCall({onCallArgs}); return; }}");
+			sb.AppendLine($"\t\t\t\tif (_strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"{member.Name}\");");
 		}
 		else if (isAsync)
 		{
 			sb.AppendLine($"\t\t\t\tif ({group.Name}.OnCall is {{ }} onCall) return onCall({onCallArgs});");
+			sb.AppendLine($"\t\t\t\tif (_strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"{member.Name}\");");
 			// Return completed task for async methods
 			if (isTask && member.ReturnType == "global::System.Threading.Tasks.Task")
 			{
@@ -1732,11 +1756,13 @@ public partial class KnockOffGenerator
 		else if (member.DefaultStrategy == DefaultValueStrategy.ThrowException)
 		{
 			sb.AppendLine($"\t\t\t\tif ({group.Name}.OnCall is {{ }} onCall) return onCall({onCallArgs});");
+			sb.AppendLine($"\t\t\t\tif (_strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"{member.Name}\");");
 			sb.AppendLine($"\t\t\t\tthrow new global::System.InvalidOperationException(\"No implementation provided for {member.Name}. Set {group.Name}.OnCall.\");");
 		}
 		else
 		{
 			sb.AppendLine($"\t\t\t\tif ({group.Name}.OnCall is {{ }} onCall) return onCall({onCallArgs});");
+			sb.AppendLine($"\t\t\t\tif (_strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"{member.Name}\");");
 			var defaultExpr = GetDefaultForType(member.ReturnType, member.DefaultStrategy, member.ConcreteTypeForNew);
 			sb.AppendLine($"\t\t\t\treturn {defaultExpr};");
 		}
@@ -1773,6 +1799,9 @@ public partial class KnockOffGenerator
 		var isVoid = member.ReturnType == "void";
 		var isTask = member.ReturnType == "global::System.Threading.Tasks.Task";
 		var isValueTask = member.ReturnType == "global::System.Threading.Tasks.ValueTask";
+
+		// Extract simple interface name for StubException message
+		var simpleIfaceName = ExtractSimpleTypeName(interfaceFullName);
 
 		// Generate method signature with type parameters (only class/struct constraints allowed in explicit impl)
 		sb.AppendLine($"\t\t\t{member.ReturnType} {interfaceFullName}.{member.Name}<{typeParamNames}>({paramList}){constraintClauses}");
@@ -1828,6 +1857,9 @@ public partial class KnockOffGenerator
 				sb.AppendLine($"\t\t\t\t\treturn onCallCallback(this, {argList});");
 			}
 		}
+
+		// Strict mode check before default behavior
+		sb.AppendLine($"\t\t\t\tif (_strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"{member.Name}\");");
 
 		// Default behavior
 		if (isVoid)

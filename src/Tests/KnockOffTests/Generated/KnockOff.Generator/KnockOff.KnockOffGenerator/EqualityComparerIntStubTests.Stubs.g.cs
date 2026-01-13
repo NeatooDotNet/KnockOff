@@ -61,6 +61,7 @@ partial class EqualityComparerIntStubTests
 			{
 				Equals.RecordCall(x, y);
 				if (Equals.OnCall is { } onCall) return onCall(this, x, y);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEqualityComparer<int>", "Equals");
 				return default!;
 			}
 
@@ -68,11 +69,22 @@ partial class EqualityComparerIntStubTests
 			{
 				GetHashCode.RecordCall(obj);
 				if (GetHashCode.OnCall is { } onCall) return onCall(this, obj);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEqualityComparer<int>", "GetHashCode");
 				return default!;
 			}
 
 			/// <summary>The global::System.Collections.Generic.IEqualityComparer<int> instance. Use for passing to code expecting the interface.</summary>
 			public global::System.Collections.Generic.IEqualityComparer<int> Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IEqualityComparer(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

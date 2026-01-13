@@ -36,6 +36,9 @@ partial class VsUnitOfWorkKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IVsUnitOfWork instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IVsUnitOfWork Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::System.Threading.Tasks.Task<int> global::KnockOff.Documentation.Samples.Comparison.IVsUnitOfWork.SaveChangesAsync(global::System.Threading.CancellationToken cancellationToken)
 	{
 		SaveChangesAsync2.RecordCall(cancellationToken);

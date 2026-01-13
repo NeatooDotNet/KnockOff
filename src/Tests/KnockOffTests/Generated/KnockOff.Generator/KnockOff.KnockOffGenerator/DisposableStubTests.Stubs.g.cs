@@ -34,11 +34,22 @@ partial class DisposableStubTests
 			void global::System.IDisposable.Dispose()
 			{
 				Dispose.RecordCall();
-				if (Dispose.OnCall is { } onCall) onCall(this);
+				if (Dispose.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDisposable", "Dispose");
 			}
 
 			/// <summary>The global::System.IDisposable instance. Use for passing to code expecting the interface.</summary>
 			public global::System.IDisposable Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IDisposable(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

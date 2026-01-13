@@ -55,15 +55,20 @@ partial class NotifierKnockOff
 	/// <summary>The global::KnockOff.Tests.INotifier instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.INotifier Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Tests.INotifier.Notify(string recipient)
 	{
 		Notify.RecordCall(recipient);
-		Notify.OnCall?.Invoke(this, recipient);
+		if (Notify.OnCall is { } onCallCallback)
+		{ onCallCallback(this, recipient); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("INotifier", "Notify");
 	}
 
 	string global::KnockOff.Tests.INotifier.Name
 	{
-		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? Name.Value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("INotifier", "Name"); return Name.Value; }
 	}
 
 }

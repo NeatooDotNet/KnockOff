@@ -128,6 +128,9 @@ partial class EventSourceKnockOff
 	/// <summary>The global::KnockOff.Tests.IEventSource instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IEventSource Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	event global::System.EventHandler<string>? global::KnockOff.Tests.IEventSource.MessageReceived
 	{
 		add => MessageReceived.RecordAdd(value);

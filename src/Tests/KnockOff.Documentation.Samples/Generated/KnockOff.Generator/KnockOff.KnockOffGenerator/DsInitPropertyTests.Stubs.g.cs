@@ -85,13 +85,15 @@ partial class DsInitPropertyTests
 				{
 					Id.RecordGet();
 					if (Id.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDsEntity", "Id");
 					return Id.Value;
 				}
 				init
 				{
 					Id.RecordSet(value);
-					if (Id.OnSet is { } onSet) onSet(this, value);
-					else Id.Value = value;
+					if (Id.OnSet is { } onSet) { onSet(this, value); return; }
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDsEntity", "Id");
+					Id.Value = value;
 				}
 			}
 
@@ -101,18 +103,30 @@ partial class DsInitPropertyTests
 				{
 					Name.RecordGet();
 					if (Name.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDsEntity", "Name");
 					return Name.Value;
 				}
 				init
 				{
 					Name.RecordSet(value);
-					if (Name.OnSet is { } onSet) onSet(this, value);
-					else Name.Value = value;
+					if (Name.OnSet is { } onSet) { onSet(this, value); return; }
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDsEntity", "Name");
+					Name.Value = value;
 				}
 			}
 
 			/// <summary>The global::KnockOff.Documentation.Samples.Design.IDsEntity instance. Use for passing to code expecting the interface.</summary>
 			public global::KnockOff.Documentation.Samples.Design.IDsEntity Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IDsEntity(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 
@@ -215,13 +229,15 @@ partial class DsInitPropertyTests
 				{
 					Id.RecordGet();
 					if (Id.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDsDocument", "Id");
 					return Id.Value;
 				}
 				init
 				{
 					Id.RecordSet(value);
-					if (Id.OnSet is { } onSet) onSet(this, value);
-					else Id.Value = value;
+					if (Id.OnSet is { } onSet) { onSet(this, value); return; }
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDsDocument", "Id");
+					Id.Value = value;
 				}
 			}
 
@@ -231,13 +247,15 @@ partial class DsInitPropertyTests
 				{
 					Title.RecordGet();
 					if (Title.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDsDocument", "Title");
 					return Title.Value;
 				}
 				set
 				{
 					Title.RecordSet(value);
-					if (Title.OnSet is { } onSet) onSet(this, value);
-					else Title.Value = value;
+					if (Title.OnSet is { } onSet) { onSet(this, value); return; }
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDsDocument", "Title");
+					Title.Value = value;
 				}
 			}
 
@@ -247,12 +265,23 @@ partial class DsInitPropertyTests
 				{
 					Version.RecordGet();
 					if (Version.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDsDocument", "Version");
 					return Version.Value;
 				}
 			}
 
 			/// <summary>The global::KnockOff.Documentation.Samples.Design.IDsDocument instance. Use for passing to code expecting the interface.</summary>
 			public global::KnockOff.Documentation.Samples.Design.IDsDocument Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IDsDocument(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

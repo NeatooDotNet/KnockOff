@@ -83,6 +83,9 @@ partial class DocumentWithMixedPropertiesKnockOff
 	/// <summary>The global::KnockOffTests.IDocumentWithMixedProperties instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOffTests.IDocumentWithMixedProperties Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	string global::KnockOffTests.IDocumentWithMixedProperties.Id
 	{
 		get { Id.RecordGet(); return Id.Value; }
@@ -91,13 +94,13 @@ partial class DocumentWithMixedPropertiesKnockOff
 
 	string global::KnockOffTests.IDocumentWithMixedProperties.Title
 	{
-		get { Title.RecordGet(); return Title.OnGet?.Invoke(this) ?? Title.Value; }
-		set { Title.RecordSet(value); if (Title.OnSet != null) Title.OnSet(this, value); else Title.Value = value; }
+		get { Title.RecordGet(); if (Title.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IDocumentWithMixedProperties", "Title"); return Title.Value; }
+		set { Title.RecordSet(value); if (Title.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IDocumentWithMixedProperties", "Title"); Title.Value = value; }
 	}
 
 	int global::KnockOffTests.IDocumentWithMixedProperties.Version
 	{
-		get { Version.RecordGet(); return Version.OnGet?.Invoke(this) ?? Version.Value; }
+		get { Version.RecordGet(); if (Version.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IDocumentWithMixedProperties", "Version"); return Version.Value; }
 	}
 
 }

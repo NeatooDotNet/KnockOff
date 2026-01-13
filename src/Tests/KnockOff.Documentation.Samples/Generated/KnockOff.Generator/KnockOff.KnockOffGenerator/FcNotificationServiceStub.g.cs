@@ -58,16 +58,23 @@ partial class FcNotificationServiceStub
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IFcNotificationService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IFcNotificationService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Documentation.Samples.Comparison.IFcNotificationService.SendOrderConfirmation(int customerId, int orderId)
 	{
 		SendOrderConfirmation.RecordCall(customerId, orderId);
-		SendOrderConfirmation.OnCall?.Invoke(this, customerId, orderId);
+		if (SendOrderConfirmation.OnCall is { } onCallCallback)
+		{ onCallCallback(this, customerId, orderId); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFcNotificationService", "SendOrderConfirmation");
 	}
 
 	void global::KnockOff.Documentation.Samples.Comparison.IFcNotificationService.SendPaymentFailure(int customerId, string reason)
 	{
 		SendPaymentFailure.RecordCall(customerId, reason);
-		SendPaymentFailure.OnCall?.Invoke(this, customerId, reason);
+		if (SendPaymentFailure.OnCall is { } onCallCallback)
+		{ onCallCallback(this, customerId, reason); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFcNotificationService", "SendPaymentFailure");
 	}
 
 }

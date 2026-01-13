@@ -683,7 +683,7 @@ Source-generated code means full IntelliSense, Ctrl+Click navigation, and refact
 
 ## Limitations vs Moq
 
-KnockOff doesn't support: argument matchers (`It.IsAny<T>`, `It.Is<T>(predicate)`), `SetupSequence`, strict mode, `VerifyNoOtherCalls`, `InSequence` call ordering, `LINQ to Mocks`, `As<T>()` interface addition, recursive auto-mocking, protected member mocking, or `MockRepository`.
+KnockOff doesn't support: argument matchers (`It.IsAny<T>`, `It.Is<T>(predicate)`), `SetupSequence`, `VerifyNoOtherCalls`, `InSequence` call ordering, `LINQ to Mocks`, `As<T>()` interface addition, recursive auto-mocking, protected member mocking, or `MockRepository`.
 
 **Covered differently:** Moq's `Callback` → `OnCall`; `Returns` → `OnCall` return or `.Value`; `Times.Once` → `Assert.Equal(1, stub.Method.CallCount)`.
 

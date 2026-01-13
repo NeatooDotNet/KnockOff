@@ -139,34 +139,49 @@ partial class OverloadedServiceStub
 	/// <summary>The global::KnockOff.Benchmarks.Interfaces.IOverloadedService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Interfaces.IOverloadedService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Benchmarks.Interfaces.IOverloadedService.Process(int @value)
 	{
 		Process1.RecordCall(@value);
-		Process1.OnCall?.Invoke(this, @value);
+		if (Process1.OnCall is { } onCallCallback)
+		{ onCallCallback(this, @value); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IOverloadedService", "Process");
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.IOverloadedService.Process(string @value)
 	{
 		Process2.RecordCall(@value);
-		Process2.OnCall?.Invoke(this, @value);
+		if (Process2.OnCall is { } onCallCallback)
+		{ onCallCallback(this, @value); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IOverloadedService", "Process");
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.IOverloadedService.Process(int a, int b)
 	{
 		Process3.RecordCall(a, b);
-		Process3.OnCall?.Invoke(this, a, b);
+		if (Process3.OnCall is { } onCallCallback)
+		{ onCallCallback(this, a, b); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IOverloadedService", "Process");
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.IOverloadedService.Calculate(int @value)
 	{
 		Calculate1.RecordCall(@value);
-		return Calculate1.OnCall?.Invoke(this, @value) ?? default!;
+		if (Calculate1.OnCall is { } callback)
+			return callback(this, @value);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IOverloadedService", "Calculate");
+		return default!;
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.IOverloadedService.Calculate(int a, int b)
 	{
 		Calculate2.RecordCall(a, b);
-		return Calculate2.OnCall?.Invoke(this, a, b) ?? default!;
+		if (Calculate2.OnCall is { } callback)
+			return callback(this, a, b);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IOverloadedService", "Calculate");
+		return default!;
 	}
 
 }

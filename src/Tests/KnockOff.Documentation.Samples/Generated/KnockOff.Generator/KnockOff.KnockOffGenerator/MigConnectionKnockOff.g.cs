@@ -30,10 +30,15 @@ partial class MigConnectionKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IMigConnection instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IMigConnection Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Documentation.Samples.Comparison.IMigConnection.Connect()
 	{
 		Connect.RecordCall();
-		Connect.OnCall?.Invoke(this);
+		if (Connect.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMigConnection", "Connect");
 	}
 
 }

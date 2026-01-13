@@ -61,16 +61,24 @@ partial class PersonDbContextKnockOff
 	/// <summary>The global::Person.Ef.IPersonDbContext instance. Use for passing to code expecting the interface.</summary>
 	public global::Person.Ef.IPersonDbContext Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::Person.Ef.IPersonDbContext.SavePerson(global::DomainModel.Person person)
 	{
 		SavePerson.RecordCall(person);
-		SavePerson.OnCall?.Invoke(this, person);
+		if (SavePerson.OnCall is { } onCallCallback)
+		{ onCallCallback(this, person); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IPersonDbContext", "SavePerson");
 	}
 
 	global::DomainModel.Person? global::Person.Ef.IPersonDbContext.GetPerson(int id)
 	{
 		GetPerson.RecordCall(id);
-		return GetPerson.OnCall?.Invoke(this, id) ?? default!;
+		if (GetPerson.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IPersonDbContext", "GetPerson");
+		return default!;
 	}
 
 }

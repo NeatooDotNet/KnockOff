@@ -61,16 +61,24 @@ partial class FcInventoryServiceStub
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IFcInventoryService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IFcInventoryService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	bool global::KnockOff.Documentation.Samples.Comparison.IFcInventoryService.ReserveItems(global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Comparison.FcOrderItem> items)
 	{
 		ReserveItems.RecordCall(items);
-		return ReserveItems.OnCall?.Invoke(this, items) ?? default!;
+		if (ReserveItems.OnCall is { } callback)
+			return callback(this, items);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFcInventoryService", "ReserveItems");
+		return default!;
 	}
 
 	void global::KnockOff.Documentation.Samples.Comparison.IFcInventoryService.ReleaseItems(global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Comparison.FcOrderItem> items)
 	{
 		ReleaseItems.RecordCall(items);
-		ReleaseItems.OnCall?.Invoke(this, items);
+		if (ReleaseItems.OnCall is { } onCallCallback)
+		{ onCallCallback(this, items); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFcInventoryService", "ReleaseItems");
 	}
 
 }

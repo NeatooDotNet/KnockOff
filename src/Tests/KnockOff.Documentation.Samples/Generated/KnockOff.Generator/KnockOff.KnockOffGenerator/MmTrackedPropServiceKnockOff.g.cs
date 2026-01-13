@@ -178,34 +178,37 @@ partial class MmTrackedPropServiceKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IMmTrackedPropService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.IMmTrackedPropService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	bool global::KnockOff.Documentation.Samples.Skills.IMmTrackedPropService.Active
 	{
-		get { Active.RecordGet(); return Active.OnGet?.Invoke(this) ?? Active.Value; }
-		set { Active.RecordSet(value); if (Active.OnSet != null) Active.OnSet(this, value); else Active.Value = value; }
+		get { Active.RecordGet(); if (Active.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmTrackedPropService", "Active"); return Active.Value; }
+		set { Active.RecordSet(value); if (Active.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmTrackedPropService", "Active"); Active.Value = value; }
 	}
 
 	global::System.DateTime global::KnockOff.Documentation.Samples.Skills.IMmTrackedPropService.NewDate
 	{
-		get { NewDate.RecordGet(); return NewDate.OnGet?.Invoke(this) ?? NewDate.Value; }
-		set { NewDate.RecordSet(value); if (NewDate.OnSet != null) NewDate.OnSet(this, value); else NewDate.Value = value; }
+		get { NewDate.RecordGet(); if (NewDate.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmTrackedPropService", "NewDate"); return NewDate.Value; }
+		set { NewDate.RecordSet(value); if (NewDate.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmTrackedPropService", "NewDate"); NewDate.Value = value; }
 	}
 
 	long global::KnockOff.Documentation.Samples.Skills.IMmTrackedPropService.VisitId
 	{
-		get { VisitId.RecordGet(); return VisitId.OnGet?.Invoke(this) ?? VisitId.Value; }
-		set { VisitId.RecordSet(value); if (VisitId.OnSet != null) VisitId.OnSet(this, value); else VisitId.Value = value; }
+		get { VisitId.RecordGet(); if (VisitId.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmTrackedPropService", "VisitId"); return VisitId.Value; }
+		set { VisitId.RecordSet(value); if (VisitId.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmTrackedPropService", "VisitId"); VisitId.Value = value; }
 	}
 
 	string global::KnockOff.Documentation.Samples.Skills.IMmTrackedPropService.VisitLabel
 	{
-		get { VisitLabel.RecordGet(); return VisitLabel.OnGet?.Invoke(this) ?? VisitLabel.Value; }
-		set { VisitLabel.RecordSet(value); if (VisitLabel.OnSet != null) VisitLabel.OnSet(this, value); else VisitLabel.Value = value; }
+		get { VisitLabel.RecordGet(); if (VisitLabel.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmTrackedPropService", "VisitLabel"); return VisitLabel.Value; }
+		set { VisitLabel.RecordSet(value); if (VisitLabel.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmTrackedPropService", "VisitLabel"); VisitLabel.Value = value; }
 	}
 
 	global::System.DateTime? global::KnockOff.Documentation.Samples.Skills.IMmTrackedPropService.PreviousVisitDate
 	{
-		get { PreviousVisitDate.RecordGet(); return PreviousVisitDate.OnGet?.Invoke(this) ?? PreviousVisitDate.Value; }
-		set { PreviousVisitDate.RecordSet(value); if (PreviousVisitDate.OnSet != null) PreviousVisitDate.OnSet(this, value); else PreviousVisitDate.Value = value; }
+		get { PreviousVisitDate.RecordGet(); if (PreviousVisitDate.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmTrackedPropService", "PreviousVisitDate"); return PreviousVisitDate.Value; }
+		set { PreviousVisitDate.RecordSet(value); if (PreviousVisitDate.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmTrackedPropService", "PreviousVisitDate"); PreviousVisitDate.Value = value; }
 	}
 
 }

@@ -120,28 +120,39 @@ partial class GenericRepositoryStub<T> where T : class
 	/// <summary>The global::KnockOff.Tests.IGenericRepository<T> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IGenericRepository<T> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	T? global::KnockOff.Tests.IGenericRepository<T>.GetById(int id)
 	{
 		GetById.RecordCall(id);
-		return GetById.OnCall?.Invoke(this, id) ?? default!;
+		if (GetById.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericRepository<T>", "GetById");
+		return default!;
 	}
 
 	void global::KnockOff.Tests.IGenericRepository<T>.Save(T entity)
 	{
 		Save.RecordCall(entity);
-		Save.OnCall?.Invoke(this, entity);
+		if (Save.OnCall is { } onCallCallback)
+		{ onCallCallback(this, entity); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericRepository<T>", "Save");
 	}
 
 	global::System.Collections.Generic.IEnumerable<T> global::KnockOff.Tests.IGenericRepository<T>.GetAll()
 	{
 		GetAll.RecordCall();
-		return GetAll.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<T>();
+		if (GetAll.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericRepository<T>", "GetAll");
+		return new global::System.Collections.Generic.List<T>();
 	}
 
 	int global::KnockOff.Tests.IGenericRepository<T>.Count
 	{
-		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? Count.Value; }
-		set { Count.RecordSet(value); if (Count.OnSet != null) Count.OnSet(this, value); else Count.Value = value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericRepository<T>", "Count"); return Count.Value; }
+		set { Count.RecordSet(value); if (Count.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericRepository<T>", "Count"); Count.Value = value; }
 	}
 
 }

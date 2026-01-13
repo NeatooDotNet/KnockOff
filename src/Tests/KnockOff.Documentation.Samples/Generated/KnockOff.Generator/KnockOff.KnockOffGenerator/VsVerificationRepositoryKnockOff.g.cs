@@ -108,28 +108,40 @@ partial class VsVerificationRepositoryKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository.Save(global::KnockOff.Documentation.Samples.Comparison.VsEntity entity)
 	{
 		Save.RecordCall(entity);
-		Save.OnCall?.Invoke(this, entity);
+		if (Save.OnCall is { } onCallCallback)
+		{ onCallCallback(this, entity); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IVsVerificationRepository", "Save");
 	}
 
 	void global::KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository.Delete(int id)
 	{
 		Delete.RecordCall(id);
-		Delete.OnCall?.Invoke(this, id);
+		if (Delete.OnCall is { } onCallCallback)
+		{ onCallCallback(this, id); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IVsVerificationRepository", "Delete");
 	}
 
 	global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Comparison.VsEntity> global::KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository.GetAll()
 	{
 		GetAll.RecordCall();
-		return GetAll.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Comparison.VsEntity>();
+		if (GetAll.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IVsVerificationRepository", "GetAll");
+		return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Comparison.VsEntity>();
 	}
 
 	void global::KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository.Update(global::KnockOff.Documentation.Samples.Comparison.VsEntity entity)
 	{
 		Update.RecordCall(entity);
-		Update.OnCall?.Invoke(this, entity);
+		if (Update.OnCall is { } onCallCallback)
+		{ onCallCallback(this, entity); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IVsVerificationRepository", "Update");
 	}
 
 }

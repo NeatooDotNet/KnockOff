@@ -38,6 +38,9 @@ partial class GuideDataServiceKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IGuideDataService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IGuideDataService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	event global::System.EventHandler<global::KnockOff.Documentation.Samples.Guides.DataChangedEventArgs>? global::KnockOff.Documentation.Samples.Guides.IGuideDataService.DataChanged
 	{
 		add => DataChanged.RecordAdd(value);

@@ -33,10 +33,15 @@ partial class MigProcessorKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IMigProcessor instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IMigProcessor Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Documentation.Samples.Comparison.IMigProcessor.Process(string data)
 	{
 		Process.RecordCall(data);
-		Process.OnCall?.Invoke(this, data);
+		if (Process.OnCall is { } onCallCallback)
+		{ onCallCallback(this, data); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMigProcessor", "Process");
 	}
 
 }

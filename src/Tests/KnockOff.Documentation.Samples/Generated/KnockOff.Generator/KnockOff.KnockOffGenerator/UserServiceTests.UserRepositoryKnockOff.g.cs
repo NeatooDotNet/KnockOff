@@ -63,16 +63,24 @@ partial class UserRepositoryKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.GettingStarted.IUserRepository instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.GettingStarted.IUserRepository Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Documentation.Samples.GettingStarted.User? global::KnockOff.Documentation.Samples.GettingStarted.IUserRepository.GetUser(int id)
 	{
 		GetUser.RecordCall(id);
-		return GetUser.OnCall?.Invoke(this, id) ?? default!;
+		if (GetUser.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserRepository", "GetUser");
+		return default!;
 	}
 
 	void global::KnockOff.Documentation.Samples.GettingStarted.IUserRepository.SaveUser(global::KnockOff.Documentation.Samples.GettingStarted.User user)
 	{
 		SaveUser.RecordCall(user);
-		SaveUser.OnCall?.Invoke(this, user);
+		if (SaveUser.OnCall is { } onCallCallback)
+		{ onCallCallback(this, user); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserRepository", "SaveUser");
 	}
 
 }

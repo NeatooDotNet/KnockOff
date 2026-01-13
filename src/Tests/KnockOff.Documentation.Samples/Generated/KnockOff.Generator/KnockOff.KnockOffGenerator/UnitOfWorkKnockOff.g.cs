@@ -30,10 +30,15 @@ partial class UnitOfWorkKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork.Commit()
 	{
 		Commit.RecordCall();
-		Commit.OnCall?.Invoke(this);
+		if (Commit.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IUnitOfWork", "Commit");
 	}
 
 }

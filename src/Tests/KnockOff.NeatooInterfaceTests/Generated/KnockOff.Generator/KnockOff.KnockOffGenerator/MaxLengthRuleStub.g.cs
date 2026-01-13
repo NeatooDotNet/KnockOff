@@ -215,14 +215,17 @@ partial class MaxLengthRuleStub
 	/// <summary>The global::Neatoo.Rules.Rules.IMaxLengthRule instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.Rules.Rules.IMaxLengthRule Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	string global::Neatoo.Rules.Rules.IMaxLengthRule.ErrorMessage
 	{
-		get { ErrorMessage.RecordGet(); return ErrorMessage.OnGet?.Invoke(this) ?? ErrorMessage.Value; }
+		get { ErrorMessage.RecordGet(); if (ErrorMessage.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IMaxLengthRule", "ErrorMessage"); return ErrorMessage.Value; }
 	}
 
 	int global::Neatoo.Rules.Rules.IMaxLengthRule.Length
 	{
-		get { Length.RecordGet(); return Length.OnGet?.Invoke(this) ?? Length.Value; }
+		get { Length.RecordGet(); if (Length.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IMaxLengthRule", "Length"); return Length.Value; }
 	}
 
 	global::System.Threading.Tasks.Task<global::Neatoo.Rules.IRuleMessages> global::Neatoo.Rules.IRule.RunRule(global::Neatoo.IValidateBase target, global::System.Threading.CancellationToken? token)
@@ -230,38 +233,41 @@ partial class MaxLengthRuleStub
 		RunRule.RecordCall(target, token);
 		if (RunRule.OnCall is { } callback)
 			return callback(this, target, token);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "RunRule");
 		throw new global::System.InvalidOperationException("No implementation provided for RunRule. Set RunRule.OnCall or define a protected method 'RunRule' in your partial class.");
 	}
 
 	void global::Neatoo.Rules.IRule.OnRuleAdded(global::Neatoo.Rules.IRuleManager ruleManager, uint uniqueIndex)
 	{
 		OnRuleAdded.RecordCall(ruleManager, uniqueIndex);
-		OnRuleAdded.OnCall?.Invoke(this, ruleManager, uniqueIndex);
+		if (OnRuleAdded.OnCall is { } onCallCallback)
+		{ onCallCallback(this, ruleManager, uniqueIndex); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "OnRuleAdded");
 	}
 
 	bool global::Neatoo.Rules.IRule.Executed
 	{
-		get { Executed.RecordGet(); return Executed.OnGet?.Invoke(this) ?? Executed.Value; }
+		get { Executed.RecordGet(); if (Executed.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "Executed"); return Executed.Value; }
 	}
 
 	int global::Neatoo.Rules.IRule.RuleOrder
 	{
-		get { RuleOrder.RecordGet(); return RuleOrder.OnGet?.Invoke(this) ?? RuleOrder.Value; }
+		get { RuleOrder.RecordGet(); if (RuleOrder.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "RuleOrder"); return RuleOrder.Value; }
 	}
 
 	uint global::Neatoo.Rules.IRule.UniqueIndex
 	{
-		get { UniqueIndex.RecordGet(); return UniqueIndex.OnGet?.Invoke(this) ?? UniqueIndex.Value; }
+		get { UniqueIndex.RecordGet(); if (UniqueIndex.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "UniqueIndex"); return UniqueIndex.Value; }
 	}
 
 	global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.IRuleMessage> global::Neatoo.Rules.IRule.Messages
 	{
-		get { Messages.RecordGet(); return Messages.OnGet?.Invoke(this) ?? Messages.Value; }
+		get { Messages.RecordGet(); if (Messages.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "Messages"); return Messages.Value; }
 	}
 
 	global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.ITriggerProperty> global::Neatoo.Rules.IRule.TriggerProperties
 	{
-		get { TriggerProperties.RecordGet(); return TriggerProperties.OnGet?.Invoke(this) ?? TriggerProperties.Value; }
+		get { TriggerProperties.RecordGet(); if (TriggerProperties.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "TriggerProperties"); return TriggerProperties.Value; }
 	}
 
 }

@@ -95,16 +95,22 @@ partial class SkDataServiceKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkDataService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ISkDataService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	string global::KnockOff.Documentation.Samples.Skills.ISkDataService.Name
 	{
-		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else Name.Value = value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkDataService", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkDataService", "Name"); Name.Value = value; }
 	}
 
 	string? global::KnockOff.Documentation.Samples.Skills.ISkDataService.GetDescription(int id)
 	{
 		GetDescription.RecordCall(id);
-		return GetDescription.OnCall?.Invoke(this, id) ?? default!;
+		if (GetDescription.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkDataService", "GetDescription");
+		return default!;
 	}
 
 	int global::KnockOff.Documentation.Samples.Skills.ISkDataService.GetCount()

@@ -189,24 +189,32 @@ partial class FcCacheServiceStub
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IFcCacheService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IFcCacheService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	T? global::KnockOff.Documentation.Samples.Comparison.IFcCacheService.Get<T>(string key) where T : class
 	{
 		Get.Of<T>().RecordCall(key);
 		if (Get.Of<T>().OnCall is { } callback)
 			return callback(this, key);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFcCacheService", "Get");
 		return default!;
 	}
 
 	void global::KnockOff.Documentation.Samples.Comparison.IFcCacheService.Set<T>(string key, T @value, global::System.TimeSpan expiration) where T : class
 	{
 		Set.Of<T>().RecordCall(key);
-		Set.Of<T>().OnCall?.Invoke(this, key, @value, expiration);
+		if (Set.Of<T>().OnCall is { } onCallCallback)
+		{ onCallCallback(this, key, @value, expiration); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFcCacheService", "Set");
 	}
 
 	void global::KnockOff.Documentation.Samples.Comparison.IFcCacheService.Remove(string key)
 	{
 		Remove.RecordCall(key);
-		Remove.OnCall?.Invoke(this, key);
+		if (Remove.OnCall is { } onCallCallback)
+		{ onCallCallback(this, key); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFcCacheService", "Remove");
 	}
 
 }

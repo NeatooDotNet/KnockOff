@@ -86,22 +86,33 @@ partial class PatternCallbackServiceKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Concepts.IPatternCallbackService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Concepts.IPatternCallbackService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Documentation.Samples.Concepts.IPatternCallbackService.DoSomething()
 	{
 		DoSomething.RecordCall();
-		DoSomething.OnCall?.Invoke(this);
+		if (DoSomething.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IPatternCallbackService", "DoSomething");
 	}
 
 	global::KnockOff.Documentation.Samples.Concepts.PatternUser global::KnockOff.Documentation.Samples.Concepts.IPatternCallbackService.GetUser(int id)
 	{
 		GetUser.RecordCall(id);
-		return GetUser.OnCall?.Invoke(this, id) ?? new global::KnockOff.Documentation.Samples.Concepts.PatternUser();
+		if (GetUser.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IPatternCallbackService", "GetUser");
+		return new global::KnockOff.Documentation.Samples.Concepts.PatternUser();
 	}
 
 	int global::KnockOff.Documentation.Samples.Concepts.IPatternCallbackService.Calculate(string name, int @value, bool flag)
 	{
 		Calculate.RecordCall(name, @value, flag);
-		return Calculate.OnCall?.Invoke(this, name, @value, flag) ?? default!;
+		if (Calculate.OnCall is { } callback)
+			return callback(this, name, @value, flag);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IPatternCallbackService", "Calculate");
+		return default!;
 	}
 
 }

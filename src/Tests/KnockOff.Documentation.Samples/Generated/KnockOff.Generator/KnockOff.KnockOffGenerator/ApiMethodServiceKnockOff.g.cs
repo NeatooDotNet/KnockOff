@@ -83,22 +83,32 @@ partial class ApiMethodServiceKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Reference.IApiMethodService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Reference.IApiMethodService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Documentation.Samples.Reference.IApiMethodService.Initialize()
 	{
 		Initialize.RecordCall();
-		Initialize.OnCall?.Invoke(this);
+		if (Initialize.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IApiMethodService", "Initialize");
 	}
 
 	global::KnockOff.Documentation.Samples.Reference.ApiUser global::KnockOff.Documentation.Samples.Reference.IApiMethodService.GetById(int id)
 	{
 		GetById.RecordCall(id);
-		return GetById.OnCall?.Invoke(this, id) ?? new global::KnockOff.Documentation.Samples.Reference.ApiUser();
+		if (GetById.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IApiMethodService", "GetById");
+		return new global::KnockOff.Documentation.Samples.Reference.ApiUser();
 	}
 
 	void global::KnockOff.Documentation.Samples.Reference.IApiMethodService.Log(string level, string message)
 	{
 		Log.RecordCall(level, message);
-		Log.OnCall?.Invoke(this, level, message);
+		if (Log.OnCall is { } onCallCallback)
+		{ onCallCallback(this, level, message); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IApiMethodService", "Log");
 	}
 
 }

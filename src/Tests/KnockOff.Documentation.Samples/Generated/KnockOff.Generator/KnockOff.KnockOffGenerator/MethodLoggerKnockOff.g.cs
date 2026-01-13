@@ -58,16 +58,23 @@ partial class MethodLoggerKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IMethodLogger instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IMethodLogger Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Documentation.Samples.Guides.IMethodLogger.Log(string message)
 	{
 		Log.RecordCall(message);
-		Log.OnCall?.Invoke(this, message);
+		if (Log.OnCall is { } onCallCallback)
+		{ onCallCallback(this, message); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMethodLogger", "Log");
 	}
 
 	void global::KnockOff.Documentation.Samples.Guides.IMethodLogger.LogError(string message, global::System.Exception ex)
 	{
 		LogError.RecordCall(message, ex);
-		LogError.OnCall?.Invoke(this, message, ex);
+		if (LogError.OnCall is { } onCallCallback)
+		{ onCallCallback(this, message, ex); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMethodLogger", "LogError");
 	}
 
 }

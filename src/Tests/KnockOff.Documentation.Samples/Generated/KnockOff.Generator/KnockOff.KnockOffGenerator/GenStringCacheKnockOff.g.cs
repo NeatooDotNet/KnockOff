@@ -61,16 +61,24 @@ partial class GenStringCacheKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IGenCache<string, global::KnockOff.Documentation.Samples.Guides.GenUser> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IGenCache<string, global::KnockOff.Documentation.Samples.Guides.GenUser> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Documentation.Samples.Guides.GenUser? global::KnockOff.Documentation.Samples.Guides.IGenCache<string, global::KnockOff.Documentation.Samples.Guides.GenUser>.Get(string key)
 	{
 		Get.RecordCall(key);
-		return Get.OnCall?.Invoke(this, key) ?? default!;
+		if (Get.OnCall is { } callback)
+			return callback(this, key);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("GenUser>", "Get");
+		return default!;
 	}
 
 	void global::KnockOff.Documentation.Samples.Guides.IGenCache<string, global::KnockOff.Documentation.Samples.Guides.GenUser>.Set(string key, global::KnockOff.Documentation.Samples.Guides.GenUser @value)
 	{
 		Set.RecordCall(key, @value);
-		Set.OnCall?.Invoke(this, key, @value);
+		if (Set.OnCall is { } onCallCallback)
+		{ onCallCallback(this, key, @value); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("GenUser>", "Set");
 	}
 
 }

@@ -30,10 +30,15 @@ partial class DisposableKnockOff
 	/// <summary>The global::System.IDisposable instance. Use for passing to code expecting the interface.</summary>
 	public global::System.IDisposable Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::System.IDisposable.Dispose()
 	{
 		Dispose.RecordCall();
-		Dispose.OnCall?.Invoke(this);
+		if (Dispose.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IDisposable", "Dispose");
 	}
 
 }

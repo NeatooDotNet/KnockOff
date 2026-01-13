@@ -58,6 +58,9 @@ partial class DataProviderKnockOff
 	/// <summary>The global::KnockOff.Tests.IDataProvider instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IDataProvider Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	string global::KnockOff.Tests.IDataProvider.GetData(int id)
 	{
 		GetData2.RecordCall(id);
@@ -67,7 +70,7 @@ partial class DataProviderKnockOff
 
 	int global::KnockOff.Tests.IDataProvider.Count
 	{
-		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? Count.Value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IDataProvider", "Count"); return Count.Value; }
 	}
 
 }

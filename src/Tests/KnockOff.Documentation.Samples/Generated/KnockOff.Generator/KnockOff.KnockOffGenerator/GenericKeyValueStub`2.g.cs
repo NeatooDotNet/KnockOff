@@ -61,16 +61,24 @@ partial class GenericKeyValueStub<TKey, TValue> where TKey : notnull where TValu
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IGenericKeyValue<TKey, TValue> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IGenericKeyValue<TKey, TValue> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	TValue? global::KnockOff.Documentation.Samples.Guides.IGenericKeyValue<TKey, TValue>.Get(TKey key)
 	{
 		Get.RecordCall(key);
-		return Get.OnCall?.Invoke(this, key) ?? default!;
+		if (Get.OnCall is { } callback)
+			return callback(this, key);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericKeyValue<TKey, TValue>", "Get");
+		return default!;
 	}
 
 	void global::KnockOff.Documentation.Samples.Guides.IGenericKeyValue<TKey, TValue>.Set(TKey key, TValue @value)
 	{
 		Set.RecordCall(key, @value);
-		Set.OnCall?.Invoke(this, key, @value);
+		if (Set.OnCall is { } onCallCallback)
+		{ onCallCallback(this, key, @value); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericKeyValue<TKey, TValue>", "Set");
 	}
 
 }

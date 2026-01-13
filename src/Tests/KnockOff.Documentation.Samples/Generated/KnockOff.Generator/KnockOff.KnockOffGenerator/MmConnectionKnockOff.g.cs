@@ -30,10 +30,15 @@ partial class MmConnectionKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IMmConnectionService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.IMmConnectionService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Documentation.Samples.Skills.IMmConnectionService.Connect()
 	{
 		Connect.RecordCall();
-		Connect.OnCall?.Invoke(this);
+		if (Connect.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmConnectionService", "Connect");
 	}
 
 }

@@ -35,11 +35,22 @@ partial class CloneableStubTests
 			{
 				Clone.RecordCall();
 				if (Clone.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("ICloneable", "Clone");
 				return new object();
 			}
 
 			/// <summary>The global::System.ICloneable instance. Use for passing to code expecting the interface.</summary>
 			public global::System.ICloneable Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public ICloneable(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

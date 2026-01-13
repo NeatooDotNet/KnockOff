@@ -241,6 +241,7 @@ partial class DbConnectionStubTests
 			{
 				BeginTransaction.RecordCall(null);
 				if (BeginTransaction.OnCall is { } onCall) return onCall(this, null);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbConnection", "BeginTransaction");
 				throw new global::System.InvalidOperationException("No implementation provided for BeginTransaction. Set BeginTransaction.OnCall.");
 			}
 
@@ -248,32 +249,37 @@ partial class DbConnectionStubTests
 			{
 				BeginTransaction.RecordCall(il);
 				if (BeginTransaction.OnCall is { } onCall) return onCall(this, il);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbConnection", "BeginTransaction");
 				throw new global::System.InvalidOperationException("No implementation provided for BeginTransaction. Set BeginTransaction.OnCall.");
 			}
 
 			void global::System.Data.IDbConnection.ChangeDatabase(string databaseName)
 			{
 				ChangeDatabase.RecordCall(databaseName);
-				if (ChangeDatabase.OnCall is { } onCall) onCall(this, databaseName);
+				if (ChangeDatabase.OnCall is { } onCall) { onCall(this, databaseName); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbConnection", "ChangeDatabase");
 			}
 
 			void global::System.Data.IDbConnection.Close()
 			{
 				Close.RecordCall();
-				if (Close.OnCall is { } onCall) onCall(this);
+				if (Close.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbConnection", "Close");
 			}
 
 			global::System.Data.IDbCommand global::System.Data.IDbConnection.CreateCommand()
 			{
 				CreateCommand.RecordCall();
 				if (CreateCommand.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbConnection", "CreateCommand");
 				throw new global::System.InvalidOperationException("No implementation provided for CreateCommand. Set CreateCommand.OnCall.");
 			}
 
 			void global::System.Data.IDbConnection.Open()
 			{
 				Open.RecordCall();
-				if (Open.OnCall is { } onCall) onCall(this);
+				if (Open.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbConnection", "Open");
 			}
 
 			string global::System.Data.IDbConnection.ConnectionString
@@ -282,14 +288,16 @@ partial class DbConnectionStubTests
 				{
 					ConnectionString.RecordGet();
 					if (ConnectionString.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbConnection", "ConnectionString");
 					return ConnectionString.Value;
 				}
 #pragma warning disable CS8769
 				set
 				{
 					ConnectionString.RecordSet(value);
-					if (ConnectionString.OnSet is { } onSet) onSet(this, value);
-					else ConnectionString.Value = value;
+					if (ConnectionString.OnSet is { } onSet) { onSet(this, value); return; }
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbConnection", "ConnectionString");
+					ConnectionString.Value = value;
 				}
 
 #pragma warning restore CS8769
@@ -301,6 +309,7 @@ partial class DbConnectionStubTests
 				{
 					ConnectionTimeout.RecordGet();
 					if (ConnectionTimeout.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbConnection", "ConnectionTimeout");
 					return ConnectionTimeout.Value;
 				}
 			}
@@ -311,6 +320,7 @@ partial class DbConnectionStubTests
 				{
 					Database.RecordGet();
 					if (Database.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbConnection", "Database");
 					return Database.Value;
 				}
 			}
@@ -321,6 +331,7 @@ partial class DbConnectionStubTests
 				{
 					State.RecordGet();
 					if (State.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbConnection", "State");
 					return State.Value;
 				}
 			}
@@ -328,11 +339,22 @@ partial class DbConnectionStubTests
 			void global::System.IDisposable.Dispose()
 			{
 				Dispose.RecordCall();
-				if (Dispose.OnCall is { } onCall) onCall(this);
+				if (Dispose.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDisposable", "Dispose");
 			}
 
 			/// <summary>The global::System.Data.IDbConnection instance. Use for passing to code expecting the interface.</summary>
 			public global::System.Data.IDbConnection Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IDbConnection(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

@@ -33,10 +33,16 @@ partial class AsyncNestedStub<T> where T : class
 	/// <summary>The global::KnockOff.Tests.IAsyncNestedService<T> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IAsyncNestedService<T> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::System.Threading.Tasks.Task<T?> global::KnockOff.Tests.IAsyncNestedService<T>.GetAsync()
 	{
 		GetAsync.RecordCall();
-		return GetAsync.OnCall?.Invoke(this) ?? global::System.Threading.Tasks.Task.FromResult<T?>(default!);
+		if (GetAsync.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncNestedService<T>", "GetAsync");
+		return global::System.Threading.Tasks.Task.FromResult<T?>(default!);
 	}
 
 }

@@ -210,6 +210,7 @@ partial class IPropertyInfoTests
 				typedHandler.RecordCall();
 				if (typedHandler.OnCall is { } onCallCallback)
 					return onCallCallback(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "GetCustomAttribute");
 				return default!;
 			}
 
@@ -217,6 +218,7 @@ partial class IPropertyInfoTests
 			{
 				GetCustomAttributes.RecordCall();
 				if (GetCustomAttributes.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "GetCustomAttributes");
 				return new global::System.Collections.Generic.List<global::System.Attribute>();
 			}
 
@@ -226,6 +228,7 @@ partial class IPropertyInfoTests
 				{
 					PropertyInfo.RecordGet();
 					if (PropertyInfo.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "PropertyInfo");
 					return PropertyInfo.Value;
 				}
 			}
@@ -236,6 +239,7 @@ partial class IPropertyInfoTests
 				{
 					Name.RecordGet();
 					if (Name.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "Name");
 					return Name.Value;
 				}
 			}
@@ -246,6 +250,7 @@ partial class IPropertyInfoTests
 				{
 					Type.RecordGet();
 					if (Type.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "Type");
 					return Type.Value;
 				}
 			}
@@ -256,6 +261,7 @@ partial class IPropertyInfoTests
 				{
 					Key.RecordGet();
 					if (Key.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "Key");
 					return Key.Value;
 				}
 			}
@@ -266,12 +272,23 @@ partial class IPropertyInfoTests
 				{
 					IsPrivateSetter.RecordGet();
 					if (IsPrivateSetter.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "IsPrivateSetter");
 					return IsPrivateSetter.Value;
 				}
 			}
 
 			/// <summary>The global::Neatoo.IPropertyInfo instance. Use for passing to code expecting the interface.</summary>
 			public global::Neatoo.IPropertyInfo Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IPropertyInfo(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 			/// <summary>Gets a smart default value for a generic type at runtime.</summary>
 			private static T SmartDefault<T>(string methodName)

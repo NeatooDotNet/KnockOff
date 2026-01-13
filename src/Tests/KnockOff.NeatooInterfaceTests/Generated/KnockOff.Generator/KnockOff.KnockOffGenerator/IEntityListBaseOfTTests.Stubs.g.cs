@@ -721,7 +721,8 @@ partial class IEntityListBaseOfTTests
 			void global::Neatoo.IEntityListBase<global::Neatoo.IEntityBase>.RemoveAt(int index)
 			{
 				RemoveAt.RecordCall(index);
-				if (RemoveAt.OnCall is { } onCall) onCall(this, index);
+				if (RemoveAt.OnCall is { } onCall) { onCall(this, index); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "RemoveAt");
 			}
 
 			global::Neatoo.IValidateBase? global::Neatoo.IValidateListBase<global::Neatoo.IEntityBase>.Parent
@@ -730,6 +731,7 @@ partial class IEntityListBaseOfTTests
 				{
 					Parent.RecordGet();
 					if (Parent.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "Parent");
 					return Parent.Value;
 				}
 			}
@@ -738,19 +740,22 @@ partial class IEntityListBaseOfTTests
 			{
 				IndexOf.RecordCall(item);
 				if (IndexOf.OnCall is { } onCall) return onCall(this, item);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "IndexOf");
 				return default!;
 			}
 
 			void global::System.Collections.Generic.IList<global::Neatoo.IEntityBase>.Insert(int index, global::Neatoo.IEntityBase item)
 			{
 				Insert.RecordCall(index, item);
-				if (Insert.OnCall is { } onCall) onCall(this, index, item);
+				if (Insert.OnCall is { } onCall) { onCall(this, index, item); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "Insert");
 			}
 
 			void global::System.Collections.Generic.IList<global::Neatoo.IEntityBase>.RemoveAt(int index)
 			{
 				RemoveAt.RecordCall(index);
-				if (RemoveAt.OnCall is { } onCall) onCall(this, index);
+				if (RemoveAt.OnCall is { } onCall) { onCall(this, index); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "RemoveAt");
 			}
 
 			global::Neatoo.IEntityBase global::System.Collections.Generic.IList<global::Neatoo.IEntityBase>.this[int index]
@@ -759,45 +764,52 @@ partial class IEntityListBaseOfTTests
 				{
 					Indexer.RecordGet(index);
 					if (Indexer.OnGet is { } onGet) return onGet(this, index);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "this[]");
 					return Indexer.Backing.TryGetValue(index, out var v) ? v : default!;
 				}
 				set
 				{
 					Indexer.RecordSet(index, value);
-					if (Indexer.OnSet is { } onSet) onSet(this, index, value);
-					else Indexer.Backing[index] = value;
+					if (Indexer.OnSet is { } onSet) { onSet(this, index, value); return; }
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "this[]");
+					Indexer.Backing[index] = value;
 				}
 			}
 
 			void global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>.Add(global::Neatoo.IEntityBase item)
 			{
 				Add.RecordCall(item);
-				if (Add.OnCall is { } onCall) onCall(this, item);
+				if (Add.OnCall is { } onCall) { onCall(this, item); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "Add");
 			}
 
 			void global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>.Clear()
 			{
 				Clear.RecordCall();
-				if (Clear.OnCall is { } onCall) onCall(this);
+				if (Clear.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "Clear");
 			}
 
 			bool global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>.Contains(global::Neatoo.IEntityBase item)
 			{
 				Contains.RecordCall(item);
 				if (Contains.OnCall is { } onCall) return onCall(this, item);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "Contains");
 				return default!;
 			}
 
 			void global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>.CopyTo(global::Neatoo.IEntityBase[] array, int arrayIndex)
 			{
 				CopyTo.RecordCall(array, arrayIndex);
-				if (CopyTo.OnCall is { } onCall) onCall(this, array, arrayIndex);
+				if (CopyTo.OnCall is { } onCall) { onCall(this, array, arrayIndex); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "CopyTo");
 			}
 
 			bool global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>.Remove(global::Neatoo.IEntityBase item)
 			{
 				Remove.RecordCall(item);
 				if (Remove.OnCall is { } onCall) return onCall(this, item);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "Remove");
 				return default!;
 			}
 
@@ -807,6 +819,7 @@ partial class IEntityListBaseOfTTests
 				{
 					Count.RecordGet();
 					if (Count.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "Count");
 					return Count.Value;
 				}
 			}
@@ -817,6 +830,7 @@ partial class IEntityListBaseOfTTests
 				{
 					IsReadOnly.RecordGet();
 					if (IsReadOnly.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "IsReadOnly");
 					return IsReadOnly.Value;
 				}
 			}
@@ -825,6 +839,7 @@ partial class IEntityListBaseOfTTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
@@ -832,6 +847,7 @@ partial class IEntityListBaseOfTTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
@@ -839,6 +855,7 @@ partial class IEntityListBaseOfTTests
 			{
 				WaitForTasks.RecordCall(null);
 				if (WaitForTasks.OnCall is { } onCall) return onCall(this, null);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -846,6 +863,7 @@ partial class IEntityListBaseOfTTests
 			{
 				WaitForTasks.RecordCall(token);
 				if (WaitForTasks.OnCall is { } onCall) return onCall(this, token);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -853,6 +871,7 @@ partial class IEntityListBaseOfTTests
 			{
 				RunRules.RecordCall(propertyName, token, null);
 				if (RunRules.OnCall is { } onCall) return onCall(this, propertyName, token, null);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -860,19 +879,22 @@ partial class IEntityListBaseOfTTests
 			{
 				RunRules.RecordCall(null, token, runRules);
 				if (RunRules.OnCall is { } onCall) return onCall(this, null, token, runRules);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
 			void global::Neatoo.IValidateMetaProperties.ClearAllMessages()
 			{
 				ClearAllMessages.RecordCall();
-				if (ClearAllMessages.OnCall is { } onCall) onCall(this);
+				if (ClearAllMessages.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "ClearAllMessages");
 			}
 
 			void global::Neatoo.IValidateMetaProperties.ClearSelfMessages()
 			{
 				ClearSelfMessages.RecordCall();
-				if (ClearSelfMessages.OnCall is { } onCall) onCall(this);
+				if (ClearSelfMessages.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "ClearSelfMessages");
 			}
 
 			bool global::Neatoo.IValidateMetaProperties.IsBusy
@@ -881,6 +903,7 @@ partial class IEntityListBaseOfTTests
 				{
 					IsBusy.RecordGet();
 					if (IsBusy.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsBusy");
 					return IsBusy.Value;
 				}
 			}
@@ -891,6 +914,7 @@ partial class IEntityListBaseOfTTests
 				{
 					IsValid.RecordGet();
 					if (IsValid.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsValid");
 					return IsValid.Value;
 				}
 			}
@@ -901,6 +925,7 @@ partial class IEntityListBaseOfTTests
 				{
 					IsSelfValid.RecordGet();
 					if (IsSelfValid.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsSelfValid");
 					return IsSelfValid.Value;
 				}
 			}
@@ -911,6 +936,7 @@ partial class IEntityListBaseOfTTests
 				{
 					PropertyMessages.RecordGet();
 					if (PropertyMessages.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "PropertyMessages");
 					return PropertyMessages.Value;
 				}
 			}
@@ -921,6 +947,7 @@ partial class IEntityListBaseOfTTests
 				{
 					IsChild.RecordGet();
 					if (IsChild.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsChild");
 					return IsChild.Value;
 				}
 			}
@@ -931,6 +958,7 @@ partial class IEntityListBaseOfTTests
 				{
 					IsModified.RecordGet();
 					if (IsModified.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsModified");
 					return IsModified.Value;
 				}
 			}
@@ -941,6 +969,7 @@ partial class IEntityListBaseOfTTests
 				{
 					IsSelfModified.RecordGet();
 					if (IsSelfModified.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsSelfModified");
 					return IsSelfModified.Value;
 				}
 			}
@@ -951,6 +980,7 @@ partial class IEntityListBaseOfTTests
 				{
 					IsMarkedModified.RecordGet();
 					if (IsMarkedModified.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsMarkedModified");
 					return IsMarkedModified.Value;
 				}
 			}
@@ -961,6 +991,7 @@ partial class IEntityListBaseOfTTests
 				{
 					IsSavable.RecordGet();
 					if (IsSavable.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsSavable");
 					return IsSavable.Value;
 				}
 			}
@@ -971,6 +1002,7 @@ partial class IEntityListBaseOfTTests
 				{
 					IsDeleted.RecordGet();
 					if (IsDeleted.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IFactorySaveMeta", "IsDeleted");
 					return IsDeleted.Value;
 				}
 			}
@@ -981,6 +1013,7 @@ partial class IEntityListBaseOfTTests
 				{
 					IsNew.RecordGet();
 					if (IsNew.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IFactorySaveMeta", "IsNew");
 					return IsNew.Value;
 				}
 			}
@@ -1005,6 +1038,16 @@ partial class IEntityListBaseOfTTests
 
 			/// <summary>The global::Neatoo.IEntityListBase<global::Neatoo.IEntityBase> instance. Use for passing to code expecting the interface.</summary>
 			public global::Neatoo.IEntityListBase<global::Neatoo.IEntityBase> Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IEntityListBase(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

@@ -64,6 +64,9 @@ partial class CalculatorKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.ReadMe.ICalculator instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.ReadMe.ICalculator Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	int global::KnockOff.Documentation.Samples.ReadMe.ICalculator.Add(int a, int b)
 	{
 		Add2.RecordCall(a, b);
@@ -74,7 +77,10 @@ partial class CalculatorKnockOff
 	int global::KnockOff.Documentation.Samples.ReadMe.ICalculator.Multiply(int a, int b)
 	{
 		Multiply.RecordCall(a, b);
-		return Multiply.OnCall?.Invoke(this, a, b) ?? default!;
+		if (Multiply.OnCall is { } callback)
+			return callback(this, a, b);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ICalculator", "Multiply");
+		return default!;
 	}
 
 }

@@ -58,16 +58,24 @@ partial class StructConstraintStub<T> where T : struct
 	/// <summary>The global::KnockOff.Tests.IStructConstraintService<T> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IStructConstraintService<T> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	T global::KnockOff.Tests.IStructConstraintService<T>.GetDefault()
 	{
 		GetDefault.RecordCall();
-		return GetDefault.OnCall?.Invoke(this) ?? default!;
+		if (GetDefault.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IStructConstraintService<T>", "GetDefault");
+		return default!;
 	}
 
 	void global::KnockOff.Tests.IStructConstraintService<T>.Set(T @value)
 	{
 		Set.RecordCall(@value);
-		Set.OnCall?.Invoke(this, @value);
+		if (Set.OnCall is { } onCallCallback)
+		{ onCallCallback(this, @value); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IStructConstraintService<T>", "Set");
 	}
 
 }

@@ -58,16 +58,25 @@ partial class AsyncCallOrderKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IAsyncCallOrder instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IAsyncCallOrder Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::System.Threading.Tasks.Task global::KnockOff.Documentation.Samples.Guides.IAsyncCallOrder.StartAsync()
 	{
 		StartAsync.RecordCall();
-		return StartAsync.OnCall?.Invoke(this) ?? global::System.Threading.Tasks.Task.CompletedTask;
+		if (StartAsync.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncCallOrder", "StartAsync");
+		return global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
 	global::System.Threading.Tasks.Task global::KnockOff.Documentation.Samples.Guides.IAsyncCallOrder.ProcessAsync()
 	{
 		ProcessAsync.RecordCall();
-		return ProcessAsync.OnCall?.Invoke(this) ?? global::System.Threading.Tasks.Task.CompletedTask;
+		if (ProcessAsync.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncCallOrder", "ProcessAsync");
+		return global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
 }

@@ -293,6 +293,29 @@ snippet: skill-SKILL-smart-defaults
 | `IDictionary<K,V>`, `IReadOnlyDictionary<K,V>` | `Dictionary<K,V>` |
 | `ISet<T>` | `HashSet<T>` |
 
+## Strict Mode
+
+By default, stubs return smart defaults for unconfigured methods. **Strict mode** throws `StubException` instead.
+
+<!-- pseudo:skill-strict-mode-quick -->
+```csharp
+// Standalone - set property
+var stub = new UserServiceKnockOff();
+stub.Strict = true;
+
+// Inline - constructor parameter
+var stub = new Stubs.IUserService(strict: true);
+
+// Attribute default
+[KnockOff(Strict = true)]
+public partial class StrictServiceKnockOff : IUserService { }
+```
+<!-- /snippet -->
+
+Unconfigured calls throw `StubException`. Configure `OnCall`/`OnGet`/`OnSet` for expected interactions.
+
+See [Strict Mode](strict-mode.md) for detailed patterns and Moq migration.
+
 ## Stub Minimalism
 
 **Only stub what the test needs.** Don't implement every interface member.
@@ -579,6 +602,7 @@ For detailed guidance, see:
 - [Customization Patterns](customization-patterns.md) - Deep dive on user methods vs callbacks
 - [Interceptor API Reference](interceptor-api.md) - Complete API for all interceptor types
 - [Moq Migration](moq-migration.md) - Step-by-step migration patterns
+- [Strict Mode](strict-mode.md) - Throwing on unconfigured calls
 - [Version Migrations](migrations.md) - Breaking changes and upgrade guides
 
 ## Skill Sync Status

@@ -61,16 +61,24 @@ partial class MultiRepositoryKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IMultiRepository instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IMultiRepository Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Documentation.Samples.Guides.MultiUser? global::KnockOff.Documentation.Samples.Guides.IMultiRepository.GetById(int id)
 	{
 		GetById.RecordCall(id);
-		return GetById.OnCall?.Invoke(this, id) ?? default!;
+		if (GetById.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMultiRepository", "GetById");
+		return default!;
 	}
 
 	void global::KnockOff.Documentation.Samples.Guides.IMultiRepository.Add(global::KnockOff.Documentation.Samples.Guides.MultiUser user)
 	{
 		Add.RecordCall(user);
-		Add.OnCall?.Invoke(this, user);
+		if (Add.OnCall is { } onCallCallback)
+		{ onCallCallback(this, user); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMultiRepository", "Add");
 	}
 
 }

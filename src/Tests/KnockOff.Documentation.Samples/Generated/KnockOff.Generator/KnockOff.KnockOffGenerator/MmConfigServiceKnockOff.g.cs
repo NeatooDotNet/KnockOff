@@ -33,6 +33,9 @@ partial class MmConfigServiceKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IMmConfigService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.IMmConfigService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Documentation.Samples.Skills.MmConfig global::KnockOff.Documentation.Samples.Skills.IMmConfigService.GetConfig()
 	{
 		GetConfig2.RecordCall();

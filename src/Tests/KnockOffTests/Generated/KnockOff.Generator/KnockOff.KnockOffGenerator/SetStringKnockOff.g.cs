@@ -476,110 +476,154 @@ partial class SetStringKnockOff
 	/// <summary>The global::System.Collections.Generic.ISet<string> instance. Use for passing to code expecting the interface.</summary>
 	public global::System.Collections.Generic.ISet<string> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	bool global::System.Collections.Generic.ISet<string>.Add(string item)
 	{
 		Add.RecordCall(item);
-		return Add.OnCall?.Invoke(this, item) ?? default!;
+		if (Add.OnCall is { } callback)
+			return callback(this, item);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISet<string>", "Add");
+		return default!;
 	}
 
 	void global::System.Collections.Generic.ISet<string>.ExceptWith(global::System.Collections.Generic.IEnumerable<string> other)
 	{
 		ExceptWith.RecordCall(other);
-		ExceptWith.OnCall?.Invoke(this, other);
+		if (ExceptWith.OnCall is { } onCallCallback)
+		{ onCallCallback(this, other); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISet<string>", "ExceptWith");
 	}
 
 	void global::System.Collections.Generic.ISet<string>.IntersectWith(global::System.Collections.Generic.IEnumerable<string> other)
 	{
 		IntersectWith.RecordCall(other);
-		IntersectWith.OnCall?.Invoke(this, other);
+		if (IntersectWith.OnCall is { } onCallCallback)
+		{ onCallCallback(this, other); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISet<string>", "IntersectWith");
 	}
 
 	bool global::System.Collections.Generic.ISet<string>.IsProperSubsetOf(global::System.Collections.Generic.IEnumerable<string> other)
 	{
 		IsProperSubsetOf.RecordCall(other);
-		return IsProperSubsetOf.OnCall?.Invoke(this, other) ?? default!;
+		if (IsProperSubsetOf.OnCall is { } callback)
+			return callback(this, other);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISet<string>", "IsProperSubsetOf");
+		return default!;
 	}
 
 	bool global::System.Collections.Generic.ISet<string>.IsProperSupersetOf(global::System.Collections.Generic.IEnumerable<string> other)
 	{
 		IsProperSupersetOf.RecordCall(other);
-		return IsProperSupersetOf.OnCall?.Invoke(this, other) ?? default!;
+		if (IsProperSupersetOf.OnCall is { } callback)
+			return callback(this, other);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISet<string>", "IsProperSupersetOf");
+		return default!;
 	}
 
 	bool global::System.Collections.Generic.ISet<string>.IsSubsetOf(global::System.Collections.Generic.IEnumerable<string> other)
 	{
 		IsSubsetOf.RecordCall(other);
-		return IsSubsetOf.OnCall?.Invoke(this, other) ?? default!;
+		if (IsSubsetOf.OnCall is { } callback)
+			return callback(this, other);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISet<string>", "IsSubsetOf");
+		return default!;
 	}
 
 	bool global::System.Collections.Generic.ISet<string>.IsSupersetOf(global::System.Collections.Generic.IEnumerable<string> other)
 	{
 		IsSupersetOf.RecordCall(other);
-		return IsSupersetOf.OnCall?.Invoke(this, other) ?? default!;
+		if (IsSupersetOf.OnCall is { } callback)
+			return callback(this, other);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISet<string>", "IsSupersetOf");
+		return default!;
 	}
 
 	bool global::System.Collections.Generic.ISet<string>.Overlaps(global::System.Collections.Generic.IEnumerable<string> other)
 	{
 		Overlaps.RecordCall(other);
-		return Overlaps.OnCall?.Invoke(this, other) ?? default!;
+		if (Overlaps.OnCall is { } callback)
+			return callback(this, other);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISet<string>", "Overlaps");
+		return default!;
 	}
 
 	bool global::System.Collections.Generic.ISet<string>.SetEquals(global::System.Collections.Generic.IEnumerable<string> other)
 	{
 		SetEquals.RecordCall(other);
-		return SetEquals.OnCall?.Invoke(this, other) ?? default!;
+		if (SetEquals.OnCall is { } callback)
+			return callback(this, other);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISet<string>", "SetEquals");
+		return default!;
 	}
 
 	void global::System.Collections.Generic.ISet<string>.SymmetricExceptWith(global::System.Collections.Generic.IEnumerable<string> other)
 	{
 		SymmetricExceptWith.RecordCall(other);
-		SymmetricExceptWith.OnCall?.Invoke(this, other);
+		if (SymmetricExceptWith.OnCall is { } onCallCallback)
+		{ onCallCallback(this, other); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISet<string>", "SymmetricExceptWith");
 	}
 
 	void global::System.Collections.Generic.ISet<string>.UnionWith(global::System.Collections.Generic.IEnumerable<string> other)
 	{
 		UnionWith.RecordCall(other);
-		UnionWith.OnCall?.Invoke(this, other);
+		if (UnionWith.OnCall is { } onCallCallback)
+		{ onCallCallback(this, other); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISet<string>", "UnionWith");
 	}
 
 	void global::System.Collections.Generic.ICollection<string>.Add(string item)
 	{
 		Add.RecordCall(item);
-		Add.OnCall?.Invoke(this, item);
+		if (Add.OnCall is { } onCallCallback)
+		{ onCallCallback(this, item); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "Add");
 	}
 
 	void global::System.Collections.Generic.ICollection<string>.Clear()
 	{
 		Clear.RecordCall();
-		Clear.OnCall?.Invoke(this);
+		if (Clear.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "Clear");
 	}
 
 	bool global::System.Collections.Generic.ICollection<string>.Contains(string item)
 	{
 		Contains.RecordCall(item);
-		return Contains.OnCall?.Invoke(this, item) ?? default!;
+		if (Contains.OnCall is { } callback)
+			return callback(this, item);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "Contains");
+		return default!;
 	}
 
 	void global::System.Collections.Generic.ICollection<string>.CopyTo(string[] array, int arrayIndex)
 	{
 		CopyTo.RecordCall(array, arrayIndex);
-		CopyTo.OnCall?.Invoke(this, array, arrayIndex);
+		if (CopyTo.OnCall is { } onCallCallback)
+		{ onCallCallback(this, array, arrayIndex); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "CopyTo");
 	}
 
 	bool global::System.Collections.Generic.ICollection<string>.Remove(string item)
 	{
 		Remove.RecordCall(item);
-		return Remove.OnCall?.Invoke(this, item) ?? default!;
+		if (Remove.OnCall is { } callback)
+			return callback(this, item);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "Remove");
+		return default!;
 	}
 
 	int global::System.Collections.Generic.ICollection<string>.Count
 	{
-		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? Count.Value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "Count"); return Count.Value; }
 	}
 
 	bool global::System.Collections.Generic.ICollection<string>.IsReadOnly
 	{
-		get { IsReadOnly.RecordGet(); return IsReadOnly.OnGet?.Invoke(this) ?? IsReadOnly.Value; }
+		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "IsReadOnly"); return IsReadOnly.Value; }
 	}
 
 	global::System.Collections.Generic.IEnumerator<string> global::System.Collections.Generic.IEnumerable<string>.GetEnumerator()
@@ -587,6 +631,7 @@ partial class SetStringKnockOff
 		GetEnumerator.RecordCall();
 		if (GetEnumerator.OnCall is { } callback)
 			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable<string>", "GetEnumerator");
 		throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall or define a protected method 'GetEnumerator' in your partial class.");
 	}
 

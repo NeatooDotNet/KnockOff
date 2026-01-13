@@ -86,22 +86,33 @@ partial class CpCallbackServiceKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ICpCallbackService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ICpCallbackService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Documentation.Samples.Skills.ICpCallbackService.Initialize()
 	{
 		Initialize.RecordCall();
-		Initialize.OnCall?.Invoke(this);
+		if (Initialize.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ICpCallbackService", "Initialize");
 	}
 
 	global::KnockOff.Documentation.Samples.Skills.CpUser global::KnockOff.Documentation.Samples.Skills.ICpCallbackService.GetById(int id)
 	{
 		GetById.RecordCall(id);
-		return GetById.OnCall?.Invoke(this, id) ?? new global::KnockOff.Documentation.Samples.Skills.CpUser();
+		if (GetById.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ICpCallbackService", "GetById");
+		return new global::KnockOff.Documentation.Samples.Skills.CpUser();
 	}
 
 	global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.CpUser> global::KnockOff.Documentation.Samples.Skills.ICpCallbackService.Search(string query, int limit, int offset)
 	{
 		Search.RecordCall(query, limit, offset);
-		return Search.OnCall?.Invoke(this, query, limit, offset) ?? new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.CpUser>();
+		if (Search.OnCall is { } callback)
+			return callback(this, query, limit, offset);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ICpCallbackService", "Search");
+		return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.CpUser>();
 	}
 
 }

@@ -887,6 +887,7 @@ public partial class KnockOffGenerator
 	private static void GenerateFlatPropertyImplementationWithName(System.Text.StringBuilder sb, InterfaceMemberInfo member, string baseName)
 	{
 		var ifaceName = member.DeclaringInterfaceFullName;
+		var simpleIfaceName = ExtractSimpleTypeName(ifaceName);
 
 		sb.AppendLine($"\t{member.ReturnType} {ifaceName}.{member.Name}");
 		sb.AppendLine("\t{");
@@ -894,7 +895,8 @@ public partial class KnockOffGenerator
 		if (member.IsInitOnly)
 		{
 			// Init-only: read from interceptor's Value, record access
-			// The init accessor stores to interceptor's Value
+			// Init-only interceptors don't have OnGet/OnSet callbacks - they're simpler (just Value storage)
+			// Strict mode does NOT apply to init-only properties - they're initialized via object initializers
 			sb.AppendLine($"\t\tget {{ {baseName}.RecordGet(); return {baseName}.Value; }}");
 			sb.AppendLine($"\t\tinit {{ {baseName}.Value = value; }}");
 		}
@@ -903,7 +905,7 @@ public partial class KnockOffGenerator
 			// Regular property: delegate to interceptor's Value property
 			if (member.HasGetter)
 			{
-				sb.AppendLine($"\t\tget {{ {baseName}.RecordGet(); return {baseName}.OnGet?.Invoke(this) ?? {baseName}.Value; }}");
+				sb.AppendLine($"\t\tget {{ {baseName}.RecordGet(); if ({baseName}.OnGet is {{ }} onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"{member.Name}\"); return {baseName}.Value; }}");
 			}
 
 			if (member.HasSetter)
@@ -912,7 +914,7 @@ public partial class KnockOffGenerator
 				var pragmaRestore = GetSetterNullabilityRestore(member);
 				if (!string.IsNullOrEmpty(pragmaDisable))
 					sb.Append(pragmaDisable);
-				sb.AppendLine($"\t\tset {{ {baseName}.RecordSet(value); if ({baseName}.OnSet != null) {baseName}.OnSet(this, value); else {baseName}.Value = value; }}");
+				sb.AppendLine($"\t\tset {{ {baseName}.RecordSet(value); if ({baseName}.OnSet is {{ }} onSet) {{ onSet(this, value); return; }} if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"{member.Name}\"); {baseName}.Value = value; }}");
 				if (!string.IsNullOrEmpty(pragmaRestore))
 					sb.AppendLine(pragmaRestore);
 			}
@@ -928,6 +930,7 @@ public partial class KnockOffGenerator
 	private static void GenerateFlatIndexerImplementationWithName(System.Text.StringBuilder sb, InterfaceMemberInfo member, string interceptorName)
 	{
 		var ifaceName = member.DeclaringInterfaceFullName;
+		var simpleIfaceName = ExtractSimpleTypeName(ifaceName);
 
 		var keyType = member.IndexerParameters.Count > 0
 			? member.IndexerParameters.GetArray()![0].Type
@@ -942,12 +945,12 @@ public partial class KnockOffGenerator
 		if (member.HasGetter)
 		{
 			var defaultExpr = member.IsNullable ? "default" : GetDefaultForType(member.ReturnType, member.DefaultStrategy, member.ConcreteTypeForNew);
-			sb.AppendLine($"\t\tget {{ {interceptorName}.RecordGet({keyParam}); if ({interceptorName}.OnGet != null) return {interceptorName}.OnGet(this, {keyParam}); return {interceptorName}.Backing.TryGetValue({keyParam}, out var v) ? v : {defaultExpr}; }}");
+			sb.AppendLine($"\t\tget {{ {interceptorName}.RecordGet({keyParam}); if ({interceptorName}.OnGet is {{ }} onGet) return onGet(this, {keyParam}); if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"this[]\"); return {interceptorName}.Backing.TryGetValue({keyParam}, out var v) ? v : {defaultExpr}; }}");
 		}
 
 		if (member.HasSetter)
 		{
-			sb.AppendLine($"\t\tset {{ {interceptorName}.RecordSet({keyParam}, value); if ({interceptorName}.OnSet != null) {interceptorName}.OnSet(this, {keyParam}, value); else {interceptorName}.Backing[{keyParam}] = value; }}");
+			sb.AppendLine($"\t\tset {{ {interceptorName}.RecordSet({keyParam}, value); if ({interceptorName}.OnSet is {{ }} onSet) {{ onSet(this, {keyParam}, value); return; }} if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"this[]\"); {interceptorName}.Backing[{keyParam}] = value; }}");
 		}
 
 		sb.AppendLine("\t}");
@@ -1052,6 +1055,8 @@ public partial class KnockOffGenerator
 		else
 		{
 			// Check for OnCall callback
+			// Extract simple interface name for StubException message
+			var simpleIfaceName = ExtractSimpleTypeName(ifaceName);
 			if (hasRefOrOut)
 			{
 				// For ref/out methods, we need to call the delegate and then return
@@ -1059,11 +1064,13 @@ public partial class KnockOffGenerator
 				{
 					sb.AppendLine($"\t\tif ({interceptorAccess}.OnCall is {{ }} onCallCallback)");
 					sb.AppendLine($"\t\t{{ onCallCallback({onCallArgs}); return; }}");
+					sb.AppendLine($"\t\tif (Strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"{member.Name}\");");
 				}
 				else
 				{
 					sb.AppendLine($"\t\tif ({interceptorAccess}.OnCall is {{ }} onCallCallback)");
 					sb.AppendLine($"\t\t\treturn onCallCallback({onCallArgs});");
+					sb.AppendLine($"\t\tif (Strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"{member.Name}\");");
 					if (member.IsGenericMethod && member.IsNullable)
 					{
 						sb.AppendLine($"\t\treturn default!;");
@@ -1089,13 +1096,16 @@ public partial class KnockOffGenerator
 				// Standard invocation
 				if (isVoid)
 				{
-					sb.AppendLine($"\t\t{interceptorAccess}.OnCall?.Invoke({onCallArgs});");
+					sb.AppendLine($"\t\tif ({interceptorAccess}.OnCall is {{ }} onCallCallback)");
+					sb.AppendLine($"\t\t{{ onCallCallback({onCallArgs}); return; }}");
+					sb.AppendLine($"\t\tif (Strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"{member.Name}\");");
 				}
 				else if (member.IsGenericMethod)
 				{
 					// For generic methods, check nullability first, then use SmartDefault
 					sb.AppendLine($"\t\tif ({interceptorAccess}.OnCall is {{ }} callback)");
 					sb.AppendLine($"\t\t\treturn callback({onCallArgs});");
+					sb.AppendLine($"\t\tif (Strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"{member.Name}\");");
 					if (member.IsNullable)
 					{
 						// Nullable generic return - return default (null)
@@ -1112,12 +1122,16 @@ public partial class KnockOffGenerator
 					// Non-nullable type without parameterless constructor - must throw
 					sb.AppendLine($"\t\tif ({interceptorAccess}.OnCall is {{ }} callback)");
 					sb.AppendLine($"\t\t\treturn callback({onCallArgs});");
+					sb.AppendLine($"\t\tif (Strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"{member.Name}\");");
 					sb.AppendLine($"\t\tthrow new global::System.InvalidOperationException(\"No implementation provided for {member.Name}. Set {interceptorAccess}.OnCall or define a protected method '{member.Name}' in your partial class.\");");
 				}
 				else
 				{
+					sb.AppendLine($"\t\tif ({interceptorAccess}.OnCall is {{ }} callback)");
+					sb.AppendLine($"\t\t\treturn callback({onCallArgs});");
+					sb.AppendLine($"\t\tif (Strict) throw global::KnockOff.StubException.NotConfigured(\"{simpleIfaceName}\", \"{member.Name}\");");
 					var defaultExpr = GetDefaultForType(returnType, member.DefaultStrategy, member.ConcreteTypeForNew);
-					sb.AppendLine($"\t\treturn {interceptorAccess}.OnCall?.Invoke({onCallArgs}) ?? {defaultExpr};");
+					sb.AppendLine($"\t\treturn {defaultExpr};");
 				}
 			}
 		}

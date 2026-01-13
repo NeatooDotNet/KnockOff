@@ -61,17 +61,29 @@ partial class MultiDataContextTests
 			{
 				GetById.RecordCall(id);
 				if (GetById.OnCall is { } onCall) return onCall(this, id);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IMultiRepository", "GetById");
 				return default!;
 			}
 
 			void global::KnockOff.Documentation.Samples.Guides.IMultiRepository.Add(global::KnockOff.Documentation.Samples.Guides.MultiUser user)
 			{
 				Add.RecordCall(user);
-				if (Add.OnCall is { } onCall) onCall(this, user);
+				if (Add.OnCall is { } onCall) { onCall(this, user); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IMultiRepository", "Add");
 			}
 
 			/// <summary>The global::KnockOff.Documentation.Samples.Guides.IMultiRepository instance. Use for passing to code expecting the interface.</summary>
 			public global::KnockOff.Documentation.Samples.Guides.IMultiRepository Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IMultiRepository(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 
@@ -105,11 +117,22 @@ partial class MultiDataContextTests
 			{
 				SaveChangesAsync.RecordCall(ct);
 				if (SaveChangesAsync.OnCall is { } onCall) return onCall(this, ct);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IMultiUnitOfWork", "SaveChangesAsync");
 				return global::System.Threading.Tasks.Task.FromResult<int>(default!);
 			}
 
 			/// <summary>The global::KnockOff.Documentation.Samples.Guides.IMultiUnitOfWork instance. Use for passing to code expecting the interface.</summary>
 			public global::KnockOff.Documentation.Samples.Guides.IMultiUnitOfWork Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IMultiUnitOfWork(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

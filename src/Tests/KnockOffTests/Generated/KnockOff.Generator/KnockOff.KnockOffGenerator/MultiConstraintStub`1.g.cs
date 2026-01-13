@@ -61,16 +61,24 @@ partial class MultiConstraintStub<T> where T : class, global::KnockOff.Tests.IEn
 	/// <summary>The global::KnockOff.Tests.IMultiConstraintService<T> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IMultiConstraintService<T> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Tests.IMultiConstraintService<T>.Save(T entity)
 	{
 		Save.RecordCall(entity);
-		Save.OnCall?.Invoke(this, entity);
+		if (Save.OnCall is { } onCallCallback)
+		{ onCallCallback(this, entity); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMultiConstraintService<T>", "Save");
 	}
 
 	T? global::KnockOff.Tests.IMultiConstraintService<T>.Find(int id)
 	{
 		Find.RecordCall(id);
-		return Find.OnCall?.Invoke(this, id) ?? default!;
+		if (Find.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMultiConstraintService<T>", "Find");
+		return default!;
 	}
 
 }

@@ -35,11 +35,22 @@ partial class AsyncDisposableStubTests
 			{
 				DisposeAsync.RecordCall();
 				if (DisposeAsync.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IAsyncDisposable", "DisposeAsync");
 				return default;
 			}
 
 			/// <summary>The global::System.IAsyncDisposable instance. Use for passing to code expecting the interface.</summary>
 			public global::System.IAsyncDisposable Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IAsyncDisposable(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

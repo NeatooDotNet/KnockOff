@@ -36,10 +36,16 @@ partial class ComparerStringKnockOff
 	/// <summary>The global::System.Collections.Generic.IComparer<string> instance. Use for passing to code expecting the interface.</summary>
 	public global::System.Collections.Generic.IComparer<string> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	int global::System.Collections.Generic.IComparer<string>.Compare(string? x, string? y)
 	{
 		Compare.RecordCall(x, y);
-		return Compare.OnCall?.Invoke(this, x, y) ?? default!;
+		if (Compare.OnCall is { } callback)
+			return callback(this, x, y);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IComparer<string>", "Compare");
+		return default!;
 	}
 
 }

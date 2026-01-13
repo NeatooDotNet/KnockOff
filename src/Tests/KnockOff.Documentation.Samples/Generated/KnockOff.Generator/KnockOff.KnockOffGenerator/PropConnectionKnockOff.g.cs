@@ -52,15 +52,20 @@ partial class PropConnectionKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IPropConnection instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IPropConnection Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	bool global::KnockOff.Documentation.Samples.Guides.IPropConnection.IsConnected
 	{
-		get { IsConnected.RecordGet(); return IsConnected.OnGet?.Invoke(this) ?? IsConnected.Value; }
+		get { IsConnected.RecordGet(); if (IsConnected.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropConnection", "IsConnected"); return IsConnected.Value; }
 	}
 
 	void global::KnockOff.Documentation.Samples.Guides.IPropConnection.Connect()
 	{
 		Connect.RecordCall();
-		Connect.OnCall?.Invoke(this);
+		if (Connect.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropConnection", "Connect");
 	}
 
 }

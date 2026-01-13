@@ -139,21 +139,26 @@ partial class UserServiceKnockOff
 	/// <summary>The global::KnockOff.Sandbox.IUserService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Sandbox.IUserService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	string global::KnockOff.Sandbox.IUserService.Name
 	{
-		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else Name.Value = value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserService", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserService", "Name"); Name.Value = value; }
 	}
 
 	int global::KnockOff.Sandbox.IUserService.Count
 	{
-		get { Count.RecordGet(); return Count.OnGet?.Invoke(this) ?? Count.Value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserService", "Count"); return Count.Value; }
 	}
 
 	void global::KnockOff.Sandbox.IUserService.DoWork()
 	{
 		DoWork.RecordCall();
-		DoWork.OnCall?.Invoke(this);
+		if (DoWork.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserService", "DoWork");
 	}
 
 	string global::KnockOff.Sandbox.IUserService.GetGreeting(string name)
@@ -166,7 +171,9 @@ partial class UserServiceKnockOff
 	void global::KnockOff.Sandbox.IUserService.Process(string id, int count, bool urgent)
 	{
 		Process.RecordCall(id, count, urgent);
-		Process.OnCall?.Invoke(this, id, count, urgent);
+		if (Process.OnCall is { } onCallCallback)
+		{ onCallCallback(this, id, count, urgent); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserService", "Process");
 	}
 
 }

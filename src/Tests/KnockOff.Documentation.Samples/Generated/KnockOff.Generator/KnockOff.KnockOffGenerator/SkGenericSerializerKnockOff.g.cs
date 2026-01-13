@@ -161,11 +161,15 @@ partial class SkGenericSerializerKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkGenericSerializer instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ISkGenericSerializer Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	T global::KnockOff.Documentation.Samples.Skills.ISkGenericSerializer.Deserialize<T>(string json)
 	{
 		Deserialize.Of<T>().RecordCall(json);
 		if (Deserialize.Of<T>().OnCall is { } callback)
 			return callback(this, json);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkGenericSerializer", "Deserialize");
 		return SmartDefault<T>("Deserialize");
 	}
 
@@ -174,6 +178,7 @@ partial class SkGenericSerializerKnockOff
 		Convert.Of<TIn, TOut>().RecordCall();
 		if (Convert.Of<TIn, TOut>().OnCall is { } callback)
 			return callback(this, input);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkGenericSerializer", "Convert");
 		return SmartDefault<TOut>("Convert");
 	}
 

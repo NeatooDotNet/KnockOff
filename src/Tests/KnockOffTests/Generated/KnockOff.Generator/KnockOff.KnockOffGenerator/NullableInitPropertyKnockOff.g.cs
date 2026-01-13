@@ -27,6 +27,9 @@ partial class NullableInitPropertyKnockOff
 	/// <summary>The global::KnockOffTests.INullableInitProperty instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOffTests.INullableInitProperty Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	string? global::KnockOffTests.INullableInitProperty.Name
 	{
 		get { Name.RecordGet(); return Name.Value; }

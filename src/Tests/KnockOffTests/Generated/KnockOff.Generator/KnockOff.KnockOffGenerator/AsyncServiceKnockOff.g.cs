@@ -164,10 +164,16 @@ partial class AsyncServiceKnockOff
 	/// <summary>The global::KnockOff.Tests.IAsyncService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IAsyncService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::System.Threading.Tasks.Task global::KnockOff.Tests.IAsyncService.DoWorkAsync()
 	{
 		DoWorkAsync.RecordCall();
-		return DoWorkAsync.OnCall?.Invoke(this) ?? global::System.Threading.Tasks.Task.CompletedTask;
+		if (DoWorkAsync.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncService", "DoWorkAsync");
+		return global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
 	global::System.Threading.Tasks.Task<int> global::KnockOff.Tests.IAsyncService.GetValueAsync(int input)
@@ -180,7 +186,10 @@ partial class AsyncServiceKnockOff
 	global::System.Threading.Tasks.Task<string?> global::KnockOff.Tests.IAsyncService.GetOptionalAsync()
 	{
 		GetOptionalAsync.RecordCall();
-		return GetOptionalAsync.OnCall?.Invoke(this) ?? global::System.Threading.Tasks.Task.FromResult<string?>(default!);
+		if (GetOptionalAsync.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncService", "GetOptionalAsync");
+		return global::System.Threading.Tasks.Task.FromResult<string?>(default!);
 	}
 
 	global::System.Threading.Tasks.Task<string> global::KnockOff.Tests.IAsyncService.GetRequiredAsync()
@@ -188,13 +197,17 @@ partial class AsyncServiceKnockOff
 		GetRequiredAsync.RecordCall();
 		if (GetRequiredAsync.OnCall is { } callback)
 			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncService", "GetRequiredAsync");
 		throw new global::System.InvalidOperationException("No implementation provided for GetRequiredAsync. Set GetRequiredAsync.OnCall or define a protected method 'GetRequiredAsync' in your partial class.");
 	}
 
 	global::System.Threading.Tasks.ValueTask global::KnockOff.Tests.IAsyncService.DoWorkValueTaskAsync()
 	{
 		DoWorkValueTaskAsync.RecordCall();
-		return DoWorkValueTaskAsync.OnCall?.Invoke(this) ?? default;
+		if (DoWorkValueTaskAsync.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncService", "DoWorkValueTaskAsync");
+		return default;
 	}
 
 	global::System.Threading.Tasks.ValueTask<int> global::KnockOff.Tests.IAsyncService.GetValueValueTaskAsync(int input)

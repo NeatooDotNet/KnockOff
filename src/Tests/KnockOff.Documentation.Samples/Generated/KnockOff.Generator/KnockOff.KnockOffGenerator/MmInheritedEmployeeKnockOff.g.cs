@@ -98,21 +98,24 @@ partial class MmInheritedEmployeeKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IMmInheritedEmployee instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.IMmInheritedEmployee Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	string global::KnockOff.Documentation.Samples.Skills.IMmInheritedEmployee.Name
 	{
-		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else Name.Value = value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmInheritedEmployee", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmInheritedEmployee", "Name"); Name.Value = value; }
 	}
 
 	string global::KnockOff.Documentation.Samples.Skills.IMmInheritedEmployee.Department
 	{
-		get { Department.RecordGet(); return Department.OnGet?.Invoke(this) ?? Department.Value; }
-		set { Department.RecordSet(value); if (Department.OnSet != null) Department.OnSet(this, value); else Department.Value = value; }
+		get { Department.RecordGet(); if (Department.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmInheritedEmployee", "Department"); return Department.Value; }
+		set { Department.RecordSet(value); if (Department.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmInheritedEmployee", "Department"); Department.Value = value; }
 	}
 
 	int global::KnockOff.Documentation.Samples.Skills.IMmInheritedEntityBase.Id
 	{
-		get { Id.RecordGet(); return Id.OnGet?.Invoke(this) ?? Id.Value; }
+		get { Id.RecordGet(); if (Id.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmInheritedEntityBase", "Id"); return Id.Value; }
 	}
 
 }

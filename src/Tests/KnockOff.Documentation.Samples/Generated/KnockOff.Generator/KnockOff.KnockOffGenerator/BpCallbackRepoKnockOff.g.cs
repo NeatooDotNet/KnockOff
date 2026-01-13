@@ -36,10 +36,16 @@ partial class BpCallbackRepoKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IBpCallbackRepo instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IBpCallbackRepo Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Documentation.Samples.SampleDomain.User? global::KnockOff.Documentation.Samples.Guides.IBpCallbackRepo.GetById(int id)
 	{
 		GetById.RecordCall(id);
-		return GetById.OnCall?.Invoke(this, id) ?? default!;
+		if (GetById.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpCallbackRepo", "GetById");
+		return default!;
 	}
 
 }

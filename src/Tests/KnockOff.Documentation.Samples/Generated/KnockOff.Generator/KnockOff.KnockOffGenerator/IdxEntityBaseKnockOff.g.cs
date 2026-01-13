@@ -55,14 +55,17 @@ partial class IdxEntityBaseKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IIdxEntityBase instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IIdxEntityBase Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Documentation.Samples.Guides.IIdxEntityProperty? global::KnockOff.Documentation.Samples.Guides.IIdxEntityBase.this[string propertyName]
 	{
-		get { Indexer.RecordGet(propertyName); if (Indexer.OnGet != null) return Indexer.OnGet(this, propertyName); return Indexer.Backing.TryGetValue(propertyName, out var v) ? v : default; }
+		get { Indexer.RecordGet(propertyName); if (Indexer.OnGet is { } onGet) return onGet(this, propertyName); if (Strict) throw global::KnockOff.StubException.NotConfigured("IIdxEntityBase", "this[]"); return Indexer.Backing.TryGetValue(propertyName, out var v) ? v : default; }
 	}
 
 	bool global::KnockOff.Documentation.Samples.Guides.IIdxEntityBase.IsNew
 	{
-		get { IsNew.RecordGet(); return IsNew.OnGet?.Invoke(this) ?? IsNew.Value; }
+		get { IsNew.RecordGet(); if (IsNew.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IIdxEntityBase", "IsNew"); return IsNew.Value; }
 	}
 
 }

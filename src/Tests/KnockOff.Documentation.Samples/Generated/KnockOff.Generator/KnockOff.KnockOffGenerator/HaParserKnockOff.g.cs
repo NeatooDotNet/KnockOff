@@ -61,12 +61,16 @@ partial class HaParserKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IHaParser instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.IHaParser Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	bool global::KnockOff.Documentation.Samples.Skills.IHaParser.TryParse(string input, out int result)
 	{
 		result = default!;
 		TryParse.RecordCall(input);
 		if (TryParse.OnCall is { } onCallCallback)
 			return onCallCallback(this, input, out result);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IHaParser", "TryParse");
 		return default!;
 	}
 
@@ -77,6 +81,7 @@ partial class HaParserKnockOff
 		GetData.RecordCall();
 		if (GetData.OnCall is { } onCallCallback)
 		{ onCallCallback(this, out name, out count); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IHaParser", "GetData");
 	}
 
 }

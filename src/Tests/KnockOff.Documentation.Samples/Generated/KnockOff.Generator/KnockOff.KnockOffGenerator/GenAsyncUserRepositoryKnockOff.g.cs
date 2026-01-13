@@ -89,22 +89,34 @@ partial class GenAsyncUserRepositoryKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<global::KnockOff.Documentation.Samples.Guides.GenUser> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<global::KnockOff.Documentation.Samples.Guides.GenUser> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.GenUser?> global::KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>.GetByIdAsync(int id)
 	{
 		GetByIdAsync.RecordCall(id);
-		return GetByIdAsync.OnCall?.Invoke(this, id) ?? global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Guides.GenUser?>(default!);
+		if (GetByIdAsync.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("GenUser>", "GetByIdAsync");
+		return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Guides.GenUser?>(default!);
 	}
 
 	global::System.Threading.Tasks.Task<global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Guides.GenUser>> global::KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>.GetAllAsync()
 	{
 		GetAllAsync.RecordCall();
-		return GetAllAsync.OnCall?.Invoke(this) ?? global::System.Threading.Tasks.Task.FromResult<global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Guides.GenUser>>(new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Guides.GenUser>());
+		if (GetAllAsync.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("GenUser>", "GetAllAsync");
+		return global::System.Threading.Tasks.Task.FromResult<global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Guides.GenUser>>(new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Guides.GenUser>());
 	}
 
 	global::System.Threading.Tasks.Task global::KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>.SaveAsync(global::KnockOff.Documentation.Samples.Guides.GenUser entity)
 	{
 		SaveAsync.RecordCall(entity);
-		return SaveAsync.OnCall?.Invoke(this, entity) ?? global::System.Threading.Tasks.Task.CompletedTask;
+		if (SaveAsync.OnCall is { } callback)
+			return callback(this, entity);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("GenUser>", "SaveAsync");
+		return global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
 }

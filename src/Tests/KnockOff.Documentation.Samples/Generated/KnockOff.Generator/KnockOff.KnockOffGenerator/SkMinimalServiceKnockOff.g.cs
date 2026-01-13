@@ -86,6 +86,9 @@ partial class SkMinimalServiceKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkMinimalService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ISkMinimalService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Documentation.Samples.Skills.SkUser? global::KnockOff.Documentation.Samples.Skills.ISkMinimalService.GetUser(int id)
 	{
 		GetUser2.RecordCall(id);
@@ -96,13 +99,19 @@ partial class SkMinimalServiceKnockOff
 	int global::KnockOff.Documentation.Samples.Skills.ISkMinimalService.GetCount()
 	{
 		GetCount.RecordCall();
-		return GetCount.OnCall?.Invoke(this) ?? default!;
+		if (GetCount.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkMinimalService", "GetCount");
+		return default!;
 	}
 
 	global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser> global::KnockOff.Documentation.Samples.Skills.ISkMinimalService.GetUsers()
 	{
 		GetUsers.RecordCall();
-		return GetUsers.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser>();
+		if (GetUsers.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkMinimalService", "GetUsers");
+		return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser>();
 	}
 
 }

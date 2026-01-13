@@ -38,11 +38,22 @@ partial class ObservableStringStubTests
 			{
 				Subscribe.RecordCall(observer);
 				if (Subscribe.OnCall is { } onCall) return onCall(this, observer);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IObservable<string>", "Subscribe");
 				throw new global::System.InvalidOperationException("No implementation provided for Subscribe. Set Subscribe.OnCall.");
 			}
 
 			/// <summary>The global::System.IObservable<string> instance. Use for passing to code expecting the interface.</summary>
 			public global::System.IObservable<string> Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IObservable(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

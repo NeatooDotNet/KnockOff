@@ -1,6 +1,12 @@
 # Property Semantics Redesign
 
-## Status: Planning
+## Status: Abandoned
+
+**Decision (2026-01-13):** Keep the current API where `stub.Property` is the interceptor and `stub.Property.Value` provides the backing value. The proposed change to `stub.Property` + `stub.PropertyInterceptor` was decided against.
+
+---
+
+*Original proposal below for historical reference:*
 
 The current implementation sacrifices semantic enforcement for "convenience". This redesign enforces correct property semantics at compile-time.
 

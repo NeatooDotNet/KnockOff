@@ -33,10 +33,15 @@ partial class MethodMultiParamKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IMethodMultiParam instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IMethodMultiParam Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Documentation.Samples.Guides.IMethodMultiParam.Process(string name, int @value, bool flag)
 	{
 		Process.RecordCall(name, @value, flag);
-		Process.OnCall?.Invoke(this, name, @value, flag);
+		if (Process.OnCall is { } onCallCallback)
+		{ onCallCallback(this, name, @value, flag); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMethodMultiParam", "Process");
 	}
 
 }

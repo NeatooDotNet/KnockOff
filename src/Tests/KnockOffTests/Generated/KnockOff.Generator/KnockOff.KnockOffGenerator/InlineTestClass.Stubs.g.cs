@@ -94,31 +94,45 @@ partial class InlineTestClass
 				{
 					Name.RecordGet();
 					if (Name.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("ISimpleService", "Name");
 					return Name.Value;
 				}
 				set
 				{
 					Name.RecordSet(value);
-					if (Name.OnSet is { } onSet) onSet(this, value);
-					else Name.Value = value;
+					if (Name.OnSet is { } onSet) { onSet(this, value); return; }
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("ISimpleService", "Name");
+					Name.Value = value;
 				}
 			}
 
 			void global::KnockOff.Tests.ISimpleService.DoSomething()
 			{
 				DoSomething.RecordCall();
-				if (DoSomething.OnCall is { } onCall) onCall(this);
+				if (DoSomething.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("ISimpleService", "DoSomething");
 			}
 
 			int global::KnockOff.Tests.ISimpleService.GetValue(int input)
 			{
 				GetValue.RecordCall(input);
 				if (GetValue.OnCall is { } onCall) return onCall(this, input);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("ISimpleService", "GetValue");
 				return default!;
 			}
 
 			/// <summary>The global::KnockOff.Tests.ISimpleService instance. Use for passing to code expecting the interface.</summary>
 			public global::KnockOff.Tests.ISimpleService Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public ISimpleService(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

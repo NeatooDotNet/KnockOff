@@ -404,18 +404,24 @@ partial class GenericMethodServiceKnockOff
 	/// <summary>The global::KnockOff.Tests.IGenericMethodService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IGenericMethodService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	T global::KnockOff.Tests.IGenericMethodService.Create<T>()
 	{
 		Create.Of<T>().RecordCall();
 		if (Create.Of<T>().OnCall is { } callback)
 			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Create");
 		return SmartDefault<T>("Create");
 	}
 
 	void global::KnockOff.Tests.IGenericMethodService.Process<T>(T @value)
 	{
 		Process.Of<T>().RecordCall();
-		Process.Of<T>().OnCall?.Invoke(this, @value);
+		if (Process.Of<T>().OnCall is { } onCallCallback)
+		{ onCallCallback(this, @value); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Process");
 	}
 
 	T global::KnockOff.Tests.IGenericMethodService.Deserialize<T>(string json)
@@ -423,6 +429,7 @@ partial class GenericMethodServiceKnockOff
 		Deserialize.Of<T>().RecordCall(json);
 		if (Deserialize.Of<T>().OnCall is { } callback)
 			return callback(this, json);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Deserialize");
 		return SmartDefault<T>("Deserialize");
 	}
 
@@ -431,6 +438,7 @@ partial class GenericMethodServiceKnockOff
 		Convert.Of<TIn, TOut>().RecordCall();
 		if (Convert.Of<TIn, TOut>().OnCall is { } callback)
 			return callback(this, input);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Convert");
 		return SmartDefault<TOut>("Convert");
 	}
 
@@ -439,13 +447,16 @@ partial class GenericMethodServiceKnockOff
 		Find.Of<T>().RecordCall(id);
 		if (Find.Of<T>().OnCall is { } callback)
 			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Find");
 		return default!;
 	}
 
 	void global::KnockOff.Tests.IGenericMethodService.Transfer<TSource, TDest>(TSource source, TDest destination)
 	{
 		Transfer.Of<TSource, TDest>().RecordCall();
-		Transfer.Of<TSource, TDest>().OnCall?.Invoke(this, source, destination);
+		if (Transfer.Of<TSource, TDest>().OnCall is { } onCallCallback)
+		{ onCallCallback(this, source, destination); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Transfer");
 	}
 
 }

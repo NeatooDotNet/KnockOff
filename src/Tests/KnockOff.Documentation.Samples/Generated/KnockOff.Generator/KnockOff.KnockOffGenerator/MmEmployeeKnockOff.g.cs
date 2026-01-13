@@ -64,15 +64,18 @@ partial class MmEmployeeKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IMmEmployee instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.IMmEmployee Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	string global::KnockOff.Documentation.Samples.Skills.IMmEmployee.Name
 	{
-		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else Name.Value = value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmEmployee", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmEmployee", "Name"); Name.Value = value; }
 	}
 
 	int global::KnockOff.Documentation.Samples.Skills.IMmEntityBase.Id
 	{
-		get { Id.RecordGet(); return Id.OnGet?.Invoke(this) ?? Id.Value; }
+		get { Id.RecordGet(); if (Id.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmEntityBase", "Id"); return Id.Value; }
 	}
 
 }

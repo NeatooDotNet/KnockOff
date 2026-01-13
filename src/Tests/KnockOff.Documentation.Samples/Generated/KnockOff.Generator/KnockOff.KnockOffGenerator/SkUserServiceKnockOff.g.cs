@@ -36,10 +36,16 @@ partial class SkUserServiceKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkUserService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ISkUserService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Documentation.Samples.Skills.SkUser global::KnockOff.Documentation.Samples.Skills.ISkUserService.GetUser(int id)
 	{
 		GetUser.RecordCall(id);
-		return GetUser.OnCall?.Invoke(this, id) ?? new global::KnockOff.Documentation.Samples.Skills.SkUser();
+		if (GetUser.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkUserService", "GetUser");
+		return new global::KnockOff.Documentation.Samples.Skills.SkUser();
 	}
 
 }

@@ -86,22 +86,33 @@ partial class HaServiceKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IHaService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.IHaService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Documentation.Samples.Skills.IHaService.Initialize()
 	{
 		Initialize.RecordCall();
-		Initialize.OnCall?.Invoke(this);
+		if (Initialize.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IHaService", "Initialize");
 	}
 
 	global::KnockOff.Documentation.Samples.Skills.HaUser global::KnockOff.Documentation.Samples.Skills.IHaService.GetById(int id)
 	{
 		GetById.RecordCall(id);
-		return GetById.OnCall?.Invoke(this, id) ?? new global::KnockOff.Documentation.Samples.Skills.HaUser();
+		if (GetById.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IHaService", "GetById");
+		return new global::KnockOff.Documentation.Samples.Skills.HaUser();
 	}
 
 	global::KnockOff.Documentation.Samples.Skills.HaEntity global::KnockOff.Documentation.Samples.Skills.IHaService.Create(string name, int @value)
 	{
 		Create.RecordCall(name, @value);
-		return Create.OnCall?.Invoke(this, name, @value) ?? new global::KnockOff.Documentation.Samples.Skills.HaEntity();
+		if (Create.OnCall is { } callback)
+			return callback(this, name, @value);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IHaService", "Create");
+		return new global::KnockOff.Documentation.Samples.Skills.HaEntity();
 	}
 
 }

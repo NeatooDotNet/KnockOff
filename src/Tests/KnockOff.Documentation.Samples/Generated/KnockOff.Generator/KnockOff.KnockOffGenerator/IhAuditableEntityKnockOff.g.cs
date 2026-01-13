@@ -120,26 +120,29 @@ partial class IhAuditableEntityKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IIhAuditableEntity instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IIhAuditableEntity Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::System.DateTime? global::KnockOff.Documentation.Samples.Guides.IIhAuditableEntity.ModifiedAt
 	{
-		get { ModifiedAt.RecordGet(); return ModifiedAt.OnGet?.Invoke(this) ?? ModifiedAt.Value; }
-		set { ModifiedAt.RecordSet(value); if (ModifiedAt.OnSet != null) ModifiedAt.OnSet(this, value); else ModifiedAt.Value = value; }
+		get { ModifiedAt.RecordGet(); if (ModifiedAt.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IIhAuditableEntity", "ModifiedAt"); return ModifiedAt.Value; }
+		set { ModifiedAt.RecordSet(value); if (ModifiedAt.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IIhAuditableEntity", "ModifiedAt"); ModifiedAt.Value = value; }
 	}
 
 	string global::KnockOff.Documentation.Samples.Guides.IIhAuditableEntity.ModifiedBy
 	{
-		get { ModifiedBy.RecordGet(); return ModifiedBy.OnGet?.Invoke(this) ?? ModifiedBy.Value; }
-		set { ModifiedBy.RecordSet(value); if (ModifiedBy.OnSet != null) ModifiedBy.OnSet(this, value); else ModifiedBy.Value = value; }
+		get { ModifiedBy.RecordGet(); if (ModifiedBy.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IIhAuditableEntity", "ModifiedBy"); return ModifiedBy.Value; }
+		set { ModifiedBy.RecordSet(value); if (ModifiedBy.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IIhAuditableEntity", "ModifiedBy"); ModifiedBy.Value = value; }
 	}
 
 	int global::KnockOff.Documentation.Samples.Guides.IIhBaseEntity.Id
 	{
-		get { Id.RecordGet(); return Id.OnGet?.Invoke(this) ?? Id.Value; }
+		get { Id.RecordGet(); if (Id.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IIhBaseEntity", "Id"); return Id.Value; }
 	}
 
 	global::System.DateTime global::KnockOff.Documentation.Samples.Guides.IIhBaseEntity.CreatedAt
 	{
-		get { CreatedAt.RecordGet(); return CreatedAt.OnGet?.Invoke(this) ?? CreatedAt.Value; }
+		get { CreatedAt.RecordGet(); if (CreatedAt.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IIhBaseEntity", "CreatedAt"); return CreatedAt.Value; }
 	}
 
 }

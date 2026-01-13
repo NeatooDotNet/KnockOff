@@ -33,10 +33,16 @@ partial class NestedDictStub<TKey, TValue> where TKey : notnull
 	/// <summary>The global::KnockOff.Tests.INestedDictService<TKey, TValue> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.INestedDictService<TKey, TValue> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::System.Collections.Generic.Dictionary<TKey, TValue> global::KnockOff.Tests.INestedDictService<TKey, TValue>.GetMapping()
 	{
 		GetMapping.RecordCall();
-		return GetMapping.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.Dictionary<TKey, TValue>();
+		if (GetMapping.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("INestedDictService<TKey, TValue>", "GetMapping");
+		return new global::System.Collections.Generic.Dictionary<TKey, TValue>();
 	}
 
 }

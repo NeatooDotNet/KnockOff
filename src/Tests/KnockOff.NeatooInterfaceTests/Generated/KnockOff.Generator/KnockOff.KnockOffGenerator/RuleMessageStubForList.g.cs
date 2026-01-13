@@ -74,19 +74,22 @@ partial class RuleMessageStubForList
 	/// <summary>The global::Neatoo.Rules.IRuleMessage instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.Rules.IRuleMessage Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	uint global::Neatoo.Rules.IRuleMessage.RuleIndex
 	{
-		get { RuleIndex.RecordGet(); return RuleIndex.OnGet?.Invoke(this) ?? RuleIndex.Value; }
+		get { RuleIndex.RecordGet(); if (RuleIndex.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage", "RuleIndex"); return RuleIndex.Value; }
 	}
 
 	string global::Neatoo.Rules.IRuleMessage.PropertyName
 	{
-		get { PropertyName.RecordGet(); return PropertyName.OnGet?.Invoke(this) ?? PropertyName.Value; }
+		get { PropertyName.RecordGet(); if (PropertyName.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage", "PropertyName"); return PropertyName.Value; }
 	}
 
 	string? global::Neatoo.Rules.IRuleMessage.Message
 	{
-		get { Message.RecordGet(); return Message.OnGet?.Invoke(this) ?? Message.Value; }
+		get { Message.RecordGet(); if (Message.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage", "Message"); return Message.Value; }
 	}
 
 }

@@ -481,57 +481,78 @@ partial class ValidatePropertyOfStringStub
 	/// <summary>The global::Neatoo.IValidateProperty<string> instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.IValidateProperty<string> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	string? global::Neatoo.IValidateProperty<string>.Value
 	{
-		get { Value.RecordGet(); return Value.OnGet?.Invoke(this) ?? Value.Value; }
-		set { Value.RecordSet(value); if (Value.OnSet != null) Value.OnSet(this, value); else Value.Value = value; }
+		get { Value.RecordGet(); if (Value.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty<string>", "Value"); return Value.Value; }
+		set { Value.RecordSet(value); if (Value.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty<string>", "Value"); Value.Value = value; }
 	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateProperty.SetValue(object? newValue)
 	{
 		SetValue.RecordCall(newValue);
-		return SetValue.OnCall?.Invoke(this, newValue) ?? global::System.Threading.Tasks.Task.CompletedTask;
+		if (SetValue.OnCall is { } callback)
+			return callback(this, newValue);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "SetValue");
+		return global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
 	void global::Neatoo.IValidateProperty.AddMarkedBusy(long id)
 	{
 		AddMarkedBusy.RecordCall(id);
-		AddMarkedBusy.OnCall?.Invoke(this, id);
+		if (AddMarkedBusy.OnCall is { } onCallCallback)
+		{ onCallCallback(this, id); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "AddMarkedBusy");
 	}
 
 	void global::Neatoo.IValidateProperty.RemoveMarkedBusy(long id)
 	{
 		RemoveMarkedBusy.RecordCall(id);
-		RemoveMarkedBusy.OnCall?.Invoke(this, id);
+		if (RemoveMarkedBusy.OnCall is { } onCallCallback)
+		{ onCallCallback(this, id); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "RemoveMarkedBusy");
 	}
 
 	void global::Neatoo.IValidateProperty.LoadValue(object? @value)
 	{
 		LoadValue.RecordCall(@value);
-		LoadValue.OnCall?.Invoke(this, @value);
+		if (LoadValue.OnCall is { } onCallCallback)
+		{ onCallCallback(this, @value); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "LoadValue");
 	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateProperty.WaitForTasks()
 	{
 		WaitForTasks.RecordCall();
-		return WaitForTasks.OnCall?.Invoke(this) ?? global::System.Threading.Tasks.Task.CompletedTask;
+		if (WaitForTasks.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "WaitForTasks");
+		return global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
 	global::System.Runtime.CompilerServices.TaskAwaiter global::Neatoo.IValidateProperty.GetAwaiter()
 	{
 		GetAwaiter.RecordCall();
-		return GetAwaiter.OnCall?.Invoke(this) ?? default!;
+		if (GetAwaiter.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "GetAwaiter");
+		return default!;
 	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateProperty.RunRules(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
 	{
 		RunRules.RecordCall(runRules, token);
-		return RunRules.OnCall?.Invoke(this, runRules, token) ?? global::System.Threading.Tasks.Task.CompletedTask;
+		if (RunRules.OnCall is { } callback)
+			return callback(this, runRules, token);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "RunRules");
+		return global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
 	string global::Neatoo.IValidateProperty.Name
 	{
-		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? Name.Value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "Name"); return Name.Value; }
 	}
 
 	object? global::Neatoo.IValidateProperty.Value
@@ -542,42 +563,42 @@ partial class ValidatePropertyOfStringStub
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateProperty.Task
 	{
-		get { Task.RecordGet(); return Task.OnGet?.Invoke(this) ?? Task.Value; }
+		get { Task.RecordGet(); if (Task.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "Task"); return Task.Value; }
 	}
 
 	bool global::Neatoo.IValidateProperty.IsBusy
 	{
-		get { IsBusy.RecordGet(); return IsBusy.OnGet?.Invoke(this) ?? IsBusy.Value; }
+		get { IsBusy.RecordGet(); if (IsBusy.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "IsBusy"); return IsBusy.Value; }
 	}
 
 	bool global::Neatoo.IValidateProperty.IsReadOnly
 	{
-		get { IsReadOnly.RecordGet(); return IsReadOnly.OnGet?.Invoke(this) ?? IsReadOnly.Value; }
+		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "IsReadOnly"); return IsReadOnly.Value; }
 	}
 
 	global::System.Type global::Neatoo.IValidateProperty.Type
 	{
-		get { Type.RecordGet(); return Type.OnGet?.Invoke(this) ?? Type.Value; }
+		get { Type.RecordGet(); if (Type.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "Type"); return Type.Value; }
 	}
 
 	string? global::Neatoo.IValidateProperty.StringValue
 	{
-		get { StringValue.RecordGet(); return StringValue.OnGet?.Invoke(this) ?? StringValue.Value; }
+		get { StringValue.RecordGet(); if (StringValue.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "StringValue"); return StringValue.Value; }
 	}
 
 	bool global::Neatoo.IValidateProperty.IsSelfValid
 	{
-		get { IsSelfValid.RecordGet(); return IsSelfValid.OnGet?.Invoke(this) ?? IsSelfValid.Value; }
+		get { IsSelfValid.RecordGet(); if (IsSelfValid.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "IsSelfValid"); return IsSelfValid.Value; }
 	}
 
 	bool global::Neatoo.IValidateProperty.IsValid
 	{
-		get { IsValid.RecordGet(); return IsValid.OnGet?.Invoke(this) ?? IsValid.Value; }
+		get { IsValid.RecordGet(); if (IsValid.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "IsValid"); return IsValid.Value; }
 	}
 
 	global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> global::Neatoo.IValidateProperty.PropertyMessages
 	{
-		get { PropertyMessages.RecordGet(); return PropertyMessages.OnGet?.Invoke(this) ?? PropertyMessages.Value; }
+		get { PropertyMessages.RecordGet(); if (PropertyMessages.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "PropertyMessages"); return PropertyMessages.Value; }
 	}
 
 	event global::System.ComponentModel.PropertyChangedEventHandler? global::System.ComponentModel.INotifyPropertyChanged.PropertyChanged

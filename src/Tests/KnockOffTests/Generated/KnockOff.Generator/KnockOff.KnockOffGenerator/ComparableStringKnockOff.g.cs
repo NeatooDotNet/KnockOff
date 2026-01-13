@@ -36,10 +36,16 @@ partial class ComparableStringKnockOff
 	/// <summary>The global::System.IComparable<string> instance. Use for passing to code expecting the interface.</summary>
 	public global::System.IComparable<string> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	int global::System.IComparable<string>.CompareTo(string? other)
 	{
 		CompareTo.RecordCall(other);
-		return CompareTo.OnCall?.Invoke(this, other) ?? default!;
+		if (CompareTo.OnCall is { } callback)
+			return callback(this, other);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IComparable<string>", "CompareTo");
+		return default!;
 	}
 
 }

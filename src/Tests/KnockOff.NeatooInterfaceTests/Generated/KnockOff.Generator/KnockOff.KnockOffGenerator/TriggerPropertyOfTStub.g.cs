@@ -86,21 +86,30 @@ partial class TriggerPropertyOfTStub
 	/// <summary>The global::Neatoo.Rules.ITriggerProperty<global::Neatoo.IValidateBase> instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.Rules.ITriggerProperty<global::Neatoo.IValidateBase> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	object? global::Neatoo.Rules.ITriggerProperty<global::Neatoo.IValidateBase>.GetValue(global::Neatoo.IValidateBase target)
 	{
 		GetValue.RecordCall(target);
-		return GetValue.OnCall?.Invoke(this, target) ?? default!;
+		if (GetValue.OnCall is { } callback)
+			return callback(this, target);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "GetValue");
+		return default!;
 	}
 
 	bool global::Neatoo.Rules.ITriggerProperty.IsMatch(string propertyName)
 	{
 		IsMatch.RecordCall(propertyName);
-		return IsMatch.OnCall?.Invoke(this, propertyName) ?? default!;
+		if (IsMatch.OnCall is { } callback)
+			return callback(this, propertyName);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ITriggerProperty", "IsMatch");
+		return default!;
 	}
 
 	string global::Neatoo.Rules.ITriggerProperty.PropertyName
 	{
-		get { PropertyName.RecordGet(); return PropertyName.OnGet?.Invoke(this) ?? PropertyName.Value; }
+		get { PropertyName.RecordGet(); if (PropertyName.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ITriggerProperty", "PropertyName"); return PropertyName.Value; }
 	}
 
 }

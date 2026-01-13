@@ -111,28 +111,41 @@ partial class SkOnCallKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkOnCallService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ISkOnCallService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Documentation.Samples.Skills.ISkOnCallService.Clear()
 	{
 		Clear.RecordCall();
-		Clear.OnCall?.Invoke(this);
+		if (Clear.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkOnCallService", "Clear");
 	}
 
 	global::KnockOff.Documentation.Samples.Skills.SkUser global::KnockOff.Documentation.Samples.Skills.ISkOnCallService.GetById(int id)
 	{
 		GetById.RecordCall(id);
-		return GetById.OnCall?.Invoke(this, id) ?? new global::KnockOff.Documentation.Samples.Skills.SkUser();
+		if (GetById.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkOnCallService", "GetById");
+		return new global::KnockOff.Documentation.Samples.Skills.SkUser();
 	}
 
 	global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser> global::KnockOff.Documentation.Samples.Skills.ISkOnCallService.Find(string name, bool active)
 	{
 		Find.RecordCall(name, active);
-		return Find.OnCall?.Invoke(this, name, active) ?? new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser>();
+		if (Find.OnCall is { } callback)
+			return callback(this, name, active);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkOnCallService", "Find");
+		return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser>();
 	}
 
 	void global::KnockOff.Documentation.Samples.Skills.ISkOnCallService.Save(object entity)
 	{
 		Save.RecordCall(entity);
-		Save.OnCall?.Invoke(this, entity);
+		if (Save.OnCall is { } onCallCallback)
+		{ onCallCallback(this, entity); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkOnCallService", "Save");
 	}
 
 }

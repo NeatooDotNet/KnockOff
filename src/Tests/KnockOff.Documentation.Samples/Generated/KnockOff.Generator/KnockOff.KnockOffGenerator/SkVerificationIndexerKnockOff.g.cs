@@ -45,10 +45,13 @@ partial class SkVerificationIndexerKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkVerificationPropertyStore instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ISkVerificationPropertyStore Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	object? global::KnockOff.Documentation.Samples.Skills.ISkVerificationPropertyStore.this[string key]
 	{
-		get { Indexer.RecordGet(key); if (Indexer.OnGet != null) return Indexer.OnGet(this, key); return Indexer.Backing.TryGetValue(key, out var v) ? v : default; }
-		set { Indexer.RecordSet(key, value); if (Indexer.OnSet != null) Indexer.OnSet(this, key, value); else Indexer.Backing[key] = value; }
+		get { Indexer.RecordGet(key); if (Indexer.OnGet is { } onGet) return onGet(this, key); if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkVerificationPropertyStore", "this[]"); return Indexer.Backing.TryGetValue(key, out var v) ? v : default; }
+		set { Indexer.RecordSet(key, value); if (Indexer.OnSet is { } onSet) { onSet(this, key, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkVerificationPropertyStore", "this[]"); Indexer.Backing[key] = value; }
 	}
 
 }

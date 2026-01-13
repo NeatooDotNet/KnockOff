@@ -190,32 +190,37 @@ partial class CollectionStringStubTests
 			void global::System.Collections.Generic.ICollection<string>.Add(string item)
 			{
 				Add.RecordCall(item);
-				if (Add.OnCall is { } onCall) onCall(this, item);
+				if (Add.OnCall is { } onCall) { onCall(this, item); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "Add");
 			}
 
 			void global::System.Collections.Generic.ICollection<string>.Clear()
 			{
 				Clear.RecordCall();
-				if (Clear.OnCall is { } onCall) onCall(this);
+				if (Clear.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "Clear");
 			}
 
 			bool global::System.Collections.Generic.ICollection<string>.Contains(string item)
 			{
 				Contains.RecordCall(item);
 				if (Contains.OnCall is { } onCall) return onCall(this, item);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "Contains");
 				return default!;
 			}
 
 			void global::System.Collections.Generic.ICollection<string>.CopyTo(string[] array, int arrayIndex)
 			{
 				CopyTo.RecordCall(array, arrayIndex);
-				if (CopyTo.OnCall is { } onCall) onCall(this, array, arrayIndex);
+				if (CopyTo.OnCall is { } onCall) { onCall(this, array, arrayIndex); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "CopyTo");
 			}
 
 			bool global::System.Collections.Generic.ICollection<string>.Remove(string item)
 			{
 				Remove.RecordCall(item);
 				if (Remove.OnCall is { } onCall) return onCall(this, item);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "Remove");
 				return default!;
 			}
 
@@ -225,6 +230,7 @@ partial class CollectionStringStubTests
 				{
 					Count.RecordGet();
 					if (Count.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "Count");
 					return Count.Value;
 				}
 			}
@@ -235,6 +241,7 @@ partial class CollectionStringStubTests
 				{
 					IsReadOnly.RecordGet();
 					if (IsReadOnly.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "IsReadOnly");
 					return IsReadOnly.Value;
 				}
 			}
@@ -243,6 +250,7 @@ partial class CollectionStringStubTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable<string>", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
@@ -250,11 +258,22 @@ partial class CollectionStringStubTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
 			/// <summary>The global::System.Collections.Generic.ICollection<string> instance. Use for passing to code expecting the interface.</summary>
 			public global::System.Collections.Generic.ICollection<string> Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public ICollection(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

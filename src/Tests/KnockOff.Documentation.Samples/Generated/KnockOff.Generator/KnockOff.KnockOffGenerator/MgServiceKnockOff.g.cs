@@ -36,10 +36,16 @@ partial class MgServiceKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IMgService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.IMgService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Documentation.Samples.Skills.MgUser? global::KnockOff.Documentation.Samples.Skills.IMgService.GetUser(int id)
 	{
 		GetUser.RecordCall(id);
-		return GetUser.OnCall?.Invoke(this, id) ?? default!;
+		if (GetUser.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMgService", "GetUser");
+		return default!;
 	}
 
 }

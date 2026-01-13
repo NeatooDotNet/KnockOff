@@ -64,15 +64,18 @@ partial class ConfigServiceStub
 	/// <summary>The global::KnockOff.Documentation.Samples.ReadMe.IConfigService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.ReadMe.IConfigService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	string global::KnockOff.Documentation.Samples.ReadMe.IConfigService.ConnectionString
 	{
-		get { ConnectionString.RecordGet(); return ConnectionString.OnGet?.Invoke(this) ?? ConnectionString.Value; }
+		get { ConnectionString.RecordGet(); if (ConnectionString.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IConfigService", "ConnectionString"); return ConnectionString.Value; }
 	}
 
 	string global::KnockOff.Documentation.Samples.ReadMe.IConfigService.LogLevel
 	{
-		get { LogLevel.RecordGet(); return LogLevel.OnGet?.Invoke(this) ?? LogLevel.Value; }
-		set { LogLevel.RecordSet(value); if (LogLevel.OnSet != null) LogLevel.OnSet(this, value); else LogLevel.Value = value; }
+		get { LogLevel.RecordGet(); if (LogLevel.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IConfigService", "LogLevel"); return LogLevel.Value; }
+		set { LogLevel.RecordSet(value); if (LogLevel.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IConfigService", "LogLevel"); LogLevel.Value = value; }
 	}
 
 }

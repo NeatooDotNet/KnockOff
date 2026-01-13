@@ -36,6 +36,9 @@ partial class SkServiceKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ISkService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	int global::KnockOff.Documentation.Samples.Skills.ISkService.GetValue(int id)
 	{
 		GetValue2.RecordCall(id);

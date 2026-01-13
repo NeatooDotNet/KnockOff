@@ -89,12 +89,16 @@ partial class OutParameterServiceKnockOff
 	/// <summary>The global::KnockOff.Tests.IOutParameterService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IOutParameterService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	bool global::KnockOff.Tests.IOutParameterService.TryGetValue(string key, out string? @value)
 	{
 		@value = default!;
 		TryGetValue.RecordCall(key);
 		if (TryGetValue.OnCall is { } onCallCallback)
 			return onCallCallback(this, key, out @value);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IOutParameterService", "TryGetValue");
 		return default!;
 	}
 
@@ -104,6 +108,7 @@ partial class OutParameterServiceKnockOff
 		TryParse.RecordCall(input);
 		if (TryParse.OnCall is { } onCallCallback)
 			return onCallCallback(this, input, out result);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IOutParameterService", "TryParse");
 		return default!;
 	}
 
@@ -114,6 +119,7 @@ partial class OutParameterServiceKnockOff
 		GetData.RecordCall();
 		if (GetData.OnCall is { } onCallCallback)
 		{ onCallCallback(this, out name, out count); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IOutParameterService", "GetData");
 	}
 
 }

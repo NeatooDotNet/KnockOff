@@ -33,10 +33,15 @@ partial class GenLoggerKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Reference.IGenLogger instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Reference.IGenLogger Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Documentation.Samples.Reference.IGenLogger.Log(string level, string message, int code)
 	{
 		Log.RecordCall(level, message, code);
-		Log.OnCall?.Invoke(this, level, message, code);
+		if (Log.OnCall is { } onCallCallback)
+		{ onCallCallback(this, level, message, code); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenLogger", "Log");
 	}
 
 }

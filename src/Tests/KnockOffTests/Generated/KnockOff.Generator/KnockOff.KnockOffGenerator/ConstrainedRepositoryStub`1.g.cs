@@ -61,16 +61,24 @@ partial class ConstrainedRepositoryStub<T> where T : class
 	/// <summary>The global::KnockOff.Tests.IConstrainedRepository<T> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IConstrainedRepository<T> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	T? global::KnockOff.Tests.IConstrainedRepository<T>.GetById(int id)
 	{
 		GetById.RecordCall(id);
-		return GetById.OnCall?.Invoke(this, id) ?? default!;
+		if (GetById.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IConstrainedRepository<T>", "GetById");
+		return default!;
 	}
 
 	void global::KnockOff.Tests.IConstrainedRepository<T>.Save(T entity)
 	{
 		Save.RecordCall(entity);
-		Save.OnCall?.Invoke(this, entity);
+		if (Save.OnCall is { } onCallCallback)
+		{ onCallCallback(this, entity); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IConstrainedRepository<T>", "Save");
 	}
 
 }

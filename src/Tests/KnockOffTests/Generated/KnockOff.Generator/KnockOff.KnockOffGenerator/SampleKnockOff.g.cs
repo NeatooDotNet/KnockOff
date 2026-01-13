@@ -142,16 +142,21 @@ partial class SampleKnockOff
 	/// <summary>The global::KnockOff.Tests.ISampleService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.ISampleService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	string global::KnockOff.Tests.ISampleService.Name
 	{
-		get { Name.RecordGet(); return Name.OnGet?.Invoke(this) ?? Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet != null) Name.OnSet(this, value); else Name.Value = value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ISampleService", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ISampleService", "Name"); Name.Value = value; }
 	}
 
 	void global::KnockOff.Tests.ISampleService.DoSomething()
 	{
 		DoSomething.RecordCall();
-		DoSomething.OnCall?.Invoke(this);
+		if (DoSomething.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISampleService", "DoSomething");
 	}
 
 	int global::KnockOff.Tests.ISampleService.GetValue(int input)
@@ -164,13 +169,18 @@ partial class SampleKnockOff
 	void global::KnockOff.Tests.ISampleService.Calculate(string name, int @value, bool flag)
 	{
 		Calculate.RecordCall(name, @value, flag);
-		Calculate.OnCall?.Invoke(this, name, @value, flag);
+		if (Calculate.OnCall is { } onCallCallback)
+		{ onCallCallback(this, name, @value, flag); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISampleService", "Calculate");
 	}
 
 	string? global::KnockOff.Tests.ISampleService.GetOptional()
 	{
 		GetOptional.RecordCall();
-		return GetOptional.OnCall?.Invoke(this) ?? default!;
+		if (GetOptional.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISampleService", "GetOptional");
+		return default!;
 	}
 
 }

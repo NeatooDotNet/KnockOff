@@ -77,13 +77,15 @@ partial class EnumeratorStubTests
 			{
 				MoveNext.RecordCall();
 				if (MoveNext.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerator", "MoveNext");
 				return default!;
 			}
 
 			void global::System.Collections.IEnumerator.Reset()
 			{
 				Reset.RecordCall();
-				if (Reset.OnCall is { } onCall) onCall(this);
+				if (Reset.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerator", "Reset");
 			}
 
 			object global::System.Collections.IEnumerator.Current
@@ -92,12 +94,23 @@ partial class EnumeratorStubTests
 				{
 					Current.RecordGet();
 					if (Current.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerator", "Current");
 					return Current.Value;
 				}
 			}
 
 			/// <summary>The global::System.Collections.IEnumerator instance. Use for passing to code expecting the interface.</summary>
 			public global::System.Collections.IEnumerator Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IEnumerator(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

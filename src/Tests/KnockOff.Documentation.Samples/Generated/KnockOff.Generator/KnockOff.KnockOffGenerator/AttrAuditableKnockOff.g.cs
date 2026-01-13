@@ -52,14 +52,17 @@ partial class AttrAuditableKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Reference.IAttrAuditableEntity instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Reference.IAttrAuditableEntity Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::System.DateTime global::KnockOff.Documentation.Samples.Reference.IAttrAuditableEntity.CreatedAt
 	{
-		get { CreatedAt.RecordGet(); return CreatedAt.OnGet?.Invoke(this) ?? CreatedAt.Value; }
+		get { CreatedAt.RecordGet(); if (CreatedAt.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IAttrAuditableEntity", "CreatedAt"); return CreatedAt.Value; }
 	}
 
 	string global::KnockOff.Documentation.Samples.Reference.IAttrAuditableEntity.CreatedBy
 	{
-		get { CreatedBy.RecordGet(); return CreatedBy.OnGet?.Invoke(this) ?? CreatedBy.Value; }
+		get { CreatedBy.RecordGet(); if (CreatedBy.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IAttrAuditableEntity", "CreatedBy"); return CreatedBy.Value; }
 	}
 
 }

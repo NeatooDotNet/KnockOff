@@ -35,6 +35,7 @@ partial class EnumerableStringStubTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable<string>", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
@@ -45,6 +46,16 @@ partial class EnumerableStringStubTests
 
 			/// <summary>The global::System.Collections.Generic.IEnumerable<string> instance. Use for passing to code expecting the interface.</summary>
 			public global::System.Collections.Generic.IEnumerable<string> Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IEnumerable(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

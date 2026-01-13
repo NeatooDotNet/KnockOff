@@ -23,7 +23,12 @@ internal sealed record KnockOffTypeInfo(
 	/// Flat collection of all events from all interfaces, deduplicated.
 	/// Used for generating event interceptors directly on stub class in v10.9+ flat API.
 	/// </summary>
-	EquatableArray<EventMemberInfo> FlatEvents) : IEquatable<KnockOffTypeInfo>;
+	EquatableArray<EventMemberInfo> FlatEvents,
+	/// <summary>
+	/// When true, the generated constructor defaults to strict mode (throws on unconfigured calls).
+	/// From [KnockOff(Strict = true)].
+	/// </summary>
+	bool Strict = false) : IEquatable<KnockOffTypeInfo>;
 
 /// <summary>
 /// Represents a containing type (for nested class support).

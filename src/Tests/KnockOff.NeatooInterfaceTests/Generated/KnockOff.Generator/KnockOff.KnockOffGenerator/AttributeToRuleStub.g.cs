@@ -101,11 +101,15 @@ partial class AttributeToRuleStub
 	/// <summary>The global::Neatoo.Rules.Rules.IAttributeToRule instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.Rules.Rules.IAttributeToRule Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::Neatoo.Rules.IRule? global::Neatoo.Rules.Rules.IAttributeToRule.GetRule<T>(global::Neatoo.IPropertyInfo r, object? attribute) where T : class
 	{
 		GetRule.Of<T>().RecordCall(r, attribute);
 		if (GetRule.Of<T>().OnCall is { } callback)
 			return callback(this, r, attribute);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IAttributeToRule", "GetRule");
 		return default!;
 	}
 

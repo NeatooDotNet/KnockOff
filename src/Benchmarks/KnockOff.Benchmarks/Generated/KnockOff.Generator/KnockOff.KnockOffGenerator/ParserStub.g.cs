@@ -64,12 +64,16 @@ partial class ParserStub
 	/// <summary>The global::KnockOff.Benchmarks.Interfaces.IParser instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Interfaces.IParser Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	bool global::KnockOff.Benchmarks.Interfaces.IParser.TryParse(string input, out int result)
 	{
 		result = default!;
 		TryParse.RecordCall(input);
 		if (TryParse.OnCall is { } onCallCallback)
 			return onCallCallback(this, input, out result);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IParser", "TryParse");
 		return default!;
 	}
 
@@ -78,6 +82,7 @@ partial class ParserStub
 		Increment.RecordCall(@value);
 		if (Increment.OnCall is { } onCallCallback)
 		{ onCallCallback(this, ref @value); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IParser", "Increment");
 	}
 
 }

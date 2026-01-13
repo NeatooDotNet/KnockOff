@@ -103,6 +103,7 @@ partial class OrderedEnumerableStringStubTests
 				typedHandler.RecordCall(descending);
 				if (typedHandler.OnCall is { } onCallCallback)
 					return onCallCallback(this, keySelector, comparer, descending);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IOrderedEnumerable<string>", "CreateOrderedEnumerable");
 				return SmartDefault<global::System.Linq.IOrderedEnumerable<string>>("CreateOrderedEnumerable");
 			}
 
@@ -110,6 +111,7 @@ partial class OrderedEnumerableStringStubTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable<string>", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
@@ -117,11 +119,22 @@ partial class OrderedEnumerableStringStubTests
 			{
 				GetEnumerator.RecordCall();
 				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
 			}
 
 			/// <summary>The global::System.Linq.IOrderedEnumerable<string> instance. Use for passing to code expecting the interface.</summary>
 			public global::System.Linq.IOrderedEnumerable<string> Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IOrderedEnumerable(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 			/// <summary>Gets a smart default value for a generic type at runtime.</summary>
 			private static T SmartDefault<T>(string methodName)

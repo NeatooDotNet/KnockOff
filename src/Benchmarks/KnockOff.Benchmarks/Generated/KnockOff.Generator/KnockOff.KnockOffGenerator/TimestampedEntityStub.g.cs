@@ -74,19 +74,22 @@ partial class TimestampedEntityStub
 	/// <summary>The global::KnockOff.Benchmarks.Interfaces.ITimestampedEntity instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Interfaces.ITimestampedEntity Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::System.DateTime global::KnockOff.Benchmarks.Interfaces.ITimestampedEntity.CreatedAt
 	{
-		get { CreatedAt.RecordGet(); return CreatedAt.OnGet?.Invoke(this) ?? CreatedAt.Value; }
+		get { CreatedAt.RecordGet(); if (CreatedAt.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ITimestampedEntity", "CreatedAt"); return CreatedAt.Value; }
 	}
 
 	global::System.DateTime? global::KnockOff.Benchmarks.Interfaces.ITimestampedEntity.UpdatedAt
 	{
-		get { UpdatedAt.RecordGet(); return UpdatedAt.OnGet?.Invoke(this) ?? UpdatedAt.Value; }
+		get { UpdatedAt.RecordGet(); if (UpdatedAt.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ITimestampedEntity", "UpdatedAt"); return UpdatedAt.Value; }
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.IBaseEntity.Id
 	{
-		get { Id.RecordGet(); return Id.OnGet?.Invoke(this) ?? Id.Value; }
+		get { Id.RecordGet(); if (Id.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IBaseEntity", "Id"); return Id.Value; }
 	}
 
 }

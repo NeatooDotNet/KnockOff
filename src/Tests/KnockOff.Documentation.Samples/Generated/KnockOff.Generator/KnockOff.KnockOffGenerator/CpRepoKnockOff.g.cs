@@ -61,6 +61,9 @@ partial class CpRepoKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ICpRepository instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ICpRepository Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.CpUser?> global::KnockOff.Documentation.Samples.Skills.ICpRepository.GetByIdAsync(int id)
 	{
 		GetByIdAsync2.RecordCall(id);

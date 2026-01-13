@@ -33,10 +33,15 @@ partial class MethodFailureKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IMethodFailure instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IMethodFailure Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Documentation.Samples.Guides.IMethodFailure.Save(global::KnockOff.Documentation.Samples.Guides.MethodEntity entity)
 	{
 		Save.RecordCall(entity);
-		Save.OnCall?.Invoke(this, entity);
+		if (Save.OnCall is { } onCallCallback)
+		{ onCallCallback(this, entity); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMethodFailure", "Save");
 	}
 
 }

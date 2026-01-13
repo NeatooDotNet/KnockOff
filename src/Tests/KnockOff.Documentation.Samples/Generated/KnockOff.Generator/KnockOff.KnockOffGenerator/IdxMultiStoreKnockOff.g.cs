@@ -82,16 +82,19 @@ partial class IdxMultiStoreKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IIdxMultiStore instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IIdxMultiStore Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	object? global::KnockOff.Documentation.Samples.Guides.IIdxMultiStore.this[string key]
 	{
-		get { IndexerString.RecordGet(key); if (IndexerString.OnGet != null) return IndexerString.OnGet(this, key); return IndexerString.Backing.TryGetValue(key, out var v) ? v : default; }
-		set { IndexerString.RecordSet(key, value); if (IndexerString.OnSet != null) IndexerString.OnSet(this, key, value); else IndexerString.Backing[key] = value; }
+		get { IndexerString.RecordGet(key); if (IndexerString.OnGet is { } onGet) return onGet(this, key); if (Strict) throw global::KnockOff.StubException.NotConfigured("IIdxMultiStore", "this[]"); return IndexerString.Backing.TryGetValue(key, out var v) ? v : default; }
+		set { IndexerString.RecordSet(key, value); if (IndexerString.OnSet is { } onSet) { onSet(this, key, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IIdxMultiStore", "this[]"); IndexerString.Backing[key] = value; }
 	}
 
 	object? global::KnockOff.Documentation.Samples.Guides.IIdxMultiStore.this[int index]
 	{
-		get { IndexerInt32.RecordGet(index); if (IndexerInt32.OnGet != null) return IndexerInt32.OnGet(this, index); return IndexerInt32.Backing.TryGetValue(index, out var v) ? v : default; }
-		set { IndexerInt32.RecordSet(index, value); if (IndexerInt32.OnSet != null) IndexerInt32.OnSet(this, index, value); else IndexerInt32.Backing[index] = value; }
+		get { IndexerInt32.RecordGet(index); if (IndexerInt32.OnGet is { } onGet) return onGet(this, index); if (Strict) throw global::KnockOff.StubException.NotConfigured("IIdxMultiStore", "this[]"); return IndexerInt32.Backing.TryGetValue(index, out var v) ? v : default; }
+		set { IndexerInt32.RecordSet(index, value); if (IndexerInt32.OnSet is { } onSet) { onSet(this, index, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IIdxMultiStore", "this[]"); IndexerInt32.Backing[index] = value; }
 	}
 
 }

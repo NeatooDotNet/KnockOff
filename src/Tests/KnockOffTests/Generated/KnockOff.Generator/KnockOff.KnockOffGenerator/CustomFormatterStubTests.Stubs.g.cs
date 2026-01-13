@@ -38,11 +38,22 @@ partial class CustomFormatterStubTests
 			{
 				Format.RecordCall(format, arg, formatProvider);
 				if (Format.OnCall is { } onCall) return onCall(this, format, arg, formatProvider);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("ICustomFormatter", "Format");
 				throw new global::System.InvalidOperationException("No implementation provided for Format. Set Format.OnCall.");
 			}
 
 			/// <summary>The global::System.ICustomFormatter instance. Use for passing to code expecting the interface.</summary>
 			public global::System.ICustomFormatter Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public ICustomFormatter(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

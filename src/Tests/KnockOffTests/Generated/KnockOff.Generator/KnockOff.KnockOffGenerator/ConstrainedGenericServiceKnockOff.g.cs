@@ -158,18 +158,24 @@ partial class ConstrainedGenericServiceKnockOff
 	/// <summary>The global::KnockOff.Tests.IConstrainedGenericService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IConstrainedGenericService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	T global::KnockOff.Tests.IConstrainedGenericService.CreateEntity<T>() where T : class
 	{
 		CreateEntity.Of<T>().RecordCall();
 		if (CreateEntity.Of<T>().OnCall is { } callback)
 			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IConstrainedGenericService", "CreateEntity");
 		return SmartDefault<T>("CreateEntity");
 	}
 
 	void global::KnockOff.Tests.IConstrainedGenericService.SaveEntity<T>(T entity)
 	{
 		SaveEntity.Of<T>().RecordCall();
-		SaveEntity.Of<T>().OnCall?.Invoke(this, entity);
+		if (SaveEntity.Of<T>().OnCall is { } onCallCallback)
+		{ onCallCallback(this, entity); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IConstrainedGenericService", "SaveEntity");
 	}
 
 }

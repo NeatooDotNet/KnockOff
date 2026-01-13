@@ -324,34 +324,50 @@ partial class RuleManagerStub
 	/// <summary>The global::Neatoo.Rules.IRuleManager instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.Rules.IRuleManager Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::System.Threading.Tasks.Task global::Neatoo.Rules.IRuleManager.RunRules(string propertyName, global::System.Threading.CancellationToken? token)
 	{
 		RunRules1.RecordCall(propertyName, token);
-		return RunRules1.OnCall?.Invoke(this, propertyName, token) ?? global::System.Threading.Tasks.Task.CompletedTask;
+		if (RunRules1.OnCall is { } callback)
+			return callback(this, propertyName, token);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleManager", "RunRules");
+		return global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.Rules.IRuleManager.RunRules(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
 	{
 		RunRules2.RecordCall(runRules, token);
-		return RunRules2.OnCall?.Invoke(this, runRules, token) ?? global::System.Threading.Tasks.Task.CompletedTask;
+		if (RunRules2.OnCall is { } callback)
+			return callback(this, runRules, token);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleManager", "RunRules");
+		return global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
 	void global::Neatoo.Rules.IRuleManager.AddRule<T>(global::Neatoo.Rules.IRule<T> rule)
 	{
 		AddRule.Of<T>().RecordCall();
-		AddRule.Of<T>().OnCall?.Invoke(this, rule);
+		if (AddRule.Of<T>().OnCall is { } onCallCallback)
+		{ onCallCallback(this, rule); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleManager", "AddRule");
 	}
 
 	void global::Neatoo.Rules.IRuleManager.AddRules<T>(global::Neatoo.Rules.IRule<T>[] rules)
 	{
 		AddRules.Of<T>().RecordCall();
-		AddRules.Of<T>().OnCall?.Invoke(this, rules);
+		if (AddRules.Of<T>().OnCall is { } onCallCallback)
+		{ onCallCallback(this, rules); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleManager", "AddRules");
 	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.Rules.IRuleManager.RunRule(global::Neatoo.Rules.IRule r, global::System.Threading.CancellationToken? token)
 	{
 		RunRule.RecordCall(r, token);
-		return RunRule.OnCall?.Invoke(this, r, token) ?? global::System.Threading.Tasks.Task.CompletedTask;
+		if (RunRule.OnCall is { } callback)
+			return callback(this, r, token);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleManager", "RunRule");
+		return global::System.Threading.Tasks.Task.CompletedTask;
 	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.Rules.IRuleManager.RunRule<T>(global::System.Threading.CancellationToken? token)
@@ -359,12 +375,13 @@ partial class RuleManagerStub
 		RunRuleGeneric.Of<T>().RecordCall();
 		if (RunRuleGeneric.Of<T>().OnCall is { } callback)
 			return callback(this, token);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleManager", "RunRule");
 		return default!;
 	}
 
 	global::System.Collections.Generic.IEnumerable<global::Neatoo.Rules.IRule> global::Neatoo.Rules.IRuleManager.Rules
 	{
-		get { Rules.RecordGet(); return Rules.OnGet?.Invoke(this) ?? Rules.Value; }
+		get { Rules.RecordGet(); if (Rules.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleManager", "Rules"); return Rules.Value; }
 	}
 
 }

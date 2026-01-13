@@ -61,18 +61,24 @@ partial class GenericKeyValueStoreStub<TKey, TValue>
 	/// <summary>The global::KnockOff.Tests.IGenericKeyValueStore<TKey, TValue> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IGenericKeyValueStore<TKey, TValue> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	TValue global::KnockOff.Tests.IGenericKeyValueStore<TKey, TValue>.Get(TKey key)
 	{
 		Get.RecordCall(key);
 		if (Get.OnCall is { } callback)
 			return callback(this, key);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericKeyValueStore<TKey, TValue>", "Get");
 		throw new global::System.InvalidOperationException("No implementation provided for Get. Set Get.OnCall or define a protected method 'Get' in your partial class.");
 	}
 
 	void global::KnockOff.Tests.IGenericKeyValueStore<TKey, TValue>.Set(TKey key, TValue @value)
 	{
 		Set.RecordCall(key, @value);
-		Set.OnCall?.Invoke(this, key, @value);
+		if (Set.OnCall is { } onCallCallback)
+		{ onCallCallback(this, key, @value); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericKeyValueStore<TKey, TValue>", "Set");
 	}
 
 }

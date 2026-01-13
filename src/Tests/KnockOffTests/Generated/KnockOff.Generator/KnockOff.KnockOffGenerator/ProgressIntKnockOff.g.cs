@@ -33,10 +33,15 @@ partial class ProgressIntKnockOff
 	/// <summary>The global::System.IProgress<int> instance. Use for passing to code expecting the interface.</summary>
 	public global::System.IProgress<int> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::System.IProgress<int>.Report(int @value)
 	{
 		Report.RecordCall(@value);
-		Report.OnCall?.Invoke(this, @value);
+		if (Report.OnCall is { } onCallCallback)
+		{ onCallCallback(this, @value); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IProgress<int>", "Report");
 	}
 
 }

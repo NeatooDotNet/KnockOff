@@ -114,28 +114,41 @@ partial class HaOverloadServiceKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IHaOverloadService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.IHaOverloadService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Documentation.Samples.Skills.IHaOverloadService.Process(string data)
 	{
 		Process1.RecordCall(data);
-		Process1.OnCall?.Invoke(this, data);
+		if (Process1.OnCall is { } onCallCallback)
+		{ onCallCallback(this, data); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IHaOverloadService", "Process");
 	}
 
 	void global::KnockOff.Documentation.Samples.Skills.IHaOverloadService.Process(string data, int priority)
 	{
 		Process2.RecordCall(data, priority);
-		Process2.OnCall?.Invoke(this, data, priority);
+		if (Process2.OnCall is { } onCallCallback)
+		{ onCallCallback(this, data, priority); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IHaOverloadService", "Process");
 	}
 
 	int global::KnockOff.Documentation.Samples.Skills.IHaOverloadService.Calculate(int @value)
 	{
 		Calculate1.RecordCall(@value);
-		return Calculate1.OnCall?.Invoke(this, @value) ?? default!;
+		if (Calculate1.OnCall is { } callback)
+			return callback(this, @value);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IHaOverloadService", "Calculate");
+		return default!;
 	}
 
 	int global::KnockOff.Documentation.Samples.Skills.IHaOverloadService.Calculate(int a, int b)
 	{
 		Calculate2.RecordCall(a, b);
-		return Calculate2.OnCall?.Invoke(this, a, b) ?? default!;
+		if (Calculate2.OnCall is { } callback)
+			return callback(this, a, b);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IHaOverloadService", "Calculate");
+		return default!;
 	}
 
 }

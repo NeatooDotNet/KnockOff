@@ -61,16 +61,24 @@ partial class FcOrderRepositoryStub
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IFcOrderRepository instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IFcOrderRepository Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Documentation.Samples.Comparison.FcOrder? global::KnockOff.Documentation.Samples.Comparison.IFcOrderRepository.GetById(int id)
 	{
 		GetById.RecordCall(id);
-		return GetById.OnCall?.Invoke(this, id) ?? default!;
+		if (GetById.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFcOrderRepository", "GetById");
+		return default!;
 	}
 
 	void global::KnockOff.Documentation.Samples.Comparison.IFcOrderRepository.Save(global::KnockOff.Documentation.Samples.Comparison.FcOrder order)
 	{
 		Save.RecordCall(order);
-		Save.OnCall?.Invoke(this, order);
+		if (Save.OnCall is { } onCallCallback)
+		{ onCallCallback(this, order); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFcOrderRepository", "Save");
 	}
 
 }

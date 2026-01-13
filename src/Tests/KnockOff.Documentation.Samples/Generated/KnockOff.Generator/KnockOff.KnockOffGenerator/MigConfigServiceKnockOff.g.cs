@@ -33,6 +33,9 @@ partial class MigConfigServiceKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IMigConfigService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IMigConfigService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Documentation.Samples.Comparison.MigConfig global::KnockOff.Documentation.Samples.Comparison.IMigConfigService.GetConfig()
 	{
 		GetConfig2.RecordCall();

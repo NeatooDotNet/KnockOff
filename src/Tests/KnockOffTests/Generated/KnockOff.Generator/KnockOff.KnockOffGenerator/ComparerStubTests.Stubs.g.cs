@@ -38,11 +38,22 @@ partial class ComparerStubTests
 			{
 				Compare.RecordCall(x, y);
 				if (Compare.OnCall is { } onCall) return onCall(this, x, y);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IComparer", "Compare");
 				return default!;
 			}
 
 			/// <summary>The global::System.Collections.IComparer instance. Use for passing to code expecting the interface.</summary>
 			public global::System.Collections.IComparer Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IComparer(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

@@ -38,6 +38,9 @@ partial class GuideDownloaderKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IGuideDownloader instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IGuideDownloader Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	event global::System.Action<int>? global::KnockOff.Documentation.Samples.Guides.IGuideDownloader.ProgressChanged
 	{
 		add => ProgressChanged.RecordAdd(value);

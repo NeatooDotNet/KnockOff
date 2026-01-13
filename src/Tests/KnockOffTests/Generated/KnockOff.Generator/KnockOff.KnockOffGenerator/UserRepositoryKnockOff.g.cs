@@ -89,22 +89,33 @@ partial class UserRepositoryKnockOff
 	/// <summary>The global::KnockOff.Tests.IRepository<global::KnockOff.Tests.User> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IRepository<global::KnockOff.Tests.User> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Tests.User? global::KnockOff.Tests.IRepository<global::KnockOff.Tests.User>.GetById(int id)
 	{
 		GetById.RecordCall(id);
-		return GetById.OnCall?.Invoke(this, id) ?? default!;
+		if (GetById.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("User>", "GetById");
+		return default!;
 	}
 
 	void global::KnockOff.Tests.IRepository<global::KnockOff.Tests.User>.Save(global::KnockOff.Tests.User entity)
 	{
 		Save.RecordCall(entity);
-		Save.OnCall?.Invoke(this, entity);
+		if (Save.OnCall is { } onCallCallback)
+		{ onCallCallback(this, entity); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("User>", "Save");
 	}
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> global::KnockOff.Tests.IRepository<global::KnockOff.Tests.User>.GetByIdAsync(int id)
 	{
 		GetByIdAsync.RecordCall(id);
-		return GetByIdAsync.OnCall?.Invoke(this, id) ?? global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.User?>(default!);
+		if (GetByIdAsync.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("User>", "GetByIdAsync");
+		return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.User?>(default!);
 	}
 
 }

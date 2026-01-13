@@ -73,6 +73,7 @@ partial class PropertyStoreKnockOff
 				{
 					Name.RecordGet();
 					if (Name.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IInPropertyInfo", "Name");
 					return Name.Value;
 				}
 			}
@@ -83,18 +84,30 @@ partial class PropertyStoreKnockOff
 				{
 					Value.RecordGet();
 					if (Value.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IInPropertyInfo", "Value");
 					return Value.Value;
 				}
 				set
 				{
 					Value.RecordSet(value);
-					if (Value.OnSet is { } onSet) onSet(this, value);
-					else Value.Value = value;
+					if (Value.OnSet is { } onSet) { onSet(this, value); return; }
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IInPropertyInfo", "Value");
+					Value.Value = value;
 				}
 			}
 
 			/// <summary>The global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo instance. Use for passing to code expecting the interface.</summary>
 			public global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IInPropertyInfo(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

@@ -86,22 +86,33 @@ partial class GenericRepoStub<T> where T : class
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IGenericRepo<T> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IGenericRepo<T> Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	T? global::KnockOff.Documentation.Samples.Guides.IGenericRepo<T>.GetById(int id)
 	{
 		GetById.RecordCall(id);
-		return GetById.OnCall?.Invoke(this, id) ?? default!;
+		if (GetById.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericRepo<T>", "GetById");
+		return default!;
 	}
 
 	void global::KnockOff.Documentation.Samples.Guides.IGenericRepo<T>.Save(T entity)
 	{
 		Save.RecordCall(entity);
-		Save.OnCall?.Invoke(this, entity);
+		if (Save.OnCall is { } onCallCallback)
+		{ onCallCallback(this, entity); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericRepo<T>", "Save");
 	}
 
 	global::System.Collections.Generic.IEnumerable<T> global::KnockOff.Documentation.Samples.Guides.IGenericRepo<T>.GetAll()
 	{
 		GetAll.RecordCall();
-		return GetAll.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<T>();
+		if (GetAll.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericRepo<T>", "GetAll");
+		return new global::System.Collections.Generic.List<T>();
 	}
 
 }

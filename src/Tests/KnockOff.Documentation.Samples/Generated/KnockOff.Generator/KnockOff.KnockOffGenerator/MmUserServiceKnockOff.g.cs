@@ -164,40 +164,58 @@ partial class MmUserServiceKnockOff
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IMmUserService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.IMmUserService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	global::KnockOff.Documentation.Samples.Skills.MmUser? global::KnockOff.Documentation.Samples.Skills.IMmUserService.GetUser(int id)
 	{
 		GetUser.RecordCall(id);
-		return GetUser.OnCall?.Invoke(this, id) ?? default!;
+		if (GetUser.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmUserService", "GetUser");
+		return default!;
 	}
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.MmUser?> global::KnockOff.Documentation.Samples.Skills.IMmUserService.GetUserAsync(int id)
 	{
 		GetUserAsync.RecordCall(id);
-		return GetUserAsync.OnCall?.Invoke(this, id) ?? global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Skills.MmUser?>(default!);
+		if (GetUserAsync.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmUserService", "GetUserAsync");
+		return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Skills.MmUser?>(default!);
 	}
 
 	void global::KnockOff.Documentation.Samples.Skills.IMmUserService.Save(global::KnockOff.Documentation.Samples.Skills.MmUser user)
 	{
 		Save.RecordCall(user);
-		Save.OnCall?.Invoke(this, user);
+		if (Save.OnCall is { } onCallCallback)
+		{ onCallCallback(this, user); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmUserService", "Save");
 	}
 
 	void global::KnockOff.Documentation.Samples.Skills.IMmUserService.Delete(int id)
 	{
 		Delete.RecordCall(id);
-		Delete.OnCall?.Invoke(this, id);
+		if (Delete.OnCall is { } onCallCallback)
+		{ onCallCallback(this, id); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmUserService", "Delete");
 	}
 
 	global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Skills.MmUser> global::KnockOff.Documentation.Samples.Skills.IMmUserService.GetAll()
 	{
 		GetAll.RecordCall();
-		return GetAll.OnCall?.Invoke(this) ?? new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.MmUser>();
+		if (GetAll.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmUserService", "GetAll");
+		return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.MmUser>();
 	}
 
 	void global::KnockOff.Documentation.Samples.Skills.IMmUserService.Update(global::KnockOff.Documentation.Samples.Skills.MmUser user)
 	{
 		Update.RecordCall(user);
-		Update.OnCall?.Invoke(this, user);
+		if (Update.OnCall is { } onCallCallback)
+		{ onCallCallback(this, user); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmUserService", "Update");
 	}
 
 }

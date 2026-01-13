@@ -83,15 +83,20 @@ partial class EmailServiceWithValidation
 	/// <summary>The global::KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	void global::KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation.SendEmail(string to, string subject, string body)
 	{
 		SendEmail.RecordCall(to, subject, body);
-		SendEmail.OnCall?.Invoke(this, to, subject, body);
+		if (SendEmail.OnCall is { } onCallCallback)
+		{ onCallCallback(this, to, subject, body); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEmailServiceWithValidation", "SendEmail");
 	}
 
 	bool global::KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation.IsConnected
 	{
-		get { IsConnected.RecordGet(); return IsConnected.OnGet?.Invoke(this) ?? IsConnected.Value; }
+		get { IsConnected.RecordGet(); if (IsConnected.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IEmailServiceWithValidation", "IsConnected"); return IsConnected.Value; }
 	}
 
 	bool global::KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation.IsValidAddress(string email)

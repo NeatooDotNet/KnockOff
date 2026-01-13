@@ -118,13 +118,15 @@ partial class DbTransactionStubTests
 			void global::System.Data.IDbTransaction.Commit()
 			{
 				Commit.RecordCall();
-				if (Commit.OnCall is { } onCall) onCall(this);
+				if (Commit.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbTransaction", "Commit");
 			}
 
 			void global::System.Data.IDbTransaction.Rollback()
 			{
 				Rollback.RecordCall();
-				if (Rollback.OnCall is { } onCall) onCall(this);
+				if (Rollback.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbTransaction", "Rollback");
 			}
 
 			global::System.Data.IDbConnection? global::System.Data.IDbTransaction.Connection
@@ -133,6 +135,7 @@ partial class DbTransactionStubTests
 				{
 					Connection.RecordGet();
 					if (Connection.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbTransaction", "Connection");
 					return Connection.Value;
 				}
 			}
@@ -143,6 +146,7 @@ partial class DbTransactionStubTests
 				{
 					IsolationLevel.RecordGet();
 					if (IsolationLevel.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IDbTransaction", "IsolationLevel");
 					return IsolationLevel.Value;
 				}
 			}
@@ -150,11 +154,22 @@ partial class DbTransactionStubTests
 			void global::System.IDisposable.Dispose()
 			{
 				Dispose.RecordCall();
-				if (Dispose.OnCall is { } onCall) onCall(this);
+				if (Dispose.OnCall is { } onCall) { onCall(this); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IDisposable", "Dispose");
 			}
 
 			/// <summary>The global::System.Data.IDbTransaction instance. Use for passing to code expecting the interface.</summary>
 			public global::System.Data.IDbTransaction Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IDbTransaction(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

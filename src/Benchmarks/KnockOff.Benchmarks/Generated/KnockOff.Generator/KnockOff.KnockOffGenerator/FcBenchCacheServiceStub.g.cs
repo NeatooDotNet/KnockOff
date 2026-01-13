@@ -189,24 +189,32 @@ partial class FcBenchCacheServiceStub
 	/// <summary>The global::KnockOff.Benchmarks.Benchmarks.IFcBenchCacheService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Benchmarks.IFcBenchCacheService Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	T? global::KnockOff.Benchmarks.Benchmarks.IFcBenchCacheService.Get<T>(string key) where T : class
 	{
 		Get.Of<T>().RecordCall(key);
 		if (Get.Of<T>().OnCall is { } callback)
 			return callback(this, key);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFcBenchCacheService", "Get");
 		return default!;
 	}
 
 	void global::KnockOff.Benchmarks.Benchmarks.IFcBenchCacheService.Set<T>(string key, T @value, global::System.TimeSpan expiration) where T : class
 	{
 		Set.Of<T>().RecordCall(key);
-		Set.Of<T>().OnCall?.Invoke(this, key, @value, expiration);
+		if (Set.Of<T>().OnCall is { } onCallCallback)
+		{ onCallCallback(this, key, @value, expiration); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFcBenchCacheService", "Set");
 	}
 
 	void global::KnockOff.Benchmarks.Benchmarks.IFcBenchCacheService.Remove(string key)
 	{
 		Remove.RecordCall(key);
-		Remove.OnCall?.Invoke(this, key);
+		if (Remove.OnCall is { } onCallCallback)
+		{ onCallCallback(this, key); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFcBenchCacheService", "Remove");
 	}
 
 }

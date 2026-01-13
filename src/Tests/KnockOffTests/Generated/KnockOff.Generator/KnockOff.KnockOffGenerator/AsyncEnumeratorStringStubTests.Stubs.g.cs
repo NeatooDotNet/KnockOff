@@ -77,6 +77,7 @@ partial class AsyncEnumeratorStringStubTests
 			{
 				MoveNextAsync.RecordCall();
 				if (MoveNextAsync.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IAsyncEnumerator<string>", "MoveNextAsync");
 				return default;
 			}
 
@@ -86,6 +87,7 @@ partial class AsyncEnumeratorStringStubTests
 				{
 					Current.RecordGet();
 					if (Current.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IAsyncEnumerator<string>", "Current");
 					return Current.Value;
 				}
 			}
@@ -94,11 +96,22 @@ partial class AsyncEnumeratorStringStubTests
 			{
 				DisposeAsync.RecordCall();
 				if (DisposeAsync.OnCall is { } onCall) return onCall(this);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IAsyncDisposable", "DisposeAsync");
 				return default;
 			}
 
 			/// <summary>The global::System.Collections.Generic.IAsyncEnumerator<string> instance. Use for passing to code expecting the interface.</summary>
 			public global::System.Collections.Generic.IAsyncEnumerator<string> Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IAsyncEnumerator(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 		}
 

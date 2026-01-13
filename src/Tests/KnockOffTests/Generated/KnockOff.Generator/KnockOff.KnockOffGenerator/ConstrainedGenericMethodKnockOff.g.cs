@@ -341,11 +341,15 @@ partial class ConstrainedGenericMethodKnockOff
 	/// <summary>The global::KnockOff.Tests.IConstrainedGenericMethod instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IConstrainedGenericMethod Object => this;
 
+	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	public bool Strict { get; set; } = false;
+
 	T? global::KnockOff.Tests.IConstrainedGenericMethod.GetAttribute<T>() where T : class
 	{
 		GetAttribute.Of<T>().RecordCall();
 		if (GetAttribute.Of<T>().OnCall is { } callback)
 			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IConstrainedGenericMethod", "GetAttribute");
 		return default!;
 	}
 
@@ -354,6 +358,7 @@ partial class ConstrainedGenericMethodKnockOff
 		GetOrDefault.Of<T>().RecordCall();
 		if (GetOrDefault.Of<T>().OnCall is { } callback)
 			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IConstrainedGenericMethod", "GetOrDefault");
 		return default!;
 	}
 
@@ -362,6 +367,7 @@ partial class ConstrainedGenericMethodKnockOff
 		Transform.Of<TInput, TResult>().RecordCall();
 		if (Transform.Of<TInput, TResult>().OnCall is { } callback)
 			return callback(this, input);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IConstrainedGenericMethod", "Transform");
 		return default!;
 	}
 
@@ -370,6 +376,7 @@ partial class ConstrainedGenericMethodKnockOff
 		GetValue.Of<T>().RecordCall(index);
 		if (GetValue.Of<T>().OnCall is { } callback)
 			return callback(this, index);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IConstrainedGenericMethod", "GetValue");
 		return SmartDefault<T>("GetValue");
 	}
 
@@ -378,6 +385,7 @@ partial class ConstrainedGenericMethodKnockOff
 		FindService.Of<T>().RecordCall();
 		if (FindService.Of<T>().OnCall is { } callback)
 			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IConstrainedGenericMethod", "FindService");
 		return default!;
 	}
 

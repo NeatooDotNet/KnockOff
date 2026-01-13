@@ -269,6 +269,7 @@ partial class InlineRuleManagerTests
 			{
 				RunRules.RecordCall(propertyName, token, null);
 				if (RunRules.OnCall is { } onCall) return onCall(this, propertyName, token, null);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IRuleManager", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -276,6 +277,7 @@ partial class InlineRuleManagerTests
 			{
 				RunRules.RecordCall(null, token, runRules);
 				if (RunRules.OnCall is { } onCall) return onCall(this, null, token, runRules);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IRuleManager", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -285,6 +287,7 @@ partial class InlineRuleManagerTests
 				typedHandler.RecordCall();
 				if (typedHandler.OnCall is { } onCallCallback)
 				{ onCallCallback(this, rule); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IRuleManager", "AddRule");
 			}
 
 			void global::Neatoo.Rules.IRuleManager.AddRules<T>(global::Neatoo.Rules.IRule<T>[] rules)
@@ -293,12 +296,14 @@ partial class InlineRuleManagerTests
 				typedHandler.RecordCall();
 				if (typedHandler.OnCall is { } onCallCallback)
 				{ onCallCallback(this, rules); return; }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IRuleManager", "AddRules");
 			}
 
 			global::System.Threading.Tasks.Task global::Neatoo.Rules.IRuleManager.RunRule(global::Neatoo.Rules.IRule r, global::System.Threading.CancellationToken? token)
 			{
 				RunRule.RecordCall(r, token);
 				if (RunRule.OnCall is { } onCall) return onCall(this, r, token);
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IRuleManager", "RunRule");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -308,6 +313,7 @@ partial class InlineRuleManagerTests
 				typedHandler.RecordCall(token);
 				if (typedHandler.OnCall is { } onCallCallback)
 				{ return onCallCallback(this, token); }
+				if (_strict) throw global::KnockOff.StubException.NotConfigured("IRuleManager", "RunRule");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -317,12 +323,23 @@ partial class InlineRuleManagerTests
 				{
 					Rules.RecordGet();
 					if (Rules.OnGet is { } onGet) return onGet(this);
+					if (_strict) throw global::KnockOff.StubException.NotConfigured("IRuleManager", "Rules");
 					return Rules.Value;
 				}
 			}
 
 			/// <summary>The global::Neatoo.Rules.IRuleManager instance. Use for passing to code expecting the interface.</summary>
 			public global::Neatoo.Rules.IRuleManager Object => this;
+
+			/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+			private readonly bool _strict;
+
+			/// <summary>Creates a new instance of the stub.</summary>
+			/// <param name="strict">When true, unconfigured method calls throw StubException.</param>
+			public IRuleManager(bool strict = false)
+			{
+				_strict = strict;
+			}
 
 			/// <summary>Gets a smart default value for a generic type at runtime.</summary>
 			private static T SmartDefault<T>(string methodName)
