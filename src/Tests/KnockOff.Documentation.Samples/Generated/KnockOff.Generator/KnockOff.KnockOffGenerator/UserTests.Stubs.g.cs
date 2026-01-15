@@ -8,7 +8,7 @@ partial class UserTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IUserService.GetUser.</summary>
+		/// <summary>Interceptor for GetUser.</summary>
 		public sealed class IUserService_GetUserInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
