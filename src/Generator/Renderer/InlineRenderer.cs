@@ -77,7 +77,7 @@ internal static class InlineRenderer
         // Render class stubs
         foreach (var classStub in unit.ClassStubs)
         {
-            RenderClassStubPlaceholder(w, classStub);
+            RenderClassStub(w, classStub);
         }
 
         w.Line("\t}"); // Close Stubs class
@@ -919,14 +919,12 @@ internal static class InlineRenderer
 
     #endregion
 
-    #region Class Stub Rendering (Placeholder)
+    #region Class Stub Rendering
 
-    private static void RenderClassStubPlaceholder(CodeWriter w, InlineClassStubModel cls)
+    private static void RenderClassStub(CodeWriter w, InlineClassStubModel cls)
     {
-        // This is a placeholder - class stubs will use the existing GenerateClassStubClass for now
-        // until we refactor that to use models as well
-        w.Line($"\t\t// Class stub for {cls.ClassType} - rendered via legacy path");
-        w.Line();
+        // Delegate to ClassRenderer for full rendering
+        ClassRenderer.Render(w, cls, baseIndent: 2);
     }
 
     #endregion

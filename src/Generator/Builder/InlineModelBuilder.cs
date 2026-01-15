@@ -994,38 +994,8 @@ internal static class InlineModelBuilder
 
     private static InlineClassStubModel BuildClassStub(ClassStubInfo cls)
     {
-        // TODO: Full implementation for class stubs
-        // For now, return a minimal stub that allows the code to compile
-        var typeParamList = SymbolHelpers.FormatTypeParameterList(cls.TypeParameters);
-        var constraints = SymbolHelpers.FormatTypeConstraints(cls.TypeParameters);
-        var constraintClause = string.IsNullOrEmpty(constraints) ? "" : $" {constraints}";
-
-        var baseType = cls.IsOpenGeneric && typeParamList.Length > 0
-            ? SymbolHelpers.ReplaceUnboundGeneric(cls.FullName, typeParamList)
-            : cls.FullName;
-
-        var typeParameters = cls.TypeParameters.Select(tp => new TypeParameterModel(
-            Name: tp.Name,
-            Constraints: string.Join(", ", tp.Constraints))).ToEquatableArray();
-
-        // We'll delegate to existing GenerateClassStubClass for now
-        // This model just holds the minimal info needed
-        return new InlineClassStubModel(
-            StubClassName: cls.Name,
-            ClassType: cls.FullName,
-            BaseType: baseType,
-            IsOpenGeneric: cls.IsOpenGeneric,
-            TypeParameters: typeParameters,
-            TypeParameterList: typeParamList,
-            ConstraintClauses: constraintClause,
-            Constructors: EquatableArray<InlineConstructorModel>.Empty,
-            Properties: EquatableArray<InlineClassPropertyModel>.Empty,
-            Indexers: EquatableArray<InlineClassIndexerModel>.Empty,
-            Methods: EquatableArray<InlineClassMethodModel>.Empty,
-            Events: EquatableArray<InlineClassEventModel>.Empty,
-            InterceptorProperties: EquatableArray<InlineInterceptorPropertyModel>.Empty,
-            HasRequiredMembers: false,
-            RequiredMemberNames: EquatableArray<string>.Empty);
+        // Delegate to ClassModelBuilder for full implementation
+        return ClassModelBuilder.Build(cls);
     }
 
     #endregion
