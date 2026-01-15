@@ -1,6 +1,8 @@
 // src/Generator/Renderer/FlatRenderer.cs
 #nullable enable
+using System.Collections.Generic;
 using System.Linq;
+using KnockOff;
 using KnockOff.Model.Flat;
 using KnockOff.Model.Shared;
 
@@ -20,6 +22,13 @@ internal static class FlatRenderer
 		w.Line("#nullable enable");
 		w.Line();
 
+		// Add using System.Linq if there are generic methods (needed for aggregate LINQ in handlers)
+		if (unit.HasGenericMethods)
+		{
+			w.Line("using System.Linq;");
+			w.Line();
+		}
+
 		// Namespace
 		if (!string.IsNullOrEmpty(unit.Namespace))
 		{
@@ -27,32 +36,66 @@ internal static class FlatRenderer
 			w.Line();
 		}
 
+		// Open containing type wrappers for nested classes
+		foreach (var containingType in unit.ContainingTypes)
+		{
+			var accessMod = string.IsNullOrEmpty(containingType.AccessModifier)
+				? ""
+				: containingType.AccessModifier + " ";
+			w.Line($"{accessMod}partial {containingType.Keyword} {containingType.Name}");
+			w.Line("{");
+		}
+
 		// Class declaration with interfaces
 		var interfaces = string.Join(", ", unit.InterfaceList);
 		var typeParams = FormatTypeParameters(unit.TypeParameters);
 		var constraints = FormatConstraints(unit.TypeParameters);
 
+		// Calculate the class name with type parameters for delegate signatures
+		var classNameWithTypeParams = $"{unit.ClassName}{typeParams}";
+
 		using (w.Block($"partial class {unit.ClassName}{typeParams} : {interfaces}, global::KnockOff.IKnockOffStub{constraints}"))
 		{
+			// Track rendered interceptors to avoid duplicates
+			// (Multiple interface members may map to the same interceptor)
+			var renderedInterceptorClasses = new HashSet<string>();
+
 			// Generic method interfaces if needed
 			if (unit.HasGenericMethods)
 				RenderGenericMethodInterfaces(w);
 
-			// Interceptor classes
+			// Interceptor classes (deduplicated by interceptor name)
 			foreach (var prop in unit.Properties)
-				RenderPropertyInterceptorClass(w, prop, unit.ClassName);
+			{
+				if (renderedInterceptorClasses.Add(prop.InterceptorClassName))
+					RenderPropertyInterceptorClass(w, prop, classNameWithTypeParams);
+			}
 
 			foreach (var indexer in unit.Indexers)
-				RenderIndexerInterceptorClass(w, indexer, unit.ClassName);
+			{
+				if (renderedInterceptorClasses.Add(indexer.InterceptorClassName))
+					RenderIndexerInterceptorClass(w, indexer, classNameWithTypeParams);
+			}
 
-			foreach (var method in unit.Methods)
-				RenderMethodInterceptorClass(w, method, unit.ClassName);
+			// Only render interceptor classes for non-generic methods
+			// Generic methods use the handler classes with Of<T>() pattern
+			foreach (var method in unit.Methods.Where(m => !m.IsGenericMethod))
+			{
+				if (renderedInterceptorClasses.Add(method.InterceptorClassName))
+					RenderMethodInterceptorClass(w, method, classNameWithTypeParams);
+			}
 
 			foreach (var handler in unit.GenericMethodHandlers)
-				RenderGenericMethodHandler(w, handler, unit.ClassName);
+			{
+				if (renderedInterceptorClasses.Add(handler.InterceptorClassName))
+					RenderGenericMethodHandler(w, handler, classNameWithTypeParams);
+			}
 
 			foreach (var evt in unit.Events)
-				RenderEventInterceptorClass(w, evt);
+			{
+				if (renderedInterceptorClasses.Add(evt.InterceptorClassName))
+					RenderEventInterceptorClass(w, evt);
+			}
 
 			// Interceptor properties (public access to interceptors)
 			RenderInterceptorProperties(w, unit);
@@ -60,7 +103,7 @@ internal static class FlatRenderer
 			// Standard members (Strict mode, Object accessor)
 			RenderStandardMembers(w, unit);
 
-			// Explicit interface implementations
+			// Explicit interface implementations (NOT deduplicated - one per interface member)
 			foreach (var prop in unit.Properties)
 				RenderPropertyImplementation(w, prop);
 
@@ -72,6 +115,12 @@ internal static class FlatRenderer
 
 			foreach (var evt in unit.Events)
 				RenderEventImplementation(w, evt);
+		}
+
+		// Close containing type wrappers for nested classes
+		for (int i = 0; i < unit.ContainingTypes.Count; i++)
+		{
+			w.Line("}");
 		}
 
 		return w.ToString();
@@ -605,9 +654,14 @@ internal static class FlatRenderer
 
 	private static void RenderInterceptorProperties(CodeWriter w, FlatGenerationUnit unit)
 	{
+		// Track rendered interceptor properties to avoid duplicates
+		var renderedProperties = new HashSet<string>();
+
 		// Properties
 		foreach (var prop in unit.Properties)
 		{
+			if (!renderedProperties.Add(prop.InterceptorName))
+				continue;
 			var newKeyword = prop.NeedsNewKeyword ? "new " : "";
 			w.Line($"/// <summary>Interceptor for {prop.MemberName}. Configure via .Value, track via .GetCount.</summary>");
 			w.Line($"public {newKeyword}{prop.InterceptorClassName} {prop.InterceptorName} {{ get; }} = new();");
@@ -617,15 +671,19 @@ internal static class FlatRenderer
 		// Indexers
 		foreach (var indexer in unit.Indexers)
 		{
+			if (!renderedProperties.Add(indexer.InterceptorName))
+				continue;
 			var newKeyword = indexer.NeedsNewKeyword ? "new " : "";
 			w.Line($"/// <summary>Interceptor for indexer. Configure callbacks and track access.</summary>");
 			w.Line($"public {newKeyword}{indexer.InterceptorClassName} {indexer.InterceptorName} {{ get; }} = new();");
 			w.Line();
 		}
 
-		// Methods
-		foreach (var method in unit.Methods)
+		// Methods (only non-generic - generic methods use handler properties)
+		foreach (var method in unit.Methods.Where(m => !m.IsGenericMethod))
 		{
+			if (!renderedProperties.Add(method.InterceptorName))
+				continue;
 			var newKeyword = method.NeedsNewKeyword ? "new " : "";
 			w.Line($"/// <summary>Interceptor for {method.MethodName}.</summary>");
 			w.Line($"public {newKeyword}{method.InterceptorClassName} {method.InterceptorName} {{ get; }} = new();");
@@ -635,6 +693,8 @@ internal static class FlatRenderer
 		// Generic method handlers
 		foreach (var handler in unit.GenericMethodHandlers)
 		{
+			if (!renderedProperties.Add(handler.InterceptorName))
+				continue;
 			var newKeyword = handler.NeedsNewKeyword ? "new " : "";
 			w.Line($"/// <summary>Interceptor for {handler.MethodName} (generic method).</summary>");
 			w.Line($"public {newKeyword}{handler.InterceptorClassName} {handler.InterceptorName} {{ get; }} = new();");
@@ -644,6 +704,8 @@ internal static class FlatRenderer
 		// Events
 		foreach (var evt in unit.Events)
 		{
+			if (!renderedProperties.Add(evt.InterceptorName))
+				continue;
 			var newKeyword = evt.NeedsNewKeyword ? "new " : "";
 			w.Line($"/// <summary>Interceptor for {evt.EventName} event.</summary>");
 			w.Line($"public {newKeyword}{evt.InterceptorClassName} {evt.InterceptorName} {{ get; }} = new();");
@@ -657,16 +719,17 @@ internal static class FlatRenderer
 
 	private static void RenderStandardMembers(CodeWriter w, FlatGenerationUnit unit)
 	{
-		// Strict mode property
+		// Strict mode property with configurable default
+		var strictDefault = unit.Strict ? "true" : "false";
 		w.Line("/// <summary>When true, throws StubException for unconfigured member access.</summary>");
-		w.Line("public bool Strict { get; set; }");
+		w.Line($"public bool Strict {{ get; set; }} = {strictDefault};");
 		w.Line();
 
-		// Object accessor
-		var interfaces = string.Join(", ", unit.InterfaceList);
+		// Object accessor - returns the first interface type
 		var typeParams = FormatTypeParameters(unit.TypeParameters);
-		w.Line("/// <summary>Gets this stub as the implemented interface.</summary>");
-		w.Line($"public {unit.ClassName}{typeParams} Object => this;");
+		var primaryInterface = unit.InterfaceList.Count > 0 ? unit.InterfaceList.GetArray()![0] : $"{unit.ClassName}{typeParams}";
+		w.Line($"/// <summary>The {primaryInterface} instance. Use for passing to code expecting the interface.</summary>");
+		w.Line($"public {primaryInterface} Object => this;");
 		w.Line();
 
 		// SmartDefault helper (only if there are generic methods)
@@ -678,35 +741,26 @@ internal static class FlatRenderer
 
 	private static void RenderSmartDefaultMethod(CodeWriter w)
 	{
-		w.Line("/// <summary>Returns a smart default value for type T, creating instances when possible.</summary>");
-		using (w.Block("private static T SmartDefault<T>(string memberName)"))
+		w.Line("/// <summary>Gets a smart default value for a generic type at runtime.</summary>");
+		using (w.Block("private static T SmartDefault<T>(string methodName)"))
 		{
 			w.Line("var type = typeof(T);");
 			w.Line();
-			w.Line("// Value types get default");
+			w.Line("// Value types -> default(T)");
 			w.Line("if (type.IsValueType)");
 			w.Line("\treturn default!;");
 			w.Line();
-			w.Line("// Arrays get empty array");
-			w.Line("if (type.IsArray)");
-			w.Line("\treturn (T)(object)global::System.Array.CreateInstance(type.GetElementType()!, 0);");
+			w.Line("// Check for parameterless constructor");
+			w.Line("var ctor = type.GetConstructor(");
+			w.Line("\tSystem.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,");
+			w.Line("\tnull, System.Type.EmptyTypes, null);");
 			w.Line();
-			w.Line("// String gets empty");
-			w.Line("if (type == typeof(string))");
-			w.Line("\treturn (T)(object)\"\";");
+			w.Line("if (ctor != null)");
+			w.Line("\treturn (T)ctor.Invoke(null);");
 			w.Line();
-			w.Line("// Try parameterless constructor");
-			w.Line("try");
-			using (w.Braces())
-			{
-				w.Line("var ctor = type.GetConstructor(global::System.Type.EmptyTypes);");
-				w.Line("if (ctor != null)");
-				w.Line("\treturn (T)ctor.Invoke(null);");
-			}
-			w.Line("catch { }");
-			w.Line();
-			w.Line("// Fallback to default (null for reference types)");
-			w.Line("return default!;");
+			w.Line("throw new global::System.InvalidOperationException(");
+			w.Line("\t$\"No implementation provided for {methodName}<{type.Name}>. \" +");
+			w.Line("\t$\"Set the handler's OnCall.\");");
 		}
 		w.Line();
 	}
@@ -717,6 +771,13 @@ internal static class FlatRenderer
 
 	private static void RenderPropertyImplementation(CodeWriter w, FlatPropertyModel prop)
 	{
+		// Handle property delegation (e.g., IProperty.Value (object) delegates to IProperty<T>.Value (T))
+		if (prop.DelegationTarget != null && prop.DelegationTargetInterface != null)
+		{
+			RenderPropertyDelegation(w, prop);
+			return;
+		}
+
 		w.Line($"{prop.ReturnType} {prop.DeclaringInterface}.{prop.MemberName}");
 		using (w.Braces())
 		{
@@ -741,6 +802,29 @@ internal static class FlatRenderer
 					if (prop.SetterPragmaRestore != null)
 						w.Line(prop.SetterPragmaRestore);
 				}
+			}
+		}
+		w.Line();
+	}
+
+	private static void RenderPropertyDelegation(CodeWriter w, FlatPropertyModel prop)
+	{
+		var target = prop.DelegationTarget!;
+		var targetInterface = prop.DelegationTargetInterface!;
+
+		w.Line($"{prop.ReturnType} {prop.DeclaringInterface}.{prop.MemberName}");
+		using (w.Braces())
+		{
+			if (prop.HasGetter)
+			{
+				// Cast the typed value to object (or the base return type)
+				w.Line($"get => (({targetInterface})this).{target.Name}!;");
+			}
+
+			if (prop.HasSetter)
+			{
+				// Cast the object value to the typed type
+				w.Line($"set => (({targetInterface})this).{target.Name} = ({target.ReturnType.TrimEnd('?')})value!;");
 			}
 		}
 		w.Line();
@@ -774,6 +858,13 @@ internal static class FlatRenderer
 
 	private static void RenderMethodImplementation(CodeWriter w, FlatMethodModel method)
 	{
+		// Handle method delegation (e.g., IRule.RunRule(IValidateBase) delegates to IRule<T>.RunRule(T))
+		if (method.DelegationTarget != null && method.DelegationTargetInterface != null)
+		{
+			RenderMethodDelegation(w, method);
+			return;
+		}
+
 		w.Line($"{method.ReturnType} {method.DeclaringInterface}.{method.MethodName}{method.TypeParameterDecl}({method.ParameterDeclarations}){method.ConstraintClauses}");
 		using (w.Braces())
 		{
@@ -783,8 +874,15 @@ internal static class FlatRenderer
 				w.Line($"{p.EscapedName} = default!;");
 			}
 
+			// Build interceptor access expression
+			// For generic methods: MethodName.Of<T>() pattern
+			// For non-generic methods: MethodName directly
+			var interceptorAccess = method.IsGenericMethod
+				? $"{method.InterceptorName}{method.OfTypeAccess}"
+				: method.InterceptorName;
+
 			// Record the call
-			w.Line($"{method.InterceptorName}{method.TypeParameterList}.RecordCall({method.RecordCallArgs});");
+			w.Line($"{interceptorAccess}.RecordCall({method.RecordCallArgs});");
 
 			// Build onCall args
 			var hasRefOrOut = method.Parameters.Any(p => p.RefKind == Microsoft.CodeAnalysis.RefKind.Ref || p.RefKind == Microsoft.CodeAnalysis.RefKind.Out);
@@ -797,12 +895,12 @@ internal static class FlatRenderer
 				// User method takes priority
 				if (method.IsVoid)
 				{
-					w.Line($"if ({method.InterceptorName}{method.TypeParameterList}.OnCall is {{ }} callback) {{ callback({onCallArgs}); return; }}");
+					w.Line($"if ({interceptorAccess}.OnCall is {{ }} callback) {{ callback({onCallArgs}); return; }}");
 					w.Line($"{method.UserMethodCall};");
 				}
 				else
 				{
-					w.Line($"if ({method.InterceptorName}{method.TypeParameterList}.OnCall is {{ }} callback) return callback({onCallArgs});");
+					w.Line($"if ({interceptorAccess}.OnCall is {{ }} callback) return callback({onCallArgs});");
 					w.Line($"return {method.UserMethodCall};");
 				}
 			}
@@ -811,18 +909,18 @@ internal static class FlatRenderer
 				// Ref/out methods need special handling
 				if (method.IsVoid)
 				{
-					w.Line($"if ({method.InterceptorName}{method.TypeParameterList}.OnCall is {{ }} onCallCallback)");
+					w.Line($"if ({interceptorAccess}.OnCall is {{ }} onCallCallback)");
 					w.Line($"{{ onCallCallback({onCallArgs}); return; }}");
 					w.Line($"if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{method.SimpleInterfaceName}\", \"{method.MethodName}\");");
 				}
 				else
 				{
-					w.Line($"if ({method.InterceptorName}{method.TypeParameterList}.OnCall is {{ }} onCallCallback)");
+					w.Line($"if ({interceptorAccess}.OnCall is {{ }} onCallCallback)");
 					w.Line($"\treturn onCallCallback({onCallArgs});");
 					w.Line($"if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{method.SimpleInterfaceName}\", \"{method.MethodName}\");");
 					if (method.ThrowsOnDefault)
 					{
-						w.Line($"throw new global::System.InvalidOperationException(\"No implementation provided for {method.MethodName}. Set {method.InterceptorName}.OnCall or define a protected method '{method.MethodName}' in your partial class.\");");
+						w.Line($"throw new global::System.InvalidOperationException(\"No implementation provided for {method.MethodName}. Set {interceptorAccess}.OnCall or define a protected method '{method.MethodName}' in your partial class.\");");
 					}
 					else
 					{
@@ -835,26 +933,61 @@ internal static class FlatRenderer
 				// Standard method
 				if (method.IsVoid)
 				{
-					w.Line($"if ({method.InterceptorName}{method.TypeParameterList}.OnCall is {{ }} onCallCallback)");
+					w.Line($"if ({interceptorAccess}.OnCall is {{ }} onCallCallback)");
 					w.Line($"{{ onCallCallback({onCallArgs}); return; }}");
 					w.Line($"if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{method.SimpleInterfaceName}\", \"{method.MethodName}\");");
 				}
 				else if (method.ThrowsOnDefault)
 				{
-					w.Line($"if ({method.InterceptorName}{method.TypeParameterList}.OnCall is {{ }} callback)");
+					w.Line($"if ({interceptorAccess}.OnCall is {{ }} callback)");
 					w.Line($"\treturn callback({onCallArgs});");
 					w.Line($"if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{method.SimpleInterfaceName}\", \"{method.MethodName}\");");
-					w.Line($"throw new global::System.InvalidOperationException(\"No implementation provided for {method.MethodName}. Set {method.InterceptorName}.OnCall or define a protected method '{method.MethodName}' in your partial class.\");");
+					w.Line($"throw new global::System.InvalidOperationException(\"No implementation provided for {method.MethodName}. Set {interceptorAccess}.OnCall or define a protected method '{method.MethodName}' in your partial class.\");");
 				}
 				else
 				{
-					w.Line($"if ({method.InterceptorName}{method.TypeParameterList}.OnCall is {{ }} callback)");
+					w.Line($"if ({interceptorAccess}.OnCall is {{ }} callback)");
 					w.Line($"\treturn callback({onCallArgs});");
 					w.Line($"if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{method.SimpleInterfaceName}\", \"{method.MethodName}\");");
 					w.Line($"return {method.DefaultExpression};");
 				}
 			}
 		}
+		w.Line();
+	}
+
+	private static void RenderMethodDelegation(CodeWriter w, FlatMethodModel method)
+	{
+		var target = method.DelegationTarget!;
+		var targetInterface = method.DelegationTargetInterface!;
+
+		// Build parameter cast expressions for delegation
+		var memberParams = method.Parameters.GetArray() ?? System.Array.Empty<KnockOff.Model.Shared.ParameterModel>();
+		var targetParams = target.Parameters.GetArray() ?? System.Array.Empty<ParameterInfo>();
+
+		var castArgs = new List<string>();
+		for (int i = 0; i < memberParams.Length; i++)
+		{
+			var memberType = memberParams[i].Type;
+			var targetType = targetParams[i].Type;
+			var paramName = memberParams[i].EscapedName;
+
+			if (memberType != targetType)
+			{
+				// Cast to the target type
+				castArgs.Add($"({targetType}){paramName}");
+			}
+			else
+			{
+				castArgs.Add(paramName);
+			}
+		}
+
+		var argList = string.Join(", ", castArgs);
+		var returnKeyword = method.IsVoid ? "" : "return ";
+
+		w.Line($"{method.ReturnType} {method.DeclaringInterface}.{method.MethodName}{method.TypeParameterDecl}({method.ParameterDeclarations}){method.ConstraintClauses}");
+		w.Line($"\t=> {returnKeyword}(({targetInterface})this).{target.Name}({argList});");
 		w.Line();
 	}
 

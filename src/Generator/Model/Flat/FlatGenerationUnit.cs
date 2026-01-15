@@ -13,10 +13,12 @@ internal sealed record FlatGenerationUnit(
     string Namespace,
     EquatableArray<string> InterfaceList,
     EquatableArray<TypeParameterModel> TypeParameters,
+    EquatableArray<ContainingTypeModel> ContainingTypes,
     EquatableArray<FlatPropertyModel> Properties,
     EquatableArray<FlatIndexerModel> Indexers,
     EquatableArray<FlatMethodModel> Methods,
     EquatableArray<FlatGenericMethodHandlerModel> GenericMethodHandlers,
     EquatableArray<FlatEventModel> Events,
     bool HasGenericMethods,
-    bool ImplementsIKnockOffStub);
+    bool ImplementsIKnockOffStub,
+    bool Strict);

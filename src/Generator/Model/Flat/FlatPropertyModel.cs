@@ -1,5 +1,6 @@
 // src/Generator/Model/Flat/FlatPropertyModel.cs
 #nullable enable
+using KnockOff;
 
 namespace KnockOff.Model.Flat;
 
@@ -21,4 +22,6 @@ internal sealed record FlatPropertyModel(
     string? SetterPragmaRestore,
     string SimpleInterfaceName,
     string? UserMethodName,
-    bool NeedsNewKeyword);
+    bool NeedsNewKeyword,
+    InterfaceMemberInfo? DelegationTarget,
+    string? DelegationTargetInterface);

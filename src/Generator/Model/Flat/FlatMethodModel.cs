@@ -1,5 +1,6 @@
 // src/Generator/Model/Flat/FlatMethodModel.cs
 #nullable enable
+using KnockOff;
 using KnockOff.Model.Shared;
 
 namespace KnockOff.Model.Flat;
@@ -31,4 +32,9 @@ internal sealed record FlatMethodModel(
     string TypeParameterDecl,
     string TypeParameterList,
     string ConstraintClauses,
-    bool NeedsNewKeyword);
+    bool NeedsNewKeyword,
+    bool IsGenericMethod,
+    bool IsNullableReturn,
+    string OfTypeAccess,
+    InterfaceMemberInfo? DelegationTarget,
+    string? DelegationTargetInterface);

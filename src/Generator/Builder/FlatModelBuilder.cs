@@ -38,18 +38,26 @@ internal static class FlatModelBuilder
 		var (methods, genericHandlers) = BuildMethodModels(typeInfo, nameMap, methodGroups, className);
 		var events = BuildEventModels(typeInfo, nameMap);
 
+		// Build containing types models
+		var containingTypes = typeInfo.ContainingTypes.Select(ct => new ContainingTypeModel(
+			Keyword: ct.Keyword,
+			Name: ct.Name,
+			AccessModifier: ct.AccessibilityModifier)).ToEquatableArray();
+
 		return new FlatGenerationUnit(
 			ClassName: typeInfo.ClassName,
 			Namespace: typeInfo.Namespace,
 			InterfaceList: typeInfo.Interfaces.Select(i => i.FullName).ToEquatableArray(),
 			TypeParameters: BuildTypeParameters(typeInfo.TypeParameters),
+			ContainingTypes: containingTypes,
 			Properties: properties,
 			Indexers: indexers,
 			Methods: methods,
 			GenericMethodHandlers: genericHandlers,
 			Events: events,
-			HasGenericMethods: genericHandlers.Count > 0,
-			ImplementsIKnockOffStub: true);
+			HasGenericMethods: genericHandlers.Count > 0 || methods.Any(m => m.IsGenericMethod),
+			ImplementsIKnockOffStub: true,
+			Strict: typeInfo.Strict);
 	}
 
 	#region Name Map Building
@@ -243,45 +251,201 @@ internal static class FlatModelBuilder
 		string className)
 	{
 		var properties = new List<FlatPropertyModel>();
+		var generatedImplementations = new HashSet<string>();
 
-		foreach (var member in typeInfo.FlatMembers)
+		// Iterate over ALL interfaces for implementations (not just FlatMembers)
+		foreach (var iface in typeInfo.Interfaces)
 		{
-			if (!member.IsProperty || member.IsIndexer)
-				continue;
+			foreach (var member in iface.Members)
+			{
+				if (!member.IsProperty || member.IsIndexer)
+					continue;
 
-			var key = GetMemberKey(member);
-			var interceptorName = nameMap[key];
-			var interceptorClassName = $"{interceptorName}Interceptor";
+				// Create unique key for this specific interface implementation
+				var implKey = $"{member.DeclaringInterfaceFullName}.{member.Name}";
+				if (!generatedImplementations.Add(implKey))
+					continue; // Skip duplicates
 
-			var defaultExpr = member.IsInitOnly
-				? "default!"
-				: GetDefaultForType(member.ReturnType, member.DefaultStrategy, member.ConcreteTypeForNew);
+				var key = GetMemberKey(member);
+				var interceptorName = nameMap[key];
+				var interceptorClassName = $"{interceptorName}Interceptor";
 
-			var setterPragmaDisable = GetSetterNullabilityAttribute(member);
-			var setterPragmaRestore = GetSetterNullabilityRestore(member);
+				var defaultExpr = member.IsInitOnly
+					? "default!"
+					: GetDefaultValueForProperty(member.ReturnType, member.DefaultStrategy, member.ConcreteTypeForNew);
 
-			var userMethod = FindUserMethod(typeInfo.UserMethods, member);
-			var simpleIfaceName = ExtractSimpleTypeName(member.DeclaringInterfaceFullName);
+				var setterPragmaDisable = GetSetterNullabilityAttribute(member);
+				var setterPragmaRestore = GetSetterNullabilityRestore(member);
 
-			properties.Add(new FlatPropertyModel(
-				InterceptorName: interceptorName,
-				InterceptorClassName: interceptorClassName,
-				DeclaringInterface: member.DeclaringInterfaceFullName,
-				MemberName: member.Name,
-				ReturnType: member.ReturnType,
-				NullableReturnType: MakeNullable(member.ReturnType),
-				HasGetter: member.HasGetter,
-				HasSetter: member.HasSetter,
-				IsInitOnly: member.IsInitOnly,
-				DefaultExpression: defaultExpr,
-				SetterPragmaDisable: string.IsNullOrEmpty(setterPragmaDisable) ? null : setterPragmaDisable,
-				SetterPragmaRestore: string.IsNullOrEmpty(setterPragmaRestore) ? null : setterPragmaRestore,
-				SimpleInterfaceName: simpleIfaceName,
-				UserMethodName: userMethod?.Name,
-				NeedsNewKeyword: NeedsNewKeyword(interceptorName)));
+				var userMethod = FindUserMethod(typeInfo.UserMethods, member);
+				var simpleIfaceName = ExtractSimpleTypeName(member.DeclaringInterfaceFullName);
+
+				// Check for property delegation (IProperty.Value (object) -> IProperty<T>.Value (T))
+				var (delegationTarget, delegationInterface) = FindPropertyDelegationTarget(member, typeInfo.Interfaces);
+
+				properties.Add(new FlatPropertyModel(
+					InterceptorName: interceptorName,
+					InterceptorClassName: interceptorClassName,
+					DeclaringInterface: member.DeclaringInterfaceFullName,
+					MemberName: member.Name,
+					ReturnType: member.ReturnType,
+					NullableReturnType: MakeNullable(member.ReturnType),
+					HasGetter: member.HasGetter,
+					HasSetter: member.HasSetter,
+					IsInitOnly: member.IsInitOnly,
+					DefaultExpression: defaultExpr,
+					SetterPragmaDisable: string.IsNullOrEmpty(setterPragmaDisable) ? null : setterPragmaDisable,
+					SetterPragmaRestore: string.IsNullOrEmpty(setterPragmaRestore) ? null : setterPragmaRestore,
+					SimpleInterfaceName: simpleIfaceName,
+					UserMethodName: userMethod?.Name,
+					NeedsNewKeyword: NeedsNewKeyword(interceptorName),
+					DelegationTarget: delegationTarget,
+					DelegationTargetInterface: delegationInterface));
+			}
 		}
 
 		return properties.ToEquatableArray();
+	}
+
+	/// <summary>
+	/// Finds a property delegation target for properties that should delegate to a typed counterpart.
+	/// For example, IProperty.Value (object) delegates to IProperty&lt;T&gt;.Value (T).
+	/// </summary>
+	private static (InterfaceMemberInfo? Target, string? TargetInterface) FindPropertyDelegationTarget(
+		InterfaceMemberInfo member,
+		EquatableArray<InterfaceInfo> interfaces)
+	{
+		// Only delegate from object type to specific type
+		var memberType = member.ReturnType.TrimEnd('?');
+		if (memberType != "object" && memberType != "System.Object" && memberType != "global::System.Object")
+			return (null, null);
+
+		// Look for a property with the same name but different (more specific) type
+		foreach (var iface in interfaces)
+		{
+			foreach (var candidate in iface.Members)
+			{
+				// Skip if this is the same member
+				if (candidate.DeclaringInterfaceFullName == member.DeclaringInterfaceFullName &&
+				    candidate.Name == member.Name &&
+				    candidate.ReturnType == member.ReturnType)
+					continue;
+
+				// Must be a property with the same name
+				if (!candidate.IsProperty || candidate.Name != member.Name)
+					continue;
+
+				// Must have different return type
+				if (candidate.ReturnType == member.ReturnType)
+					continue;
+
+				// Found a typed property to delegate to
+				return (candidate, iface.FullName);
+			}
+		}
+
+		return (null, null);
+	}
+
+	/// <summary>
+	/// Finds a method delegation target for methods that should delegate to a typed counterpart.
+	/// For example, IRule.RunRule(IValidateBase) delegates to IRule&lt;T&gt;.RunRule(T).
+	/// </summary>
+	private static (InterfaceMemberInfo? Target, string? TargetInterface) FindMethodDelegationTarget(
+		InterfaceMemberInfo member,
+		EquatableArray<InterfaceInfo> interfaces)
+	{
+		// Only applies to methods
+		if (member.IsProperty || member.IsIndexer)
+			return (null, null);
+
+		// Look for a method with the same name but different (more specific) parameter types
+		foreach (var iface in interfaces)
+		{
+			foreach (var candidate in iface.Members)
+			{
+				// Skip if this is the same member
+				if (candidate.DeclaringInterfaceFullName == member.DeclaringInterfaceFullName &&
+				    candidate.Name == member.Name &&
+				    AreSameParameters(candidate.Parameters, member.Parameters))
+					continue;
+
+				// Must be a method with the same name
+				if (candidate.IsProperty || candidate.IsIndexer || candidate.Name != member.Name)
+					continue;
+
+				// Must have same number of parameters
+				if (candidate.Parameters.Count != member.Parameters.Count)
+					continue;
+
+				// Check if this could be a typed version (different parameter types)
+				if (AreSameParameters(candidate.Parameters, member.Parameters))
+					continue;
+
+				// Check if the base method uses base types (IValidateBase) and candidate uses specific types (T)
+				// This is a heuristic - we delegate if the member has base interface types as parameters
+				// and the candidate has type parameters or concrete types
+				if (IsBaseToTypedDelegation(member, candidate))
+				{
+					return (candidate, iface.FullName);
+				}
+			}
+		}
+
+		return (null, null);
+	}
+
+	/// <summary>
+	/// Checks if two parameter lists are the same.
+	/// </summary>
+	private static bool AreSameParameters(EquatableArray<ParameterInfo> a, EquatableArray<ParameterInfo> b)
+	{
+		if (a.Count != b.Count)
+			return false;
+
+		var aArray = a.GetArray() ?? Array.Empty<ParameterInfo>();
+		var bArray = b.GetArray() ?? Array.Empty<ParameterInfo>();
+
+		for (int i = 0; i < aArray.Length; i++)
+		{
+			if (aArray[i].Type != bArray[i].Type)
+				return false;
+		}
+
+		return true;
+	}
+
+	/// <summary>
+	/// Checks if a method should delegate from base to typed version.
+	/// Returns true if member's parameter types are "base" types (like IValidateBase, object)
+	/// and candidate's parameters are more specific.
+	/// </summary>
+	private static bool IsBaseToTypedDelegation(InterfaceMemberInfo member, InterfaceMemberInfo candidate)
+	{
+		var memberParams = member.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+		var candidateParams = candidate.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+
+		// Check if at least one parameter changes from a base type
+		for (int i = 0; i < memberParams.Length; i++)
+		{
+			var memberType = memberParams[i].Type;
+			var candidateType = candidateParams[i].Type;
+
+			// If the types are different and the member type looks like a base interface
+			// (ends with "Base" or is "object"), this might be a delegation case
+			if (memberType != candidateType)
+			{
+				var normalizedMemberType = memberType.Replace("global::", "").TrimEnd('?');
+				if (normalizedMemberType.EndsWith("Base") ||
+				    normalizedMemberType == "object" ||
+				    normalizedMemberType == "System.Object")
+				{
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	#endregion
@@ -295,43 +459,54 @@ internal static class FlatModelBuilder
 		string className)
 	{
 		var indexers = new List<FlatIndexerModel>();
+		var generatedImplementations = new HashSet<string>();
 
-		foreach (var member in typeInfo.FlatMembers)
+		// Iterate over ALL interfaces for implementations
+		foreach (var iface in typeInfo.Interfaces)
 		{
-			if (!member.IsIndexer)
-				continue;
+			foreach (var member in iface.Members)
+			{
+				if (!member.IsIndexer)
+					continue;
 
-			var key = GetMemberKey(member);
-			var interceptorName = nameMap[key];
-			var interceptorClassName = $"{interceptorName}Interceptor";
+				// Create unique key for this specific interface implementation
+				var paramTypes = member.IndexerParameters.Select(p => p.Type);
+				var implKey = $"{member.DeclaringInterfaceFullName}.this[{string.Join(",", paramTypes)}]";
+				if (!generatedImplementations.Add(implKey))
+					continue; // Skip duplicates
 
-			var keyType = member.IndexerParameters.Count > 0
-				? member.IndexerParameters.GetArray()![0].Type
-				: "object";
-			var keyParamName = member.IndexerParameters.Count > 0
-				? member.IndexerParameters.GetArray()![0].Name
-				: "key";
+				var key = GetMemberKey(member);
+				var interceptorName = nameMap[key];
+				var interceptorClassName = $"{interceptorName}Interceptor";
 
-			var defaultExpr = member.IsNullable
-				? "default"
-				: GetDefaultForType(member.ReturnType, member.DefaultStrategy, member.ConcreteTypeForNew);
+				var keyType = member.IndexerParameters.Count > 0
+					? member.IndexerParameters.GetArray()![0].Type
+					: "object";
+				var keyParamName = member.IndexerParameters.Count > 0
+					? member.IndexerParameters.GetArray()![0].Name
+					: "key";
 
-			var simpleIfaceName = ExtractSimpleTypeName(member.DeclaringInterfaceFullName);
+				var defaultExpr = member.IsNullable
+					? "default"
+					: GetDefaultForType(member.ReturnType, member.DefaultStrategy, member.ConcreteTypeForNew);
 
-			indexers.Add(new FlatIndexerModel(
-				InterceptorName: interceptorName,
-				InterceptorClassName: interceptorClassName,
-				DeclaringInterface: member.DeclaringInterfaceFullName,
-				ReturnType: member.ReturnType,
-				NullableReturnType: MakeNullable(member.ReturnType),
-				DefaultExpression: defaultExpr,
-				KeyType: keyType,
-				KeyParamName: keyParamName,
-				NullableKeyType: MakeNullable(keyType),
-				HasGetter: member.HasGetter,
-				HasSetter: member.HasSetter,
-				SimpleInterfaceName: simpleIfaceName,
-				NeedsNewKeyword: NeedsNewKeyword(interceptorName)));
+				var simpleIfaceName = ExtractSimpleTypeName(member.DeclaringInterfaceFullName);
+
+				indexers.Add(new FlatIndexerModel(
+					InterceptorName: interceptorName,
+					InterceptorClassName: interceptorClassName,
+					DeclaringInterface: member.DeclaringInterfaceFullName,
+					ReturnType: member.ReturnType,
+					NullableReturnType: MakeNullable(member.ReturnType),
+					DefaultExpression: defaultExpr,
+					KeyType: keyType,
+					KeyParamName: keyParamName,
+					NullableKeyType: MakeNullable(keyType),
+					HasGetter: member.HasGetter,
+					HasSetter: member.HasSetter,
+					SimpleInterfaceName: simpleIfaceName,
+					NeedsNewKeyword: NeedsNewKeyword(interceptorName)));
+			}
 		}
 
 		return indexers.ToEquatableArray();
@@ -350,16 +525,16 @@ internal static class FlatModelBuilder
 		var methods = new List<FlatMethodModel>();
 		var genericHandlers = new List<FlatGenericMethodHandlerModel>();
 		var processedGenericGroups = new HashSet<string>();
+		var generatedImplementations = new HashSet<string>();
 
+		// First pass: Build generic method handlers from FlatMembers (deduplicated)
 		foreach (var member in typeInfo.FlatMembers)
 		{
 			if (member.IsProperty || member.IsIndexer)
 				continue;
 
-			// Check if this is a generic method
 			if (member.IsGenericMethod)
 			{
-				// Generic methods use handlers - we'll process them as groups
 				var groupName = member.Name;
 				if (!processedGenericGroups.Contains(groupName))
 				{
@@ -367,7 +542,6 @@ internal static class FlatModelBuilder
 
 					if (methodGroups.TryGetValue(groupName, out var group))
 					{
-						// Check for mixed groups
 						var isMixed = IsMixedMethodGroup(group);
 						if (isMixed)
 						{
@@ -385,14 +559,41 @@ internal static class FlatModelBuilder
 						}
 					}
 				}
-				continue;
 			}
+		}
 
-			// Non-generic method
-			var key = GetMemberKey(member);
-			var interceptorName = nameMap[key];
-			var model = BuildMethodModel(member, interceptorName, typeInfo, className);
-			methods.Add(model);
+		// Second pass: Build method implementation models from ALL interfaces (not deduplicated)
+		// This ensures we generate explicit implementations for every interface member
+		foreach (var iface in typeInfo.Interfaces)
+		{
+			foreach (var member in iface.Members)
+			{
+				if (member.IsProperty || member.IsIndexer)
+					continue;
+
+				// Create unique key for this specific interface implementation
+				var paramList = member.Parameters.Select(p => p.Type);
+				var implKey = $"{member.DeclaringInterfaceFullName}.{member.Name}({string.Join(",", paramList)})";
+				if (!generatedImplementations.Add(implKey))
+					continue; // Skip duplicates
+
+				var key = GetMemberKey(member);
+				var interceptorName = nameMap[key];
+
+				// Check for method delegation (e.g., IRule.RunRule(IValidateBase) -> IRule<T>.RunRule(T))
+				var (delegationTarget, delegationInterface) = FindMethodDelegationTarget(member, typeInfo.Interfaces);
+
+				if (member.IsGenericMethod)
+				{
+					var model = BuildGenericMethodModel(member, interceptorName, typeInfo, className, delegationTarget, delegationInterface);
+					methods.Add(model);
+				}
+				else
+				{
+					var model = BuildMethodModel(member, interceptorName, typeInfo, className, delegationTarget, delegationInterface);
+					methods.Add(model);
+				}
+			}
 		}
 
 		return (methods.ToEquatableArray(), genericHandlers.ToEquatableArray());
@@ -402,7 +603,9 @@ internal static class FlatModelBuilder
 		InterfaceMemberInfo member,
 		string interceptorName,
 		KnockOffTypeInfo typeInfo,
-		string className)
+		string className,
+		InterfaceMemberInfo? delegationTarget,
+		string? delegationInterface)
 	{
 		var interceptorClassName = $"{interceptorName}Interceptor";
 		var paramArray = member.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
@@ -514,7 +717,169 @@ internal static class FlatModelBuilder
 			TypeParameterDecl: "",
 			TypeParameterList: "",
 			ConstraintClauses: "",
-			NeedsNewKeyword: NeedsNewKeyword(interceptorName));
+			NeedsNewKeyword: NeedsNewKeyword(interceptorName),
+			IsGenericMethod: false,
+			IsNullableReturn: member.IsNullable,
+			OfTypeAccess: "",
+			DelegationTarget: delegationTarget,
+			DelegationTargetInterface: delegationInterface);
+	}
+
+	/// <summary>
+	/// Builds a FlatMethodModel for a generic method (for interface implementation).
+	/// Generic methods need special handling: .Of&lt;T&gt;() access, constraint clauses for explicit impl, etc.
+	/// </summary>
+	private static FlatMethodModel BuildGenericMethodModel(
+		InterfaceMemberInfo member,
+		string interceptorName,
+		KnockOffTypeInfo typeInfo,
+		string className,
+		InterfaceMemberInfo? delegationTarget,
+		string? delegationInterface)
+	{
+		var interceptorClassName = $"{interceptorName}Interceptor";
+		var paramArray = member.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+		var isVoid = member.ReturnType == "void";
+
+		// Build type parameter info
+		var tpArray = member.TypeParameters.GetArray() ?? Array.Empty<TypeParameterInfo>();
+		var typeParamNames = string.Join(", ", tpArray.Select(tp => tp.Name));
+		var typeParamDecl = tpArray.Length > 0 ? $"<{typeParamNames}>" : "";
+		var typeParamList = typeParamDecl; // Same format for method call
+		var ofTypeAccess = tpArray.Length > 0 ? $".Of<{typeParamNames}>()" : "";
+
+		// Build constraint clauses for explicit interface implementation (only class/struct constraints)
+		var constraintClauses = GetConstraintsForExplicitImpl(tpArray, member.ReturnType);
+
+		// Build parameter models
+		var parameters = paramArray.Select(p => new ParameterModel(
+			Name: p.Name,
+			EscapedName: EscapeIdentifier(p.Name),
+			Type: p.Type,
+			NullableType: MakeNullable(p.Type),
+			RefKind: p.RefKind,
+			RefPrefix: GetRefKindPrefix(p.RefKind))).ToEquatableArray();
+
+		// Trackable parameters for generic methods: exclude out params AND generic-typed params
+		var trackableParams = paramArray
+			.Where(p => p.RefKind != RefKind.Out)
+			.Where(p => !tpArray.Any(tp => p.Type.Contains(tp.Name)))
+			.Select(p => new ParameterModel(
+				Name: p.Name,
+				EscapedName: EscapeIdentifier(p.Name),
+				Type: p.Type,
+				NullableType: MakeNullable(p.Type),
+				RefKind: p.RefKind,
+				RefPrefix: GetRefKindPrefix(p.RefKind))).ToEquatableArray();
+
+		// Parameter declarations and names
+		var paramDecls = string.Join(", ", paramArray.Select(p => FormatParameterWithRefKind(p)));
+		var paramNames = string.Join(", ", paramArray.Select(p => FormatParameterNameWithRefKind(p)));
+		var recordCallArgs = string.Join(", ", trackableParams.Select(p => p.EscapedName));
+
+		// LastCall type
+		string? lastCallType = null;
+		if (trackableParams.Count == 1)
+		{
+			lastCallType = trackableParams.GetArray()![0].NullableType;
+		}
+		else if (trackableParams.Count > 1)
+		{
+			lastCallType = $"({string.Join(", ", trackableParams.Select(p => $"{p.NullableType} {p.EscapedName}"))})";
+		}
+
+		// For generic methods, we use a delegate (not Action/Func) because of type parameters
+		var delegateName = $"{member.Name}Delegate";
+		var delegateParams = new List<string> { $"{className} ko" };
+		foreach (var p in paramArray)
+		{
+			delegateParams.Add(FormatParameterWithRefKind(p));
+		}
+		var delegateParamList = string.Join(", ", delegateParams);
+		var delegateSignature = isVoid
+			? $"public delegate void {delegateName}({delegateParamList});"
+			: $"public delegate {member.ReturnType} {delegateName}({delegateParamList});";
+		var onCallDelegateType = $"{delegateName}?";
+
+		// Default expression - for generic methods, use SmartDefault or default based on nullability
+		var throwsOnDefault = false; // Generic methods use SmartDefault instead of throwing
+		var defaultExpr = member.IsNullable ? "default!" : $"SmartDefault<{member.ReturnType.TrimEnd('?')}>(\"{member.Name}\")";
+
+		// User method
+		var userMethod = FindUserMethod(typeInfo.UserMethods, member);
+		string? userMethodCall = null;
+		if (userMethod != null)
+		{
+			userMethodCall = $"{member.Name}{typeParamDecl}({paramNames})";
+		}
+
+		var simpleIfaceName = ExtractSimpleTypeName(member.DeclaringInterfaceFullName);
+
+		return new FlatMethodModel(
+			InterceptorName: interceptorName,
+			InterceptorClassName: interceptorClassName,
+			DeclaringInterface: member.DeclaringInterfaceFullName,
+			MethodName: member.Name,
+			ReturnType: member.ReturnType,
+			IsVoid: isVoid,
+			Parameters: parameters,
+			ParameterDeclarations: paramDecls,
+			ParameterNames: paramNames,
+			RecordCallArgs: recordCallArgs,
+			TrackableParameters: trackableParams,
+			LastCallType: lastCallType,
+			OnCallDelegateType: onCallDelegateType,
+			NeedsCustomDelegate: true,
+			CustomDelegateName: delegateName,
+			CustomDelegateSignature: delegateSignature,
+			DefaultExpression: defaultExpr,
+			ThrowsOnDefault: throwsOnDefault,
+			UserMethodCall: userMethodCall,
+			SimpleInterfaceName: simpleIfaceName,
+			TypeParameterDecl: typeParamDecl,
+			TypeParameterList: typeParamList,
+			ConstraintClauses: constraintClauses,
+			NeedsNewKeyword: NeedsNewKeyword(interceptorName),
+			IsGenericMethod: true,
+			IsNullableReturn: member.IsNullable,
+			OfTypeAccess: ofTypeAccess,
+			DelegationTarget: delegationTarget,
+			DelegationTargetInterface: delegationInterface);
+	}
+
+	/// <summary>
+	/// Gets constraint clauses for explicit interface implementation.
+	/// For explicit impl, only class/struct constraints are allowed (CS0460).
+	/// </summary>
+	private static string GetConstraintsForExplicitImpl(TypeParameterInfo[] typeParams, string returnType)
+	{
+		var clauses = new List<string>();
+		foreach (var tp in typeParams)
+		{
+			var constraintArray = tp.Constraints.GetArray() ?? Array.Empty<string>();
+
+			// Check for struct first (mutually exclusive with class)
+			if (constraintArray.Contains("struct"))
+			{
+				clauses.Add($" where {tp.Name} : struct");
+				continue;
+			}
+
+			// Check for explicit class constraint
+			if (constraintArray.Contains("class"))
+			{
+				clauses.Add($" where {tp.Name} : class");
+				continue;
+			}
+
+			// Check if return type uses this type parameter with nullability (T?)
+			// If the return type is nullable reference type T?, we need class constraint
+			if (returnType.Contains($"{tp.Name}?") || returnType.EndsWith($"{tp.Name}?"))
+			{
+				clauses.Add($" where {tp.Name} : class");
+			}
+		}
+		return string.Join("", clauses);
 	}
 
 	private static FlatGenericMethodHandlerModel BuildGenericMethodHandler(
@@ -616,32 +981,42 @@ internal static class FlatModelBuilder
 		Dictionary<string, string> nameMap)
 	{
 		var events = new List<FlatEventModel>();
+		var generatedImplementations = new HashSet<string>();
 
-		foreach (var evt in typeInfo.FlatEvents)
+		// Iterate over ALL interfaces for event implementations
+		foreach (var iface in typeInfo.Interfaces)
 		{
-			var key = $"event:{evt.Name}";
-			var interceptorName = nameMap[key];
-			var interceptorClassName = $"{interceptorName}Interceptor";
+			foreach (var evt in iface.Events)
+			{
+				// Create unique key for this specific interface implementation
+				var implKey = $"{evt.DeclaringInterfaceFullName}.{evt.Name}";
+				if (!generatedImplementations.Add(implKey))
+					continue; // Skip duplicates
 
-			// Strip trailing ? from delegate type since we add our own nullable marker
-			var delegateType = evt.FullDelegateTypeName.TrimEnd('?');
+				var key = $"event:{evt.Name}";
+				var interceptorName = nameMap[key];
+				var interceptorClassName = $"{interceptorName}Interceptor";
 
-			// Build raise method signature based on delegate kind
-			var (raiseParams, raiseArgs, raiseReturnType, raiseReturnsValue, usesDynamicInvoke) =
-				GetRaiseMethodInfo(evt);
+				// Strip trailing ? from delegate type since we add our own nullable marker
+				var delegateType = evt.FullDelegateTypeName.TrimEnd('?');
 
-			events.Add(new FlatEventModel(
-				InterceptorName: interceptorName,
-				InterceptorClassName: interceptorClassName,
-				DeclaringInterface: evt.DeclaringInterfaceFullName,
-				EventName: evt.Name,
-				DelegateType: delegateType,
-				RaiseParameters: raiseParams,
-				RaiseArguments: raiseArgs,
-				RaiseReturnType: raiseReturnType,
-				RaiseReturnsValue: raiseReturnsValue,
-				UsesDynamicInvoke: usesDynamicInvoke,
-				NeedsNewKeyword: NeedsNewKeyword(interceptorName)));
+				// Build raise method signature based on delegate kind
+				var (raiseParams, raiseArgs, raiseReturnType, raiseReturnsValue, usesDynamicInvoke) =
+					GetRaiseMethodInfo(evt);
+
+				events.Add(new FlatEventModel(
+					InterceptorName: interceptorName,
+					InterceptorClassName: interceptorClassName,
+					DeclaringInterface: evt.DeclaringInterfaceFullName,
+					EventName: evt.Name,
+					DelegateType: delegateType,
+					RaiseParameters: raiseParams,
+					RaiseArguments: raiseArgs,
+					RaiseReturnType: raiseReturnType,
+					RaiseReturnsValue: raiseReturnsValue,
+					UsesDynamicInvoke: usesDynamicInvoke,
+					NeedsNewKeyword: NeedsNewKeyword(interceptorName)));
+			}
 		}
 
 		return events.ToEquatableArray();
@@ -953,6 +1328,50 @@ internal static class FlatModelBuilder
 	{
 		var refKindPrefix = GetRefKindPrefix(p.RefKind);
 		return $"{refKindPrefix}{EscapeIdentifier(p.Name)}";
+	}
+
+	/// <summary>
+	/// Gets a default value expression for property backing storage.
+	/// Handles ThrowException strategy specially for string, arrays, etc.
+	/// </summary>
+	private static string GetDefaultValueForProperty(string typeName, DefaultValueStrategy strategy, string? concreteType)
+	{
+		var typeToNew = concreteType ?? typeName;
+		return strategy switch
+		{
+			DefaultValueStrategy.NewInstance => $"new {typeToNew}()",
+			DefaultValueStrategy.Default => "default!",
+			DefaultValueStrategy.ThrowException => GetBackingPropertyInitializer(typeName),
+			_ => "default!"
+		};
+	}
+
+	/// <summary>
+	/// Gets a backing property initializer for types with ThrowException strategy.
+	/// Provides sensible defaults for string, arrays, collection interfaces.
+	/// </summary>
+	private static string GetBackingPropertyInitializer(string typeName)
+	{
+		// Handle string - use empty string
+		if (typeName == "global::System.String" || typeName == "string")
+			return "\"\"";
+
+		// Handle arrays - use Array.Empty<T>() or empty array
+		if (typeName.EndsWith("[]"))
+		{
+			var elementType = typeName.Substring(0, typeName.Length - 2);
+			return $"global::System.Array.Empty<{elementType}>()";
+		}
+
+		// Handle collection interfaces - use Array.Empty<T>()
+		if (typeName.Contains("IEnumerable<") || typeName.Contains("IReadOnlyCollection<") || typeName.Contains("IReadOnlyList<"))
+		{
+			var elementType = ExtractGenericArg(typeName);
+			return $"global::System.Array.Empty<{elementType}>()";
+		}
+
+		// Fallback: suppress nullable warning (property exists but user must set it)
+		return "default!";
 	}
 
 	/// <summary>
