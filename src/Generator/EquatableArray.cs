@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace KnockOff;
 
@@ -68,4 +69,18 @@ internal readonly struct EquatableArray<T> : IEquatable<EquatableArray<T>>, IEnu
 	public static bool operator ==(EquatableArray<T> left, EquatableArray<T> right) => left.Equals(right);
 
 	public static bool operator !=(EquatableArray<T> left, EquatableArray<T> right) => !left.Equals(right);
+}
+
+/// <summary>
+/// Extension methods for converting to EquatableArray.
+/// </summary>
+internal static class EquatableArrayExtensions
+{
+	/// <summary>
+	/// Converts an enumerable to an EquatableArray.
+	/// </summary>
+	public static EquatableArray<T> ToEquatableArray<T>(this IEnumerable<T> source) where T : IEquatable<T>
+	{
+		return new EquatableArray<T>(source.ToArray());
+	}
 }
