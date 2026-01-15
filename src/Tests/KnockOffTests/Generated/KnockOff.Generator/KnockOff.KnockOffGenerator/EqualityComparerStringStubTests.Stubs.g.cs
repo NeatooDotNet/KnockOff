@@ -8,7 +8,7 @@ partial class EqualityComparerStringStubTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IEqualityComparer.Equals.</summary>
+		/// <summary>Interceptor for Equals.</summary>
 		public sealed class IEqualityComparer_EqualsInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -28,7 +28,7 @@ partial class EqualityComparerStringStubTests
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IEqualityComparer.GetHashCode.</summary>
+		/// <summary>Interceptor for GetHashCode.</summary>
 		public sealed class IEqualityComparer_GetHashCodeInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

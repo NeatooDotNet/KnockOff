@@ -8,7 +8,7 @@ partial class BpInlineTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IBpInlineUserService.GetUser.</summary>
+		/// <summary>Interceptor for GetUser.</summary>
 		public sealed class IBpInlineUserService_GetUserInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -57,7 +57,7 @@ partial class BpInlineTests
 
 		}
 
-		/// <summary>Interceptor for IBpInlineLogger.Log.</summary>
+		/// <summary>Interceptor for Log.</summary>
 		public sealed class IBpInlineLogger_LogInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

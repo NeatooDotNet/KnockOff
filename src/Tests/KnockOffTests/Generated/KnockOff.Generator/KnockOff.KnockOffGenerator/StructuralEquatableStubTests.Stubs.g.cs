@@ -8,7 +8,7 @@ partial class StructuralEquatableStubTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IStructuralEquatable.Equals.</summary>
+		/// <summary>Interceptor for Equals.</summary>
 		public sealed class IStructuralEquatable_EqualsInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -28,7 +28,7 @@ partial class StructuralEquatableStubTests
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IStructuralEquatable.GetHashCode.</summary>
+		/// <summary>Interceptor for GetHashCode.</summary>
 		public sealed class IStructuralEquatable_GetHashCodeInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

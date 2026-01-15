@@ -65,7 +65,7 @@ partial class CollectionStubTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for ICollection.CopyTo.</summary>
+		/// <summary>Interceptor for CopyTo.</summary>
 		public sealed class ICollection_CopyToInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -85,7 +85,7 @@ partial class CollectionStubTests
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for ICollection.GetEnumerator.</summary>
+		/// <summary>Interceptor for GetEnumerator.</summary>
 		public sealed class ICollection_GetEnumeratorInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

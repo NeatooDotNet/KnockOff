@@ -8,7 +8,7 @@ partial class EnumerableIntStubTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IEnumerable.GetEnumerator.</summary>
+		/// <summary>Interceptor for GetEnumerator.</summary>
 		public sealed class IEnumerable_GetEnumeratorInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

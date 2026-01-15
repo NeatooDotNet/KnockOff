@@ -84,7 +84,7 @@ partial class IValidateMetaPropertiesTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IValidateMetaProperties.WaitForTasks.</summary>
+		/// <summary>Interceptor for WaitForTasks.</summary>
 		public sealed class IValidateMetaProperties_WaitForTasksInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -104,7 +104,7 @@ partial class IValidateMetaPropertiesTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IValidateMetaProperties.RunRules.</summary>
+		/// <summary>Interceptor for RunRules.</summary>
 		public sealed class IValidateMetaProperties_RunRulesInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -124,7 +124,7 @@ partial class IValidateMetaPropertiesTests
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IValidateMetaProperties.ClearAllMessages.</summary>
+		/// <summary>Interceptor for ClearAllMessages.</summary>
 		public sealed class IValidateMetaProperties_ClearAllMessagesInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -141,7 +141,7 @@ partial class IValidateMetaPropertiesTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IValidateMetaProperties.ClearSelfMessages.</summary>
+		/// <summary>Interceptor for ClearSelfMessages.</summary>
 		public sealed class IValidateMetaProperties_ClearSelfMessagesInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

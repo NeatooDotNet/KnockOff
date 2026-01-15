@@ -73,7 +73,7 @@ partial class DsInlineInterfaceTests
 			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
 		}
 
-		/// <summary>Interceptor for IDsUserService.GetUser.</summary>
+		/// <summary>Interceptor for GetUser.</summary>
 		public sealed class IDsUserService_GetUserInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

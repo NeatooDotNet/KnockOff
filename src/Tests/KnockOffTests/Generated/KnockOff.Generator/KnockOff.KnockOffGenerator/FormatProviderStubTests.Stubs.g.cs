@@ -8,7 +8,7 @@ partial class FormatProviderStubTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IFormatProvider.GetFormat.</summary>
+		/// <summary>Interceptor for GetFormat.</summary>
 		public sealed class IFormatProvider_GetFormatInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

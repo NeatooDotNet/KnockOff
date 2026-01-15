@@ -46,7 +46,7 @@ partial class DbTransactionStubTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IDbTransaction.Commit.</summary>
+		/// <summary>Interceptor for Commit.</summary>
 		public sealed class IDbTransaction_CommitInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -63,7 +63,7 @@ partial class DbTransactionStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDbTransaction.Rollback.</summary>
+		/// <summary>Interceptor for Rollback.</summary>
 		public sealed class IDbTransaction_RollbackInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -80,7 +80,7 @@ partial class DbTransactionStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDbTransaction.Dispose.</summary>
+		/// <summary>Interceptor for Dispose.</summary>
 		public sealed class IDbTransaction_DisposeInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

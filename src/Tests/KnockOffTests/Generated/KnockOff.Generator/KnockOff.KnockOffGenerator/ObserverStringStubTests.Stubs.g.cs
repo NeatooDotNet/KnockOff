@@ -8,7 +8,7 @@ partial class ObserverStringStubTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IObserver.OnCompleted.</summary>
+		/// <summary>Interceptor for OnCompleted.</summary>
 		public sealed class IObserver_OnCompletedInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -25,7 +25,7 @@ partial class ObserverStringStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IObserver.OnError.</summary>
+		/// <summary>Interceptor for OnError.</summary>
 		public sealed class IObserver_OnErrorInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -45,7 +45,7 @@ partial class ObserverStringStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IObserver.OnNext.</summary>
+		/// <summary>Interceptor for OnNext.</summary>
 		public sealed class IObserver_OnNextInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

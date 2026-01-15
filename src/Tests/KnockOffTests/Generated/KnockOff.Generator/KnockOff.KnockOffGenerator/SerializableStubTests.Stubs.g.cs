@@ -8,7 +8,7 @@ partial class SerializableStubTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for ISerializable.GetObjectData.</summary>
+		/// <summary>Interceptor for GetObjectData.</summary>
 		public sealed class ISerializable_GetObjectDataInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

@@ -27,28 +27,6 @@ partial class IValidatePropertyManagerTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IValidatePropertyManager.Indexer.</summary>
-		public sealed class IValidatePropertyManager_IndexerInterceptor
-		{
-			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
-
-			/// <summary>The last key used to access the getter.</summary>
-			public string? LastGetKey { get; private set; }
-
-			/// <summary>Callback for getter.</summary>
-			public global::System.Func<Stubs.IValidatePropertyManager, string, global::Neatoo.IValidateProperty>? OnGet { get; set; }
-
-			/// <summary>Records a getter access.</summary>
-			public void RecordGet(string propertyName) { GetCount++; LastGetKey = propertyName; }
-
-			/// <summary>Backing storage for this indexer.</summary>
-			public global::System.Collections.Generic.Dictionary<string, global::Neatoo.IValidateProperty> Backing { get; } = new();
-
-			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
-		}
-
 		/// <summary>Interceptor for IValidatePropertyManager.IsSelfValid.</summary>
 		public sealed class IValidatePropertyManager_IsSelfValidInterceptor
 		{
@@ -125,7 +103,29 @@ partial class IValidatePropertyManagerTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IValidatePropertyManager.WaitForTasks.</summary>
+		/// <summary>Interceptor for IValidatePropertyManager.Indexer.</summary>
+		public sealed class IValidatePropertyManager_IndexerInterceptor
+		{
+			/// <summary>Number of times the getter was accessed.</summary>
+			public int GetCount { get; private set; }
+
+			/// <summary>The last key used to access the getter.</summary>
+			public string? LastGetKey { get; private set; }
+
+			/// <summary>Callback for getter.</summary>
+			public global::System.Func<Stubs.IValidatePropertyManager, string, global::Neatoo.IValidateProperty>? OnGet { get; set; }
+
+			/// <summary>Records a getter access.</summary>
+			public void RecordGet(string propertyName) { GetCount++; LastGetKey = propertyName; }
+
+			/// <summary>Backing storage for this indexer.</summary>
+			public global::System.Collections.Generic.Dictionary<string, global::Neatoo.IValidateProperty> Backing { get; } = new();
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
+		}
+
+		/// <summary>Interceptor for WaitForTasks.</summary>
 		public sealed class IValidatePropertyManager_WaitForTasksInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -142,7 +142,7 @@ partial class IValidatePropertyManagerTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IValidatePropertyManager.HasProperty.</summary>
+		/// <summary>Interceptor for HasProperty.</summary>
 		public sealed class IValidatePropertyManager_HasPropertyInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -162,7 +162,7 @@ partial class IValidatePropertyManagerTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IValidatePropertyManager.GetProperty.</summary>
+		/// <summary>Interceptor for GetProperty.</summary>
 		public sealed class IValidatePropertyManager_GetPropertyInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -182,7 +182,7 @@ partial class IValidatePropertyManagerTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IValidatePropertyManager.SetProperties.</summary>
+		/// <summary>Interceptor for SetProperties.</summary>
 		public sealed class IValidatePropertyManager_SetPropertiesInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -202,7 +202,7 @@ partial class IValidatePropertyManagerTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IValidatePropertyManager.RunRules.</summary>
+		/// <summary>Interceptor for RunRules.</summary>
 		public sealed class IValidatePropertyManager_RunRulesInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -222,7 +222,7 @@ partial class IValidatePropertyManagerTests
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IValidatePropertyManager.PauseAllActions.</summary>
+		/// <summary>Interceptor for PauseAllActions.</summary>
 		public sealed class IValidatePropertyManager_PauseAllActionsInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -239,7 +239,7 @@ partial class IValidatePropertyManagerTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IValidatePropertyManager.ResumeAllActions.</summary>
+		/// <summary>Interceptor for ResumeAllActions.</summary>
 		public sealed class IValidatePropertyManager_ResumeAllActionsInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -256,7 +256,7 @@ partial class IValidatePropertyManagerTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IValidatePropertyManager.ClearAllMessages.</summary>
+		/// <summary>Interceptor for ClearAllMessages.</summary>
 		public sealed class IValidatePropertyManager_ClearAllMessagesInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -273,7 +273,7 @@ partial class IValidatePropertyManagerTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IValidatePropertyManager.ClearSelfMessages.</summary>
+		/// <summary>Interceptor for ClearSelfMessages.</summary>
 		public sealed class IValidatePropertyManager_ClearSelfMessagesInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

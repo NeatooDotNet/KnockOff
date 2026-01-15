@@ -65,7 +65,7 @@ partial class QueryableStubTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IQueryable.GetEnumerator.</summary>
+		/// <summary>Interceptor for GetEnumerator.</summary>
 		public sealed class IQueryable_GetEnumeratorInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

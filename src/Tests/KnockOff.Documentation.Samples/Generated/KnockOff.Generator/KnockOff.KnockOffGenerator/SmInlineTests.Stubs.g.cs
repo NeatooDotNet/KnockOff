@@ -8,7 +8,7 @@ partial class SmInlineTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for ISmUserService.GetUser.</summary>
+		/// <summary>Interceptor for GetUser.</summary>
 		public sealed class ISmUserService_GetUserInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -28,7 +28,7 @@ partial class SmInlineTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for ISmUserService.DeleteUser.</summary>
+		/// <summary>Interceptor for DeleteUser.</summary>
 		public sealed class ISmUserService_DeleteUserInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -87,7 +87,7 @@ partial class SmInlineTests
 
 		}
 
-		/// <summary>Interceptor for ISmStrictByDefault.GetData.</summary>
+		/// <summary>Interceptor for GetData.</summary>
 		public sealed class ISmStrictByDefault_GetDataInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

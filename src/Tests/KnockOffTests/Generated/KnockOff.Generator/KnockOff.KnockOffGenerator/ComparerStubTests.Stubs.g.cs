@@ -8,7 +8,7 @@ partial class ComparerStubTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IComparer.Compare.</summary>
+		/// <summary>Interceptor for Compare.</summary>
 		public sealed class IComparer_CompareInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

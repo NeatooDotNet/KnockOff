@@ -46,7 +46,7 @@ partial class SetIntStubTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for ISet.Add.</summary>
+		/// <summary>Interceptor for Add.</summary>
 		public sealed class ISet_AddInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -66,7 +66,7 @@ partial class SetIntStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for ISet.ExceptWith.</summary>
+		/// <summary>Interceptor for ExceptWith.</summary>
 		public sealed class ISet_ExceptWithInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -86,7 +86,7 @@ partial class SetIntStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for ISet.IntersectWith.</summary>
+		/// <summary>Interceptor for IntersectWith.</summary>
 		public sealed class ISet_IntersectWithInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -106,7 +106,7 @@ partial class SetIntStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for ISet.IsProperSubsetOf.</summary>
+		/// <summary>Interceptor for IsProperSubsetOf.</summary>
 		public sealed class ISet_IsProperSubsetOfInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -126,7 +126,7 @@ partial class SetIntStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for ISet.IsProperSupersetOf.</summary>
+		/// <summary>Interceptor for IsProperSupersetOf.</summary>
 		public sealed class ISet_IsProperSupersetOfInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -146,7 +146,7 @@ partial class SetIntStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for ISet.IsSubsetOf.</summary>
+		/// <summary>Interceptor for IsSubsetOf.</summary>
 		public sealed class ISet_IsSubsetOfInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -166,7 +166,7 @@ partial class SetIntStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for ISet.IsSupersetOf.</summary>
+		/// <summary>Interceptor for IsSupersetOf.</summary>
 		public sealed class ISet_IsSupersetOfInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -186,7 +186,7 @@ partial class SetIntStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for ISet.Overlaps.</summary>
+		/// <summary>Interceptor for Overlaps.</summary>
 		public sealed class ISet_OverlapsInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -206,7 +206,7 @@ partial class SetIntStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for ISet.SetEquals.</summary>
+		/// <summary>Interceptor for SetEquals.</summary>
 		public sealed class ISet_SetEqualsInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -226,7 +226,7 @@ partial class SetIntStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for ISet.SymmetricExceptWith.</summary>
+		/// <summary>Interceptor for SymmetricExceptWith.</summary>
 		public sealed class ISet_SymmetricExceptWithInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -246,7 +246,7 @@ partial class SetIntStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for ISet.UnionWith.</summary>
+		/// <summary>Interceptor for UnionWith.</summary>
 		public sealed class ISet_UnionWithInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -266,7 +266,7 @@ partial class SetIntStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for ISet.Clear.</summary>
+		/// <summary>Interceptor for Clear.</summary>
 		public sealed class ISet_ClearInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -283,7 +283,7 @@ partial class SetIntStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for ISet.Contains.</summary>
+		/// <summary>Interceptor for Contains.</summary>
 		public sealed class ISet_ContainsInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -303,7 +303,7 @@ partial class SetIntStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for ISet.CopyTo.</summary>
+		/// <summary>Interceptor for CopyTo.</summary>
 		public sealed class ISet_CopyToInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -323,7 +323,7 @@ partial class SetIntStubTests
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for ISet.Remove.</summary>
+		/// <summary>Interceptor for Remove.</summary>
 		public sealed class ISet_RemoveInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -343,7 +343,7 @@ partial class SetIntStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for ISet.GetEnumerator.</summary>
+		/// <summary>Interceptor for GetEnumerator.</summary>
 		public sealed class ISet_GetEnumeratorInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

@@ -27,7 +27,7 @@ partial class EnumeratorStubTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IEnumerator.MoveNext.</summary>
+		/// <summary>Interceptor for MoveNext.</summary>
 		public sealed class IEnumerator_MoveNextInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -44,7 +44,7 @@ partial class EnumeratorStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IEnumerator.Reset.</summary>
+		/// <summary>Interceptor for Reset.</summary>
 		public sealed class IEnumerator_ResetInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

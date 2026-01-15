@@ -27,7 +27,7 @@ partial class AsyncEnumeratorStringStubTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IAsyncEnumerator.MoveNextAsync.</summary>
+		/// <summary>Interceptor for MoveNextAsync.</summary>
 		public sealed class IAsyncEnumerator_MoveNextAsyncInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -44,7 +44,7 @@ partial class AsyncEnumeratorStringStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IAsyncEnumerator.DisposeAsync.</summary>
+		/// <summary>Interceptor for DisposeAsync.</summary>
 		public sealed class IAsyncEnumerator_DisposeAsyncInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

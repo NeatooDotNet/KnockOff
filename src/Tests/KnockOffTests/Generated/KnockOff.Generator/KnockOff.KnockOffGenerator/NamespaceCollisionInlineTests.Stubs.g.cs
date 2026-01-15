@@ -8,7 +8,7 @@ partial class NamespaceCollisionInlineTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IPersonDbContext.SavePerson.</summary>
+		/// <summary>Interceptor for SavePerson.</summary>
 		public sealed class IPersonDbContext_SavePersonInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -28,7 +28,7 @@ partial class NamespaceCollisionInlineTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IPersonDbContext.GetPerson.</summary>
+		/// <summary>Interceptor for GetPerson.</summary>
 		public sealed class IPersonDbContext_GetPersonInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

@@ -8,7 +8,7 @@ partial class CustomFormatterStubTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for ICustomFormatter.Format.</summary>
+		/// <summary>Interceptor for Format.</summary>
 		public sealed class ICustomFormatter_FormatInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

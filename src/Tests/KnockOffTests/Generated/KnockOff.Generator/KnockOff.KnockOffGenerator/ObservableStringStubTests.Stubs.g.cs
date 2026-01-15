@@ -8,7 +8,7 @@ partial class ObservableStringStubTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IObservable.Subscribe.</summary>
+		/// <summary>Interceptor for Subscribe.</summary>
 		public sealed class IObservable_SubscribeInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

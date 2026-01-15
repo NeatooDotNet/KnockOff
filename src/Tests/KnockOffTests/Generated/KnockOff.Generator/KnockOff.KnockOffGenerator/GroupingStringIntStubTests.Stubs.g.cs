@@ -27,7 +27,7 @@ partial class GroupingStringIntStubTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IGrouping.GetEnumerator.</summary>
+		/// <summary>Interceptor for GetEnumerator.</summary>
 		public sealed class IGrouping_GetEnumeratorInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

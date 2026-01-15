@@ -8,7 +8,7 @@ partial class FormattableStubTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IFormattable.ToString.</summary>
+		/// <summary>Interceptor for ToString.</summary>
 		public sealed class IFormattable_ToStringInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

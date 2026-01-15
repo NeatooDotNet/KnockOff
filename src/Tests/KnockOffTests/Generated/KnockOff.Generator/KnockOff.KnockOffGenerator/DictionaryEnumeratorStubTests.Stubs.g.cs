@@ -84,7 +84,7 @@ partial class DictionaryEnumeratorStubTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IDictionaryEnumerator.MoveNext.</summary>
+		/// <summary>Interceptor for MoveNext.</summary>
 		public sealed class IDictionaryEnumerator_MoveNextInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -101,7 +101,7 @@ partial class DictionaryEnumeratorStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDictionaryEnumerator.Reset.</summary>
+		/// <summary>Interceptor for Reset.</summary>
 		public sealed class IDictionaryEnumerator_ResetInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

@@ -27,7 +27,7 @@ partial class OpenGenericInterfaceTest
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IOGRepository.Add.</summary>
+		/// <summary>Interceptor for Add.</summary>
 		public sealed class IOGRepository_AddInterceptor<T>
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -47,7 +47,7 @@ partial class OpenGenericInterfaceTest
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IOGRepository.GetById.</summary>
+		/// <summary>Interceptor for GetById.</summary>
 		public sealed class IOGRepository_GetByIdInterceptor<T>
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -67,7 +67,7 @@ partial class OpenGenericInterfaceTest
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IOGRepository.GetAll.</summary>
+		/// <summary>Interceptor for GetAll.</summary>
 		public sealed class IOGRepository_GetAllInterceptor<T>
 		{
 			/// <summary>Number of times this method was called.</summary>

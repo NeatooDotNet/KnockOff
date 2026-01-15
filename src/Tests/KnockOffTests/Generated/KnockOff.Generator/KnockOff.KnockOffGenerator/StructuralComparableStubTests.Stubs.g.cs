@@ -8,7 +8,7 @@ partial class StructuralComparableStubTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IStructuralComparable.CompareTo.</summary>
+		/// <summary>Interceptor for CompareTo.</summary>
 		public sealed class IStructuralComparable_CompareToInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

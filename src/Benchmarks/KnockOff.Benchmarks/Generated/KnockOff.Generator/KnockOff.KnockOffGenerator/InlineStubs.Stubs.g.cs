@@ -8,7 +8,7 @@ partial class InlineStubs
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for ISimpleService.DoWork.</summary>
+		/// <summary>Interceptor for DoWork.</summary>
 		public sealed class ISimpleService_DoWorkInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -53,7 +53,7 @@ partial class InlineStubs
 
 		}
 
-		/// <summary>Interceptor for ICalculator.Add.</summary>
+		/// <summary>Interceptor for Add.</summary>
 		public sealed class ICalculator_AddInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -73,7 +73,7 @@ partial class InlineStubs
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for ICalculator.Subtract.</summary>
+		/// <summary>Interceptor for Subtract.</summary>
 		public sealed class ICalculator_SubtractInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -93,7 +93,7 @@ partial class InlineStubs
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for ICalculator.Multiply.</summary>
+		/// <summary>Interceptor for Multiply.</summary>
 		public sealed class ICalculator_MultiplyInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -113,7 +113,7 @@ partial class InlineStubs
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for ICalculator.Divide.</summary>
+		/// <summary>Interceptor for Divide.</summary>
 		public sealed class ICalculator_DivideInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -133,7 +133,7 @@ partial class InlineStubs
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for ICalculator.Square.</summary>
+		/// <summary>Interceptor for Square.</summary>
 		public sealed class ICalculator_SquareInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

@@ -122,7 +122,7 @@ partial class IRequiredRuleTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IRequiredRule.RunRule.</summary>
+		/// <summary>Interceptor for RunRule.</summary>
 		public sealed class IRequiredRule_RunRuleInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -142,7 +142,7 @@ partial class IRequiredRuleTests
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IRequiredRule.OnRuleAdded.</summary>
+		/// <summary>Interceptor for OnRuleAdded.</summary>
 		public sealed class IRequiredRule_OnRuleAddedInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

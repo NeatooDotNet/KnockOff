@@ -39,7 +39,7 @@ partial class InlineTestClass
 			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for ISimpleService.DoSomething.</summary>
+		/// <summary>Interceptor for DoSomething.</summary>
 		public sealed class ISimpleService_DoSomethingInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -56,7 +56,7 @@ partial class InlineTestClass
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for ISimpleService.GetValue.</summary>
+		/// <summary>Interceptor for GetValue.</summary>
 		public sealed class ISimpleService_GetValueInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

@@ -8,7 +8,7 @@ partial class SkPartialPropertyTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for ISkInlineUserService.GetUser.</summary>
+		/// <summary>Interceptor for GetUser.</summary>
 		public sealed class ISkInlineUserService_GetUserInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

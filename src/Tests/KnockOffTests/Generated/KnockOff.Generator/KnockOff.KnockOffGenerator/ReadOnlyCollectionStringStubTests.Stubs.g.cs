@@ -27,7 +27,7 @@ partial class ReadOnlyCollectionStringStubTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IReadOnlyCollection.GetEnumerator.</summary>
+		/// <summary>Interceptor for GetEnumerator.</summary>
 		public sealed class IReadOnlyCollection_GetEnumeratorInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

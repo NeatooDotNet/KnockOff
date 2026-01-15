@@ -96,7 +96,7 @@ partial class DbConnectionStubTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IDbConnection.BeginTransaction.</summary>
+		/// <summary>Interceptor for BeginTransaction.</summary>
 		public sealed class IDbConnection_BeginTransactionInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -116,7 +116,7 @@ partial class DbConnectionStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDbConnection.ChangeDatabase.</summary>
+		/// <summary>Interceptor for ChangeDatabase.</summary>
 		public sealed class IDbConnection_ChangeDatabaseInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -136,7 +136,7 @@ partial class DbConnectionStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDbConnection.Close.</summary>
+		/// <summary>Interceptor for Close.</summary>
 		public sealed class IDbConnection_CloseInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -153,7 +153,7 @@ partial class DbConnectionStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDbConnection.CreateCommand.</summary>
+		/// <summary>Interceptor for CreateCommand.</summary>
 		public sealed class IDbConnection_CreateCommandInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -170,7 +170,7 @@ partial class DbConnectionStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDbConnection.Open.</summary>
+		/// <summary>Interceptor for Open.</summary>
 		public sealed class IDbConnection_OpenInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -187,7 +187,7 @@ partial class DbConnectionStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDbConnection.Dispose.</summary>
+		/// <summary>Interceptor for Dispose.</summary>
 		public sealed class IDbConnection_DisposeInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

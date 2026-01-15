@@ -8,7 +8,7 @@ partial class ServiceProviderStubTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IServiceProvider.GetService.</summary>
+		/// <summary>Interceptor for GetService.</summary>
 		public sealed class IServiceProvider_GetServiceInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

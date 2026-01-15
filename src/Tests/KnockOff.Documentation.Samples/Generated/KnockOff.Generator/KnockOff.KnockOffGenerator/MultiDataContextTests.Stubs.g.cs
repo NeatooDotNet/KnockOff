@@ -8,7 +8,7 @@ partial class MultiDataContextTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IMultiRepository.GetById.</summary>
+		/// <summary>Interceptor for GetById.</summary>
 		public sealed class IMultiRepository_GetByIdInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -28,7 +28,7 @@ partial class MultiDataContextTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IMultiRepository.Add.</summary>
+		/// <summary>Interceptor for Add.</summary>
 		public sealed class IMultiRepository_AddInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -87,7 +87,7 @@ partial class MultiDataContextTests
 
 		}
 
-		/// <summary>Interceptor for IMultiUnitOfWork.SaveChangesAsync.</summary>
+		/// <summary>Interceptor for SaveChangesAsync.</summary>
 		public sealed class IMultiUnitOfWork_SaveChangesAsyncInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

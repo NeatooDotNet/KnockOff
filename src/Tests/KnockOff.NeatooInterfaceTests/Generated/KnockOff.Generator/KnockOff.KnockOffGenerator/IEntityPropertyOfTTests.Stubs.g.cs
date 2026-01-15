@@ -298,7 +298,7 @@ partial class IEntityPropertyOfTTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IEntityProperty.MarkSelfUnmodified.</summary>
+		/// <summary>Interceptor for MarkSelfUnmodified.</summary>
 		public sealed class IEntityProperty_MarkSelfUnmodifiedInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -315,7 +315,7 @@ partial class IEntityPropertyOfTTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IEntityProperty.ApplyPropertyInfo.</summary>
+		/// <summary>Interceptor for ApplyPropertyInfo.</summary>
 		public sealed class IEntityProperty_ApplyPropertyInfoInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -335,7 +335,7 @@ partial class IEntityPropertyOfTTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IEntityProperty.SetValue.</summary>
+		/// <summary>Interceptor for SetValue.</summary>
 		public sealed class IEntityProperty_SetValueInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -355,7 +355,7 @@ partial class IEntityPropertyOfTTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IEntityProperty.AddMarkedBusy.</summary>
+		/// <summary>Interceptor for AddMarkedBusy.</summary>
 		public sealed class IEntityProperty_AddMarkedBusyInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -375,7 +375,7 @@ partial class IEntityPropertyOfTTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IEntityProperty.RemoveMarkedBusy.</summary>
+		/// <summary>Interceptor for RemoveMarkedBusy.</summary>
 		public sealed class IEntityProperty_RemoveMarkedBusyInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -395,7 +395,7 @@ partial class IEntityPropertyOfTTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IEntityProperty.LoadValue.</summary>
+		/// <summary>Interceptor for LoadValue.</summary>
 		public sealed class IEntityProperty_LoadValueInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -415,7 +415,7 @@ partial class IEntityPropertyOfTTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IEntityProperty.WaitForTasks.</summary>
+		/// <summary>Interceptor for WaitForTasks.</summary>
 		public sealed class IEntityProperty_WaitForTasksInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -432,7 +432,7 @@ partial class IEntityPropertyOfTTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IEntityProperty.GetAwaiter.</summary>
+		/// <summary>Interceptor for GetAwaiter.</summary>
 		public sealed class IEntityProperty_GetAwaiterInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -449,7 +449,7 @@ partial class IEntityPropertyOfTTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IEntityProperty.RunRules.</summary>
+		/// <summary>Interceptor for RunRules.</summary>
 		public sealed class IEntityProperty_RunRulesInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

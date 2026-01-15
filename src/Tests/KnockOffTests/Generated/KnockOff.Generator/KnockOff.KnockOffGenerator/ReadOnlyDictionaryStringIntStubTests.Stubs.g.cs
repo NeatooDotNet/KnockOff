@@ -8,28 +8,6 @@ partial class ReadOnlyDictionaryStringIntStubTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IReadOnlyDictionary.Indexer.</summary>
-		public sealed class IReadOnlyDictionary_IndexerInterceptor
-		{
-			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
-
-			/// <summary>The last key used to access the getter.</summary>
-			public string? LastGetKey { get; private set; }
-
-			/// <summary>Callback for getter.</summary>
-			public global::System.Func<Stubs.IReadOnlyDictionary, string, int>? OnGet { get; set; }
-
-			/// <summary>Records a getter access.</summary>
-			public void RecordGet(string key) { GetCount++; LastGetKey = key; }
-
-			/// <summary>Backing storage for this indexer.</summary>
-			public global::System.Collections.Generic.Dictionary<string, int> Backing { get; } = new();
-
-			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
-		}
-
 		/// <summary>Interceptor for IReadOnlyDictionary.Keys.</summary>
 		public sealed class IReadOnlyDictionary_KeysInterceptor
 		{
@@ -87,7 +65,29 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IReadOnlyDictionary.ContainsKey.</summary>
+		/// <summary>Interceptor for IReadOnlyDictionary.Indexer.</summary>
+		public sealed class IReadOnlyDictionary_IndexerInterceptor
+		{
+			/// <summary>Number of times the getter was accessed.</summary>
+			public int GetCount { get; private set; }
+
+			/// <summary>The last key used to access the getter.</summary>
+			public string? LastGetKey { get; private set; }
+
+			/// <summary>Callback for getter.</summary>
+			public global::System.Func<Stubs.IReadOnlyDictionary, string, int>? OnGet { get; set; }
+
+			/// <summary>Records a getter access.</summary>
+			public void RecordGet(string key) { GetCount++; LastGetKey = key; }
+
+			/// <summary>Backing storage for this indexer.</summary>
+			public global::System.Collections.Generic.Dictionary<string, int> Backing { get; } = new();
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
+		}
+
+		/// <summary>Interceptor for ContainsKey.</summary>
 		public sealed class IReadOnlyDictionary_ContainsKeyInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -107,7 +107,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IReadOnlyDictionary.TryGetValue.</summary>
+		/// <summary>Interceptor for TryGetValue.</summary>
 		public sealed class IReadOnlyDictionary_TryGetValueInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -127,7 +127,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IReadOnlyDictionary.GetEnumerator.</summary>
+		/// <summary>Interceptor for GetEnumerator.</summary>
 		public sealed class IReadOnlyDictionary_GetEnumeratorInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

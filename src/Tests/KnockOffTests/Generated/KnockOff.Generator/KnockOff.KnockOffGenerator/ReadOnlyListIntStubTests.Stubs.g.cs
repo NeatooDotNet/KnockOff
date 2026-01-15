@@ -8,6 +8,25 @@ partial class ReadOnlyListIntStubTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
+		/// <summary>Interceptor for IReadOnlyList.Count.</summary>
+		public sealed class IReadOnlyList_CountInterceptor
+		{
+			/// <summary>Number of times the getter was accessed.</summary>
+			public int GetCount { get; private set; }
+
+			/// <summary>Callback for getter. If set, returns its value.</summary>
+			public global::System.Func<Stubs.IReadOnlyList, int>? OnGet { get; set; }
+
+			/// <summary>Value returned by getter when OnGet is not set.</summary>
+			public int Value { get; set; } = default!;
+
+			/// <summary>Records a getter access.</summary>
+			public void RecordGet() => GetCount++;
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		}
+
 		/// <summary>Interceptor for IReadOnlyList.Indexer.</summary>
 		public sealed class IReadOnlyList_IndexerInterceptor
 		{
@@ -30,26 +49,7 @@ partial class ReadOnlyListIntStubTests
 			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
 		}
 
-		/// <summary>Interceptor for IReadOnlyList.Count.</summary>
-		public sealed class IReadOnlyList_CountInterceptor
-		{
-			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
-
-			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IReadOnlyList, int>? OnGet { get; set; }
-
-			/// <summary>Value returned by getter when OnGet is not set.</summary>
-			public int Value { get; set; } = default!;
-
-			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => GetCount++;
-
-			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
-		}
-
-		/// <summary>Interceptor for IReadOnlyList.GetEnumerator.</summary>
+		/// <summary>Interceptor for GetEnumerator.</summary>
 		public sealed class IReadOnlyList_GetEnumeratorInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

@@ -141,7 +141,7 @@ partial class IMaxLengthRuleTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IMaxLengthRule.RunRule.</summary>
+		/// <summary>Interceptor for RunRule.</summary>
 		public sealed class IMaxLengthRule_RunRuleInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -161,7 +161,7 @@ partial class IMaxLengthRuleTests
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IMaxLengthRule.OnRuleAdded.</summary>
+		/// <summary>Interceptor for OnRuleAdded.</summary>
 		public sealed class IMaxLengthRule_OnRuleAddedInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

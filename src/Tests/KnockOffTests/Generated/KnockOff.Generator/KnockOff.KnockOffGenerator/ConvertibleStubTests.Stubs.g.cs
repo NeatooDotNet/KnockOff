@@ -8,7 +8,7 @@ partial class ConvertibleStubTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IConvertible.GetTypeCode.</summary>
+		/// <summary>Interceptor for GetTypeCode.</summary>
 		public sealed class IConvertible_GetTypeCodeInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -25,7 +25,7 @@ partial class ConvertibleStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IConvertible.ToBoolean.</summary>
+		/// <summary>Interceptor for ToBoolean.</summary>
 		public sealed class IConvertible_ToBooleanInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -45,7 +45,7 @@ partial class ConvertibleStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IConvertible.ToByte.</summary>
+		/// <summary>Interceptor for ToByte.</summary>
 		public sealed class IConvertible_ToByteInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -65,7 +65,7 @@ partial class ConvertibleStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IConvertible.ToChar.</summary>
+		/// <summary>Interceptor for ToChar.</summary>
 		public sealed class IConvertible_ToCharInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -85,7 +85,7 @@ partial class ConvertibleStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IConvertible.ToDateTime.</summary>
+		/// <summary>Interceptor for ToDateTime.</summary>
 		public sealed class IConvertible_ToDateTimeInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -105,7 +105,7 @@ partial class ConvertibleStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IConvertible.ToDecimal.</summary>
+		/// <summary>Interceptor for ToDecimal.</summary>
 		public sealed class IConvertible_ToDecimalInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -125,7 +125,7 @@ partial class ConvertibleStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IConvertible.ToDouble.</summary>
+		/// <summary>Interceptor for ToDouble.</summary>
 		public sealed class IConvertible_ToDoubleInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -145,7 +145,7 @@ partial class ConvertibleStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IConvertible.ToInt16.</summary>
+		/// <summary>Interceptor for ToInt16.</summary>
 		public sealed class IConvertible_ToInt16Interceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -165,7 +165,7 @@ partial class ConvertibleStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IConvertible.ToInt32.</summary>
+		/// <summary>Interceptor for ToInt32.</summary>
 		public sealed class IConvertible_ToInt32Interceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -185,7 +185,7 @@ partial class ConvertibleStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IConvertible.ToInt64.</summary>
+		/// <summary>Interceptor for ToInt64.</summary>
 		public sealed class IConvertible_ToInt64Interceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -205,7 +205,7 @@ partial class ConvertibleStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IConvertible.ToSByte.</summary>
+		/// <summary>Interceptor for ToSByte.</summary>
 		public sealed class IConvertible_ToSByteInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -225,7 +225,7 @@ partial class ConvertibleStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IConvertible.ToSingle.</summary>
+		/// <summary>Interceptor for ToSingle.</summary>
 		public sealed class IConvertible_ToSingleInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -245,7 +245,7 @@ partial class ConvertibleStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IConvertible.ToString.</summary>
+		/// <summary>Interceptor for ToString.</summary>
 		public sealed class IConvertible_ToStringInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -265,7 +265,7 @@ partial class ConvertibleStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IConvertible.ToType.</summary>
+		/// <summary>Interceptor for ToType.</summary>
 		public sealed class IConvertible_ToTypeInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -285,7 +285,7 @@ partial class ConvertibleStubTests
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IConvertible.ToUInt16.</summary>
+		/// <summary>Interceptor for ToUInt16.</summary>
 		public sealed class IConvertible_ToUInt16Interceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -305,7 +305,7 @@ partial class ConvertibleStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IConvertible.ToUInt32.</summary>
+		/// <summary>Interceptor for ToUInt32.</summary>
 		public sealed class IConvertible_ToUInt32Interceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -325,7 +325,7 @@ partial class ConvertibleStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IConvertible.ToUInt64.</summary>
+		/// <summary>Interceptor for ToUInt64.</summary>
 		public sealed class IConvertible_ToUInt64Interceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

@@ -48,28 +48,6 @@ partial class InlineEntityContainer
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IEntityBase.IndexerString.</summary>
-		public sealed class IEntityBase_IndexerStringInterceptor
-		{
-			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
-
-			/// <summary>The last key used to access the getter.</summary>
-			public string? LastGetKey { get; private set; }
-
-			/// <summary>Callback for getter.</summary>
-			public global::System.Func<Stubs.IEntityBase, string, global::Neatoo.IEntityProperty>? OnGet { get; set; }
-
-			/// <summary>Records a getter access.</summary>
-			public void RecordGet(string propertyName) { GetCount++; LastGetKey = propertyName; }
-
-			/// <summary>Backing storage for this indexer.</summary>
-			public global::System.Collections.Generic.Dictionary<string, global::Neatoo.IEntityProperty> Backing { get; } = new();
-
-			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
-		}
-
 		/// <summary>Interceptor for IEntityBase.Parent.</summary>
 		public sealed class IEntityBase_ParentInterceptor
 		{
@@ -317,7 +295,29 @@ partial class InlineEntityContainer
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IEntityBase.Delete.</summary>
+		/// <summary>Interceptor for IEntityBase.IndexerString.</summary>
+		public sealed class IEntityBase_IndexerStringInterceptor
+		{
+			/// <summary>Number of times the getter was accessed.</summary>
+			public int GetCount { get; private set; }
+
+			/// <summary>The last key used to access the getter.</summary>
+			public string? LastGetKey { get; private set; }
+
+			/// <summary>Callback for getter.</summary>
+			public global::System.Func<Stubs.IEntityBase, string, global::Neatoo.IEntityProperty>? OnGet { get; set; }
+
+			/// <summary>Records a getter access.</summary>
+			public void RecordGet(string propertyName) { GetCount++; LastGetKey = propertyName; }
+
+			/// <summary>Backing storage for this indexer.</summary>
+			public global::System.Collections.Generic.Dictionary<string, global::Neatoo.IEntityProperty> Backing { get; } = new();
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
+		}
+
+		/// <summary>Interceptor for Delete.</summary>
 		public sealed class IEntityBase_DeleteInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -334,7 +334,7 @@ partial class InlineEntityContainer
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IEntityBase.UnDelete.</summary>
+		/// <summary>Interceptor for UnDelete.</summary>
 		public sealed class IEntityBase_UnDeleteInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -351,7 +351,7 @@ partial class InlineEntityContainer
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IEntityBase.Save.</summary>
+		/// <summary>Interceptor for Save.</summary>
 		public sealed class IEntityBase_SaveInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -368,7 +368,7 @@ partial class InlineEntityContainer
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IEntityBase.GetProperty.</summary>
+		/// <summary>Interceptor for GetProperty.</summary>
 		public sealed class IEntityBase_GetPropertyInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -388,7 +388,7 @@ partial class InlineEntityContainer
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IEntityBase.TryGetProperty.</summary>
+		/// <summary>Interceptor for TryGetProperty.</summary>
 		public sealed class IEntityBase_TryGetPropertyInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -408,7 +408,7 @@ partial class InlineEntityContainer
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IEntityBase.WaitForTasks.</summary>
+		/// <summary>Interceptor for WaitForTasks.</summary>
 		public sealed class IEntityBase_WaitForTasksInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -428,7 +428,7 @@ partial class InlineEntityContainer
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IEntityBase.RunRules.</summary>
+		/// <summary>Interceptor for RunRules.</summary>
 		public sealed class IEntityBase_RunRulesInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -448,7 +448,7 @@ partial class InlineEntityContainer
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IEntityBase.ClearAllMessages.</summary>
+		/// <summary>Interceptor for ClearAllMessages.</summary>
 		public sealed class IEntityBase_ClearAllMessagesInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -465,7 +465,7 @@ partial class InlineEntityContainer
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IEntityBase.ClearSelfMessages.</summary>
+		/// <summary>Interceptor for ClearSelfMessages.</summary>
 		public sealed class IEntityBase_ClearSelfMessagesInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

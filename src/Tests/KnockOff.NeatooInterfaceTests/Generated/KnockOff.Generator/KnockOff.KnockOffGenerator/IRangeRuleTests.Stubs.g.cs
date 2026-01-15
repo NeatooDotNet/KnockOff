@@ -160,7 +160,7 @@ partial class IRangeRuleTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IRangeRule.RunRule.</summary>
+		/// <summary>Interceptor for RunRule.</summary>
 		public sealed class IRangeRule_RunRuleInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -180,7 +180,7 @@ partial class IRangeRuleTests
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IRangeRule.OnRuleAdded.</summary>
+		/// <summary>Interceptor for OnRuleAdded.</summary>
 		public sealed class IRangeRule_OnRuleAddedInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

@@ -46,7 +46,7 @@ partial class CollectionStringStubTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for ICollection.Add.</summary>
+		/// <summary>Interceptor for Add.</summary>
 		public sealed class ICollection_AddInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -66,7 +66,7 @@ partial class CollectionStringStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for ICollection.Clear.</summary>
+		/// <summary>Interceptor for Clear.</summary>
 		public sealed class ICollection_ClearInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -83,7 +83,7 @@ partial class CollectionStringStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for ICollection.Contains.</summary>
+		/// <summary>Interceptor for Contains.</summary>
 		public sealed class ICollection_ContainsInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -103,7 +103,7 @@ partial class CollectionStringStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for ICollection.CopyTo.</summary>
+		/// <summary>Interceptor for CopyTo.</summary>
 		public sealed class ICollection_CopyToInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -123,7 +123,7 @@ partial class CollectionStringStubTests
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for ICollection.Remove.</summary>
+		/// <summary>Interceptor for Remove.</summary>
 		public sealed class ICollection_RemoveInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -143,7 +143,7 @@ partial class CollectionStringStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for ICollection.GetEnumerator.</summary>
+		/// <summary>Interceptor for GetEnumerator.</summary>
 		public sealed class ICollection_GetEnumeratorInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

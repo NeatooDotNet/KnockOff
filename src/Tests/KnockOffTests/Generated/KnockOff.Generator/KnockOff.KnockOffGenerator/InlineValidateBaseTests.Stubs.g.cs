@@ -46,28 +46,6 @@ partial class InlineValidateBaseTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IValidateBase.Indexer.</summary>
-		public sealed class IValidateBase_IndexerInterceptor
-		{
-			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
-
-			/// <summary>The last key used to access the getter.</summary>
-			public string? LastGetKey { get; private set; }
-
-			/// <summary>Callback for getter.</summary>
-			public global::System.Func<Stubs.IValidateBase, string, global::Neatoo.IValidateProperty>? OnGet { get; set; }
-
-			/// <summary>Records a getter access.</summary>
-			public void RecordGet(string propertyName) { GetCount++; LastGetKey = propertyName; }
-
-			/// <summary>Backing storage for this indexer.</summary>
-			public global::System.Collections.Generic.Dictionary<string, global::Neatoo.IValidateProperty> Backing { get; } = new();
-
-			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
-		}
-
 		/// <summary>Interceptor for IValidateBase.IsBusy.</summary>
 		public sealed class IValidateBase_IsBusyInterceptor
 		{
@@ -144,7 +122,29 @@ partial class InlineValidateBaseTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IValidateBase.GetProperty.</summary>
+		/// <summary>Interceptor for IValidateBase.Indexer.</summary>
+		public sealed class IValidateBase_IndexerInterceptor
+		{
+			/// <summary>Number of times the getter was accessed.</summary>
+			public int GetCount { get; private set; }
+
+			/// <summary>The last key used to access the getter.</summary>
+			public string? LastGetKey { get; private set; }
+
+			/// <summary>Callback for getter.</summary>
+			public global::System.Func<Stubs.IValidateBase, string, global::Neatoo.IValidateProperty>? OnGet { get; set; }
+
+			/// <summary>Records a getter access.</summary>
+			public void RecordGet(string propertyName) { GetCount++; LastGetKey = propertyName; }
+
+			/// <summary>Backing storage for this indexer.</summary>
+			public global::System.Collections.Generic.Dictionary<string, global::Neatoo.IValidateProperty> Backing { get; } = new();
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
+		}
+
+		/// <summary>Interceptor for GetProperty.</summary>
 		public sealed class IValidateBase_GetPropertyInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -164,7 +164,7 @@ partial class InlineValidateBaseTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IValidateBase.TryGetProperty.</summary>
+		/// <summary>Interceptor for TryGetProperty.</summary>
 		public sealed class IValidateBase_TryGetPropertyInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -184,7 +184,7 @@ partial class InlineValidateBaseTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IValidateBase.WaitForTasks.</summary>
+		/// <summary>Interceptor for WaitForTasks.</summary>
 		public sealed class IValidateBase_WaitForTasksInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -204,7 +204,7 @@ partial class InlineValidateBaseTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IValidateBase.RunRules.</summary>
+		/// <summary>Interceptor for RunRules.</summary>
 		public sealed class IValidateBase_RunRulesInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -224,7 +224,7 @@ partial class InlineValidateBaseTests
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IValidateBase.ClearAllMessages.</summary>
+		/// <summary>Interceptor for ClearAllMessages.</summary>
 		public sealed class IValidateBase_ClearAllMessagesInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -241,7 +241,7 @@ partial class InlineValidateBaseTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IValidateBase.ClearSelfMessages.</summary>
+		/// <summary>Interceptor for ClearSelfMessages.</summary>
 		public sealed class IValidateBase_ClearSelfMessagesInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

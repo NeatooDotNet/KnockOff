@@ -65,7 +65,7 @@ partial class OrderedQueryableUserStubTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IOrderedQueryable.GetEnumerator.</summary>
+		/// <summary>Interceptor for GetEnumerator.</summary>
 		public sealed class IOrderedQueryable_GetEnumeratorInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

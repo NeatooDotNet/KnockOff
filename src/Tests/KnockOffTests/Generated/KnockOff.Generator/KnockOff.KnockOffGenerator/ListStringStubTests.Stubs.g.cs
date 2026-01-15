@@ -8,40 +8,6 @@ partial class ListStringStubTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IList.Indexer.</summary>
-		public sealed class IList_IndexerInterceptor
-		{
-			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
-
-			/// <summary>The last key used to access the getter.</summary>
-			public int? LastGetKey { get; private set; }
-
-			/// <summary>Callback for getter.</summary>
-			public global::System.Func<Stubs.IList, int, string>? OnGet { get; set; }
-
-			/// <summary>Number of times the setter was accessed.</summary>
-			public int SetCount { get; private set; }
-
-			/// <summary>The last key-value pair passed to the setter.</summary>
-			public (int Key, string Value)? LastSetEntry { get; private set; }
-
-			/// <summary>Callback for setter.</summary>
-			public global::System.Action<Stubs.IList, int, string>? OnSet { get; set; }
-
-			/// <summary>Records a getter access.</summary>
-			public void RecordGet(int index) { GetCount++; LastGetKey = index; }
-
-			/// <summary>Records a setter access.</summary>
-			public void RecordSet(int index, string value) { SetCount++; LastSetEntry = (index, value); }
-
-			/// <summary>Backing storage for this indexer.</summary>
-			public global::System.Collections.Generic.Dictionary<int, string> Backing { get; } = new();
-
-			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
-		}
-
 		/// <summary>Interceptor for IList.Count.</summary>
 		public sealed class IList_CountInterceptor
 		{
@@ -80,7 +46,41 @@ partial class ListStringStubTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IList.IndexOf.</summary>
+		/// <summary>Interceptor for IList.Indexer.</summary>
+		public sealed class IList_IndexerInterceptor
+		{
+			/// <summary>Number of times the getter was accessed.</summary>
+			public int GetCount { get; private set; }
+
+			/// <summary>The last key used to access the getter.</summary>
+			public int? LastGetKey { get; private set; }
+
+			/// <summary>Callback for getter.</summary>
+			public global::System.Func<Stubs.IList, int, string>? OnGet { get; set; }
+
+			/// <summary>Number of times the setter was accessed.</summary>
+			public int SetCount { get; private set; }
+
+			/// <summary>The last key-value pair passed to the setter.</summary>
+			public (int Key, string Value)? LastSetEntry { get; private set; }
+
+			/// <summary>Callback for setter.</summary>
+			public global::System.Action<Stubs.IList, int, string>? OnSet { get; set; }
+
+			/// <summary>Records a getter access.</summary>
+			public void RecordGet(int index) { GetCount++; LastGetKey = index; }
+
+			/// <summary>Records a setter access.</summary>
+			public void RecordSet(int index, string value) { SetCount++; LastSetEntry = (index, value); }
+
+			/// <summary>Backing storage for this indexer.</summary>
+			public global::System.Collections.Generic.Dictionary<int, string> Backing { get; } = new();
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
+		}
+
+		/// <summary>Interceptor for IndexOf.</summary>
 		public sealed class IList_IndexOfInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -100,7 +100,7 @@ partial class ListStringStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IList.Insert.</summary>
+		/// <summary>Interceptor for Insert.</summary>
 		public sealed class IList_InsertInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -120,7 +120,7 @@ partial class ListStringStubTests
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IList.RemoveAt.</summary>
+		/// <summary>Interceptor for RemoveAt.</summary>
 		public sealed class IList_RemoveAtInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -140,7 +140,7 @@ partial class ListStringStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IList.Add.</summary>
+		/// <summary>Interceptor for Add.</summary>
 		public sealed class IList_AddInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -160,7 +160,7 @@ partial class ListStringStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IList.Clear.</summary>
+		/// <summary>Interceptor for Clear.</summary>
 		public sealed class IList_ClearInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -177,7 +177,7 @@ partial class ListStringStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IList.Contains.</summary>
+		/// <summary>Interceptor for Contains.</summary>
 		public sealed class IList_ContainsInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -197,7 +197,7 @@ partial class ListStringStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IList.CopyTo.</summary>
+		/// <summary>Interceptor for CopyTo.</summary>
 		public sealed class IList_CopyToInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -217,7 +217,7 @@ partial class ListStringStubTests
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IList.Remove.</summary>
+		/// <summary>Interceptor for Remove.</summary>
 		public sealed class IList_RemoveInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -237,7 +237,7 @@ partial class ListStringStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IList.GetEnumerator.</summary>
+		/// <summary>Interceptor for GetEnumerator.</summary>
 		public sealed class IList_GetEnumeratorInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

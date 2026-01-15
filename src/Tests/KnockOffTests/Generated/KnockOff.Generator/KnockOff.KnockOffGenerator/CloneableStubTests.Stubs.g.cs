@@ -8,7 +8,7 @@ partial class CloneableStubTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for ICloneable.Clone.</summary>
+		/// <summary>Interceptor for Clone.</summary>
 		public sealed class ICloneable_CloneInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

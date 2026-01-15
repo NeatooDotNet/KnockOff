@@ -27,7 +27,7 @@ partial class ITriggerPropertyTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for ITriggerProperty.IsMatch.</summary>
+		/// <summary>Interceptor for IsMatch.</summary>
 		public sealed class ITriggerProperty_IsMatchInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

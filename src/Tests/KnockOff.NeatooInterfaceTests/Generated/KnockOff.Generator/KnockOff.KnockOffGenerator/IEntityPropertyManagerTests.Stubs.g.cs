@@ -84,28 +84,6 @@ partial class IEntityPropertyManagerTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IEntityPropertyManager.Indexer.</summary>
-		public sealed class IEntityPropertyManager_IndexerInterceptor
-		{
-			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
-
-			/// <summary>The last key used to access the getter.</summary>
-			public string? LastGetKey { get; private set; }
-
-			/// <summary>Callback for getter.</summary>
-			public global::System.Func<Stubs.IEntityPropertyManager, string, global::Neatoo.IEntityProperty>? OnGet { get; set; }
-
-			/// <summary>Records a getter access.</summary>
-			public void RecordGet(string propertyName) { GetCount++; LastGetKey = propertyName; }
-
-			/// <summary>Backing storage for this indexer.</summary>
-			public global::System.Collections.Generic.Dictionary<string, global::Neatoo.IEntityProperty> Backing { get; } = new();
-
-			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
-		}
-
 		/// <summary>Interceptor for IEntityPropertyManager.IsSelfValid.</summary>
 		public sealed class IEntityPropertyManager_IsSelfValidInterceptor
 		{
@@ -182,7 +160,29 @@ partial class IEntityPropertyManagerTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IEntityPropertyManager.MarkSelfUnmodified.</summary>
+		/// <summary>Interceptor for IEntityPropertyManager.Indexer.</summary>
+		public sealed class IEntityPropertyManager_IndexerInterceptor
+		{
+			/// <summary>Number of times the getter was accessed.</summary>
+			public int GetCount { get; private set; }
+
+			/// <summary>The last key used to access the getter.</summary>
+			public string? LastGetKey { get; private set; }
+
+			/// <summary>Callback for getter.</summary>
+			public global::System.Func<Stubs.IEntityPropertyManager, string, global::Neatoo.IEntityProperty>? OnGet { get; set; }
+
+			/// <summary>Records a getter access.</summary>
+			public void RecordGet(string propertyName) { GetCount++; LastGetKey = propertyName; }
+
+			/// <summary>Backing storage for this indexer.</summary>
+			public global::System.Collections.Generic.Dictionary<string, global::Neatoo.IEntityProperty> Backing { get; } = new();
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
+		}
+
+		/// <summary>Interceptor for MarkSelfUnmodified.</summary>
 		public sealed class IEntityPropertyManager_MarkSelfUnmodifiedInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -199,7 +199,7 @@ partial class IEntityPropertyManagerTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IEntityPropertyManager.WaitForTasks.</summary>
+		/// <summary>Interceptor for WaitForTasks.</summary>
 		public sealed class IEntityPropertyManager_WaitForTasksInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -216,7 +216,7 @@ partial class IEntityPropertyManagerTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IEntityPropertyManager.HasProperty.</summary>
+		/// <summary>Interceptor for HasProperty.</summary>
 		public sealed class IEntityPropertyManager_HasPropertyInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -236,7 +236,7 @@ partial class IEntityPropertyManagerTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IEntityPropertyManager.GetProperty.</summary>
+		/// <summary>Interceptor for GetProperty.</summary>
 		public sealed class IEntityPropertyManager_GetPropertyInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -256,7 +256,7 @@ partial class IEntityPropertyManagerTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IEntityPropertyManager.SetProperties.</summary>
+		/// <summary>Interceptor for SetProperties.</summary>
 		public sealed class IEntityPropertyManager_SetPropertiesInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -276,7 +276,7 @@ partial class IEntityPropertyManagerTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IEntityPropertyManager.RunRules.</summary>
+		/// <summary>Interceptor for RunRules.</summary>
 		public sealed class IEntityPropertyManager_RunRulesInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -296,7 +296,7 @@ partial class IEntityPropertyManagerTests
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IEntityPropertyManager.PauseAllActions.</summary>
+		/// <summary>Interceptor for PauseAllActions.</summary>
 		public sealed class IEntityPropertyManager_PauseAllActionsInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -313,7 +313,7 @@ partial class IEntityPropertyManagerTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IEntityPropertyManager.ResumeAllActions.</summary>
+		/// <summary>Interceptor for ResumeAllActions.</summary>
 		public sealed class IEntityPropertyManager_ResumeAllActionsInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -330,7 +330,7 @@ partial class IEntityPropertyManagerTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IEntityPropertyManager.ClearAllMessages.</summary>
+		/// <summary>Interceptor for ClearAllMessages.</summary>
 		public sealed class IEntityPropertyManager_ClearAllMessagesInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -347,7 +347,7 @@ partial class IEntityPropertyManagerTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IEntityPropertyManager.ClearSelfMessages.</summary>
+		/// <summary>Interceptor for ClearSelfMessages.</summary>
 		public sealed class IEntityPropertyManager_ClearSelfMessagesInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

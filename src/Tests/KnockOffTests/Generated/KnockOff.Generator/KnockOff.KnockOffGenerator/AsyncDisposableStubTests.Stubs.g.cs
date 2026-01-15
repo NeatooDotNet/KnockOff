@@ -8,7 +8,7 @@ partial class AsyncDisposableStubTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IAsyncDisposable.DisposeAsync.</summary>
+		/// <summary>Interceptor for DisposeAsync.</summary>
 		public sealed class IAsyncDisposable_DisposeAsyncInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

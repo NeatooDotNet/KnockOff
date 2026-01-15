@@ -203,7 +203,7 @@ partial class BpComplexInterfaceTests
 			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IBpEditBase.BeginEdit.</summary>
+		/// <summary>Interceptor for BeginEdit.</summary>
 		public sealed class IBpEditBase_BeginEditInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -220,7 +220,7 @@ partial class BpComplexInterfaceTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IBpEditBase.CancelEdit.</summary>
+		/// <summary>Interceptor for CancelEdit.</summary>
 		public sealed class IBpEditBase_CancelEditInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -237,7 +237,7 @@ partial class BpComplexInterfaceTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IBpEditBase.ApplyEdit.</summary>
+		/// <summary>Interceptor for ApplyEdit.</summary>
 		public sealed class IBpEditBase_ApplyEditInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -254,7 +254,7 @@ partial class BpComplexInterfaceTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IBpEditBase.MarkDeleted.</summary>
+		/// <summary>Interceptor for MarkDeleted.</summary>
 		public sealed class IBpEditBase_MarkDeletedInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -271,7 +271,7 @@ partial class BpComplexInterfaceTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IBpEditBase.MarkNew.</summary>
+		/// <summary>Interceptor for MarkNew.</summary>
 		public sealed class IBpEditBase_MarkNewInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -288,7 +288,7 @@ partial class BpComplexInterfaceTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IBpEditBase.MarkOld.</summary>
+		/// <summary>Interceptor for MarkOld.</summary>
 		public sealed class IBpEditBase_MarkOldInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -305,7 +305,7 @@ partial class BpComplexInterfaceTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IBpEditBase.AddRule.</summary>
+		/// <summary>Interceptor for AddRule.</summary>
 		public sealed class IBpEditBase_AddRuleInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -325,7 +325,7 @@ partial class BpComplexInterfaceTests
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IBpEditBase.RemoveRule.</summary>
+		/// <summary>Interceptor for RemoveRule.</summary>
 		public sealed class IBpEditBase_RemoveRuleInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -345,7 +345,7 @@ partial class BpComplexInterfaceTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IBpEditBase.GetBrokenRules.</summary>
+		/// <summary>Interceptor for GetBrokenRules.</summary>
 		public sealed class IBpEditBase_GetBrokenRulesInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -362,7 +362,7 @@ partial class BpComplexInterfaceTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IBpEditBase.AddChild.</summary>
+		/// <summary>Interceptor for AddChild.</summary>
 		public sealed class IBpEditBase_AddChildInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -382,7 +382,7 @@ partial class BpComplexInterfaceTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IBpEditBase.RemoveChild.</summary>
+		/// <summary>Interceptor for RemoveChild.</summary>
 		public sealed class IBpEditBase_RemoveChildInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -402,7 +402,7 @@ partial class BpComplexInterfaceTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IBpEditBase.GetChildren.</summary>
+		/// <summary>Interceptor for GetChildren.</summary>
 		public sealed class IBpEditBase_GetChildrenInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

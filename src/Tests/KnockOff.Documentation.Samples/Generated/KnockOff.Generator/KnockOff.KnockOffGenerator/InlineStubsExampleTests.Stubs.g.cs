@@ -8,7 +8,7 @@ partial class InlineStubsExampleTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IRepository.Save.</summary>
+		/// <summary>Interceptor for Save.</summary>
 		public sealed class IRepository_SaveInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -56,7 +56,7 @@ partial class InlineStubsExampleTests
 
 		}
 
-		/// <summary>Interceptor for IUnitOfWork.Commit.</summary>
+		/// <summary>Interceptor for Commit.</summary>
 		public sealed class IUnitOfWork_CommitInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

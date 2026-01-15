@@ -27,7 +27,7 @@ partial class ITriggerPropertyOfTTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for ITriggerProperty.GetValue.</summary>
+		/// <summary>Interceptor for GetValue.</summary>
 		public sealed class ITriggerProperty_GetValueInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -47,7 +47,7 @@ partial class ITriggerPropertyOfTTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for ITriggerProperty.IsMatch.</summary>
+		/// <summary>Interceptor for IsMatch.</summary>
 		public sealed class ITriggerProperty_IsMatchInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

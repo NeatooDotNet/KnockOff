@@ -8,7 +8,7 @@ partial class IPropertyInfoListTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IPropertyInfoList.GetPropertyInfo.</summary>
+		/// <summary>Interceptor for GetPropertyInfo.</summary>
 		public sealed class IPropertyInfoList_GetPropertyInfoInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -28,7 +28,7 @@ partial class IPropertyInfoListTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IPropertyInfoList.Properties.</summary>
+		/// <summary>Interceptor for Properties.</summary>
 		public sealed class IPropertyInfoList_PropertiesInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -45,7 +45,7 @@ partial class IPropertyInfoListTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IPropertyInfoList.HasProperty.</summary>
+		/// <summary>Interceptor for HasProperty.</summary>
 		public sealed class IPropertyInfoList_HasPropertyInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

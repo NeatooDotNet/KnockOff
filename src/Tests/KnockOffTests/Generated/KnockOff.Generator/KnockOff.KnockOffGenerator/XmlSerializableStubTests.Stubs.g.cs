@@ -8,7 +8,7 @@ partial class XmlSerializableStubTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IXmlSerializable.GetSchema.</summary>
+		/// <summary>Interceptor for GetSchema.</summary>
 		public sealed class IXmlSerializable_GetSchemaInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -25,7 +25,7 @@ partial class XmlSerializableStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IXmlSerializable.ReadXml.</summary>
+		/// <summary>Interceptor for ReadXml.</summary>
 		public sealed class IXmlSerializable_ReadXmlInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -45,7 +45,7 @@ partial class XmlSerializableStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IXmlSerializable.WriteXml.</summary>
+		/// <summary>Interceptor for WriteXml.</summary>
 		public sealed class IXmlSerializable_WriteXmlInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

@@ -39,7 +39,7 @@ partial class StrictModeInlineTests
 			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IStrictModeTest.GetValue.</summary>
+		/// <summary>Interceptor for GetValue.</summary>
 		public sealed class IStrictModeTest_GetValueInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -59,7 +59,7 @@ partial class StrictModeInlineTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IStrictModeTest.DoSomething.</summary>
+		/// <summary>Interceptor for DoSomething.</summary>
 		public sealed class IStrictModeTest_DoSomethingInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -136,7 +136,7 @@ partial class StrictModeInlineTests
 
 		}
 
-		/// <summary>Interceptor for IStrictByDefault.GetData.</summary>
+		/// <summary>Interceptor for GetData.</summary>
 		public sealed class IStrictByDefault_GetDataInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

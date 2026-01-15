@@ -8,7 +8,7 @@ partial class DisposableStubTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IDisposable.Dispose.</summary>
+		/// <summary>Interceptor for Dispose.</summary>
 		public sealed class IDisposable_DisposeInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

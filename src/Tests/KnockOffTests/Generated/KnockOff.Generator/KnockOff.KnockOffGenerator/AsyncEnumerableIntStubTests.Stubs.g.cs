@@ -8,7 +8,7 @@ partial class AsyncEnumerableIntStubTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IAsyncEnumerable.GetAsyncEnumerator.</summary>
+		/// <summary>Interceptor for GetAsyncEnumerator.</summary>
 		public sealed class IAsyncEnumerable_GetAsyncEnumeratorInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

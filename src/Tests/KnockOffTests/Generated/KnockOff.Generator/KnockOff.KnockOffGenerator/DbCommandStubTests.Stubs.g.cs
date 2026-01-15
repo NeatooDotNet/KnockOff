@@ -213,7 +213,7 @@ partial class DbCommandStubTests
 			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IDbCommand.Cancel.</summary>
+		/// <summary>Interceptor for Cancel.</summary>
 		public sealed class IDbCommand_CancelInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -230,7 +230,7 @@ partial class DbCommandStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDbCommand.CreateParameter.</summary>
+		/// <summary>Interceptor for CreateParameter.</summary>
 		public sealed class IDbCommand_CreateParameterInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -247,7 +247,7 @@ partial class DbCommandStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDbCommand.ExecuteNonQuery.</summary>
+		/// <summary>Interceptor for ExecuteNonQuery.</summary>
 		public sealed class IDbCommand_ExecuteNonQueryInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -264,7 +264,7 @@ partial class DbCommandStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDbCommand.ExecuteReader.</summary>
+		/// <summary>Interceptor for ExecuteReader.</summary>
 		public sealed class IDbCommand_ExecuteReaderInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -284,7 +284,7 @@ partial class DbCommandStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDbCommand.ExecuteScalar.</summary>
+		/// <summary>Interceptor for ExecuteScalar.</summary>
 		public sealed class IDbCommand_ExecuteScalarInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -301,7 +301,7 @@ partial class DbCommandStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDbCommand.Prepare.</summary>
+		/// <summary>Interceptor for Prepare.</summary>
 		public sealed class IDbCommand_PrepareInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -318,7 +318,7 @@ partial class DbCommandStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDbCommand.Dispose.</summary>
+		/// <summary>Interceptor for Dispose.</summary>
 		public sealed class IDbCommand_DisposeInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

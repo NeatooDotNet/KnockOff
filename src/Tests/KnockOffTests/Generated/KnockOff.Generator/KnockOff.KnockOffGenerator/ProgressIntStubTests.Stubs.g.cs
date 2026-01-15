@@ -8,7 +8,7 @@ partial class ProgressIntStubTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IProgress.Report.</summary>
+		/// <summary>Interceptor for Report.</summary>
 		public sealed class IProgress_ReportInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

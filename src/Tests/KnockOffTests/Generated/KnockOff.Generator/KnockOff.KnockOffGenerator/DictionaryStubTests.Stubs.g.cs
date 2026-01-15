@@ -46,40 +46,6 @@ partial class DictionaryStubTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IDictionary.Indexer.</summary>
-		public sealed class IDictionary_IndexerInterceptor
-		{
-			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
-
-			/// <summary>The last key used to access the getter.</summary>
-			public object? LastGetKey { get; private set; }
-
-			/// <summary>Callback for getter.</summary>
-			public global::System.Func<Stubs.IDictionary, object, object?>? OnGet { get; set; }
-
-			/// <summary>Number of times the setter was accessed.</summary>
-			public int SetCount { get; private set; }
-
-			/// <summary>The last key-value pair passed to the setter.</summary>
-			public (object Key, object? Value)? LastSetEntry { get; private set; }
-
-			/// <summary>Callback for setter.</summary>
-			public global::System.Action<Stubs.IDictionary, object, object?>? OnSet { get; set; }
-
-			/// <summary>Records a getter access.</summary>
-			public void RecordGet(object key) { GetCount++; LastGetKey = key; }
-
-			/// <summary>Records a setter access.</summary>
-			public void RecordSet(object key, object? value) { SetCount++; LastSetEntry = (key, value); }
-
-			/// <summary>Backing storage for this indexer.</summary>
-			public global::System.Collections.Generic.Dictionary<object, object?> Backing { get; } = new();
-
-			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
-		}
-
 		/// <summary>Interceptor for IDictionary.Keys.</summary>
 		public sealed class IDictionary_KeysInterceptor
 		{
@@ -175,7 +141,41 @@ partial class DictionaryStubTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IDictionary.Add.</summary>
+		/// <summary>Interceptor for IDictionary.Indexer.</summary>
+		public sealed class IDictionary_IndexerInterceptor
+		{
+			/// <summary>Number of times the getter was accessed.</summary>
+			public int GetCount { get; private set; }
+
+			/// <summary>The last key used to access the getter.</summary>
+			public object? LastGetKey { get; private set; }
+
+			/// <summary>Callback for getter.</summary>
+			public global::System.Func<Stubs.IDictionary, object, object?>? OnGet { get; set; }
+
+			/// <summary>Number of times the setter was accessed.</summary>
+			public int SetCount { get; private set; }
+
+			/// <summary>The last key-value pair passed to the setter.</summary>
+			public (object Key, object? Value)? LastSetEntry { get; private set; }
+
+			/// <summary>Callback for setter.</summary>
+			public global::System.Action<Stubs.IDictionary, object, object?>? OnSet { get; set; }
+
+			/// <summary>Records a getter access.</summary>
+			public void RecordGet(object key) { GetCount++; LastGetKey = key; }
+
+			/// <summary>Records a setter access.</summary>
+			public void RecordSet(object key, object? value) { SetCount++; LastSetEntry = (key, value); }
+
+			/// <summary>Backing storage for this indexer.</summary>
+			public global::System.Collections.Generic.Dictionary<object, object?> Backing { get; } = new();
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
+		}
+
+		/// <summary>Interceptor for Add.</summary>
 		public sealed class IDictionary_AddInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -195,7 +195,7 @@ partial class DictionaryStubTests
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDictionary.Clear.</summary>
+		/// <summary>Interceptor for Clear.</summary>
 		public sealed class IDictionary_ClearInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -212,7 +212,7 @@ partial class DictionaryStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDictionary.Contains.</summary>
+		/// <summary>Interceptor for Contains.</summary>
 		public sealed class IDictionary_ContainsInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -232,7 +232,7 @@ partial class DictionaryStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDictionary.GetEnumerator.</summary>
+		/// <summary>Interceptor for GetEnumerator.</summary>
 		public sealed class IDictionary_GetEnumeratorInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -249,7 +249,7 @@ partial class DictionaryStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDictionary.Remove.</summary>
+		/// <summary>Interceptor for Remove.</summary>
 		public sealed class IDictionary_RemoveInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -269,7 +269,7 @@ partial class DictionaryStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDictionary.CopyTo.</summary>
+		/// <summary>Interceptor for CopyTo.</summary>
 		public sealed class IDictionary_CopyToInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

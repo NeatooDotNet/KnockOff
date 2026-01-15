@@ -39,7 +39,7 @@ partial class DirectInstantiationTests
 			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IInUserService.GetUser.</summary>
+		/// <summary>Interceptor for GetUser.</summary>
 		public sealed class IInUserService_GetUserInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -59,7 +59,7 @@ partial class DirectInstantiationTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IInUserService.SaveUser.</summary>
+		/// <summary>Interceptor for SaveUser.</summary>
 		public sealed class IInUserService_SaveUserInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

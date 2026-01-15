@@ -71,7 +71,7 @@ partial class DataRecordStubTests
 			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
 		}
 
-		/// <summary>Interceptor for IDataRecord.GetBoolean.</summary>
+		/// <summary>Interceptor for GetBoolean.</summary>
 		public sealed class IDataRecord_GetBooleanInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -91,7 +91,7 @@ partial class DataRecordStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataRecord.GetByte.</summary>
+		/// <summary>Interceptor for GetByte.</summary>
 		public sealed class IDataRecord_GetByteInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -111,7 +111,7 @@ partial class DataRecordStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataRecord.GetBytes.</summary>
+		/// <summary>Interceptor for GetBytes.</summary>
 		public sealed class IDataRecord_GetBytesInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -131,7 +131,7 @@ partial class DataRecordStubTests
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataRecord.GetChar.</summary>
+		/// <summary>Interceptor for GetChar.</summary>
 		public sealed class IDataRecord_GetCharInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -151,7 +151,7 @@ partial class DataRecordStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataRecord.GetChars.</summary>
+		/// <summary>Interceptor for GetChars.</summary>
 		public sealed class IDataRecord_GetCharsInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -171,7 +171,7 @@ partial class DataRecordStubTests
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataRecord.GetData.</summary>
+		/// <summary>Interceptor for GetData.</summary>
 		public sealed class IDataRecord_GetDataInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -191,7 +191,7 @@ partial class DataRecordStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataRecord.GetDataTypeName.</summary>
+		/// <summary>Interceptor for GetDataTypeName.</summary>
 		public sealed class IDataRecord_GetDataTypeNameInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -211,7 +211,7 @@ partial class DataRecordStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataRecord.GetDateTime.</summary>
+		/// <summary>Interceptor for GetDateTime.</summary>
 		public sealed class IDataRecord_GetDateTimeInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -231,7 +231,7 @@ partial class DataRecordStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataRecord.GetDecimal.</summary>
+		/// <summary>Interceptor for GetDecimal.</summary>
 		public sealed class IDataRecord_GetDecimalInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -251,7 +251,7 @@ partial class DataRecordStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataRecord.GetDouble.</summary>
+		/// <summary>Interceptor for GetDouble.</summary>
 		public sealed class IDataRecord_GetDoubleInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -271,7 +271,7 @@ partial class DataRecordStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataRecord.GetFieldType.</summary>
+		/// <summary>Interceptor for GetFieldType.</summary>
 		public sealed class IDataRecord_GetFieldTypeInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -291,7 +291,7 @@ partial class DataRecordStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataRecord.GetFloat.</summary>
+		/// <summary>Interceptor for GetFloat.</summary>
 		public sealed class IDataRecord_GetFloatInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -311,7 +311,7 @@ partial class DataRecordStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataRecord.GetGuid.</summary>
+		/// <summary>Interceptor for GetGuid.</summary>
 		public sealed class IDataRecord_GetGuidInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -331,7 +331,7 @@ partial class DataRecordStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataRecord.GetInt16.</summary>
+		/// <summary>Interceptor for GetInt16.</summary>
 		public sealed class IDataRecord_GetInt16Interceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -351,7 +351,7 @@ partial class DataRecordStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataRecord.GetInt32.</summary>
+		/// <summary>Interceptor for GetInt32.</summary>
 		public sealed class IDataRecord_GetInt32Interceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -371,7 +371,7 @@ partial class DataRecordStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataRecord.GetInt64.</summary>
+		/// <summary>Interceptor for GetInt64.</summary>
 		public sealed class IDataRecord_GetInt64Interceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -391,7 +391,7 @@ partial class DataRecordStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataRecord.GetName.</summary>
+		/// <summary>Interceptor for GetName.</summary>
 		public sealed class IDataRecord_GetNameInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -411,7 +411,7 @@ partial class DataRecordStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataRecord.GetOrdinal.</summary>
+		/// <summary>Interceptor for GetOrdinal.</summary>
 		public sealed class IDataRecord_GetOrdinalInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -431,7 +431,7 @@ partial class DataRecordStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataRecord.GetString.</summary>
+		/// <summary>Interceptor for GetString.</summary>
 		public sealed class IDataRecord_GetStringInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -451,7 +451,7 @@ partial class DataRecordStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataRecord.GetValue.</summary>
+		/// <summary>Interceptor for GetValue.</summary>
 		public sealed class IDataRecord_GetValueInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -471,7 +471,7 @@ partial class DataRecordStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataRecord.GetValues.</summary>
+		/// <summary>Interceptor for GetValues.</summary>
 		public sealed class IDataRecord_GetValuesInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -491,7 +491,7 @@ partial class DataRecordStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataRecord.IsDBNull.</summary>
+		/// <summary>Interceptor for IsDBNull.</summary>
 		public sealed class IDataRecord_IsDBNullInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

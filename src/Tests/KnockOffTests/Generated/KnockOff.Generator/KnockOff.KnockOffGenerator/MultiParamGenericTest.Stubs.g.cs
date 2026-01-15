@@ -8,7 +8,7 @@ partial class MultiParamGenericTest
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IKeyValueStore.Set.</summary>
+		/// <summary>Interceptor for Set.</summary>
 		public sealed class IKeyValueStore_SetInterceptor<TKey, TValue>
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -28,7 +28,7 @@ partial class MultiParamGenericTest
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IKeyValueStore.Get.</summary>
+		/// <summary>Interceptor for Get.</summary>
 		public sealed class IKeyValueStore_GetInterceptor<TKey, TValue>
 		{
 			/// <summary>Number of times this method was called.</summary>

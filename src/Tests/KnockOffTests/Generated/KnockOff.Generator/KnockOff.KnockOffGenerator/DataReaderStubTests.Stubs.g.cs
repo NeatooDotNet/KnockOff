@@ -128,7 +128,7 @@ partial class DataReaderStubTests
 			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
 		}
 
-		/// <summary>Interceptor for IDataReader.Close.</summary>
+		/// <summary>Interceptor for Close.</summary>
 		public sealed class IDataReader_CloseInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -145,7 +145,7 @@ partial class DataReaderStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataReader.GetSchemaTable.</summary>
+		/// <summary>Interceptor for GetSchemaTable.</summary>
 		public sealed class IDataReader_GetSchemaTableInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -162,7 +162,7 @@ partial class DataReaderStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataReader.NextResult.</summary>
+		/// <summary>Interceptor for NextResult.</summary>
 		public sealed class IDataReader_NextResultInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -179,7 +179,7 @@ partial class DataReaderStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataReader.Read.</summary>
+		/// <summary>Interceptor for Read.</summary>
 		public sealed class IDataReader_ReadInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -196,7 +196,7 @@ partial class DataReaderStubTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataReader.GetBoolean.</summary>
+		/// <summary>Interceptor for GetBoolean.</summary>
 		public sealed class IDataReader_GetBooleanInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -216,7 +216,7 @@ partial class DataReaderStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataReader.GetByte.</summary>
+		/// <summary>Interceptor for GetByte.</summary>
 		public sealed class IDataReader_GetByteInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -236,7 +236,7 @@ partial class DataReaderStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataReader.GetBytes.</summary>
+		/// <summary>Interceptor for GetBytes.</summary>
 		public sealed class IDataReader_GetBytesInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -256,7 +256,7 @@ partial class DataReaderStubTests
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataReader.GetChar.</summary>
+		/// <summary>Interceptor for GetChar.</summary>
 		public sealed class IDataReader_GetCharInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -276,7 +276,7 @@ partial class DataReaderStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataReader.GetChars.</summary>
+		/// <summary>Interceptor for GetChars.</summary>
 		public sealed class IDataReader_GetCharsInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -296,7 +296,7 @@ partial class DataReaderStubTests
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataReader.GetData.</summary>
+		/// <summary>Interceptor for GetData.</summary>
 		public sealed class IDataReader_GetDataInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -316,7 +316,7 @@ partial class DataReaderStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataReader.GetDataTypeName.</summary>
+		/// <summary>Interceptor for GetDataTypeName.</summary>
 		public sealed class IDataReader_GetDataTypeNameInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -336,7 +336,7 @@ partial class DataReaderStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataReader.GetDateTime.</summary>
+		/// <summary>Interceptor for GetDateTime.</summary>
 		public sealed class IDataReader_GetDateTimeInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -356,7 +356,7 @@ partial class DataReaderStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataReader.GetDecimal.</summary>
+		/// <summary>Interceptor for GetDecimal.</summary>
 		public sealed class IDataReader_GetDecimalInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -376,7 +376,7 @@ partial class DataReaderStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataReader.GetDouble.</summary>
+		/// <summary>Interceptor for GetDouble.</summary>
 		public sealed class IDataReader_GetDoubleInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -396,7 +396,7 @@ partial class DataReaderStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataReader.GetFieldType.</summary>
+		/// <summary>Interceptor for GetFieldType.</summary>
 		public sealed class IDataReader_GetFieldTypeInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -416,7 +416,7 @@ partial class DataReaderStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataReader.GetFloat.</summary>
+		/// <summary>Interceptor for GetFloat.</summary>
 		public sealed class IDataReader_GetFloatInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -436,7 +436,7 @@ partial class DataReaderStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataReader.GetGuid.</summary>
+		/// <summary>Interceptor for GetGuid.</summary>
 		public sealed class IDataReader_GetGuidInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -456,7 +456,7 @@ partial class DataReaderStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataReader.GetInt16.</summary>
+		/// <summary>Interceptor for GetInt16.</summary>
 		public sealed class IDataReader_GetInt16Interceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -476,7 +476,7 @@ partial class DataReaderStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataReader.GetInt32.</summary>
+		/// <summary>Interceptor for GetInt32.</summary>
 		public sealed class IDataReader_GetInt32Interceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -496,7 +496,7 @@ partial class DataReaderStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataReader.GetInt64.</summary>
+		/// <summary>Interceptor for GetInt64.</summary>
 		public sealed class IDataReader_GetInt64Interceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -516,7 +516,7 @@ partial class DataReaderStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataReader.GetName.</summary>
+		/// <summary>Interceptor for GetName.</summary>
 		public sealed class IDataReader_GetNameInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -536,7 +536,7 @@ partial class DataReaderStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataReader.GetOrdinal.</summary>
+		/// <summary>Interceptor for GetOrdinal.</summary>
 		public sealed class IDataReader_GetOrdinalInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -556,7 +556,7 @@ partial class DataReaderStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataReader.GetString.</summary>
+		/// <summary>Interceptor for GetString.</summary>
 		public sealed class IDataReader_GetStringInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -576,7 +576,7 @@ partial class DataReaderStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataReader.GetValue.</summary>
+		/// <summary>Interceptor for GetValue.</summary>
 		public sealed class IDataReader_GetValueInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -596,7 +596,7 @@ partial class DataReaderStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataReader.GetValues.</summary>
+		/// <summary>Interceptor for GetValues.</summary>
 		public sealed class IDataReader_GetValuesInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -616,7 +616,7 @@ partial class DataReaderStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataReader.IsDBNull.</summary>
+		/// <summary>Interceptor for IsDBNull.</summary>
 		public sealed class IDataReader_IsDBNullInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -636,7 +636,7 @@ partial class DataReaderStubTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IDataReader.Dispose.</summary>
+		/// <summary>Interceptor for Dispose.</summary>
 		public sealed class IDataReader_DisposeInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

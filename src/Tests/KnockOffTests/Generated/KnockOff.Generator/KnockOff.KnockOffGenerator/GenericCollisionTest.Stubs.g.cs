@@ -8,40 +8,6 @@ partial class GenericCollisionTest
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IListString.Indexer.</summary>
-		public sealed class IListString_IndexerInterceptor
-		{
-			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
-
-			/// <summary>The last key used to access the getter.</summary>
-			public int? LastGetKey { get; private set; }
-
-			/// <summary>Callback for getter.</summary>
-			public global::System.Func<Stubs.IListString, int, string>? OnGet { get; set; }
-
-			/// <summary>Number of times the setter was accessed.</summary>
-			public int SetCount { get; private set; }
-
-			/// <summary>The last key-value pair passed to the setter.</summary>
-			public (int Key, string Value)? LastSetEntry { get; private set; }
-
-			/// <summary>Callback for setter.</summary>
-			public global::System.Action<Stubs.IListString, int, string>? OnSet { get; set; }
-
-			/// <summary>Records a getter access.</summary>
-			public void RecordGet(int index) { GetCount++; LastGetKey = index; }
-
-			/// <summary>Records a setter access.</summary>
-			public void RecordSet(int index, string value) { SetCount++; LastSetEntry = (index, value); }
-
-			/// <summary>Backing storage for this indexer.</summary>
-			public global::System.Collections.Generic.Dictionary<int, string> Backing { get; } = new();
-
-			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
-		}
-
 		/// <summary>Interceptor for IListString.Count.</summary>
 		public sealed class IListString_CountInterceptor
 		{
@@ -80,7 +46,41 @@ partial class GenericCollisionTest
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IListString.IndexOf.</summary>
+		/// <summary>Interceptor for IListString.Indexer.</summary>
+		public sealed class IListString_IndexerInterceptor
+		{
+			/// <summary>Number of times the getter was accessed.</summary>
+			public int GetCount { get; private set; }
+
+			/// <summary>The last key used to access the getter.</summary>
+			public int? LastGetKey { get; private set; }
+
+			/// <summary>Callback for getter.</summary>
+			public global::System.Func<Stubs.IListString, int, string>? OnGet { get; set; }
+
+			/// <summary>Number of times the setter was accessed.</summary>
+			public int SetCount { get; private set; }
+
+			/// <summary>The last key-value pair passed to the setter.</summary>
+			public (int Key, string Value)? LastSetEntry { get; private set; }
+
+			/// <summary>Callback for setter.</summary>
+			public global::System.Action<Stubs.IListString, int, string>? OnSet { get; set; }
+
+			/// <summary>Records a getter access.</summary>
+			public void RecordGet(int index) { GetCount++; LastGetKey = index; }
+
+			/// <summary>Records a setter access.</summary>
+			public void RecordSet(int index, string value) { SetCount++; LastSetEntry = (index, value); }
+
+			/// <summary>Backing storage for this indexer.</summary>
+			public global::System.Collections.Generic.Dictionary<int, string> Backing { get; } = new();
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
+		}
+
+		/// <summary>Interceptor for IndexOf.</summary>
 		public sealed class IListString_IndexOfInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -100,7 +100,7 @@ partial class GenericCollisionTest
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IListString.Insert.</summary>
+		/// <summary>Interceptor for Insert.</summary>
 		public sealed class IListString_InsertInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -120,7 +120,7 @@ partial class GenericCollisionTest
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IListString.RemoveAt.</summary>
+		/// <summary>Interceptor for RemoveAt.</summary>
 		public sealed class IListString_RemoveAtInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -140,7 +140,7 @@ partial class GenericCollisionTest
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IListString.Add.</summary>
+		/// <summary>Interceptor for Add.</summary>
 		public sealed class IListString_AddInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -160,7 +160,7 @@ partial class GenericCollisionTest
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IListString.Clear.</summary>
+		/// <summary>Interceptor for Clear.</summary>
 		public sealed class IListString_ClearInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -177,7 +177,7 @@ partial class GenericCollisionTest
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IListString.Contains.</summary>
+		/// <summary>Interceptor for Contains.</summary>
 		public sealed class IListString_ContainsInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -197,7 +197,7 @@ partial class GenericCollisionTest
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IListString.CopyTo.</summary>
+		/// <summary>Interceptor for CopyTo.</summary>
 		public sealed class IListString_CopyToInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -217,7 +217,7 @@ partial class GenericCollisionTest
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IListString.Remove.</summary>
+		/// <summary>Interceptor for Remove.</summary>
 		public sealed class IListString_RemoveInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -237,7 +237,7 @@ partial class GenericCollisionTest
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IListString.GetEnumerator.</summary>
+		/// <summary>Interceptor for GetEnumerator.</summary>
 		public sealed class IListString_GetEnumeratorInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -423,40 +423,6 @@ partial class GenericCollisionTest
 
 		}
 
-		/// <summary>Interceptor for IListInt32.Indexer.</summary>
-		public sealed class IListInt32_IndexerInterceptor
-		{
-			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
-
-			/// <summary>The last key used to access the getter.</summary>
-			public int? LastGetKey { get; private set; }
-
-			/// <summary>Callback for getter.</summary>
-			public global::System.Func<Stubs.IListInt32, int, int>? OnGet { get; set; }
-
-			/// <summary>Number of times the setter was accessed.</summary>
-			public int SetCount { get; private set; }
-
-			/// <summary>The last key-value pair passed to the setter.</summary>
-			public (int Key, int Value)? LastSetEntry { get; private set; }
-
-			/// <summary>Callback for setter.</summary>
-			public global::System.Action<Stubs.IListInt32, int, int>? OnSet { get; set; }
-
-			/// <summary>Records a getter access.</summary>
-			public void RecordGet(int index) { GetCount++; LastGetKey = index; }
-
-			/// <summary>Records a setter access.</summary>
-			public void RecordSet(int index, int value) { SetCount++; LastSetEntry = (index, value); }
-
-			/// <summary>Backing storage for this indexer.</summary>
-			public global::System.Collections.Generic.Dictionary<int, int> Backing { get; } = new();
-
-			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
-		}
-
 		/// <summary>Interceptor for IListInt32.Count.</summary>
 		public sealed class IListInt32_CountInterceptor
 		{
@@ -495,7 +461,41 @@ partial class GenericCollisionTest
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IListInt32.IndexOf.</summary>
+		/// <summary>Interceptor for IListInt32.Indexer.</summary>
+		public sealed class IListInt32_IndexerInterceptor
+		{
+			/// <summary>Number of times the getter was accessed.</summary>
+			public int GetCount { get; private set; }
+
+			/// <summary>The last key used to access the getter.</summary>
+			public int? LastGetKey { get; private set; }
+
+			/// <summary>Callback for getter.</summary>
+			public global::System.Func<Stubs.IListInt32, int, int>? OnGet { get; set; }
+
+			/// <summary>Number of times the setter was accessed.</summary>
+			public int SetCount { get; private set; }
+
+			/// <summary>The last key-value pair passed to the setter.</summary>
+			public (int Key, int Value)? LastSetEntry { get; private set; }
+
+			/// <summary>Callback for setter.</summary>
+			public global::System.Action<Stubs.IListInt32, int, int>? OnSet { get; set; }
+
+			/// <summary>Records a getter access.</summary>
+			public void RecordGet(int index) { GetCount++; LastGetKey = index; }
+
+			/// <summary>Records a setter access.</summary>
+			public void RecordSet(int index, int value) { SetCount++; LastSetEntry = (index, value); }
+
+			/// <summary>Backing storage for this indexer.</summary>
+			public global::System.Collections.Generic.Dictionary<int, int> Backing { get; } = new();
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
+		}
+
+		/// <summary>Interceptor for IndexOf.</summary>
 		public sealed class IListInt32_IndexOfInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -515,7 +515,7 @@ partial class GenericCollisionTest
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IListInt32.Insert.</summary>
+		/// <summary>Interceptor for Insert.</summary>
 		public sealed class IListInt32_InsertInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -535,7 +535,7 @@ partial class GenericCollisionTest
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IListInt32.RemoveAt.</summary>
+		/// <summary>Interceptor for RemoveAt.</summary>
 		public sealed class IListInt32_RemoveAtInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -555,7 +555,7 @@ partial class GenericCollisionTest
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IListInt32.Add.</summary>
+		/// <summary>Interceptor for Add.</summary>
 		public sealed class IListInt32_AddInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -575,7 +575,7 @@ partial class GenericCollisionTest
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IListInt32.Clear.</summary>
+		/// <summary>Interceptor for Clear.</summary>
 		public sealed class IListInt32_ClearInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -592,7 +592,7 @@ partial class GenericCollisionTest
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IListInt32.Contains.</summary>
+		/// <summary>Interceptor for Contains.</summary>
 		public sealed class IListInt32_ContainsInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -612,7 +612,7 @@ partial class GenericCollisionTest
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IListInt32.CopyTo.</summary>
+		/// <summary>Interceptor for CopyTo.</summary>
 		public sealed class IListInt32_CopyToInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -632,7 +632,7 @@ partial class GenericCollisionTest
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IListInt32.Remove.</summary>
+		/// <summary>Interceptor for Remove.</summary>
 		public sealed class IListInt32_RemoveInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -652,7 +652,7 @@ partial class GenericCollisionTest
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IListInt32.GetEnumerator.</summary>
+		/// <summary>Interceptor for GetEnumerator.</summary>
 		public sealed class IListInt32_GetEnumeratorInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

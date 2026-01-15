@@ -210,7 +210,7 @@ partial class IValidatePropertyTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for IValidateProperty.SetValue.</summary>
+		/// <summary>Interceptor for SetValue.</summary>
 		public sealed class IValidateProperty_SetValueInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -230,7 +230,7 @@ partial class IValidatePropertyTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IValidateProperty.AddMarkedBusy.</summary>
+		/// <summary>Interceptor for AddMarkedBusy.</summary>
 		public sealed class IValidateProperty_AddMarkedBusyInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -250,7 +250,7 @@ partial class IValidatePropertyTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IValidateProperty.RemoveMarkedBusy.</summary>
+		/// <summary>Interceptor for RemoveMarkedBusy.</summary>
 		public sealed class IValidateProperty_RemoveMarkedBusyInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -270,7 +270,7 @@ partial class IValidatePropertyTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IValidateProperty.LoadValue.</summary>
+		/// <summary>Interceptor for LoadValue.</summary>
 		public sealed class IValidateProperty_LoadValueInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -290,7 +290,7 @@ partial class IValidatePropertyTests
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IValidateProperty.WaitForTasks.</summary>
+		/// <summary>Interceptor for WaitForTasks.</summary>
 		public sealed class IValidateProperty_WaitForTasksInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -307,7 +307,7 @@ partial class IValidatePropertyTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IValidateProperty.GetAwaiter.</summary>
+		/// <summary>Interceptor for GetAwaiter.</summary>
 		public sealed class IValidateProperty_GetAwaiterInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -324,7 +324,7 @@ partial class IValidatePropertyTests
 			public void Reset() { CallCount = 0; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IValidateProperty.RunRules.</summary>
+		/// <summary>Interceptor for RunRules.</summary>
 		public sealed class IValidateProperty_RunRulesInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

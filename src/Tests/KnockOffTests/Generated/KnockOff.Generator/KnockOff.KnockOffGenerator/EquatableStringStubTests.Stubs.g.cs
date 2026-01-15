@@ -8,7 +8,7 @@ partial class EquatableStringStubTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IEquatable.Equals.</summary>
+		/// <summary>Interceptor for Equals.</summary>
 		public sealed class IEquatable_EqualsInterceptor
 		{
 			/// <summary>Number of times this method was called.</summary>

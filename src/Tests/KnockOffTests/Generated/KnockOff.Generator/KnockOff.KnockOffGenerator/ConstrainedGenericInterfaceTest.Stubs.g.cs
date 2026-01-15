@@ -8,7 +8,7 @@ partial class ConstrainedGenericInterfaceTest
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IClassRepository.Add.</summary>
+		/// <summary>Interceptor for Add.</summary>
 		public sealed class IClassRepository_AddInterceptor<T> where T : class
 		{
 			/// <summary>Number of times this method was called.</summary>
@@ -28,7 +28,7 @@ partial class ConstrainedGenericInterfaceTest
 			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
-		/// <summary>Interceptor for IClassRepository.Find.</summary>
+		/// <summary>Interceptor for Find.</summary>
 		public sealed class IClassRepository_FindInterceptor<T> where T : class
 		{
 			/// <summary>Number of times this method was called.</summary>
