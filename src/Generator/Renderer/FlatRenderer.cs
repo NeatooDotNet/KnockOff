@@ -984,10 +984,10 @@ internal static class FlatRenderer
 		}
 
 		var argList = string.Join(", ", castArgs);
-		var returnKeyword = method.IsVoid ? "" : "return ";
 
+		// Expression-bodied members don't use 'return' keyword
 		w.Line($"{method.ReturnType} {method.DeclaringInterface}.{method.MethodName}{method.TypeParameterDecl}({method.ParameterDeclarations}){method.ConstraintClauses}");
-		w.Line($"\t=> {returnKeyword}(({targetInterface})this).{target.Name}({argList});");
+		w.Line($"\t=> (({targetInterface})this).{target.Name}({argList});");
 		w.Line();
 	}
 

@@ -95,13 +95,7 @@ partial class DataProviderStub : global::KnockOff.Benchmarks.Interfaces.IDataPro
 	}
 
 	global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
-	{
-		GetEnumerator.RecordCall();
-		if (GetEnumerator.OnCall is { } callback)
-			return callback(this);
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
-		throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall or define a protected method 'GetEnumerator' in your partial class.");
-	}
+		=> ((global::KnockOff.Benchmarks.Interfaces.IDataProvider)this).GetEnumerator();
 
 	void global::System.IDisposable.Dispose()
 	{

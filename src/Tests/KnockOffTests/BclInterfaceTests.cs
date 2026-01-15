@@ -127,6 +127,24 @@ public class BclInterfaceTests
         Assert.True(stub.GetEnumerator.WasCalled);
     }
 
+    [Fact]
+    public void IEnumerableString_NonGenericGetEnumerator_DelegatesToGeneric()
+    {
+        // This test verifies that IEnumerable.GetEnumerator() delegates to IEnumerable<T>.GetEnumerator()
+        // Bug: Prior to fix, non-generic GetEnumerator had its own interceptor instead of delegating
+        var stub = new EnumerableStringStubTests.Stubs.IEnumerable();
+        var items = new List<string> { "a", "b", "c" };
+        stub.GetEnumerator.OnCall = ko => items.GetEnumerator();
+
+        // Cast to non-generic IEnumerable and call GetEnumerator - should delegate to generic version
+        IEnumerable nonGenericEnumerable = stub;
+        var enumerator = nonGenericEnumerable.GetEnumerator();
+
+        Assert.True(enumerator.MoveNext());
+        Assert.Equal("a", enumerator.Current);
+        Assert.Equal(1, stub.GetEnumerator.CallCount); // Should only track once via delegation
+    }
+
     #endregion
 
     #region 4. IList<T> / IList

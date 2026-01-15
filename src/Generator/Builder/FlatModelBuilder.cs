@@ -350,6 +350,7 @@ internal static class FlatModelBuilder
 	/// <summary>
 	/// Finds a method delegation target for methods that should delegate to a typed counterpart.
 	/// For example, IRule.RunRule(IValidateBase) delegates to IRule&lt;T&gt;.RunRule(T).
+	/// Also handles return type covariance: IEnumerable.GetEnumerator() delegates to IEnumerable&lt;T&gt;.GetEnumerator().
 	/// </summary>
 	private static (InterfaceMemberInfo? Target, string? TargetInterface) FindMethodDelegationTarget(
 		InterfaceMemberInfo member,
@@ -359,7 +360,7 @@ internal static class FlatModelBuilder
 		if (member.IsProperty || member.IsIndexer)
 			return (null, null);
 
-		// Look for a method with the same name but different (more specific) parameter types
+		// Look for a method with the same name but different (more specific) parameter or return types
 		foreach (var iface in interfaces)
 		{
 			foreach (var candidate in iface.Members)
@@ -378,16 +379,25 @@ internal static class FlatModelBuilder
 				if (candidate.Parameters.Count != member.Parameters.Count)
 					continue;
 
-				// Check if this could be a typed version (different parameter types)
-				if (AreSameParameters(candidate.Parameters, member.Parameters))
-					continue;
+				var sameParams = AreSameParameters(candidate.Parameters, member.Parameters);
 
-				// Check if the base method uses base types (IValidateBase) and candidate uses specific types (T)
-				// This is a heuristic - we delegate if the member has base interface types as parameters
-				// and the candidate has type parameters or concrete types
-				if (IsBaseToTypedDelegation(member, candidate))
+				if (sameParams)
 				{
-					return (candidate, iface.FullName);
+					// Parameters are identical - check for return type covariance
+					// This handles cases like IEnumerable.GetEnumerator() -> IEnumerable<T>.GetEnumerator()
+					if (IsReturnTypeCovariantDelegation(member, candidate))
+					{
+						return (candidate, iface.FullName);
+					}
+				}
+				else
+				{
+					// Parameters differ - check if the base method uses base types (IValidateBase)
+					// and candidate uses specific types (T)
+					if (IsBaseToTypedDelegation(member, candidate))
+					{
+						return (candidate, iface.FullName);
+					}
 				}
 			}
 		}
@@ -446,6 +456,51 @@ internal static class FlatModelBuilder
 		}
 
 		return false;
+	}
+
+	/// <summary>
+	/// Checks if a method should delegate based on return type covariance.
+	/// Returns true when the member's return type is a non-generic base of the candidate's generic return type.
+	/// For example: IEnumerator vs IEnumerator&lt;T&gt;, IEnumerable vs IEnumerable&lt;T&gt;.
+	/// </summary>
+	private static bool IsReturnTypeCovariantDelegation(InterfaceMemberInfo member, InterfaceMemberInfo candidate)
+	{
+		var memberReturn = member.ReturnType.Replace("global::", "").TrimEnd('?');
+		var candidateReturn = candidate.ReturnType.Replace("global::", "").TrimEnd('?');
+
+		// Return types must be different
+		if (memberReturn == candidateReturn)
+			return false;
+
+		// Look for pattern: member returns non-generic, candidate returns generic version
+		// e.g., IEnumerator vs IEnumerator<string>, IEnumerable vs IEnumerable<int>
+		// The generic version will contain '<' while the non-generic won't
+
+		// Member should not be generic, candidate should be generic
+		if (memberReturn.Contains('<') || !candidateReturn.Contains('<'))
+			return false;
+
+		// Extract the base type name from the candidate (before the '<')
+		var candidateBaseName = candidateReturn.Substring(0, candidateReturn.IndexOf('<'));
+
+		// Check if member's type matches the base of candidate's type
+		// Handle both full namespace and simple name matching
+		// E.g., "System.Collections.IEnumerator" matches "System.Collections.Generic.IEnumerator<T>"
+		// Also handle case where member might be simpler: "IEnumerator" matches candidate base "IEnumerator"
+
+		// Get simple name from member type
+		var memberSimpleName = memberReturn.Contains('.')
+			? memberReturn.Substring(memberReturn.LastIndexOf('.') + 1)
+			: memberReturn;
+
+		// Get simple name from candidate base
+		var candidateSimpleName = candidateBaseName.Contains('.')
+			? candidateBaseName.Substring(candidateBaseName.LastIndexOf('.') + 1)
+			: candidateBaseName;
+
+		// The simple names should match for covariant delegation
+		// E.g., "IEnumerator" == "IEnumerator" (from IEnumerator<T>)
+		return memberSimpleName == candidateSimpleName;
 	}
 
 	#endregion
