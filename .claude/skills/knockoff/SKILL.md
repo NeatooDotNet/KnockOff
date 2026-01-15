@@ -105,6 +105,7 @@ KnockOff supports multiple stub patterns:
 | **Explicit** | `[KnockOff]` on class implementing interface | Interface | Reusable stubs, user methods |
 | **Generic Standalone** | `[KnockOff]` on generic class implementing generic interface | Interface | Reusable generic stubs |
 | **Inline Interface** | `[KnockOff<TInterface>]` on test class | Interface | Test-local interface stubs |
+| **Open Generic Inline** | `[KnockOff(typeof(IRepo<>))]` on test class | Interface | Test-local generic stubs |
 | **Inline Class** | `[KnockOff<TClass>]` on test class | Class | Test-local class stubs |
 | **Inline Delegate** | `[KnockOff<TDelegate>]` on test class | Delegate | Test-local delegate stubs |
 
@@ -165,6 +166,37 @@ public partial class CacheStub<TKey, TValue> : ICache<TKey, TValue> { }
 [KnockOff]
 public partial class BadStub<T, TExtra> : IRepository<T> { }
 ```
+
+### Open Generic Inline Stubs
+
+Use `typeof()` with an unbound generic to generate a **generic stub class** inside your test class:
+
+```csharp
+[KnockOff(typeof(IRepository<>))]
+public partial class MyTests { }
+
+// Generated: MyTests.Stubs.IRepository<T>
+var userRepo = new MyTests.Stubs.IRepository<User>();
+var orderRepo = new MyTests.Stubs.IRepository<Order>();
+```
+
+This differs from closed generics which require pre-declaring each type:
+
+| Pattern | Syntax | Generated |
+|---------|--------|-----------|
+| Closed | `[KnockOff<IRepo<User>>]` | `Stubs.IRepoUser` (non-generic) |
+| Open | `[KnockOff(typeof(IRepo<>))]` | `Stubs.IRepo<T>` (generic) |
+
+**Multi-parameter generics** use `<,>` syntax:
+
+```csharp
+[KnockOff(typeof(IKeyValueStore<,>))]
+public partial class MyTests { }
+
+var store = new MyTests.Stubs.IKeyValueStore<string, int>();
+```
+
+**Type constraints** from the interface are preserved on the generated stub.
 
 ### Delegate Stubs
 
@@ -436,6 +468,7 @@ snippet: skill-SKILL-backing-indexers
 | Explicit stubs (`[KnockOff]` on interface impl) | Supported |
 | Generic standalone stubs (`Stub<T> : IRepo<T>`) | Supported |
 | Inline interface stubs (`[KnockOff<TInterface>]`) | Supported |
+| Open generic inline stubs (`[KnockOff(typeof(IRepo<>))]`) | Supported |
 | Inline class stubs (`[KnockOff<TClass>]`) | Supported |
 | Delegate stubs (`[KnockOff<TDelegate>]`) | Supported |
 | Partial property auto-instantiation (C# 13+) | Supported |

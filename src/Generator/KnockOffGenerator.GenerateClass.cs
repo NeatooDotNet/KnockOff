@@ -19,6 +19,16 @@ public partial class KnockOffGenerator
 	{
 		var stubClassName = cls.Name;
 
+		// For open generic classes, add type parameters
+		var typeParamList = SymbolHelpers.FormatTypeParameterList(cls.TypeParameters);
+		var constraints = SymbolHelpers.FormatTypeConstraints(cls.TypeParameters);
+		var constraintClause = string.IsNullOrEmpty(constraints) ? "" : $" {constraints}";
+
+		// For open generic, replace the empty <> in FullName with actual type params
+		var baseType = cls.IsOpenGeneric && typeParamList.Length > 0
+			? SymbolHelpers.ReplaceUnboundGeneric(cls.FullName, typeParamList)
+			: cls.FullName;
+
 		// Group methods by name for overload handling
 		var methodGroups = GroupClassMethodsByName(cls.Members.Where(m => !m.IsProperty && !m.IsIndexer));
 
@@ -43,12 +53,12 @@ public partial class KnockOffGenerator
 		// Generate interceptor classes for events
 		foreach (var evt in cls.Events)
 		{
-			GenerateInlineStubEventHandlerClass(sb, evt, cls.Name);
+			GenerateInlineStubEventHandlerClass(sb, evt, cls.Name, cls.TypeParameters);
 		}
 
 		// Generate the wrapper stub class (no inheritance from target)
-		sb.AppendLine($"\t\t/// <summary>Stub for {cls.FullName} via composition.</summary>");
-		sb.AppendLine($"\t\tpublic class {stubClassName} : global::KnockOff.IKnockOffStub");
+		sb.AppendLine($"\t\t/// <summary>Stub for {baseType} via composition.</summary>");
+		sb.AppendLine($"\t\tpublic class {stubClassName}{typeParamList} : global::KnockOff.IKnockOffStub{constraintClause}");
 		sb.AppendLine("\t\t{");
 
 		// Strict property for IKnockOffStub (class stubs don't have strict mode behavior yet)
@@ -95,14 +105,14 @@ public partial class KnockOffGenerator
 		sb.AppendLine();
 
 		// .Object property - returns the Impl instance as target class type
-		sb.AppendLine($"\t\t\t/// <summary>The {cls.FullName} instance. Pass this to code expecting the target class.</summary>");
-		sb.AppendLine($"\t\t\tpublic {cls.FullName} Object {{ get; }}");
+		sb.AppendLine($"\t\t\t/// <summary>The {baseType} instance. Pass this to code expecting the target class.</summary>");
+		sb.AppendLine($"\t\t\tpublic {baseType} Object {{ get; }}");
 		sb.AppendLine();
 
 		// Generate constructors that create Impl instance
 		foreach (var ctor in cls.Constructors)
 		{
-			GenerateClassWrapperConstructor(sb, ctor, stubClassName, cls.FullName);
+			GenerateClassWrapperConstructor(sb, ctor, stubClassName + typeParamList, baseType);
 		}
 
 		// ResetInterceptors method
@@ -141,7 +151,7 @@ public partial class KnockOffGenerator
 		sb.AppendLine();
 
 		// Generate nested Impl class that inherits from target
-		GenerateClassImplClass(sb, cls, methodGroups, stubClassName, indexerCount);
+		GenerateClassImplClass(sb, cls, methodGroups, stubClassName + typeParamList, indexerCount, baseType, constraintClause);
 
 		sb.AppendLine("\t\t}");
 		sb.AppendLine();
@@ -155,7 +165,9 @@ public partial class KnockOffGenerator
 		ClassStubInfo cls,
 		Dictionary<string, ClassMethodGroupInfo> methodGroups,
 		string stubClassName,
-		int indexerCount)
+		int indexerCount,
+		string baseType,
+		string constraintClause)
 	{
 		// Check if class has any required properties - need [SetsRequiredMembers] on constructor
 		var requiredMembers = cls.Members.Where(m => m.IsProperty && m.IsRequired).ToList();
@@ -168,8 +180,8 @@ public partial class KnockOffGenerator
 			sb.AppendLine("#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor");
 		}
 
-		sb.AppendLine($"\t\t\t/// <summary>Internal implementation that inherits from {cls.FullName}.</summary>");
-		sb.AppendLine($"\t\t\tprivate sealed class Impl : {cls.FullName}");
+		sb.AppendLine($"\t\t\t/// <summary>Internal implementation that inherits from {baseType}.</summary>");
+		sb.AppendLine($"\t\t\tprivate sealed class Impl : {baseType}{constraintClause}");
 		sb.AppendLine("\t\t\t{");
 
 		// Reference to the wrapper
@@ -179,7 +191,7 @@ public partial class KnockOffGenerator
 		// Generate constructors that chain to base
 		foreach (var ctor in cls.Constructors)
 		{
-			GenerateClassImplConstructor(sb, ctor, stubClassName, cls.FullName, hasRequiredMembers, requiredMembers);
+			GenerateClassImplConstructor(sb, ctor, stubClassName, baseType, hasRequiredMembers, requiredMembers);
 		}
 
 		// Generate overrides for properties

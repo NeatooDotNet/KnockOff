@@ -1,5 +1,7 @@
 # Generic Inline Interface Support
 
+**Status: ✅ COMPLETED (v10.18)**
+
 ## Problem
 
 KnockOff supports **closed** generic inline interface stubs but not **open** generic inline stubs.
@@ -121,16 +123,16 @@ Open inline keeps stubs organized inside the test class while supporting any typ
 
 ## Task List
 
-- [ ] Add `[KnockOff(Type type)]` constructor overload to attribute (if not present)
-- [ ] Update predicate to accept non-generic `KnockOffAttribute` with Type argument
-- [ ] In transform, detect `typeof(IInterface<>)` with unbound type arguments
-- [ ] Extract type parameters from unbound generic type
-- [ ] Generate generic stub class with those type parameters
-- [ ] Generate generic interceptor classes (delegates need type params too)
-- [ ] Handle multiple type parameters: `IRepo<T, U>` → `Stubs.Repo<T, U>`
-- [ ] Preserve type constraints from interface definition
-- [ ] Add tests for open generic inline interface stubs
-- [ ] Update documentation
+- [x] Add `[KnockOff(Type type)]` constructor overload to attribute (if not present)
+- [x] Update predicate to accept non-generic `KnockOffAttribute` with Type argument
+- [x] In transform, detect `typeof(IInterface<>)` with unbound type arguments
+- [x] Extract type parameters from unbound generic type
+- [x] Generate generic stub class with those type parameters
+- [x] Generate generic interceptor classes (delegates need type params too)
+- [x] Handle multiple type parameters: `IRepo<T, U>` → `Stubs.Repo<T, U>`
+- [x] Preserve type constraints from interface definition
+- [x] Add tests for open generic inline interface stubs
+- [x] Update documentation
 
 ## Technical Notes
 

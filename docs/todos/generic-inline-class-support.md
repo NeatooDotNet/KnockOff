@@ -39,7 +39,7 @@ var orderRepo = new MyTests.Stubs.Repository<Order>();
 
 ## Current Workaround
 
-**Option 1:** Create separate inline stubs for each closed type needed:
+Create separate inline stubs for each closed type needed:
 
 ```csharp
 [KnockOff<Repository<User>>]
@@ -50,14 +50,7 @@ public partial class MyTests { }
 // Use: new MyTests.Stubs.RepositoryUser(), etc.
 ```
 
-**Option 2:** Use generic standalone stub (if it works - untested):
-
-```csharp
-[KnockOff]
-public partial class RepositoryStub<T> : Repository<T> { }
-
-// Use: new RepositoryStub<User>(), etc.
-```
+**Note:** Generic standalone stubs (`[KnockOff] class Stub<T> : BaseClass<T>`) do NOT work for class inheritance. The standalone pattern only supports interface implementation. This is why open generic inline class support is needed.
 
 ## Solution
 
@@ -127,7 +120,7 @@ public class MyTests
 
 ## Task List
 
-- [ ] Verify standalone generic class stubs work (may already be supported)
+- [x] Verify standalone generic class stubs work → **Result: Not supported** (standalone requires interface implementation)
 - [ ] Add `[KnockOff(Type type)]` constructor overload to attribute (if not present)
 - [ ] Update predicate to accept non-generic `KnockOffAttribute` with Type argument
 - [ ] In transform, detect `typeof(SomeClass<>)` with unbound type arguments

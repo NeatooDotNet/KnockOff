@@ -93,6 +93,61 @@ public partial class MultiListTests
 ```
 <!-- endSnippet -->
 
+## Open Generic Inline Stubs
+
+Use `typeof()` with an unbound generic interface to generate a **generic stub class**:
+
+<!-- pseudo: open-generic-basic-usage -->
+```csharp
+[KnockOff(typeof(IRepository<>))]
+public partial class MyTests { }
+
+// Generated: MyTests.Stubs.IRepository<T>
+// Use with any type argument:
+var userRepo = new MyTests.Stubs.IRepository<User>();
+var orderRepo = new MyTests.Stubs.IRepository<Order>();
+```
+
+This differs from the closed generic syntax which requires pre-declaring each type:
+
+| Pattern | Syntax | Generated Stub |
+|---------|--------|----------------|
+| Closed | `[KnockOff<IRepo<User>>]` | `Stubs.IRepoUser` (non-generic) |
+| Open | `[KnockOff(typeof(IRepo<>))]` | `Stubs.IRepo<T>` (generic) |
+
+### Multi-Parameter Generics
+
+Interfaces with multiple type parameters are supported:
+
+<!-- pseudo: open-generic-multi-param -->
+```csharp
+[KnockOff(typeof(IKeyValueStore<,>))]
+public partial class MyTests { }
+
+// Use:
+var store = new MyTests.Stubs.IKeyValueStore<string, int>();
+store.Set.OnCall = (ko, key, value) => Console.WriteLine($"{key}={value}");
+```
+
+### Type Constraints
+
+Type constraints from the interface are preserved:
+
+<!-- pseudo: open-generic-constraints -->
+```csharp
+public interface IClassRepository<T> where T : class
+{
+    void Add(T item);
+}
+
+[KnockOff(typeof(IClassRepository<>))]
+public partial class MyTests { }
+
+// Constraint enforced at compile time:
+var stub = new MyTests.Stubs.IClassRepository<User>();  // OK
+// var stub = new MyTests.Stubs.IClassRepository<int>(); // Compile error
+```
+
 ### Direct Instantiation (All .NET Versions)
 
 Without partial properties, instantiate stubs directly:

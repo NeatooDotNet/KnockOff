@@ -14,7 +14,17 @@ internal sealed record ClassStubInfo(
 	string Name,
 	EquatableArray<ClassMemberInfo> Members,
 	EquatableArray<ClassConstructorInfo> Constructors,
-	EquatableArray<EventMemberInfo> Events) : IEquatable<ClassStubInfo>;
+	EquatableArray<EventMemberInfo> Events,
+	/// <summary>
+	/// True when this is an open generic class from [KnockOff(typeof(Repository&lt;&gt;))].
+	/// When true, the generated stub class will have type parameters.
+	/// </summary>
+	bool IsOpenGeneric = false,
+	/// <summary>
+	/// Type parameters for open generic classes (e.g., T, TKey, TValue).
+	/// Empty for closed generic or non-generic classes.
+	/// </summary>
+	EquatableArray<TypeParameterInfo> TypeParameters = default) : IEquatable<ClassStubInfo>;
 
 /// <summary>
 /// Info about a virtual/abstract member of a class for stubbing.

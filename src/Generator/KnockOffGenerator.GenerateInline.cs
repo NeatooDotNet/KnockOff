@@ -147,19 +147,19 @@ public partial class KnockOffGenerator
 			// Generate handler classes for deduplicated properties/indexers
 			foreach (var member in deduplicatedPropertyMembers)
 			{
-				GenerateInlineStubMemberHandlerClass(sb, member, stubClassName, indexerCount);
+				GenerateInlineStubMemberHandlerClass(sb, member, stubClassName, indexerCount, iface.TypeParameters);
 			}
 
 			// Generate handler classes for methods
 			foreach (var group in methodGroups.Values)
 			{
-				GenerateInlineStubMethodGroupHandlerClass(sb, group, stubClassName);
+				GenerateInlineStubMethodGroupHandlerClass(sb, group, stubClassName, iface.TypeParameters);
 			}
 
 			// Generate handler classes for deduplicated events
 			foreach (var evt in deduplicatedEvents)
 			{
-				GenerateInlineStubEventHandlerClass(sb, evt, stubClassName);
+				GenerateInlineStubEventHandlerClass(sb, evt, stubClassName, iface.TypeParameters);
 			}
 
 			// Generate the stub class implementing the interface
@@ -219,17 +219,24 @@ public partial class KnockOffGenerator
 		System.Text.StringBuilder sb,
 		InterfaceMemberInfo member,
 		string interfaceSimpleName,
-		int indexerCount)
+		int indexerCount,
+		EquatableArray<TypeParameterInfo> typeParameters)
 	{
 		// For indexers, compute name based on count (single: Indexer, multiple: IndexerString, IndexerInt)
 		var memberName = member.IsIndexer
 			? SymbolHelpers.GetIndexerName(indexerCount, member.IndexerTypeSuffix)
 			: member.Name;
+
+		// For open generic interfaces, make the interceptor class generic too
+		var typeParamList = SymbolHelpers.FormatTypeParameterList(typeParameters);
+		var constraints = SymbolHelpers.FormatTypeConstraints(typeParameters);
+		var constraintClause = string.IsNullOrEmpty(constraints) ? "" : $" {constraints}";
+
 		var interceptClassName = $"{interfaceSimpleName}_{memberName}Interceptor";
-		var stubClassName = $"Stubs.{interfaceSimpleName}";
+		var stubClassName = $"Stubs.{interfaceSimpleName}{typeParamList}";
 
 		sb.AppendLine($"\t\t/// <summary>Interceptor for {interfaceSimpleName}.{memberName}.</summary>");
-		sb.AppendLine($"\t\tpublic sealed class {interceptClassName}");
+		sb.AppendLine($"\t\tpublic sealed class {interceptClassName}{typeParamList}{constraintClause}");
 		sb.AppendLine("\t\t{");
 
 		if (member.IsIndexer)
@@ -392,7 +399,8 @@ public partial class KnockOffGenerator
 	private static void GenerateInlineStubMethodGroupHandlerClass(
 		System.Text.StringBuilder sb,
 		MethodGroupInfo group,
-		string interfaceSimpleName)
+		string interfaceSimpleName,
+		EquatableArray<TypeParameterInfo> typeParameters)
 	{
 		// Check if this is a mixed group (has both generic and non-generic overloads)
 		if (IsMixedMethodGroup(group))
@@ -402,12 +410,12 @@ public partial class KnockOffGenerator
 
 			if (nonGenericGroup is not null)
 			{
-				GenerateInlineStubNonGenericMethodHandlerClass(sb, nonGenericGroup, interfaceSimpleName);
+				GenerateInlineStubNonGenericMethodHandlerClass(sb, nonGenericGroup, interfaceSimpleName, typeParameters);
 			}
 
 			if (genericGroup is not null)
 			{
-				GenerateInlineStubGenericMethodHandlerClass(sb, genericGroup, interfaceSimpleName);
+				GenerateInlineStubGenericMethodHandlerClass(sb, genericGroup, interfaceSimpleName, typeParameters);
 			}
 		}
 		else
@@ -417,11 +425,11 @@ public partial class KnockOffGenerator
 
 			if (hasGenericOverload)
 			{
-				GenerateInlineStubGenericMethodHandlerClass(sb, group, interfaceSimpleName);
+				GenerateInlineStubGenericMethodHandlerClass(sb, group, interfaceSimpleName, typeParameters);
 			}
 			else
 			{
-				GenerateInlineStubNonGenericMethodHandlerClass(sb, group, interfaceSimpleName);
+				GenerateInlineStubNonGenericMethodHandlerClass(sb, group, interfaceSimpleName, typeParameters);
 			}
 		}
 	}
@@ -429,14 +437,20 @@ public partial class KnockOffGenerator
 	private static void GenerateInlineStubNonGenericMethodHandlerClass(
 		System.Text.StringBuilder sb,
 		MethodGroupInfo group,
-		string interfaceSimpleName)
+		string interfaceSimpleName,
+		EquatableArray<TypeParameterInfo> typeParameters)
 	{
+		// For open generic interfaces, make the interceptor class generic too
+		var typeParamList = SymbolHelpers.FormatTypeParameterList(typeParameters);
+		var constraints = SymbolHelpers.FormatTypeConstraints(typeParameters);
+		var constraintClause = string.IsNullOrEmpty(constraints) ? "" : $" {constraints}";
+
 		var interceptClassName = $"{interfaceSimpleName}_{group.Name}Interceptor";
-		var stubClassName = $"Stubs.{interfaceSimpleName}";
+		var stubClassName = $"Stubs.{interfaceSimpleName}{typeParamList}";
 		var inputParams = GetInputCombinedParameters(group.CombinedParameters).ToArray();
 
 		sb.AppendLine($"\t\t/// <summary>Interceptor for {interfaceSimpleName}.{group.Name}.</summary>");
-		sb.AppendLine($"\t\tpublic sealed class {interceptClassName}");
+		sb.AppendLine($"\t\tpublic sealed class {interceptClassName}{typeParamList}{constraintClause}");
 		sb.AppendLine("\t\t{");
 
 		// Delegate type for OnCall
@@ -510,10 +524,16 @@ public partial class KnockOffGenerator
 	private static void GenerateInlineStubGenericMethodHandlerClass(
 		System.Text.StringBuilder sb,
 		MethodGroupInfo group,
-		string interfaceSimpleName)
+		string interfaceSimpleName,
+		EquatableArray<TypeParameterInfo> interfaceTypeParameters)
 	{
+		// For open generic interfaces, make the interceptor class generic too
+		var ifaceTypeParamList = SymbolHelpers.FormatTypeParameterList(interfaceTypeParameters);
+		var ifaceConstraints = SymbolHelpers.FormatTypeConstraints(interfaceTypeParameters);
+		var ifaceConstraintClause = string.IsNullOrEmpty(ifaceConstraints) ? "" : $" {ifaceConstraints}";
+
 		var interceptClassName = $"{interfaceSimpleName}_{group.Name}Interceptor";
-		var stubClassName = $"Stubs.{interfaceSimpleName}";
+		var stubClassName = $"Stubs.{interfaceSimpleName}{ifaceTypeParamList}";
 
 		// Get the first generic overload's type parameters (all generic overloads should have same type param count)
 		var genericOverload = group.Overloads.First(o => o.IsGenericMethod);
@@ -542,7 +562,7 @@ public partial class KnockOffGenerator
 			: $"({string.Join(", ", typeParams.Select(tp => $"typeof({tp.Name})"))})";
 
 		sb.AppendLine($"\t\t/// <summary>Interceptor for {interfaceSimpleName}.{group.Name}.</summary>");
-		sb.AppendLine($"\t\tpublic sealed class {interceptClassName}");
+		sb.AppendLine($"\t\tpublic sealed class {interceptClassName}{ifaceTypeParamList}{ifaceConstraintClause}");
 		sb.AppendLine("\t\t{");
 
 		// --- Base Handler: Dictionary + Of<T>() + aggregate tracking ---
@@ -686,14 +706,20 @@ public partial class KnockOffGenerator
 	private static void GenerateInlineStubEventHandlerClass(
 		System.Text.StringBuilder sb,
 		EventMemberInfo evt,
-		string interfaceSimpleName)
+		string interfaceSimpleName,
+		EquatableArray<TypeParameterInfo> typeParameters)
 	{
+		// For open generic interfaces, make the interceptor class generic too
+		var typeParamList = SymbolHelpers.FormatTypeParameterList(typeParameters);
+		var constraints = SymbolHelpers.FormatTypeConstraints(typeParameters);
+		var constraintClause = string.IsNullOrEmpty(constraints) ? "" : $" {constraints}";
+
 		var interceptClassName = $"{interfaceSimpleName}_{evt.Name}Interceptor";
 		// Strip trailing ? from delegate type since we add our own nullable marker
 		var delegateType = evt.FullDelegateTypeName.TrimEnd('?');
 
 		sb.AppendLine($"\t\t/// <summary>Interceptor for {interfaceSimpleName}.{evt.Name} event.</summary>");
-		sb.AppendLine($"\t\tpublic sealed class {interceptClassName}");
+		sb.AppendLine($"\t\tpublic sealed class {interceptClassName}{typeParamList}{constraintClause}");
 		sb.AppendLine("\t\t{");
 
 		sb.AppendLine("\t\t\t/// <summary>Number of times the event was subscribed to.</summary>");
@@ -732,8 +758,19 @@ public partial class KnockOffGenerator
 		// Use StubClassName which includes type suffix when needed for collision avoidance
 		var stubClassName = iface.StubClassName;
 
-		sb.AppendLine($"\t\t/// <summary>Stub implementation of {iface.FullName}.</summary>");
-		sb.AppendLine($"\t\tpublic class {stubClassName} : {iface.FullName}, global::KnockOff.IKnockOffStub");
+		// For open generic interfaces, add type parameters to class declaration
+		var typeParamList = SymbolHelpers.FormatTypeParameterList(iface.TypeParameters);
+		var constraints = SymbolHelpers.FormatTypeConstraints(iface.TypeParameters);
+		var constraintClause = string.IsNullOrEmpty(constraints) ? "" : $" {constraints}";
+
+		// For open generic, replace the empty <> in FullName with actual type params
+		// e.g., "global::MyNamespace.IRepository<>" -> "global::MyNamespace.IRepository<T>"
+		var baseType = iface.IsOpenGeneric && typeParamList.Length > 0
+			? SymbolHelpers.ReplaceUnboundGeneric(iface.FullName, typeParamList)
+			: iface.FullName;
+
+		sb.AppendLine($"\t\t/// <summary>Stub implementation of {baseType}.</summary>");
+		sb.AppendLine($"\t\tpublic class {stubClassName}{typeParamList} : {baseType}, global::KnockOff.IKnockOffStub{constraintClause}");
 		sb.AppendLine("\t\t{");
 
 		// Generate interceptor properties (using deduplicated members to avoid duplicates)
@@ -745,7 +782,7 @@ public partial class KnockOffGenerator
 				? SymbolHelpers.GetIndexerName(indexerCount, member.IndexerTypeSuffix)
 				: member.Name;
 			sb.AppendLine($"\t\t\t/// <summary>Interceptor for {memberName}.</summary>");
-			sb.AppendLine($"\t\t\tpublic {GetNewKeywordIfNeeded(memberName)}{stubClassName}_{memberName}Interceptor {memberName} {{ get; }} = new();");
+			sb.AppendLine($"\t\t\tpublic {GetNewKeywordIfNeeded(memberName)}{stubClassName}_{memberName}Interceptor{typeParamList} {memberName} {{ get; }} = new();");
 			sb.AppendLine();
 		}
 		// Method interceptors keep method name as property name (no Interceptor suffix)
@@ -755,18 +792,18 @@ public partial class KnockOffGenerator
 			{
 				// Mixed group: generate TWO properties (non-generic and generic with suffix)
 				sb.AppendLine($"\t\t\t/// <summary>Interceptor for {group.Name} (non-generic overloads).</summary>");
-				sb.AppendLine($"\t\t\tpublic {GetNewKeywordIfNeeded(group.Name)}{stubClassName}_{group.Name}Interceptor {group.Name} {{ get; }} = new();");
+				sb.AppendLine($"\t\t\tpublic {GetNewKeywordIfNeeded(group.Name)}{stubClassName}_{group.Name}Interceptor{typeParamList} {group.Name} {{ get; }} = new();");
 				sb.AppendLine();
 
 				var genericName = group.Name + GenericSuffix;
 				sb.AppendLine($"\t\t\t/// <summary>Interceptor for {group.Name} (generic overloads, use .Of&lt;T&gt;()).</summary>");
-				sb.AppendLine($"\t\t\tpublic {GetNewKeywordIfNeeded(genericName)}{stubClassName}_{genericName}Interceptor {genericName} {{ get; }} = new();");
+				sb.AppendLine($"\t\t\tpublic {GetNewKeywordIfNeeded(genericName)}{stubClassName}_{genericName}Interceptor{typeParamList} {genericName} {{ get; }} = new();");
 				sb.AppendLine();
 			}
 			else
 			{
 				sb.AppendLine($"\t\t\t/// <summary>Interceptor for {group.Name}.</summary>");
-				sb.AppendLine($"\t\t\tpublic {GetNewKeywordIfNeeded(group.Name)}{stubClassName}_{group.Name}Interceptor {group.Name} {{ get; }} = new();");
+				sb.AppendLine($"\t\t\tpublic {GetNewKeywordIfNeeded(group.Name)}{stubClassName}_{group.Name}Interceptor{typeParamList} {group.Name} {{ get; }} = new();");
 				sb.AppendLine();
 			}
 		}
@@ -774,16 +811,21 @@ public partial class KnockOffGenerator
 		foreach (var evt in deduplicatedEvents)
 		{
 			sb.AppendLine($"\t\t\t/// <summary>Interceptor for {evt.Name} event.</summary>");
-			sb.AppendLine($"\t\t\tpublic {stubClassName}_{evt.Name}Interceptor {evt.Name}Interceptor {{ get; }} = new();");
+			sb.AppendLine($"\t\t\tpublic {stubClassName}_{evt.Name}Interceptor{typeParamList} {evt.Name}Interceptor {{ get; }} = new();");
 			sb.AppendLine();
 		}
 
 		// Generate explicit interface implementations
 		foreach (var member in iface.Members)
 		{
+			// For open generics, replace <> with actual type params in the declaring interface name
+			var memberIfaceName = iface.IsOpenGeneric && typeParamList.Length > 0
+				? SymbolHelpers.ReplaceUnboundGeneric(member.DeclaringInterfaceFullName, typeParamList)
+				: member.DeclaringInterfaceFullName;
+
 			if (member.IsIndexer)
 			{
-				GenerateInlineStubIndexerImplementation(sb, member.DeclaringInterfaceFullName, member, stubClassName, indexerCount);
+				GenerateInlineStubIndexerImplementation(sb, memberIfaceName, member, stubClassName, indexerCount);
 			}
 			else if (member.IsProperty)
 			{
@@ -796,7 +838,7 @@ public partial class KnockOffGenerator
 				}
 				else
 				{
-					GenerateInlineStubPropertyImplementation(sb, member.DeclaringInterfaceFullName, member, stubClassName);
+					GenerateInlineStubPropertyImplementation(sb, memberIfaceName, member, stubClassName);
 				}
 			}
 			else
@@ -806,7 +848,7 @@ public partial class KnockOffGenerator
 				var delegationTarget = FindDelegationTarget(member, iface);
 				if (delegationTarget != null)
 				{
-					GenerateInlineStubDelegationImplementation(sb, member, delegationTarget, iface.FullName);
+					GenerateInlineStubDelegationImplementation(sb, member, delegationTarget, baseType);
 				}
 				else
 				{
@@ -817,11 +859,11 @@ public partial class KnockOffGenerator
 					{
 						var (nonGenericGroup, genericGroup) = SplitMixedGroup(group);
 						var effectiveGroup = member.IsGenericMethod ? genericGroup! : nonGenericGroup!;
-						GenerateInlineStubMethodImplementation(sb, member.DeclaringInterfaceFullName, member, effectiveGroup, stubClassName);
+						GenerateInlineStubMethodImplementation(sb, memberIfaceName, member, effectiveGroup, stubClassName);
 					}
 					else
 					{
-						GenerateInlineStubMethodImplementation(sb, member.DeclaringInterfaceFullName, member, group, stubClassName);
+						GenerateInlineStubMethodImplementation(sb, memberIfaceName, member, group, stubClassName);
 					}
 				}
 			}
@@ -830,12 +872,16 @@ public partial class KnockOffGenerator
 		// Generate event implementations
 		foreach (var evt in iface.Events)
 		{
-			GenerateInlineStubEventImplementation(sb, evt.DeclaringInterfaceFullName, evt, stubClassName);
+			// For open generics, replace <> with actual type params in the declaring interface name
+			var evtIfaceName = iface.IsOpenGeneric && typeParamList.Length > 0
+				? SymbolHelpers.ReplaceUnboundGeneric(evt.DeclaringInterfaceFullName, typeParamList)
+				: evt.DeclaringInterfaceFullName;
+			GenerateInlineStubEventImplementation(sb, evtIfaceName, evt, stubClassName);
 		}
 
 		// Generate Object property - returns this stub as the interface type
-		sb.AppendLine($"\t\t\t/// <summary>The {iface.FullName} instance. Use for passing to code expecting the interface.</summary>");
-		sb.AppendLine($"\t\t\tpublic {iface.FullName} Object => this;");
+		sb.AppendLine($"\t\t\t/// <summary>The {baseType} instance. Use for passing to code expecting the interface.</summary>");
+		sb.AppendLine($"\t\t\tpublic {baseType} Object => this;");
 		sb.AppendLine();
 
 		// Generate Strict property and constructor for strict mode support
@@ -893,7 +939,17 @@ public partial class KnockOffGenerator
 		var stubClassName = del.Name;
 		var interceptClassName = $"{del.Name}Interceptor";
 
-		// Generate handler class first
+		// For open generic delegates, add type parameters
+		var typeParamList = SymbolHelpers.FormatTypeParameterList(del.TypeParameters);
+		var constraints = SymbolHelpers.FormatTypeConstraints(del.TypeParameters);
+		var constraintClause = string.IsNullOrEmpty(constraints) ? "" : $" {constraints}";
+
+		// For open generic, replace the empty <> in FullName with actual type params
+		var delegateType = del.IsOpenGeneric && typeParamList.Length > 0
+			? SymbolHelpers.ReplaceUnboundGeneric(del.FullName, typeParamList)
+			: del.FullName;
+
+		// Generate handler class first (non-generic, shared across all instantiations)
 		sb.AppendLine($"\t\t/// <summary>Interceptor for {del.Name} delegate.</summary>");
 		sb.AppendLine($"\t\tpublic sealed class {interceptClassName}");
 		sb.AppendLine("\t\t{");
@@ -959,8 +1015,8 @@ public partial class KnockOffGenerator
 		sb.AppendLine();
 
 		// Generate stub class
-		sb.AppendLine($"\t\t/// <summary>Stub for {del.FullName} delegate.</summary>");
-		sb.AppendLine($"\t\tpublic sealed class {stubClassName} : global::KnockOff.IKnockOffStub");
+		sb.AppendLine($"\t\t/// <summary>Stub for {delegateType} delegate.</summary>");
+		sb.AppendLine($"\t\tpublic sealed class {stubClassName}{typeParamList} : global::KnockOff.IKnockOffStub{constraintClause}");
 		sb.AppendLine("\t\t{");
 
 		// Strict property for IKnockOffStub (delegate stubs don't have strict mode behavior yet)
@@ -997,8 +1053,8 @@ public partial class KnockOffGenerator
 		sb.AppendLine();
 
 		// Implicit conversion operator to delegate
-		sb.AppendLine($"\t\t\t/// <summary>Implicit conversion to {del.FullName}.</summary>");
-		sb.AppendLine($"\t\t\tpublic static implicit operator {del.FullName}({stubClassName} stub) => stub.Invoke;");
+		sb.AppendLine($"\t\t\t/// <summary>Implicit conversion to {delegateType}.</summary>");
+		sb.AppendLine($"\t\t\tpublic static implicit operator {delegateType}({stubClassName}{typeParamList} stub) => stub.Invoke;");
 
 		sb.AppendLine("\t\t}");
 		sb.AppendLine();

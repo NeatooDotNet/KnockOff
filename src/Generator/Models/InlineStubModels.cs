@@ -36,13 +36,23 @@ internal sealed record DelegateInfo(
 	string Name,
 	string ReturnType,
 	bool IsVoid,
-	EquatableArray<ParameterInfo> Parameters) : IEquatable<DelegateInfo>
+	EquatableArray<ParameterInfo> Parameters,
+	/// <summary>
+	/// True when this is an open generic delegate from [KnockOff(typeof(Factory&lt;&gt;))].
+	/// When true, the generated stub class will have type parameters.
+	/// </summary>
+	bool IsOpenGeneric = false,
+	/// <summary>
+	/// Type parameters for open generic delegates (e.g., T, TKey, TValue).
+	/// Empty for closed generic or non-generic delegates.
+	/// </summary>
+	EquatableArray<TypeParameterInfo> TypeParameters = default) : IEquatable<DelegateInfo>
 {
 	/// <summary>
 	/// Extracts delegate info for inline delegate stubs.
 	/// Returns null if the delegate cannot be processed.
 	/// </summary>
-	public static DelegateInfo? Extract(INamedTypeSymbol delegateType)
+	public static DelegateInfo? Extract(INamedTypeSymbol delegateType, bool isOpenGeneric = false, EquatableArray<TypeParameterInfo> typeParameters = default)
 	{
 		// Get the Invoke method - all delegates have one
 		var invokeMethod = delegateType.DelegateInvokeMethod;
@@ -66,6 +76,8 @@ internal sealed record DelegateInfo(
 			Name: delegateType.Name,
 			ReturnType: returnType,
 			IsVoid: isVoid,
-			Parameters: new EquatableArray<ParameterInfo>(parameters));
+			Parameters: new EquatableArray<ParameterInfo>(parameters),
+			IsOpenGeneric: isOpenGeneric,
+			TypeParameters: typeParameters);
 	}
 }

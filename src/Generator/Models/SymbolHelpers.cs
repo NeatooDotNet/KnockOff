@@ -289,6 +289,36 @@ internal static class SymbolHelpers
 	}
 
 	/// <summary>
+	/// Replaces unbound generic syntax (e.g., "&lt;&gt;", "&lt;,&gt;", "&lt;,,&gt;") in a type name with actual type parameters.
+	/// For example: "IKeyValueStore&lt;,&gt;" with "&lt;TKey, TValue&gt;" → "IKeyValueStore&lt;TKey, TValue&gt;"
+	/// </summary>
+	public static string ReplaceUnboundGeneric(string fullName, string typeParamList)
+	{
+		if (string.IsNullOrEmpty(typeParamList))
+			return fullName;
+
+		// Find the unbound generic pattern: < followed by zero or more commas followed by >
+		// Examples: <>, <,>, <,,>
+		var startIndex = fullName.LastIndexOf('<');
+		if (startIndex == -1)
+			return fullName;
+
+		var endIndex = fullName.IndexOf('>', startIndex);
+		if (endIndex == -1)
+			return fullName;
+
+		var unboundPart = fullName.Substring(startIndex, endIndex - startIndex + 1);
+		// Check if it's an unbound generic (only commas between < and >)
+		var inner = unboundPart.Substring(1, unboundPart.Length - 2);
+		if (inner.All(c => c == ','))
+		{
+			return fullName.Substring(0, startIndex) + typeParamList + fullName.Substring(endIndex + 1);
+		}
+
+		return fullName;
+	}
+
+	/// <summary>
 	/// Formats type constraint clauses (e.g., "where T : class where U : new()") from type parameter info.
 	/// Returns empty string if no constraints.
 	/// </summary>

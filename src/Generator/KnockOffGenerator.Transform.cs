@@ -63,16 +63,35 @@ public partial class KnockOffGenerator
 
 		foreach (var attributeData in context.Attributes)
 		{
-			if (attributeData.AttributeClass is not INamedTypeSymbol attrType || !attrType.IsGenericType)
-				continue;
-
-			var typeArg = attrType.TypeArguments.FirstOrDefault();
-			if (typeArg is null)
-				continue;
+			ITypeSymbol? typeArg = null;
+			bool isOpenGeneric = false;
+			EquatableArray<TypeParameterInfo> openGenericTypeParams = default;
 
 			// Get attribute location for diagnostics
 			var attrLocation = attributeData.ApplicationSyntaxReference?.GetSyntax()?.GetLocation();
 			var attrLineSpan = attrLocation?.GetLineSpan() ?? default;
+
+			// Path 1: Generic attribute [KnockOff<T>] - extract from TypeArguments
+			if (attributeData.AttributeClass is INamedTypeSymbol attrType && attrType.IsGenericType)
+			{
+				typeArg = attrType.TypeArguments.FirstOrDefault();
+			}
+			// Path 2: Non-generic attribute [KnockOff(typeof(T))] - extract from ConstructorArguments
+			else if (attributeData.ConstructorArguments.Length > 0
+				&& attributeData.ConstructorArguments[0].Value is INamedTypeSymbol ctorTypeArg)
+			{
+				typeArg = ctorTypeArg;
+
+				// Check if this is an open generic (unbound) type
+				if (ctorTypeArg.IsUnboundGenericType)
+				{
+					isOpenGeneric = true;
+					openGenericTypeParams = SymbolHelpers.ExtractTypeParameters(ctorTypeArg.TypeParameters);
+				}
+			}
+
+			if (typeArg is null)
+				continue;
 
 			// Extract Strict property from attribute (default false)
 			var strict = false;
@@ -116,14 +135,14 @@ public partial class KnockOffGenerator
 			// Get interface info
 			if (typeArg.TypeKind == TypeKind.Interface && typeArg is INamedTypeSymbol namedInterface)
 			{
-				var interfaceInfo = ExtractInterfaceInfo(namedInterface, classSymbol.ContainingAssembly, typeSuffix, strict);
+				var interfaceInfo = ExtractInterfaceInfo(namedInterface, classSymbol.ContainingAssembly, typeSuffix, strict, isOpenGeneric, openGenericTypeParams);
 				interfaceEntries.Add((namedInterface, interfaceInfo));
 				stubTypeNames.Add(namedInterface.Name); // e.g., "IUserService"
 			}
 			// Get delegate info
 			else if (typeArg.TypeKind == TypeKind.Delegate && typeArg is INamedTypeSymbol namedDelegate)
 			{
-				var delegateInfo = DelegateInfo.Extract(namedDelegate);
+				var delegateInfo = DelegateInfo.Extract(namedDelegate, isOpenGeneric, openGenericTypeParams);
 				if (delegateInfo is not null)
 				{
 					delegates.Add(delegateInfo);
@@ -133,7 +152,7 @@ public partial class KnockOffGenerator
 			// Get class info for class stubbing via inheritance
 			else if (typeArg.TypeKind == TypeKind.Class && typeArg is INamedTypeSymbol namedClass)
 			{
-				var classInfo = ExtractClassInfo(namedClass, classSymbol.ContainingAssembly, filePath, attrLineSpan, diagnostics);
+				var classInfo = ExtractClassInfo(namedClass, classSymbol.ContainingAssembly, filePath, attrLineSpan, diagnostics, isOpenGeneric, openGenericTypeParams);
 				if (classInfo is not null)
 				{
 					classes.Add(classInfo);
@@ -279,13 +298,24 @@ public partial class KnockOffGenerator
 	/// <summary>
 	/// Extracts interface info for inline stubs (reuses same InterfaceInfo as explicit pattern).
 	/// </summary>
-	private static InterfaceInfo ExtractInterfaceInfo(INamedTypeSymbol iface, IAssemblySymbol knockOffAssembly, string typeSuffix = "", bool strict = false)
+	private static InterfaceInfo ExtractInterfaceInfo(
+		INamedTypeSymbol iface,
+		IAssemblySymbol knockOffAssembly,
+		string typeSuffix = "",
+		bool strict = false,
+		bool isOpenGeneric = false,
+		EquatableArray<TypeParameterInfo> typeParameters = default)
 	{
 		var members = new List<InterfaceMemberInfo>();
 		var events = new List<EventMemberInfo>();
 
+		// For unbound generic types, GetMembers() returns empty - use OriginalDefinition instead
+		var memberSource = isOpenGeneric && iface.IsUnboundGenericType
+			? iface.OriginalDefinition
+			: iface;
+
 		var ifaceFullName = iface.ToDisplayString(FullyQualifiedWithNullability);
-		foreach (var member in iface.GetMembers())
+		foreach (var member in memberSource.GetMembers())
 		{
 			// Skip internal members from external assemblies
 			if (!IsMemberAccessible(member, knockOffAssembly))
@@ -338,7 +368,9 @@ public partial class KnockOffGenerator
 			new EquatableArray<InterfaceMemberInfo>(members.ToArray()),
 			new EquatableArray<EventMemberInfo>(events.ToArray()),
 			TypeSuffix: typeSuffix,
-			Strict: strict);
+			Strict: strict,
+			IsOpenGeneric: isOpenGeneric,
+			TypeParameters: typeParameters);
 	}
 
 	/// <summary>
@@ -350,7 +382,9 @@ public partial class KnockOffGenerator
 		IAssemblySymbol knockOffAssembly,
 		string filePath,
 		Microsoft.CodeAnalysis.FileLinePositionSpan attrLineSpan,
-		List<DiagnosticInfo> diagnostics)
+		List<DiagnosticInfo> diagnostics,
+		bool isOpenGeneric = false,
+		EquatableArray<TypeParameterInfo> typeParameters = default)
 	{
 		var className = classType.Name;
 		var classFullName = classType.ToDisplayString(FullyQualifiedWithNullability);
@@ -492,7 +526,9 @@ public partial class KnockOffGenerator
 			className,
 			new EquatableArray<ClassMemberInfo>(members.ToArray()),
 			new EquatableArray<ClassConstructorInfo>(constructors.ToArray()),
-			new EquatableArray<EventMemberInfo>(events.ToArray()));
+			new EquatableArray<EventMemberInfo>(events.ToArray()),
+			IsOpenGeneric: isOpenGeneric,
+			TypeParameters: typeParameters);
 	}
 
 	/// <summary>

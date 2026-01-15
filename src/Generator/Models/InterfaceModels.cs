@@ -25,7 +25,17 @@ internal sealed record InterfaceInfo(
 	/// When true, the generated constructor defaults to strict mode (throws on unconfigured calls).
 	/// From [KnockOff&lt;T&gt;(Strict = true)].
 	/// </summary>
-	bool Strict = false) : IEquatable<InterfaceInfo>
+	bool Strict = false,
+	/// <summary>
+	/// True when this is an open generic type from [KnockOff(typeof(IRepo&lt;&gt;))].
+	/// When true, the generated stub class will have type parameters.
+	/// </summary>
+	bool IsOpenGeneric = false,
+	/// <summary>
+	/// Type parameters for open generic interfaces (e.g., T, TKey, TValue).
+	/// Empty for closed generic or non-generic interfaces.
+	/// </summary>
+	EquatableArray<TypeParameterInfo> TypeParameters = default) : IEquatable<InterfaceInfo>
 {
 	/// <summary>
 	/// Gets the stub class name, including type suffix when needed for collision avoidance.

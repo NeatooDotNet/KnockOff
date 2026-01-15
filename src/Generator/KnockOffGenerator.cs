@@ -205,10 +205,11 @@ public partial class KnockOffGenerator : IIncrementalGenerator
 
 	public void Initialize(IncrementalGeneratorInitializationContext context)
 	{
-		// Pipeline 1: Explicit [KnockOff] pattern (class implements interfaces)
+		// Pipeline 1: Explicit [KnockOff] pattern (class implements interfaces) - standalone stubs
+		// Only triggers when [KnockOff] has no constructor arguments (standalone pattern)
 		var classesToGenerate = context.SyntaxProvider.ForAttributeWithMetadataName(
 			"KnockOff.KnockOffAttribute",
-			predicate: static (node, _) => IsCandidateClass(node),
+			predicate: static (node, _) => IsCandidateClass(node) && !HasTypeofArgument(node),
 			transform: static (ctx, _) => TransformClass(ctx));
 
 		context.RegisterSourceOutput(classesToGenerate, static (spc, typeInfo) =>
@@ -227,6 +228,21 @@ public partial class KnockOffGenerator : IIncrementalGenerator
 			transform: static (ctx, _) => TransformInlineStubClass(ctx));
 
 		context.RegisterSourceOutput(inlineStubsToGenerate, static (spc, info) =>
+		{
+			if (info is not null)
+			{
+				GenerateInlineStubs(spc, info);
+			}
+		});
+
+		// Pipeline 3: Inline [KnockOff(typeof(T))] pattern for open generic stubs
+		// Triggers when [KnockOff] has a typeof constructor argument
+		var openGenericStubsToGenerate = context.SyntaxProvider.ForAttributeWithMetadataName(
+			"KnockOff.KnockOffAttribute",
+			predicate: static (node, _) => IsInlineStubCandidate(node) && HasTypeofArgument(node),
+			transform: static (ctx, _) => TransformInlineStubClass(ctx));
+
+		context.RegisterSourceOutput(openGenericStubsToGenerate, static (spc, info) =>
 		{
 			if (info is not null)
 			{
@@ -279,6 +295,38 @@ public partial class KnockOffGenerator : IIncrementalGenerator
 		return true;
 	}
 
+	/// <summary>
+	/// Checks if any [KnockOff] attribute on the class has a typeof() argument.
+	/// Used to distinguish [KnockOff] standalone stubs from [KnockOff(typeof(T))] inline stubs.
+	/// </summary>
+	private static bool HasTypeofArgument(SyntaxNode node)
+	{
+		if (node is not ClassDeclarationSyntax classDecl)
+			return false;
+
+		// Check all attribute lists on the class
+		foreach (var attrList in classDecl.AttributeLists)
+		{
+			foreach (var attr in attrList.Attributes)
+			{
+				// Check if this is a KnockOff attribute (without generic args)
+				var name = attr.Name.ToString();
+				if (name != "KnockOff" && name != "KnockOffAttribute")
+					continue;
+
+				// Check if it has an argument list with at least one argument
+				if (attr.ArgumentList is { Arguments.Count: > 0 })
+				{
+					// Check if the first argument is a typeof expression
+					var firstArg = attr.ArgumentList.Arguments[0];
+					if (firstArg.Expression is TypeOfExpressionSyntax)
+						return true;
+				}
+			}
+		}
+
+		return false;
+	}
 
 	/// <summary>
 	/// Generate the partial class with explicit interface implementations
