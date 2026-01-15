@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Comparison;
 
-partial class MigConnectionKnockOff : global::KnockOff.IKnockOffStub
+partial class MigConnectionKnockOff : global::KnockOff.Documentation.Samples.Comparison.IMigConnection, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Connect.</summary>
 	public sealed class ConnectInterceptor
@@ -27,11 +27,11 @@ partial class MigConnectionKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Connect.</summary>
 	public ConnectInterceptor Connect { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IMigConnection instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IMigConnection Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	void global::KnockOff.Documentation.Samples.Comparison.IMigConnection.Connect()
 	{

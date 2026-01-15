@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class GenericRepositoryStub<T> : global::KnockOff.IKnockOffStub where T : class
+partial class GenericRepositoryStub<T> : global::KnockOff.Tests.IGenericRepository<T>, global::KnockOff.IKnockOffStub where T : class
 {
 	/// <summary>Tracks and configures behavior for Count.</summary>
 	public sealed class CountInterceptor
@@ -105,7 +105,7 @@ partial class GenericRepositoryStub<T> : global::KnockOff.IKnockOffStub where T 
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Count. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Count. Configure via .Value, track via .GetCount.</summary>
 	public CountInterceptor Count { get; } = new();
 
 	/// <summary>Interceptor for GetById.</summary>
@@ -117,11 +117,17 @@ partial class GenericRepositoryStub<T> : global::KnockOff.IKnockOffStub where T 
 	/// <summary>Interceptor for GetAll.</summary>
 	public GetAllInterceptor GetAll { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Tests.IGenericRepository<T> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IGenericRepository<T> Object => this;
 
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
+	int global::KnockOff.Tests.IGenericRepository<T>.Count
+	{
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericRepository<T>", "Count"); return Count.Value; }
+		set { Count.RecordSet(value); if (Count.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericRepository<T>", "Count"); Count.Value = value; }
+	}
 
 	T? global::KnockOff.Tests.IGenericRepository<T>.GetById(int id)
 	{
@@ -147,12 +153,6 @@ partial class GenericRepositoryStub<T> : global::KnockOff.IKnockOffStub where T 
 			return callback(this);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericRepository<T>", "GetAll");
 		return new global::System.Collections.Generic.List<T>();
-	}
-
-	int global::KnockOff.Tests.IGenericRepository<T>.Count
-	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericRepository<T>", "Count"); return Count.Value; }
-		set { Count.RecordSet(value); if (Count.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericRepository<T>", "Count"); Count.Value = value; }
 	}
 
 }

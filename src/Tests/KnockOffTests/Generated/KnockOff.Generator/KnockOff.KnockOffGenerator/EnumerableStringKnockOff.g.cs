@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class EnumerableStringKnockOff : global::KnockOff.IKnockOffStub
+partial class EnumerableStringKnockOff : global::System.Collections.Generic.IEnumerable<string>, global::System.Collections.IEnumerable, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetEnumerator.</summary>
 	public sealed class GetEnumeratorInterceptor
@@ -30,11 +30,11 @@ partial class EnumerableStringKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for GetEnumerator.</summary>
 	public GetEnumeratorInterceptor GetEnumerator { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::System.Collections.Generic.IEnumerable<string> instance. Use for passing to code expecting the interface.</summary>
 	public global::System.Collections.Generic.IEnumerable<string> Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::System.Collections.Generic.IEnumerator<string> global::System.Collections.Generic.IEnumerable<string>.GetEnumerator()
 	{
@@ -47,7 +47,11 @@ partial class EnumerableStringKnockOff : global::KnockOff.IKnockOffStub
 
 	global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
 	{
-		return ((global::System.Collections.Generic.IEnumerable<string>)this).GetEnumerator();
+		GetEnumerator.RecordCall();
+		if (GetEnumerator.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
+		throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall or define a protected method 'GetEnumerator' in your partial class.");
 	}
 
 }

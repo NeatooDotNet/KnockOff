@@ -3,9 +3,9 @@
 
 namespace KnockOff.Tests;
 
-partial class PropertyStoreKnockOff : global::KnockOff.IKnockOffStub
+partial class PropertyStoreKnockOff : global::KnockOff.Tests.IPropertyStore, global::KnockOff.IKnockOffStub
 {
-	/// <summary>Tracks and configures behavior for Indexer.</summary>
+	/// <summary>Tracks and configures behavior for indexer.</summary>
 	public sealed class IndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
@@ -27,14 +27,14 @@ partial class PropertyStoreKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
 	}
 
-	/// <summary>Interceptor for Indexer.</summary>
+	/// <summary>Interceptor for indexer. Configure callbacks and track access.</summary>
 	public IndexerInterceptor Indexer { get; } = new();
+
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
 
 	/// <summary>The global::KnockOff.Tests.IPropertyStore instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IPropertyStore Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::KnockOff.Tests.PropertyInfo? global::KnockOff.Tests.IPropertyStore.this[string key]
 	{

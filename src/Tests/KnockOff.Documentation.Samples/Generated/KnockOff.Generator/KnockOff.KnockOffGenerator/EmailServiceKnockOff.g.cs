@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.GettingStarted;
 
-partial class EmailServiceKnockOff : global::KnockOff.IKnockOffStub
+partial class EmailServiceKnockOff : global::KnockOff.Documentation.Samples.GettingStarted.IEmailService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for IsConnected.</summary>
 	public sealed class IsConnectedInterceptor
@@ -46,17 +46,22 @@ partial class EmailServiceKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for IsConnected. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsConnected. Configure via .Value, track via .GetCount.</summary>
 	public IsConnectedInterceptor IsConnected { get; } = new();
 
 	/// <summary>Interceptor for SendEmail.</summary>
 	public SendEmailInterceptor SendEmail { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.GettingStarted.IEmailService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.GettingStarted.IEmailService Object => this;
 
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
+	bool global::KnockOff.Documentation.Samples.GettingStarted.IEmailService.IsConnected
+	{
+		get { IsConnected.RecordGet(); if (IsConnected.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IEmailService", "IsConnected"); return IsConnected.Value; }
+	}
 
 	void global::KnockOff.Documentation.Samples.GettingStarted.IEmailService.SendEmail(string to, string subject, string body)
 	{
@@ -64,11 +69,6 @@ partial class EmailServiceKnockOff : global::KnockOff.IKnockOffStub
 		if (SendEmail.OnCall is { } onCallCallback)
 		{ onCallCallback(this, to, subject, body); return; }
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEmailService", "SendEmail");
-	}
-
-	bool global::KnockOff.Documentation.Samples.GettingStarted.IEmailService.IsConnected
-	{
-		get { IsConnected.RecordGet(); if (IsConnected.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IEmailService", "IsConnected"); return IsConnected.Value; }
 	}
 
 }

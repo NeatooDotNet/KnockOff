@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class SkRepositoryKnockOff : global::KnockOff.IKnockOffStub
+partial class SkRepositoryKnockOff : global::KnockOff.Documentation.Samples.Skills.ISkRepository, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Save.</summary>
 	public sealed class SaveInterceptor
@@ -30,11 +30,11 @@ partial class SkRepositoryKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Save.</summary>
 	public SaveInterceptor Save { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkRepository instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ISkRepository Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	void global::KnockOff.Documentation.Samples.Skills.ISkRepository.Save(object entity)
 	{

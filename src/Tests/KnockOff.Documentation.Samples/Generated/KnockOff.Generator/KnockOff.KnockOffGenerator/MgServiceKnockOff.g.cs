@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class MgServiceKnockOff : global::KnockOff.IKnockOffStub
+partial class MgServiceKnockOff : global::KnockOff.Documentation.Samples.Skills.IMgService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetUser.</summary>
 	public sealed class GetUserInterceptor
@@ -33,11 +33,11 @@ partial class MgServiceKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for GetUser.</summary>
 	public GetUserInterceptor GetUser { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IMgService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.IMgService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::KnockOff.Documentation.Samples.Skills.MgUser? global::KnockOff.Documentation.Samples.Skills.IMgService.GetUser(int id)
 	{

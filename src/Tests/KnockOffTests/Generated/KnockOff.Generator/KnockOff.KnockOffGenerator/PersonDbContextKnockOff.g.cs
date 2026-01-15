@@ -3,7 +3,7 @@
 
 namespace DomainModel.Tests;
 
-partial class PersonDbContextKnockOff : global::KnockOff.IKnockOffStub
+partial class PersonDbContextKnockOff : global::Person.Ef.IPersonDbContext, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for SavePerson.</summary>
 	public sealed class SavePersonInterceptor
@@ -58,11 +58,11 @@ partial class PersonDbContextKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for GetPerson.</summary>
 	public GetPersonInterceptor GetPerson { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::Person.Ef.IPersonDbContext instance. Use for passing to code expecting the interface.</summary>
 	public global::Person.Ef.IPersonDbContext Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	void global::Person.Ef.IPersonDbContext.SavePerson(global::DomainModel.Person person)
 	{

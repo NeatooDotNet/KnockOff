@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class GenericKeyValueStub<TKey, TValue> : global::KnockOff.IKnockOffStub where TKey : notnull where TValue : class
+partial class GenericKeyValueStub<TKey, TValue> : global::KnockOff.Documentation.Samples.Guides.IGenericKeyValue<TKey, TValue>, global::KnockOff.IKnockOffStub where TKey : notnull where TValue : class
 {
 	/// <summary>Tracks and configures behavior for Get.</summary>
 	public sealed class GetInterceptor
@@ -58,11 +58,11 @@ partial class GenericKeyValueStub<TKey, TValue> : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Set.</summary>
 	public SetInterceptor Set { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IGenericKeyValue<TKey, TValue> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IGenericKeyValue<TKey, TValue> Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	TValue? global::KnockOff.Documentation.Samples.Guides.IGenericKeyValue<TKey, TValue>.Get(TKey key)
 	{

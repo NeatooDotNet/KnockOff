@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class OverloadedServiceKnockOff : global::KnockOff.IKnockOffStub
+partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetByIdAsync.</summary>
 	public sealed class GetByIdAsync1Interceptor
@@ -192,11 +192,11 @@ partial class OverloadedServiceKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Calculate.</summary>
 	public Calculate2Interceptor Calculate2 { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Tests.IOverloadedService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IOverloadedService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> global::KnockOff.Tests.IOverloadedService.GetByIdAsync(int id)
 	{

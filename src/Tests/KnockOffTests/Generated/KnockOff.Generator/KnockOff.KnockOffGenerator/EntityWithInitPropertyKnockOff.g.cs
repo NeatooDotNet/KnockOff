@@ -3,7 +3,7 @@
 
 namespace KnockOffTests;
 
-partial class EntityWithInitPropertyKnockOff : global::KnockOff.IKnockOffStub
+partial class EntityWithInitPropertyKnockOff : global::KnockOffTests.IEntityWithInitProperty, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Id.</summary>
 	public sealed class IdInterceptor
@@ -24,11 +24,11 @@ partial class EntityWithInitPropertyKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Id. Configure via .Value, track via .GetCount.</summary>
 	public IdInterceptor Id { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOffTests.IEntityWithInitProperty instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOffTests.IEntityWithInitProperty Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	string global::KnockOffTests.IEntityWithInitProperty.Id
 	{

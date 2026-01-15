@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class SkServiceKnockOff : global::KnockOff.IKnockOffStub
+partial class SkServiceKnockOff : global::KnockOff.Documentation.Samples.Skills.ISkService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetValue.</summary>
 	public sealed class GetValue2Interceptor
@@ -33,11 +33,11 @@ partial class SkServiceKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for GetValue.</summary>
 	public GetValue2Interceptor GetValue2 { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ISkService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	int global::KnockOff.Documentation.Samples.Skills.ISkService.GetValue(int id)
 	{

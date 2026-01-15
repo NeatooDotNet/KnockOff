@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class SkRepoKnockOff : global::KnockOff.IKnockOffStub
+partial class SkRepoKnockOff : global::KnockOff.Documentation.Samples.Skills.ISkRepoService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetById.</summary>
 	public sealed class GetById2Interceptor
@@ -61,11 +61,11 @@ partial class SkRepoKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for GetByIdAsync.</summary>
 	public GetByIdAsync2Interceptor GetByIdAsync2 { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkRepoService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ISkRepoService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::KnockOff.Documentation.Samples.Skills.SkUser? global::KnockOff.Documentation.Samples.Skills.ISkRepoService.GetById(int id)
 	{

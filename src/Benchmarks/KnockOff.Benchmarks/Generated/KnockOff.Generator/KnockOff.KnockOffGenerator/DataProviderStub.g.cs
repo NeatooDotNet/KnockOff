@@ -3,7 +3,7 @@
 
 namespace KnockOff.Benchmarks.Stubs;
 
-partial class DataProviderStub : global::KnockOff.IKnockOffStub
+partial class DataProviderStub : global::KnockOff.Benchmarks.Interfaces.IDataProvider, global::System.Collections.Generic.IEnumerable<string>, global::System.Collections.IEnumerable, global::System.IDisposable, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Count.</summary>
 	public sealed class CountInterceptor
@@ -65,7 +65,7 @@ partial class DataProviderStub : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Count. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Count. Configure via .Value, track via .GetCount.</summary>
 	public CountInterceptor Count { get; } = new();
 
 	/// <summary>Interceptor for GetEnumerator.</summary>
@@ -74,11 +74,11 @@ partial class DataProviderStub : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Dispose.</summary>
 	public DisposeInterceptor Dispose { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Benchmarks.Interfaces.IDataProvider instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Interfaces.IDataProvider Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	int global::KnockOff.Benchmarks.Interfaces.IDataProvider.Count
 	{
@@ -96,7 +96,11 @@ partial class DataProviderStub : global::KnockOff.IKnockOffStub
 
 	global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
 	{
-		return ((global::System.Collections.Generic.IEnumerable<string>)this).GetEnumerator();
+		GetEnumerator.RecordCall();
+		if (GetEnumerator.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
+		throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall or define a protected method 'GetEnumerator' in your partial class.");
 	}
 
 	void global::System.IDisposable.Dispose()

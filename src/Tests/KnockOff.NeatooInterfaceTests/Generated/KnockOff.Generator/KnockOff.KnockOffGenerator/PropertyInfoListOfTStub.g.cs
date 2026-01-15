@@ -3,7 +3,7 @@
 
 namespace KnockOff.NeatooInterfaceTests.Properties;
 
-partial class PropertyInfoListOfTStub : global::KnockOff.IKnockOffStub
+partial class PropertyInfoListOfTStub : global::Neatoo.IPropertyInfoList<global::Neatoo.IValidateBase>, global::Neatoo.IPropertyInfoList, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetPropertyInfo.</summary>
 	public sealed class GetPropertyInfoInterceptor
@@ -86,11 +86,11 @@ partial class PropertyInfoListOfTStub : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for HasProperty.</summary>
 	public HasPropertyInterceptor HasProperty { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::Neatoo.IPropertyInfoList<global::Neatoo.IValidateBase> instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.IPropertyInfoList<global::Neatoo.IValidateBase> Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::Neatoo.IPropertyInfo? global::Neatoo.IPropertyInfoList.GetPropertyInfo(string name)
 	{

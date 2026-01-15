@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class KeyLookupKnockOff : global::KnockOff.IKnockOffStub
+partial class KeyLookupKnockOff : global::KnockOff.Tests.IKeyLookup, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Count.</summary>
 	public sealed class CountInterceptor
@@ -61,29 +61,29 @@ partial class KeyLookupKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Count. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Count. Configure via .Value, track via .GetCount.</summary>
 	public CountInterceptor Count { get; } = new();
 
 	/// <summary>Interceptor for GetData.</summary>
 	public GetData2Interceptor GetData2 { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Tests.IKeyLookup instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IKeyLookup Object => this;
 
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
+	int global::KnockOff.Tests.IKeyLookup.Count
+	{
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IKeyLookup", "Count"); return Count.Value; }
+		set { Count.RecordSet(value); if (Count.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IKeyLookup", "Count"); Count.Value = value; }
+	}
 
 	int global::KnockOff.Tests.IKeyLookup.GetData(string key)
 	{
 		GetData2.RecordCall(key);
 		if (GetData2.OnCall is { } callback) return callback(this, key);
 		return GetData(key);
-	}
-
-	int global::KnockOff.Tests.IKeyLookup.Count
-	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IKeyLookup", "Count"); return Count.Value; }
-		set { Count.RecordSet(value); if (Count.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IKeyLookup", "Count"); Count.Value = value; }
 	}
 
 }

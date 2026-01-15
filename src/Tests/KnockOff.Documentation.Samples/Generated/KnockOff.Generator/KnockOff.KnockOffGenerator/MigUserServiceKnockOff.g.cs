@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Comparison;
 
-partial class MigUserServiceKnockOff : global::KnockOff.IKnockOffStub
+partial class MigUserServiceKnockOff : global::KnockOff.Documentation.Samples.Comparison.IMigUserService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameInterceptor
@@ -174,7 +174,7 @@ partial class MigUserServiceKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Name. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Name. Configure via .Value, track via .GetCount.</summary>
 	public NameInterceptor Name { get; } = new();
 
 	/// <summary>Interceptor for GetUser.</summary>
@@ -195,11 +195,17 @@ partial class MigUserServiceKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Update.</summary>
 	public UpdateInterceptor Update { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IMigUserService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IMigUserService Object => this;
 
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
+	string global::KnockOff.Documentation.Samples.Comparison.IMigUserService.Name
+	{
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IMigUserService", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IMigUserService", "Name"); Name.Value = value; }
+	}
 
 	global::KnockOff.Documentation.Samples.Comparison.MigUser global::KnockOff.Documentation.Samples.Comparison.IMigUserService.GetUser(int id)
 	{
@@ -250,12 +256,6 @@ partial class MigUserServiceKnockOff : global::KnockOff.IKnockOffStub
 		if (Update.OnCall is { } onCallCallback)
 		{ onCallCallback(this, user); return; }
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMigUserService", "Update");
-	}
-
-	string global::KnockOff.Documentation.Samples.Comparison.IMigUserService.Name
-	{
-		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IMigUserService", "Name"); return Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IMigUserService", "Name"); Name.Value = value; }
 	}
 
 }

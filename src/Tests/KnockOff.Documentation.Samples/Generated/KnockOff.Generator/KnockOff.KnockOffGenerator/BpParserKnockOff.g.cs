@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class BpParserKnockOff : global::KnockOff.IKnockOffStub
+partial class BpParserKnockOff : global::KnockOff.Documentation.Samples.Guides.IBpParser, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for TryParse.</summary>
 	public sealed class TryParseInterceptor
@@ -33,11 +33,11 @@ partial class BpParserKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for TryParse.</summary>
 	public TryParseInterceptor TryParse { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IBpParser instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IBpParser Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	bool global::KnockOff.Documentation.Samples.Guides.IBpParser.TryParse(string input, out int result)
 	{

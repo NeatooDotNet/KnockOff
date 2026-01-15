@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class PropPersonKnockOff : global::KnockOff.IKnockOffStub
+partial class PropPersonKnockOff : global::KnockOff.Documentation.Samples.Guides.IPropPerson, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for FirstName.</summary>
 	public sealed class FirstNameInterceptor
@@ -86,20 +86,20 @@ partial class PropPersonKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for FirstName. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for FirstName. Configure via .Value, track via .GetCount.</summary>
 	public FirstNameInterceptor FirstName { get; } = new();
 
-	/// <summary>Interceptor for LastName. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for LastName. Configure via .Value, track via .GetCount.</summary>
 	public LastNameInterceptor LastName { get; } = new();
 
-	/// <summary>Interceptor for FullName. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for FullName. Configure via .Value, track via .GetCount.</summary>
 	public FullNameInterceptor FullName { get; } = new();
+
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
 
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IPropPerson instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IPropPerson Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	string global::KnockOff.Documentation.Samples.Guides.IPropPerson.FirstName
 	{

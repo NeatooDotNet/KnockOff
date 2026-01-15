@@ -3,7 +3,7 @@
 
 namespace KnockOff.Sandbox;
 
-partial class OverloadedServiceKnockOff : global::KnockOff.IKnockOffStub
+partial class OverloadedServiceKnockOff : global::KnockOff.Sandbox.IOverloadedService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Format.</summary>
 	public sealed class Format1Interceptor
@@ -89,11 +89,11 @@ partial class OverloadedServiceKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Format.</summary>
 	public Format3Interceptor Format3 { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Sandbox.IOverloadedService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Sandbox.IOverloadedService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	string global::KnockOff.Sandbox.IOverloadedService.Format(string input)
 	{

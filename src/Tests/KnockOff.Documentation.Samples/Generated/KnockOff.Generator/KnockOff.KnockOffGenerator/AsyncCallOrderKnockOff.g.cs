@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class AsyncCallOrderKnockOff : global::KnockOff.IKnockOffStub
+partial class AsyncCallOrderKnockOff : global::KnockOff.Documentation.Samples.Guides.IAsyncCallOrder, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for StartAsync.</summary>
 	public sealed class StartAsyncInterceptor
@@ -55,11 +55,11 @@ partial class AsyncCallOrderKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for ProcessAsync.</summary>
 	public ProcessAsyncInterceptor ProcessAsync { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IAsyncCallOrder instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IAsyncCallOrder Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::System.Threading.Tasks.Task global::KnockOff.Documentation.Samples.Guides.IAsyncCallOrder.StartAsync()
 	{

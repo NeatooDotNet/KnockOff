@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class ConstrainedRepositoryStub<T> : global::KnockOff.IKnockOffStub where T : class
+partial class ConstrainedRepositoryStub<T> : global::KnockOff.Tests.IConstrainedRepository<T>, global::KnockOff.IKnockOffStub where T : class
 {
 	/// <summary>Tracks and configures behavior for GetById.</summary>
 	public sealed class GetByIdInterceptor
@@ -58,11 +58,11 @@ partial class ConstrainedRepositoryStub<T> : global::KnockOff.IKnockOffStub wher
 	/// <summary>Interceptor for Save.</summary>
 	public SaveInterceptor Save { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Tests.IConstrainedRepository<T> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IConstrainedRepository<T> Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	T? global::KnockOff.Tests.IConstrainedRepository<T>.GetById(int id)
 	{

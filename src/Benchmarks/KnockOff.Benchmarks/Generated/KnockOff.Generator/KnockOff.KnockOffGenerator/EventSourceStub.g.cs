@@ -3,7 +3,7 @@
 
 namespace KnockOff.Benchmarks.Stubs;
 
-partial class EventSourceStub : global::KnockOff.IKnockOffStub
+partial class EventSourceStub : global::KnockOff.Benchmarks.Interfaces.IEventSource, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Interceptor for MessageReceived event.</summary>
 	public sealed class MessageReceivedInterceptor
@@ -65,11 +65,11 @@ partial class EventSourceStub : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for ValueChanged event.</summary>
 	public ValueChangedInterceptor ValueChanged { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Benchmarks.Interfaces.IEventSource instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Interfaces.IEventSource Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	event global::System.EventHandler<string>? global::KnockOff.Benchmarks.Interfaces.IEventSource.MessageReceived
 	{

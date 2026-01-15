@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class PropConnectionKnockOff : global::KnockOff.IKnockOffStub
+partial class PropConnectionKnockOff : global::KnockOff.Documentation.Samples.Guides.IPropConnection, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for IsConnected.</summary>
 	public sealed class IsConnectedInterceptor
@@ -43,17 +43,17 @@ partial class PropConnectionKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for IsConnected. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsConnected. Configure via .Value, track via .GetCount.</summary>
 	public IsConnectedInterceptor IsConnected { get; } = new();
 
 	/// <summary>Interceptor for Connect.</summary>
 	public ConnectInterceptor Connect { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IPropConnection instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IPropConnection Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	bool global::KnockOff.Documentation.Samples.Guides.IPropConnection.IsConnected
 	{

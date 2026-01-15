@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.GettingStarted;
 
-partial class EmailServiceWithValidation : global::KnockOff.IKnockOffStub
+partial class EmailServiceWithValidation : global::KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for IsConnected.</summary>
 	public sealed class IsConnectedInterceptor
@@ -71,7 +71,7 @@ partial class EmailServiceWithValidation : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for IsConnected. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsConnected. Configure via .Value, track via .GetCount.</summary>
 	public IsConnectedInterceptor IsConnected { get; } = new();
 
 	/// <summary>Interceptor for SendEmail.</summary>
@@ -80,11 +80,16 @@ partial class EmailServiceWithValidation : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for IsValidAddress.</summary>
 	public IsValidAddress2Interceptor IsValidAddress2 { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation Object => this;
 
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
+	bool global::KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation.IsConnected
+	{
+		get { IsConnected.RecordGet(); if (IsConnected.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IEmailServiceWithValidation", "IsConnected"); return IsConnected.Value; }
+	}
 
 	void global::KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation.SendEmail(string to, string subject, string body)
 	{
@@ -92,11 +97,6 @@ partial class EmailServiceWithValidation : global::KnockOff.IKnockOffStub
 		if (SendEmail.OnCall is { } onCallCallback)
 		{ onCallCallback(this, to, subject, body); return; }
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEmailServiceWithValidation", "SendEmail");
-	}
-
-	bool global::KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation.IsConnected
-	{
-		get { IsConnected.RecordGet(); if (IsConnected.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IEmailServiceWithValidation", "IsConnected"); return IsConnected.Value; }
 	}
 
 	bool global::KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation.IsValidAddress(string email)

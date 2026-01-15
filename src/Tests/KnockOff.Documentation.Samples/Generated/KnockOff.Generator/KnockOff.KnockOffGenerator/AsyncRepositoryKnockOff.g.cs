@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class AsyncRepositoryKnockOff : global::KnockOff.IKnockOffStub
+partial class AsyncRepositoryKnockOff : global::KnockOff.Documentation.Samples.Guides.IAsyncRepository, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for InitializeAsync.</summary>
 	public sealed class InitializeAsyncInterceptor
@@ -83,11 +83,11 @@ partial class AsyncRepositoryKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for CountAsync.</summary>
 	public CountAsyncInterceptor CountAsync { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IAsyncRepository instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IAsyncRepository Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::System.Threading.Tasks.Task global::KnockOff.Documentation.Samples.Guides.IAsyncRepository.InitializeAsync()
 	{

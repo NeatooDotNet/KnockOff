@@ -3,7 +3,7 @@
 
 namespace KnockOff.NeatooInterfaceTests.ValidationRules;
 
-partial class TriggerPropertyStub : global::KnockOff.IKnockOffStub
+partial class TriggerPropertyStub : global::Neatoo.Rules.ITriggerProperty, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for PropertyName.</summary>
 	public sealed class PropertyNameInterceptor
@@ -49,17 +49,22 @@ partial class TriggerPropertyStub : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for PropertyName. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for PropertyName. Configure via .Value, track via .GetCount.</summary>
 	public PropertyNameInterceptor PropertyName { get; } = new();
 
 	/// <summary>Interceptor for IsMatch.</summary>
 	public IsMatchInterceptor IsMatch { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::Neatoo.Rules.ITriggerProperty instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.Rules.ITriggerProperty Object => this;
 
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
+	string global::Neatoo.Rules.ITriggerProperty.PropertyName
+	{
+		get { PropertyName.RecordGet(); if (PropertyName.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ITriggerProperty", "PropertyName"); return PropertyName.Value; }
+	}
 
 	bool global::Neatoo.Rules.ITriggerProperty.IsMatch(string propertyName)
 	{
@@ -68,11 +73,6 @@ partial class TriggerPropertyStub : global::KnockOff.IKnockOffStub
 			return callback(this, propertyName);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("ITriggerProperty", "IsMatch");
 		return default!;
-	}
-
-	string global::Neatoo.Rules.ITriggerProperty.PropertyName
-	{
-		get { PropertyName.RecordGet(); if (PropertyName.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ITriggerProperty", "PropertyName"); return PropertyName.Value; }
 	}
 
 }

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Benchmarks.Stubs;
 
-partial class PropertyServiceStub : global::KnockOff.IKnockOffStub
+partial class PropertyServiceStub : global::KnockOff.Benchmarks.Interfaces.IPropertyService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameInterceptor
@@ -77,20 +77,20 @@ partial class PropertyServiceStub : global::KnockOff.IKnockOffStub
 		public void Reset() { SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for Name. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Name. Configure via .Value, track via .GetCount.</summary>
 	public NameInterceptor Name { get; } = new();
 
-	/// <summary>Interceptor for ReadOnlyValue. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for ReadOnlyValue. Configure via .Value, track via .GetCount.</summary>
 	public ReadOnlyValueInterceptor ReadOnlyValue { get; } = new();
 
-	/// <summary>Interceptor for WriteOnlyValue. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for WriteOnlyValue. Configure via .Value, track via .GetCount.</summary>
 	public WriteOnlyValueInterceptor WriteOnlyValue { get; } = new();
+
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
 
 	/// <summary>The global::KnockOff.Benchmarks.Interfaces.IPropertyService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Interfaces.IPropertyService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	string global::KnockOff.Benchmarks.Interfaces.IPropertyService.Name
 	{

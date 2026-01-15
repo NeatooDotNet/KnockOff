@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class DataProviderKnockOff : global::KnockOff.IKnockOffStub
+partial class DataProviderKnockOff : global::KnockOff.Tests.IDataProvider, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Count.</summary>
 	public sealed class CountInterceptor
@@ -49,28 +49,28 @@ partial class DataProviderKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Count. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Count. Configure via .Value, track via .GetCount.</summary>
 	public CountInterceptor Count { get; } = new();
 
 	/// <summary>Interceptor for GetData.</summary>
 	public GetData2Interceptor GetData2 { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Tests.IDataProvider instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IDataProvider Object => this;
 
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
+	int global::KnockOff.Tests.IDataProvider.Count
+	{
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IDataProvider", "Count"); return Count.Value; }
+	}
 
 	string global::KnockOff.Tests.IDataProvider.GetData(int id)
 	{
 		GetData2.RecordCall(id);
 		if (GetData2.OnCall is { } callback) return callback(this, id);
 		return GetData(id);
-	}
-
-	int global::KnockOff.Tests.IDataProvider.Count
-	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IDataProvider", "Count"); return Count.Value; }
 	}
 
 }

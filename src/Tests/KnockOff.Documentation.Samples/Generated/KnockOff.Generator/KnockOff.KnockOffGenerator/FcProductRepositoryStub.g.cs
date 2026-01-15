@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Comparison;
 
-partial class FcProductRepositoryStub : global::KnockOff.IKnockOffStub
+partial class FcProductRepositoryStub : global::KnockOff.Documentation.Samples.Comparison.IFcProductRepository, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetByIdAsync.</summary>
 	public sealed class GetByIdAsyncInterceptor
@@ -114,11 +114,11 @@ partial class FcProductRepositoryStub : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for DeleteAsync.</summary>
 	public DeleteAsyncInterceptor DeleteAsync { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IFcProductRepository instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IFcProductRepository Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Comparison.FcProduct?> global::KnockOff.Documentation.Samples.Comparison.IFcProductRepository.GetByIdAsync(int id)
 	{

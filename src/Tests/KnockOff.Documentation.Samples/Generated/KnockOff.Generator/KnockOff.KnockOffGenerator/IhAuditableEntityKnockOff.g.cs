@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class IhAuditableEntityKnockOff : global::KnockOff.IKnockOffStub
+partial class IhAuditableEntityKnockOff : global::KnockOff.Documentation.Samples.Guides.IIhAuditableEntity, global::KnockOff.Documentation.Samples.Guides.IIhBaseEntity, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for ModifiedAt.</summary>
 	public sealed class ModifiedAtInterceptor
@@ -105,23 +105,23 @@ partial class IhAuditableEntityKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for ModifiedAt. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for ModifiedAt. Configure via .Value, track via .GetCount.</summary>
 	public ModifiedAtInterceptor ModifiedAt { get; } = new();
 
-	/// <summary>Interceptor for ModifiedBy. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for ModifiedBy. Configure via .Value, track via .GetCount.</summary>
 	public ModifiedByInterceptor ModifiedBy { get; } = new();
 
-	/// <summary>Interceptor for Id. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Id. Configure via .Value, track via .GetCount.</summary>
 	public IdInterceptor Id { get; } = new();
 
-	/// <summary>Interceptor for CreatedAt. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for CreatedAt. Configure via .Value, track via .GetCount.</summary>
 	public CreatedAtInterceptor CreatedAt { get; } = new();
+
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
 
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IIhAuditableEntity instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IIhAuditableEntity Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::System.DateTime? global::KnockOff.Documentation.Samples.Guides.IIhAuditableEntity.ModifiedAt
 	{

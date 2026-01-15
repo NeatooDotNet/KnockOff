@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class GenAsyncUserRepositoryKnockOff : global::KnockOff.IKnockOffStub
+partial class GenAsyncUserRepositoryKnockOff : global::KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetByIdAsync.</summary>
 	public sealed class GetByIdAsyncInterceptor
@@ -86,11 +86,11 @@ partial class GenAsyncUserRepositoryKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for SaveAsync.</summary>
 	public SaveAsyncInterceptor SaveAsync { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<global::KnockOff.Documentation.Samples.Guides.GenUser> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<global::KnockOff.Documentation.Samples.Guides.GenUser> Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.GenUser?> global::KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>.GetByIdAsync(int id)
 	{

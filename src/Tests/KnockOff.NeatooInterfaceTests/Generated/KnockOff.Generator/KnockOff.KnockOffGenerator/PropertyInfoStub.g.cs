@@ -5,34 +5,19 @@ using System.Linq;
 
 namespace KnockOff.NeatooInterfaceTests.Properties;
 
-partial class PropertyInfoStub : global::KnockOff.IKnockOffStub
+partial class PropertyInfoStub : global::Neatoo.IPropertyInfo, global::KnockOff.IKnockOffStub
 {
-	/// <summary>Marker interface for generic method call tracking.</summary>
-	private interface IGenericMethodCallTracker { int CallCount { get; } bool WasCalled { get; } }
-
-	/// <summary>Marker interface for resettable handlers.</summary>
-	private interface IResettable { void Reset(); }
-
-	/// <summary>Gets a smart default value for a generic type at runtime.</summary>
-	private static T SmartDefault<T>(string methodName)
+	/// <summary>Interface for tracking calls to generic methods.</summary>
+	private interface IGenericMethodCallTracker
 	{
-		var type = typeof(T);
+		int CallCount { get; }
+		bool WasCalled { get; }
+	}
 
-		// Value types -> default(T)
-		if (type.IsValueType)
-			return default!;
-
-		// Check for parameterless constructor
-		var ctor = type.GetConstructor(
-			System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,
-			null, System.Type.EmptyTypes, null);
-
-		if (ctor != null)
-			return (T)ctor.Invoke(null);
-
-		throw new global::System.InvalidOperationException(
-			$"No implementation provided for {methodName}<{type.Name}>. " +
-			$"Define a protected method '{methodName}' in your partial class, or set the handler's OnCall.");
+	/// <summary>Interface for resetting state.</summary>
+	private interface IResettable
+	{
+		void Reset();
 	}
 
 	/// <summary>Tracks and configures behavior for PropertyInfo.</summary>
@@ -130,6 +115,28 @@ partial class PropertyInfoStub : global::KnockOff.IKnockOffStub
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
+	/// <summary>Tracks and configures behavior for GetCustomAttributes.</summary>
+	public sealed class GetCustomAttributesInterceptor
+	{
+		/// <summary>Delegate for GetCustomAttributes.</summary>
+		public delegate global::System.Collections.Generic.IEnumerable<global::System.Attribute> GetCustomAttributesDelegate(PropertyInfoStub ko);
+
+		/// <summary>Number of times this method was called.</summary>
+		public int CallCount { get; private set; }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>Callback invoked when this method is called.</summary>
+		public GetCustomAttributesDelegate? OnCall { get; set; }
+
+		/// <summary>Records a method call.</summary>
+		public void RecordCall() => CallCount++;
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { CallCount = 0; OnCall = null; }
+	}
+
 	/// <summary>Interceptor for GetCustomAttribute (generic method with Of&lt;T&gt;() access).</summary>
 	public sealed class GetCustomAttributeInterceptor
 	{
@@ -187,71 +194,53 @@ partial class PropertyInfoStub : global::KnockOff.IKnockOffStub
 		}
 	}
 
-	/// <summary>Tracks and configures behavior for GetCustomAttributes.</summary>
-	public sealed class GetCustomAttributesInterceptor
-	{
-		/// <summary>Delegate for GetCustomAttributes.</summary>
-		public delegate global::System.Collections.Generic.IEnumerable<global::System.Attribute> GetCustomAttributesDelegate(PropertyInfoStub ko);
-
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
-
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
-
-		/// <summary>Callback invoked when this method is called.</summary>
-		public GetCustomAttributesDelegate? OnCall { get; set; }
-
-		/// <summary>Records a method call.</summary>
-		public void RecordCall() => CallCount++;
-
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; OnCall = null; }
-	}
-
-	/// <summary>Interceptor for PropertyInfo. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for PropertyInfo. Configure via .Value, track via .GetCount.</summary>
 	public PropertyInfoInterceptor PropertyInfo { get; } = new();
 
-	/// <summary>Interceptor for Name. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Name. Configure via .Value, track via .GetCount.</summary>
 	public NameInterceptor Name { get; } = new();
 
-	/// <summary>Interceptor for Type. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Type. Configure via .Value, track via .GetCount.</summary>
 	public TypeInterceptor Type { get; } = new();
 
-	/// <summary>Interceptor for Key. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Key. Configure via .Value, track via .GetCount.</summary>
 	public KeyInterceptor Key { get; } = new();
 
-	/// <summary>Interceptor for IsPrivateSetter. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsPrivateSetter. Configure via .Value, track via .GetCount.</summary>
 	public IsPrivateSetterInterceptor IsPrivateSetter { get; } = new();
-
-	/// <summary>Interceptor for GetCustomAttribute (use .Of&lt;T&gt;() to access typed handler).</summary>
-	public GetCustomAttributeInterceptor GetCustomAttribute { get; } = new();
 
 	/// <summary>Interceptor for GetCustomAttributes.</summary>
 	public GetCustomAttributesInterceptor GetCustomAttributes { get; } = new();
 
+	/// <summary>Interceptor for GetCustomAttribute (generic method).</summary>
+	public GetCustomAttributeInterceptor GetCustomAttribute { get; } = new();
+
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::Neatoo.IPropertyInfo instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.IPropertyInfo Object => this;
 
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
-
-	T? global::Neatoo.IPropertyInfo.GetCustomAttribute<T>() where T : class
+	/// <summary>Gets a smart default value for a generic type at runtime.</summary>
+	private static T SmartDefault<T>(string methodName)
 	{
-		GetCustomAttribute.Of<T>().RecordCall();
-		if (GetCustomAttribute.Of<T>().OnCall is { } callback)
-			return callback(this);
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "GetCustomAttribute");
-		return default!;
-	}
+		var type = typeof(T);
 
-	global::System.Collections.Generic.IEnumerable<global::System.Attribute> global::Neatoo.IPropertyInfo.GetCustomAttributes()
-	{
-		GetCustomAttributes.RecordCall();
-		if (GetCustomAttributes.OnCall is { } callback)
-			return callback(this);
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "GetCustomAttributes");
-		return new global::System.Collections.Generic.List<global::System.Attribute>();
+		// Value types -> default(T)
+		if (type.IsValueType)
+			return default!;
+
+		// Check for parameterless constructor
+		var ctor = type.GetConstructor(
+			System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,
+			null, System.Type.EmptyTypes, null);
+
+		if (ctor != null)
+			return (T)ctor.Invoke(null);
+
+		throw new global::System.InvalidOperationException(
+			$"No implementation provided for {methodName}<{type.Name}>. " +
+			$"Set the handler's OnCall.");
 	}
 
 	global::System.Reflection.PropertyInfo global::Neatoo.IPropertyInfo.PropertyInfo
@@ -277,6 +266,24 @@ partial class PropertyInfoStub : global::KnockOff.IKnockOffStub
 	bool global::Neatoo.IPropertyInfo.IsPrivateSetter
 	{
 		get { IsPrivateSetter.RecordGet(); if (IsPrivateSetter.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "IsPrivateSetter"); return IsPrivateSetter.Value; }
+	}
+
+	T? global::Neatoo.IPropertyInfo.GetCustomAttribute<T>() where T : class
+	{
+		GetCustomAttribute.Of<T>().RecordCall();
+		if (GetCustomAttribute.Of<T>().OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "GetCustomAttribute");
+		return default!;
+	}
+
+	global::System.Collections.Generic.IEnumerable<global::System.Attribute> global::Neatoo.IPropertyInfo.GetCustomAttributes()
+	{
+		GetCustomAttributes.RecordCall();
+		if (GetCustomAttributes.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "GetCustomAttributes");
+		return new global::System.Collections.Generic.List<global::System.Attribute>();
 	}
 
 }

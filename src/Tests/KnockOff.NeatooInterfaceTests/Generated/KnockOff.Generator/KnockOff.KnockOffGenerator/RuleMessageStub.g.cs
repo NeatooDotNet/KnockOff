@@ -3,7 +3,7 @@
 
 namespace KnockOff.NeatooInterfaceTests.ValidationRules;
 
-partial class RuleMessageStub : global::KnockOff.IKnockOffStub
+partial class RuleMessageStub : global::Neatoo.Rules.IRuleMessage, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for RuleIndex.</summary>
 	public sealed class RuleIndexInterceptor
@@ -62,20 +62,20 @@ partial class RuleMessageStub : global::KnockOff.IKnockOffStub
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for RuleIndex. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for RuleIndex. Configure via .Value, track via .GetCount.</summary>
 	public RuleIndexInterceptor RuleIndex { get; } = new();
 
-	/// <summary>Interceptor for PropertyName. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for PropertyName. Configure via .Value, track via .GetCount.</summary>
 	public PropertyNameInterceptor PropertyName { get; } = new();
 
-	/// <summary>Interceptor for Message. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Message. Configure via .Value, track via .GetCount.</summary>
 	public MessageInterceptor Message { get; } = new();
+
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
 
 	/// <summary>The global::Neatoo.Rules.IRuleMessage instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.Rules.IRuleMessage Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	uint global::Neatoo.Rules.IRuleMessage.RuleIndex
 	{

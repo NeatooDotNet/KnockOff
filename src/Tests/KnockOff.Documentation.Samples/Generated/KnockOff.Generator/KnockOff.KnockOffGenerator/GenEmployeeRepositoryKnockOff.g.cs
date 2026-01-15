@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class GenEmployeeRepositoryKnockOff : global::KnockOff.IKnockOffStub
+partial class GenEmployeeRepositoryKnockOff : global::KnockOff.Documentation.Samples.Guides.IGenEntityRepository<global::KnockOff.Documentation.Samples.Guides.GenEmployee>, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for FindById.</summary>
 	public sealed class FindByIdInterceptor
@@ -33,11 +33,11 @@ partial class GenEmployeeRepositoryKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for FindById.</summary>
 	public FindByIdInterceptor FindById { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IGenEntityRepository<global::KnockOff.Documentation.Samples.Guides.GenEmployee> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IGenEntityRepository<global::KnockOff.Documentation.Samples.Guides.GenEmployee> Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::KnockOff.Documentation.Samples.Guides.GenEmployee? global::KnockOff.Documentation.Samples.Guides.IGenEntityRepository<global::KnockOff.Documentation.Samples.Guides.GenEmployee>.FindById(int id)
 	{

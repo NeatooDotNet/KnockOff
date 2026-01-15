@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class NotifierKnockOff : global::KnockOff.IKnockOffStub
+partial class NotifierKnockOff : global::KnockOff.Tests.INotifier, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameInterceptor
@@ -46,17 +46,22 @@ partial class NotifierKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Name. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Name. Configure via .Value, track via .GetCount.</summary>
 	public NameInterceptor Name { get; } = new();
 
 	/// <summary>Interceptor for Notify.</summary>
 	public NotifyInterceptor Notify { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Tests.INotifier instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.INotifier Object => this;
 
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
+	string global::KnockOff.Tests.INotifier.Name
+	{
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("INotifier", "Name"); return Name.Value; }
+	}
 
 	void global::KnockOff.Tests.INotifier.Notify(string recipient)
 	{
@@ -64,11 +69,6 @@ partial class NotifierKnockOff : global::KnockOff.IKnockOffStub
 		if (Notify.OnCall is { } onCallCallback)
 		{ onCallCallback(this, recipient); return; }
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("INotifier", "Notify");
-	}
-
-	string global::KnockOff.Tests.INotifier.Name
-	{
-		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("INotifier", "Name"); return Name.Value; }
 	}
 
 }

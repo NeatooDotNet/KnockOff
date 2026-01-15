@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class MultiConstraintStub<T> : global::KnockOff.IKnockOffStub where T : class, global::KnockOff.Tests.IEntity
+partial class MultiConstraintStub<T> : global::KnockOff.Tests.IMultiConstraintService<T>, global::KnockOff.IKnockOffStub where T : class, global::KnockOff.Tests.IEntity
 {
 	/// <summary>Tracks and configures behavior for Save.</summary>
 	public sealed class SaveInterceptor
@@ -58,11 +58,11 @@ partial class MultiConstraintStub<T> : global::KnockOff.IKnockOffStub where T : 
 	/// <summary>Interceptor for Find.</summary>
 	public FindInterceptor Find { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Tests.IMultiConstraintService<T> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IMultiConstraintService<T> Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	void global::KnockOff.Tests.IMultiConstraintService<T>.Save(T entity)
 	{

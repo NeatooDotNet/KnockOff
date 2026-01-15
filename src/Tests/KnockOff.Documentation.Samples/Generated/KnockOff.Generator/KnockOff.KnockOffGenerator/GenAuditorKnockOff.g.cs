@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Reference;
 
-partial class GenAuditorKnockOff : global::KnockOff.IKnockOffStub
+partial class GenAuditorKnockOff : global::KnockOff.Documentation.Samples.Reference.IGenAuditor, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Audit.</summary>
 	public sealed class AuditInterceptor
@@ -30,11 +30,11 @@ partial class GenAuditorKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Audit.</summary>
 	public AuditInterceptor Audit { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Reference.IGenAuditor instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Reference.IGenAuditor Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	void global::KnockOff.Documentation.Samples.Reference.IGenAuditor.Audit(string action)
 	{

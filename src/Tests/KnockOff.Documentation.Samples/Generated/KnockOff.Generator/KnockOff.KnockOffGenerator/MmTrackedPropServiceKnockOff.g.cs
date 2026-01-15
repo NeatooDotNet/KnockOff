@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class MmTrackedPropServiceKnockOff : global::KnockOff.IKnockOffStub
+partial class MmTrackedPropServiceKnockOff : global::KnockOff.Documentation.Samples.Skills.IMmTrackedPropService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Active.</summary>
 	public sealed class ActiveInterceptor
@@ -160,26 +160,26 @@ partial class MmTrackedPropServiceKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for Active. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Active. Configure via .Value, track via .GetCount.</summary>
 	public ActiveInterceptor Active { get; } = new();
 
-	/// <summary>Interceptor for NewDate. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for NewDate. Configure via .Value, track via .GetCount.</summary>
 	public NewDateInterceptor NewDate { get; } = new();
 
-	/// <summary>Interceptor for VisitId. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for VisitId. Configure via .Value, track via .GetCount.</summary>
 	public VisitIdInterceptor VisitId { get; } = new();
 
-	/// <summary>Interceptor for VisitLabel. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for VisitLabel. Configure via .Value, track via .GetCount.</summary>
 	public VisitLabelInterceptor VisitLabel { get; } = new();
 
-	/// <summary>Interceptor for PreviousVisitDate. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for PreviousVisitDate. Configure via .Value, track via .GetCount.</summary>
 	public PreviousVisitDateInterceptor PreviousVisitDate { get; } = new();
+
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
 
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IMmTrackedPropService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.IMmTrackedPropService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	bool global::KnockOff.Documentation.Samples.Skills.IMmTrackedPropService.Active
 	{

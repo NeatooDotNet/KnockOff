@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Reference;
 
-partial class AttrAuditableKnockOff : global::KnockOff.IKnockOffStub
+partial class AttrAuditableKnockOff : global::KnockOff.Documentation.Samples.Reference.IAttrAuditableEntity, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for CreatedAt.</summary>
 	public sealed class CreatedAtInterceptor
@@ -43,17 +43,17 @@ partial class AttrAuditableKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for CreatedAt. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for CreatedAt. Configure via .Value, track via .GetCount.</summary>
 	public CreatedAtInterceptor CreatedAt { get; } = new();
 
-	/// <summary>Interceptor for CreatedBy. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for CreatedBy. Configure via .Value, track via .GetCount.</summary>
 	public CreatedByInterceptor CreatedBy { get; } = new();
+
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
 
 	/// <summary>The global::KnockOff.Documentation.Samples.Reference.IAttrAuditableEntity instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Reference.IAttrAuditableEntity Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::System.DateTime global::KnockOff.Documentation.Samples.Reference.IAttrAuditableEntity.CreatedAt
 	{

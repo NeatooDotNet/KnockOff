@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.GettingStarted;
 
-partial class ProcessServiceKnockOff : global::KnockOff.IKnockOffStub
+partial class ProcessServiceKnockOff : global::KnockOff.Documentation.Samples.GettingStarted.IProcessService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Process.</summary>
 	public sealed class Process1Interceptor
@@ -80,11 +80,11 @@ partial class ProcessServiceKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Process.</summary>
 	public Process3Interceptor Process3 { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.GettingStarted.IProcessService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.GettingStarted.IProcessService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	void global::KnockOff.Documentation.Samples.GettingStarted.IProcessService.Process(string data)
 	{

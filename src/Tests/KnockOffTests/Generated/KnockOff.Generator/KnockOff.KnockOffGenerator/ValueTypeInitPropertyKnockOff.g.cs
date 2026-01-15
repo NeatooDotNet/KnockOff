@@ -3,7 +3,7 @@
 
 namespace KnockOffTests;
 
-partial class ValueTypeInitPropertyKnockOff : global::KnockOff.IKnockOffStub
+partial class ValueTypeInitPropertyKnockOff : global::KnockOffTests.IValueTypeInitProperty, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Count.</summary>
 	public sealed class CountInterceptor
@@ -24,11 +24,11 @@ partial class ValueTypeInitPropertyKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Count. Configure via .Value, track via .GetCount.</summary>
 	public CountInterceptor Count { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOffTests.IValueTypeInitProperty instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOffTests.IValueTypeInitProperty Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	int global::KnockOffTests.IValueTypeInitProperty.Count
 	{

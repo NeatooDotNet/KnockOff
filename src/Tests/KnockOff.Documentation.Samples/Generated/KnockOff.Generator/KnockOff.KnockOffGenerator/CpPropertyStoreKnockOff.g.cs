@@ -3,9 +3,9 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class CpPropertyStoreKnockOff : global::KnockOff.IKnockOffStub
+partial class CpPropertyStoreKnockOff : global::KnockOff.Documentation.Samples.Skills.ICpPropertyStore, global::KnockOff.IKnockOffStub
 {
-	/// <summary>Tracks and configures behavior for Indexer.</summary>
+	/// <summary>Tracks and configures behavior for indexer.</summary>
 	public sealed class IndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
@@ -39,14 +39,14 @@ partial class CpPropertyStoreKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; }
 	}
 
-	/// <summary>Interceptor for Indexer.</summary>
+	/// <summary>Interceptor for indexer. Configure callbacks and track access.</summary>
 	public IndexerInterceptor Indexer { get; } = new();
+
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
 
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ICpPropertyStore instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ICpPropertyStore Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	object? global::KnockOff.Documentation.Samples.Skills.ICpPropertyStore.this[string key]
 	{

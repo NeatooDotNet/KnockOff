@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class GenOrderRepositoryKnockOff : global::KnockOff.IKnockOffStub
+partial class GenOrderRepositoryKnockOff : global::KnockOff.Documentation.Samples.Guides.IGenRepository<global::KnockOff.Documentation.Samples.Guides.GenOrder>, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetById.</summary>
 	public sealed class GetByIdInterceptor
@@ -86,11 +86,11 @@ partial class GenOrderRepositoryKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for GetByIdAsync.</summary>
 	public GetByIdAsyncInterceptor GetByIdAsync { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IGenRepository<global::KnockOff.Documentation.Samples.Guides.GenOrder> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IGenRepository<global::KnockOff.Documentation.Samples.Guides.GenOrder> Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::KnockOff.Documentation.Samples.Guides.GenOrder? global::KnockOff.Documentation.Samples.Guides.IGenRepository<global::KnockOff.Documentation.Samples.Guides.GenOrder>.GetById(int id)
 	{

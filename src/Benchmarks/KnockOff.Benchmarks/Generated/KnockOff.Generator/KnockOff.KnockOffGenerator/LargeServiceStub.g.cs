@@ -3,7 +3,7 @@
 
 namespace KnockOff.Benchmarks.Stubs;
 
-partial class LargeServiceStub : global::KnockOff.IKnockOffStub
+partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for VoidMethod01.</summary>
 	public sealed class VoidMethod01Interceptor
@@ -1255,11 +1255,11 @@ partial class LargeServiceStub : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for IntMethodWithParam10.</summary>
 	public IntMethodWithParam10Interceptor IntMethodWithParam10 { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Benchmarks.Interfaces.ILargeService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Interfaces.ILargeService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod01()
 	{

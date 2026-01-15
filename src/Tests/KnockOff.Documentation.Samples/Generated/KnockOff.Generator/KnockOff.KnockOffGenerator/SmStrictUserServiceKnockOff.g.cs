@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class SmStrictUserServiceKnockOff : global::KnockOff.IKnockOffStub
+partial class SmStrictUserServiceKnockOff : global::KnockOff.Documentation.Samples.Skills.ISmUserService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetUser.</summary>
 	public sealed class GetUserInterceptor
@@ -58,11 +58,11 @@ partial class SmStrictUserServiceKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for DeleteUser.</summary>
 	public DeleteUserInterceptor DeleteUser { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = true;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISmUserService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ISmUserService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = true;
 
 	global::KnockOff.Documentation.Samples.SampleDomain.User global::KnockOff.Documentation.Samples.Skills.ISmUserService.GetUser(int id)
 	{

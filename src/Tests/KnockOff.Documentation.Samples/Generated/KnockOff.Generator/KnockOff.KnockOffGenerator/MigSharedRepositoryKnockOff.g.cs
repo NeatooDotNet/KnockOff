@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Comparison;
 
-partial class MigSharedRepositoryKnockOff : global::KnockOff.IKnockOffStub
+partial class MigSharedRepositoryKnockOff : global::KnockOff.Documentation.Samples.Comparison.IMigSharedRepository, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetById.</summary>
 	public sealed class GetById2Interceptor
@@ -33,11 +33,11 @@ partial class MigSharedRepositoryKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for GetById.</summary>
 	public GetById2Interceptor GetById2 { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IMigSharedRepository instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IMigSharedRepository Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::KnockOff.Documentation.Samples.Comparison.MigUser? global::KnockOff.Documentation.Samples.Comparison.IMigSharedRepository.GetById(int id)
 	{

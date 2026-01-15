@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Concepts;
 
-partial class PatternKoAccessServiceKnockOff : global::KnockOff.IKnockOffStub
+partial class PatternKoAccessServiceKnockOff : global::KnockOff.Documentation.Samples.Concepts.IPatternKoAccessService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameInterceptor
@@ -80,7 +80,7 @@ partial class PatternKoAccessServiceKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Name. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Name. Configure via .Value, track via .GetCount.</summary>
 	public NameInterceptor Name { get; } = new();
 
 	/// <summary>Interceptor for GetUser.</summary>
@@ -89,11 +89,17 @@ partial class PatternKoAccessServiceKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Initialize.</summary>
 	public InitializeInterceptor Initialize { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Concepts.IPatternKoAccessService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Concepts.IPatternKoAccessService Object => this;
 
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
+	string global::KnockOff.Documentation.Samples.Concepts.IPatternKoAccessService.Name
+	{
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IPatternKoAccessService", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IPatternKoAccessService", "Name"); Name.Value = value; }
+	}
 
 	global::KnockOff.Documentation.Samples.Concepts.PatternUser global::KnockOff.Documentation.Samples.Concepts.IPatternKoAccessService.GetUser(int id)
 	{
@@ -110,12 +116,6 @@ partial class PatternKoAccessServiceKnockOff : global::KnockOff.IKnockOffStub
 		if (Initialize.OnCall is { } onCallCallback)
 		{ onCallCallback(this); return; }
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IPatternKoAccessService", "Initialize");
-	}
-
-	string global::KnockOff.Documentation.Samples.Concepts.IPatternKoAccessService.Name
-	{
-		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IPatternKoAccessService", "Name"); return Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IPatternKoAccessService", "Name"); Name.Value = value; }
 	}
 
 }

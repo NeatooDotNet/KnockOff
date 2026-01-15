@@ -3,7 +3,7 @@
 
 namespace KnockOff.Benchmarks.Stubs;
 
-partial class AsyncServiceStub : global::KnockOff.IKnockOffStub
+partial class AsyncServiceStub : global::KnockOff.Benchmarks.Interfaces.IAsyncService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for DoWorkAsync.</summary>
 	public sealed class DoWorkAsyncInterceptor
@@ -80,11 +80,11 @@ partial class AsyncServiceStub : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for GetStringValueAsync.</summary>
 	public GetStringValueAsyncInterceptor GetStringValueAsync { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Benchmarks.Interfaces.IAsyncService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Interfaces.IAsyncService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::System.Threading.Tasks.Task global::KnockOff.Benchmarks.Interfaces.IAsyncService.DoWorkAsync()
 	{

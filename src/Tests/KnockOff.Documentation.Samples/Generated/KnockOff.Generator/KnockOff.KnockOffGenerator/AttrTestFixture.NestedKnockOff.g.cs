@@ -5,7 +5,7 @@ namespace KnockOff.Documentation.Samples.Reference;
 
 public partial class AttrTestFixture
 {
-partial class NestedKnockOff : global::KnockOff.IKnockOffStub
+partial class NestedKnockOff : global::KnockOff.Documentation.Samples.Reference.IAttrService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for DoWork.</summary>
 	public sealed class DoWorkInterceptor
@@ -29,11 +29,11 @@ partial class NestedKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for DoWork.</summary>
 	public DoWorkInterceptor DoWork { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Reference.IAttrService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Reference.IAttrService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	void global::KnockOff.Documentation.Samples.Reference.IAttrService.DoWork()
 	{

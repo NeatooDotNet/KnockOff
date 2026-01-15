@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Comparison;
 
-partial class FcOrderRepositoryStub : global::KnockOff.IKnockOffStub
+partial class FcOrderRepositoryStub : global::KnockOff.Documentation.Samples.Comparison.IFcOrderRepository, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetById.</summary>
 	public sealed class GetByIdInterceptor
@@ -58,11 +58,11 @@ partial class FcOrderRepositoryStub : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Save.</summary>
 	public SaveInterceptor Save { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IFcOrderRepository instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IFcOrderRepository Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::KnockOff.Documentation.Samples.Comparison.FcOrder? global::KnockOff.Documentation.Samples.Comparison.IFcOrderRepository.GetById(int id)
 	{

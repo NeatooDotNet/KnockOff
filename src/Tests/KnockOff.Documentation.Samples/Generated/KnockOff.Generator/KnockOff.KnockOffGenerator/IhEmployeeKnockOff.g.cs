@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class IhEmployeeKnockOff : global::KnockOff.IKnockOffStub
+partial class IhEmployeeKnockOff : global::KnockOff.Documentation.Samples.Guides.IIhEmployee, global::KnockOff.Documentation.Samples.Guides.IIhEntityBase, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameInterceptor
@@ -86,20 +86,20 @@ partial class IhEmployeeKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for Name. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Name. Configure via .Value, track via .GetCount.</summary>
 	public NameInterceptor Name { get; } = new();
 
-	/// <summary>Interceptor for Department. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Department. Configure via .Value, track via .GetCount.</summary>
 	public DepartmentInterceptor Department { get; } = new();
 
-	/// <summary>Interceptor for Id. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Id. Configure via .Value, track via .GetCount.</summary>
 	public IdInterceptor Id { get; } = new();
+
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
 
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IIhEmployee instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IIhEmployee Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	string global::KnockOff.Documentation.Samples.Guides.IIhEmployee.Name
 	{

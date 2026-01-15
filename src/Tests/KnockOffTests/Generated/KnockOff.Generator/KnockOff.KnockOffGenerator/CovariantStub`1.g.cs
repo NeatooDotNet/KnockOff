@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class CovariantStub<T> : global::KnockOff.IKnockOffStub
+partial class CovariantStub<T> : global::KnockOff.Tests.ICovariantService<T>, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Get.</summary>
 	public sealed class GetInterceptor
@@ -30,11 +30,11 @@ partial class CovariantStub<T> : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Get.</summary>
 	public GetInterceptor Get { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Tests.ICovariantService<T> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.ICovariantService<T> Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	T global::KnockOff.Tests.ICovariantService<T>.Get()
 	{

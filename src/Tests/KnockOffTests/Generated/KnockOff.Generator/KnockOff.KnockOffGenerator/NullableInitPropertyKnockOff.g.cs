@@ -3,7 +3,7 @@
 
 namespace KnockOffTests;
 
-partial class NullableInitPropertyKnockOff : global::KnockOff.IKnockOffStub
+partial class NullableInitPropertyKnockOff : global::KnockOffTests.INullableInitProperty, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameInterceptor
@@ -24,11 +24,11 @@ partial class NullableInitPropertyKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Name. Configure via .Value, track via .GetCount.</summary>
 	public NameInterceptor Name { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOffTests.INullableInitProperty instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOffTests.INullableInitProperty Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	string? global::KnockOffTests.INullableInitProperty.Name
 	{

@@ -3,7 +3,7 @@
 
 namespace KnockOff.NeatooInterfaceTests.BuiltInRules;
 
-partial class StringLengthRuleStub : global::KnockOff.IKnockOffStub
+partial class StringLengthRuleStub : global::Neatoo.Rules.Rules.IStringLengthRule, global::Neatoo.Rules.IRule, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for ErrorMessage.</summary>
 	public sealed class ErrorMessageInterceptor
@@ -204,28 +204,28 @@ partial class StringLengthRuleStub : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for ErrorMessage. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for ErrorMessage. Configure via .Value, track via .GetCount.</summary>
 	public ErrorMessageInterceptor ErrorMessage { get; } = new();
 
-	/// <summary>Interceptor for MinimumLength. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for MinimumLength. Configure via .Value, track via .GetCount.</summary>
 	public MinimumLengthInterceptor MinimumLength { get; } = new();
 
-	/// <summary>Interceptor for MaximumLength. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for MaximumLength. Configure via .Value, track via .GetCount.</summary>
 	public MaximumLengthInterceptor MaximumLength { get; } = new();
 
-	/// <summary>Interceptor for Executed. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Executed. Configure via .Value, track via .GetCount.</summary>
 	public ExecutedInterceptor Executed { get; } = new();
 
-	/// <summary>Interceptor for RuleOrder. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for RuleOrder. Configure via .Value, track via .GetCount.</summary>
 	public RuleOrderInterceptor RuleOrder { get; } = new();
 
-	/// <summary>Interceptor for UniqueIndex. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for UniqueIndex. Configure via .Value, track via .GetCount.</summary>
 	public UniqueIndexInterceptor UniqueIndex { get; } = new();
 
-	/// <summary>Interceptor for Messages. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Messages. Configure via .Value, track via .GetCount.</summary>
 	public MessagesInterceptor Messages { get; } = new();
 
-	/// <summary>Interceptor for TriggerProperties. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for TriggerProperties. Configure via .Value, track via .GetCount.</summary>
 	public TriggerPropertiesInterceptor TriggerProperties { get; } = new();
 
 	/// <summary>Interceptor for RunRule.</summary>
@@ -234,11 +234,11 @@ partial class StringLengthRuleStub : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for OnRuleAdded.</summary>
 	public OnRuleAddedInterceptor OnRuleAdded { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::Neatoo.Rules.Rules.IStringLengthRule instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.Rules.Rules.IStringLengthRule Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	string global::Neatoo.Rules.Rules.IStringLengthRule.ErrorMessage
 	{
@@ -253,23 +253,6 @@ partial class StringLengthRuleStub : global::KnockOff.IKnockOffStub
 	int global::Neatoo.Rules.Rules.IStringLengthRule.MaximumLength
 	{
 		get { MaximumLength.RecordGet(); if (MaximumLength.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IStringLengthRule", "MaximumLength"); return MaximumLength.Value; }
-	}
-
-	global::System.Threading.Tasks.Task<global::Neatoo.Rules.IRuleMessages> global::Neatoo.Rules.IRule.RunRule(global::Neatoo.IValidateBase target, global::System.Threading.CancellationToken? token)
-	{
-		RunRule.RecordCall(target, token);
-		if (RunRule.OnCall is { } callback)
-			return callback(this, target, token);
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "RunRule");
-		throw new global::System.InvalidOperationException("No implementation provided for RunRule. Set RunRule.OnCall or define a protected method 'RunRule' in your partial class.");
-	}
-
-	void global::Neatoo.Rules.IRule.OnRuleAdded(global::Neatoo.Rules.IRuleManager ruleManager, uint uniqueIndex)
-	{
-		OnRuleAdded.RecordCall(ruleManager, uniqueIndex);
-		if (OnRuleAdded.OnCall is { } onCallCallback)
-		{ onCallCallback(this, ruleManager, uniqueIndex); return; }
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "OnRuleAdded");
 	}
 
 	bool global::Neatoo.Rules.IRule.Executed
@@ -295,6 +278,23 @@ partial class StringLengthRuleStub : global::KnockOff.IKnockOffStub
 	global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.ITriggerProperty> global::Neatoo.Rules.IRule.TriggerProperties
 	{
 		get { TriggerProperties.RecordGet(); if (TriggerProperties.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "TriggerProperties"); return TriggerProperties.Value; }
+	}
+
+	global::System.Threading.Tasks.Task<global::Neatoo.Rules.IRuleMessages> global::Neatoo.Rules.IRule.RunRule(global::Neatoo.IValidateBase target, global::System.Threading.CancellationToken? token)
+	{
+		RunRule.RecordCall(target, token);
+		if (RunRule.OnCall is { } callback)
+			return callback(this, target, token);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "RunRule");
+		throw new global::System.InvalidOperationException("No implementation provided for RunRule. Set RunRule.OnCall or define a protected method 'RunRule' in your partial class.");
+	}
+
+	void global::Neatoo.Rules.IRule.OnRuleAdded(global::Neatoo.Rules.IRuleManager ruleManager, uint uniqueIndex)
+	{
+		OnRuleAdded.RecordCall(ruleManager, uniqueIndex);
+		if (OnRuleAdded.OnCall is { } onCallCallback)
+		{ onCallCallback(this, ruleManager, uniqueIndex); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "OnRuleAdded");
 	}
 
 }

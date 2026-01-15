@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class MethodSequentialKnockOff : global::KnockOff.IKnockOffStub
+partial class MethodSequentialKnockOff : global::KnockOff.Documentation.Samples.Guides.IMethodSequential, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetNext.</summary>
 	public sealed class GetNextInterceptor
@@ -30,11 +30,11 @@ partial class MethodSequentialKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for GetNext.</summary>
 	public GetNextInterceptor GetNext { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IMethodSequential instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IMethodSequential Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	int global::KnockOff.Documentation.Samples.Guides.IMethodSequential.GetNext()
 	{

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Benchmarks.Stubs;
 
-partial class OverloadedServiceStub : global::KnockOff.IKnockOffStub
+partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOverloadedService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Process.</summary>
 	public sealed class Process1Interceptor
@@ -136,11 +136,11 @@ partial class OverloadedServiceStub : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Calculate.</summary>
 	public Calculate2Interceptor Calculate2 { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Benchmarks.Interfaces.IOverloadedService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Interfaces.IOverloadedService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	void global::KnockOff.Benchmarks.Interfaces.IOverloadedService.Process(int @value)
 	{

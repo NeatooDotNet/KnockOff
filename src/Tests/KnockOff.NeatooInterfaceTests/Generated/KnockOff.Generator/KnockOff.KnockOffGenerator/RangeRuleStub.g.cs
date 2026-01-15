@@ -3,7 +3,7 @@
 
 namespace KnockOff.NeatooInterfaceTests.BuiltInRules;
 
-partial class RangeRuleStub : global::KnockOff.IKnockOffStub
+partial class RangeRuleStub : global::Neatoo.Rules.Rules.IRangeRule, global::Neatoo.Rules.IRule, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for ErrorMessage.</summary>
 	public sealed class ErrorMessageInterceptor
@@ -204,28 +204,28 @@ partial class RangeRuleStub : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for ErrorMessage. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for ErrorMessage. Configure via .Value, track via .GetCount.</summary>
 	public ErrorMessageInterceptor ErrorMessage { get; } = new();
 
-	/// <summary>Interceptor for Minimum. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Minimum. Configure via .Value, track via .GetCount.</summary>
 	public MinimumInterceptor Minimum { get; } = new();
 
-	/// <summary>Interceptor for Maximum. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Maximum. Configure via .Value, track via .GetCount.</summary>
 	public MaximumInterceptor Maximum { get; } = new();
 
-	/// <summary>Interceptor for Executed. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Executed. Configure via .Value, track via .GetCount.</summary>
 	public ExecutedInterceptor Executed { get; } = new();
 
-	/// <summary>Interceptor for RuleOrder. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for RuleOrder. Configure via .Value, track via .GetCount.</summary>
 	public RuleOrderInterceptor RuleOrder { get; } = new();
 
-	/// <summary>Interceptor for UniqueIndex. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for UniqueIndex. Configure via .Value, track via .GetCount.</summary>
 	public UniqueIndexInterceptor UniqueIndex { get; } = new();
 
-	/// <summary>Interceptor for Messages. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Messages. Configure via .Value, track via .GetCount.</summary>
 	public MessagesInterceptor Messages { get; } = new();
 
-	/// <summary>Interceptor for TriggerProperties. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for TriggerProperties. Configure via .Value, track via .GetCount.</summary>
 	public TriggerPropertiesInterceptor TriggerProperties { get; } = new();
 
 	/// <summary>Interceptor for RunRule.</summary>
@@ -234,11 +234,11 @@ partial class RangeRuleStub : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for OnRuleAdded.</summary>
 	public OnRuleAddedInterceptor OnRuleAdded { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::Neatoo.Rules.Rules.IRangeRule instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.Rules.Rules.IRangeRule Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	string global::Neatoo.Rules.Rules.IRangeRule.ErrorMessage
 	{
@@ -253,23 +253,6 @@ partial class RangeRuleStub : global::KnockOff.IKnockOffStub
 	object global::Neatoo.Rules.Rules.IRangeRule.Maximum
 	{
 		get { Maximum.RecordGet(); if (Maximum.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRangeRule", "Maximum"); return Maximum.Value; }
-	}
-
-	global::System.Threading.Tasks.Task<global::Neatoo.Rules.IRuleMessages> global::Neatoo.Rules.IRule.RunRule(global::Neatoo.IValidateBase target, global::System.Threading.CancellationToken? token)
-	{
-		RunRule.RecordCall(target, token);
-		if (RunRule.OnCall is { } callback)
-			return callback(this, target, token);
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "RunRule");
-		throw new global::System.InvalidOperationException("No implementation provided for RunRule. Set RunRule.OnCall or define a protected method 'RunRule' in your partial class.");
-	}
-
-	void global::Neatoo.Rules.IRule.OnRuleAdded(global::Neatoo.Rules.IRuleManager ruleManager, uint uniqueIndex)
-	{
-		OnRuleAdded.RecordCall(ruleManager, uniqueIndex);
-		if (OnRuleAdded.OnCall is { } onCallCallback)
-		{ onCallCallback(this, ruleManager, uniqueIndex); return; }
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "OnRuleAdded");
 	}
 
 	bool global::Neatoo.Rules.IRule.Executed
@@ -295,6 +278,23 @@ partial class RangeRuleStub : global::KnockOff.IKnockOffStub
 	global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.ITriggerProperty> global::Neatoo.Rules.IRule.TriggerProperties
 	{
 		get { TriggerProperties.RecordGet(); if (TriggerProperties.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "TriggerProperties"); return TriggerProperties.Value; }
+	}
+
+	global::System.Threading.Tasks.Task<global::Neatoo.Rules.IRuleMessages> global::Neatoo.Rules.IRule.RunRule(global::Neatoo.IValidateBase target, global::System.Threading.CancellationToken? token)
+	{
+		RunRule.RecordCall(target, token);
+		if (RunRule.OnCall is { } callback)
+			return callback(this, target, token);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "RunRule");
+		throw new global::System.InvalidOperationException("No implementation provided for RunRule. Set RunRule.OnCall or define a protected method 'RunRule' in your partial class.");
+	}
+
+	void global::Neatoo.Rules.IRule.OnRuleAdded(global::Neatoo.Rules.IRuleManager ruleManager, uint uniqueIndex)
+	{
+		OnRuleAdded.RecordCall(ruleManager, uniqueIndex);
+		if (OnRuleAdded.OnCall is { } onCallCallback)
+		{ onCallCallback(this, ruleManager, uniqueIndex); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "OnRuleAdded");
 	}
 
 }

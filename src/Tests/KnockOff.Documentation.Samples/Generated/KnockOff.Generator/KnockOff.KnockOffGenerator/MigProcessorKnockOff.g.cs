@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Comparison;
 
-partial class MigProcessorKnockOff : global::KnockOff.IKnockOffStub
+partial class MigProcessorKnockOff : global::KnockOff.Documentation.Samples.Comparison.IMigProcessor, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Process.</summary>
 	public sealed class ProcessInterceptor
@@ -30,11 +30,11 @@ partial class MigProcessorKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Process.</summary>
 	public ProcessInterceptor Process { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IMigProcessor instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IMigProcessor Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	void global::KnockOff.Documentation.Samples.Comparison.IMigProcessor.Process(string data)
 	{

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Comparison;
 
-partial class FcPaymentServiceStub : global::KnockOff.IKnockOffStub
+partial class FcPaymentServiceStub : global::KnockOff.Documentation.Samples.Comparison.IFcPaymentService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for ProcessPayment.</summary>
 	public sealed class ProcessPaymentInterceptor
@@ -33,11 +33,11 @@ partial class FcPaymentServiceStub : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for ProcessPayment.</summary>
 	public ProcessPaymentInterceptor ProcessPayment { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IFcPaymentService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IFcPaymentService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::KnockOff.Documentation.Samples.Comparison.FcPaymentResult global::KnockOff.Documentation.Samples.Comparison.IFcPaymentService.ProcessPayment(int customerId, decimal amount)
 	{

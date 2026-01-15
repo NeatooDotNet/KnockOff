@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class MethodHandlerStateKnockOff : global::KnockOff.IKnockOffStub
+partial class MethodHandlerStateKnockOff : global::KnockOff.Documentation.Samples.Guides.IMethodHandlerState, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Initialize.</summary>
 	public sealed class InitializeInterceptor
@@ -49,11 +49,11 @@ partial class MethodHandlerStateKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Process.</summary>
 	public ProcessInterceptor Process { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IMethodHandlerState instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IMethodHandlerState Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	void global::KnockOff.Documentation.Samples.Guides.IMethodHandlerState.Initialize()
 	{

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class GuideEventSourceKnockOff : global::KnockOff.IKnockOffStub
+partial class GuideEventSourceKnockOff : global::KnockOff.Documentation.Samples.Guides.IGuideEventSource, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Interceptor for MessageReceived event.</summary>
 	public sealed class MessageReceivedInterceptor
@@ -125,11 +125,11 @@ partial class GuideEventSourceKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for OnData event.</summary>
 	public OnDataInterceptor OnData { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IGuideEventSource instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IGuideEventSource Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	event global::System.EventHandler<string>? global::KnockOff.Documentation.Samples.Guides.IGuideEventSource.MessageReceived
 	{

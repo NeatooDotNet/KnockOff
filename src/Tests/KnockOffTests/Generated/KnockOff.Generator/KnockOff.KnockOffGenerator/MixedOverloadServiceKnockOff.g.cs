@@ -5,34 +5,19 @@ using System.Linq;
 
 namespace KnockOff.Tests;
 
-partial class MixedOverloadServiceKnockOff : global::KnockOff.IKnockOffStub
+partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverloadService, global::KnockOff.IKnockOffStub
 {
-	/// <summary>Marker interface for generic method call tracking.</summary>
-	private interface IGenericMethodCallTracker { int CallCount { get; } bool WasCalled { get; } }
-
-	/// <summary>Marker interface for resettable handlers.</summary>
-	private interface IResettable { void Reset(); }
-
-	/// <summary>Gets a smart default value for a generic type at runtime.</summary>
-	private static T SmartDefault<T>(string methodName)
+	/// <summary>Interface for tracking calls to generic methods.</summary>
+	private interface IGenericMethodCallTracker
 	{
-		var type = typeof(T);
+		int CallCount { get; }
+		bool WasCalled { get; }
+	}
 
-		// Value types -> default(T)
-		if (type.IsValueType)
-			return default!;
-
-		// Check for parameterless constructor
-		var ctor = type.GetConstructor(
-			System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,
-			null, System.Type.EmptyTypes, null);
-
-		if (ctor != null)
-			return (T)ctor.Invoke(null);
-
-		throw new global::System.InvalidOperationException(
-			$"No implementation provided for {methodName}<{type.Name}>. " +
-			$"Define a protected method '{methodName}' in your partial class, or set the handler's OnCall.");
+	/// <summary>Interface for resetting state.</summary>
+	private interface IResettable
+	{
+		void Reset();
 	}
 
 	/// <summary>Tracks and configures behavior for Process.</summary>
@@ -79,63 +64,6 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for ProcessGeneric (generic method with Of&lt;T&gt;() access).</summary>
-	public sealed class ProcessGenericInterceptor
-	{
-		private readonly global::System.Collections.Generic.Dictionary<global::System.Type, object> _typedHandlers = new();
-
-		/// <summary>Gets the typed handler for the specified type argument(s).</summary>
-		public ProcessGenericTypedHandler<T> Of<T>()
-		{
-			var key = typeof(T);
-			if (!_typedHandlers.TryGetValue(key, out var handler))
-			{
-				handler = new ProcessGenericTypedHandler<T>();
-				_typedHandlers[key] = handler;
-			}
-			return (ProcessGenericTypedHandler<T>)handler;
-		}
-
-		/// <summary>Total number of calls across all type arguments.</summary>
-		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
-
-		/// <summary>True if this method was called with any type argument.</summary>
-		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
-
-		/// <summary>All type argument(s) that were used in calls.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
-
-		/// <summary>Resets all typed handlers.</summary>
-		public void Reset()
-		{
-			foreach (var handler in _typedHandlers.Values)
-				((IResettable)handler).Reset();
-			_typedHandlers.Clear();
-		}
-
-		/// <summary>Typed handler for ProcessGeneric with specific type arguments.</summary>
-		public sealed class ProcessGenericTypedHandler<T> : IGenericMethodCallTracker, IResettable
-		{
-			/// <summary>Delegate for ProcessGeneric.</summary>
-			public delegate void ProcessGenericDelegate(MixedOverloadServiceKnockOff ko, T @value);
-
-			/// <summary>Number of times this method was called with these type arguments.</summary>
-			public int CallCount { get; private set; }
-
-			/// <summary>True if this method was called at least once with these type arguments.</summary>
-			public bool WasCalled => CallCount > 0;
-
-			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public ProcessGenericDelegate? OnCall { get; set; }
-
-			/// <summary>Records a method call.</summary>
-			public void RecordCall() => CallCount++;
-
-			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; OnCall = null; }
-		}
-	}
-
 	/// <summary>Tracks and configures behavior for Format.</summary>
 	public sealed class FormatInterceptor
 	{
@@ -161,21 +89,21 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for FormatGeneric (generic method with Of&lt;T&gt;() access).</summary>
-	public sealed class FormatGenericInterceptor
+	/// <summary>Interceptor for Process (generic method with Of&lt;T&gt;() access).</summary>
+	public sealed class ProcessGenericInterceptor
 	{
 		private readonly global::System.Collections.Generic.Dictionary<global::System.Type, object> _typedHandlers = new();
 
 		/// <summary>Gets the typed handler for the specified type argument(s).</summary>
-		public FormatGenericTypedHandler<T> Of<T>()
+		public ProcessTypedHandler<T> Of<T>()
 		{
 			var key = typeof(T);
 			if (!_typedHandlers.TryGetValue(key, out var handler))
 			{
-				handler = new FormatGenericTypedHandler<T>();
+				handler = new ProcessTypedHandler<T>();
 				_typedHandlers[key] = handler;
 			}
-			return (FormatGenericTypedHandler<T>)handler;
+			return (ProcessTypedHandler<T>)handler;
 		}
 
 		/// <summary>Total number of calls across all type arguments.</summary>
@@ -195,11 +123,11 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.IKnockOffStub
 			_typedHandlers.Clear();
 		}
 
-		/// <summary>Typed handler for FormatGeneric with specific type arguments.</summary>
-		public sealed class FormatGenericTypedHandler<T> : IGenericMethodCallTracker, IResettable
+		/// <summary>Typed handler for Process with specific type arguments.</summary>
+		public sealed class ProcessTypedHandler<T> : IGenericMethodCallTracker, IResettable
 		{
-			/// <summary>Delegate for FormatGeneric.</summary>
-			public delegate string FormatGenericDelegate(MixedOverloadServiceKnockOff ko, T @value);
+			/// <summary>Delegate for Process.</summary>
+			public delegate void ProcessDelegate(MixedOverloadServiceKnockOff ko, T @value);
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -208,7 +136,64 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.IKnockOffStub
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public FormatGenericDelegate? OnCall { get; set; }
+			public ProcessDelegate? OnCall { get; set; }
+
+			/// <summary>Records a method call.</summary>
+			public void RecordCall() => CallCount++;
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset() { CallCount = 0; OnCall = null; }
+		}
+	}
+
+	/// <summary>Interceptor for Format (generic method with Of&lt;T&gt;() access).</summary>
+	public sealed class FormatGenericInterceptor
+	{
+		private readonly global::System.Collections.Generic.Dictionary<global::System.Type, object> _typedHandlers = new();
+
+		/// <summary>Gets the typed handler for the specified type argument(s).</summary>
+		public FormatTypedHandler<T> Of<T>()
+		{
+			var key = typeof(T);
+			if (!_typedHandlers.TryGetValue(key, out var handler))
+			{
+				handler = new FormatTypedHandler<T>();
+				_typedHandlers[key] = handler;
+			}
+			return (FormatTypedHandler<T>)handler;
+		}
+
+		/// <summary>Total number of calls across all type arguments.</summary>
+		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
+
+		/// <summary>True if this method was called with any type argument.</summary>
+		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
+
+		/// <summary>All type argument(s) that were used in calls.</summary>
+		public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
+
+		/// <summary>Resets all typed handlers.</summary>
+		public void Reset()
+		{
+			foreach (var handler in _typedHandlers.Values)
+				((IResettable)handler).Reset();
+			_typedHandlers.Clear();
+		}
+
+		/// <summary>Typed handler for Format with specific type arguments.</summary>
+		public sealed class FormatTypedHandler<T> : IGenericMethodCallTracker, IResettable
+		{
+			/// <summary>Delegate for Format.</summary>
+			public delegate string FormatDelegate(MixedOverloadServiceKnockOff ko, T @value);
+
+			/// <summary>Number of times this method was called with these type arguments.</summary>
+			public int CallCount { get; private set; }
+
+			/// <summary>True if this method was called at least once with these type arguments.</summary>
+			public bool WasCalled => CallCount > 0;
+
+			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
+			public FormatDelegate? OnCall { get; set; }
 
 			/// <summary>Records a method call.</summary>
 			public void RecordCall() => CallCount++;
@@ -224,20 +209,42 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Process.</summary>
 	public Process2Interceptor Process2 { get; } = new();
 
-	/// <summary>Interceptor for Process (generic overloads, use .Of&lt;T&gt;()).</summary>
-	public ProcessGenericInterceptor ProcessGeneric { get; } = new();
-
 	/// <summary>Interceptor for Format.</summary>
 	public FormatInterceptor Format { get; } = new();
 
-	/// <summary>Interceptor for Format (generic overloads, use .Of&lt;T&gt;()).</summary>
+	/// <summary>Interceptor for Process (generic method).</summary>
+	public ProcessGenericInterceptor ProcessGeneric { get; } = new();
+
+	/// <summary>Interceptor for Format (generic method).</summary>
 	public FormatGenericInterceptor FormatGeneric { get; } = new();
+
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
 
 	/// <summary>The global::KnockOff.Tests.IMixedOverloadService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IMixedOverloadService Object => this;
 
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
+	/// <summary>Gets a smart default value for a generic type at runtime.</summary>
+	private static T SmartDefault<T>(string methodName)
+	{
+		var type = typeof(T);
+
+		// Value types -> default(T)
+		if (type.IsValueType)
+			return default!;
+
+		// Check for parameterless constructor
+		var ctor = type.GetConstructor(
+			System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,
+			null, System.Type.EmptyTypes, null);
+
+		if (ctor != null)
+			return (T)ctor.Invoke(null);
+
+		throw new global::System.InvalidOperationException(
+			$"No implementation provided for {methodName}<{type.Name}>. " +
+			$"Set the handler's OnCall.");
+	}
 
 	void global::KnockOff.Tests.IMixedOverloadService.Process(string @value)
 	{

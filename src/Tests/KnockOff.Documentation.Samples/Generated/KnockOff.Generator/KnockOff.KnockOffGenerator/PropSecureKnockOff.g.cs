@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class PropSecureKnockOff : global::KnockOff.IKnockOffStub
+partial class PropSecureKnockOff : global::KnockOff.Documentation.Samples.Guides.IPropSecure, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for SecretKey.</summary>
 	public sealed class SecretKeyInterceptor
@@ -24,14 +24,14 @@ partial class PropSecureKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for SecretKey. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for SecretKey. Configure via .Value, track via .GetCount.</summary>
 	public SecretKeyInterceptor SecretKey { get; } = new();
+
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
 
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IPropSecure instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IPropSecure Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	string global::KnockOff.Documentation.Samples.Guides.IPropSecure.SecretKey
 	{

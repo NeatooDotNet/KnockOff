@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class SkCallbackMethodKnockOff : global::KnockOff.IKnockOffStub
+partial class SkCallbackMethodKnockOff : global::KnockOff.Documentation.Samples.Skills.ISkCallbackService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameInterceptor
@@ -136,10 +136,10 @@ partial class SkCallbackMethodKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Name. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Name. Configure via .Value, track via .GetCount.</summary>
 	public NameInterceptor Name { get; } = new();
 
-	/// <summary>Interceptor for CurrentUser. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for CurrentUser. Configure via .Value, track via .GetCount.</summary>
 	public CurrentUserInterceptor CurrentUser { get; } = new();
 
 	/// <summary>Interceptor for DoWork.</summary>
@@ -151,11 +151,23 @@ partial class SkCallbackMethodKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Search.</summary>
 	public SearchInterceptor Search { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkCallbackService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ISkCallbackService Object => this;
 
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
+	string global::KnockOff.Documentation.Samples.Skills.ISkCallbackService.Name
+	{
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkCallbackService", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkCallbackService", "Name"); Name.Value = value; }
+	}
+
+	global::KnockOff.Documentation.Samples.Skills.SkUser? global::KnockOff.Documentation.Samples.Skills.ISkCallbackService.CurrentUser
+	{
+		get { CurrentUser.RecordGet(); if (CurrentUser.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkCallbackService", "CurrentUser"); return CurrentUser.Value; }
+		set { CurrentUser.RecordSet(value); if (CurrentUser.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkCallbackService", "CurrentUser"); CurrentUser.Value = value; }
+	}
 
 	void global::KnockOff.Documentation.Samples.Skills.ISkCallbackService.DoWork()
 	{
@@ -181,18 +193,6 @@ partial class SkCallbackMethodKnockOff : global::KnockOff.IKnockOffStub
 			return callback(this, query, limit, offset);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkCallbackService", "Search");
 		return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser>();
-	}
-
-	string global::KnockOff.Documentation.Samples.Skills.ISkCallbackService.Name
-	{
-		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkCallbackService", "Name"); return Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkCallbackService", "Name"); Name.Value = value; }
-	}
-
-	global::KnockOff.Documentation.Samples.Skills.SkUser? global::KnockOff.Documentation.Samples.Skills.ISkCallbackService.CurrentUser
-	{
-		get { CurrentUser.RecordGet(); if (CurrentUser.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkCallbackService", "CurrentUser"); return CurrentUser.Value; }
-		set { CurrentUser.RecordSet(value); if (CurrentUser.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkCallbackService", "CurrentUser"); CurrentUser.Value = value; }
 	}
 
 }

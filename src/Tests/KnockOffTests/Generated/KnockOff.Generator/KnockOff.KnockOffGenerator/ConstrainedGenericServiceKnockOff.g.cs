@@ -5,34 +5,19 @@ using System.Linq;
 
 namespace KnockOff.Tests;
 
-partial class ConstrainedGenericServiceKnockOff : global::KnockOff.IKnockOffStub
+partial class ConstrainedGenericServiceKnockOff : global::KnockOff.Tests.IConstrainedGenericService, global::KnockOff.IKnockOffStub
 {
-	/// <summary>Marker interface for generic method call tracking.</summary>
-	private interface IGenericMethodCallTracker { int CallCount { get; } bool WasCalled { get; } }
-
-	/// <summary>Marker interface for resettable handlers.</summary>
-	private interface IResettable { void Reset(); }
-
-	/// <summary>Gets a smart default value for a generic type at runtime.</summary>
-	private static T SmartDefault<T>(string methodName)
+	/// <summary>Interface for tracking calls to generic methods.</summary>
+	private interface IGenericMethodCallTracker
 	{
-		var type = typeof(T);
+		int CallCount { get; }
+		bool WasCalled { get; }
+	}
 
-		// Value types -> default(T)
-		if (type.IsValueType)
-			return default!;
-
-		// Check for parameterless constructor
-		var ctor = type.GetConstructor(
-			System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,
-			null, System.Type.EmptyTypes, null);
-
-		if (ctor != null)
-			return (T)ctor.Invoke(null);
-
-		throw new global::System.InvalidOperationException(
-			$"No implementation provided for {methodName}<{type.Name}>. " +
-			$"Define a protected method '{methodName}' in your partial class, or set the handler's OnCall.");
+	/// <summary>Interface for resetting state.</summary>
+	private interface IResettable
+	{
+		void Reset();
 	}
 
 	/// <summary>Interceptor for CreateEntity (generic method with Of&lt;T&gt;() access).</summary>
@@ -149,17 +134,39 @@ partial class ConstrainedGenericServiceKnockOff : global::KnockOff.IKnockOffStub
 		}
 	}
 
-	/// <summary>Interceptor for CreateEntity (use .Of&lt;T&gt;() to access typed handler).</summary>
+	/// <summary>Interceptor for CreateEntity (generic method).</summary>
 	public CreateEntityInterceptor CreateEntity { get; } = new();
 
-	/// <summary>Interceptor for SaveEntity (use .Of&lt;T&gt;() to access typed handler).</summary>
+	/// <summary>Interceptor for SaveEntity (generic method).</summary>
 	public SaveEntityInterceptor SaveEntity { get; } = new();
+
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
 
 	/// <summary>The global::KnockOff.Tests.IConstrainedGenericService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IConstrainedGenericService Object => this;
 
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
+	/// <summary>Gets a smart default value for a generic type at runtime.</summary>
+	private static T SmartDefault<T>(string methodName)
+	{
+		var type = typeof(T);
+
+		// Value types -> default(T)
+		if (type.IsValueType)
+			return default!;
+
+		// Check for parameterless constructor
+		var ctor = type.GetConstructor(
+			System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,
+			null, System.Type.EmptyTypes, null);
+
+		if (ctor != null)
+			return (T)ctor.Invoke(null);
+
+		throw new global::System.InvalidOperationException(
+			$"No implementation provided for {methodName}<{type.Name}>. " +
+			$"Set the handler's OnCall.");
+	}
 
 	T global::KnockOff.Tests.IConstrainedGenericService.CreateEntity<T>() where T : class
 	{

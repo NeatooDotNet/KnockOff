@@ -3,7 +3,7 @@
 
 namespace KnockOff.NeatooInterfaceTests.MetaProperties;
 
-partial class ValidateMetaPropertiesStub : global::KnockOff.IKnockOffStub
+partial class ValidateMetaPropertiesStub : global::Neatoo.IValidateMetaProperties, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for IsBusy.</summary>
 	public sealed class IsBusyInterceptor
@@ -216,16 +216,16 @@ partial class ValidateMetaPropertiesStub : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for IsBusy. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsBusy. Configure via .Value, track via .GetCount.</summary>
 	public IsBusyInterceptor IsBusy { get; } = new();
 
-	/// <summary>Interceptor for IsValid. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsValid. Configure via .Value, track via .GetCount.</summary>
 	public IsValidInterceptor IsValid { get; } = new();
 
-	/// <summary>Interceptor for IsSelfValid. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsSelfValid. Configure via .Value, track via .GetCount.</summary>
 	public IsSelfValidInterceptor IsSelfValid { get; } = new();
 
-	/// <summary>Interceptor for PropertyMessages. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for PropertyMessages. Configure via .Value, track via .GetCount.</summary>
 	public PropertyMessagesInterceptor PropertyMessages { get; } = new();
 
 	/// <summary>Interceptor for WaitForTasks.</summary>
@@ -246,11 +246,31 @@ partial class ValidateMetaPropertiesStub : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for ClearSelfMessages.</summary>
 	public ClearSelfMessagesInterceptor ClearSelfMessages { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::Neatoo.IValidateMetaProperties instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.IValidateMetaProperties Object => this;
 
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
+	bool global::Neatoo.IValidateMetaProperties.IsBusy
+	{
+		get { IsBusy.RecordGet(); if (IsBusy.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsBusy"); return IsBusy.Value; }
+	}
+
+	bool global::Neatoo.IValidateMetaProperties.IsValid
+	{
+		get { IsValid.RecordGet(); if (IsValid.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsValid"); return IsValid.Value; }
+	}
+
+	bool global::Neatoo.IValidateMetaProperties.IsSelfValid
+	{
+		get { IsSelfValid.RecordGet(); if (IsSelfValid.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsSelfValid"); return IsSelfValid.Value; }
+	}
+
+	global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> global::Neatoo.IValidateMetaProperties.PropertyMessages
+	{
+		get { PropertyMessages.RecordGet(); if (PropertyMessages.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "PropertyMessages"); return PropertyMessages.Value; }
+	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.WaitForTasks()
 	{
@@ -302,26 +322,6 @@ partial class ValidateMetaPropertiesStub : global::KnockOff.IKnockOffStub
 		if (ClearSelfMessages.OnCall is { } onCallCallback)
 		{ onCallCallback(this); return; }
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "ClearSelfMessages");
-	}
-
-	bool global::Neatoo.IValidateMetaProperties.IsBusy
-	{
-		get { IsBusy.RecordGet(); if (IsBusy.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsBusy"); return IsBusy.Value; }
-	}
-
-	bool global::Neatoo.IValidateMetaProperties.IsValid
-	{
-		get { IsValid.RecordGet(); if (IsValid.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsValid"); return IsValid.Value; }
-	}
-
-	bool global::Neatoo.IValidateMetaProperties.IsSelfValid
-	{
-		get { IsSelfValid.RecordGet(); if (IsSelfValid.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsSelfValid"); return IsSelfValid.Value; }
-	}
-
-	global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> global::Neatoo.IValidateMetaProperties.PropertyMessages
-	{
-		get { PropertyMessages.RecordGet(); if (PropertyMessages.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "PropertyMessages"); return PropertyMessages.Value; }
 	}
 
 }

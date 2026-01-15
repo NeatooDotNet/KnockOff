@@ -3,7 +3,7 @@
 
 namespace KnockOffTests;
 
-partial class NullableValueTypeInitPropertyKnockOff : global::KnockOff.IKnockOffStub
+partial class NullableValueTypeInitPropertyKnockOff : global::KnockOffTests.INullableValueTypeInitProperty, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Revision.</summary>
 	public sealed class RevisionInterceptor
@@ -24,11 +24,11 @@ partial class NullableValueTypeInitPropertyKnockOff : global::KnockOff.IKnockOff
 	/// <summary>Interceptor for Revision. Configure via .Value, track via .GetCount.</summary>
 	public RevisionInterceptor Revision { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOffTests.INullableValueTypeInitProperty instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOffTests.INullableValueTypeInitProperty Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	int? global::KnockOffTests.INullableValueTypeInitProperty.Revision
 	{

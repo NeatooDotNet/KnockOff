@@ -3,7 +3,7 @@
 
 namespace KnockOff.NeatooInterfaceTests.Properties;
 
-partial class ValidatePropertyStub : global::KnockOff.IKnockOffStub
+partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::System.ComponentModel.INotifyPropertyChanged, global::Neatoo.INotifyNeatooPropertyChanged, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameInterceptor
@@ -421,34 +421,34 @@ partial class ValidatePropertyStub : global::KnockOff.IKnockOffStub
 		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
 	}
 
-	/// <summary>Interceptor for Name. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Name. Configure via .Value, track via .GetCount.</summary>
 	public NameInterceptor Name { get; } = new();
 
-	/// <summary>Interceptor for Value. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Value. Configure via .Value, track via .GetCount.</summary>
 	public ValueInterceptor Value { get; } = new();
 
-	/// <summary>Interceptor for Task. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Task. Configure via .Value, track via .GetCount.</summary>
 	public TaskInterceptor Task { get; } = new();
 
-	/// <summary>Interceptor for IsBusy. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsBusy. Configure via .Value, track via .GetCount.</summary>
 	public IsBusyInterceptor IsBusy { get; } = new();
 
-	/// <summary>Interceptor for IsReadOnly. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsReadOnly. Configure via .Value, track via .GetCount.</summary>
 	public IsReadOnlyInterceptor IsReadOnly { get; } = new();
 
-	/// <summary>Interceptor for Type. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Type. Configure via .Value, track via .GetCount.</summary>
 	public TypeInterceptor Type { get; } = new();
 
-	/// <summary>Interceptor for StringValue. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for StringValue. Configure via .Value, track via .GetCount.</summary>
 	public StringValueInterceptor StringValue { get; } = new();
 
-	/// <summary>Interceptor for IsSelfValid. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsSelfValid. Configure via .Value, track via .GetCount.</summary>
 	public IsSelfValidInterceptor IsSelfValid { get; } = new();
 
-	/// <summary>Interceptor for IsValid. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsValid. Configure via .Value, track via .GetCount.</summary>
 	public IsValidInterceptor IsValid { get; } = new();
 
-	/// <summary>Interceptor for PropertyMessages. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for PropertyMessages. Configure via .Value, track via .GetCount.</summary>
 	public PropertyMessagesInterceptor PropertyMessages { get; } = new();
 
 	/// <summary>Interceptor for SetValue.</summary>
@@ -478,11 +478,62 @@ partial class ValidatePropertyStub : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for NeatooPropertyChanged event.</summary>
 	public NeatooPropertyChangedInterceptor NeatooPropertyChanged { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::Neatoo.IValidateProperty instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.IValidateProperty Object => this;
 
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
+	string global::Neatoo.IValidateProperty.Name
+	{
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "Name"); return Name.Value; }
+	}
+
+	object? global::Neatoo.IValidateProperty.Value
+	{
+		get { Value.RecordGet(); if (Value.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "Value"); return Value.Value; }
+		set { Value.RecordSet(value); if (Value.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "Value"); Value.Value = value; }
+	}
+
+	global::System.Threading.Tasks.Task global::Neatoo.IValidateProperty.Task
+	{
+		get { Task.RecordGet(); if (Task.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "Task"); return Task.Value; }
+	}
+
+	bool global::Neatoo.IValidateProperty.IsBusy
+	{
+		get { IsBusy.RecordGet(); if (IsBusy.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "IsBusy"); return IsBusy.Value; }
+	}
+
+	bool global::Neatoo.IValidateProperty.IsReadOnly
+	{
+		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "IsReadOnly"); return IsReadOnly.Value; }
+	}
+
+	global::System.Type global::Neatoo.IValidateProperty.Type
+	{
+		get { Type.RecordGet(); if (Type.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "Type"); return Type.Value; }
+	}
+
+	string? global::Neatoo.IValidateProperty.StringValue
+	{
+		get { StringValue.RecordGet(); if (StringValue.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "StringValue"); return StringValue.Value; }
+	}
+
+	bool global::Neatoo.IValidateProperty.IsSelfValid
+	{
+		get { IsSelfValid.RecordGet(); if (IsSelfValid.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "IsSelfValid"); return IsSelfValid.Value; }
+	}
+
+	bool global::Neatoo.IValidateProperty.IsValid
+	{
+		get { IsValid.RecordGet(); if (IsValid.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "IsValid"); return IsValid.Value; }
+	}
+
+	global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> global::Neatoo.IValidateProperty.PropertyMessages
+	{
+		get { PropertyMessages.RecordGet(); if (PropertyMessages.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "PropertyMessages"); return PropertyMessages.Value; }
+	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateProperty.SetValue(object? newValue)
 	{
@@ -542,57 +593,6 @@ partial class ValidatePropertyStub : global::KnockOff.IKnockOffStub
 			return callback(this, runRules, token);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "RunRules");
 		return global::System.Threading.Tasks.Task.CompletedTask;
-	}
-
-	string global::Neatoo.IValidateProperty.Name
-	{
-		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "Name"); return Name.Value; }
-	}
-
-	object? global::Neatoo.IValidateProperty.Value
-	{
-		get { Value.RecordGet(); if (Value.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "Value"); return Value.Value; }
-		set { Value.RecordSet(value); if (Value.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "Value"); Value.Value = value; }
-	}
-
-	global::System.Threading.Tasks.Task global::Neatoo.IValidateProperty.Task
-	{
-		get { Task.RecordGet(); if (Task.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "Task"); return Task.Value; }
-	}
-
-	bool global::Neatoo.IValidateProperty.IsBusy
-	{
-		get { IsBusy.RecordGet(); if (IsBusy.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "IsBusy"); return IsBusy.Value; }
-	}
-
-	bool global::Neatoo.IValidateProperty.IsReadOnly
-	{
-		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "IsReadOnly"); return IsReadOnly.Value; }
-	}
-
-	global::System.Type global::Neatoo.IValidateProperty.Type
-	{
-		get { Type.RecordGet(); if (Type.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "Type"); return Type.Value; }
-	}
-
-	string? global::Neatoo.IValidateProperty.StringValue
-	{
-		get { StringValue.RecordGet(); if (StringValue.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "StringValue"); return StringValue.Value; }
-	}
-
-	bool global::Neatoo.IValidateProperty.IsSelfValid
-	{
-		get { IsSelfValid.RecordGet(); if (IsSelfValid.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "IsSelfValid"); return IsSelfValid.Value; }
-	}
-
-	bool global::Neatoo.IValidateProperty.IsValid
-	{
-		get { IsValid.RecordGet(); if (IsValid.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "IsValid"); return IsValid.Value; }
-	}
-
-	global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> global::Neatoo.IValidateProperty.PropertyMessages
-	{
-		get { PropertyMessages.RecordGet(); if (PropertyMessages.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "PropertyMessages"); return PropertyMessages.Value; }
 	}
 
 	event global::System.ComponentModel.PropertyChangedEventHandler? global::System.ComponentModel.INotifyPropertyChanged.PropertyChanged

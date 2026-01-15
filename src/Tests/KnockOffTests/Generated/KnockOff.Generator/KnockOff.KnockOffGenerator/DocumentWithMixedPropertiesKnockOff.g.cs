@@ -3,7 +3,7 @@
 
 namespace KnockOffTests;
 
-partial class DocumentWithMixedPropertiesKnockOff : global::KnockOff.IKnockOffStub
+partial class DocumentWithMixedPropertiesKnockOff : global::KnockOffTests.IDocumentWithMixedProperties, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Id.</summary>
 	public sealed class IdInterceptor
@@ -74,17 +74,17 @@ partial class DocumentWithMixedPropertiesKnockOff : global::KnockOff.IKnockOffSt
 	/// <summary>Interceptor for Id. Configure via .Value, track via .GetCount.</summary>
 	public IdInterceptor Id { get; } = new();
 
-	/// <summary>Interceptor for Title. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Title. Configure via .Value, track via .GetCount.</summary>
 	public TitleInterceptor Title { get; } = new();
 
-	/// <summary>Interceptor for Version. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Version. Configure via .Value, track via .GetCount.</summary>
 	public VersionInterceptor Version { get; } = new();
+
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
 
 	/// <summary>The global::KnockOffTests.IDocumentWithMixedProperties instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOffTests.IDocumentWithMixedProperties Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	string global::KnockOffTests.IDocumentWithMixedProperties.Id
 	{

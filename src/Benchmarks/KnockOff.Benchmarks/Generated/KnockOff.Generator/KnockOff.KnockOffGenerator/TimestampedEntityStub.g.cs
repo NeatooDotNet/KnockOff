@@ -3,7 +3,7 @@
 
 namespace KnockOff.Benchmarks.Stubs;
 
-partial class TimestampedEntityStub : global::KnockOff.IKnockOffStub
+partial class TimestampedEntityStub : global::KnockOff.Benchmarks.Interfaces.ITimestampedEntity, global::KnockOff.Benchmarks.Interfaces.IBaseEntity, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for CreatedAt.</summary>
 	public sealed class CreatedAtInterceptor
@@ -62,20 +62,20 @@ partial class TimestampedEntityStub : global::KnockOff.IKnockOffStub
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for CreatedAt. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for CreatedAt. Configure via .Value, track via .GetCount.</summary>
 	public CreatedAtInterceptor CreatedAt { get; } = new();
 
-	/// <summary>Interceptor for UpdatedAt. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for UpdatedAt. Configure via .Value, track via .GetCount.</summary>
 	public UpdatedAtInterceptor UpdatedAt { get; } = new();
 
-	/// <summary>Interceptor for Id. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Id. Configure via .Value, track via .GetCount.</summary>
 	public IdInterceptor Id { get; } = new();
+
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
 
 	/// <summary>The global::KnockOff.Benchmarks.Interfaces.ITimestampedEntity instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Interfaces.ITimestampedEntity Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::System.DateTime global::KnockOff.Benchmarks.Interfaces.ITimestampedEntity.CreatedAt
 	{

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class GenStringCacheKnockOff : global::KnockOff.IKnockOffStub
+partial class GenStringCacheKnockOff : global::KnockOff.Documentation.Samples.Guides.IGenCache<string, global::KnockOff.Documentation.Samples.Guides.GenUser>, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Get.</summary>
 	public sealed class GetInterceptor
@@ -58,11 +58,11 @@ partial class GenStringCacheKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Set.</summary>
 	public SetInterceptor Set { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IGenCache<string, global::KnockOff.Documentation.Samples.Guides.GenUser> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IGenCache<string, global::KnockOff.Documentation.Samples.Guides.GenUser> Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::KnockOff.Documentation.Samples.Guides.GenUser? global::KnockOff.Documentation.Samples.Guides.IGenCache<string, global::KnockOff.Documentation.Samples.Guides.GenUser>.Get(string key)
 	{

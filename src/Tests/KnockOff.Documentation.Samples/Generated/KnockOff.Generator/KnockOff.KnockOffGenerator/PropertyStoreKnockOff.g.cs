@@ -3,9 +3,28 @@
 
 namespace KnockOff.Documentation.Samples.Guides.InlineStubs;
 
-partial class PropertyStoreKnockOff : global::KnockOff.IKnockOffStub
+partial class PropertyStoreKnockOff : global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore, global::KnockOff.IKnockOffStub
 {
-	/// <summary>Tracks and configures behavior for Indexer.</summary>
+	/// <summary>Tracks and configures behavior for Count.</summary>
+	public sealed class CountInterceptor
+	{
+		/// <summary>Number of times the getter was accessed.</summary>
+		public int GetCount { get; private set; }
+
+		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
+		public global::System.Func<PropertyStoreKnockOff, int>? OnGet { get; set; }
+
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public int Value { get; set; } = default!;
+
+		/// <summary>Records a getter access.</summary>
+		public void RecordGet() => GetCount++;
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+	}
+
+	/// <summary>Tracks and configures behavior for indexer.</summary>
 	public sealed class IndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
@@ -27,45 +46,26 @@ partial class PropertyStoreKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for Count.</summary>
-	public sealed class CountInterceptor
-	{
-		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+	/// <summary>Interceptor for Count. Configure via .Value, track via .GetCount.</summary>
+	public CountInterceptor Count { get; } = new();
 
-		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<PropertyStoreKnockOff, int>? OnGet { get; set; }
-
-		/// <summary>Value returned by getter when OnGet is not set.</summary>
-		public int Value { get; set; } = default!;
-
-		/// <summary>Records a getter access.</summary>
-		public void RecordGet() => GetCount++;
-
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
-	}
-
-	/// <summary>Interceptor for Indexer.</summary>
+	/// <summary>Interceptor for indexer. Configure callbacks and track access.</summary>
 	public IndexerInterceptor Indexer { get; } = new();
 
-	/// <summary>Interceptor for Count. Configure callbacks and track access.</summary>
-	public CountInterceptor Count { get; } = new();
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
 
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore Object => this;
 
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
+	int global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore.Count
+	{
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IInPropertyStore", "Count"); return Count.Value; }
+	}
 
 	global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore.this[int index]
 	{
 		get { Indexer.RecordGet(index); if (Indexer.OnGet is { } onGet) return onGet(this, index); if (Strict) throw global::KnockOff.StubException.NotConfigured("IInPropertyStore", "this[]"); return Indexer.Backing.TryGetValue(index, out var v) ? v : default!; }
-	}
-
-	int global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore.Count
-	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IInPropertyStore", "Count"); return Count.Value; }
 	}
 
 }

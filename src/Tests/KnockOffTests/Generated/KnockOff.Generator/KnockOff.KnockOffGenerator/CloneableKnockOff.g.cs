@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class CloneableKnockOff : global::KnockOff.IKnockOffStub
+partial class CloneableKnockOff : global::System.ICloneable, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Clone.</summary>
 	public sealed class CloneInterceptor
@@ -30,11 +30,11 @@ partial class CloneableKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Clone.</summary>
 	public CloneInterceptor Clone { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::System.ICloneable instance. Use for passing to code expecting the interface.</summary>
 	public global::System.ICloneable Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	object global::System.ICloneable.Clone()
 	{

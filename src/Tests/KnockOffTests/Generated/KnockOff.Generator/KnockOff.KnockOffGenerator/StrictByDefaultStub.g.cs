@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class StrictByDefaultStub : global::KnockOff.IKnockOffStub
+partial class StrictByDefaultStub : global::KnockOff.Tests.IStrictModeTest, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameInterceptor
@@ -80,7 +80,7 @@ partial class StrictByDefaultStub : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Name. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Name. Configure via .Value, track via .GetCount.</summary>
 	public NameInterceptor Name { get; } = new();
 
 	/// <summary>Interceptor for GetValue.</summary>
@@ -89,11 +89,11 @@ partial class StrictByDefaultStub : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for DoSomething.</summary>
 	public DoSomethingInterceptor DoSomething { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = true;
+
 	/// <summary>The global::KnockOff.Tests.IStrictModeTest instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IStrictModeTest Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = true;
 
 	string global::KnockOff.Tests.IStrictModeTest.Name
 	{

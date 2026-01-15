@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class ComparerStringKnockOff : global::KnockOff.IKnockOffStub
+partial class ComparerStringKnockOff : global::System.Collections.Generic.IComparer<string>, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Compare.</summary>
 	public sealed class CompareInterceptor
@@ -33,11 +33,11 @@ partial class ComparerStringKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Compare.</summary>
 	public CompareInterceptor Compare { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::System.Collections.Generic.IComparer<string> instance. Use for passing to code expecting the interface.</summary>
 	public global::System.Collections.Generic.IComparer<string> Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	int global::System.Collections.Generic.IComparer<string>.Compare(string? x, string? y)
 	{

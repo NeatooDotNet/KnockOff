@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class PropStatusKnockOff : global::KnockOff.IKnockOffStub
+partial class PropStatusKnockOff : global::KnockOff.Documentation.Samples.Guides.IPropStatus, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Status.</summary>
 	public sealed class StatusInterceptor
@@ -36,14 +36,14 @@ partial class PropStatusKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for Status. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Status. Configure via .Value, track via .GetCount.</summary>
 	public StatusInterceptor Status { get; } = new();
+
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
 
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IPropStatus instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IPropStatus Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	string global::KnockOff.Documentation.Samples.Guides.IPropStatus.Status
 	{

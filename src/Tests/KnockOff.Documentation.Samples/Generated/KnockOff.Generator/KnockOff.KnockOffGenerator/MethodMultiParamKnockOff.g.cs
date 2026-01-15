@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class MethodMultiParamKnockOff : global::KnockOff.IKnockOffStub
+partial class MethodMultiParamKnockOff : global::KnockOff.Documentation.Samples.Guides.IMethodMultiParam, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Process.</summary>
 	public sealed class ProcessInterceptor
@@ -30,11 +30,11 @@ partial class MethodMultiParamKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Process.</summary>
 	public ProcessInterceptor Process { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IMethodMultiParam instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IMethodMultiParam Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	void global::KnockOff.Documentation.Samples.Guides.IMethodMultiParam.Process(string name, int @value, bool flag)
 	{

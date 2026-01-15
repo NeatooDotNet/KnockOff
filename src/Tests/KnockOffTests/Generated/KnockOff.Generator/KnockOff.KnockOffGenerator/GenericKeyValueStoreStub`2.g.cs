@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class GenericKeyValueStoreStub<TKey, TValue> : global::KnockOff.IKnockOffStub
+partial class GenericKeyValueStoreStub<TKey, TValue> : global::KnockOff.Tests.IGenericKeyValueStore<TKey, TValue>, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Get.</summary>
 	public sealed class GetInterceptor
@@ -58,11 +58,11 @@ partial class GenericKeyValueStoreStub<TKey, TValue> : global::KnockOff.IKnockOf
 	/// <summary>Interceptor for Set.</summary>
 	public SetInterceptor Set { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Tests.IGenericKeyValueStore<TKey, TValue> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IGenericKeyValueStore<TKey, TValue> Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	TValue global::KnockOff.Tests.IGenericKeyValueStore<TKey, TValue>.Get(TKey key)
 	{

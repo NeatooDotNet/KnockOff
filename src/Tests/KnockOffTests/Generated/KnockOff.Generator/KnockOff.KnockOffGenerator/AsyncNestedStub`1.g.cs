@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class AsyncNestedStub<T> : global::KnockOff.IKnockOffStub where T : class
+partial class AsyncNestedStub<T> : global::KnockOff.Tests.IAsyncNestedService<T>, global::KnockOff.IKnockOffStub where T : class
 {
 	/// <summary>Tracks and configures behavior for GetAsync.</summary>
 	public sealed class GetAsyncInterceptor
@@ -30,11 +30,11 @@ partial class AsyncNestedStub<T> : global::KnockOff.IKnockOffStub where T : clas
 	/// <summary>Interceptor for GetAsync.</summary>
 	public GetAsyncInterceptor GetAsync { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Tests.IAsyncNestedService<T> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IAsyncNestedService<T> Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::System.Threading.Tasks.Task<T?> global::KnockOff.Tests.IAsyncNestedService<T>.GetAsync()
 	{

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Concepts;
 
-partial class PatternUserServiceKnockOff : global::KnockOff.IKnockOffStub
+partial class PatternUserServiceKnockOff : global::KnockOff.Documentation.Samples.Concepts.IPatternUserService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetUser.</summary>
 	public sealed class GetUser2Interceptor
@@ -61,11 +61,11 @@ partial class PatternUserServiceKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for CalculateScore.</summary>
 	public CalculateScore2Interceptor CalculateScore2 { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Concepts.IPatternUserService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Concepts.IPatternUserService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::KnockOff.Documentation.Samples.Concepts.PatternUser global::KnockOff.Documentation.Samples.Concepts.IPatternUserService.GetUser(int id)
 	{

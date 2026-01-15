@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class IhFullEntityKnockOff : global::KnockOff.IKnockOffStub
+partial class IhFullEntityKnockOff : global::KnockOff.Documentation.Samples.Guides.IIhFullAuditableEntity, global::KnockOff.Documentation.Samples.Guides.IIhTimestampedEntity, global::KnockOff.Documentation.Samples.Guides.IIhEntity, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for CreatedBy.</summary>
 	public sealed class CreatedByInterceptor
@@ -93,23 +93,23 @@ partial class IhFullEntityKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for CreatedBy. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for CreatedBy. Configure via .Value, track via .GetCount.</summary>
 	public CreatedByInterceptor CreatedBy { get; } = new();
 
-	/// <summary>Interceptor for ModifiedBy. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for ModifiedBy. Configure via .Value, track via .GetCount.</summary>
 	public ModifiedByInterceptor ModifiedBy { get; } = new();
 
-	/// <summary>Interceptor for CreatedAt. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for CreatedAt. Configure via .Value, track via .GetCount.</summary>
 	public CreatedAtInterceptor CreatedAt { get; } = new();
 
-	/// <summary>Interceptor for Id. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Id. Configure via .Value, track via .GetCount.</summary>
 	public IdInterceptor Id { get; } = new();
+
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
 
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IIhFullAuditableEntity instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IIhFullAuditableEntity Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	string global::KnockOff.Documentation.Samples.Guides.IIhFullAuditableEntity.CreatedBy
 	{

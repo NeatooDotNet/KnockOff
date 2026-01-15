@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class BpRepositoryKnockOff : global::KnockOff.IKnockOffStub
+partial class BpRepositoryKnockOff : global::KnockOff.Documentation.Samples.Guides.IBpRepository, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetById.</summary>
 	public sealed class GetById2Interceptor
@@ -33,11 +33,11 @@ partial class BpRepositoryKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for GetById.</summary>
 	public GetById2Interceptor GetById2 { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IBpRepository instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IBpRepository Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::KnockOff.Documentation.Samples.SampleDomain.User? global::KnockOff.Documentation.Samples.Guides.IBpRepository.GetById(int id)
 	{

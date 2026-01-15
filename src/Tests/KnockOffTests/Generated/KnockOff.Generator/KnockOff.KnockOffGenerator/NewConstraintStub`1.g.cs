@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class NewConstraintStub<T> : global::KnockOff.IKnockOffStub where T : new()
+partial class NewConstraintStub<T> : global::KnockOff.Tests.INewConstraintService<T>, global::KnockOff.IKnockOffStub where T : new()
 {
 	/// <summary>Tracks and configures behavior for Create.</summary>
 	public sealed class CreateInterceptor
@@ -30,11 +30,11 @@ partial class NewConstraintStub<T> : global::KnockOff.IKnockOffStub where T : ne
 	/// <summary>Interceptor for Create.</summary>
 	public CreateInterceptor Create { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Tests.INewConstraintService<T> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.INewConstraintService<T> Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	T global::KnockOff.Tests.INewConstraintService<T>.Create()
 	{

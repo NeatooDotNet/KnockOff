@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class MultiUnitOfWorkKnockOff : global::KnockOff.IKnockOffStub
+partial class MultiUnitOfWorkKnockOff : global::KnockOff.Documentation.Samples.Guides.IMultiUnitOfWork, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for SaveChangesAsync.</summary>
 	public sealed class SaveChangesAsyncInterceptor
@@ -33,11 +33,11 @@ partial class MultiUnitOfWorkKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for SaveChangesAsync.</summary>
 	public SaveChangesAsyncInterceptor SaveChangesAsync { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IMultiUnitOfWork instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IMultiUnitOfWork Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::System.Threading.Tasks.Task<int> global::KnockOff.Documentation.Samples.Guides.IMultiUnitOfWork.SaveChangesAsync(global::System.Threading.CancellationToken ct)
 	{

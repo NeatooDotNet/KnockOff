@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class HaServiceKnockOff : global::KnockOff.IKnockOffStub
+partial class HaServiceKnockOff : global::KnockOff.Documentation.Samples.Skills.IHaService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Initialize.</summary>
 	public sealed class InitializeInterceptor
@@ -83,11 +83,11 @@ partial class HaServiceKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Create.</summary>
 	public CreateInterceptor Create { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IHaService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.IHaService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	void global::KnockOff.Documentation.Samples.Skills.IHaService.Initialize()
 	{

@@ -3,7 +3,7 @@
 
 namespace KnockOff.NeatooInterfaceTests.Collections;
 
-partial class EntityListBaseOfTStub : global::KnockOff.IKnockOffStub
+partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Neatoo.IEntityBase>, global::Neatoo.IValidateListBase<global::Neatoo.IEntityBase>, global::System.Collections.Generic.IList<global::Neatoo.IEntityBase>, global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>, global::System.Collections.Generic.IEnumerable<global::Neatoo.IEntityBase>, global::System.Collections.IEnumerable, global::System.Collections.Specialized.INotifyCollectionChanged, global::System.ComponentModel.INotifyPropertyChanged, global::Neatoo.INotifyNeatooPropertyChanged, global::Neatoo.IValidateMetaProperties, global::Neatoo.IEntityMetaProperties, global::Neatoo.RemoteFactory.IFactorySaveMeta, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Parent.</summary>
 	public sealed class ParentInterceptor
@@ -22,40 +22,6 @@ partial class EntityListBaseOfTStub : global::KnockOff.IKnockOffStub
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
-	}
-
-	/// <summary>Tracks and configures behavior for Indexer.</summary>
-	public sealed class IndexerInterceptor
-	{
-		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
-
-		/// <summary>The key from the most recent getter access.</summary>
-		public int? LastGetKey { get; private set; }
-
-		/// <summary>Callback invoked when the getter is accessed.</summary>
-		public global::System.Func<EntityListBaseOfTStub, int, global::Neatoo.IEntityBase>? OnGet { get; set; }
-
-		/// <summary>Number of times the setter was accessed.</summary>
-		public int SetCount { get; private set; }
-
-		/// <summary>The key and value from the most recent setter call.</summary>
-		public (int? Key, global::Neatoo.IEntityBase? Value)? LastSetEntry { get; private set; }
-
-		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<EntityListBaseOfTStub, int, global::Neatoo.IEntityBase>? OnSet { get; set; }
-
-		/// <summary>Records a getter access.</summary>
-		public void RecordGet(int? index) { GetCount++; LastGetKey = index; }
-
-		/// <summary>Records a setter access.</summary>
-		public void RecordSet(int? index, global::Neatoo.IEntityBase? value) { SetCount++; LastSetEntry = (index, value); }
-
-		/// <summary>Backing storage for this indexer.</summary>
-		public global::System.Collections.Generic.Dictionary<int, global::Neatoo.IEntityBase> Backing { get; } = new();
-
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for Count.</summary>
@@ -303,6 +269,40 @@ partial class EntityListBaseOfTStub : global::KnockOff.IKnockOffStub
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+	}
+
+	/// <summary>Tracks and configures behavior for indexer.</summary>
+	public sealed class IndexerInterceptor
+	{
+		/// <summary>Number of times the getter was accessed.</summary>
+		public int GetCount { get; private set; }
+
+		/// <summary>The key from the most recent getter access.</summary>
+		public int? LastGetKey { get; private set; }
+
+		/// <summary>Callback invoked when the getter is accessed.</summary>
+		public global::System.Func<EntityListBaseOfTStub, int, global::Neatoo.IEntityBase>? OnGet { get; set; }
+
+		/// <summary>Number of times the setter was accessed.</summary>
+		public int SetCount { get; private set; }
+
+		/// <summary>The key and value from the most recent setter call.</summary>
+		public (int? Key, global::Neatoo.IEntityBase? Value)? LastSetEntry { get; private set; }
+
+		/// <summary>Callback invoked when the setter is accessed.</summary>
+		public global::System.Action<EntityListBaseOfTStub, int, global::Neatoo.IEntityBase>? OnSet { get; set; }
+
+		/// <summary>Records a getter access.</summary>
+		public void RecordGet(int? index) { GetCount++; LastGetKey = index; }
+
+		/// <summary>Records a setter access.</summary>
+		public void RecordSet(int? index, global::Neatoo.IEntityBase? value) { SetCount++; LastSetEntry = (index, value); }
+
+		/// <summary>Backing storage for this indexer.</summary>
+		public global::System.Collections.Generic.Dictionary<int, global::Neatoo.IEntityBase> Backing { get; } = new();
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for RemoveAt.</summary>
@@ -725,50 +725,50 @@ partial class EntityListBaseOfTStub : global::KnockOff.IKnockOffStub
 		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
 	}
 
-	/// <summary>Interceptor for Parent. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Parent. Configure via .Value, track via .GetCount.</summary>
 	public ParentInterceptor Parent { get; } = new();
 
-	/// <summary>Interceptor for Indexer.</summary>
-	public IndexerInterceptor Indexer { get; } = new();
-
-	/// <summary>Interceptor for Count. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Count. Configure via .Value, track via .GetCount.</summary>
 	public CountInterceptor Count { get; } = new();
 
-	/// <summary>Interceptor for IsReadOnly. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsReadOnly. Configure via .Value, track via .GetCount.</summary>
 	public IsReadOnlyInterceptor IsReadOnly { get; } = new();
 
-	/// <summary>Interceptor for IsBusy. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsBusy. Configure via .Value, track via .GetCount.</summary>
 	public IsBusyInterceptor IsBusy { get; } = new();
 
-	/// <summary>Interceptor for IsValid. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsValid. Configure via .Value, track via .GetCount.</summary>
 	public IsValidInterceptor IsValid { get; } = new();
 
-	/// <summary>Interceptor for IsSelfValid. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsSelfValid. Configure via .Value, track via .GetCount.</summary>
 	public IsSelfValidInterceptor IsSelfValid { get; } = new();
 
-	/// <summary>Interceptor for PropertyMessages. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for PropertyMessages. Configure via .Value, track via .GetCount.</summary>
 	public PropertyMessagesInterceptor PropertyMessages { get; } = new();
 
-	/// <summary>Interceptor for IsChild. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsChild. Configure via .Value, track via .GetCount.</summary>
 	public IsChildInterceptor IsChild { get; } = new();
 
-	/// <summary>Interceptor for IsModified. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsModified. Configure via .Value, track via .GetCount.</summary>
 	public IsModifiedInterceptor IsModified { get; } = new();
 
-	/// <summary>Interceptor for IsSelfModified. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsSelfModified. Configure via .Value, track via .GetCount.</summary>
 	public IsSelfModifiedInterceptor IsSelfModified { get; } = new();
 
-	/// <summary>Interceptor for IsMarkedModified. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsMarkedModified. Configure via .Value, track via .GetCount.</summary>
 	public IsMarkedModifiedInterceptor IsMarkedModified { get; } = new();
 
-	/// <summary>Interceptor for IsSavable. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsSavable. Configure via .Value, track via .GetCount.</summary>
 	public IsSavableInterceptor IsSavable { get; } = new();
 
-	/// <summary>Interceptor for IsDeleted. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsDeleted. Configure via .Value, track via .GetCount.</summary>
 	public IsDeletedInterceptor IsDeleted { get; } = new();
 
-	/// <summary>Interceptor for IsNew. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsNew. Configure via .Value, track via .GetCount.</summary>
 	public IsNewInterceptor IsNew { get; } = new();
+
+	/// <summary>Interceptor for indexer. Configure callbacks and track access.</summary>
+	public IndexerInterceptor Indexer { get; } = new();
 
 	/// <summary>Interceptor for RemoveAt.</summary>
 	public RemoveAtInterceptor RemoveAt { get; } = new();
@@ -824,96 +824,15 @@ partial class EntityListBaseOfTStub : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for NeatooPropertyChanged event.</summary>
 	public NeatooPropertyChangedInterceptor NeatooPropertyChanged { get; } = new();
 
-	/// <summary>The global::Neatoo.IEntityListBase<global::Neatoo.IEntityBase> instance. Use for passing to code expecting the interface.</summary>
-	public global::Neatoo.IEntityListBase<global::Neatoo.IEntityBase> Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
 	public bool Strict { get; set; } = false;
 
-	void global::Neatoo.IEntityListBase<global::Neatoo.IEntityBase>.RemoveAt(int index)
-	{
-		RemoveAt.RecordCall(index);
-		if (RemoveAt.OnCall is { } onCallCallback)
-		{ onCallCallback(this, index); return; }
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "RemoveAt");
-	}
+	/// <summary>The global::Neatoo.IEntityListBase<global::Neatoo.IEntityBase> instance. Use for passing to code expecting the interface.</summary>
+	public global::Neatoo.IEntityListBase<global::Neatoo.IEntityBase> Object => this;
 
 	global::Neatoo.IValidateBase? global::Neatoo.IValidateListBase<global::Neatoo.IEntityBase>.Parent
 	{
 		get { Parent.RecordGet(); if (Parent.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "Parent"); return Parent.Value; }
-	}
-
-	int global::System.Collections.Generic.IList<global::Neatoo.IEntityBase>.IndexOf(global::Neatoo.IEntityBase item)
-	{
-		IndexOf.RecordCall(item);
-		if (IndexOf.OnCall is { } callback)
-			return callback(this, item);
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "IndexOf");
-		return default!;
-	}
-
-	void global::System.Collections.Generic.IList<global::Neatoo.IEntityBase>.Insert(int index, global::Neatoo.IEntityBase item)
-	{
-		Insert.RecordCall(index, item);
-		if (Insert.OnCall is { } onCallCallback)
-		{ onCallCallback(this, index, item); return; }
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "Insert");
-	}
-
-	void global::System.Collections.Generic.IList<global::Neatoo.IEntityBase>.RemoveAt(int index)
-	{
-		RemoveAt.RecordCall(index);
-		if (RemoveAt.OnCall is { } onCallCallback)
-		{ onCallCallback(this, index); return; }
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "RemoveAt");
-	}
-
-	global::Neatoo.IEntityBase global::System.Collections.Generic.IList<global::Neatoo.IEntityBase>.this[int index]
-	{
-		get { Indexer.RecordGet(index); if (Indexer.OnGet is { } onGet) return onGet(this, index); if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "this[]"); return Indexer.Backing.TryGetValue(index, out var v) ? v : default!; }
-		set { Indexer.RecordSet(index, value); if (Indexer.OnSet is { } onSet) { onSet(this, index, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "this[]"); Indexer.Backing[index] = value; }
-	}
-
-	void global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>.Add(global::Neatoo.IEntityBase item)
-	{
-		Add.RecordCall(item);
-		if (Add.OnCall is { } onCallCallback)
-		{ onCallCallback(this, item); return; }
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "Add");
-	}
-
-	void global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>.Clear()
-	{
-		Clear.RecordCall();
-		if (Clear.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "Clear");
-	}
-
-	bool global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>.Contains(global::Neatoo.IEntityBase item)
-	{
-		Contains.RecordCall(item);
-		if (Contains.OnCall is { } callback)
-			return callback(this, item);
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "Contains");
-		return default!;
-	}
-
-	void global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>.CopyTo(global::Neatoo.IEntityBase[] array, int arrayIndex)
-	{
-		CopyTo.RecordCall(array, arrayIndex);
-		if (CopyTo.OnCall is { } onCallCallback)
-		{ onCallCallback(this, array, arrayIndex); return; }
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "CopyTo");
-	}
-
-	bool global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>.Remove(global::Neatoo.IEntityBase item)
-	{
-		Remove.RecordCall(item);
-		if (Remove.OnCall is { } callback)
-			return callback(this, item);
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "Remove");
-		return default!;
 	}
 
 	int global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>.Count
@@ -924,72 +843,6 @@ partial class EntityListBaseOfTStub : global::KnockOff.IKnockOffStub
 	bool global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>.IsReadOnly
 	{
 		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "IsReadOnly"); return IsReadOnly.Value; }
-	}
-
-	global::System.Collections.Generic.IEnumerator<global::Neatoo.IEntityBase> global::System.Collections.Generic.IEnumerable<global::Neatoo.IEntityBase>.GetEnumerator()
-	{
-		GetEnumerator.RecordCall();
-		if (GetEnumerator.OnCall is { } callback)
-			return callback(this);
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "GetEnumerator");
-		throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall or define a protected method 'GetEnumerator' in your partial class.");
-	}
-
-	global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
-	{
-		return ((global::System.Collections.Generic.IEnumerable<global::Neatoo.IEntityBase>)this).GetEnumerator();
-	}
-
-	global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.WaitForTasks()
-	{
-		WaitForTasks1.RecordCall();
-		if (WaitForTasks1.OnCall is { } callback)
-			return callback(this);
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "WaitForTasks");
-		return global::System.Threading.Tasks.Task.CompletedTask;
-	}
-
-	global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.WaitForTasks(global::System.Threading.CancellationToken token)
-	{
-		WaitForTasks2.RecordCall(token);
-		if (WaitForTasks2.OnCall is { } callback)
-			return callback(this, token);
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "WaitForTasks");
-		return global::System.Threading.Tasks.Task.CompletedTask;
-	}
-
-	global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.RunRules(string propertyName, global::System.Threading.CancellationToken? token)
-	{
-		RunRules1.RecordCall(propertyName, token);
-		if (RunRules1.OnCall is { } callback)
-			return callback(this, propertyName, token);
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "RunRules");
-		return global::System.Threading.Tasks.Task.CompletedTask;
-	}
-
-	global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.RunRules(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
-	{
-		RunRules2.RecordCall(runRules, token);
-		if (RunRules2.OnCall is { } callback)
-			return callback(this, runRules, token);
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "RunRules");
-		return global::System.Threading.Tasks.Task.CompletedTask;
-	}
-
-	void global::Neatoo.IValidateMetaProperties.ClearAllMessages()
-	{
-		ClearAllMessages.RecordCall();
-		if (ClearAllMessages.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "ClearAllMessages");
-	}
-
-	void global::Neatoo.IValidateMetaProperties.ClearSelfMessages()
-	{
-		ClearSelfMessages.RecordCall();
-		if (ClearSelfMessages.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "ClearSelfMessages");
 	}
 
 	bool global::Neatoo.IValidateMetaProperties.IsBusy
@@ -1045,6 +898,157 @@ partial class EntityListBaseOfTStub : global::KnockOff.IKnockOffStub
 	bool global::Neatoo.RemoteFactory.IFactorySaveMeta.IsNew
 	{
 		get { IsNew.RecordGet(); if (IsNew.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IFactorySaveMeta", "IsNew"); return IsNew.Value; }
+	}
+
+	global::Neatoo.IEntityBase global::System.Collections.Generic.IList<global::Neatoo.IEntityBase>.this[int index]
+	{
+		get { Indexer.RecordGet(index); if (Indexer.OnGet is { } onGet) return onGet(this, index); if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "this[]"); return Indexer.Backing.TryGetValue(index, out var v) ? v : default!; }
+		set { Indexer.RecordSet(index, value); if (Indexer.OnSet is { } onSet) { onSet(this, index, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "this[]"); Indexer.Backing[index] = value; }
+	}
+
+	void global::Neatoo.IEntityListBase<global::Neatoo.IEntityBase>.RemoveAt(int index)
+	{
+		RemoveAt.RecordCall(index);
+		if (RemoveAt.OnCall is { } onCallCallback)
+		{ onCallCallback(this, index); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "RemoveAt");
+	}
+
+	int global::System.Collections.Generic.IList<global::Neatoo.IEntityBase>.IndexOf(global::Neatoo.IEntityBase item)
+	{
+		IndexOf.RecordCall(item);
+		if (IndexOf.OnCall is { } callback)
+			return callback(this, item);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "IndexOf");
+		return default!;
+	}
+
+	void global::System.Collections.Generic.IList<global::Neatoo.IEntityBase>.Insert(int index, global::Neatoo.IEntityBase item)
+	{
+		Insert.RecordCall(index, item);
+		if (Insert.OnCall is { } onCallCallback)
+		{ onCallCallback(this, index, item); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "Insert");
+	}
+
+	void global::System.Collections.Generic.IList<global::Neatoo.IEntityBase>.RemoveAt(int index)
+	{
+		RemoveAt.RecordCall(index);
+		if (RemoveAt.OnCall is { } onCallCallback)
+		{ onCallCallback(this, index); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "RemoveAt");
+	}
+
+	void global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>.Add(global::Neatoo.IEntityBase item)
+	{
+		Add.RecordCall(item);
+		if (Add.OnCall is { } onCallCallback)
+		{ onCallCallback(this, item); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "Add");
+	}
+
+	void global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>.Clear()
+	{
+		Clear.RecordCall();
+		if (Clear.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "Clear");
+	}
+
+	bool global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>.Contains(global::Neatoo.IEntityBase item)
+	{
+		Contains.RecordCall(item);
+		if (Contains.OnCall is { } callback)
+			return callback(this, item);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "Contains");
+		return default!;
+	}
+
+	void global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>.CopyTo(global::Neatoo.IEntityBase[] array, int arrayIndex)
+	{
+		CopyTo.RecordCall(array, arrayIndex);
+		if (CopyTo.OnCall is { } onCallCallback)
+		{ onCallCallback(this, array, arrayIndex); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "CopyTo");
+	}
+
+	bool global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>.Remove(global::Neatoo.IEntityBase item)
+	{
+		Remove.RecordCall(item);
+		if (Remove.OnCall is { } callback)
+			return callback(this, item);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "Remove");
+		return default!;
+	}
+
+	global::System.Collections.Generic.IEnumerator<global::Neatoo.IEntityBase> global::System.Collections.Generic.IEnumerable<global::Neatoo.IEntityBase>.GetEnumerator()
+	{
+		GetEnumerator.RecordCall();
+		if (GetEnumerator.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "GetEnumerator");
+		throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall or define a protected method 'GetEnumerator' in your partial class.");
+	}
+
+	global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
+	{
+		GetEnumerator.RecordCall();
+		if (GetEnumerator.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
+		throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall or define a protected method 'GetEnumerator' in your partial class.");
+	}
+
+	global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.WaitForTasks()
+	{
+		WaitForTasks1.RecordCall();
+		if (WaitForTasks1.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "WaitForTasks");
+		return global::System.Threading.Tasks.Task.CompletedTask;
+	}
+
+	global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.WaitForTasks(global::System.Threading.CancellationToken token)
+	{
+		WaitForTasks2.RecordCall(token);
+		if (WaitForTasks2.OnCall is { } callback)
+			return callback(this, token);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "WaitForTasks");
+		return global::System.Threading.Tasks.Task.CompletedTask;
+	}
+
+	global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.RunRules(string propertyName, global::System.Threading.CancellationToken? token)
+	{
+		RunRules1.RecordCall(propertyName, token);
+		if (RunRules1.OnCall is { } callback)
+			return callback(this, propertyName, token);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "RunRules");
+		return global::System.Threading.Tasks.Task.CompletedTask;
+	}
+
+	global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.RunRules(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
+	{
+		RunRules2.RecordCall(runRules, token);
+		if (RunRules2.OnCall is { } callback)
+			return callback(this, runRules, token);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "RunRules");
+		return global::System.Threading.Tasks.Task.CompletedTask;
+	}
+
+	void global::Neatoo.IValidateMetaProperties.ClearAllMessages()
+	{
+		ClearAllMessages.RecordCall();
+		if (ClearAllMessages.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "ClearAllMessages");
+	}
+
+	void global::Neatoo.IValidateMetaProperties.ClearSelfMessages()
+	{
+		ClearSelfMessages.RecordCall();
+		if (ClearSelfMessages.OnCall is { } onCallCallback)
+		{ onCallCallback(this); return; }
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "ClearSelfMessages");
 	}
 
 	event global::System.Collections.Specialized.NotifyCollectionChangedEventHandler? global::System.Collections.Specialized.INotifyCollectionChanged.CollectionChanged

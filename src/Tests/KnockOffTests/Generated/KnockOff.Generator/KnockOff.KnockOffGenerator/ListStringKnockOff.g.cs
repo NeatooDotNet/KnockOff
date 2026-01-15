@@ -3,42 +3,8 @@
 
 namespace KnockOff.Tests;
 
-partial class ListStringKnockOff : global::KnockOff.IKnockOffStub
+partial class ListStringKnockOff : global::System.Collections.Generic.IList<string>, global::System.Collections.Generic.ICollection<string>, global::System.Collections.Generic.IEnumerable<string>, global::System.Collections.IEnumerable, global::KnockOff.IKnockOffStub
 {
-	/// <summary>Tracks and configures behavior for Indexer.</summary>
-	public sealed class IndexerInterceptor
-	{
-		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
-
-		/// <summary>The key from the most recent getter access.</summary>
-		public int? LastGetKey { get; private set; }
-
-		/// <summary>Callback invoked when the getter is accessed.</summary>
-		public global::System.Func<ListStringKnockOff, int, string>? OnGet { get; set; }
-
-		/// <summary>Number of times the setter was accessed.</summary>
-		public int SetCount { get; private set; }
-
-		/// <summary>The key and value from the most recent setter call.</summary>
-		public (int? Key, string? Value)? LastSetEntry { get; private set; }
-
-		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<ListStringKnockOff, int, string>? OnSet { get; set; }
-
-		/// <summary>Records a getter access.</summary>
-		public void RecordGet(int? index) { GetCount++; LastGetKey = index; }
-
-		/// <summary>Records a setter access.</summary>
-		public void RecordSet(int? index, string? value) { SetCount++; LastSetEntry = (index, value); }
-
-		/// <summary>Backing storage for this indexer.</summary>
-		public global::System.Collections.Generic.Dictionary<int, string> Backing { get; } = new();
-
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; }
-	}
-
 	/// <summary>Tracks and configures behavior for Count.</summary>
 	public sealed class CountInterceptor
 	{
@@ -75,6 +41,40 @@ partial class ListStringKnockOff : global::KnockOff.IKnockOffStub
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+	}
+
+	/// <summary>Tracks and configures behavior for indexer.</summary>
+	public sealed class IndexerInterceptor
+	{
+		/// <summary>Number of times the getter was accessed.</summary>
+		public int GetCount { get; private set; }
+
+		/// <summary>The key from the most recent getter access.</summary>
+		public int? LastGetKey { get; private set; }
+
+		/// <summary>Callback invoked when the getter is accessed.</summary>
+		public global::System.Func<ListStringKnockOff, int, string>? OnGet { get; set; }
+
+		/// <summary>Number of times the setter was accessed.</summary>
+		public int SetCount { get; private set; }
+
+		/// <summary>The key and value from the most recent setter call.</summary>
+		public (int? Key, string? Value)? LastSetEntry { get; private set; }
+
+		/// <summary>Callback invoked when the setter is accessed.</summary>
+		public global::System.Action<ListStringKnockOff, int, string>? OnSet { get; set; }
+
+		/// <summary>Records a getter access.</summary>
+		public void RecordGet(int? index) { GetCount++; LastGetKey = index; }
+
+		/// <summary>Records a setter access.</summary>
+		public void RecordSet(int? index, string? value) { SetCount++; LastSetEntry = (index, value); }
+
+		/// <summary>Backing storage for this indexer.</summary>
+		public global::System.Collections.Generic.Dictionary<int, string> Backing { get; } = new();
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IndexOf.</summary>
@@ -281,14 +281,14 @@ partial class ListStringKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Indexer.</summary>
-	public IndexerInterceptor Indexer { get; } = new();
-
-	/// <summary>Interceptor for Count. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Count. Configure via .Value, track via .GetCount.</summary>
 	public CountInterceptor Count { get; } = new();
 
-	/// <summary>Interceptor for IsReadOnly. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsReadOnly. Configure via .Value, track via .GetCount.</summary>
 	public IsReadOnlyInterceptor IsReadOnly { get; } = new();
+
+	/// <summary>Interceptor for indexer. Configure callbacks and track access.</summary>
+	public IndexerInterceptor Indexer { get; } = new();
 
 	/// <summary>Interceptor for IndexOf.</summary>
 	public IndexOfInterceptor IndexOf { get; } = new();
@@ -317,11 +317,27 @@ partial class ListStringKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for GetEnumerator.</summary>
 	public GetEnumeratorInterceptor GetEnumerator { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::System.Collections.Generic.IList<string> instance. Use for passing to code expecting the interface.</summary>
 	public global::System.Collections.Generic.IList<string> Object => this;
 
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
+	int global::System.Collections.Generic.ICollection<string>.Count
+	{
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "Count"); return Count.Value; }
+	}
+
+	bool global::System.Collections.Generic.ICollection<string>.IsReadOnly
+	{
+		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "IsReadOnly"); return IsReadOnly.Value; }
+	}
+
+	string global::System.Collections.Generic.IList<string>.this[int index]
+	{
+		get { Indexer.RecordGet(index); if (Indexer.OnGet is { } onGet) return onGet(this, index); if (Strict) throw global::KnockOff.StubException.NotConfigured("IList<string>", "this[]"); return Indexer.Backing.TryGetValue(index, out var v) ? v : default!; }
+		set { Indexer.RecordSet(index, value); if (Indexer.OnSet is { } onSet) { onSet(this, index, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IList<string>", "this[]"); Indexer.Backing[index] = value; }
+	}
 
 	int global::System.Collections.Generic.IList<string>.IndexOf(string item)
 	{
@@ -346,12 +362,6 @@ partial class ListStringKnockOff : global::KnockOff.IKnockOffStub
 		if (RemoveAt.OnCall is { } onCallCallback)
 		{ onCallCallback(this, index); return; }
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IList<string>", "RemoveAt");
-	}
-
-	string global::System.Collections.Generic.IList<string>.this[int index]
-	{
-		get { Indexer.RecordGet(index); if (Indexer.OnGet is { } onGet) return onGet(this, index); if (Strict) throw global::KnockOff.StubException.NotConfigured("IList<string>", "this[]"); return Indexer.Backing.TryGetValue(index, out var v) ? v : default!; }
-		set { Indexer.RecordSet(index, value); if (Indexer.OnSet is { } onSet) { onSet(this, index, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IList<string>", "this[]"); Indexer.Backing[index] = value; }
 	}
 
 	void global::System.Collections.Generic.ICollection<string>.Add(string item)
@@ -396,16 +406,6 @@ partial class ListStringKnockOff : global::KnockOff.IKnockOffStub
 		return default!;
 	}
 
-	int global::System.Collections.Generic.ICollection<string>.Count
-	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "Count"); return Count.Value; }
-	}
-
-	bool global::System.Collections.Generic.ICollection<string>.IsReadOnly
-	{
-		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "IsReadOnly"); return IsReadOnly.Value; }
-	}
-
 	global::System.Collections.Generic.IEnumerator<string> global::System.Collections.Generic.IEnumerable<string>.GetEnumerator()
 	{
 		GetEnumerator.RecordCall();
@@ -417,7 +417,11 @@ partial class ListStringKnockOff : global::KnockOff.IKnockOffStub
 
 	global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
 	{
-		return ((global::System.Collections.Generic.IEnumerable<string>)this).GetEnumerator();
+		GetEnumerator.RecordCall();
+		if (GetEnumerator.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
+		throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall or define a protected method 'GetEnumerator' in your partial class.");
 	}
 
 }

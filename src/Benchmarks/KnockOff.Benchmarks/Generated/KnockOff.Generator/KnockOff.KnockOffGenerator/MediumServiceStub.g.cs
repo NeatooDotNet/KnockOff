@@ -3,7 +3,7 @@
 
 namespace KnockOff.Benchmarks.Stubs;
 
-partial class MediumServiceStub : global::KnockOff.IKnockOffStub
+partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMediumService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Method1.</summary>
 	public sealed class Method1Interceptor
@@ -261,11 +261,11 @@ partial class MediumServiceStub : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Method10.</summary>
 	public Method10Interceptor Method10 { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Benchmarks.Interfaces.IMediumService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Interfaces.IMediumService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	void global::KnockOff.Benchmarks.Interfaces.IMediumService.Method1()
 	{

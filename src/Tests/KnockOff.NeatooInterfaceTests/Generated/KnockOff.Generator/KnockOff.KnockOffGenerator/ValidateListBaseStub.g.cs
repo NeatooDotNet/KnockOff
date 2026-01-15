@@ -3,7 +3,7 @@
 
 namespace KnockOff.NeatooInterfaceTests.Collections;
 
-partial class ValidateListBaseStub : global::KnockOff.IKnockOffStub
+partial class ValidateListBaseStub : global::Neatoo.IValidateListBase, global::System.Collections.Specialized.INotifyCollectionChanged, global::System.ComponentModel.INotifyPropertyChanged, global::System.Collections.IList, global::System.Collections.ICollection, global::System.Collections.IEnumerable, global::Neatoo.INotifyNeatooPropertyChanged, global::Neatoo.IValidateMetaProperties, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Parent.</summary>
 	public sealed class ParentInterceptor
@@ -60,40 +60,6 @@ partial class ValidateListBaseStub : global::KnockOff.IKnockOffStub
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
-	}
-
-	/// <summary>Tracks and configures behavior for Indexer.</summary>
-	public sealed class IndexerInterceptor
-	{
-		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
-
-		/// <summary>The key from the most recent getter access.</summary>
-		public int? LastGetKey { get; private set; }
-
-		/// <summary>Callback invoked when the getter is accessed.</summary>
-		public global::System.Func<ValidateListBaseStub, int, object?>? OnGet { get; set; }
-
-		/// <summary>Number of times the setter was accessed.</summary>
-		public int SetCount { get; private set; }
-
-		/// <summary>The key and value from the most recent setter call.</summary>
-		public (int? Key, object? Value)? LastSetEntry { get; private set; }
-
-		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<ValidateListBaseStub, int, object?>? OnSet { get; set; }
-
-		/// <summary>Records a getter access.</summary>
-		public void RecordGet(int? index) { GetCount++; LastGetKey = index; }
-
-		/// <summary>Records a setter access.</summary>
-		public void RecordSet(int? index, object? value) { SetCount++; LastSetEntry = (index, value); }
-
-		/// <summary>Backing storage for this indexer.</summary>
-		public global::System.Collections.Generic.Dictionary<int, object?> Backing { get; } = new();
-
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for Count.</summary>
@@ -227,6 +193,40 @@ partial class ValidateListBaseStub : global::KnockOff.IKnockOffStub
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+	}
+
+	/// <summary>Tracks and configures behavior for indexer.</summary>
+	public sealed class IndexerInterceptor
+	{
+		/// <summary>Number of times the getter was accessed.</summary>
+		public int GetCount { get; private set; }
+
+		/// <summary>The key from the most recent getter access.</summary>
+		public int? LastGetKey { get; private set; }
+
+		/// <summary>Callback invoked when the getter is accessed.</summary>
+		public global::System.Func<ValidateListBaseStub, int, object?>? OnGet { get; set; }
+
+		/// <summary>Number of times the setter was accessed.</summary>
+		public int SetCount { get; private set; }
+
+		/// <summary>The key and value from the most recent setter call.</summary>
+		public (int? Key, object? Value)? LastSetEntry { get; private set; }
+
+		/// <summary>Callback invoked when the setter is accessed.</summary>
+		public global::System.Action<ValidateListBaseStub, int, object?>? OnSet { get; set; }
+
+		/// <summary>Records a getter access.</summary>
+		public void RecordGet(int? index) { GetCount++; LastGetKey = index; }
+
+		/// <summary>Records a setter access.</summary>
+		public void RecordSet(int? index, object? value) { SetCount++; LastSetEntry = (index, value); }
+
+		/// <summary>Backing storage for this indexer.</summary>
+		public global::System.Collections.Generic.Dictionary<int, object?> Backing { get; } = new();
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for Add.</summary>
@@ -649,38 +649,38 @@ partial class ValidateListBaseStub : global::KnockOff.IKnockOffStub
 		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
 	}
 
-	/// <summary>Interceptor for Parent. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Parent. Configure via .Value, track via .GetCount.</summary>
 	public ParentInterceptor Parent { get; } = new();
 
-	/// <summary>Interceptor for IsFixedSize. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsFixedSize. Configure via .Value, track via .GetCount.</summary>
 	public IsFixedSizeInterceptor IsFixedSize { get; } = new();
 
-	/// <summary>Interceptor for IsReadOnly. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsReadOnly. Configure via .Value, track via .GetCount.</summary>
 	public IsReadOnlyInterceptor IsReadOnly { get; } = new();
 
-	/// <summary>Interceptor for Indexer.</summary>
-	public IndexerInterceptor Indexer { get; } = new();
-
-	/// <summary>Interceptor for Count. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Count. Configure via .Value, track via .GetCount.</summary>
 	public CountInterceptor Count { get; } = new();
 
-	/// <summary>Interceptor for IsSynchronized. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsSynchronized. Configure via .Value, track via .GetCount.</summary>
 	public IsSynchronizedInterceptor IsSynchronized { get; } = new();
 
-	/// <summary>Interceptor for SyncRoot. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for SyncRoot. Configure via .Value, track via .GetCount.</summary>
 	public SyncRootInterceptor SyncRoot { get; } = new();
 
-	/// <summary>Interceptor for IsBusy. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsBusy. Configure via .Value, track via .GetCount.</summary>
 	public IsBusyInterceptor IsBusy { get; } = new();
 
-	/// <summary>Interceptor for IsValid. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsValid. Configure via .Value, track via .GetCount.</summary>
 	public IsValidInterceptor IsValid { get; } = new();
 
-	/// <summary>Interceptor for IsSelfValid. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsSelfValid. Configure via .Value, track via .GetCount.</summary>
 	public IsSelfValidInterceptor IsSelfValid { get; } = new();
 
-	/// <summary>Interceptor for PropertyMessages. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for PropertyMessages. Configure via .Value, track via .GetCount.</summary>
 	public PropertyMessagesInterceptor PropertyMessages { get; } = new();
+
+	/// <summary>Interceptor for indexer. Configure callbacks and track access.</summary>
+	public IndexerInterceptor Indexer { get; } = new();
 
 	/// <summary>Interceptor for Add.</summary>
 	public AddInterceptor Add { get; } = new();
@@ -736,15 +736,66 @@ partial class ValidateListBaseStub : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for NeatooPropertyChanged event.</summary>
 	public NeatooPropertyChangedInterceptor NeatooPropertyChanged { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::Neatoo.IValidateListBase instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.IValidateListBase Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::Neatoo.IValidateBase? global::Neatoo.IValidateListBase.Parent
 	{
 		get { Parent.RecordGet(); if (Parent.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateListBase", "Parent"); return Parent.Value; }
+	}
+
+	bool global::System.Collections.IList.IsFixedSize
+	{
+		get { IsFixedSize.RecordGet(); if (IsFixedSize.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IList", "IsFixedSize"); return IsFixedSize.Value; }
+	}
+
+	bool global::System.Collections.IList.IsReadOnly
+	{
+		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IList", "IsReadOnly"); return IsReadOnly.Value; }
+	}
+
+	int global::System.Collections.ICollection.Count
+	{
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection", "Count"); return Count.Value; }
+	}
+
+	bool global::System.Collections.ICollection.IsSynchronized
+	{
+		get { IsSynchronized.RecordGet(); if (IsSynchronized.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection", "IsSynchronized"); return IsSynchronized.Value; }
+	}
+
+	object global::System.Collections.ICollection.SyncRoot
+	{
+		get { SyncRoot.RecordGet(); if (SyncRoot.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection", "SyncRoot"); return SyncRoot.Value; }
+	}
+
+	bool global::Neatoo.IValidateMetaProperties.IsBusy
+	{
+		get { IsBusy.RecordGet(); if (IsBusy.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsBusy"); return IsBusy.Value; }
+	}
+
+	bool global::Neatoo.IValidateMetaProperties.IsValid
+	{
+		get { IsValid.RecordGet(); if (IsValid.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsValid"); return IsValid.Value; }
+	}
+
+	bool global::Neatoo.IValidateMetaProperties.IsSelfValid
+	{
+		get { IsSelfValid.RecordGet(); if (IsSelfValid.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsSelfValid"); return IsSelfValid.Value; }
+	}
+
+	global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> global::Neatoo.IValidateMetaProperties.PropertyMessages
+	{
+		get { PropertyMessages.RecordGet(); if (PropertyMessages.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "PropertyMessages"); return PropertyMessages.Value; }
+	}
+
+	object? global::System.Collections.IList.this[int index]
+	{
+		get { Indexer.RecordGet(index); if (Indexer.OnGet is { } onGet) return onGet(this, index); if (Strict) throw global::KnockOff.StubException.NotConfigured("IList", "this[]"); return Indexer.Backing.TryGetValue(index, out var v) ? v : default; }
+		set { Indexer.RecordSet(index, value); if (Indexer.OnSet is { } onSet) { onSet(this, index, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IList", "this[]"); Indexer.Backing[index] = value; }
 	}
 
 	int global::System.Collections.IList.Add(object? @value)
@@ -806,43 +857,12 @@ partial class ValidateListBaseStub : global::KnockOff.IKnockOffStub
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IList", "RemoveAt");
 	}
 
-	bool global::System.Collections.IList.IsFixedSize
-	{
-		get { IsFixedSize.RecordGet(); if (IsFixedSize.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IList", "IsFixedSize"); return IsFixedSize.Value; }
-	}
-
-	bool global::System.Collections.IList.IsReadOnly
-	{
-		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IList", "IsReadOnly"); return IsReadOnly.Value; }
-	}
-
-	object? global::System.Collections.IList.this[int index]
-	{
-		get { Indexer.RecordGet(index); if (Indexer.OnGet is { } onGet) return onGet(this, index); if (Strict) throw global::KnockOff.StubException.NotConfigured("IList", "this[]"); return Indexer.Backing.TryGetValue(index, out var v) ? v : default; }
-		set { Indexer.RecordSet(index, value); if (Indexer.OnSet is { } onSet) { onSet(this, index, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IList", "this[]"); Indexer.Backing[index] = value; }
-	}
-
 	void global::System.Collections.ICollection.CopyTo(global::System.Array array, int index)
 	{
 		CopyTo.RecordCall(array, index);
 		if (CopyTo.OnCall is { } onCallCallback)
 		{ onCallCallback(this, array, index); return; }
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection", "CopyTo");
-	}
-
-	int global::System.Collections.ICollection.Count
-	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection", "Count"); return Count.Value; }
-	}
-
-	bool global::System.Collections.ICollection.IsSynchronized
-	{
-		get { IsSynchronized.RecordGet(); if (IsSynchronized.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection", "IsSynchronized"); return IsSynchronized.Value; }
-	}
-
-	object global::System.Collections.ICollection.SyncRoot
-	{
-		get { SyncRoot.RecordGet(); if (SyncRoot.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection", "SyncRoot"); return SyncRoot.Value; }
 	}
 
 	global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
@@ -904,26 +924,6 @@ partial class ValidateListBaseStub : global::KnockOff.IKnockOffStub
 		if (ClearSelfMessages.OnCall is { } onCallCallback)
 		{ onCallCallback(this); return; }
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "ClearSelfMessages");
-	}
-
-	bool global::Neatoo.IValidateMetaProperties.IsBusy
-	{
-		get { IsBusy.RecordGet(); if (IsBusy.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsBusy"); return IsBusy.Value; }
-	}
-
-	bool global::Neatoo.IValidateMetaProperties.IsValid
-	{
-		get { IsValid.RecordGet(); if (IsValid.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsValid"); return IsValid.Value; }
-	}
-
-	bool global::Neatoo.IValidateMetaProperties.IsSelfValid
-	{
-		get { IsSelfValid.RecordGet(); if (IsSelfValid.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsSelfValid"); return IsSelfValid.Value; }
-	}
-
-	global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> global::Neatoo.IValidateMetaProperties.PropertyMessages
-	{
-		get { PropertyMessages.RecordGet(); if (PropertyMessages.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "PropertyMessages"); return PropertyMessages.Value; }
 	}
 
 	event global::System.Collections.Specialized.NotifyCollectionChangedEventHandler? global::System.Collections.Specialized.INotifyCollectionChanged.CollectionChanged

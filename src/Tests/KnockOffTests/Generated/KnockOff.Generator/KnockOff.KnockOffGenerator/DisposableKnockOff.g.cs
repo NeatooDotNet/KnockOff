@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class DisposableKnockOff : global::KnockOff.IKnockOffStub
+partial class DisposableKnockOff : global::System.IDisposable, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Dispose.</summary>
 	public sealed class DisposeInterceptor
@@ -27,11 +27,11 @@ partial class DisposableKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Dispose.</summary>
 	public DisposeInterceptor Dispose { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::System.IDisposable instance. Use for passing to code expecting the interface.</summary>
 	public global::System.IDisposable Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	void global::System.IDisposable.Dispose()
 	{

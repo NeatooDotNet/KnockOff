@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class NotifyPropertyChangedKnockOff : global::KnockOff.IKnockOffStub
+partial class NotifyPropertyChangedKnockOff : global::System.ComponentModel.INotifyPropertyChanged, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Interceptor for PropertyChanged event.</summary>
 	public sealed class PropertyChangedInterceptor
@@ -35,11 +35,11 @@ partial class NotifyPropertyChangedKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for PropertyChanged event.</summary>
 	public PropertyChangedInterceptor PropertyChanged { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::System.ComponentModel.INotifyPropertyChanged instance. Use for passing to code expecting the interface.</summary>
 	public global::System.ComponentModel.INotifyPropertyChanged Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	event global::System.ComponentModel.PropertyChangedEventHandler? global::System.ComponentModel.INotifyPropertyChanged.PropertyChanged
 	{

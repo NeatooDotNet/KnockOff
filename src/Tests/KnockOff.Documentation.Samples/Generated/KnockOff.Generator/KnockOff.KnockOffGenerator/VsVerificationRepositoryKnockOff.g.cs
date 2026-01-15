@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Comparison;
 
-partial class VsVerificationRepositoryKnockOff : global::KnockOff.IKnockOffStub
+partial class VsVerificationRepositoryKnockOff : global::KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Save.</summary>
 	public sealed class SaveInterceptor
@@ -105,11 +105,11 @@ partial class VsVerificationRepositoryKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Update.</summary>
 	public UpdateInterceptor Update { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	void global::KnockOff.Documentation.Samples.Comparison.IVsVerificationRepository.Save(global::KnockOff.Documentation.Samples.Comparison.VsEntity entity)
 	{

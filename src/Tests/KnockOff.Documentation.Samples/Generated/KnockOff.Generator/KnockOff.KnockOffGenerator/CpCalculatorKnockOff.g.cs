@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class CpCalculatorKnockOff : global::KnockOff.IKnockOffStub
+partial class CpCalculatorKnockOff : global::KnockOff.Documentation.Samples.Skills.ICpCalculator, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Add.</summary>
 	public sealed class Add2Interceptor
@@ -61,11 +61,11 @@ partial class CpCalculatorKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Divide.</summary>
 	public Divide2Interceptor Divide2 { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ICpCalculator instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ICpCalculator Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	int global::KnockOff.Documentation.Samples.Skills.ICpCalculator.Add(int a, int b)
 	{

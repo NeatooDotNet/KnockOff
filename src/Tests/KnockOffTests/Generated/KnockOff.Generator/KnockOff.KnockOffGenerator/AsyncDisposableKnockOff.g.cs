@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class AsyncDisposableKnockOff : global::KnockOff.IKnockOffStub
+partial class AsyncDisposableKnockOff : global::System.IAsyncDisposable, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for DisposeAsync.</summary>
 	public sealed class DisposeAsyncInterceptor
@@ -30,11 +30,11 @@ partial class AsyncDisposableKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for DisposeAsync.</summary>
 	public DisposeAsyncInterceptor DisposeAsync { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::System.IAsyncDisposable instance. Use for passing to code expecting the interface.</summary>
 	public global::System.IAsyncDisposable Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::System.Threading.Tasks.ValueTask global::System.IAsyncDisposable.DisposeAsync()
 	{

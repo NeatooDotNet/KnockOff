@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Reference;
 
-partial class GenUserServiceKnockOff : global::KnockOff.IKnockOffStub
+partial class GenUserServiceKnockOff : global::KnockOff.Documentation.Samples.Reference.IGenUserService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameInterceptor
@@ -61,17 +61,17 @@ partial class GenUserServiceKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Name. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Name. Configure via .Value, track via .GetCount.</summary>
 	public NameInterceptor Name { get; } = new();
 
 	/// <summary>Interceptor for GetUser.</summary>
 	public GetUser2Interceptor GetUser2 { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Reference.IGenUserService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Reference.IGenUserService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	string global::KnockOff.Documentation.Samples.Reference.IGenUserService.Name
 	{

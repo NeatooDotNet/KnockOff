@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Comparison;
 
-partial class FcInventoryServiceStub : global::KnockOff.IKnockOffStub
+partial class FcInventoryServiceStub : global::KnockOff.Documentation.Samples.Comparison.IFcInventoryService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for ReserveItems.</summary>
 	public sealed class ReserveItemsInterceptor
@@ -58,11 +58,11 @@ partial class FcInventoryServiceStub : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for ReleaseItems.</summary>
 	public ReleaseItemsInterceptor ReleaseItems { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IFcInventoryService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IFcInventoryService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	bool global::KnockOff.Documentation.Samples.Comparison.IFcInventoryService.ReserveItems(global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Comparison.FcOrderItem> items)
 	{

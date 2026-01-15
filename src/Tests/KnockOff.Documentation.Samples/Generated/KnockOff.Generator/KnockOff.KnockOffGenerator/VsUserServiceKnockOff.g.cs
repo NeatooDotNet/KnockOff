@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Comparison;
 
-partial class VsUserServiceKnockOff : global::KnockOff.IKnockOffStub
+partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Comparison.IVsUserService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for CurrentUser.</summary>
 	public sealed class CurrentUserInterceptor
@@ -152,7 +152,7 @@ partial class VsUserServiceKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for CurrentUser. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for CurrentUser. Configure via .Value, track via .GetCount.</summary>
 	public CurrentUserInterceptor CurrentUser { get; } = new();
 
 	/// <summary>Interceptor for GetUser.</summary>
@@ -170,23 +170,23 @@ partial class VsUserServiceKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Update.</summary>
 	public UpdateInterceptor Update { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IVsUserService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IVsUserService Object => this;
 
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
+	global::KnockOff.Documentation.Samples.Comparison.VsUser? global::KnockOff.Documentation.Samples.Comparison.IVsUserService.CurrentUser
+	{
+		get { CurrentUser.RecordGet(); if (CurrentUser.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IVsUserService", "CurrentUser"); return CurrentUser.Value; }
+		set { CurrentUser.RecordSet(value); if (CurrentUser.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IVsUserService", "CurrentUser"); CurrentUser.Value = value; }
+	}
 
 	global::KnockOff.Documentation.Samples.Comparison.VsUser global::KnockOff.Documentation.Samples.Comparison.IVsUserService.GetUser(int id)
 	{
 		GetUser2.RecordCall(id);
 		if (GetUser2.OnCall is { } callback) return callback(this, id);
 		return GetUser(id);
-	}
-
-	global::KnockOff.Documentation.Samples.Comparison.VsUser? global::KnockOff.Documentation.Samples.Comparison.IVsUserService.CurrentUser
-	{
-		get { CurrentUser.RecordGet(); if (CurrentUser.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IVsUserService", "CurrentUser"); return CurrentUser.Value; }
-		set { CurrentUser.RecordSet(value); if (CurrentUser.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IVsUserService", "CurrentUser"); CurrentUser.Value = value; }
 	}
 
 	global::KnockOff.Documentation.Samples.Comparison.VsUser? global::KnockOff.Documentation.Samples.Comparison.IVsUserService.Save(global::KnockOff.Documentation.Samples.Comparison.VsUser user)

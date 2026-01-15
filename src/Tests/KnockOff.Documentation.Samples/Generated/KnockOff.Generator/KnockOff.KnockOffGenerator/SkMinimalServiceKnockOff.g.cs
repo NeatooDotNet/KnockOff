@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class SkMinimalServiceKnockOff : global::KnockOff.IKnockOffStub
+partial class SkMinimalServiceKnockOff : global::KnockOff.Documentation.Samples.Skills.ISkMinimalService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetUser.</summary>
 	public sealed class GetUser2Interceptor
@@ -83,11 +83,11 @@ partial class SkMinimalServiceKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for GetUsers.</summary>
 	public GetUsersInterceptor GetUsers { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkMinimalService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ISkMinimalService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::KnockOff.Documentation.Samples.Skills.SkUser? global::KnockOff.Documentation.Samples.Skills.ISkMinimalService.GetUser(int id)
 	{

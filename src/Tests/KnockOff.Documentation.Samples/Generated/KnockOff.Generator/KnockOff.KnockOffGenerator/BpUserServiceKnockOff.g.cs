@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class BpUserServiceKnockOff : global::KnockOff.IKnockOffStub
+partial class BpUserServiceKnockOff : global::KnockOff.Documentation.Samples.Guides.IBpUserService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetUser.</summary>
 	public sealed class GetUser2Interceptor
@@ -108,11 +108,11 @@ partial class BpUserServiceKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Save.</summary>
 	public SaveInterceptor Save { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IBpUserService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IBpUserService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::KnockOff.Documentation.Samples.SampleDomain.User? global::KnockOff.Documentation.Samples.Guides.IBpUserService.GetUser(int id)
 	{

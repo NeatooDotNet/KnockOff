@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class MultiRepositoryKnockOff : global::KnockOff.IKnockOffStub
+partial class MultiRepositoryKnockOff : global::KnockOff.Documentation.Samples.Guides.IMultiRepository, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetById.</summary>
 	public sealed class GetByIdInterceptor
@@ -58,11 +58,11 @@ partial class MultiRepositoryKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Add.</summary>
 	public AddInterceptor Add { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IMultiRepository instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IMultiRepository Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::KnockOff.Documentation.Samples.Guides.MultiUser? global::KnockOff.Documentation.Samples.Guides.IMultiRepository.GetById(int id)
 	{

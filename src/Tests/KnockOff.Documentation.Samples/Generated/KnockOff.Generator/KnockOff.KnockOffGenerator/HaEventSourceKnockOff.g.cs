@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class HaEventSourceKnockOff : global::KnockOff.IKnockOffStub
+partial class HaEventSourceKnockOff : global::KnockOff.Documentation.Samples.Skills.IHaEventSource, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Interceptor for DataReceived event.</summary>
 	public sealed class DataReceivedInterceptor
@@ -125,11 +125,11 @@ partial class HaEventSourceKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for DataUpdated event.</summary>
 	public DataUpdatedInterceptor DataUpdated { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IHaEventSource instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.IHaEventSource Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	event global::System.EventHandler<string>? global::KnockOff.Documentation.Samples.Skills.IHaEventSource.DataReceived
 	{

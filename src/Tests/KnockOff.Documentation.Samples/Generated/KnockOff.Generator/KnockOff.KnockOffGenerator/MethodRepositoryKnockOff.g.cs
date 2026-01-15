@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class MethodRepositoryKnockOff : global::KnockOff.IKnockOffStub
+partial class MethodRepositoryKnockOff : global::KnockOff.Documentation.Samples.Guides.IMethodRepository, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetById.</summary>
 	public sealed class GetByIdInterceptor
@@ -58,11 +58,11 @@ partial class MethodRepositoryKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Count.</summary>
 	public CountInterceptor Count { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IMethodRepository instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IMethodRepository Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::KnockOff.Documentation.Samples.Guides.MethodUser? global::KnockOff.Documentation.Samples.Guides.IMethodRepository.GetById(int id)
 	{

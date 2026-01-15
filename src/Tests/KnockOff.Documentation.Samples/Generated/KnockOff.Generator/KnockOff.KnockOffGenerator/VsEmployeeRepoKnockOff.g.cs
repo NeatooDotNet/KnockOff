@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Comparison;
 
-partial class VsEmployeeRepoKnockOff : global::KnockOff.IKnockOffStub
+partial class VsEmployeeRepoKnockOff : global::KnockOff.Documentation.Samples.Comparison.IVsEmployeeRepository, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetEmployee.</summary>
 	public sealed class GetEmployeeInterceptor
@@ -33,11 +33,11 @@ partial class VsEmployeeRepoKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for GetEmployee.</summary>
 	public GetEmployeeInterceptor GetEmployee { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IVsEmployeeRepository instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IVsEmployeeRepository Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::KnockOff.Documentation.Samples.Comparison.VsUser? global::KnockOff.Documentation.Samples.Comparison.IVsEmployeeRepository.GetEmployee(int id)
 	{

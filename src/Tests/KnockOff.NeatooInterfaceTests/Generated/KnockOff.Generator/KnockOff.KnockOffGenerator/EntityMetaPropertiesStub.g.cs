@@ -3,7 +3,7 @@
 
 namespace KnockOff.NeatooInterfaceTests.MetaProperties;
 
-partial class EntityMetaPropertiesStub : global::KnockOff.IKnockOffStub
+partial class EntityMetaPropertiesStub : global::Neatoo.IEntityMetaProperties, global::Neatoo.RemoteFactory.IFactorySaveMeta, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for IsChild.</summary>
 	public sealed class IsChildInterceptor
@@ -138,32 +138,32 @@ partial class EntityMetaPropertiesStub : global::KnockOff.IKnockOffStub
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for IsChild. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsChild. Configure via .Value, track via .GetCount.</summary>
 	public IsChildInterceptor IsChild { get; } = new();
 
-	/// <summary>Interceptor for IsModified. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsModified. Configure via .Value, track via .GetCount.</summary>
 	public IsModifiedInterceptor IsModified { get; } = new();
 
-	/// <summary>Interceptor for IsSelfModified. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsSelfModified. Configure via .Value, track via .GetCount.</summary>
 	public IsSelfModifiedInterceptor IsSelfModified { get; } = new();
 
-	/// <summary>Interceptor for IsMarkedModified. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsMarkedModified. Configure via .Value, track via .GetCount.</summary>
 	public IsMarkedModifiedInterceptor IsMarkedModified { get; } = new();
 
-	/// <summary>Interceptor for IsSavable. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsSavable. Configure via .Value, track via .GetCount.</summary>
 	public IsSavableInterceptor IsSavable { get; } = new();
 
-	/// <summary>Interceptor for IsDeleted. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsDeleted. Configure via .Value, track via .GetCount.</summary>
 	public IsDeletedInterceptor IsDeleted { get; } = new();
 
-	/// <summary>Interceptor for IsNew. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsNew. Configure via .Value, track via .GetCount.</summary>
 	public IsNewInterceptor IsNew { get; } = new();
+
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
 
 	/// <summary>The global::Neatoo.IEntityMetaProperties instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.IEntityMetaProperties Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	bool global::Neatoo.IEntityMetaProperties.IsChild
 	{

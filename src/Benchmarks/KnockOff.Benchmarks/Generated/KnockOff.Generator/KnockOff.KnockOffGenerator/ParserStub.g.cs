@@ -3,7 +3,7 @@
 
 namespace KnockOff.Benchmarks.Stubs;
 
-partial class ParserStub : global::KnockOff.IKnockOffStub
+partial class ParserStub : global::KnockOff.Benchmarks.Interfaces.IParser, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for TryParse.</summary>
 	public sealed class TryParseInterceptor
@@ -61,11 +61,11 @@ partial class ParserStub : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Increment.</summary>
 	public IncrementInterceptor Increment { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Benchmarks.Interfaces.IParser instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Interfaces.IParser Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	bool global::KnockOff.Benchmarks.Interfaces.IParser.TryParse(string input, out int result)
 	{

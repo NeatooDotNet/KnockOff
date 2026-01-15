@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class MethodLoggerKnockOff : global::KnockOff.IKnockOffStub
+partial class MethodLoggerKnockOff : global::KnockOff.Documentation.Samples.Guides.IMethodLogger, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Log.</summary>
 	public sealed class LogInterceptor
@@ -55,11 +55,11 @@ partial class MethodLoggerKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for LogError.</summary>
 	public LogErrorInterceptor LogError { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IMethodLogger instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IMethodLogger Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	void global::KnockOff.Documentation.Samples.Guides.IMethodLogger.Log(string message)
 	{

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class CollisionKnockOff : global::KnockOff.IKnockOffStub
+partial class CollisionKnockOff : global::KnockOff.Tests.ICollision, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for ICollision.</summary>
 	public sealed class ICollisionInterceptor
@@ -55,17 +55,17 @@ partial class CollisionKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for ICollision. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for ICollision. Configure via .Value, track via .GetCount.</summary>
 	public ICollisionInterceptor ICollision { get; } = new();
 
 	/// <summary>Interceptor for DoWork.</summary>
 	public DoWorkInterceptor DoWork { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Tests.ICollision instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.ICollision Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	string global::KnockOff.Tests.ICollision.ICollision
 	{

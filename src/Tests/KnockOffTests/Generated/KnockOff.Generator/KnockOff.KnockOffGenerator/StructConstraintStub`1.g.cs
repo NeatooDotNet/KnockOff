@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class StructConstraintStub<T> : global::KnockOff.IKnockOffStub where T : struct
+partial class StructConstraintStub<T> : global::KnockOff.Tests.IStructConstraintService<T>, global::KnockOff.IKnockOffStub where T : struct
 {
 	/// <summary>Tracks and configures behavior for GetDefault.</summary>
 	public sealed class GetDefaultInterceptor
@@ -55,11 +55,11 @@ partial class StructConstraintStub<T> : global::KnockOff.IKnockOffStub where T :
 	/// <summary>Interceptor for Set.</summary>
 	public SetInterceptor Set { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Tests.IStructConstraintService<T> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IStructConstraintService<T> Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	T global::KnockOff.Tests.IStructConstraintService<T>.GetDefault()
 	{

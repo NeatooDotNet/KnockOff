@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class SkOutParamParserKnockOff : global::KnockOff.IKnockOffStub
+partial class SkOutParamParserKnockOff : global::KnockOff.Documentation.Samples.Skills.ISkOutParamParser, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for TryParse.</summary>
 	public sealed class TryParseInterceptor
@@ -58,11 +58,11 @@ partial class SkOutParamParserKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for GetData.</summary>
 	public GetDataInterceptor GetData { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkOutParamParser instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ISkOutParamParser Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	bool global::KnockOff.Documentation.Samples.Skills.ISkOutParamParser.TryParse(string input, out int result)
 	{

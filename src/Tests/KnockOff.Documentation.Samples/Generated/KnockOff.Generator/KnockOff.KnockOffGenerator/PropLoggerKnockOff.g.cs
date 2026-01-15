@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class PropLoggerKnockOff : global::KnockOff.IKnockOffStub
+partial class PropLoggerKnockOff : global::KnockOff.Documentation.Samples.Guides.IPropLogger, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Output.</summary>
 	public sealed class OutputInterceptor
@@ -27,14 +27,14 @@ partial class PropLoggerKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 	}
 
-	/// <summary>Interceptor for Output. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Output. Configure via .Value, track via .GetCount.</summary>
 	public OutputInterceptor Output { get; } = new();
+
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
 
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IPropLogger instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IPropLogger Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	string global::KnockOff.Documentation.Samples.Guides.IPropLogger.Output
 	{

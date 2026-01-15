@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class BpDynamicServiceKnockOff : global::KnockOff.IKnockOffStub
+partial class BpDynamicServiceKnockOff : global::KnockOff.Documentation.Samples.Guides.IBpDynamicService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for RequestId.</summary>
 	public sealed class RequestIdInterceptor
@@ -62,20 +62,20 @@ partial class BpDynamicServiceKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for RequestId. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for RequestId. Configure via .Value, track via .GetCount.</summary>
 	public RequestIdInterceptor RequestId { get; } = new();
 
-	/// <summary>Interceptor for IsReady. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsReady. Configure via .Value, track via .GetCount.</summary>
 	public IsReadyInterceptor IsReady { get; } = new();
 
 	/// <summary>Interceptor for Initialize.</summary>
 	public InitializeInterceptor Initialize { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IBpDynamicService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IBpDynamicService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	string global::KnockOff.Documentation.Samples.Guides.IBpDynamicService.RequestId
 	{

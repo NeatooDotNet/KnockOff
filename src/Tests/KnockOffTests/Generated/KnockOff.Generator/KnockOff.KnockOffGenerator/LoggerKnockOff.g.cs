@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class LoggerKnockOff : global::KnockOff.IKnockOffStub
+partial class LoggerKnockOff : global::KnockOff.Tests.ILogger, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameInterceptor
@@ -58,17 +58,23 @@ partial class LoggerKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Name. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Name. Configure via .Value, track via .GetCount.</summary>
 	public NameInterceptor Name { get; } = new();
 
 	/// <summary>Interceptor for Log.</summary>
 	public LogInterceptor Log { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Tests.ILogger instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.ILogger Object => this;
 
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
+	string global::KnockOff.Tests.ILogger.Name
+	{
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ILogger", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ILogger", "Name"); Name.Value = value; }
+	}
 
 	void global::KnockOff.Tests.ILogger.Log(string message)
 	{
@@ -76,12 +82,6 @@ partial class LoggerKnockOff : global::KnockOff.IKnockOffStub
 		if (Log.OnCall is { } onCallCallback)
 		{ onCallCallback(this, message); return; }
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("ILogger", "Log");
-	}
-
-	string global::KnockOff.Tests.ILogger.Name
-	{
-		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ILogger", "Name"); return Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ILogger", "Name"); Name.Value = value; }
 	}
 
 }

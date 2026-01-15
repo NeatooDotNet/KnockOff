@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class GenericEntityRepoStub<T> : global::KnockOff.IKnockOffStub where T : class, global::KnockOff.Documentation.Samples.Guides.IGenEntity
+partial class GenericEntityRepoStub<T> : global::KnockOff.Documentation.Samples.Guides.IGenericEntityRepo<T>, global::KnockOff.IKnockOffStub where T : class, global::KnockOff.Documentation.Samples.Guides.IGenEntity
 {
 	/// <summary>Tracks and configures behavior for FindById.</summary>
 	public sealed class FindByIdInterceptor
@@ -58,11 +58,11 @@ partial class GenericEntityRepoStub<T> : global::KnockOff.IKnockOffStub where T 
 	/// <summary>Interceptor for Save.</summary>
 	public SaveInterceptor Save { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IGenericEntityRepo<T> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IGenericEntityRepo<T> Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	T? global::KnockOff.Documentation.Samples.Guides.IGenericEntityRepo<T>.FindById(int id)
 	{

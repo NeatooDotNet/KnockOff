@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class IhOrderKnockOff : global::KnockOff.IKnockOffStub
+partial class IhOrderKnockOff : global::KnockOff.Documentation.Samples.Guides.IIhOrder, global::KnockOff.Documentation.Samples.Guides.IIhValidatable, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Total.</summary>
 	public sealed class TotalInterceptor
@@ -84,10 +84,10 @@ partial class IhOrderKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Total. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Total. Configure via .Value, track via .GetCount.</summary>
 	public TotalInterceptor Total { get; } = new();
 
-	/// <summary>Interceptor for IsValid. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsValid. Configure via .Value, track via .GetCount.</summary>
 	public IsValidInterceptor IsValid { get; } = new();
 
 	/// <summary>Interceptor for Submit.</summary>
@@ -96,15 +96,20 @@ partial class IhOrderKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for GetErrors.</summary>
 	public GetErrorsInterceptor GetErrors { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IIhOrder instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IIhOrder Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	decimal global::KnockOff.Documentation.Samples.Guides.IIhOrder.Total
 	{
 		get { Total.RecordGet(); if (Total.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IIhOrder", "Total"); return Total.Value; }
+	}
+
+	bool global::KnockOff.Documentation.Samples.Guides.IIhValidatable.IsValid
+	{
+		get { IsValid.RecordGet(); if (IsValid.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IIhValidatable", "IsValid"); return IsValid.Value; }
 	}
 
 	void global::KnockOff.Documentation.Samples.Guides.IIhOrder.Submit()
@@ -113,11 +118,6 @@ partial class IhOrderKnockOff : global::KnockOff.IKnockOffStub
 		if (Submit.OnCall is { } onCallCallback)
 		{ onCallCallback(this); return; }
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IIhOrder", "Submit");
-	}
-
-	bool global::KnockOff.Documentation.Samples.Guides.IIhValidatable.IsValid
-	{
-		get { IsValid.RecordGet(); if (IsValid.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IIhValidatable", "IsValid"); return IsValid.Value; }
 	}
 
 	global::System.Collections.Generic.IEnumerable<string> global::KnockOff.Documentation.Samples.Guides.IIhValidatable.GetErrors()

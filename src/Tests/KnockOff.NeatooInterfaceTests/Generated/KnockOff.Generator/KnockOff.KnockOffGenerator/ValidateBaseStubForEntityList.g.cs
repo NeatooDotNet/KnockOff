@@ -3,7 +3,7 @@
 
 namespace KnockOff.NeatooInterfaceTests.Collections;
 
-partial class ValidateBaseStubForEntityList : global::KnockOff.IKnockOffStub
+partial class ValidateBaseStubForEntityList : global::Neatoo.IValidateBase, global::System.ComponentModel.INotifyPropertyChanged, global::Neatoo.INotifyNeatooPropertyChanged, global::Neatoo.IValidateMetaProperties, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Parent.</summary>
 	public sealed class ParentInterceptor
@@ -41,28 +41,6 @@ partial class ValidateBaseStubForEntityList : global::KnockOff.IKnockOffStub
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
-	}
-
-	/// <summary>Tracks and configures behavior for Indexer.</summary>
-	public sealed class IndexerInterceptor
-	{
-		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
-
-		/// <summary>The key from the most recent getter access.</summary>
-		public string? LastGetKey { get; private set; }
-
-		/// <summary>Callback invoked when the getter is accessed.</summary>
-		public global::System.Func<ValidateBaseStubForEntityList, string, global::Neatoo.IValidateProperty>? OnGet { get; set; }
-
-		/// <summary>Records a getter access.</summary>
-		public void RecordGet(string? propertyName) { GetCount++; LastGetKey = propertyName; }
-
-		/// <summary>Backing storage for this indexer.</summary>
-		public global::System.Collections.Generic.Dictionary<string, global::Neatoo.IValidateProperty> Backing { get; } = new();
-
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsBusy.</summary>
@@ -139,6 +117,28 @@ partial class ValidateBaseStubForEntityList : global::KnockOff.IKnockOffStub
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+	}
+
+	/// <summary>Tracks and configures behavior for indexer.</summary>
+	public sealed class IndexerInterceptor
+	{
+		/// <summary>Number of times the getter was accessed.</summary>
+		public int GetCount { get; private set; }
+
+		/// <summary>The key from the most recent getter access.</summary>
+		public string? LastGetKey { get; private set; }
+
+		/// <summary>Callback invoked when the getter is accessed.</summary>
+		public global::System.Func<ValidateBaseStubForEntityList, string, global::Neatoo.IValidateProperty>? OnGet { get; set; }
+
+		/// <summary>Records a getter access.</summary>
+		public void RecordGet(string? propertyName) { GetCount++; LastGetKey = propertyName; }
+
+		/// <summary>Backing storage for this indexer.</summary>
+		public global::System.Collections.Generic.Dictionary<string, global::Neatoo.IValidateProperty> Backing { get; } = new();
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for GetProperty.</summary>
@@ -380,26 +380,26 @@ partial class ValidateBaseStubForEntityList : global::KnockOff.IKnockOffStub
 		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
 	}
 
-	/// <summary>Interceptor for Parent. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Parent. Configure via .Value, track via .GetCount.</summary>
 	public ParentInterceptor Parent { get; } = new();
 
-	/// <summary>Interceptor for IsPaused. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsPaused. Configure via .Value, track via .GetCount.</summary>
 	public IsPausedInterceptor IsPaused { get; } = new();
 
-	/// <summary>Interceptor for Indexer.</summary>
-	public IndexerInterceptor Indexer { get; } = new();
-
-	/// <summary>Interceptor for IsBusy. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsBusy. Configure via .Value, track via .GetCount.</summary>
 	public IsBusyInterceptor IsBusy { get; } = new();
 
-	/// <summary>Interceptor for IsValid. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsValid. Configure via .Value, track via .GetCount.</summary>
 	public IsValidInterceptor IsValid { get; } = new();
 
-	/// <summary>Interceptor for IsSelfValid. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsSelfValid. Configure via .Value, track via .GetCount.</summary>
 	public IsSelfValidInterceptor IsSelfValid { get; } = new();
 
-	/// <summary>Interceptor for PropertyMessages. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for PropertyMessages. Configure via .Value, track via .GetCount.</summary>
 	public PropertyMessagesInterceptor PropertyMessages { get; } = new();
+
+	/// <summary>Interceptor for indexer. Configure callbacks and track access.</summary>
+	public IndexerInterceptor Indexer { get; } = new();
 
 	/// <summary>Interceptor for GetProperty.</summary>
 	public GetPropertyInterceptor GetProperty { get; } = new();
@@ -431,11 +431,46 @@ partial class ValidateBaseStubForEntityList : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for NeatooPropertyChanged event.</summary>
 	public NeatooPropertyChangedInterceptor NeatooPropertyChanged { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::Neatoo.IValidateBase instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.IValidateBase Object => this;
 
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
+	global::Neatoo.IValidateBase? global::Neatoo.IValidateBase.Parent
+	{
+		get { Parent.RecordGet(); if (Parent.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "Parent"); return Parent.Value; }
+	}
+
+	bool global::Neatoo.IValidateBase.IsPaused
+	{
+		get { IsPaused.RecordGet(); if (IsPaused.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "IsPaused"); return IsPaused.Value; }
+	}
+
+	bool global::Neatoo.IValidateMetaProperties.IsBusy
+	{
+		get { IsBusy.RecordGet(); if (IsBusy.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsBusy"); return IsBusy.Value; }
+	}
+
+	bool global::Neatoo.IValidateMetaProperties.IsValid
+	{
+		get { IsValid.RecordGet(); if (IsValid.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsValid"); return IsValid.Value; }
+	}
+
+	bool global::Neatoo.IValidateMetaProperties.IsSelfValid
+	{
+		get { IsSelfValid.RecordGet(); if (IsSelfValid.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsSelfValid"); return IsSelfValid.Value; }
+	}
+
+	global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> global::Neatoo.IValidateMetaProperties.PropertyMessages
+	{
+		get { PropertyMessages.RecordGet(); if (PropertyMessages.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "PropertyMessages"); return PropertyMessages.Value; }
+	}
+
+	global::Neatoo.IValidateProperty global::Neatoo.IValidateBase.this[string propertyName]
+	{
+		get { Indexer.RecordGet(propertyName); if (Indexer.OnGet is { } onGet) return onGet(this, propertyName); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "this[]"); return Indexer.Backing.TryGetValue(propertyName, out var v) ? v : default!; }
+	}
 
 	global::Neatoo.IValidateProperty global::Neatoo.IValidateBase.GetProperty(string propertyName)
 	{
@@ -454,21 +489,6 @@ partial class ValidateBaseStubForEntityList : global::KnockOff.IKnockOffStub
 			return onCallCallback(this, propertyName, out validateProperty);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "TryGetProperty");
 		return default!;
-	}
-
-	global::Neatoo.IValidateBase? global::Neatoo.IValidateBase.Parent
-	{
-		get { Parent.RecordGet(); if (Parent.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "Parent"); return Parent.Value; }
-	}
-
-	bool global::Neatoo.IValidateBase.IsPaused
-	{
-		get { IsPaused.RecordGet(); if (IsPaused.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "IsPaused"); return IsPaused.Value; }
-	}
-
-	global::Neatoo.IValidateProperty global::Neatoo.IValidateBase.this[string propertyName]
-	{
-		get { Indexer.RecordGet(propertyName); if (Indexer.OnGet is { } onGet) return onGet(this, propertyName); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "this[]"); return Indexer.Backing.TryGetValue(propertyName, out var v) ? v : default!; }
 	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.WaitForTasks()
@@ -521,26 +541,6 @@ partial class ValidateBaseStubForEntityList : global::KnockOff.IKnockOffStub
 		if (ClearSelfMessages.OnCall is { } onCallCallback)
 		{ onCallCallback(this); return; }
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "ClearSelfMessages");
-	}
-
-	bool global::Neatoo.IValidateMetaProperties.IsBusy
-	{
-		get { IsBusy.RecordGet(); if (IsBusy.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsBusy"); return IsBusy.Value; }
-	}
-
-	bool global::Neatoo.IValidateMetaProperties.IsValid
-	{
-		get { IsValid.RecordGet(); if (IsValid.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsValid"); return IsValid.Value; }
-	}
-
-	bool global::Neatoo.IValidateMetaProperties.IsSelfValid
-	{
-		get { IsSelfValid.RecordGet(); if (IsSelfValid.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsSelfValid"); return IsSelfValid.Value; }
-	}
-
-	global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> global::Neatoo.IValidateMetaProperties.PropertyMessages
-	{
-		get { PropertyMessages.RecordGet(); if (PropertyMessages.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "PropertyMessages"); return PropertyMessages.Value; }
 	}
 
 	event global::System.ComponentModel.PropertyChangedEventHandler? global::System.ComponentModel.INotifyPropertyChanged.PropertyChanged

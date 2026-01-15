@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class NestedTypeParamStub<T> : global::KnockOff.IKnockOffStub
+partial class NestedTypeParamStub<T> : global::KnockOff.Tests.INestedTypeParamService<T>, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetItems.</summary>
 	public sealed class GetItemsInterceptor
@@ -55,11 +55,11 @@ partial class NestedTypeParamStub<T> : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for AddItems.</summary>
 	public AddItemsInterceptor AddItems { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Tests.INestedTypeParamService<T> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.INestedTypeParamService<T> Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::System.Collections.Generic.List<T> global::KnockOff.Tests.INestedTypeParamService<T>.GetItems()
 	{

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Benchmarks.Stubs;
 
-partial class EntityRepositoryStub : global::KnockOff.IKnockOffStub
+partial class EntityRepositoryStub : global::KnockOff.Benchmarks.Interfaces.IRepository<global::KnockOff.Benchmarks.Interfaces.Entity>, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetById.</summary>
 	public sealed class GetByIdInterceptor
@@ -83,11 +83,11 @@ partial class EntityRepositoryStub : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for GetAll.</summary>
 	public GetAllInterceptor GetAll { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Benchmarks.Interfaces.IRepository<global::KnockOff.Benchmarks.Interfaces.Entity> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Interfaces.IRepository<global::KnockOff.Benchmarks.Interfaces.Entity> Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::KnockOff.Benchmarks.Interfaces.Entity? global::KnockOff.Benchmarks.Interfaces.IRepository<global::KnockOff.Benchmarks.Interfaces.Entity>.GetById(int id)
 	{

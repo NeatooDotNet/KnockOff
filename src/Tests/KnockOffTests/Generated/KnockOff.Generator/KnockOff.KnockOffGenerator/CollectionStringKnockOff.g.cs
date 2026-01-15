@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class CollectionStringKnockOff : global::KnockOff.IKnockOffStub
+partial class CollectionStringKnockOff : global::System.Collections.Generic.ICollection<string>, global::System.Collections.Generic.IEnumerable<string>, global::System.Collections.IEnumerable, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Count.</summary>
 	public sealed class CountInterceptor
@@ -178,10 +178,10 @@ partial class CollectionStringKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Count. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Count. Configure via .Value, track via .GetCount.</summary>
 	public CountInterceptor Count { get; } = new();
 
-	/// <summary>Interceptor for IsReadOnly. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsReadOnly. Configure via .Value, track via .GetCount.</summary>
 	public IsReadOnlyInterceptor IsReadOnly { get; } = new();
 
 	/// <summary>Interceptor for Add.</summary>
@@ -202,11 +202,21 @@ partial class CollectionStringKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for GetEnumerator.</summary>
 	public GetEnumeratorInterceptor GetEnumerator { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::System.Collections.Generic.ICollection<string> instance. Use for passing to code expecting the interface.</summary>
 	public global::System.Collections.Generic.ICollection<string> Object => this;
 
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
+	int global::System.Collections.Generic.ICollection<string>.Count
+	{
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "Count"); return Count.Value; }
+	}
+
+	bool global::System.Collections.Generic.ICollection<string>.IsReadOnly
+	{
+		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "IsReadOnly"); return IsReadOnly.Value; }
+	}
 
 	void global::System.Collections.Generic.ICollection<string>.Add(string item)
 	{
@@ -250,16 +260,6 @@ partial class CollectionStringKnockOff : global::KnockOff.IKnockOffStub
 		return default!;
 	}
 
-	int global::System.Collections.Generic.ICollection<string>.Count
-	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "Count"); return Count.Value; }
-	}
-
-	bool global::System.Collections.Generic.ICollection<string>.IsReadOnly
-	{
-		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "IsReadOnly"); return IsReadOnly.Value; }
-	}
-
 	global::System.Collections.Generic.IEnumerator<string> global::System.Collections.Generic.IEnumerable<string>.GetEnumerator()
 	{
 		GetEnumerator.RecordCall();
@@ -271,7 +271,11 @@ partial class CollectionStringKnockOff : global::KnockOff.IKnockOffStub
 
 	global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
 	{
-		return ((global::System.Collections.Generic.IEnumerable<string>)this).GetEnumerator();
+		GetEnumerator.RecordCall();
+		if (GetEnumerator.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
+		throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall or define a protected method 'GetEnumerator' in your partial class.");
 	}
 
 }

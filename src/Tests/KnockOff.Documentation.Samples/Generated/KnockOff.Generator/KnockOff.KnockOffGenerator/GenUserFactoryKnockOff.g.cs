@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class GenUserFactoryKnockOff : global::KnockOff.IKnockOffStub
+partial class GenUserFactoryKnockOff : global::KnockOff.Documentation.Samples.Guides.IGenFactory<global::KnockOff.Documentation.Samples.Guides.GenUser>, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Create.</summary>
 	public sealed class CreateInterceptor
@@ -30,11 +30,11 @@ partial class GenUserFactoryKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Create.</summary>
 	public CreateInterceptor Create { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IGenFactory<global::KnockOff.Documentation.Samples.Guides.GenUser> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IGenFactory<global::KnockOff.Documentation.Samples.Guides.GenUser> Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::KnockOff.Documentation.Samples.Guides.GenUser global::KnockOff.Documentation.Samples.Guides.IGenFactory<global::KnockOff.Documentation.Samples.Guides.GenUser>.Create()
 	{

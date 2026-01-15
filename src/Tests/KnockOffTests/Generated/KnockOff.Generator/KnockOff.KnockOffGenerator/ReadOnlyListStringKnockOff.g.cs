@@ -3,9 +3,28 @@
 
 namespace KnockOff.Tests;
 
-partial class ReadOnlyListStringKnockOff : global::KnockOff.IKnockOffStub
+partial class ReadOnlyListStringKnockOff : global::System.Collections.Generic.IReadOnlyList<string>, global::System.Collections.Generic.IReadOnlyCollection<string>, global::System.Collections.Generic.IEnumerable<string>, global::System.Collections.IEnumerable, global::KnockOff.IKnockOffStub
 {
-	/// <summary>Tracks and configures behavior for Indexer.</summary>
+	/// <summary>Tracks and configures behavior for Count.</summary>
+	public sealed class CountInterceptor
+	{
+		/// <summary>Number of times the getter was accessed.</summary>
+		public int GetCount { get; private set; }
+
+		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
+		public global::System.Func<ReadOnlyListStringKnockOff, int>? OnGet { get; set; }
+
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public int Value { get; set; } = default!;
+
+		/// <summary>Records a getter access.</summary>
+		public void RecordGet() => GetCount++;
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+	}
+
+	/// <summary>Tracks and configures behavior for indexer.</summary>
 	public sealed class IndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
@@ -25,25 +44,6 @@ partial class ReadOnlyListStringKnockOff : global::KnockOff.IKnockOffStub
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
-	}
-
-	/// <summary>Tracks and configures behavior for Count.</summary>
-	public sealed class CountInterceptor
-	{
-		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
-
-		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<ReadOnlyListStringKnockOff, int>? OnGet { get; set; }
-
-		/// <summary>Value returned by getter when OnGet is not set.</summary>
-		public int Value { get; set; } = default!;
-
-		/// <summary>Records a getter access.</summary>
-		public void RecordGet() => GetCount++;
-
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for GetEnumerator.</summary>
@@ -68,29 +68,29 @@ partial class ReadOnlyListStringKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Indexer.</summary>
-	public IndexerInterceptor Indexer { get; } = new();
-
-	/// <summary>Interceptor for Count. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Count. Configure via .Value, track via .GetCount.</summary>
 	public CountInterceptor Count { get; } = new();
+
+	/// <summary>Interceptor for indexer. Configure callbacks and track access.</summary>
+	public IndexerInterceptor Indexer { get; } = new();
 
 	/// <summary>Interceptor for GetEnumerator.</summary>
 	public GetEnumeratorInterceptor GetEnumerator { get; } = new();
 
-	/// <summary>The global::System.Collections.Generic.IReadOnlyList<string> instance. Use for passing to code expecting the interface.</summary>
-	public global::System.Collections.Generic.IReadOnlyList<string> Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
 	public bool Strict { get; set; } = false;
 
-	string global::System.Collections.Generic.IReadOnlyList<string>.this[int index]
-	{
-		get { Indexer.RecordGet(index); if (Indexer.OnGet is { } onGet) return onGet(this, index); if (Strict) throw global::KnockOff.StubException.NotConfigured("IReadOnlyList<string>", "this[]"); return Indexer.Backing.TryGetValue(index, out var v) ? v : default!; }
-	}
+	/// <summary>The global::System.Collections.Generic.IReadOnlyList<string> instance. Use for passing to code expecting the interface.</summary>
+	public global::System.Collections.Generic.IReadOnlyList<string> Object => this;
 
 	int global::System.Collections.Generic.IReadOnlyCollection<string>.Count
 	{
 		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IReadOnlyCollection<string>", "Count"); return Count.Value; }
+	}
+
+	string global::System.Collections.Generic.IReadOnlyList<string>.this[int index]
+	{
+		get { Indexer.RecordGet(index); if (Indexer.OnGet is { } onGet) return onGet(this, index); if (Strict) throw global::KnockOff.StubException.NotConfigured("IReadOnlyList<string>", "this[]"); return Indexer.Backing.TryGetValue(index, out var v) ? v : default!; }
 	}
 
 	global::System.Collections.Generic.IEnumerator<string> global::System.Collections.Generic.IEnumerable<string>.GetEnumerator()
@@ -104,7 +104,11 @@ partial class ReadOnlyListStringKnockOff : global::KnockOff.IKnockOffStub
 
 	global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
 	{
-		return ((global::System.Collections.Generic.IEnumerable<string>)this).GetEnumerator();
+		GetEnumerator.RecordCall();
+		if (GetEnumerator.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
+		throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall or define a protected method 'GetEnumerator' in your partial class.");
 	}
 
 }

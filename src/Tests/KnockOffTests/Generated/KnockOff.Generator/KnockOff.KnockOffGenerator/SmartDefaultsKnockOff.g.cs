@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class SmartDefaultsKnockOff : global::KnockOff.IKnockOffStub
+partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Count.</summary>
 	public sealed class CountInterceptor
@@ -351,10 +351,10 @@ partial class SmartDefaultsKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Count. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Count. Configure via .Value, track via .GetCount.</summary>
 	public CountInterceptor Count { get; } = new();
 
-	/// <summary>Interceptor for Items. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Items. Configure via .Value, track via .GetCount.</summary>
 	public ItemsInterceptor Items { get; } = new();
 
 	/// <summary>Interceptor for GetInt.</summary>
@@ -399,11 +399,21 @@ partial class SmartDefaultsKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for GetStringAsync.</summary>
 	public GetStringAsyncInterceptor GetStringAsync { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Tests.ISmartDefaultsService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.ISmartDefaultsService Object => this;
 
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
+	int global::KnockOff.Tests.ISmartDefaultsService.Count
+	{
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ISmartDefaultsService", "Count"); return Count.Value; }
+	}
+
+	global::System.Collections.Generic.List<string> global::KnockOff.Tests.ISmartDefaultsService.Items
+	{
+		get { Items.RecordGet(); if (Items.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ISmartDefaultsService", "Items"); return Items.Value; }
+	}
 
 	int global::KnockOff.Tests.ISmartDefaultsService.GetInt()
 	{
@@ -529,16 +539,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.IKnockOffStub
 			return callback(this);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISmartDefaultsService", "GetStringAsync");
 		throw new global::System.InvalidOperationException("No implementation provided for GetStringAsync. Set GetStringAsync.OnCall or define a protected method 'GetStringAsync' in your partial class.");
-	}
-
-	int global::KnockOff.Tests.ISmartDefaultsService.Count
-	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ISmartDefaultsService", "Count"); return Count.Value; }
-	}
-
-	global::System.Collections.Generic.List<string> global::KnockOff.Tests.ISmartDefaultsService.Items
-	{
-		get { Items.RecordGet(); if (Items.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ISmartDefaultsService", "Items"); return Items.Value; }
 	}
 
 }

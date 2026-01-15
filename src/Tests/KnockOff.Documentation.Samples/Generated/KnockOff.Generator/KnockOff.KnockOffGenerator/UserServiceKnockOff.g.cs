@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.GettingStarted;
 
-partial class UserServiceKnockOff : global::KnockOff.IKnockOffStub
+partial class UserServiceKnockOff : global::KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameInterceptor
@@ -61,29 +61,29 @@ partial class UserServiceKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Name. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Name. Configure via .Value, track via .GetCount.</summary>
 	public NameInterceptor Name { get; } = new();
 
 	/// <summary>Interceptor for GetUser.</summary>
 	public GetUser2Interceptor GetUser2 { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple Object => this;
 
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
+	string global::KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple.Name
+	{
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserServiceSimple", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserServiceSimple", "Name"); Name.Value = value; }
+	}
 
 	global::KnockOff.Documentation.Samples.GettingStarted.User global::KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple.GetUser(int id)
 	{
 		GetUser2.RecordCall(id);
 		if (GetUser2.OnCall is { } callback) return callback(this, id);
 		return GetUser(id);
-	}
-
-	string global::KnockOff.Documentation.Samples.GettingStarted.IUserServiceSimple.Name
-	{
-		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserServiceSimple", "Name"); return Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserServiceSimple", "Name"); Name.Value = value; }
 	}
 
 }

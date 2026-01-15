@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class SkSingleMethodServiceKnockOff : global::KnockOff.IKnockOffStub
+partial class SkSingleMethodServiceKnockOff : global::KnockOff.Documentation.Samples.Skills.ISkSingleMethodService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for SendEmail.</summary>
 	public sealed class SendEmailInterceptor
@@ -30,11 +30,11 @@ partial class SkSingleMethodServiceKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for SendEmail.</summary>
 	public SendEmailInterceptor SendEmail { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkSingleMethodService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ISkSingleMethodService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	void global::KnockOff.Documentation.Samples.Skills.ISkSingleMethodService.SendEmail(string to, string subject)
 	{

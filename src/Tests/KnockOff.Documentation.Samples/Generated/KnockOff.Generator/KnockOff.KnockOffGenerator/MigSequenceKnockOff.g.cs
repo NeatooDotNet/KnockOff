@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Comparison;
 
-partial class MigSequenceKnockOff : global::KnockOff.IKnockOffStub
+partial class MigSequenceKnockOff : global::KnockOff.Documentation.Samples.Comparison.IMigSequence, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetNext.</summary>
 	public sealed class GetNextInterceptor
@@ -30,11 +30,11 @@ partial class MigSequenceKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for GetNext.</summary>
 	public GetNextInterceptor GetNext { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IMigSequence instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IMigSequence Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	int global::KnockOff.Documentation.Samples.Comparison.IMigSequence.GetNext()
 	{

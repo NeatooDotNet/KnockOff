@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class MethodServiceKnockOff : global::KnockOff.IKnockOffStub
+partial class MethodServiceKnockOff : global::KnockOff.Documentation.Samples.Guides.IMethodService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Initialize.</summary>
 	public sealed class InitializeInterceptor
@@ -27,11 +27,11 @@ partial class MethodServiceKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Initialize.</summary>
 	public InitializeInterceptor Initialize { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IMethodService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IMethodService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	void global::KnockOff.Documentation.Samples.Guides.IMethodService.Initialize()
 	{

@@ -5,34 +5,41 @@ using System.Linq;
 
 namespace KnockOff.Documentation.Samples.Comparison;
 
-partial class FcCacheServiceStub : global::KnockOff.IKnockOffStub
+partial class FcCacheServiceStub : global::KnockOff.Documentation.Samples.Comparison.IFcCacheService, global::KnockOff.IKnockOffStub
 {
-	/// <summary>Marker interface for generic method call tracking.</summary>
-	private interface IGenericMethodCallTracker { int CallCount { get; } bool WasCalled { get; } }
-
-	/// <summary>Marker interface for resettable handlers.</summary>
-	private interface IResettable { void Reset(); }
-
-	/// <summary>Gets a smart default value for a generic type at runtime.</summary>
-	private static T SmartDefault<T>(string methodName)
+	/// <summary>Interface for tracking calls to generic methods.</summary>
+	private interface IGenericMethodCallTracker
 	{
-		var type = typeof(T);
+		int CallCount { get; }
+		bool WasCalled { get; }
+	}
 
-		// Value types -> default(T)
-		if (type.IsValueType)
-			return default!;
+	/// <summary>Interface for resetting state.</summary>
+	private interface IResettable
+	{
+		void Reset();
+	}
 
-		// Check for parameterless constructor
-		var ctor = type.GetConstructor(
-			System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,
-			null, System.Type.EmptyTypes, null);
+	/// <summary>Tracks and configures behavior for Remove.</summary>
+	public sealed class RemoveInterceptor
+	{
+		/// <summary>Number of times this method was called.</summary>
+		public int CallCount { get; private set; }
 
-		if (ctor != null)
-			return (T)ctor.Invoke(null);
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
 
-		throw new global::System.InvalidOperationException(
-			$"No implementation provided for {methodName}<{type.Name}>. " +
-			$"Define a protected method '{methodName}' in your partial class, or set the handler's OnCall.");
+		/// <summary>The argument from the most recent call.</summary>
+		public string? LastCallArg { get; private set; }
+
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<FcCacheServiceStub, string>? OnCall { get; set; }
+
+		/// <summary>Records a method call.</summary>
+		public void RecordCall(string? key) { CallCount++; LastCallArg = key; }
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Interceptor for Get (generic method with Of&lt;T&gt;() access).</summary>
@@ -155,42 +162,42 @@ partial class FcCacheServiceStub : global::KnockOff.IKnockOffStub
 		}
 	}
 
-	/// <summary>Tracks and configures behavior for Remove.</summary>
-	public sealed class RemoveInterceptor
-	{
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
-
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
-
-		/// <summary>The argument from the most recent call.</summary>
-		public string? LastCallArg { get; private set; }
-
-		/// <summary>Callback invoked when this method is called.</summary>
-		public global::System.Action<FcCacheServiceStub, string>? OnCall { get; set; }
-
-		/// <summary>Records a method call.</summary>
-		public void RecordCall(string? key) { CallCount++; LastCallArg = key; }
-
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
-	}
-
-	/// <summary>Interceptor for Get (use .Of&lt;T&gt;() to access typed handler).</summary>
-	public GetInterceptor Get { get; } = new();
-
-	/// <summary>Interceptor for Set (use .Of&lt;T&gt;() to access typed handler).</summary>
-	public SetInterceptor Set { get; } = new();
-
 	/// <summary>Interceptor for Remove.</summary>
 	public RemoveInterceptor Remove { get; } = new();
+
+	/// <summary>Interceptor for Get (generic method).</summary>
+	public GetInterceptor Get { get; } = new();
+
+	/// <summary>Interceptor for Set (generic method).</summary>
+	public SetInterceptor Set { get; } = new();
+
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
 
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IFcCacheService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IFcCacheService Object => this;
 
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
+	/// <summary>Gets a smart default value for a generic type at runtime.</summary>
+	private static T SmartDefault<T>(string methodName)
+	{
+		var type = typeof(T);
+
+		// Value types -> default(T)
+		if (type.IsValueType)
+			return default!;
+
+		// Check for parameterless constructor
+		var ctor = type.GetConstructor(
+			System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,
+			null, System.Type.EmptyTypes, null);
+
+		if (ctor != null)
+			return (T)ctor.Invoke(null);
+
+		throw new global::System.InvalidOperationException(
+			$"No implementation provided for {methodName}<{type.Name}>. " +
+			$"Set the handler's OnCall.");
+	}
 
 	T? global::KnockOff.Documentation.Samples.Comparison.IFcCacheService.Get<T>(string key) where T : class
 	{

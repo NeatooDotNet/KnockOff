@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.GettingStarted;
 
-partial class SingleUnitOfWorkKnockOff : global::KnockOff.IKnockOffStub
+partial class SingleUnitOfWorkKnockOff : global::KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Commit.</summary>
 	public sealed class CommitInterceptor
@@ -27,11 +27,11 @@ partial class SingleUnitOfWorkKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Commit.</summary>
 	public CommitInterceptor Commit { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	void global::KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork.Commit()
 	{

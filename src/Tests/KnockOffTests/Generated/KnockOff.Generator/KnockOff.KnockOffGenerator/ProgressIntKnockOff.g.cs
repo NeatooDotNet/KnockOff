@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class ProgressIntKnockOff : global::KnockOff.IKnockOffStub
+partial class ProgressIntKnockOff : global::System.IProgress<int>, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Report.</summary>
 	public sealed class ReportInterceptor
@@ -30,11 +30,11 @@ partial class ProgressIntKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Report.</summary>
 	public ReportInterceptor Report { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::System.IProgress<int> instance. Use for passing to code expecting the interface.</summary>
 	public global::System.IProgress<int> Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	void global::System.IProgress<int>.Report(int @value)
 	{

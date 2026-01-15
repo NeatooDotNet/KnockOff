@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class SkOnCallKnockOff : global::KnockOff.IKnockOffStub
+partial class SkOnCallKnockOff : global::KnockOff.Documentation.Samples.Skills.ISkOnCallService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Clear.</summary>
 	public sealed class ClearInterceptor
@@ -108,11 +108,11 @@ partial class SkOnCallKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Save.</summary>
 	public SaveInterceptor Save { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkOnCallService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ISkOnCallService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	void global::KnockOff.Documentation.Samples.Skills.ISkOnCallService.Clear()
 	{

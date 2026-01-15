@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class NestedDictStub<TKey, TValue> : global::KnockOff.IKnockOffStub where TKey : notnull
+partial class NestedDictStub<TKey, TValue> : global::KnockOff.Tests.INestedDictService<TKey, TValue>, global::KnockOff.IKnockOffStub where TKey : notnull
 {
 	/// <summary>Tracks and configures behavior for GetMapping.</summary>
 	public sealed class GetMappingInterceptor
@@ -30,11 +30,11 @@ partial class NestedDictStub<TKey, TValue> : global::KnockOff.IKnockOffStub wher
 	/// <summary>Interceptor for GetMapping.</summary>
 	public GetMappingInterceptor GetMapping { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Tests.INestedDictService<TKey, TValue> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.INestedDictService<TKey, TValue> Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::System.Collections.Generic.Dictionary<TKey, TValue> global::KnockOff.Tests.INestedDictService<TKey, TValue>.GetMapping()
 	{

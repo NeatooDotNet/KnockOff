@@ -3,7 +3,7 @@
 
 namespace KnockOff.Benchmarks.Stubs;
 
-partial class OrderServiceStub : global::KnockOff.IKnockOffStub
+partial class OrderServiceStub : global::KnockOff.Benchmarks.Interfaces.IOrderService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetOrder.</summary>
 	public sealed class GetOrderInterceptor
@@ -114,11 +114,11 @@ partial class OrderServiceStub : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for SaveOrder.</summary>
 	public SaveOrderInterceptor SaveOrder { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Benchmarks.Interfaces.IOrderService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Interfaces.IOrderService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::KnockOff.Benchmarks.Interfaces.Order global::KnockOff.Benchmarks.Interfaces.IOrderService.GetOrder(int id)
 	{

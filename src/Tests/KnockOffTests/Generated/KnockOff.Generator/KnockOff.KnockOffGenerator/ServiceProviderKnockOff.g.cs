@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class ServiceProviderKnockOff : global::KnockOff.IKnockOffStub
+partial class ServiceProviderKnockOff : global::System.IServiceProvider, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetService.</summary>
 	public sealed class GetServiceInterceptor
@@ -33,11 +33,11 @@ partial class ServiceProviderKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for GetService.</summary>
 	public GetServiceInterceptor GetService { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::System.IServiceProvider instance. Use for passing to code expecting the interface.</summary>
 	public global::System.IServiceProvider Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	object? global::System.IServiceProvider.GetService(global::System.Type serviceType)
 	{

@@ -3,9 +3,28 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class IdxEntityBaseKnockOff : global::KnockOff.IKnockOffStub
+partial class IdxEntityBaseKnockOff : global::KnockOff.Documentation.Samples.Guides.IIdxEntityBase, global::KnockOff.IKnockOffStub
 {
-	/// <summary>Tracks and configures behavior for Indexer.</summary>
+	/// <summary>Tracks and configures behavior for IsNew.</summary>
+	public sealed class IsNewInterceptor
+	{
+		/// <summary>Number of times the getter was accessed.</summary>
+		public int GetCount { get; private set; }
+
+		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
+		public global::System.Func<IdxEntityBaseKnockOff, bool>? OnGet { get; set; }
+
+		/// <summary>Value returned by getter when OnGet is not set.</summary>
+		public bool Value { get; set; } = default!;
+
+		/// <summary>Records a getter access.</summary>
+		public void RecordGet() => GetCount++;
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+	}
+
+	/// <summary>Tracks and configures behavior for indexer.</summary>
 	public sealed class IndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
@@ -27,45 +46,26 @@ partial class IdxEntityBaseKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for IsNew.</summary>
-	public sealed class IsNewInterceptor
-	{
-		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+	/// <summary>Interceptor for IsNew. Configure via .Value, track via .GetCount.</summary>
+	public IsNewInterceptor IsNew { get; } = new();
 
-		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<IdxEntityBaseKnockOff, bool>? OnGet { get; set; }
-
-		/// <summary>Value returned by getter when OnGet is not set.</summary>
-		public bool Value { get; set; } = default!;
-
-		/// <summary>Records a getter access.</summary>
-		public void RecordGet() => GetCount++;
-
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
-	}
-
-	/// <summary>Interceptor for Indexer.</summary>
+	/// <summary>Interceptor for indexer. Configure callbacks and track access.</summary>
 	public IndexerInterceptor Indexer { get; } = new();
 
-	/// <summary>Interceptor for IsNew. Configure callbacks and track access.</summary>
-	public IsNewInterceptor IsNew { get; } = new();
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
 
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IIdxEntityBase instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IIdxEntityBase Object => this;
 
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
+	bool global::KnockOff.Documentation.Samples.Guides.IIdxEntityBase.IsNew
+	{
+		get { IsNew.RecordGet(); if (IsNew.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IIdxEntityBase", "IsNew"); return IsNew.Value; }
+	}
 
 	global::KnockOff.Documentation.Samples.Guides.IIdxEntityProperty? global::KnockOff.Documentation.Samples.Guides.IIdxEntityBase.this[string propertyName]
 	{
 		get { Indexer.RecordGet(propertyName); if (Indexer.OnGet is { } onGet) return onGet(this, propertyName); if (Strict) throw global::KnockOff.StubException.NotConfigured("IIdxEntityBase", "this[]"); return Indexer.Backing.TryGetValue(propertyName, out var v) ? v : default; }
-	}
-
-	bool global::KnockOff.Documentation.Samples.Guides.IIdxEntityBase.IsNew
-	{
-		get { IsNew.RecordGet(); if (IsNew.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IIdxEntityBase", "IsNew"); return IsNew.Value; }
 	}
 
 }

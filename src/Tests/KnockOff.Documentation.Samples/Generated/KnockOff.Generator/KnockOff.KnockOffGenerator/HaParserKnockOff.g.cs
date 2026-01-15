@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class HaParserKnockOff : global::KnockOff.IKnockOffStub
+partial class HaParserKnockOff : global::KnockOff.Documentation.Samples.Skills.IHaParser, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for TryParse.</summary>
 	public sealed class TryParseInterceptor
@@ -58,11 +58,11 @@ partial class HaParserKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for GetData.</summary>
 	public GetDataInterceptor GetData { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IHaParser instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.IHaParser Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	bool global::KnockOff.Documentation.Samples.Skills.IHaParser.TryParse(string input, out int result)
 	{

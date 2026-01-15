@@ -3,7 +3,7 @@
 
 namespace KnockOff.Benchmarks.Stubs;
 
-partial class CalculatorStub : global::KnockOff.IKnockOffStub
+partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculator, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Add.</summary>
 	public sealed class AddInterceptor
@@ -145,11 +145,11 @@ partial class CalculatorStub : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Square.</summary>
 	public SquareInterceptor Square { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Benchmarks.Interfaces.ICalculator instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Interfaces.ICalculator Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	int global::KnockOff.Benchmarks.Interfaces.ICalculator.Add(int a, int b)
 	{

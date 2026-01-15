@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Concepts;
 
-partial class PatternRepositoryKnockOff : global::KnockOff.IKnockOffStub
+partial class PatternRepositoryKnockOff : global::KnockOff.Documentation.Samples.Concepts.IPatternRepository, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetByIdAsync.</summary>
 	public sealed class GetByIdAsync2Interceptor
@@ -58,11 +58,11 @@ partial class PatternRepositoryKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for CountAsync.</summary>
 	public CountAsync2Interceptor CountAsync2 { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Concepts.IPatternRepository instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Concepts.IPatternRepository Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Concepts.PatternUser?> global::KnockOff.Documentation.Samples.Concepts.IPatternRepository.GetByIdAsync(int id)
 	{

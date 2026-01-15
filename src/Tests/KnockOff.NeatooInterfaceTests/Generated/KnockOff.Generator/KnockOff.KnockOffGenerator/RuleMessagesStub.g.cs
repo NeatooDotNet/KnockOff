@@ -3,42 +3,8 @@
 
 namespace KnockOff.NeatooInterfaceTests.ValidationRules;
 
-partial class RuleMessagesStub : global::KnockOff.IKnockOffStub
+partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::System.Collections.Generic.IList<global::Neatoo.Rules.IRuleMessage>, global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>, global::System.Collections.Generic.IEnumerable<global::Neatoo.Rules.IRuleMessage>, global::System.Collections.IEnumerable, global::KnockOff.IKnockOffStub
 {
-	/// <summary>Tracks and configures behavior for Indexer.</summary>
-	public sealed class IndexerInterceptor
-	{
-		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
-
-		/// <summary>The key from the most recent getter access.</summary>
-		public int? LastGetKey { get; private set; }
-
-		/// <summary>Callback invoked when the getter is accessed.</summary>
-		public global::System.Func<RuleMessagesStub, int, global::Neatoo.Rules.IRuleMessage>? OnGet { get; set; }
-
-		/// <summary>Number of times the setter was accessed.</summary>
-		public int SetCount { get; private set; }
-
-		/// <summary>The key and value from the most recent setter call.</summary>
-		public (int? Key, global::Neatoo.Rules.IRuleMessage? Value)? LastSetEntry { get; private set; }
-
-		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<RuleMessagesStub, int, global::Neatoo.Rules.IRuleMessage>? OnSet { get; set; }
-
-		/// <summary>Records a getter access.</summary>
-		public void RecordGet(int? index) { GetCount++; LastGetKey = index; }
-
-		/// <summary>Records a setter access.</summary>
-		public void RecordSet(int? index, global::Neatoo.Rules.IRuleMessage? value) { SetCount++; LastSetEntry = (index, value); }
-
-		/// <summary>Backing storage for this indexer.</summary>
-		public global::System.Collections.Generic.Dictionary<int, global::Neatoo.Rules.IRuleMessage> Backing { get; } = new();
-
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; }
-	}
-
 	/// <summary>Tracks and configures behavior for Count.</summary>
 	public sealed class CountInterceptor
 	{
@@ -77,6 +43,40 @@ partial class RuleMessagesStub : global::KnockOff.IKnockOffStub
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
+	/// <summary>Tracks and configures behavior for indexer.</summary>
+	public sealed class IndexerInterceptor
+	{
+		/// <summary>Number of times the getter was accessed.</summary>
+		public int GetCount { get; private set; }
+
+		/// <summary>The key from the most recent getter access.</summary>
+		public int? LastGetKey { get; private set; }
+
+		/// <summary>Callback invoked when the getter is accessed.</summary>
+		public global::System.Func<RuleMessagesStub, int, global::Neatoo.Rules.IRuleMessage>? OnGet { get; set; }
+
+		/// <summary>Number of times the setter was accessed.</summary>
+		public int SetCount { get; private set; }
+
+		/// <summary>The key and value from the most recent setter call.</summary>
+		public (int? Key, global::Neatoo.Rules.IRuleMessage? Value)? LastSetEntry { get; private set; }
+
+		/// <summary>Callback invoked when the setter is accessed.</summary>
+		public global::System.Action<RuleMessagesStub, int, global::Neatoo.Rules.IRuleMessage>? OnSet { get; set; }
+
+		/// <summary>Records a getter access.</summary>
+		public void RecordGet(int? index) { GetCount++; LastGetKey = index; }
+
+		/// <summary>Records a setter access.</summary>
+		public void RecordSet(int? index, global::Neatoo.Rules.IRuleMessage? value) { SetCount++; LastSetEntry = (index, value); }
+
+		/// <summary>Backing storage for this indexer.</summary>
+		public global::System.Collections.Generic.Dictionary<int, global::Neatoo.Rules.IRuleMessage> Backing { get; } = new();
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; }
+	}
+
 	/// <summary>Tracks and configures behavior for Add.</summary>
 	public sealed class Add1Interceptor
 	{
@@ -97,28 +97,6 @@ partial class RuleMessagesStub : global::KnockOff.IKnockOffStub
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
-	}
-
-	/// <summary>Tracks and configures behavior for Add.</summary>
-	public sealed class Add2Interceptor
-	{
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
-
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
-
-		/// <summary>The argument from the most recent call.</summary>
-		public global::Neatoo.Rules.IRuleMessage? LastCallArg { get; private set; }
-
-		/// <summary>Callback invoked when this method is called.</summary>
-		public global::System.Action<RuleMessagesStub, global::Neatoo.Rules.IRuleMessage>? OnCall { get; set; }
-
-		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::Neatoo.Rules.IRuleMessage? item) { CallCount++; LastCallArg = item; }
-
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IndexOf.</summary>
@@ -185,6 +163,28 @@ partial class RuleMessagesStub : global::KnockOff.IKnockOffStub
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall(int? index) { CallCount++; LastCallArg = index; }
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+	}
+
+	/// <summary>Tracks and configures behavior for Add.</summary>
+	public sealed class Add2Interceptor
+	{
+		/// <summary>Number of times this method was called.</summary>
+		public int CallCount { get; private set; }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the most recent call.</summary>
+		public global::Neatoo.Rules.IRuleMessage? LastCallArg { get; private set; }
+
+		/// <summary>Callback invoked when this method is called.</summary>
+		public global::System.Action<RuleMessagesStub, global::Neatoo.Rules.IRuleMessage>? OnCall { get; set; }
+
+		/// <summary>Records a method call.</summary>
+		public void RecordCall(global::Neatoo.Rules.IRuleMessage? item) { CallCount++; LastCallArg = item; }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
@@ -303,20 +303,17 @@ partial class RuleMessagesStub : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Indexer.</summary>
-	public IndexerInterceptor Indexer { get; } = new();
-
-	/// <summary>Interceptor for Count. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Count. Configure via .Value, track via .GetCount.</summary>
 	public CountInterceptor Count { get; } = new();
 
-	/// <summary>Interceptor for IsReadOnly. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for IsReadOnly. Configure via .Value, track via .GetCount.</summary>
 	public IsReadOnlyInterceptor IsReadOnly { get; } = new();
+
+	/// <summary>Interceptor for indexer. Configure callbacks and track access.</summary>
+	public IndexerInterceptor Indexer { get; } = new();
 
 	/// <summary>Interceptor for Add.</summary>
 	public Add1Interceptor Add1 { get; } = new();
-
-	/// <summary>Interceptor for Add.</summary>
-	public Add2Interceptor Add2 { get; } = new();
 
 	/// <summary>Interceptor for IndexOf.</summary>
 	public IndexOfInterceptor IndexOf { get; } = new();
@@ -326,6 +323,9 @@ partial class RuleMessagesStub : global::KnockOff.IKnockOffStub
 
 	/// <summary>Interceptor for RemoveAt.</summary>
 	public RemoveAtInterceptor RemoveAt { get; } = new();
+
+	/// <summary>Interceptor for Add.</summary>
+	public Add2Interceptor Add2 { get; } = new();
 
 	/// <summary>Interceptor for Clear.</summary>
 	public ClearInterceptor Clear { get; } = new();
@@ -342,11 +342,27 @@ partial class RuleMessagesStub : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for GetEnumerator.</summary>
 	public GetEnumeratorInterceptor GetEnumerator { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::Neatoo.Rules.IRuleMessages instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.Rules.IRuleMessages Object => this;
 
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
+	int global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>.Count
+	{
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "Count"); return Count.Value; }
+	}
+
+	bool global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>.IsReadOnly
+	{
+		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "IsReadOnly"); return IsReadOnly.Value; }
+	}
+
+	global::Neatoo.Rules.IRuleMessage global::System.Collections.Generic.IList<global::Neatoo.Rules.IRuleMessage>.this[int index]
+	{
+		get { Indexer.RecordGet(index); if (Indexer.OnGet is { } onGet) return onGet(this, index); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "this[]"); return Indexer.Backing.TryGetValue(index, out var v) ? v : default!; }
+		set { Indexer.RecordSet(index, value); if (Indexer.OnSet is { } onSet) { onSet(this, index, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "this[]"); Indexer.Backing[index] = value; }
+	}
 
 	void global::Neatoo.Rules.IRuleMessages.Add(string propertyName, string message)
 	{
@@ -379,12 +395,6 @@ partial class RuleMessagesStub : global::KnockOff.IKnockOffStub
 		if (RemoveAt.OnCall is { } onCallCallback)
 		{ onCallCallback(this, index); return; }
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "RemoveAt");
-	}
-
-	global::Neatoo.Rules.IRuleMessage global::System.Collections.Generic.IList<global::Neatoo.Rules.IRuleMessage>.this[int index]
-	{
-		get { Indexer.RecordGet(index); if (Indexer.OnGet is { } onGet) return onGet(this, index); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "this[]"); return Indexer.Backing.TryGetValue(index, out var v) ? v : default!; }
-		set { Indexer.RecordSet(index, value); if (Indexer.OnSet is { } onSet) { onSet(this, index, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "this[]"); Indexer.Backing[index] = value; }
 	}
 
 	void global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>.Add(global::Neatoo.Rules.IRuleMessage item)
@@ -429,16 +439,6 @@ partial class RuleMessagesStub : global::KnockOff.IKnockOffStub
 		return default!;
 	}
 
-	int global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>.Count
-	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "Count"); return Count.Value; }
-	}
-
-	bool global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>.IsReadOnly
-	{
-		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "IsReadOnly"); return IsReadOnly.Value; }
-	}
-
 	global::System.Collections.Generic.IEnumerator<global::Neatoo.Rules.IRuleMessage> global::System.Collections.Generic.IEnumerable<global::Neatoo.Rules.IRuleMessage>.GetEnumerator()
 	{
 		GetEnumerator.RecordCall();
@@ -450,7 +450,11 @@ partial class RuleMessagesStub : global::KnockOff.IKnockOffStub
 
 	global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
 	{
-		return ((global::System.Collections.Generic.IEnumerable<global::Neatoo.Rules.IRuleMessage>)this).GetEnumerator();
+		GetEnumerator.RecordCall();
+		if (GetEnumerator.OnCall is { } callback)
+			return callback(this);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
+		throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall or define a protected method 'GetEnumerator' in your partial class.");
 	}
 
 }

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class AsyncServiceKnockOff : global::KnockOff.IKnockOffStub
+partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for DoWorkAsync.</summary>
 	public sealed class DoWorkAsyncInterceptor
@@ -161,11 +161,11 @@ partial class AsyncServiceKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for GetValueValueTaskAsync.</summary>
 	public GetValueValueTaskAsync2Interceptor GetValueValueTaskAsync2 { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Tests.IAsyncService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IAsyncService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::System.Threading.Tasks.Task global::KnockOff.Tests.IAsyncService.DoWorkAsync()
 	{

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Comparison;
 
-partial class OrderServiceStub : global::KnockOff.IKnockOffStub
+partial class OrderServiceStub : global::KnockOff.Documentation.Samples.Comparison.IOrderService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetOrder.</summary>
 	public sealed class GetOrderInterceptor
@@ -114,11 +114,11 @@ partial class OrderServiceStub : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for SaveOrder.</summary>
 	public SaveOrderInterceptor SaveOrder { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IOrderService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IOrderService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::KnockOff.Documentation.Samples.Comparison.Order global::KnockOff.Documentation.Samples.Comparison.IOrderService.GetOrder(int id)
 	{

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Comparison;
 
-partial class MigConfigServiceKnockOff : global::KnockOff.IKnockOffStub
+partial class MigConfigServiceKnockOff : global::KnockOff.Documentation.Samples.Comparison.IMigConfigService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetConfig.</summary>
 	public sealed class GetConfig2Interceptor
@@ -30,11 +30,11 @@ partial class MigConfigServiceKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for GetConfig.</summary>
 	public GetConfig2Interceptor GetConfig2 { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IMigConfigService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IMigConfigService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::KnockOff.Documentation.Samples.Comparison.MigConfig global::KnockOff.Documentation.Samples.Comparison.IMigConfigService.GetConfig()
 	{

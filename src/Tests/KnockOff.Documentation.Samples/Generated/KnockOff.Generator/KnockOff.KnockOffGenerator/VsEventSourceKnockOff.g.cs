@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Comparison;
 
-partial class VsEventSourceKnockOff : global::KnockOff.IKnockOffStub
+partial class VsEventSourceKnockOff : global::KnockOff.Documentation.Samples.Comparison.IVsEventSource, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Interceptor for DataReceived event.</summary>
 	public sealed class DataReceivedInterceptor
@@ -35,11 +35,11 @@ partial class VsEventSourceKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for DataReceived event.</summary>
 	public DataReceivedInterceptor DataReceived { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IVsEventSource instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IVsEventSource Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	event global::System.EventHandler<string>? global::KnockOff.Documentation.Samples.Comparison.IVsEventSource.DataReceived
 	{

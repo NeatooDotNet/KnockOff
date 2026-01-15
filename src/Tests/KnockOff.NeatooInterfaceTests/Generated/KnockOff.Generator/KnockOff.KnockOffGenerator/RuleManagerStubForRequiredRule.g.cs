@@ -5,34 +5,19 @@ using System.Linq;
 
 namespace KnockOff.NeatooInterfaceTests.BuiltInRules;
 
-partial class RuleManagerStubForRequiredRule : global::KnockOff.IKnockOffStub
+partial class RuleManagerStubForRequiredRule : global::Neatoo.Rules.IRuleManager, global::KnockOff.IKnockOffStub
 {
-	/// <summary>Marker interface for generic method call tracking.</summary>
-	private interface IGenericMethodCallTracker { int CallCount { get; } bool WasCalled { get; } }
-
-	/// <summary>Marker interface for resettable handlers.</summary>
-	private interface IResettable { void Reset(); }
-
-	/// <summary>Gets a smart default value for a generic type at runtime.</summary>
-	private static T SmartDefault<T>(string methodName)
+	/// <summary>Interface for tracking calls to generic methods.</summary>
+	private interface IGenericMethodCallTracker
 	{
-		var type = typeof(T);
+		int CallCount { get; }
+		bool WasCalled { get; }
+	}
 
-		// Value types -> default(T)
-		if (type.IsValueType)
-			return default!;
-
-		// Check for parameterless constructor
-		var ctor = type.GetConstructor(
-			System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,
-			null, System.Type.EmptyTypes, null);
-
-		if (ctor != null)
-			return (T)ctor.Invoke(null);
-
-		throw new global::System.InvalidOperationException(
-			$"No implementation provided for {methodName}<{type.Name}>. " +
-			$"Define a protected method '{methodName}' in your partial class, or set the handler's OnCall.");
+	/// <summary>Interface for resetting state.</summary>
+	private interface IResettable
+	{
+		void Reset();
 	}
 
 	/// <summary>Tracks and configures behavior for Rules.</summary>
@@ -99,6 +84,31 @@ partial class RuleManagerStubForRequiredRule : global::KnockOff.IKnockOffStub
 
 		/// <summary>Records a method call.</summary>
 		public void RecordCall(global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token) { CallCount++; LastCallArgs = (runRules, token); }
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
+	}
+
+	/// <summary>Tracks and configures behavior for RunRule.</summary>
+	public sealed class RunRuleInterceptor
+	{
+		/// <summary>Delegate for RunRule.</summary>
+		public delegate global::System.Threading.Tasks.Task RunRuleDelegate(RuleManagerStubForRequiredRule ko, global::Neatoo.Rules.IRule r, global::System.Threading.CancellationToken? token);
+
+		/// <summary>Number of times this method was called.</summary>
+		public int CallCount { get; private set; }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The arguments from the most recent call.</summary>
+		public (global::Neatoo.Rules.IRule? r, global::System.Threading.CancellationToken? token)? LastCallArgs { get; private set; }
+
+		/// <summary>Callback invoked when this method is called.</summary>
+		public RunRuleDelegate? OnCall { get; set; }
+
+		/// <summary>Records a method call.</summary>
+		public void RecordCall(global::Neatoo.Rules.IRule? r, global::System.Threading.CancellationToken? token) { CallCount++; LastCallArgs = (r, token); }
 
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
@@ -218,46 +228,21 @@ partial class RuleManagerStubForRequiredRule : global::KnockOff.IKnockOffStub
 		}
 	}
 
-	/// <summary>Tracks and configures behavior for RunRule.</summary>
-	public sealed class RunRuleInterceptor
-	{
-		/// <summary>Delegate for RunRule.</summary>
-		public delegate global::System.Threading.Tasks.Task RunRuleDelegate(RuleManagerStubForRequiredRule ko, global::Neatoo.Rules.IRule r, global::System.Threading.CancellationToken? token);
-
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
-
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
-
-		/// <summary>The arguments from the most recent call.</summary>
-		public (global::Neatoo.Rules.IRule? r, global::System.Threading.CancellationToken? token)? LastCallArgs { get; private set; }
-
-		/// <summary>Callback invoked when this method is called.</summary>
-		public RunRuleDelegate? OnCall { get; set; }
-
-		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::Neatoo.Rules.IRule? r, global::System.Threading.CancellationToken? token) { CallCount++; LastCallArgs = (r, token); }
-
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
-	}
-
-	/// <summary>Interceptor for RunRuleGeneric (generic method with Of&lt;T&gt;() access).</summary>
+	/// <summary>Interceptor for RunRule (generic method with Of&lt;T&gt;() access).</summary>
 	public sealed class RunRuleGenericInterceptor
 	{
 		private readonly global::System.Collections.Generic.Dictionary<global::System.Type, object> _typedHandlers = new();
 
 		/// <summary>Gets the typed handler for the specified type argument(s).</summary>
-		public RunRuleGenericTypedHandler<T> Of<T>() where T : global::Neatoo.Rules.IRule
+		public RunRuleTypedHandler<T> Of<T>() where T : global::Neatoo.Rules.IRule
 		{
 			var key = typeof(T);
 			if (!_typedHandlers.TryGetValue(key, out var handler))
 			{
-				handler = new RunRuleGenericTypedHandler<T>();
+				handler = new RunRuleTypedHandler<T>();
 				_typedHandlers[key] = handler;
 			}
-			return (RunRuleGenericTypedHandler<T>)handler;
+			return (RunRuleTypedHandler<T>)handler;
 		}
 
 		/// <summary>Total number of calls across all type arguments.</summary>
@@ -277,11 +262,11 @@ partial class RuleManagerStubForRequiredRule : global::KnockOff.IKnockOffStub
 			_typedHandlers.Clear();
 		}
 
-		/// <summary>Typed handler for RunRuleGeneric with specific type arguments.</summary>
-		public sealed class RunRuleGenericTypedHandler<T> : IGenericMethodCallTracker, IResettable where T : global::Neatoo.Rules.IRule
+		/// <summary>Typed handler for RunRule with specific type arguments.</summary>
+		public sealed class RunRuleTypedHandler<T> : IGenericMethodCallTracker, IResettable where T : global::Neatoo.Rules.IRule
 		{
-			/// <summary>Delegate for RunRuleGeneric.</summary>
-			public delegate global::System.Threading.Tasks.Task RunRuleGenericDelegate(RuleManagerStubForRequiredRule ko, global::System.Threading.CancellationToken? token);
+			/// <summary>Delegate for RunRule.</summary>
+			public delegate global::System.Threading.Tasks.Task RunRuleDelegate(RuleManagerStubForRequiredRule ko, global::System.Threading.CancellationToken? token);
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -290,7 +275,7 @@ partial class RuleManagerStubForRequiredRule : global::KnockOff.IKnockOffStub
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public RunRuleGenericDelegate? OnCall { get; set; }
+			public RunRuleDelegate? OnCall { get; set; }
 
 			/// <summary>Records a method call.</summary>
 			public void RecordCall() => CallCount++;
@@ -300,7 +285,7 @@ partial class RuleManagerStubForRequiredRule : global::KnockOff.IKnockOffStub
 		}
 	}
 
-	/// <summary>Interceptor for Rules. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Rules. Configure via .Value, track via .GetCount.</summary>
 	public RulesInterceptor Rules { get; } = new();
 
 	/// <summary>Interceptor for RunRules.</summary>
@@ -309,23 +294,50 @@ partial class RuleManagerStubForRequiredRule : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for RunRules.</summary>
 	public RunRules2Interceptor RunRules2 { get; } = new();
 
-	/// <summary>Interceptor for AddRule (use .Of&lt;T&gt;() to access typed handler).</summary>
-	public AddRuleInterceptor AddRule { get; } = new();
-
-	/// <summary>Interceptor for AddRules (use .Of&lt;T&gt;() to access typed handler).</summary>
-	public AddRulesInterceptor AddRules { get; } = new();
-
 	/// <summary>Interceptor for RunRule.</summary>
 	public RunRuleInterceptor RunRule { get; } = new();
 
-	/// <summary>Interceptor for RunRule (generic overloads, use .Of&lt;T&gt;()).</summary>
+	/// <summary>Interceptor for AddRule (generic method).</summary>
+	public AddRuleInterceptor AddRule { get; } = new();
+
+	/// <summary>Interceptor for AddRules (generic method).</summary>
+	public AddRulesInterceptor AddRules { get; } = new();
+
+	/// <summary>Interceptor for RunRule (generic method).</summary>
 	public RunRuleGenericInterceptor RunRuleGeneric { get; } = new();
+
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
 
 	/// <summary>The global::Neatoo.Rules.IRuleManager instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.Rules.IRuleManager Object => this;
 
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
+	/// <summary>Gets a smart default value for a generic type at runtime.</summary>
+	private static T SmartDefault<T>(string methodName)
+	{
+		var type = typeof(T);
+
+		// Value types -> default(T)
+		if (type.IsValueType)
+			return default!;
+
+		// Check for parameterless constructor
+		var ctor = type.GetConstructor(
+			System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,
+			null, System.Type.EmptyTypes, null);
+
+		if (ctor != null)
+			return (T)ctor.Invoke(null);
+
+		throw new global::System.InvalidOperationException(
+			$"No implementation provided for {methodName}<{type.Name}>. " +
+			$"Set the handler's OnCall.");
+	}
+
+	global::System.Collections.Generic.IEnumerable<global::Neatoo.Rules.IRule> global::Neatoo.Rules.IRuleManager.Rules
+	{
+		get { Rules.RecordGet(); if (Rules.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleManager", "Rules"); return Rules.Value; }
+	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.Rules.IRuleManager.RunRules(string propertyName, global::System.Threading.CancellationToken? token)
 	{
@@ -377,11 +389,6 @@ partial class RuleManagerStubForRequiredRule : global::KnockOff.IKnockOffStub
 			return callback(this, token);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleManager", "RunRule");
 		return default!;
-	}
-
-	global::System.Collections.Generic.IEnumerable<global::Neatoo.Rules.IRule> global::Neatoo.Rules.IRuleManager.Rules
-	{
-		get { Rules.RecordGet(); if (Rules.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleManager", "Rules"); return Rules.Value; }
 	}
 
 }

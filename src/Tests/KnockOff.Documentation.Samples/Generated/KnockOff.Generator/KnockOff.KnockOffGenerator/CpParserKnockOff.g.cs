@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class CpParserKnockOff : global::KnockOff.IKnockOffStub
+partial class CpParserKnockOff : global::KnockOff.Documentation.Samples.Skills.ICpParser, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for TryParse.</summary>
 	public sealed class TryParseInterceptor
@@ -58,11 +58,11 @@ partial class CpParserKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for GetStats.</summary>
 	public GetStatsInterceptor GetStats { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ICpParser instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ICpParser Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	bool global::KnockOff.Documentation.Samples.Skills.ICpParser.TryParse(string input, out int result)
 	{

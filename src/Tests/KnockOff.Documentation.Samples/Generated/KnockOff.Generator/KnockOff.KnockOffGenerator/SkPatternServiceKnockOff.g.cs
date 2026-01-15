@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class SkPatternServiceKnockOff : global::KnockOff.IKnockOffStub
+partial class SkPatternServiceKnockOff : global::KnockOff.Documentation.Samples.Skills.ISkPatternService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetUser.</summary>
 	public sealed class GetUserInterceptor
@@ -108,11 +108,11 @@ partial class SkPatternServiceKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for GetNext.</summary>
 	public GetNextInterceptor GetNext { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkPatternService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ISkPatternService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::KnockOff.Documentation.Samples.Skills.SkUser? global::KnockOff.Documentation.Samples.Skills.ISkPatternService.GetUser(int id)
 	{

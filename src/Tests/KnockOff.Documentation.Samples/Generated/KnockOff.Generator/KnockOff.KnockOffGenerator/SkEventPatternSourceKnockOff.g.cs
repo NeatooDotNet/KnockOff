@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class SkEventPatternSourceKnockOff : global::KnockOff.IKnockOffStub
+partial class SkEventPatternSourceKnockOff : global::KnockOff.Documentation.Samples.Skills.ISkEventPatternSource, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Interceptor for DataReceived event.</summary>
 	public sealed class DataReceivedInterceptor
@@ -65,11 +65,11 @@ partial class SkEventPatternSourceKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for ProgressChanged event.</summary>
 	public ProgressChangedInterceptor ProgressChanged { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkEventPatternSource instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ISkEventPatternSource Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	event global::System.EventHandler<string>? global::KnockOff.Documentation.Samples.Skills.ISkEventPatternSource.DataReceived
 	{

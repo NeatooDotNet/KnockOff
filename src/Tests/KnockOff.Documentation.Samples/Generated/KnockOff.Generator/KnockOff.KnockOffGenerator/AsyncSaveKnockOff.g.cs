@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class AsyncSaveKnockOff : global::KnockOff.IKnockOffStub
+partial class AsyncSaveKnockOff : global::KnockOff.Documentation.Samples.Guides.IAsyncSave, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for SaveAsync.</summary>
 	public sealed class SaveAsyncInterceptor
@@ -33,11 +33,11 @@ partial class AsyncSaveKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for SaveAsync.</summary>
 	public SaveAsyncInterceptor SaveAsync { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IAsyncSave instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IAsyncSave Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::System.Threading.Tasks.Task<int> global::KnockOff.Documentation.Samples.Guides.IAsyncSave.SaveAsync(global::KnockOff.Documentation.Samples.Guides.AsyncData entity)
 	{

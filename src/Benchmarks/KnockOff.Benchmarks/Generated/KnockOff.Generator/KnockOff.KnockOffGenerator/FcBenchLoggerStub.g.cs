@@ -3,7 +3,7 @@
 
 namespace KnockOff.Benchmarks.Benchmarks;
 
-partial class FcBenchLoggerStub : global::KnockOff.IKnockOffStub
+partial class FcBenchLoggerStub : global::KnockOff.Benchmarks.Benchmarks.IFcBenchLogger, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for LogInfo.</summary>
 	public sealed class LogInfoInterceptor
@@ -80,11 +80,11 @@ partial class FcBenchLoggerStub : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for LogError.</summary>
 	public LogErrorInterceptor LogError { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Benchmarks.Benchmarks.IFcBenchLogger instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Benchmarks.IFcBenchLogger Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	void global::KnockOff.Benchmarks.Benchmarks.IFcBenchLogger.LogInfo(string message)
 	{

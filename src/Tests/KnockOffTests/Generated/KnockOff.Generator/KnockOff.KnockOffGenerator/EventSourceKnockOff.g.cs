@@ -3,7 +3,7 @@
 
 namespace KnockOff.Tests;
 
-partial class EventSourceKnockOff : global::KnockOff.IKnockOffStub
+partial class EventSourceKnockOff : global::KnockOff.Tests.IEventSource, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Interceptor for MessageReceived event.</summary>
 	public sealed class MessageReceivedInterceptor
@@ -125,11 +125,11 @@ partial class EventSourceKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for OnData event.</summary>
 	public OnDataInterceptor OnData { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Tests.IEventSource instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IEventSource Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	event global::System.EventHandler<string>? global::KnockOff.Tests.IEventSource.MessageReceived
 	{

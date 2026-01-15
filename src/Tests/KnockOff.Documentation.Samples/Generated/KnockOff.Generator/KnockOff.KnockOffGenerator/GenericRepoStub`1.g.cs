@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class GenericRepoStub<T> : global::KnockOff.IKnockOffStub where T : class
+partial class GenericRepoStub<T> : global::KnockOff.Documentation.Samples.Guides.IGenericRepo<T>, global::KnockOff.IKnockOffStub where T : class
 {
 	/// <summary>Tracks and configures behavior for GetById.</summary>
 	public sealed class GetByIdInterceptor
@@ -83,11 +83,11 @@ partial class GenericRepoStub<T> : global::KnockOff.IKnockOffStub where T : clas
 	/// <summary>Interceptor for GetAll.</summary>
 	public GetAllInterceptor GetAll { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IGenericRepo<T> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IGenericRepo<T> Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	T? global::KnockOff.Documentation.Samples.Guides.IGenericRepo<T>.GetById(int id)
 	{

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.ReadMe;
 
-partial class CalculatorKnockOff : global::KnockOff.IKnockOffStub
+partial class CalculatorKnockOff : global::KnockOff.Documentation.Samples.ReadMe.ICalculator, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Add.</summary>
 	public sealed class Add2Interceptor
@@ -61,11 +61,11 @@ partial class CalculatorKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Multiply.</summary>
 	public MultiplyInterceptor Multiply { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.ReadMe.ICalculator instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.ReadMe.ICalculator Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	int global::KnockOff.Documentation.Samples.ReadMe.ICalculator.Add(int a, int b)
 	{

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class HaAsyncRepositoryKnockOff : global::KnockOff.IKnockOffStub
+partial class HaAsyncRepositoryKnockOff : global::KnockOff.Documentation.Samples.Skills.IHaAsyncRepository, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetByIdAsync.</summary>
 	public sealed class GetByIdAsyncInterceptor
@@ -61,11 +61,11 @@ partial class HaAsyncRepositoryKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for SaveAsync.</summary>
 	public SaveAsyncInterceptor SaveAsync { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IHaAsyncRepository instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.IHaAsyncRepository Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.HaUser?> global::KnockOff.Documentation.Samples.Skills.IHaAsyncRepository.GetByIdAsync(int id)
 	{

@@ -3,7 +3,7 @@
 
 namespace KnockOff.Sandbox;
 
-partial class UserServiceKnockOff : global::KnockOff.IKnockOffStub
+partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameInterceptor
@@ -121,10 +121,10 @@ partial class UserServiceKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Name. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Name. Configure via .Value, track via .GetCount.</summary>
 	public NameInterceptor Name { get; } = new();
 
-	/// <summary>Interceptor for Count. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Count. Configure via .Value, track via .GetCount.</summary>
 	public CountInterceptor Count { get; } = new();
 
 	/// <summary>Interceptor for DoWork.</summary>
@@ -136,11 +136,11 @@ partial class UserServiceKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Process.</summary>
 	public ProcessInterceptor Process { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Sandbox.IUserService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Sandbox.IUserService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	string global::KnockOff.Sandbox.IUserService.Name
 	{

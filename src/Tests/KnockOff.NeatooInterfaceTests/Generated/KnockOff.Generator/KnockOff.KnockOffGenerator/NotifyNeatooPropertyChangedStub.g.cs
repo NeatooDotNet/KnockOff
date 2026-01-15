@@ -3,7 +3,7 @@
 
 namespace KnockOff.NeatooInterfaceTests.Notifications;
 
-partial class NotifyNeatooPropertyChangedStub : global::KnockOff.IKnockOffStub
+partial class NotifyNeatooPropertyChangedStub : global::Neatoo.INotifyNeatooPropertyChanged, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Interceptor for NeatooPropertyChanged event.</summary>
 	public sealed class NeatooPropertyChangedInterceptor
@@ -35,11 +35,11 @@ partial class NotifyNeatooPropertyChangedStub : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for NeatooPropertyChanged event.</summary>
 	public NeatooPropertyChangedInterceptor NeatooPropertyChanged { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::Neatoo.INotifyNeatooPropertyChanged instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.INotifyNeatooPropertyChanged Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	event global::Neatoo.NeatooPropertyChanged? global::Neatoo.INotifyNeatooPropertyChanged.NeatooPropertyChanged
 	{

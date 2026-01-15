@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Skills;
 
-partial class MgUserServiceKnockOff : global::KnockOff.IKnockOffStub
+partial class MgUserServiceKnockOff : global::KnockOff.Documentation.Samples.Skills.IMgUserService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameInterceptor
@@ -61,17 +61,23 @@ partial class MgUserServiceKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Name. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Name. Configure via .Value, track via .GetCount.</summary>
 	public NameInterceptor Name { get; } = new();
 
 	/// <summary>Interceptor for GetUser.</summary>
 	public GetUserInterceptor GetUser { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IMgUserService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.IMgUserService Object => this;
 
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
+	string global::KnockOff.Documentation.Samples.Skills.IMgUserService.Name
+	{
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IMgUserService", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IMgUserService", "Name"); Name.Value = value; }
+	}
 
 	global::KnockOff.Documentation.Samples.Skills.MgUser? global::KnockOff.Documentation.Samples.Skills.IMgUserService.GetUser(int id)
 	{
@@ -80,12 +86,6 @@ partial class MgUserServiceKnockOff : global::KnockOff.IKnockOffStub
 			return callback(this, id);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMgUserService", "GetUser");
 		return default!;
-	}
-
-	string global::KnockOff.Documentation.Samples.Skills.IMgUserService.Name
-	{
-		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IMgUserService", "Name"); return Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IMgUserService", "Name"); Name.Value = value; }
 	}
 
 }

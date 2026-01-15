@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Design;
 
-partial class DsUserServiceStub : global::KnockOff.IKnockOffStub
+partial class DsUserServiceStub : global::KnockOff.Documentation.Samples.Design.IDsUserService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameInterceptor
@@ -36,7 +36,7 @@ partial class DsUserServiceStub : global::KnockOff.IKnockOffStub
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 	}
 
-	/// <summary>Tracks and configures behavior for Indexer.</summary>
+	/// <summary>Tracks and configures behavior for indexer.</summary>
 	public sealed class IndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
@@ -95,29 +95,20 @@ partial class DsUserServiceStub : global::KnockOff.IKnockOffStub
 		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 	}
 
-	/// <summary>Interceptor for Name. Configure callbacks and track access.</summary>
+	/// <summary>Interceptor for Name. Configure via .Value, track via .GetCount.</summary>
 	public NameInterceptor Name { get; } = new();
 
-	/// <summary>Interceptor for Indexer.</summary>
+	/// <summary>Interceptor for indexer. Configure callbacks and track access.</summary>
 	public IndexerInterceptor Indexer { get; } = new();
 
 	/// <summary>Interceptor for GetUser.</summary>
 	public GetUserInterceptor GetUser { get; } = new();
 
-	/// <summary>The global::KnockOff.Documentation.Samples.Design.IDsUserService instance. Use for passing to code expecting the interface.</summary>
-	public global::KnockOff.Documentation.Samples.Design.IDsUserService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
 	public bool Strict { get; set; } = false;
 
-	global::KnockOff.Documentation.Samples.Design.DsUser? global::KnockOff.Documentation.Samples.Design.IDsUserService.GetUser(int id)
-	{
-		GetUser.RecordCall(id);
-		if (GetUser.OnCall is { } callback)
-			return callback(this, id);
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsUserService", "GetUser");
-		return default!;
-	}
+	/// <summary>The global::KnockOff.Documentation.Samples.Design.IDsUserService instance. Use for passing to code expecting the interface.</summary>
+	public global::KnockOff.Documentation.Samples.Design.IDsUserService Object => this;
 
 	string global::KnockOff.Documentation.Samples.Design.IDsUserService.Name
 	{
@@ -129,6 +120,15 @@ partial class DsUserServiceStub : global::KnockOff.IKnockOffStub
 	{
 		get { Indexer.RecordGet(key); if (Indexer.OnGet is { } onGet) return onGet(this, key); if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsUserService", "this[]"); return Indexer.Backing.TryGetValue(key, out var v) ? v : default; }
 		set { Indexer.RecordSet(key, value); if (Indexer.OnSet is { } onSet) { onSet(this, key, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsUserService", "this[]"); Indexer.Backing[key] = value; }
+	}
+
+	global::KnockOff.Documentation.Samples.Design.DsUser? global::KnockOff.Documentation.Samples.Design.IDsUserService.GetUser(int id)
+	{
+		GetUser.RecordCall(id);
+		if (GetUser.OnCall is { } callback)
+			return callback(this, id);
+		if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsUserService", "GetUser");
+		return default!;
 	}
 
 }

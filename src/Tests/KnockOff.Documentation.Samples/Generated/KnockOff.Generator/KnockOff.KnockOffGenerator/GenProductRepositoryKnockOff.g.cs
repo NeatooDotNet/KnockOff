@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class GenProductRepositoryKnockOff : global::KnockOff.IKnockOffStub
+partial class GenProductRepositoryKnockOff : global::KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<global::KnockOff.Documentation.Samples.Guides.GenProduct>, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for GetAll.</summary>
 	public sealed class GetAllInterceptor
@@ -58,11 +58,11 @@ partial class GenProductRepositoryKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for FindFirst.</summary>
 	public FindFirstInterceptor FindFirst { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<global::KnockOff.Documentation.Samples.Guides.GenProduct> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<global::KnockOff.Documentation.Samples.Guides.GenProduct> Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Guides.GenProduct> global::KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<global::KnockOff.Documentation.Samples.Guides.GenProduct>.GetAll()
 	{

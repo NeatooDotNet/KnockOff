@@ -3,9 +3,9 @@
 
 namespace KnockOff.Benchmarks.Stubs;
 
-partial class CacheStub : global::KnockOff.IKnockOffStub
+partial class CacheStub : global::KnockOff.Benchmarks.Interfaces.ICache, global::KnockOff.IKnockOffStub
 {
-	/// <summary>Tracks and configures behavior for Indexer.</summary>
+	/// <summary>Tracks and configures behavior for indexer.</summary>
 	public sealed class IndexerStringInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
@@ -39,7 +39,7 @@ partial class CacheStub : global::KnockOff.IKnockOffStub
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for Indexer.</summary>
+	/// <summary>Tracks and configures behavior for indexer.</summary>
 	public sealed class IndexerInt32Interceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
@@ -61,17 +61,17 @@ partial class CacheStub : global::KnockOff.IKnockOffStub
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
 	}
 
-	/// <summary>Interceptor for Indexer.</summary>
+	/// <summary>Interceptor for indexer. Configure callbacks and track access.</summary>
 	public IndexerStringInterceptor IndexerString { get; } = new();
 
-	/// <summary>Interceptor for Indexer.</summary>
+	/// <summary>Interceptor for indexer. Configure callbacks and track access.</summary>
 	public IndexerInt32Interceptor IndexerInt32 { get; } = new();
+
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
 
 	/// <summary>The global::KnockOff.Benchmarks.Interfaces.ICache instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Interfaces.ICache Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	object global::KnockOff.Benchmarks.Interfaces.ICache.this[string key]
 	{

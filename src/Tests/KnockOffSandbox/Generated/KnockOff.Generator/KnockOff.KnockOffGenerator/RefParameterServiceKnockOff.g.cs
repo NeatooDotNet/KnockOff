@@ -3,7 +3,7 @@
 
 namespace KnockOff.Sandbox;
 
-partial class RefParameterServiceKnockOff : global::KnockOff.IKnockOffStub
+partial class RefParameterServiceKnockOff : global::KnockOff.Sandbox.IRefParameterService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Increment.</summary>
 	public sealed class IncrementInterceptor
@@ -61,11 +61,11 @@ partial class RefParameterServiceKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for TryUpdate.</summary>
 	public TryUpdateInterceptor TryUpdate { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Sandbox.IRefParameterService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Sandbox.IRefParameterService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	void global::KnockOff.Sandbox.IRefParameterService.Increment(ref int @value)
 	{

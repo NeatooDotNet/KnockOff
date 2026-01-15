@@ -3,9 +3,9 @@
 
 namespace KnockOff.Documentation.Samples.Guides;
 
-partial class IdxConfigStoreKnockOff : global::KnockOff.IKnockOffStub
+partial class IdxConfigStoreKnockOff : global::KnockOff.Documentation.Samples.Guides.IIdxConfigStore, global::KnockOff.IKnockOffStub
 {
-	/// <summary>Tracks and configures behavior for Indexer.</summary>
+	/// <summary>Tracks and configures behavior for indexer.</summary>
 	public sealed class IndexerInterceptor
 	{
 		/// <summary>Number of times the getter was accessed.</summary>
@@ -27,14 +27,14 @@ partial class IdxConfigStoreKnockOff : global::KnockOff.IKnockOffStub
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
 	}
 
-	/// <summary>Interceptor for Indexer.</summary>
+	/// <summary>Interceptor for indexer. Configure callbacks and track access.</summary>
 	public IndexerInterceptor Indexer { get; } = new();
+
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
 
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IIdxConfigStore instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IIdxConfigStore Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	global::KnockOff.Documentation.Samples.Guides.IdxConfigValue? global::KnockOff.Documentation.Samples.Guides.IIdxConfigStore.this[string key]
 	{

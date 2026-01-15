@@ -3,7 +3,7 @@
 
 namespace KnockOff.Documentation.Samples.Concepts;
 
-partial class PatternServiceKnockOff : global::KnockOff.IKnockOffStub
+partial class PatternServiceKnockOff : global::KnockOff.Documentation.Samples.Concepts.IPatternService, global::KnockOff.IKnockOffStub
 {
 	/// <summary>Tracks and configures behavior for Calculate.</summary>
 	public sealed class Calculate2Interceptor
@@ -33,11 +33,11 @@ partial class PatternServiceKnockOff : global::KnockOff.IKnockOffStub
 	/// <summary>Interceptor for Calculate.</summary>
 	public Calculate2Interceptor Calculate2 { get; } = new();
 
+	/// <summary>When true, throws StubException for unconfigured member access.</summary>
+	public bool Strict { get; set; } = false;
+
 	/// <summary>The global::KnockOff.Documentation.Samples.Concepts.IPatternService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Concepts.IPatternService Object => this;
-
-	/// <summary>When true, unconfigured method calls throw StubException instead of returning default.</summary>
-	public bool Strict { get; set; } = false;
 
 	int global::KnockOff.Documentation.Samples.Concepts.IPatternService.Calculate(int input)
 	{
