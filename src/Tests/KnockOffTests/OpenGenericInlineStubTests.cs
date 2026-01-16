@@ -88,11 +88,6 @@ public class OpenGenericInlineStubTests
 
 	#endregion
 
-	// TODO: Open generic class stubs are not yet implemented
-	// #region Class Tests
-	// ...
-	// #endregion
-
 	#region Constraint Tests
 
 	[Fact]
@@ -103,14 +98,6 @@ public class OpenGenericInlineStubTests
 		var stub = new ConstrainedGenericInterfaceTest.Stubs.IClassRepository<OGTestEntity>();
 		Assert.NotNull(stub);
 	}
-
-	// TODO: Open generic class stubs are not yet implemented
-	// [Fact]
-	// public void OpenGenericWithConstraint_Class_Works()
-	// {
-	// 	var stub = new ConstrainedGenericClassTest.Stubs.ConstrainedService<OGTestEntity>();
-	// 	Assert.NotNull(stub);
-	// }
 
 	#endregion
 
@@ -337,12 +324,6 @@ public partial class OpenGenericInterfaceTest
 {
 }
 
-// TODO: Open generic class stubs are not yet implemented
-// [KnockOff(typeof(GenericService<>))]
-// public partial class OpenGenericClassTest
-// {
-// }
-
 /// <summary>
 /// Test class with constrained generic interface.
 /// </summary>
@@ -350,12 +331,6 @@ public partial class OpenGenericInterfaceTest
 public partial class ConstrainedGenericInterfaceTest
 {
 }
-
-// TODO: Open generic class stubs are not yet implemented
-// [KnockOff(typeof(ConstrainedService<>))]
-// public partial class ConstrainedGenericClassTest
-// {
-// }
 
 /// <summary>
 /// Test class with multi-parameter generic.
