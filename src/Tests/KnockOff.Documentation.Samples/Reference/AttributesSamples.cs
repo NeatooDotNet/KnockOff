@@ -1,35 +1,12 @@
 /// <summary>
 /// Code samples for docs/reference/attributes.md
-///
-/// Snippets in this file:
-/// - attributes-knockoff-usage
-/// - attributes-valid-examples
-/// - attributes-namespace-qualified
-///
-/// Corresponding tests: AttributesSamplesTests.cs
 /// </summary>
 
 namespace KnockOff.Documentation.Samples.Reference;
 
 // ============================================================================
-// Domain Types for Attribute Samples
+// Domain Types
 // ============================================================================
-
-public interface IAttrService
-{
-    void DoWork();
-}
-
-public interface IAttrRepository<T>
-{
-    T? GetById(int id);
-}
-
-public interface IAttrAuditableEntity
-{
-    DateTime CreatedAt { get; }
-    string CreatedBy { get; }
-}
 
 public class AttrUser
 {
@@ -37,51 +14,146 @@ public class AttrUser
     public string Name { get; set; } = string.Empty;
 }
 
+public interface IAttrService
+{
+    void DoWork();
+}
+
+public interface IAttrUserRepository
+{
+    AttrUser? GetById(int id);
+}
+
+public interface IAttrEmailService
+{
+    void Send(string to, string body);
+}
+
+public interface IAttrRepository<T>
+{
+    T? GetById(int id);
+}
+
+public delegate bool AttrValidationRule(string value);
+
+// Class to stub
+public class AttrEmailServiceClass
+{
+    public AttrEmailServiceClass() { }
+    public AttrEmailServiceClass(string host, int port)
+    {
+        Host = host;
+        Port = port;
+    }
+
+    public string Host { get; } = "localhost";
+    public int Port { get; } = 25;
+
+    public virtual void Send(string to, string body) { }
+}
+
 // ============================================================================
-// Basic Usage
+// Standalone Stubs
 // ============================================================================
 
-#region attributes-knockoff-usage
+#region attr-standalone-basic
 [KnockOff]
-public partial class AttrMyServiceKnockOff : IAttrService
-{
-}
+public partial class AttrUserRepositoryStub : IAttrUserRepository { }
 #endregion
 
-// ============================================================================
-// Valid Examples
-// ============================================================================
-
-#region attributes-valid-examples
+#region attr-standalone-valid
 // Basic usage
 [KnockOff]
-public partial class AttrServiceKnockOff : IAttrService { }
+public partial class AttrServiceStub : IAttrService { }
 
 // Generic interface (with concrete type)
 [KnockOff]
-public partial class AttrUserRepoKnockOff : IAttrRepository<AttrUser> { }
+public partial class AttrUserRepoStub : IAttrRepository<AttrUser> { }
 
-// Interface inheritance
+// Internal visibility
 [KnockOff]
-public partial class AttrAuditableKnockOff : IAttrAuditableEntity { }
+internal partial class AttrInternalServiceStub : IAttrService { }
 
-// Internal class
-[KnockOff]
-internal partial class AttrInternalServiceKnockOff : IAttrService { }
-
-// Nested class
-public partial class AttrTestFixture
+// Nested in test class
+public partial class AttrMyTests
 {
     [KnockOff]
-    public partial class NestedKnockOff : IAttrService { }
+    public partial class NestedStub : IAttrService { }
 }
 #endregion
 
 // ============================================================================
-// Namespace Qualified Usage
+// Inline Stubs Test Classes
 // ============================================================================
 
-#region attributes-namespace-qualified
+#region attr-inline-usage
+[KnockOff<IAttrUserRepository>]
+[KnockOff<IAttrEmailService>]
+public partial class AttrUserServiceTests
+{
+    public void Test()
+    {
+        var repoStub = new Stubs.IAttrUserRepository();
+        var emailStub = new Stubs.IAttrEmailService();
+
+        _ = (repoStub, emailStub);
+    }
+}
+#endregion
+
+#region attr-inline-interface
+[KnockOff<IAttrUserRepository>]
+public partial class AttrInterfaceTests
+{
+    public void Test()
+    {
+        var stub = new Stubs.IAttrUserRepository();
+        stub.GetById.OnCall = (ko, id) => new AttrUser { Id = id };
+
+        IAttrUserRepository repo = stub;  // Implicit conversion
+
+        _ = repo;
+    }
+}
+#endregion
+
+#region attr-inline-class
+[KnockOff<AttrEmailServiceClass>]
+public partial class AttrClassTests
+{
+    public void Test()
+    {
+        var stub = new Stubs.AttrEmailServiceClass("smtp.test.com", 587);
+        stub.Send.OnCall = (ko, to, body) => { };
+
+        AttrEmailServiceClass service = stub.Object;  // Use .Object for class instance
+
+        _ = service;
+    }
+}
+#endregion
+
+#region attr-inline-delegate
+[KnockOff<Func<int, string>>]
+[KnockOff<AttrValidationRule>]  // Named delegate
+public partial class AttrDelegateTests
+{
+    public void Test()
+    {
+        var funcStub = new Stubs.Func();
+        funcStub.Interceptor.OnCall = (ko, id) => $"Item-{id}";
+
+        Func<int, string> func = funcStub;  // Implicit conversion
+
+        _ = func;
+    }
+}
+#endregion
+
+#region attr-namespace-qualified
 [KnockOff.KnockOff]
-public partial class AttrQualifiedServiceKnockOff : IAttrService { }
+public partial class AttrFullyQualifiedStub : IAttrService { }
+
+[KnockOff.KnockOff<IAttrService>]
+public partial class AttrFullyQualifiedTests { }
 #endregion

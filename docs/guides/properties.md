@@ -1,50 +1,47 @@
-# Properties
+# Properties and Indexers
 
-KnockOff supports all property types: get/set, get-only, and set-only.
+This guide covers stubbing properties (get/set, get-only, set-only, init, required) and indexers.
 
-## Property Types
+## Properties
 
-### Get/Set Properties
+### Basic Configuration
 
-<!-- snippet: properties-get-set-property -->
+Use `Value` for simple property values:
+
+<!-- snippet: properties-value-preset -->
 ```cs
-public interface IPropUserService
-{
-    string Name { get; set; }
-}
+// Pre-set a property value before test execution
+knockOff.Name.Value = "John Doe";
 
-[KnockOff]
-public partial class PropUserServiceKnockOff : IPropUserService { }
+// Now accessing the property returns the pre-set value
+var name = service.Name;  // "John Doe"
 ```
 <!-- endSnippet -->
 
-Generated:
-- `knockOff.Name.Value` — backing value (read/write)
-- `knockOff.Name.GetCount` — number of getter calls
-- `knockOff.Name.SetCount` — number of setter calls
-- `knockOff.Name.LastSetValue` — last value set
-- `knockOff.Name.OnGet` — getter callback (for dynamic values)
-- `knockOff.Name.OnSet` — setter callback (for custom logic)
+Use `OnGet` for dynamic values:
 
-### Get-Only Properties
-
-<!-- snippet: properties-get-only-property -->
+<!-- snippet: properties-onget-callback -->
 ```cs
-public interface IPropConfig
-{
-    string ConnectionString { get; }
-}
+knockOff.Name.OnGet = (ko) => "Always This Value";
 
-[KnockOff]
-public partial class PropConfigKnockOff : IPropConfig { }
+var value = service.Name;  // "Always This Value"
 ```
 <!-- endSnippet -->
 
-For get-only properties:
-- `Value` is available for setting the return value
-- `OnGet` callback is available for dynamic values
+### Property Types
 
-**Use `Value` for static values (recommended):**
+**Get/Set properties** have full tracking:
+
+```csharp
+stub.Name.Value = "Test";       // Set return value
+stub.Name.OnGet = (ko) => val;  // Dynamic getter
+stub.Name.OnSet = (ko, v) => {};// Setter callback
+stub.Name.GetCount              // Getter call count
+stub.Name.SetCount              // Setter call count
+stub.Name.LastSetValue          // Last value set
+```
+
+**Get-only properties** can use `Value` or `OnGet`:
 
 <!-- snippet: properties-get-only-usage -->
 ```cs
@@ -53,36 +50,15 @@ knockOff.ConnectionString.Value = "Server=test";
 ```
 <!-- endSnippet -->
 
-**Use `OnGet` for dynamic/computed values:**
+**Set-only properties** track setter calls:
 
-<!-- snippet: properties-get-only-dynamic -->
-```cs
-// Use OnGet callback for dynamic/computed values
-knockOff.ConnectionString.OnGet = (ko) => Environment.GetEnvironmentVariable("DB_CONN") ?? "Server=fallback";
+```csharp
+stub.Output.SetCount      // Number of sets
+stub.Output.LastSetValue  // Last value set
+stub.Output.OnSet = (ko, value) => { };
 ```
-<!-- endSnippet -->
 
-### Set-Only Properties
-
-<!-- snippet: properties-set-only-property-interface -->
-```cs
-public interface IPropLogger
-{
-    string Output { set; }
-}
-
-[KnockOff]
-public partial class PropLoggerKnockOff : IPropLogger { }
-```
-<!-- endSnippet -->
-
-For set-only properties:
-- Only `OnSet` callback and `SetCount`/`LastSetValue` are available
-- No backing field (nothing to get)
-
-## Tracking
-
-### Get Tracking
+### Tracking
 
 <!-- snippet: properties-get-tracking -->
 ```cs
@@ -93,8 +69,6 @@ _ = service.Name;
 var getCount = knockOff.Name.GetCount;  // 3
 ```
 <!-- endSnippet -->
-
-### Set Tracking
 
 <!-- snippet: properties-set-tracking -->
 ```cs
@@ -107,96 +81,37 @@ var lastValue = knockOff.Name.LastSetValue;     // "Third"
 ```
 <!-- endSnippet -->
 
-## Customization
+### Init Properties (C# 9+)
 
-### Using Value (Recommended for Static Values)
+Init-only properties are configured via `Value`:
 
-The simplest way to configure a property is using `Value`:
-
-<!-- snippet: properties-value-preset -->
-```cs
-// Pre-set a property value before test execution
-knockOff.Name.Value = "John Doe";
-
-// Now accessing the property returns the pre-set value
-var name = service.Name;  // "John Doe"
-```
-<!-- endSnippet -->
-
-**When to use `Value`:**
-- Static test data that doesn't change
-- Pre-populating properties before test execution
-- Simple return values
-
-### Default Behavior (Via Interface)
-
-You can also set/get through the interface itself:
-
-<!-- snippet: properties-default-behavior -->
-```cs
-service.Name = "Test";
-var value = service.Name;  // "Test" - read from backing
-```
-<!-- endSnippet -->
-
-### OnGet Callback (For Dynamic Values)
-
-Use `OnGet` when you need dynamic or computed values:
-
-<!-- snippet: properties-onget-callback -->
-```cs
-knockOff.Name.OnGet = (ko) => "Always This Value";
-
-var value = service.Name;  // "Always This Value"
-```
-<!-- endSnippet -->
-
-Dynamic values:
-
-<!-- snippet: properties-dynamic-values -->
-```cs
-var counter = 0;
-knockOff.Name.OnGet = (ko) => $"Call-{++counter}";
-
-var first = service.Name;   // "Call-1"
-var second = service.Name;  // "Call-2"
-```
-<!-- endSnippet -->
-
-### OnSet Callback
-
-Override setter behavior:
-
-<!-- snippet: properties-onset-callback -->
-```cs
-string? captured = null;
-knockOff.Name.OnSet = (ko, value) =>
+```csharp
+public interface IEntity
 {
-    captured = value;
-    // Value does NOT go to backing field when OnSet is set
-};
-
-service.Name = "Test";
-// captured is now "Test"
-```
-<!-- endSnippet -->
-
-**Important**: When `OnSet` is set, the value is NOT stored in the backing field.
-
-### Conditional Logic
-
-<!-- snippet: properties-conditional-logic -->
-```cs
-public interface IPropConnection
-{
-    bool IsConnected { get; }
-    void Connect();
+    string Id { get; init; }
 }
 
-[KnockOff]
-public partial class PropConnectionKnockOff : IPropConnection { }
+stub.Id.Value = "entity-123";
+var id = entity.Id;  // "entity-123"
 ```
-<!-- endSnippet -->
+
+### Required Properties (C# 11+)
+
+Required properties work like regular properties. The `[SetsRequiredMembers]` attribute is auto-generated:
+
+```csharp
+public class AuditableEntity
+{
+    public required string Id { get; set; }
+    public required string CreatedBy { get; set; }
+}
+
+// [KnockOff<AuditableEntity>]
+stub.Id.OnGet = (ko) => "audit-001";
+stub.CreatedBy.OnGet = (ko) => "admin";
+```
+
+### Conditional Logic
 
 <!-- snippet: properties-conditional-usage -->
 ```cs
@@ -208,7 +123,7 @@ knockOff.IsConnected.OnGet = (ko) =>
 ```
 <!-- endSnippet -->
 
-## Reset
+### Reset
 
 <!-- snippet: properties-reset -->
 ```cs
@@ -222,93 +137,103 @@ var onSet = knockOff.Name.OnSet;          // null
 ```
 <!-- endSnippet -->
 
-## Common Patterns
+## Indexers
 
-### Simulating Read-Only Computed Properties
+Indexers use a backing dictionary for storage.
 
-<!-- snippet: properties-computed-property -->
+### Basic Usage
+
+<!-- snippet: indexers-backing-dictionary -->
 ```cs
-public interface IPropPerson
-{
-    string FirstName { get; set; }
-    string LastName { get; set; }
-    string FullName { get; }
-}
+// Pre-populate backing dictionary
+knockOff.Indexer.Backing["Config"] = new IdxPropertyInfo { Value = "Value1" };
+knockOff.Indexer.Backing["Setting"] = new IdxPropertyInfo { Value = "Value2" };
 
-[KnockOff]
-public partial class PropPersonKnockOff : IPropPerson { }
+// Access returns backing values
+var config = store["Config"];   // Returns the pre-populated value
+var setting = store["Setting"]; // Returns the pre-populated value
 ```
 <!-- endSnippet -->
 
-<!-- snippet: properties-computed-usage -->
+### Naming
+
+- Single indexer: `stub.Indexer`
+- Multiple indexers: `stub.IndexerString`, `stub.IndexerInt32` (key type suffix)
+
+### Tracking
+
+<!-- snippet: indexers-get-tracking -->
 ```cs
-// Set up first/last names
-person.FirstName = "John";
-person.LastName = "Doe";
+_ = store["Name"];
+_ = store["Age"];
 
-// Computed property uses backing values
-knockOff.FullName.OnGet = (ko) =>
-    $"{person.FirstName} {person.LastName}";
-
-var fullName = person.FullName;  // "John Doe"
+var getCount = knockOff.Indexer.GetCount;       // 2
+var lastKey = knockOff.Indexer.LastGetKey;      // "Age"
 ```
 <!-- endSnippet -->
 
-### Tracking Property Changes
-
-<!-- snippet: properties-tracking-changes -->
+<!-- snippet: indexers-set-tracking -->
 ```cs
-public interface IPropStatus
-{
-    string Status { get; set; }
-}
+store["Key"] = value1;
 
-[KnockOff]
-public partial class PropStatusKnockOff : IPropStatus { }
+var setCount = knockOff.Indexer.SetCount;         // 1
+var lastEntry = knockOff.Indexer.LastSetEntry;
+var lastSetKey = lastEntry?.Key;                        // "Key"
+var lastSetValue = lastEntry?.Value;                    // value1
 ```
 <!-- endSnippet -->
 
-<!-- snippet: properties-tracking-usage -->
+### Callbacks
+
+<!-- snippet: indexers-onget-callback -->
 ```cs
-var changes = new List<string>();
-knockOff.Status.OnSet = (ko, value) =>
+knockOff.Indexer.OnGet = (ko, key) =>
 {
-    changes.Add(value);
-    // Value still goes to backing when not using OnSet
+    // Compute or fetch value dynamically
+    return new IdxPropertyInfo { Name = key, Value = key.Length };
 };
+
+var result = store["Hello"];  // Returns IdxPropertyInfo with Value = 5
 ```
 <!-- endSnippet -->
 
-### Throwing on Access
-
-<!-- snippet: properties-throwing-on-access -->
+<!-- snippet: indexers-onset-callback -->
 ```cs
-public interface IPropSecure
+knockOff.Indexer.OnSet = (ko, key, value) =>
 {
-    string SecretKey { get; }
-}
+    changes.Add((key, value));
+};
 
-[KnockOff]
-public partial class PropSecureKnockOff : IPropSecure { }
+store["Key1"] = new IdxPropertyInfo { Value = "A" };
+store["Key2"] = new IdxPropertyInfo { Value = "B" };
+
+// changes contains [("Key1", ...), ("Key2", ...)]
 ```
 <!-- endSnippet -->
 
-<!-- snippet: properties-throwing-usage -->
+**Note:** When `OnSet` is set, values do NOT go to the backing dictionary.
+
+### Integer Indexers
+
+<!-- snippet: indexers-integer-indexer-usage -->
 ```cs
-knockOff.SecretKey.OnGet = (ko) =>
-    throw new UnauthorizedAccessException("Access denied");
+knockOff.Indexer.Backing[0] = "First";
+knockOff.Indexer.Backing[1] = "Second";
+
+var first = list[0];   // "First"
+var second = list[1];  // "Second"
+
+var lastGetIndex = knockOff.Indexer.LastGetKey;  // 1
 ```
 <!-- endSnippet -->
 
-## Value vs OnGet: Decision Guide
+## Value vs OnGet
 
-| Scenario | Use | Example |
-|----------|-----|---------|
-| Static test data | `Value` | `knockOff.Name.Value = "John"` |
-| Pre-populate before test | `Value` | `knockOff.Count.Value = 42` |
-| Different value each call | `OnGet` | `knockOff.Id.OnGet = (ko) => ++counter` |
-| Depends on other stub state | `OnGet` | `knockOff.IsConnected.OnGet = (ko) => ko.Connect.WasCalled` |
-| Computed from test context | `OnGet` | `knockOff.User.OnGet = (ko) => _testFixture.CurrentUser` |
-| Throw on access | `OnGet` | `knockOff.Secret.OnGet = (ko) => throw new Exception()` |
+| Scenario | Use |
+|----------|-----|
+| Static test data | `Value` |
+| Different value each call | `OnGet` |
+| Depends on stub state | `OnGet` |
+| Throw on access | `OnGet` |
 
 **Rule of thumb:** Start with `Value`. Only use `OnGet` when you need dynamic behavior.
