@@ -37,4 +37,8 @@ internal sealed record FlatMethodModel(
     bool IsNullableReturn,
     string OfTypeAccess,
     InterfaceMemberInfo? DelegationTarget,
-    string? DelegationTargetInterface);
+    string? DelegationTargetInterface,
+    /// <summary>Suffix for this signature when part of overload group (e.g., "String_Int32_String").</summary>
+    string SignatureSuffix,
+    /// <summary>True if this method is part of an overload group with multiple signatures.</summary>
+    bool IsPartOfOverloadGroup);
