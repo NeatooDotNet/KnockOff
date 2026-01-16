@@ -131,26 +131,13 @@ internal static class FlatModelBuilder
 			if (isMixed)
 			{
 				// Mixed group: handle non-generic and generic overloads separately
-
-				// Non-generic overloads get numbered suffixes if multiple, otherwise base name
-				if (nonGenericOverloads.Count == 1)
+				// All non-generic overloads share one interceptor name
+				var finalName = GetUniqueInterceptorName(methodName, usedNames);
+				usedNames.Add(finalName);
+				foreach (var overload in nonGenericOverloads)
 				{
-					var key = GetMemberKey(nonGenericOverloads[0]);
-					var finalName = GetUniqueInterceptorName(methodName, usedNames);
+					var key = GetMemberKey(overload);
 					nameMap[key] = finalName;
-					usedNames.Add(finalName);
-				}
-				else
-				{
-					for (int i = 0; i < nonGenericOverloads.Count; i++)
-					{
-						var key = GetMemberKey(nonGenericOverloads[i]);
-						var suffix = (i + 1).ToString();
-						var baseName = $"{methodName}{suffix}";
-						var finalName = GetUniqueInterceptorName(baseName, usedNames);
-						nameMap[key] = finalName;
-						usedNames.Add(finalName);
-					}
 				}
 
 				// Generic overloads use a handler with Generic suffix
@@ -192,15 +179,14 @@ internal static class FlatModelBuilder
 			}
 			else
 			{
-				// Multiple overloads - use numbered suffixes
-				for (int i = 0; i < overloads.Count; i++)
+				// Multiple overloads - all share the same interceptor name
+				// The interceptor class will have multiple OnCall overloads with suffixed delegates
+				var finalName = GetUniqueInterceptorName(methodName, usedNames);
+				usedNames.Add(finalName);
+				foreach (var overload in overloads)
 				{
-					var key = GetMemberKey(overloads[i]);
-					var suffix = (i + 1).ToString();
-					var baseName = $"{methodName}{suffix}";
-					var finalName = GetUniqueInterceptorName(baseName, usedNames);
+					var key = GetMemberKey(overload);
 					nameMap[key] = finalName;
-					usedNames.Add(finalName);
 				}
 			}
 		}
