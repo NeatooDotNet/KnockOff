@@ -695,12 +695,33 @@ internal static class FlatRenderer
 			return;
 		}
 
+		// Deduplicate methods by signature suffix
+		// Multiple interface methods with identical signatures (same params AND return type)
+		// should generate only one set of interceptor members
+		var renderedSuffixes = new HashSet<string>();
+		var uniqueMethods = new List<FlatMethodModel>();
+		foreach (var method in group.Methods)
+		{
+			var suffix = GetSignatureSuffix(method);
+			if (renderedSuffixes.Add(suffix))
+			{
+				uniqueMethods.Add(method);
+			}
+		}
+
+		// If after deduplication we only have one unique signature, use single-method pattern
+		if (uniqueMethods.Count == 1)
+		{
+			RenderMethodInterceptorClass(w, uniqueMethods[0], className);
+			return;
+		}
+
 		var firstMethod = group.Methods.GetArray()![0];
 		w.Line($"/// <summary>Tracks and configures behavior for {firstMethod.MethodName} (overloaded).</summary>");
 		using (w.Block($"public sealed class {group.InterceptorClassName}"))
 		{
-			// Generate delegates and sequences for each overload
-			foreach (var method in group.Methods)
+			// Generate delegates and sequences for each unique overload
+			foreach (var method in uniqueMethods)
 			{
 				var suffix = GetSignatureSuffix(method);
 
@@ -715,8 +736,8 @@ internal static class FlatRenderer
 				w.Line();
 			}
 
-			// OnCall overloads for each signature
-			foreach (var method in group.Methods)
+			// OnCall overloads for each unique signature
+			foreach (var method in uniqueMethods)
 			{
 				var suffix = GetSignatureSuffix(method);
 				var trackingInterface = GetTrackingInterface(method);
@@ -748,17 +769,17 @@ internal static class FlatRenderer
 				w.Line();
 			}
 
-			// Invoke methods for each signature - call RenderGroupInvokeMethod
-			foreach (var method in group.Methods)
+			// Invoke methods for each unique signature
+			foreach (var method in uniqueMethods)
 			{
 				RenderGroupInvokeMethod(w, method, className);
 			}
 
-			// Reset method (resets all sequences)
+			// Reset method (resets all unique sequences)
 			w.Line("/// <summary>Resets all tracking state for all overloads.</summary>");
 			using (w.Block("public void Reset()"))
 			{
-				foreach (var method in group.Methods)
+				foreach (var method in uniqueMethods)
 				{
 					var suffix = GetSignatureSuffix(method);
 					w.Line($"foreach (var (_, _, tracking) in _sequence_{suffix})");
@@ -772,7 +793,7 @@ internal static class FlatRenderer
 			w.Line("/// <summary>Verifies all Times constraints for all overloads were satisfied.</summary>");
 			using (w.Block("public bool Verify()"))
 			{
-				foreach (var method in group.Methods)
+				foreach (var method in uniqueMethods)
 				{
 					var suffix = GetSignatureSuffix(method);
 					w.Line($"foreach (var (_, times, tracking) in _sequence_{suffix})");
@@ -786,14 +807,14 @@ internal static class FlatRenderer
 			}
 			w.Line();
 
-			// Nested tracking classes for each signature
-			foreach (var method in group.Methods)
+			// Nested tracking classes for each unique signature
+			foreach (var method in uniqueMethods)
 			{
 				RenderGroupMethodTrackingImpl(w, method);
 			}
 
-			// Nested sequence classes for each signature
-			foreach (var method in group.Methods)
+			// Nested sequence classes for each unique signature
+			foreach (var method in uniqueMethods)
 			{
 				RenderGroupMethodSequenceImpl(w, method, group.InterceptorClassName);
 			}
@@ -803,9 +824,10 @@ internal static class FlatRenderer
 
 	private static string GetSignatureSuffix(FlatMethodModel method)
 	{
+		var returnSuffix = GetTypeSuffix(method.ReturnType);
 		if (method.Parameters.Count == 0)
-			return "NoParams";
-		return string.Join("_", method.Parameters.Select(p => GetTypeSuffix(p.Type)));
+			return $"NoParams_{returnSuffix}";
+		return string.Join("_", method.Parameters.Select(p => GetTypeSuffix(p.Type))) + $"_{returnSuffix}";
 	}
 
 	private static string GetTypeSuffix(string type)
