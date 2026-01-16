@@ -30,4 +30,15 @@ public class StubException : Exception
             $"{interfaceName}.{memberName} invocation failed with strict behavior. " +
             "Configure OnCall before invoking.");
     }
+
+    /// <summary>
+    /// Creates a StubException when a callback sequence has been exhausted.
+    /// </summary>
+    /// <param name="memberName">The method name.</param>
+    public static StubException SequenceExhausted(string memberName)
+    {
+        return new StubException(
+            $"Callback sequence exhausted for '{memberName}'. " +
+            "All configured callbacks have been used the specified number of times.");
+    }
 }

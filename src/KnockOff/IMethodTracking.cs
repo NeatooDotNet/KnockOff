@@ -20,8 +20,8 @@ public interface IMethodTracking
 /// </summary>
 public interface IMethodTracking<TArg> : IMethodTracking
 {
-    /// <summary>Last argument passed to this callback.</summary>
-    TArg? LastArg { get; }
+    /// <summary>Last argument passed to this callback. Default if never called (check WasCalled).</summary>
+    TArg LastArg { get; }
 }
 
 /// <summary>
@@ -29,6 +29,6 @@ public interface IMethodTracking<TArg> : IMethodTracking
 /// </summary>
 public interface IMethodTrackingArgs<TArgs> : IMethodTracking
 {
-    /// <summary>Last arguments passed to this callback as named tuple.</summary>
-    TArgs? LastArgs { get; }
+    /// <summary>Last arguments passed to this callback as named tuple. Default if never called (check WasCalled).</summary>
+    TArgs LastArgs { get; }
 }
