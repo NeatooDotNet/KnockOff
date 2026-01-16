@@ -38,6 +38,17 @@ internal static class FlatModelBuilder
 		var (methods, genericHandlers) = BuildMethodModels(typeInfo, nameMap, methodGroups, className);
 		var events = BuildEventModels(typeInfo, nameMap);
 
+		// Group non-generic methods by interceptor name for multi-overload support
+		var flatMethodGroups = methods
+			.Where(m => !m.IsGenericMethod && m.UserMethodCall == null)
+			.GroupBy(m => m.InterceptorName)
+			.Select(g => new FlatMethodGroup(
+				InterceptorName: g.Key,
+				InterceptorClassName: g.First().InterceptorClassName,
+				NeedsNewKeyword: g.Any(m => m.NeedsNewKeyword),
+				Methods: new EquatableArray<FlatMethodModel>(g.ToArray())))
+			.ToList();
+
 		// Build containing types models
 		var containingTypes = typeInfo.ContainingTypes.Select(ct => new ContainingTypeModel(
 			Keyword: ct.Keyword,
@@ -53,6 +64,7 @@ internal static class FlatModelBuilder
 			Properties: properties,
 			Indexers: indexers,
 			Methods: methods,
+			MethodGroups: new EquatableArray<FlatMethodGroup>(flatMethodGroups.ToArray()),
 			GenericMethodHandlers: genericHandlers,
 			Events: events,
 			HasGenericMethods: genericHandlers.Count > 0 || methods.Any(m => m.IsGenericMethod),

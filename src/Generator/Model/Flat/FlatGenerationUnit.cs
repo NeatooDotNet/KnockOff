@@ -17,6 +17,8 @@ internal sealed record FlatGenerationUnit(
     EquatableArray<FlatPropertyModel> Properties,
     EquatableArray<FlatIndexerModel> Indexers,
     EquatableArray<FlatMethodModel> Methods,
+    /// <summary>Method groups for interceptor generation (groups overloads by name).</summary>
+    EquatableArray<FlatMethodGroup> MethodGroups,
     EquatableArray<FlatGenericMethodHandlerModel> GenericMethodHandlers,
     EquatableArray<FlatEventModel> Events,
     bool HasGenericMethods,
