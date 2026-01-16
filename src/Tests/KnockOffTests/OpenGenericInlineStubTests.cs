@@ -203,6 +203,82 @@ public partial class OpenGenericDelegateTests
 	}
 }
 
+// ============================================================================
+// Open Generic Class Tests
+// ============================================================================
+
+public abstract class OGRepository<T> where T : class
+{
+	public abstract T? GetById(int id);
+	public abstract void Save(T entity);
+	public virtual string Name => "DefaultRepo";
+}
+
+public abstract class OGCache<TKey, TValue>
+	where TKey : notnull
+	where TValue : new()
+{
+	public abstract TValue Get(TKey key);
+	public abstract void Set(TKey key, TValue value);
+}
+
+[KnockOff(typeof(OGRepository<>))]
+[KnockOff(typeof(OGCache<,>))]
+public partial class OpenGenericClassTests
+{
+	[Fact]
+	public void SingleTypeParam_CanInstantiateWithDifferentTypes()
+	{
+		var userRepo = new Stubs.OGRepository<User>();
+		var orderRepo = new Stubs.OGRepository<Order>();
+
+		Assert.NotNull(userRepo);
+		Assert.NotNull(orderRepo);
+	}
+
+	[Fact]
+	public void SingleTypeParam_InterceptorTracksInvocations()
+	{
+		var stub = new Stubs.OGRepository<User>();
+		stub.GetById.OnCall = (ko, id) => new User { Id = id };
+
+		OGRepository<User> repo = stub.Object;
+		var user = repo.GetById(42);
+
+		Assert.NotNull(user);
+		Assert.Equal(42, user.Id);
+		Assert.Equal(1, stub.GetById.CallCount);
+	}
+
+	[Fact]
+	public void VirtualMember_CallsBaseByDefault()
+	{
+		var stub = new Stubs.OGRepository<User>();
+
+		OGRepository<User> repo = stub.Object;
+		var name = repo.Name;
+
+		Assert.Equal("DefaultRepo", name);
+	}
+
+	[Fact]
+	public void MultipleTypeParams_PreservesConstraints()
+	{
+		// TKey: notnull, TValue: new()
+		var stub = new Stubs.OGCache<string, List<int>>();
+		stub.Get.OnCall = (ko, key) => new List<int> { 1, 2, 3 };
+
+		OGCache<string, List<int>> cache = stub.Object;
+		var result = cache.Get("test");
+
+		Assert.Equal(3, result.Count);
+	}
+
+	// Helper types for tests
+	public class User { public int Id { get; set; } }
+	public class Order { public int Id { get; set; } }
+}
+
 /// <summary>
 /// Generic service class for testing open generic class stubs.
 /// </summary>
