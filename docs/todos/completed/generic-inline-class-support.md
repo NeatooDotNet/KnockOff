@@ -1,7 +1,7 @@
 # Generic Inline Class Support
 
 **Status:** Complete
-**Completed:** v10.19
+**Completed:** v10.20
 
 ## Problem
 

@@ -1,7 +1,7 @@
 # Open Generic Stubs - Tracker
 
 **Status:** Complete
-**Completed:** v10.19
+**Completed:** v10.20
 
 This todo tracks the overall effort to support open generic stubs across all type kinds (interface, class, delegate) and stub patterns (standalone, inline).
 
@@ -10,8 +10,8 @@ This todo tracks the overall effort to support open generic stubs across all typ
 |  | **Stand-Alone Stub** | **Inline Stub** |
 |--|---------------------|-----------------|
 | **Open Generic Interface** | ✅ Supported (v10.14)<br>`[KnockOff] class Stub<T> : IRepo<T>` | ✅ Supported (v10.18)<br>`[KnockOff(typeof(IRepo<>))]` |
-| **Open Generic Class** | ❌ Not Supported<br>Standalone requires interface implementation | ✅ Supported (v10.19)<br>`[KnockOff(typeof(SomeClass<>))]` |
-| **Open Generic Delegate** | ❌ Impossible<br>Can't inherit from delegates | ✅ Supported (v10.19)<br>`[KnockOff(typeof(Factory<>))]` |
+| **Open Generic Class** | ❌ Not Supported<br>Standalone requires interface implementation | ✅ Supported (v10.20)<br>`[KnockOff(typeof(SomeClass<>))]` |
+| **Open Generic Delegate** | ❌ Impossible<br>Can't inherit from delegates | ✅ Supported (v10.20)<br>`[KnockOff(typeof(Factory<>))]` |
 
 ## Legend
 
@@ -24,17 +24,17 @@ This todo tracks the overall effort to support open generic stubs across all typ
 
 | Todo | Type | Pattern | Priority | Notes |
 |------|------|---------|----------|-------|
-| ~~[generic-delegate-support.md](completed/generic-delegate-support.md)~~ | Delegate | Inline | ✅ Done | Completed in v10.19 |
+| ~~[generic-delegate-support.md](completed/generic-delegate-support.md)~~ | Delegate | Inline | ✅ Done | Completed in v10.20 |
 | ~~[generic-inline-interface-support.md](generic-inline-interface-support.md)~~ | Interface | Inline | ✅ Done | Completed in v10.18 |
-| ~~[generic-inline-class-support.md](completed/generic-inline-class-support.md)~~ | Class | Inline | ✅ Done | Completed in v10.19 |
+| ~~[generic-inline-class-support.md](completed/generic-inline-class-support.md)~~ | Class | Inline | ✅ Done | Completed in v10.20 |
 
 ## Task List
 
 - [x] Verify standalone generic class stubs work → **Result: Not supported** (standalone requires interface implementation; use inline pattern for class stubs)
 - [x] Implement `[KnockOff(typeof(...))]` attribute parsing (shared by all three)
-- [x] Implement open generic delegate inline stubs → **Completed v10.19**
+- [x] Implement open generic delegate inline stubs → **Completed v10.20**
 - [x] Implement open generic interface inline stubs → **Completed v10.18** (includes multi-param generics like `IKeyValueStore<TKey, TValue>` and type constraints like `where T : class`)
-- [x] Implement open generic class inline stubs → **Completed v10.19**
+- [x] Implement open generic class inline stubs → **Completed v10.20**
 - [x] Update documentation with complete support matrix
 
 ## Shared Implementation
