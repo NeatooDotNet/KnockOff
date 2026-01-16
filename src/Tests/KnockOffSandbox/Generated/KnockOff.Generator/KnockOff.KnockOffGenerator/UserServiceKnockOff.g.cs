@@ -172,27 +172,6 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 		}
 	}
 
-	/// <summary>Tracks calls to GetGreeting (user-defined implementation).</summary>
-	public sealed class GetGreeting2Interceptor : global::KnockOff.IMethodTracking<string>
-	{
-		private string _lastArg = default!;
-
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
-
-		/// <summary>True if CallCount > 0.</summary>
-		public bool WasCalled => CallCount > 0;
-
-		/// <summary>Last argument passed to this method. Default if never called.</summary>
-		public string LastArg => _lastArg;
-
-		/// <summary>Records a method call.</summary>
-		internal void RecordCall(string name) { CallCount++; _lastArg = name; }
-
-		/// <summary>Resets tracking state.</summary>
-		public void Reset() { CallCount = 0; _lastArg = default!; }
-	}
-
 	/// <summary>Tracks and configures behavior for Process.</summary>
 	public sealed class ProcessInterceptor
 	{
@@ -312,6 +291,27 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+	}
+
+	/// <summary>Tracks calls to GetGreeting (user-defined implementation).</summary>
+	public sealed class GetGreeting2Interceptor : global::KnockOff.IMethodTracking<string>
+	{
+		private string _lastArg = default!;
+
+		/// <summary>Number of times this method was called.</summary>
+		public int CallCount { get; private set; }
+
+		/// <summary>True if CallCount > 0.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>Last argument passed to this method. Default if never called.</summary>
+		public string LastArg => _lastArg;
+
+		/// <summary>Records a method call.</summary>
+		internal void RecordCall(string name) { CallCount++; _lastArg = name; }
+
+		/// <summary>Resets tracking state.</summary>
+		public void Reset() { CallCount = 0; _lastArg = default!; }
 	}
 
 	/// <summary>Interceptor for Name. Configure via .Value, track via .GetCount.</summary>
