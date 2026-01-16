@@ -36,29 +36,25 @@ partial class GenUserServiceKnockOff : global::KnockOff.Documentation.Samples.Re
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 	}
 
-	/// <summary>Tracks and configures behavior for GetUser.</summary>
-	public sealed class GetUser2Interceptor
+	/// <summary>Tracks calls to GetUser (user-defined implementation).</summary>
+	public sealed class GetUser2Interceptor : global::KnockOff.IMethodTracking<int>
 	{
-		/// <summary>Delegate for GetUser.</summary>
-		public delegate global::KnockOff.Documentation.Samples.Reference.GenUser? GetUserDelegate(GenUserServiceKnockOff ko, int id);
+		private int _lastArg = default!;
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>Whether this method was called at least once.</summary>
+		/// <summary>True if CallCount > 0.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The argument from the most recent call.</summary>
-		public int? LastCallArg { get; private set; }
-
-		/// <summary>Callback invoked when this method is called.</summary>
-		public GetUserDelegate? OnCall { get; set; }
+		/// <summary>Last argument passed to this method. Default if never called.</summary>
+		public int LastArg => _lastArg;
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
+		internal void RecordCall(int id) { CallCount++; _lastArg = id; }
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+		/// <summary>Resets tracking state.</summary>
+		public void Reset() { CallCount = 0; _lastArg = default!; }
 	}
 
 	/// <summary>Interceptor for Name. Configure via .Value, track via .GetCount.</summary>
@@ -82,7 +78,6 @@ partial class GenUserServiceKnockOff : global::KnockOff.Documentation.Samples.Re
 	global::KnockOff.Documentation.Samples.Reference.GenUser? global::KnockOff.Documentation.Samples.Reference.IGenUserService.GetUser(int id)
 	{
 		GetUser2.RecordCall(id);
-		if (GetUser2.OnCall is { } callback) return callback(this, id);
 		return GetUser(id);
 	}
 

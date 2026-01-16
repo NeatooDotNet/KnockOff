@@ -5,54 +5,46 @@ namespace KnockOff.Documentation.Samples.Concepts;
 
 partial class PatternUserServiceKnockOff : global::KnockOff.Documentation.Samples.Concepts.IPatternUserService, global::KnockOff.IKnockOffStub
 {
-	/// <summary>Tracks and configures behavior for GetUser.</summary>
-	public sealed class GetUser2Interceptor
+	/// <summary>Tracks calls to GetUser (user-defined implementation).</summary>
+	public sealed class GetUser2Interceptor : global::KnockOff.IMethodTracking<int>
 	{
-		/// <summary>Delegate for GetUser.</summary>
-		public delegate global::KnockOff.Documentation.Samples.Concepts.PatternUser GetUserDelegate(PatternUserServiceKnockOff ko, int id);
+		private int _lastArg = default!;
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>Whether this method was called at least once.</summary>
+		/// <summary>True if CallCount > 0.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The argument from the most recent call.</summary>
-		public int? LastCallArg { get; private set; }
-
-		/// <summary>Callback invoked when this method is called.</summary>
-		public GetUserDelegate? OnCall { get; set; }
+		/// <summary>Last argument passed to this method. Default if never called.</summary>
+		public int LastArg => _lastArg;
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
+		internal void RecordCall(int id) { CallCount++; _lastArg = id; }
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+		/// <summary>Resets tracking state.</summary>
+		public void Reset() { CallCount = 0; _lastArg = default!; }
 	}
 
-	/// <summary>Tracks and configures behavior for CalculateScore.</summary>
-	public sealed class CalculateScore2Interceptor
+	/// <summary>Tracks calls to CalculateScore (user-defined implementation).</summary>
+	public sealed class CalculateScore2Interceptor : global::KnockOff.IMethodTrackingArgs<(string? name, int? baseScore)>
 	{
-		/// <summary>Delegate for CalculateScore.</summary>
-		public delegate int CalculateScoreDelegate(PatternUserServiceKnockOff ko, string name, int baseScore);
+		private (string? name, int? baseScore) _lastArgs;
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>Whether this method was called at least once.</summary>
+		/// <summary>True if CallCount > 0.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The arguments from the most recent call.</summary>
-		public (string? name, int? baseScore)? LastCallArgs { get; private set; }
-
-		/// <summary>Callback invoked when this method is called.</summary>
-		public CalculateScoreDelegate? OnCall { get; set; }
+		/// <summary>Last arguments passed to this method. Default if never called.</summary>
+		public (string? name, int? baseScore) LastArgs => _lastArgs;
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string? name, int? baseScore) { CallCount++; LastCallArgs = (name, baseScore); }
+		internal void RecordCall((string? name, int? baseScore) args) { CallCount++; _lastArgs = args; }
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
+		/// <summary>Resets tracking state.</summary>
+		public void Reset() { CallCount = 0; _lastArgs = default; }
 	}
 
 	/// <summary>Interceptor for GetUser.</summary>
@@ -70,14 +62,12 @@ partial class PatternUserServiceKnockOff : global::KnockOff.Documentation.Sample
 	global::KnockOff.Documentation.Samples.Concepts.PatternUser global::KnockOff.Documentation.Samples.Concepts.IPatternUserService.GetUser(int id)
 	{
 		GetUser2.RecordCall(id);
-		if (GetUser2.OnCall is { } callback) return callback(this, id);
 		return GetUser(id);
 	}
 
 	int global::KnockOff.Documentation.Samples.Concepts.IPatternUserService.CalculateScore(string name, int baseScore)
 	{
-		CalculateScore2.RecordCall(name, baseScore);
-		if (CalculateScore2.OnCall is { } callback) return callback(this, name, baseScore);
+		CalculateScore2.RecordCall((name, baseScore));
 		return CalculateScore(name, baseScore);
 	}
 
