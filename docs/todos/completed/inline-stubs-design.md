@@ -22,7 +22,7 @@ Add support for declaring stubs directly in test classes using `[KnockOff<T>]` a
 
 - **No user method detection**: Inline stubs don't support user-defined methods. Use `OnCall` callbacks for custom behavior, or use the explicit pattern.
 - **Same-named interfaces**: Interfaces with identical simple names from different namespaces cause KO1002 error. Use explicit pattern for disambiguation.
-- **Generic delegates**: Only closed generic delegates supported (e.g., `[KnockOff<Factory<string>>]`). Open generic delegates not supported.
+- **Generic delegates**: Both closed (`[KnockOff<Factory<string>>]`) and open (`[KnockOff(typeof(Factory<>))]`) generic delegates supported. *(Open generic support added in v10.20)*
 - **Delegates with ref/out parameters**: Not supported. The `OnCall` callback uses `Func<>`/`Action<>` which cannot represent ref/out parameters. Use the explicit pattern with user-defined methods.
 
 ## Design
@@ -381,7 +381,7 @@ public partial class MyTests
 
 **Known limitations:**
 - **ref/out parameters**: Not supported. `Func<>`/`Action<>` types used for `OnCall` cannot represent ref/out parameters. Workaround: use explicit `[KnockOff]` pattern with user-defined methods.
-- **Open generic delegates**: (e.g., `delegate T Factory<T>()` without closed type arguments) are not supported. Only closed generic instantiations work.
+- **Open generic delegates**: Now supported as of v10.20 via `[KnockOff(typeof(Factory<>))]` syntax.
 
 #### Phase 9: Delegate Testing ✅
 
