@@ -26,6 +26,8 @@ Releases with notable changes.
 
 ## All Releases
 
+- [v10.19.1](v10.19.1.md) - 2026-01-15 - Fix inline stub method overload type mismatches
+- [v10.19.0](v10.19.0.md) - 2026-01-15 - BCL collection delegation fix, Model+Renderer refactor
 - [v10.18.0](v10.18.0.md) - 2026-01-15 - Open generic inline interface stubs
 - [v10.17.0](v10.17.0.md) - 2026-01-13 - Fluent `.Strict()` extension method
 - [v10.16.0](v10.16.0.md) - 2026-01-13 - Strict mode support

@@ -92,7 +92,7 @@ internal static class InlineModelBuilder
             : iface.FullName;
 
         // Group methods by name for overload handling
-        var methodGroups = GroupMethodsByName(iface.Members.Where(m => !m.IsProperty && !m.IsIndexer));
+        var (methodGroups, memberKeyToGroupName) = GroupMethodsByName(iface.Members.Where(m => !m.IsProperty && !m.IsIndexer));
 
         // Count indexers for naming strategy
         var indexerCount = SymbolHelpers.CountIndexers(iface.Members);
@@ -187,7 +187,7 @@ internal static class InlineModelBuilder
             stubClassName, indexerCount, typeParamList);
 
         // Build implementations
-        var implementations = BuildImplementations(iface, methodGroups, indexerCount, baseType, typeParamList);
+        var implementations = BuildImplementations(iface, methodGroups, memberKeyToGroupName, indexerCount, baseType, typeParamList);
 
         var hasGenericMethods = genericHandlers.Count > 0 || iface.Members.Any(m => m.IsGenericMethod);
 
@@ -508,6 +508,7 @@ internal static class InlineModelBuilder
     private static EquatableArray<InlineInterfaceImplementation> BuildImplementations(
         InterfaceInfo iface,
         Dictionary<string, MethodGroupInfo> methodGroups,
+        Dictionary<string, string> memberKeyToGroupName,
         int indexerCount,
         string baseType,
         string typeParamList)
@@ -543,7 +544,11 @@ internal static class InlineModelBuilder
                 }
                 else
                 {
-                    var group = methodGroups[member.Name];
+                    // Look up the group for this specific member
+                    var memberKey = GetMemberKey(member);
+                    var groupName = memberKeyToGroupName[memberKey];
+                    var group = methodGroups[groupName];
+
                     // For mixed groups, use the appropriate sub-group
                     if (IsMixedMethodGroup(group))
                     {
@@ -1002,74 +1007,174 @@ internal static class InlineModelBuilder
 
     #region Helper Methods
 
-    private static Dictionary<string, MethodGroupInfo> GroupMethodsByName(IEnumerable<InterfaceMemberInfo> methods)
+    /// <summary>
+    /// Creates a unique key for a method member based on its name, return type, and parameter types.
+    /// </summary>
+    private static string GetMemberKey(InterfaceMemberInfo member)
     {
-        var groups = new Dictionary<string, List<InterfaceMemberInfo>>();
+        var paramTypes = string.Join(",", member.Parameters.Select(p => p.Type));
+        return $"method:{member.ReturnType}:{member.Name}({paramTypes})";
+    }
+
+    /// <summary>
+    /// Determines if two methods with the same name can share an interceptor.
+    /// They cannot if:
+    /// 1. Different return types AND different parameters (both need separate interceptors)
+    /// 2. Same parameter name has different types across overloads (type mismatch in combined params)
+    /// </summary>
+    private static bool AreMethodsCompatibleForSharedInterceptor(InterfaceMemberInfo m1, InterfaceMemberInfo m2)
+    {
+        // Check if any shared parameter names have different types - this is always incompatible
+        var m1Params = m1.Parameters.ToDictionary(p => p.Name, p => p.Type);
+        foreach (var p2 in m2.Parameters)
+        {
+            if (m1Params.TryGetValue(p2.Name, out var m1Type) && m1Type != p2.Type)
+                return false;
+        }
+
+        // If parameter names/types are compatible, check return types
+        // Methods with same parameters but different return types (like BCL IEnumerable)
+        // typically use delegation, so they're compatible for sharing an interceptor
+        // Only split when return types differ AND there are different parameters that
+        // would cause confusion about which callback to use
+        if (m1.ReturnType != m2.ReturnType)
+        {
+            // Different return types with different parameter sets need separate interceptors
+            var m1ParamNames = new HashSet<string>(m1.Parameters.Select(p => p.Name));
+            var m2ParamNames = new HashSet<string>(m2.Parameters.Select(p => p.Name));
+
+            // If parameters are completely different or partially different,
+            // we need separate interceptors because users would want different callbacks
+            if (!m1ParamNames.SetEquals(m2ParamNames))
+                return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Groups methods by name, splitting into separate numbered groups when overloads are incompatible.
+    /// Returns both the groups dictionary (keyed by group name) and a member-to-group-name mapping.
+    /// </summary>
+    private static (Dictionary<string, MethodGroupInfo> Groups, Dictionary<string, string> MemberKeyToGroupName) GroupMethodsByName(IEnumerable<InterfaceMemberInfo> methods)
+    {
+        // First, group all methods by name
+        var methodsByName = new Dictionary<string, List<InterfaceMemberInfo>>();
 
         foreach (var method in methods.Where(m => !m.IsProperty))
         {
-            if (!groups.TryGetValue(method.Name, out var list))
+            if (!methodsByName.TryGetValue(method.Name, out var list))
             {
                 list = new List<InterfaceMemberInfo>();
-                groups[method.Name] = list;
+                methodsByName[method.Name] = list;
             }
             list.Add(method);
         }
 
-        var result = new Dictionary<string, MethodGroupInfo>();
+        var groups = new Dictionary<string, MethodGroupInfo>();
+        var memberKeyToGroupName = new Dictionary<string, string>();
 
-        foreach (var kvp in groups)
+        foreach (var kvp in methodsByName)
         {
             var methodName = kvp.Key;
             var overloads = kvp.Value;
-            var first = overloads[0];
 
-            // Build combined parameters
-            var allParamNames = new Dictionary<string, (string Type, int Count, RefKind RefKind)>();
-            var totalOverloads = overloads.Count;
-
-            foreach (var overload in overloads)
+            // Check if all overloads are compatible (can share one interceptor)
+            if (overloads.Count == 1 || AreAllOverloadsCompatible(overloads))
             {
-                foreach (var param in overload.Parameters)
+                // All compatible - create single group with combined parameters
+                var group = BuildMethodGroup(methodName, overloads);
+                groups[methodName] = group;
+
+                // Map all members to this group
+                foreach (var overload in overloads)
                 {
-                    if (allParamNames.TryGetValue(param.Name, out var existing))
-                    {
-                        allParamNames[param.Name] = (existing.Type, existing.Count + 1, existing.RefKind);
-                    }
-                    else
-                    {
-                        allParamNames[param.Name] = (param.Type, 1, param.RefKind);
-                    }
+                    memberKeyToGroupName[GetMemberKey(overload)] = methodName;
                 }
             }
-
-            var combinedParams = new List<CombinedParameterInfo>();
-            foreach (var kvp2 in allParamNames)
+            else
             {
-                var paramName = kvp2.Key;
-                var paramType = kvp2.Value.Type;
-                var count = kvp2.Value.Count;
-                var refKind = kvp2.Value.RefKind;
-                var isNullable = count < totalOverloads;
-                var nullableType = isNullable ? MakeNullable(paramType) : paramType;
-
-                combinedParams.Add(new CombinedParameterInfo(paramName, paramType, nullableType, isNullable, refKind));
+                // Incompatible overloads - create separate numbered groups
+                for (int i = 0; i < overloads.Count; i++)
+                {
+                    var overload = overloads[i];
+                    var numberedName = $"{methodName}{i + 1}";
+                    var group = BuildMethodGroup(numberedName, new List<InterfaceMemberInfo> { overload });
+                    groups[numberedName] = group;
+                    memberKeyToGroupName[GetMemberKey(overload)] = numberedName;
+                }
             }
-
-            var overloadInfos = overloads
-                .Select(o => new MethodOverloadInfo(o.Parameters, o.IsGenericMethod, o.TypeParameters))
-                .ToArray();
-
-            result[methodName] = new MethodGroupInfo(
-                Name: methodName,
-                ReturnType: first.ReturnType,
-                IsVoid: first.ReturnType == "void",
-                IsNullable: first.IsNullable,
-                Overloads: new EquatableArray<MethodOverloadInfo>(overloadInfos),
-                CombinedParameters: new EquatableArray<CombinedParameterInfo>(combinedParams.ToArray()));
         }
 
-        return result;
+        return (groups, memberKeyToGroupName);
+    }
+
+    /// <summary>
+    /// Checks if all overloads in a list are compatible with each other for sharing an interceptor.
+    /// </summary>
+    private static bool AreAllOverloadsCompatible(List<InterfaceMemberInfo> overloads)
+    {
+        for (int i = 0; i < overloads.Count; i++)
+        {
+            for (int j = i + 1; j < overloads.Count; j++)
+            {
+                if (!AreMethodsCompatibleForSharedInterceptor(overloads[i], overloads[j]))
+                    return false;
+            }
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Builds a MethodGroupInfo from a list of compatible overloads.
+    /// </summary>
+    private static MethodGroupInfo BuildMethodGroup(string groupName, List<InterfaceMemberInfo> overloads)
+    {
+        var first = overloads[0];
+
+        // Build combined parameters
+        var allParamNames = new Dictionary<string, (string Type, int Count, RefKind RefKind)>();
+        var totalOverloads = overloads.Count;
+
+        foreach (var overload in overloads)
+        {
+            foreach (var param in overload.Parameters)
+            {
+                if (allParamNames.TryGetValue(param.Name, out var existing))
+                {
+                    allParamNames[param.Name] = (existing.Type, existing.Count + 1, existing.RefKind);
+                }
+                else
+                {
+                    allParamNames[param.Name] = (param.Type, 1, param.RefKind);
+                }
+            }
+        }
+
+        var combinedParams = new List<CombinedParameterInfo>();
+        foreach (var kvp2 in allParamNames)
+        {
+            var paramName = kvp2.Key;
+            var paramType = kvp2.Value.Type;
+            var count = kvp2.Value.Count;
+            var refKind = kvp2.Value.RefKind;
+            var isNullable = count < totalOverloads;
+            var nullableType = isNullable ? MakeNullable(paramType) : paramType;
+
+            combinedParams.Add(new CombinedParameterInfo(paramName, paramType, nullableType, isNullable, refKind));
+        }
+
+        var overloadInfos = overloads
+            .Select(o => new MethodOverloadInfo(o.Parameters, o.IsGenericMethod, o.TypeParameters))
+            .ToArray();
+
+        return new MethodGroupInfo(
+            Name: groupName,
+            ReturnType: first.ReturnType,
+            IsVoid: first.ReturnType == "void",
+            IsNullable: first.IsNullable,
+            Overloads: new EquatableArray<MethodOverloadInfo>(overloadInfos),
+            CombinedParameters: new EquatableArray<CombinedParameterInfo>(combinedParams.ToArray()));
     }
 
     private static bool IsMixedMethodGroup(MethodGroupInfo group)

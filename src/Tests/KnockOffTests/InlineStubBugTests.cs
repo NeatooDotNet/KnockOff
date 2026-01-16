@@ -13,29 +13,29 @@ public class InlineStubBugTests
 	[Fact]
 	public void InlineStub_DifferentReturnTypes_SyncOverload_Works()
 	{
-		var stub = new InlineMixedReturnTypesStub();
-		IFactoryWithMixedReturnTypes factory = stub.IFactoryWithMixedReturnTypes;
+		var stub = new InlineMixedReturnTypesStub.Stubs.IFactoryWithMixedReturnTypes();
+		IFactoryWithMixedReturnTypes factory = stub;
 
 		var entity = new SampleEntity { Id = 1 };
 
-		// Set up sync callback
-		stub.IFactoryWithMixedReturnTypes.Fetch2.OnCall = (ko, e) => new SampleArea { Id = e.Id };
+		// Set up sync callback - Fetch2 is the sync overload
+		stub.Fetch2.OnCall = (ko, e) => new SampleArea { Id = e.Id };
 
 		// Call the sync overload
 		var result = factory.Fetch(entity);
 
-		Assert.True(stub.IFactoryWithMixedReturnTypes.Fetch2.WasCalled);
+		Assert.True(stub.Fetch2.WasCalled);
 		Assert.Equal(1, result.Id);
 	}
 
 	[Fact]
 	public async Task InlineStub_DifferentReturnTypes_AsyncOverload_Works()
 	{
-		var stub = new InlineMixedReturnTypesStub();
-		IFactoryWithMixedReturnTypes factory = stub.IFactoryWithMixedReturnTypes;
+		var stub = new InlineMixedReturnTypesStub.Stubs.IFactoryWithMixedReturnTypes();
+		IFactoryWithMixedReturnTypes factory = stub;
 
-		// Set up async callback
-		stub.IFactoryWithMixedReturnTypes.Fetch1.OnCall = (ko, id) =>
+		// Set up async callback - Fetch1 is the async overload
+		stub.Fetch1.OnCall = (ko, id) =>
 			Task.FromResult<ISampleArea?>(new SampleArea { Id = (int)id });
 
 		// Call the async overload
@@ -43,7 +43,7 @@ public class InlineStubBugTests
 
 		Assert.NotNull(result);
 		Assert.Equal(42, result!.Id);
-		Assert.True(stub.IFactoryWithMixedReturnTypes.Fetch1.WasCalled);
+		Assert.True(stub.Fetch1.WasCalled);
 	}
 
 	#endregion
@@ -53,40 +53,40 @@ public class InlineStubBugTests
 	[Fact]
 	public void InlineStub_GenericInheritance_TypedMethod_Works()
 	{
-		var stub = new InlineGenericInheritanceStub();
-		ISampleRule<ISampleTarget> rule = stub.ISampleValidationRule;
+		var stub = new InlineGenericInheritanceStub.Stubs.ISampleValidationRule();
+		ISampleRule<ISampleTarget> rule = stub;
 
 		var target = new SampleTarget { Value = "test" };
 		var expectedResult = new SampleResult { Success = true };
 
-		// Set up callback for typed version
-		stub.ISampleValidationRule.Execute1.OnCall = (ko, t, ct) =>
+		// Set up callback for typed version - Execute1 takes ISampleTarget
+		stub.Execute1.OnCall = (ko, t, ct) =>
 			Task.FromResult<ISampleResult>(expectedResult);
 
 		// Call via typed interface
 		var result = rule.Execute(target, CancellationToken.None);
 
-		Assert.True(stub.ISampleValidationRule.Execute1.WasCalled);
+		Assert.True(stub.Execute1.WasCalled);
 	}
 
 	[Fact]
 	public void InlineStub_GenericInheritance_BaseMethod_Works()
 	{
-		var stub = new InlineGenericInheritanceStub();
-		ISampleRule rule = stub.ISampleValidationRule; // Cast to base interface
+		var stub = new InlineGenericInheritanceStub.Stubs.ISampleValidationRule();
+		ISampleRule rule = stub; // Cast to base interface
 
 		var target = new SampleTarget { Value = "base-call" };
 		var expectedResult = new SampleResult { Success = true };
 
-		// Set up callback for base version
-		stub.ISampleValidationRule.Execute2.OnCall = (ko, t, ct) =>
+		// Set up callback for base version - Execute2 takes ISampleRuleTarget
+		stub.Execute2.OnCall = (ko, t, ct) =>
 			Task.FromResult<ISampleResult>(expectedResult);
 
 		// Call via base interface
 		var result = rule.Execute(target, CancellationToken.None);
 
 		Assert.NotNull(result);
-		Assert.True(stub.ISampleValidationRule.Execute2.WasCalled);
+		Assert.True(stub.Execute2.WasCalled);
 	}
 
 	#endregion

@@ -8,8 +8,8 @@ partial class InlineGenericInheritanceStub
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for Execute.</summary>
-		public sealed class ISampleValidationRule_ExecuteInterceptor
+		/// <summary>Interceptor for Execute1.</summary>
+		public sealed class ISampleValidationRule_Execute1Interceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
 			public int CallCount { get; private set; }
@@ -28,26 +28,49 @@ partial class InlineGenericInheritanceStub
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
 
+		/// <summary>Interceptor for Execute2.</summary>
+		public sealed class ISampleValidationRule_Execute2Interceptor
+		{
+			/// <summary>Number of times this method was called.</summary>
+			public int CallCount { get; private set; }
+
+			/// <summary>Whether this method was called at least once.</summary>
+			public bool WasCalled => CallCount > 0;
+
+			/// <summary>The arguments from the last call.</summary>
+			public (global::KnockOff.Tests.ISampleRuleTarget? target, global::System.Threading.CancellationToken? token)? LastCallArgs { get; private set; }
+
+			/// <summary>Callback invoked when method is called.</summary>
+			public global::System.Func<Stubs.ISampleValidationRule, global::KnockOff.Tests.ISampleRuleTarget, global::System.Threading.CancellationToken?, global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult>>? OnCall { get; set; }
+
+			public void RecordCall(global::KnockOff.Tests.ISampleRuleTarget target, global::System.Threading.CancellationToken? token) { CallCount++; LastCallArgs = (target, token); }
+
+			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		}
+
 		/// <summary>Stub implementation of global::KnockOff.Tests.ISampleValidationRule.</summary>
 		public class ISampleValidationRule : global::KnockOff.Tests.ISampleValidationRule, global::KnockOff.IKnockOffStub
 		{
-			/// <summary>Interceptor for Execute.</summary>
-			public ISampleValidationRule_ExecuteInterceptor Execute { get; } = new();
+			/// <summary>Interceptor for Execute1.</summary>
+			public ISampleValidationRule_Execute1Interceptor Execute1 { get; } = new();
+
+			/// <summary>Interceptor for Execute2.</summary>
+			public ISampleValidationRule_Execute2Interceptor Execute2 { get; } = new();
 
 			global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> global::KnockOff.Tests.ISampleRule<global::KnockOff.Tests.ISampleTarget>.Execute(global::KnockOff.Tests.ISampleTarget target, global::System.Threading.CancellationToken? token)
 			{
-				Execute.RecordCall(target, token);
-				if (Execute.OnCall is { } onCall) return onCall(this, target, token);
+				Execute1.RecordCall(target, token);
+				if (Execute1.OnCall is { } onCall) return onCall(this, target, token);
 				if (Strict) throw global::KnockOff.StubException.NotConfigured("ISampleTarget>", "Execute");
-				throw new global::System.InvalidOperationException("No implementation provided for Execute. Set Execute.OnCall.");
+				throw new global::System.InvalidOperationException("No implementation provided for Execute. Set Execute1.OnCall.");
 			}
 
 			global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> global::KnockOff.Tests.ISampleRule.Execute(global::KnockOff.Tests.ISampleRuleTarget target, global::System.Threading.CancellationToken? token)
 			{
-				Execute.RecordCall(target, token);
-				if (Execute.OnCall is { } onCall) return onCall(this, target, token);
+				Execute2.RecordCall(target, token);
+				if (Execute2.OnCall is { } onCall) return onCall(this, target, token);
 				if (Strict) throw global::KnockOff.StubException.NotConfigured("ISampleRule", "Execute");
-				throw new global::System.InvalidOperationException("No implementation provided for Execute. Set Execute.OnCall.");
+				throw new global::System.InvalidOperationException("No implementation provided for Execute. Set Execute2.OnCall.");
 			}
 
 			/// <summary>The global::KnockOff.Tests.ISampleValidationRule instance. Use for passing to code expecting the interface.</summary>

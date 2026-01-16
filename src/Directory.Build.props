@@ -13,15 +13,15 @@
 		<Nullable>enable</Nullable>
 		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-		<FileVersion>10.19.0</FileVersion>
-		<PackageVersion>10.19.0</PackageVersion>
+		<FileVersion>10.19.1</FileVersion>
+		<PackageVersion>10.19.1</PackageVersion>
 		<PackageTags>Unit Testing Mocking Stubs Source Generator .NET</PackageTags>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<RepositoryUrl>https://github.com/NeatooDotNet/KnockOff</RepositoryUrl>
 		<PackageProjectUrl>https://github.com/NeatooDotNet/KnockOff</PackageProjectUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageReleaseNotes>FIX: BCL collection stubs now correctly delegate non-generic GetEnumerator to generic version. INTERNAL: Generator refactored to Model+Renderer pattern.</PackageReleaseNotes>
+		<PackageReleaseNotes>FIX: Inline stubs now correctly handle method overloads with different return types and generic interface inheritance with incompatible parameter types.</PackageReleaseNotes>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	</PropertyGroup>
 </Project>

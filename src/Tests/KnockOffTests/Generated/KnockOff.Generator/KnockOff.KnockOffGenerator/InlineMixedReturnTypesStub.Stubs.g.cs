@@ -8,8 +8,8 @@ partial class InlineMixedReturnTypesStub
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for Fetch.</summary>
-		public sealed class IFactoryWithMixedReturnTypes_FetchInterceptor
+		/// <summary>Interceptor for Fetch1.</summary>
+		public sealed class IFactoryWithMixedReturnTypes_Fetch1Interceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
 			public int CallCount { get; private set; }
@@ -17,37 +17,60 @@ partial class InlineMixedReturnTypesStub
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>The arguments from the last call.</summary>
-			public (long? id, global::KnockOff.Tests.SampleEntity? entity)? LastCallArgs { get; private set; }
+			/// <summary>The argument from the last call.</summary>
+			public long? LastCallArg { get; private set; }
 
 			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Func<Stubs.IFactoryWithMixedReturnTypes, long?, global::KnockOff.Tests.SampleEntity?, global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleArea?>>? OnCall { get; set; }
+			public global::System.Func<Stubs.IFactoryWithMixedReturnTypes, long, global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleArea?>>? OnCall { get; set; }
 
-			public void RecordCall(long? id, global::KnockOff.Tests.SampleEntity? entity) { CallCount++; LastCallArgs = (id, entity); }
+			public void RecordCall(long id) { CallCount++; LastCallArg = id; }
 
-			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+		}
+
+		/// <summary>Interceptor for Fetch2.</summary>
+		public sealed class IFactoryWithMixedReturnTypes_Fetch2Interceptor
+		{
+			/// <summary>Number of times this method was called.</summary>
+			public int CallCount { get; private set; }
+
+			/// <summary>Whether this method was called at least once.</summary>
+			public bool WasCalled => CallCount > 0;
+
+			/// <summary>The argument from the last call.</summary>
+			public global::KnockOff.Tests.SampleEntity? LastCallArg { get; private set; }
+
+			/// <summary>Callback invoked when method is called.</summary>
+			public global::System.Func<Stubs.IFactoryWithMixedReturnTypes, global::KnockOff.Tests.SampleEntity, global::KnockOff.Tests.ISampleArea>? OnCall { get; set; }
+
+			public void RecordCall(global::KnockOff.Tests.SampleEntity entity) { CallCount++; LastCallArg = entity; }
+
+			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
 		}
 
 		/// <summary>Stub implementation of global::KnockOff.Tests.IFactoryWithMixedReturnTypes.</summary>
 		public class IFactoryWithMixedReturnTypes : global::KnockOff.Tests.IFactoryWithMixedReturnTypes, global::KnockOff.IKnockOffStub
 		{
-			/// <summary>Interceptor for Fetch.</summary>
-			public IFactoryWithMixedReturnTypes_FetchInterceptor Fetch { get; } = new();
+			/// <summary>Interceptor for Fetch1.</summary>
+			public IFactoryWithMixedReturnTypes_Fetch1Interceptor Fetch1 { get; } = new();
+
+			/// <summary>Interceptor for Fetch2.</summary>
+			public IFactoryWithMixedReturnTypes_Fetch2Interceptor Fetch2 { get; } = new();
 
 			global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleArea?> global::KnockOff.Tests.IFactoryWithMixedReturnTypes.Fetch(long id)
 			{
-				Fetch.RecordCall(id, null);
-				if (Fetch.OnCall is { } onCall) return onCall(this, id, null);
+				Fetch1.RecordCall(id);
+				if (Fetch1.OnCall is { } onCall) return onCall(this, id);
 				if (Strict) throw global::KnockOff.StubException.NotConfigured("IFactoryWithMixedReturnTypes", "Fetch");
 				return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.ISampleArea?>(default!);
 			}
 
 			global::KnockOff.Tests.ISampleArea global::KnockOff.Tests.IFactoryWithMixedReturnTypes.Fetch(global::KnockOff.Tests.SampleEntity entity)
 			{
-				Fetch.RecordCall(null, entity);
-				if (Fetch.OnCall is { } onCall) return onCall(this, null, entity);
+				Fetch2.RecordCall(entity);
+				if (Fetch2.OnCall is { } onCall) return onCall(this, entity);
 				if (Strict) throw global::KnockOff.StubException.NotConfigured("IFactoryWithMixedReturnTypes", "Fetch");
-				throw new global::System.InvalidOperationException("No implementation provided for Fetch. Set Fetch.OnCall.");
+				throw new global::System.InvalidOperationException("No implementation provided for Fetch. Set Fetch2.OnCall.");
 			}
 
 			/// <summary>The global::KnockOff.Tests.IFactoryWithMixedReturnTypes instance. Use for passing to code expecting the interface.</summary>
