@@ -101,7 +101,7 @@ internal static class ClassRenderer
         var indent1 = indent + "\t";
 
         w.Line($"{indent}/// <summary>Interceptor for {stubClassName}.{prop.PropertyName}.</summary>");
-        w.Line($"{indent}public sealed class {prop.InterceptorClassName}");
+        w.Line($"{indent}public sealed class {prop.InterceptorClassName}{prop.TypeParameterList}{prop.ConstraintClauses}");
         w.Line($"{indent}{{");
 
         if (prop.HasGetter)
@@ -157,7 +157,7 @@ internal static class ClassRenderer
         var indent1 = indent + "\t";
 
         w.Line($"{indent}/// <summary>Interceptor for {stubClassName}.{indexer.IndexerName}.</summary>");
-        w.Line($"{indent}public sealed class {indexer.InterceptorClassName}");
+        w.Line($"{indent}public sealed class {indexer.InterceptorClassName}{indexer.TypeParameterList}{indexer.ConstraintClauses}");
         w.Line($"{indent}{{");
 
         if (indexer.HasGetter)
@@ -238,7 +238,7 @@ internal static class ClassRenderer
         var indent1 = indent + "\t";
 
         w.Line($"{indent}/// <summary>Interceptor for {stubClassName}.{method.MethodName}.</summary>");
-        w.Line($"{indent}public sealed class {method.InterceptorClassName}");
+        w.Line($"{indent}public sealed class {method.InterceptorClassName}{method.TypeParameterList}{method.ConstraintClauses}");
         w.Line($"{indent}{{");
 
         // CallCount and WasCalled
@@ -304,7 +304,7 @@ internal static class ClassRenderer
         var indent1 = indent + "\t";
 
         w.Line($"{indent}/// <summary>Interceptor for {stubClassName}.{evt.EventName}.</summary>");
-        w.Line($"{indent}public sealed class {evt.InterceptorClassName}");
+        w.Line($"{indent}public sealed class {evt.InterceptorClassName}{evt.TypeParameterList}{evt.ConstraintClauses}");
         w.Line($"{indent}{{");
 
         w.Line($"{indent1}/// <summary>Number of times the event was subscribed to.</summary>");
@@ -335,8 +335,8 @@ internal static class ClassRenderer
 
     private static void RenderWrapperConstructor(CodeWriter w, InlineConstructorModel ctor, string stubClassName, string typeParamList, string indent)
     {
-        var fullStubName = stubClassName + typeParamList;
-        w.Line($"{indent}public {fullStubName}({ctor.ParameterDeclarations})");
+        // Constructors don't include type parameters - those come from the class definition
+        w.Line($"{indent}public {stubClassName}({ctor.ParameterDeclarations})");
         w.Line($"{indent}{{");
         if (string.IsNullOrEmpty(ctor.BaseCallArguments))
         {
@@ -365,7 +365,9 @@ internal static class ClassRenderer
         }
 
         w.Line($"{indent}/// <summary>Internal implementation that inherits from {cls.BaseType}.</summary>");
-        w.Line($"{indent}private sealed class Impl : {cls.BaseType}{cls.ConstraintClauses}");
+        // Note: Impl is a nested class - it doesn't need generic type params or constraints
+        // because it inherits them from the parent generic class
+        w.Line($"{indent}private sealed class Impl : {cls.BaseType}");
         w.Line($"{indent}{{");
 
         // Reference to the wrapper

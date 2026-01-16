@@ -154,7 +154,9 @@ public partial class KnockOffGenerator
 			// Get class info for class stubbing via inheritance
 			else if (typeArg.TypeKind == TypeKind.Class && typeArg is INamedTypeSymbol namedClass)
 			{
-				var classInfo = ExtractClassInfo(namedClass, classSymbol.ContainingAssembly, filePath, attrLineSpan, diagnostics, isOpenGeneric, openGenericTypeParams);
+				// For open generic classes, use OriginalDefinition to get members
+				var classSource = isOpenGeneric ? namedClass.OriginalDefinition : namedClass;
+				var classInfo = ExtractClassInfo(classSource, namedClass, classSymbol.ContainingAssembly, filePath, attrLineSpan, diagnostics, isOpenGeneric, openGenericTypeParams);
 				if (classInfo is not null)
 				{
 					classes.Add(classInfo);
@@ -379,7 +381,10 @@ public partial class KnockOffGenerator
 	/// Extracts class info for class stubbing via inheritance.
 	/// Returns null if the class cannot be stubbed (sealed, static, built-in, etc.).
 	/// </summary>
+	/// <param name="classSource">The class to extract members from (may be OriginalDefinition for open generics)</param>
+	/// <param name="classType">The original class type (used for display names and diagnostics)</param>
 	private static ClassStubInfo? ExtractClassInfo(
+		INamedTypeSymbol classSource,
 		INamedTypeSymbol classType,
 		IAssemblySymbol knockOffAssembly,
 		string filePath,
@@ -428,7 +433,8 @@ public partial class KnockOffGenerator
 		}
 
 		// KO2002: Must have accessible constructors
-		var accessibleConstructors = classType.InstanceConstructors
+		// For open generics, use classSource (OriginalDefinition) to get constructors
+		var accessibleConstructors = classSource.InstanceConstructors
 			.Where(c => c.DeclaredAccessibility == Accessibility.Public ||
 						c.DeclaredAccessibility == Accessibility.Protected ||
 						c.DeclaredAccessibility == Accessibility.ProtectedOrInternal ||
@@ -479,7 +485,8 @@ public partial class KnockOffGenerator
 		var events = new List<EventMemberInfo>();
 
 		// Get all members including inherited ones
-		foreach (var member in GetAllVirtualMembers(classType))
+		// For open generics, use classSource (OriginalDefinition) to get members
+		foreach (var member in GetAllVirtualMembers(classSource))
 		{
 			// Skip internal members from external assemblies
 			if (!IsMemberAccessible(member, knockOffAssembly))

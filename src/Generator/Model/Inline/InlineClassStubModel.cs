@@ -79,7 +79,11 @@ internal sealed record InlineClassPropertyModel(
     /// <summary>Whether this is a required property.</summary>
     bool IsRequired,
     /// <summary>The stub class name for delegate references.</summary>
-    string StubClassName);
+    string StubClassName,
+    /// <summary>Type parameter list string (e.g., "&lt;T&gt;").</summary>
+    string TypeParameterList = "",
+    /// <summary>Constraint clauses string (e.g., "where T : class").</summary>
+    string ConstraintClauses = "");
 
 /// <summary>
 /// Model for an indexer in class stub generation.
@@ -104,7 +108,11 @@ internal sealed record InlineClassIndexerModel(
     /// <summary>Key expression for recording.</summary>
     string KeyExpression,
     /// <summary>The stub class name for delegate references.</summary>
-    string StubClassName);
+    string StubClassName,
+    /// <summary>Type parameter list string (e.g., "&lt;T&gt;").</summary>
+    string TypeParameterList = "",
+    /// <summary>Constraint clauses string (e.g., "where T : class").</summary>
+    string ConstraintClauses = "");
 
 /// <summary>
 /// Model for a method in class stub generation.
@@ -133,7 +141,11 @@ internal sealed record InlineClassMethodModel(
     /// <summary>LastCallArgs type or null.</summary>
     string? LastCallArgsType,
     /// <summary>The stub class name for delegate references.</summary>
-    string StubClassName);
+    string StubClassName,
+    /// <summary>Type parameter list string (e.g., "&lt;T&gt;").</summary>
+    string TypeParameterList = "",
+    /// <summary>Constraint clauses string (e.g., "where T : class").</summary>
+    string ConstraintClauses = "");
 
 /// <summary>
 /// Model for an event in class stub generation.
@@ -144,7 +156,11 @@ internal sealed record InlineClassEventModel(
     /// <summary>The event name.</summary>
     string EventName,
     /// <summary>The delegate type.</summary>
-    string DelegateType);
+    string DelegateType,
+    /// <summary>Type parameter list string (e.g., "&lt;T&gt;").</summary>
+    string TypeParameterList = "",
+    /// <summary>Constraint clauses string (e.g., "where T : class").</summary>
+    string ConstraintClauses = "");
 
 // ==========================================================================
 // Impl class member models - for nested Impl class overrides

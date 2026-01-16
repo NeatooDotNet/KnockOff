@@ -58,11 +58,11 @@ internal static class ClassModelBuilder
         {
             if (member.IsProperty && !member.IsIndexer)
             {
-                var propModel = BuildPropertyModel(member, stubClassName);
+                var propModel = BuildPropertyModel(member, stubClassName, typeParamList, constraintClause);
                 properties.Add(propModel);
                 interceptorProperties.Add(new InlineInterceptorPropertyModel(
                     PropertyName: member.Name,
-                    InterceptorTypeName: propModel.InterceptorClassName,
+                    InterceptorTypeName: $"{propModel.InterceptorClassName}{typeParamList}",
                     NeedsNewKeyword: false,
                     Description: $"Interceptor for {member.Name}."));
                 resetStatements.Add($"{member.Name}.Reset();");
@@ -70,11 +70,11 @@ internal static class ClassModelBuilder
             else if (member.IsIndexer)
             {
                 var indexerName = SymbolHelpers.GetIndexerName(indexerCount, member.IndexerTypeSuffix);
-                var indexerModel = BuildIndexerModel(member, stubClassName, indexerCount);
+                var indexerModel = BuildIndexerModel(member, stubClassName, indexerCount, typeParamList, constraintClause);
                 indexers.Add(indexerModel);
                 interceptorProperties.Add(new InlineInterceptorPropertyModel(
                     PropertyName: indexerName,
-                    InterceptorTypeName: indexerModel.InterceptorClassName,
+                    InterceptorTypeName: $"{indexerModel.InterceptorClassName}{typeParamList}",
                     NeedsNewKeyword: false,
                     Description: $"Interceptor for {indexerName}."));
                 resetStatements.Add($"{indexerName}.Reset();");
@@ -89,11 +89,11 @@ internal static class ClassModelBuilder
             {
                 var member = group.Members.GetArray()![i];
                 var handlerName = hasOverloads ? $"{group.Name}{i + 1}" : group.Name;
-                var methodModel = BuildMethodModel(member, stubClassName, handlerName);
+                var methodModel = BuildMethodModel(member, stubClassName, handlerName, typeParamList, constraintClause);
                 methods.Add(methodModel);
                 interceptorProperties.Add(new InlineInterceptorPropertyModel(
                     PropertyName: handlerName,
-                    InterceptorTypeName: methodModel.InterceptorClassName,
+                    InterceptorTypeName: $"{methodModel.InterceptorClassName}{typeParamList}",
                     NeedsNewKeyword: false,
                     Description: $"Interceptor for {group.Name}."));
                 resetStatements.Add($"{handlerName}.Reset();");
@@ -103,11 +103,11 @@ internal static class ClassModelBuilder
         // Build event interceptors
         foreach (var evt in cls.Events)
         {
-            var eventModel = BuildEventModel(evt, stubClassName);
+            var eventModel = BuildEventModel(evt, stubClassName, typeParamList, constraintClause);
             events.Add(eventModel);
             interceptorProperties.Add(new InlineInterceptorPropertyModel(
                 PropertyName: evt.Name,
-                InterceptorTypeName: eventModel.InterceptorClassName,
+                InterceptorTypeName: $"{eventModel.InterceptorClassName}{typeParamList}",
                 NeedsNewKeyword: false,
                 Description: $"Interceptor for {evt.Name}."));
             resetStatements.Add($"{evt.Name}.Reset();");
@@ -180,10 +180,14 @@ internal static class ClassModelBuilder
 
     #region Model Building
 
-    private static InlineClassPropertyModel BuildPropertyModel(ClassMemberInfo member, string stubClassName)
+    private static InlineClassPropertyModel BuildPropertyModel(
+        ClassMemberInfo member,
+        string stubClassName,
+        string typeParamList,
+        string constraintClause)
     {
         var interceptClassName = $"{stubClassName}_{member.Name}Interceptor";
-        var stubClassRef = $"Stubs.{stubClassName}";
+        var stubClassRef = $"Stubs.{stubClassName}{typeParamList}";
 
         return new InlineClassPropertyModel(
             InterceptorClassName: interceptClassName,
@@ -193,14 +197,21 @@ internal static class ClassModelBuilder
             HasGetter: member.HasGetter,
             HasSetter: member.HasSetter,
             IsRequired: member.IsRequired,
-            StubClassName: stubClassRef);
+            StubClassName: stubClassRef,
+            TypeParameterList: typeParamList,
+            ConstraintClauses: constraintClause);
     }
 
-    private static InlineClassIndexerModel BuildIndexerModel(ClassMemberInfo member, string stubClassName, int indexerCount)
+    private static InlineClassIndexerModel BuildIndexerModel(
+        ClassMemberInfo member,
+        string stubClassName,
+        int indexerCount,
+        string typeParamList,
+        string constraintClause)
     {
         var indexerName = SymbolHelpers.GetIndexerName(indexerCount, member.IndexerTypeSuffix);
         var interceptClassName = $"{stubClassName}_{indexerName}Interceptor";
-        var stubClassRef = $"Stubs.{stubClassName}";
+        var stubClassRef = $"Stubs.{stubClassName}{typeParamList}";
 
         var keyType = member.IndexerParameters.Count == 1
             ? member.IndexerParameters.GetArray()![0].Type
@@ -222,13 +233,20 @@ internal static class ClassModelBuilder
             ParameterDeclarations: paramSig,
             ArgumentList: argList,
             KeyExpression: keyExpr,
-            StubClassName: stubClassRef);
+            StubClassName: stubClassRef,
+            TypeParameterList: typeParamList,
+            ConstraintClauses: constraintClause);
     }
 
-    private static InlineClassMethodModel BuildMethodModel(ClassMemberInfo member, string stubClassName, string handlerName)
+    private static InlineClassMethodModel BuildMethodModel(
+        ClassMemberInfo member,
+        string stubClassName,
+        string handlerName,
+        string typeParamList,
+        string constraintClause)
     {
         var interceptClassName = $"{stubClassName}_{handlerName}Interceptor";
-        var stubClassRef = $"Stubs.{stubClassName}";
+        var stubClassRef = $"Stubs.{stubClassName}{typeParamList}";
 
         var inputParams = GetInputParameters(member.Parameters).ToArray();
 
@@ -278,16 +296,24 @@ internal static class ClassModelBuilder
             DelegateType: delegateType,
             LastCallArgType: lastCallArgType,
             LastCallArgsType: lastCallArgsType,
-            StubClassName: stubClassRef);
+            StubClassName: stubClassRef,
+            TypeParameterList: typeParamList,
+            ConstraintClauses: constraintClause);
     }
 
-    private static InlineClassEventModel BuildEventModel(EventMemberInfo evt, string stubClassName)
+    private static InlineClassEventModel BuildEventModel(
+        EventMemberInfo evt,
+        string stubClassName,
+        string typeParamList,
+        string constraintClause)
     {
         var interceptClassName = $"{stubClassName}_{evt.Name}Interceptor";
         return new InlineClassEventModel(
             InterceptorClassName: interceptClassName,
             EventName: evt.Name,
-            DelegateType: evt.FullDelegateTypeName.TrimEnd('?'));
+            DelegateType: evt.FullDelegateTypeName.TrimEnd('?'),
+            TypeParameterList: typeParamList,
+            ConstraintClauses: constraintClause);
     }
 
     private static InlineConstructorModel BuildConstructorModel(ClassConstructorInfo ctor, string typeParamList)
