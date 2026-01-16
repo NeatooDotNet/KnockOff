@@ -491,6 +491,8 @@ internal static class FlatRenderer
 				w.Line($"if (strict) throw global::KnockOff.StubException.NotConfigured(\"\", \"{method.MethodName}\");");
 				if (method.IsVoid)
 					w.Line("return;");
+				else if (method.ThrowsOnDefault)
+					w.Line($"throw new global::System.InvalidOperationException(\"No implementation provided for {method.MethodName}. Configure via {method.InterceptorName}.OnCall.\");");
 				else
 				{
 					var defaultExpr = string.IsNullOrEmpty(method.DefaultExpression) ? "default!" : method.DefaultExpression;
@@ -881,6 +883,8 @@ internal static class FlatRenderer
 				w.Line($"if (strict) throw global::KnockOff.StubException.NotConfigured(\"\", \"{method.MethodName}\");");
 				if (method.IsVoid)
 					w.Line("return;");
+				else if (method.ThrowsOnDefault)
+					w.Line($"throw new global::System.InvalidOperationException(\"No implementation provided for {method.MethodName}. Configure via OnCall.\");");
 				else
 				{
 					var defaultExpr = string.IsNullOrEmpty(method.DefaultExpression) ? "default!" : method.DefaultExpression;
@@ -1637,20 +1641,33 @@ internal static class FlatRenderer
 				w.Line($"if ({interceptorAccess}.OnCall is {{ }} onCallCallback)");
 				w.Line($"{{ onCallCallback({onCallArgs}); return; }}");
 				w.Line($"if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{method.SimpleInterfaceName}\", \"{method.MethodName}\");");
+				// User-defined method takes priority over default
+				if (method.UserMethodCall != null)
+				{
+					w.Line($"{method.UserMethodCall};");
+				}
 			}
 			else if (method.ThrowsOnDefault)
 			{
 				w.Line($"if ({interceptorAccess}.OnCall is {{ }} callback)");
 				w.Line($"\treturn callback({onCallArgs});");
 				w.Line($"if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{method.SimpleInterfaceName}\", \"{method.MethodName}\");");
-				w.Line($"throw new global::System.InvalidOperationException(\"No implementation provided for {method.MethodName}. Set {interceptorAccess}.OnCall or define a protected method '{method.MethodName}' in your partial class.\");");
+				// User-defined method takes priority over throwing
+				if (method.UserMethodCall != null)
+					w.Line($"return {method.UserMethodCall};");
+				else
+					w.Line($"throw new global::System.InvalidOperationException(\"No implementation provided for {method.MethodName}. Set {interceptorAccess}.OnCall or define a protected method '{method.MethodName}' in your partial class.\");");
 			}
 			else
 			{
 				w.Line($"if ({interceptorAccess}.OnCall is {{ }} callback)");
 				w.Line($"\treturn callback({onCallArgs});");
 				w.Line($"if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{method.SimpleInterfaceName}\", \"{method.MethodName}\");");
-				w.Line($"return {method.DefaultExpression};");
+				// User-defined method takes priority over default
+				if (method.UserMethodCall != null)
+					w.Line($"return {method.UserMethodCall};");
+				else
+					w.Line($"return {method.DefaultExpression};");
 			}
 		}
 		w.Line();
