@@ -77,12 +77,18 @@ internal static class FlatRenderer
 					RenderIndexerInterceptorClass(w, indexer, classNameWithTypeParams);
 			}
 
-			// Only render interceptor classes for non-generic methods
-			// Generic methods use the handler classes with Of<T>() pattern
-			foreach (var method in unit.Methods.Where(m => !m.IsGenericMethod))
+			// Render method interceptor classes using groups (handles overloads)
+			foreach (var group in unit.MethodGroups)
+			{
+				if (renderedInterceptorClasses.Add(group.InterceptorClassName))
+					RenderMethodGroupInterceptorClass(w, group, classNameWithTypeParams);
+			}
+
+			// Render user-defined method interceptor classes (tracking-only, not in groups)
+			foreach (var method in unit.Methods.Where(m => !m.IsGenericMethod && m.UserMethodCall != null))
 			{
 				if (renderedInterceptorClasses.Add(method.InterceptorClassName))
-					RenderMethodInterceptorClass(w, method, classNameWithTypeParams);
+					RenderUserMethodInterceptorClass(w, method);
 			}
 
 			foreach (var handler in unit.GenericMethodHandlers)
@@ -103,6 +109,12 @@ internal static class FlatRenderer
 			// Standard members (Strict mode, Object accessor)
 			RenderStandardMembers(w, unit);
 
+			// Build set of interceptor names that have multiple overloads (need suffixed Invoke)
+			var multiOverloadInterceptors = new HashSet<string>(
+				unit.MethodGroups
+					.Where(g => g.Methods.Count > 1)
+					.Select(g => g.InterceptorName));
+
 			// Explicit interface implementations (NOT deduplicated - one per interface member)
 			foreach (var prop in unit.Properties)
 				RenderPropertyImplementation(w, prop);
@@ -111,7 +123,7 @@ internal static class FlatRenderer
 				RenderIndexerImplementation(w, indexer);
 
 			foreach (var method in unit.Methods)
-				RenderMethodImplementation(w, method);
+				RenderMethodImplementation(w, method, multiOverloadInterceptors);
 
 			foreach (var evt in unit.Events)
 				RenderEventImplementation(w, evt);
@@ -671,6 +683,332 @@ internal static class FlatRenderer
 	}
 
 	/// <summary>
+	/// Renders an interceptor class for a method group (handles single methods and overloads).
+	/// For groups with multiple methods, generates per-signature delegates, sequences, and OnCall overloads.
+	/// </summary>
+	private static void RenderMethodGroupInterceptorClass(CodeWriter w, FlatMethodGroup group, string className)
+	{
+		// If only one method in group, use simpler single-method pattern
+		if (group.Methods.Count == 1)
+		{
+			RenderMethodInterceptorClass(w, group.Methods.GetArray()![0], className);
+			return;
+		}
+
+		var firstMethod = group.Methods.GetArray()![0];
+		w.Line($"/// <summary>Tracks and configures behavior for {firstMethod.MethodName} (overloaded).</summary>");
+		using (w.Block($"public sealed class {group.InterceptorClassName}"))
+		{
+			// Generate delegates and sequences for each overload
+			foreach (var method in group.Methods)
+			{
+				var suffix = GetSignatureSuffix(method);
+
+				// Delegate
+				w.Line($"/// <summary>Delegate for {method.MethodName}({GetParamTypeList(method)}).</summary>");
+				w.Line($"public delegate {(method.IsVoid ? "void" : method.ReturnType)} {method.MethodName}Delegate_{suffix}({className} ko{(method.Parameters.Count > 0 ? ", " : "")}{method.ParameterDeclarations});");
+				w.Line();
+
+				// Sequence list
+				w.Line($"private readonly global::System.Collections.Generic.List<({method.MethodName}Delegate_{suffix} Callback, global::KnockOff.Times Times, MethodTrackingImpl_{suffix} Tracking)> _sequence_{suffix} = new();");
+				w.Line($"private int _sequenceIndex_{suffix};");
+				w.Line();
+			}
+
+			// OnCall overloads for each signature
+			foreach (var method in group.Methods)
+			{
+				var suffix = GetSignatureSuffix(method);
+				var trackingInterface = GetTrackingInterface(method);
+
+				// OnCall without Times
+				w.Line($"/// <summary>Configures callback for {method.MethodName}({GetParamTypeList(method)}). Returns tracking interface.</summary>");
+				w.Line($"public {trackingInterface} OnCall({method.MethodName}Delegate_{suffix} callback)");
+				using (w.Braces())
+				{
+					w.Line($"var tracking = new MethodTrackingImpl_{suffix}();");
+					w.Line($"_sequence_{suffix}.Clear();");
+					w.Line($"_sequence_{suffix}.Add((callback, global::KnockOff.Times.Forever, tracking));");
+					w.Line($"_sequenceIndex_{suffix} = 0;");
+					w.Line("return tracking;");
+				}
+				w.Line();
+
+				// OnCall with Times
+				w.Line($"/// <summary>Configures callback for {method.MethodName}({GetParamTypeList(method)}) with Times constraint.</summary>");
+				w.Line($"public global::KnockOff.IMethodSequence<{method.MethodName}Delegate_{suffix}> OnCall({method.MethodName}Delegate_{suffix} callback, global::KnockOff.Times times)");
+				using (w.Braces())
+				{
+					w.Line($"var tracking = new MethodTrackingImpl_{suffix}();");
+					w.Line($"_sequence_{suffix}.Clear();");
+					w.Line($"_sequence_{suffix}.Add((callback, times, tracking));");
+					w.Line($"_sequenceIndex_{suffix} = 0;");
+					w.Line($"return new MethodSequenceImpl_{suffix}(this);");
+				}
+				w.Line();
+			}
+
+			// Invoke methods for each signature - call RenderGroupInvokeMethod
+			foreach (var method in group.Methods)
+			{
+				RenderGroupInvokeMethod(w, method, className);
+			}
+
+			// Reset method (resets all sequences)
+			w.Line("/// <summary>Resets all tracking state for all overloads.</summary>");
+			using (w.Block("public void Reset()"))
+			{
+				foreach (var method in group.Methods)
+				{
+					var suffix = GetSignatureSuffix(method);
+					w.Line($"foreach (var (_, _, tracking) in _sequence_{suffix})");
+					w.Line("\ttracking.Reset();");
+					w.Line($"_sequenceIndex_{suffix} = 0;");
+				}
+			}
+			w.Line();
+
+			// Verify method
+			w.Line("/// <summary>Verifies all Times constraints for all overloads were satisfied.</summary>");
+			using (w.Block("public bool Verify()"))
+			{
+				foreach (var method in group.Methods)
+				{
+					var suffix = GetSignatureSuffix(method);
+					w.Line($"foreach (var (_, times, tracking) in _sequence_{suffix})");
+					using (w.Braces())
+					{
+						w.Line("if (!times.Verify(tracking.CallCount))");
+						w.Line("\treturn false;");
+					}
+				}
+				w.Line("return true;");
+			}
+			w.Line();
+
+			// Nested tracking classes for each signature
+			foreach (var method in group.Methods)
+			{
+				RenderGroupMethodTrackingImpl(w, method);
+			}
+
+			// Nested sequence classes for each signature
+			foreach (var method in group.Methods)
+			{
+				RenderGroupMethodSequenceImpl(w, method, group.InterceptorClassName);
+			}
+		}
+		w.Line();
+	}
+
+	private static string GetSignatureSuffix(FlatMethodModel method)
+	{
+		if (method.Parameters.Count == 0)
+			return "NoParams";
+		return string.Join("_", method.Parameters.Select(p => GetTypeSuffix(p.Type)));
+	}
+
+	private static string GetTypeSuffix(string type)
+	{
+		// Extract simple type name: "global::System.String" -> "String", "int" -> "Int32"
+		var simple = type.Replace("global::", "").Replace("System.", "");
+		simple = simple switch
+		{
+			"int" => "Int32",
+			"string" => "String",
+			"bool" => "Boolean",
+			"long" => "Int64",
+			"double" => "Double",
+			"float" => "Single",
+			"decimal" => "Decimal",
+			"char" => "Char",
+			"byte" => "Byte",
+			_ => simple.Replace(".", "_").Replace("<", "_").Replace(">", "").Replace(",", "_").Replace(" ", "")
+		};
+		return simple.TrimEnd('?');
+	}
+
+	private static string GetParamTypeList(FlatMethodModel method)
+	{
+		return string.Join(", ", method.Parameters.Select(p => p.Type));
+	}
+
+	private static void RenderGroupInvokeMethod(CodeWriter w, FlatMethodModel method, string className)
+	{
+		var suffix = GetSignatureSuffix(method);
+		var invokeParams = method.Parameters.Count > 0
+			? $"{className} ko, bool strict, " + string.Join(", ", method.Parameters.Select(p => $"{p.RefPrefix}{p.Type} {p.EscapedName}"))
+			: $"{className} ko, bool strict";
+		var returnType = method.IsVoid ? "void" : method.ReturnType;
+
+		w.Line($"/// <summary>Invokes configured callback for {method.MethodName}({GetParamTypeList(method)}).</summary>");
+		w.Line($"internal {returnType} Invoke_{suffix}({invokeParams})");
+		using (w.Braces())
+		{
+			// Initialize out parameters
+			foreach (var p in method.Parameters.Where(p => p.RefKind == Microsoft.CodeAnalysis.RefKind.Out))
+			{
+				w.Line($"{p.EscapedName} = default!;");
+			}
+
+			var trackingArgs = BuildTrackingArgs(method);
+
+			w.Line($"if (_sequence_{suffix}.Count == 0)");
+			using (w.Braces())
+			{
+				w.Line($"if (strict) throw global::KnockOff.StubException.NotConfigured(\"\", \"{method.MethodName}\");");
+				if (method.IsVoid)
+					w.Line("return;");
+				else
+				{
+					var defaultExpr = string.IsNullOrEmpty(method.DefaultExpression) ? "default!" : method.DefaultExpression;
+					w.Line($"return {defaultExpr};");
+				}
+			}
+			w.Line();
+
+			w.Line($"var (callback, times, tracking) = _sequence_{suffix}[_sequenceIndex_{suffix}];");
+			w.Line($"tracking.RecordCall({trackingArgs});");
+			w.Line();
+
+			w.Line("if (!times.IsForever && tracking.CallCount >= times.Count)");
+			using (w.Braces())
+			{
+				w.Line($"if (_sequenceIndex_{suffix} < _sequence_{suffix}.Count - 1)");
+				w.Line($"\t_sequenceIndex_{suffix}++;");
+				w.Line("else if (tracking.CallCount > times.Count)");
+				w.Line($"\tthrow global::KnockOff.StubException.SequenceExhausted(\"{method.MethodName}\");");
+			}
+			w.Line();
+
+			var callbackArgs = method.Parameters.Count > 0
+				? "ko, " + string.Join(", ", method.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"))
+				: "ko";
+
+			if (method.IsVoid)
+				w.Line($"callback({callbackArgs});");
+			else
+				w.Line($"return callback({callbackArgs});");
+		}
+		w.Line();
+	}
+
+	private static void RenderGroupMethodTrackingImpl(CodeWriter w, FlatMethodModel method)
+	{
+		var suffix = GetSignatureSuffix(method);
+		var trackingInterface = GetTrackingInterface(method);
+
+		w.Line($"private sealed class MethodTrackingImpl_{suffix} : {trackingInterface}");
+		using (w.Braces())
+		{
+			if (method.TrackableParameters.Count == 1)
+			{
+				var param = method.TrackableParameters.GetArray()![0];
+				w.Line($"private {param.Type} _lastArg = default!;");
+			}
+			else if (method.TrackableParameters.Count > 1)
+			{
+				w.Line($"private {method.LastCallType} _lastArgs;");
+			}
+			w.Line();
+
+			w.Line("public int CallCount { get; private set; }");
+			w.Line();
+			w.Line("public bool WasCalled => CallCount > 0;");
+			w.Line();
+
+			if (method.TrackableParameters.Count == 1)
+			{
+				var param = method.TrackableParameters.GetArray()![0];
+				w.Line($"public {param.Type} LastArg => _lastArg;");
+				w.Line();
+			}
+			else if (method.TrackableParameters.Count > 1)
+			{
+				w.Line($"public {method.LastCallType} LastArgs => _lastArgs;");
+				w.Line();
+			}
+
+			if (method.TrackableParameters.Count == 0)
+			{
+				w.Line("public void RecordCall() => CallCount++;");
+			}
+			else if (method.TrackableParameters.Count == 1)
+			{
+				var param = method.TrackableParameters.GetArray()![0];
+				w.Line($"public void RecordCall({param.Type} {param.EscapedName}) {{ CallCount++; _lastArg = {param.EscapedName}; }}");
+			}
+			else
+			{
+				w.Line($"public void RecordCall({method.LastCallType} args) {{ CallCount++; _lastArgs = args; }}");
+			}
+			w.Line();
+
+			if (method.TrackableParameters.Count == 0)
+				w.Line("public void Reset() => CallCount = 0;");
+			else if (method.TrackableParameters.Count == 1)
+				w.Line("public void Reset() { CallCount = 0; _lastArg = default!; }");
+			else
+				w.Line("public void Reset() { CallCount = 0; _lastArgs = default; }");
+		}
+		w.Line();
+	}
+
+	private static void RenderGroupMethodSequenceImpl(CodeWriter w, FlatMethodModel method, string interceptorClassName)
+	{
+		var suffix = GetSignatureSuffix(method);
+		var delegateType = $"{method.MethodName}Delegate_{suffix}";
+
+		w.Line($"private sealed class MethodSequenceImpl_{suffix} : global::KnockOff.IMethodSequence<{delegateType}>");
+		using (w.Braces())
+		{
+			w.Line($"private readonly {interceptorClassName} _interceptor;");
+			w.Line();
+			w.Line($"public MethodSequenceImpl_{suffix}({interceptorClassName} interceptor) => _interceptor = interceptor;");
+			w.Line();
+
+			w.Line("public int TotalCallCount");
+			using (w.Braces())
+			{
+				w.Line("get");
+				using (w.Braces())
+				{
+					w.Line("var total = 0;");
+					w.Line($"foreach (var (_, _, tracking) in _interceptor._sequence_{suffix})");
+					w.Line("\ttotal += tracking.CallCount;");
+					w.Line("return total;");
+				}
+			}
+			w.Line();
+
+			w.Line($"public global::KnockOff.IMethodSequence<{delegateType}> ThenCall({delegateType} callback, global::KnockOff.Times times)");
+			using (w.Braces())
+			{
+				w.Line($"var tracking = new MethodTrackingImpl_{suffix}();");
+				w.Line($"_interceptor._sequence_{suffix}.Add((callback, times, tracking));");
+				w.Line("return this;");
+			}
+			w.Line();
+
+			w.Line("public bool Verify()");
+			using (w.Braces())
+			{
+				w.Line($"foreach (var (_, times, tracking) in _interceptor._sequence_{suffix})");
+				using (w.Braces())
+				{
+					w.Line("if (!times.Verify(tracking.CallCount))");
+					w.Line("\treturn false;");
+				}
+				w.Line("return true;");
+			}
+			w.Line();
+
+			w.Line("public void Reset() => _interceptor.Reset();");
+		}
+		w.Line();
+	}
+
+	/// <summary>
 	/// Renders a tracking-only interceptor for user-defined methods.
 	/// No OnCall methods - the user's method is used directly.
 	/// </summary>
@@ -1186,7 +1524,7 @@ internal static class FlatRenderer
 
 	#region Method Implementation
 
-	private static void RenderMethodImplementation(CodeWriter w, FlatMethodModel method)
+	private static void RenderMethodImplementation(CodeWriter w, FlatMethodModel method, HashSet<string> multiOverloadInterceptors)
 	{
 		// Handle method delegation (e.g., IRule.RunRule(IValidateBase) delegates to IRule<T>.RunRule(T))
 		if (method.DelegationTarget != null && method.DelegationTargetInterface != null)
@@ -1209,6 +1547,10 @@ internal static class FlatRenderer
 			return;
 		}
 
+		// Determine if this method is part of an overload group (needs suffixed Invoke)
+		var isMultiOverload = multiOverloadInterceptors.Contains(method.InterceptorName);
+		var invokeSuffix = isMultiOverload ? $"_{GetSignatureSuffix(method)}" : "";
+
 		// Non-generic methods use the new Invoke pattern
 		w.Line($"{method.ReturnType} {method.DeclaringInterface}.{method.MethodName}({method.ParameterDeclarations})");
 		using (w.Braces())
@@ -1219,9 +1561,9 @@ internal static class FlatRenderer
 				: "this, Strict";
 
 			if (method.IsVoid)
-				w.Line($"{method.InterceptorName}.Invoke({invokeArgs});");
+				w.Line($"{method.InterceptorName}.Invoke{invokeSuffix}({invokeArgs});");
 			else
-				w.Line($"return {method.InterceptorName}.Invoke({invokeArgs});");
+				w.Line($"return {method.InterceptorName}.Invoke{invokeSuffix}({invokeArgs});");
 		}
 		w.Line();
 	}
