@@ -88,11 +88,6 @@ public class OpenGenericInlineStubTests
 
 	#endregion
 
-	// TODO: Open generic delegate stubs are not yet implemented
-	// #region Delegate Tests
-	// ...
-	// #endregion
-
 	// TODO: Open generic class stubs are not yet implemented
 	// #region Class Tests
 	// ...
@@ -160,6 +155,54 @@ public delegate T GenericFactory<T>();
 /// </summary>
 public delegate TResult GenericConverter<TInput, TResult>(TInput input);
 
+// ============================================================================
+// Open Generic Delegate Tests
+// ============================================================================
+
+public delegate T OGFactory<T>();
+public delegate TResult OGConverter<TIn, TOut, TResult>(TIn input) where TResult : class;
+
+[KnockOff(typeof(OGFactory<>))]
+[KnockOff(typeof(OGConverter<,,>))]
+public partial class OpenGenericDelegateTests
+{
+	[Fact]
+	public void SingleTypeParam_CanInstantiateWithDifferentTypes()
+	{
+		var stringFactory = new Stubs.OGFactory<string>();
+		var intFactory = new Stubs.OGFactory<int>();
+
+		Assert.NotNull(stringFactory);
+		Assert.NotNull(intFactory);
+	}
+
+	[Fact]
+	public void SingleTypeParam_InterceptorTracksInvocations()
+	{
+		var stub = new Stubs.OGFactory<string>();
+		stub.Interceptor.OnCall = (ko) => "test-value";
+
+		OGFactory<string> factory = stub;
+		var result = factory();
+
+		Assert.Equal("test-value", result);
+		Assert.Equal(1, stub.Interceptor.CallCount);
+	}
+
+	[Fact]
+	public void MultipleTypeParams_PreservesConstraints()
+	{
+		// TResult has 'class' constraint - string satisfies it
+		var stub = new Stubs.OGConverter<int, bool, string>();
+		stub.Interceptor.OnCall = (ko, input) => input.ToString();
+
+		OGConverter<int, bool, string> converter = stub;
+		var result = converter(42);
+
+		Assert.Equal("42", result);
+	}
+}
+
 /// <summary>
 /// Generic service class for testing open generic class stubs.
 /// </summary>
@@ -217,13 +260,6 @@ public class OGTestEntity
 public partial class OpenGenericInterfaceTest
 {
 }
-
-// TODO: Open generic delegate stubs are not yet implemented
-// [KnockOff(typeof(GenericFactory<>))]
-// [KnockOff(typeof(GenericConverter<,>))]
-// public partial class OpenGenericDelegateTest
-// {
-// }
 
 // TODO: Open generic class stubs are not yet implemented
 // [KnockOff(typeof(GenericService<>))]
