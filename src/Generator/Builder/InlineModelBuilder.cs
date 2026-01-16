@@ -936,8 +936,10 @@ internal static class InlineModelBuilder
         var invokeParamList = string.Join(", ", del.Parameters.Select(p => $"{p.Type} {p.Name}"));
         var invokeArgList = string.Join(", ", del.Parameters.Select(p => p.Name));
 
-        // OnCall type
-        var stubClassRef = $"Stubs.{stubClassName}";
+        // OnCall type - include type params for open generics so T is in scope
+        var stubClassRef = del.IsOpenGeneric && typeParamList.Length > 0
+            ? $"Stubs.{stubClassName}{typeParamList}"
+            : $"Stubs.{stubClassName}";
         string onCallType;
         if (del.IsVoid)
         {

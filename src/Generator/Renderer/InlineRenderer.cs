@@ -808,9 +808,9 @@ internal static class InlineRenderer
 
     private static void RenderDelegateStub(CodeWriter w, InlineDelegateStubModel del)
     {
-        // Generate handler class first
+        // Generate handler class first (generic if delegate is open generic)
         w.Line($"\t\t/// <summary>Interceptor for {del.StubClassName} delegate.</summary>");
-        w.Line($"\t\tpublic sealed class {del.InterceptorClassName}");
+        w.Line($"\t\tpublic sealed class {del.InterceptorClassName}{del.TypeParameterList}{del.ConstraintClauses}");
         w.Line("\t\t{");
 
         // CallCount and WasCalled
@@ -879,9 +879,9 @@ internal static class InlineRenderer
         w.Line("\t\t\tpublic bool Strict { get; set; }");
         w.Line();
 
-        // Interceptor property
+        // Interceptor property (generic if delegate is open generic)
         w.Line($"\t\t\t/// <summary>Interceptor for tracking and configuring delegate behavior.</summary>");
-        w.Line($"\t\t\tpublic {del.InterceptorClassName} Interceptor {{ get; }} = new();");
+        w.Line($"\t\t\tpublic {del.InterceptorClassName}{del.TypeParameterList} Interceptor {{ get; }} = new();");
         w.Line();
 
         // Private Invoke method
