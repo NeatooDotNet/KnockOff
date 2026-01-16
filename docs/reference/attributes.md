@@ -1,149 +1,212 @@
 # Attributes Reference
 
-## [KnockOff]
+KnockOff provides two attributes for creating stubs.
 
-The primary attribute that marks a class for code generation.
+## [KnockOff] (Standalone)
 
-### Declaration
-
-<!-- pseudo:knockoff-attribute-declaration -->
-```csharp
-namespace KnockOff;
-
-[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-public sealed class KnockOffAttribute : Attribute
-{
-}
-```
-<!-- /snippet -->
+Marks a class for standalone stub generation. The class must implement an interface.
 
 ### Usage
 
-<!-- snippet: attributes-knockoff-usage -->
+<!-- snippet: attr-standalone-basic -->
 ```cs
 [KnockOff]
-public partial class AttrMyServiceKnockOff : IAttrService
-{
-}
+public partial class AttrUserRepositoryStub : IAttrUserRepository { }
 ```
 <!-- endSnippet -->
 
 ### Requirements
 
-1. **Class must be `partial`** — The generator adds to the class
-2. **Must implement at least one interface** — The generator needs interface members
-3. **Cannot be `abstract`** — Must be instantiable
-4. **Cannot be `static`** — Must be an instance class
+| Requirement | Description |
+|-------------|-------------|
+| `partial` keyword | Required for generator to add code |
+| Implements interface | Must implement exactly one interface |
+| Not `abstract` | Must be instantiable |
+| Not `static` | Must be instance class |
 
 ### Valid Examples
 
-<!-- snippet: attributes-valid-examples -->
+<!-- snippet: attr-standalone-valid -->
 ```cs
 // Basic usage
 [KnockOff]
-public partial class AttrServiceKnockOff : IAttrService { }
+public partial class AttrServiceStub : IAttrService { }
 
 // Generic interface (with concrete type)
 [KnockOff]
-public partial class AttrUserRepoKnockOff : IAttrRepository<AttrUser> { }
+public partial class AttrUserRepoStub : IAttrRepository<AttrUser> { }
 
-// Interface inheritance
+// Internal visibility
 [KnockOff]
-public partial class AttrAuditableKnockOff : IAttrAuditableEntity { }
+internal partial class AttrInternalServiceStub : IAttrService { }
 
-// Internal class
-[KnockOff]
-internal partial class AttrInternalServiceKnockOff : IAttrService { }
-
-// Nested class
-public partial class AttrTestFixture
+// Nested in test class
+public partial class AttrMyTests
 {
     [KnockOff]
-    public partial class NestedKnockOff : IAttrService { }
+    public partial class NestedStub : IAttrService { }
 }
 ```
 <!-- endSnippet -->
 
 ### Invalid Examples
 
-<!-- invalid:knockoff-invalid-examples -->
+<!-- invalid:attr-standalone-invalid -->
 ```csharp
-// Missing partial keyword - COMPILE ERROR
+// Missing partial - COMPILE ERROR
 [KnockOff]
-public class ServiceKnockOff : IService { }
+public class ServiceStub : IService { }
 
-// No interface - GENERATOR WARNING
+// Multiple interfaces - KO0010 ERROR
 [KnockOff]
-public partial class NoInterfaceKnockOff { }
+public partial class MultiStub : IService, IDisposable { }
 
-// Abstract class - GENERATOR ERROR
+// No interface - no members generated
 [KnockOff]
-public abstract partial class AbstractKnockOff : IService { }
-
-// Static class - COMPILE ERROR
-[KnockOff]
-public static partial class StaticKnockOff : IService { }
-
-// Generic KnockOff class - NOT SUPPORTED
-[KnockOff]
-public partial class GenericKnockOff<T> : IRepository<T> { }
+public partial class EmptyStub { }
 ```
 <!-- /snippet -->
 
-### Namespace
+## [KnockOff<T>] (Inline)
 
-The attribute is in the `KnockOff` namespace:
+Generates a nested stub class inside the annotated class. Best for test-class-scoped stubs.
 
-<!-- pseudo:knockoff-namespace-using -->
+### Usage
+
+<!-- snippet: attr-inline-usage -->
+```cs
+[KnockOff<IAttrUserRepository>]
+[KnockOff<IAttrEmailService>]
+public partial class AttrUserServiceTests
+{
+    public void Test()
+    {
+        var repoStub = new Stubs.IAttrUserRepository();
+        var emailStub = new Stubs.IAttrEmailService();
+
+        _ = (repoStub, emailStub);
+    }
+}
+```
+<!-- endSnippet -->
+
+### Requirements
+
+| Requirement | Description |
+|-------------|-------------|
+| `partial` keyword | Required on the containing class |
+| Type argument | Must be an interface, class, or delegate |
+
+### What Gets Generated
+
+For each `[KnockOff<T>]` attribute, a nested `Stubs` class is generated containing:
+
+<!-- pseudo:attr-generated-stubs -->
+```csharp
+public partial class UserServiceTests
+{
+    public static partial class Stubs
+    {
+        public partial class IUserRepository : global::IUserRepository { /* ... */ }
+        public partial class IEmailService : global::IEmailService { /* ... */ }
+    }
+}
+```
+<!-- /snippet -->
+
+### Interface Stubs
+
+<!-- snippet: attr-inline-interface -->
+```cs
+[KnockOff<IAttrUserRepository>]
+public partial class AttrInterfaceTests
+{
+    public void Test()
+    {
+        var stub = new Stubs.IAttrUserRepository();
+        stub.GetById.OnCall = (ko, id) => new AttrUser { Id = id };
+
+        IAttrUserRepository repo = stub;  // Implicit conversion
+
+        _ = repo;
+    }
+}
+```
+<!-- endSnippet -->
+
+### Class Stubs
+
+For classes (must be unsealed with virtual/abstract members):
+
+<!-- snippet: attr-inline-class -->
+```cs
+[KnockOff<AttrEmailServiceClass>]
+public partial class AttrClassTests
+{
+    public void Test()
+    {
+        var stub = new Stubs.AttrEmailServiceClass("smtp.test.com", 587);
+        stub.Send.OnCall = (ko, to, body) => { };
+
+        AttrEmailServiceClass service = stub.Object;  // Use .Object for class instance
+
+        _ = service;
+    }
+}
+```
+<!-- endSnippet -->
+
+### Delegate Stubs
+
+For `Func<>`, `Action<>`, or named delegates:
+
+<!-- snippet: attr-inline-delegate -->
+```cs
+[KnockOff<Func<int, string>>]
+[KnockOff<AttrValidationRule>]  // Named delegate
+public partial class AttrDelegateTests
+{
+    public void Test()
+    {
+        var funcStub = new Stubs.Func();
+        funcStub.Interceptor.OnCall = (ko, id) => $"Item-{id}";
+
+        Func<int, string> func = funcStub;  // Implicit conversion
+
+        _ = func;
+    }
+}
+```
+<!-- endSnippet -->
+
+### Stub Naming
+
+| Type Argument | Generated Stub Name |
+|---------------|---------------------|
+| `IUserRepository` | `Stubs.IUserRepository` |
+| `EmailService` | `Stubs.EmailService` |
+| `Func<int, string>` | `Stubs.Func_int_string` |
+| `Action<string>` | `Stubs.Action_string` |
+
+## Namespace
+
+Both attributes are in the `KnockOff` namespace:
+
+<!-- pseudo:attr-namespace-using -->
 ```csharp
 using KnockOff;
 ```
 <!-- /snippet -->
 
-Or use fully qualified:
+Or fully qualified:
 
-<!-- snippet: attributes-namespace-qualified -->
+<!-- snippet: attr-namespace-qualified -->
 ```cs
 [KnockOff.KnockOff]
-public partial class AttrQualifiedServiceKnockOff : IAttrService { }
+public partial class AttrFullyQualifiedStub : IAttrService { }
+
+[KnockOff.KnockOff<IAttrService>]
+public partial class AttrFullyQualifiedTests { }
 ```
 <!-- endSnippet -->
 
-## Future Attribute Options
-
-The following options are under consideration for future versions:
-
-### Naming Customization
-
-<!-- pseudo:knockoff-future-naming -->
-```csharp
-// Hypothetical - NOT YET IMPLEMENTED
-[KnockOff(KOPropertyName = "Mock")]
-public partial class ServiceKnockOff : IService { }
-// Would generate: public ServiceKnockOffKO Mock { get; }
-```
-<!-- /snippet -->
-
-### Strict Mode
-
-<!-- pseudo:knockoff-future-strict -->
-```csharp
-// Hypothetical - NOT YET IMPLEMENTED
-[KnockOff(Strict = true)]
-public partial class ServiceKnockOff : IService { }
-// Would throw if any member is called without setup
-```
-<!-- /snippet -->
-
-### Include/Exclude Members
-
-<!-- pseudo:knockoff-future-exclude -->
-```csharp
-// Hypothetical - NOT YET IMPLEMENTED
-[KnockOff(Exclude = ["Dispose"])]
-public partial class ServiceKnockOff : IService, IDisposable { }
-// Would not generate handler for Dispose
-```
-<!-- /snippet -->
-
-These are design considerations only. The current implementation has no attribute options.

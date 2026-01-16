@@ -1,10 +1,10 @@
 # Methods
 
-KnockOff supports void methods, methods with return values, and methods with any number of parameters.
+This guide covers stubbing methods: void, return values, async, overloads, and generics.
 
-## Method Types
+## Basic Methods
 
-### Void Methods (No Parameters)
+### Void Methods
 
 <!-- snippet: methods-void-no-params -->
 ```cs
@@ -18,105 +18,7 @@ public partial class MethodServiceKnockOff : IMethodService { }
 ```
 <!-- endSnippet -->
 
-Tracking:
-- `knockOff.Initialize.WasCalled`
-- `knockOff.Initialize.CallCount`
-- `knockOff.Initialize.OnCall` — `Action<MethodServiceKnockOff>`
-
-### Void Methods (With Parameters)
-
-<!-- snippet: methods-void-with-params -->
-```cs
-public interface IMethodLogger
-{
-    void Log(string message);
-    void LogError(string message, Exception ex);
-}
-
-[KnockOff]
-public partial class MethodLoggerKnockOff : IMethodLogger { }
-```
-<!-- endSnippet -->
-
-Single parameter:
-- `knockOff.Log.LastCallArg` — the argument value (not a tuple)
-
-Multiple parameters:
-- `knockOff.LogError.LastCallArgs` — named tuple `(string message, Exception ex)`
-
-### Methods with Return Values
-
-<!-- snippet: methods-return-value -->
-```cs
-public interface IMethodRepository
-{
-    MethodUser? GetById(int id);
-    int Count();
-}
-
-[KnockOff]
-public partial class MethodRepositoryKnockOff : IMethodRepository { }
-```
-<!-- endSnippet -->
-
-Same tracking as void methods, plus:
-- `OnCall` returns the value type
-
-## Parameter Handling
-
-### Single Parameter
-
-For methods with one parameter, tracking uses the raw type (not a tuple):
-
-<!-- snippet: methods-single-param -->
-```cs
-service.GetUser(42);
-
-// Tracking - single parameter uses raw type (not a tuple)
-int? lastId = knockOff.GetUser.LastCallArg;  // 42, not (42,)
-```
-<!-- endSnippet -->
-
-### Multiple Parameters
-
-For methods with 2+ parameters, tracking uses named tuples:
-
-<!-- snippet: methods-multiple-params -->
-```cs
-service.Process("test", 42, true);
-
-// Tracking - named tuple with original parameter names
-var args = knockOff.Process.LastCallArgs;
-var name = args?.name;   // "test"
-var value = args?.value; // 42
-var flag = args?.flag;   // true
-```
-<!-- endSnippet -->
-
-## User-Defined Methods
-
-Define protected methods in your stub class for default behavior:
-
-<!-- snippet: methods-user-defined -->
-```cs
-[KnockOff]
-public partial class MethodUserDefinedKnockOff : IMethodUserDefined
-{
-    protected MethodUser? GetById(int id) => new MethodUser { Id = id, Name = "Default" };
-
-    protected int Count() => 100;
-}
-```
-<!-- endSnippet -->
-
-Rules:
-- Must be `protected`
-- Must match interface method signature exactly
-- Called when no `OnCall` callback is set
-
-## Callbacks
-
-### Void Method Callbacks
+Configure with `OnCall`:
 
 <!-- snippet: methods-void-callbacks -->
 ```cs
@@ -140,7 +42,7 @@ loggerKnockOff.LogError.OnCall = (ko, message, ex) =>
 ```
 <!-- endSnippet -->
 
-### Return Method Callbacks
+### Methods with Return Values
 
 <!-- snippet: methods-return-callbacks -->
 ```cs
@@ -152,69 +54,158 @@ knockOff.GetById.OnCall = (ko, id) => new MethodUser { Id = id };
 ```
 <!-- endSnippet -->
 
-### Callback Signatures
+### User-Defined Defaults
 
-Each method gets an `OnCall` property with a delegate or Func/Action type:
+Define protected methods for consistent behavior across tests:
 
-| Method Signature | OnCall Type |
-|------------------|-------------|
-| `void M()` | `Action<TKnockOff>?` |
-| `void M(T1 a)` | `Action<TKnockOff, T1>?` |
-| `void M(T1 a, T2 b)` | `Action<TKnockOff, T1, T2>?` |
-| `R M()` | `Func<TKnockOff, R>?` |
-| `R M(T1 a)` | `Func<TKnockOff, T1, R>?` |
-| `R M(T1 a, T2 b)` | `Func<TKnockOff, T1, T2, R>?` |
-
-## Priority Order
-
-1. **Callback** (if set) — takes precedence
-2. **User method** (if defined) — fallback
-3. **Default** — returns `default(T)` for return methods, nothing for void
-
-<!-- snippet: methods-priority-order -->
+<!-- snippet: methods-user-defined -->
 ```cs
 [KnockOff]
-public partial class MethodPriorityKnockOff : IMethodPriority
+public partial class MethodUserDefinedKnockOff : IMethodUserDefined
 {
-    protected int Calculate(int x) => x * 2;  // User method
+    protected MethodUser? GetById(int id) => new MethodUser { Id = id, Name = "Default" };
+
+    protected int Count() => 100;
 }
 ```
 <!-- endSnippet -->
 
-<!-- snippet: methods-priority-order-usage -->
+Callbacks override user methods when set.
+
+## Argument Tracking
+
+### Single Parameter
+
+<!-- snippet: methods-single-param -->
 ```cs
-// No callback → uses user method
-var result1 = service.Calculate(5);  // 10 (5 * 2)
+service.GetUser(42);
 
-// Callback → overrides user method
-knockOff.Calculate2.OnCall = (ko, x) => x * 100;
-var result2 = service.Calculate(5);  // 500 (callback)
-
-// Reset → back to user method
-knockOff.Calculate2.Reset();
-var result3 = service.Calculate(5);  // 10 (user method again)
+// Tracking - single parameter uses raw type (not a tuple)
+int? lastId = knockOff.GetUser.LastCallArg;  // 42, not (42,)
 ```
 <!-- endSnippet -->
 
-## Common Patterns
+### Multiple Parameters
 
-### Simulating Failures
-
-<!-- snippet: methods-simulating-failures -->
+<!-- snippet: methods-multiple-params -->
 ```cs
-[KnockOff]
-public partial class MethodFailureKnockOff : IMethodFailure { }
+service.Process("test", 42, true);
+
+// Tracking - named tuple with original parameter names
+var args = knockOff.Process.LastCallArgs;
+var name = args?.name;   // "test"
+var value = args?.value; // 42
+var flag = args?.flag;   // true
 ```
 <!-- endSnippet -->
 
-<!-- snippet: methods-simulating-failures-usage -->
+## Async Methods
+
+KnockOff supports `Task`, `Task<T>`, `ValueTask`, and `ValueTask<T>`.
+
+### Default Behavior
+
+Without callbacks, async methods return completed tasks with default values:
+
+<!-- snippet: async-methods-default-behavior -->
 ```cs
-knockOff.Save.OnCall = (ko, entity) =>
+await repo.InitializeAsync();       // Completes immediately
+var user = await repo.GetByIdAsync(1);  // Returns null (default)
+var count = await repo.CountAsync();    // Returns 0 (default)
+```
+<!-- endSnippet -->
+
+### Task Callbacks
+
+<!-- snippet: async-methods-task-callbacks -->
+```cs
+// Task (void equivalent)
+knockOff.InitializeAsync.OnCall = (ko) =>
 {
-    throw new InvalidOperationException("Connection failed");
+    // Custom logic
+    return Task.CompletedTask;
+};
+
+// Task<T>
+knockOff.GetByIdAsync.OnCall = (ko, id) =>
+    Task.FromResult<AsyncUser?>(new AsyncUser { Id = id, Name = "Mocked" });
+```
+<!-- endSnippet -->
+
+### ValueTask Callbacks
+
+<!-- snippet: async-methods-valuetask-callbacks -->
+```cs
+// ValueTask<T>
+knockOff.CountAsync.OnCall = (ko) => new ValueTask<int>(100);
+```
+<!-- endSnippet -->
+
+### Simulating Delays
+
+<!-- snippet: async-methods-simulating-delays -->
+```cs
+knockOff.GetByIdAsync.OnCall = async (ko, id) =>
+{
+    await Task.Delay(100);  // Simulate network latency
+    return new AsyncUser { Id = id };
 };
 ```
 <!-- endSnippet -->
+
+### Simulating Failures
+
+<!-- snippet: async-methods-simulating-failures-usage -->
+```cs
+// Faulted task
+knockOff.SaveAsync.OnCall = (ko, entity) =>
+    Task.FromException<int>(new InvalidOperationException("Connection lost"));
+
+// Or throw directly in callback
+knockOff.SaveAsync.OnCall = (ko, entity) =>
+{
+    throw new InvalidOperationException("Connection lost");
+};
+```
+<!-- endSnippet -->
+
+## Method Overloads
+
+Overloaded methods get numbered interceptors:
+
+```csharp
+public interface IProcessor
+{
+    void Process(string data);               // Process1
+    void Process(string data, int priority); // Process2
+}
+
+// Each overload has its own interceptor
+stub.Process1.OnCall = (ko, data) => { };
+stub.Process2.OnCall = (ko, data, priority) => { };
+
+// Verify specific overload
+Assert.Equal(1, stub.Process2.CallCount);
+```
+
+Methods without overloads don't get numeric suffixes.
+
+## Generic Methods
+
+```csharp
+public interface ISerializer
+{
+    T Deserialize<T>(string json);
+}
+
+// Use .Of<T>() to access type-specific interceptors
+stub.Deserialize.Of<User>().OnCall = (ko, json) => new User { Name = "Test" };
+stub.Deserialize.Of<Order>().OnCall = (ko, json) => new Order { Id = 1 };
+
+Assert.Equal(1, stub.Deserialize.Of<User>().CallCount);
+```
+
+## Common Patterns
 
 ### Conditional Returns
 
@@ -229,52 +220,7 @@ knockOff.GetById.OnCall = (ko, id) => id switch
 ```
 <!-- endSnippet -->
 
-### Capturing Arguments
-
-<!-- snippet: methods-capturing-arguments -->
-```cs
-var capturedIds = new List<int>();
-knockOff.GetById.OnCall = (ko, id) =>
-{
-    capturedIds.Add(id);
-    return new MethodUser { Id = id };
-};
-```
-<!-- endSnippet -->
-
-### Verifying Call Order
-
-<!-- snippet: methods-verifying-call-order -->
-```cs
-[KnockOff]
-public partial class MethodCallOrderKnockOff : IMethodCallOrder { }
-```
-<!-- endSnippet -->
-
-<!-- snippet: methods-verifying-call-order-usage -->
-```cs
-var callOrder = new List<string>();
-
-knockOff.Initialize.OnCall = (ko) => callOrder.Add("Initialize");
-knockOff.Process.OnCall = (ko) => callOrder.Add("Process");
-knockOff.Cleanup.OnCall = (ko) => callOrder.Add("Cleanup");
-
-service.Initialize();
-service.Process();
-service.Cleanup();
-
-// callOrder is ["Initialize", "Process", "Cleanup"]
-```
-<!-- endSnippet -->
-
 ### Sequential Returns
-
-<!-- snippet: methods-sequential-returns -->
-```cs
-[KnockOff]
-public partial class MethodSequentialKnockOff : IMethodSequential { }
-```
-<!-- endSnippet -->
 
 <!-- snippet: methods-sequential-returns-usage -->
 ```cs
@@ -287,14 +233,18 @@ var third = service.GetNext();   // 3
 ```
 <!-- endSnippet -->
 
-### Accessing Other Interceptor State
+### Throwing Exceptions
 
-<!-- snippet: methods-accessing-handler-state -->
+<!-- snippet: methods-simulating-failures-usage -->
 ```cs
-[KnockOff]
-public partial class MethodHandlerStateKnockOff : IMethodHandlerState { }
+knockOff.Save.OnCall = (ko, entity) =>
+{
+    throw new InvalidOperationException("Connection failed");
+};
 ```
 <!-- endSnippet -->
+
+### Accessing Stub State
 
 <!-- snippet: methods-accessing-handler-state-usage -->
 ```cs
@@ -303,5 +253,26 @@ knockOff.Process.OnCall = (ko) =>
     if (!ko.Initialize.WasCalled)
         throw new InvalidOperationException("Not initialized");
 };
+```
+<!-- endSnippet -->
+
+## Priority Order
+
+1. **Callback** (if set) — takes precedence
+2. **User method** (if defined) — fallback
+3. **Default** — `default(T)` for return methods
+
+<!-- snippet: methods-priority-order-usage -->
+```cs
+// No callback → uses user method
+var result1 = service.Calculate(5);  // 10 (5 * 2)
+
+// Callback → overrides user method
+knockOff.Calculate2.OnCall = (ko, x) => x * 100;
+var result2 = service.Calculate(5);  // 500 (callback)
+
+// Reset → back to user method
+knockOff.Calculate2.Reset();
+var result3 = service.Calculate(5);  // 10 (user method again)
 ```
 <!-- endSnippet -->

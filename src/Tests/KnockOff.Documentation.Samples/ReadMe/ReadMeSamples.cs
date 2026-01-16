@@ -20,6 +20,65 @@ using Xunit;
 namespace KnockOff.Documentation.Samples.ReadMe;
 
 // ============================================================================
+// First Stub Types
+// ============================================================================
+
+#region readme-first-interface
+public interface IUserRepository
+{
+    RmUser? GetById(int id);
+    void Save(RmUser user);
+}
+#endregion
+
+#region readme-first-stub
+[KnockOff]
+public partial class UserRepositoryStub : IUserRepository { }
+#endregion
+
+public class RmUser
+{
+    public int Id { get; set; }
+    public string? Name { get; set; }
+}
+
+public class RmUserService
+{
+    private readonly IUserRepository _repo;
+    public RmUserService(IUserRepository repo) => _repo = repo;
+    public void Rename(int userId, string newName)
+    {
+        var user = _repo.GetById(userId);
+        if (user != null)
+        {
+            user.Name = newName;
+            _repo.Save(user);
+        }
+    }
+}
+
+#region readme-first-test
+public class FirstStubTests
+{
+    public void UpdatesUserName()
+    {
+        // Arrange
+        var stub = new UserRepositoryStub();
+        stub.GetById.OnCall = (ko, id) => new RmUser { Id = id, Name = "Original" };
+
+        var service = new RmUserService(stub);
+
+        // Act
+        service.Rename(userId: 1, newName: "Updated");
+
+        // Assert
+        Assert.Equal(1, stub.Save.CallCount);
+        Assert.Equal("Updated", stub.Save.LastCallArg?.Name);
+    }
+}
+#endregion
+
+// ============================================================================
 // Supporting Types (outside snippets - provide compilation context)
 // ============================================================================
 
