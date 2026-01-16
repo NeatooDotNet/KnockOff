@@ -125,27 +125,6 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 		}
 	}
 
-	/// <summary>Tracks calls to GetValueAsync (user-defined implementation).</summary>
-	public sealed class GetValueAsync2Interceptor : global::KnockOff.IMethodTracking<int>
-	{
-		private int _lastArg = default!;
-
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
-
-		/// <summary>True if CallCount > 0.</summary>
-		public bool WasCalled => CallCount > 0;
-
-		/// <summary>Last argument passed to this method. Default if never called.</summary>
-		public int LastArg => _lastArg;
-
-		/// <summary>Records a method call.</summary>
-		internal void RecordCall(int input) { CallCount++; _lastArg = input; }
-
-		/// <summary>Resets tracking state.</summary>
-		public void Reset() { CallCount = 0; _lastArg = default!; }
-	}
-
 	/// <summary>Tracks and configures behavior for GetOptionalAsync.</summary>
 	public sealed class GetOptionalAsyncInterceptor
 	{
@@ -504,6 +483,27 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+	}
+
+	/// <summary>Tracks calls to GetValueAsync (user-defined implementation).</summary>
+	public sealed class GetValueAsync2Interceptor : global::KnockOff.IMethodTracking<int>
+	{
+		private int _lastArg = default!;
+
+		/// <summary>Number of times this method was called.</summary>
+		public int CallCount { get; private set; }
+
+		/// <summary>True if CallCount > 0.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>Last argument passed to this method. Default if never called.</summary>
+		public int LastArg => _lastArg;
+
+		/// <summary>Records a method call.</summary>
+		internal void RecordCall(int input) { CallCount++; _lastArg = input; }
+
+		/// <summary>Resets tracking state.</summary>
+		public void Reset() { CallCount = 0; _lastArg = default!; }
 	}
 
 	/// <summary>Tracks calls to GetValueValueTaskAsync (user-defined implementation).</summary>

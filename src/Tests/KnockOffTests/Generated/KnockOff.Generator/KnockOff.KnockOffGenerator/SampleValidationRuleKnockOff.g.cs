@@ -5,51 +5,77 @@ namespace KnockOff.Tests;
 
 partial class SampleValidationRuleKnockOff : global::KnockOff.Tests.ISampleValidationRule, global::KnockOff.Tests.ISampleRule<global::KnockOff.Tests.ISampleTarget>, global::KnockOff.Tests.ISampleRule, global::KnockOff.IKnockOffStub
 {
-	/// <summary>Tracks and configures behavior for Execute.</summary>
-	public sealed class Execute1Interceptor
+	/// <summary>Tracks and configures behavior for Execute (overloaded).</summary>
+	public sealed class ExecuteInterceptor
 	{
-		/// <summary>Delegate for Execute.</summary>
-		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> ExecuteDelegate(SampleValidationRuleKnockOff ko, global::KnockOff.Tests.ISampleTarget target, global::System.Threading.CancellationToken? token);
+		/// <summary>Delegate for Execute(global::KnockOff.Tests.ISampleTarget, global::System.Threading.CancellationToken?).</summary>
+		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> ExecuteDelegate_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult(SampleValidationRuleKnockOff ko, global::KnockOff.Tests.ISampleTarget target, global::System.Threading.CancellationToken? token);
 
-		private readonly global::System.Collections.Generic.List<(ExecuteDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
-		private int _sequenceIndex;
+		private readonly global::System.Collections.Generic.List<(ExecuteDelegate_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult Callback, global::KnockOff.Times Times, MethodTrackingImpl_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult Tracking)> _sequence_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult = new();
+		private int _sequenceIndex_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult;
 
-		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
-		public global::KnockOff.IMethodTrackingArgs<(global::KnockOff.Tests.ISampleTarget? target, global::System.Threading.CancellationToken? token)> OnCall(ExecuteDelegate callback)
+		/// <summary>Delegate for Execute(global::KnockOff.Tests.ISampleRuleTarget, global::System.Threading.CancellationToken?).</summary>
+		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> ExecuteDelegate_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult(SampleValidationRuleKnockOff ko, global::KnockOff.Tests.ISampleRuleTarget target, global::System.Threading.CancellationToken? token);
+
+		private readonly global::System.Collections.Generic.List<(ExecuteDelegate_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult Callback, global::KnockOff.Times Times, MethodTrackingImpl_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult Tracking)> _sequence_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult = new();
+		private int _sequenceIndex_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult;
+
+		/// <summary>Configures callback for Execute(global::KnockOff.Tests.ISampleTarget, global::System.Threading.CancellationToken?). Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTrackingArgs<(global::KnockOff.Tests.ISampleTarget? target, global::System.Threading.CancellationToken? token)> OnCall(ExecuteDelegate_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult callback)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
-			_sequenceIndex = 0;
+			var tracking = new MethodTrackingImpl_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult();
+			_sequence_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult.Clear();
+			_sequence_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequenceIndex_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult = 0;
 			return tracking;
 		}
 
-		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
-		public global::KnockOff.IMethodSequence<ExecuteDelegate> OnCall(ExecuteDelegate callback, global::KnockOff.Times times)
+		/// <summary>Configures callback for Execute(global::KnockOff.Tests.ISampleTarget, global::System.Threading.CancellationToken?) with Times constraint.</summary>
+		public global::KnockOff.IMethodSequence<ExecuteDelegate_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult> OnCall(ExecuteDelegate_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult callback, global::KnockOff.Times times)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, times, tracking));
-			_sequenceIndex = 0;
-			return new MethodSequenceImpl(this);
+			var tracking = new MethodTrackingImpl_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult();
+			_sequence_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult.Clear();
+			_sequence_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult.Add((callback, times, tracking));
+			_sequenceIndex_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult = 0;
+			return new MethodSequenceImpl_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult(this);
 		}
 
-		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> Invoke(SampleValidationRuleKnockOff ko, bool strict, global::KnockOff.Tests.ISampleTarget target, global::System.Threading.CancellationToken? token)
+		/// <summary>Configures callback for Execute(global::KnockOff.Tests.ISampleRuleTarget, global::System.Threading.CancellationToken?). Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTrackingArgs<(global::KnockOff.Tests.ISampleRuleTarget? target, global::System.Threading.CancellationToken? token)> OnCall(ExecuteDelegate_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult callback)
 		{
-			if (_sequence.Count == 0)
+			var tracking = new MethodTrackingImpl_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult();
+			_sequence_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult.Clear();
+			_sequence_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequenceIndex_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult = 0;
+			return tracking;
+		}
+
+		/// <summary>Configures callback for Execute(global::KnockOff.Tests.ISampleRuleTarget, global::System.Threading.CancellationToken?) with Times constraint.</summary>
+		public global::KnockOff.IMethodSequence<ExecuteDelegate_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult> OnCall(ExecuteDelegate_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult callback, global::KnockOff.Times times)
+		{
+			var tracking = new MethodTrackingImpl_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult();
+			_sequence_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult.Clear();
+			_sequence_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult.Add((callback, times, tracking));
+			_sequenceIndex_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult = 0;
+			return new MethodSequenceImpl_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult(this);
+		}
+
+		/// <summary>Invokes configured callback for Execute(global::KnockOff.Tests.ISampleTarget, global::System.Threading.CancellationToken?).</summary>
+		internal global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> Invoke_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult(SampleValidationRuleKnockOff ko, bool strict, global::KnockOff.Tests.ISampleTarget target, global::System.Threading.CancellationToken? token)
+		{
+			if (_sequence_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult.Count == 0)
 			{
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Execute");
 				return default!;
 			}
 
-			var (callback, times, tracking) = _sequence[_sequenceIndex];
+			var (callback, times, tracking) = _sequence_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult[_sequenceIndex_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult];
 			tracking.RecordCall((target, token));
 
 			if (!times.IsForever && tracking.CallCount >= times.Count)
 			{
-				if (_sequenceIndex < _sequence.Count - 1)
-					_sequenceIndex++;
+				if (_sequenceIndex_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult < _sequence_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult.Count - 1)
+					_sequenceIndex_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult++;
 				else if (tracking.CallCount > times.Count)
 					throw global::KnockOff.StubException.SequenceExhausted("Execute");
 			}
@@ -57,190 +83,113 @@ partial class SampleValidationRuleKnockOff : global::KnockOff.Tests.ISampleValid
 			return callback(ko, target, token);
 		}
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset()
+		/// <summary>Invokes configured callback for Execute(global::KnockOff.Tests.ISampleRuleTarget, global::System.Threading.CancellationToken?).</summary>
+		internal global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> Invoke_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult(SampleValidationRuleKnockOff ko, bool strict, global::KnockOff.Tests.ISampleRuleTarget target, global::System.Threading.CancellationToken? token)
 		{
-			foreach (var (_, _, tracking) in _sequence)
-				tracking.Reset();
-			_sequenceIndex = 0;
+			if (_sequence_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult.Count == 0)
+			{
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Execute");
+				return default!;
+			}
+
+			var (callback, times, tracking) = _sequence_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult[_sequenceIndex_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult];
+			tracking.RecordCall((target, token));
+
+			if (!times.IsForever && tracking.CallCount >= times.Count)
+			{
+				if (_sequenceIndex_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult < _sequence_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult.Count - 1)
+					_sequenceIndex_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult++;
+				else if (tracking.CallCount > times.Count)
+					throw global::KnockOff.StubException.SequenceExhausted("Execute");
+			}
+
+			return callback(ko, target, token);
 		}
 
-		/// <summary>Tracks invocations for this callback registration.</summary>
-		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTrackingArgs<(global::KnockOff.Tests.ISampleTarget? target, global::System.Threading.CancellationToken? token)>
+		/// <summary>Resets all tracking state for all overloads.</summary>
+		public void Reset()
+		{
+			foreach (var (_, _, tracking) in _sequence_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult)
+				tracking.Reset();
+			_sequenceIndex_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult = 0;
+			foreach (var (_, _, tracking) in _sequence_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult)
+				tracking.Reset();
+			_sequenceIndex_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult = 0;
+		}
+
+		/// <summary>Verifies all Times constraints for all overloads were satisfied.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult)
+			{
+				if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			foreach (var (_, times, tracking) in _sequence_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult)
+			{
+				if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
+		private sealed class MethodTrackingImpl_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult : global::KnockOff.IMethodTrackingArgs<(global::KnockOff.Tests.ISampleTarget? target, global::System.Threading.CancellationToken? token)>
 		{
 			private (global::KnockOff.Tests.ISampleTarget? target, global::System.Threading.CancellationToken? token) _lastArgs;
 
-			/// <summary>Number of times this callback was invoked.</summary>
 			public int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 			public (global::KnockOff.Tests.ISampleTarget? target, global::System.Threading.CancellationToken? token) LastArgs => _lastArgs;
 
-			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall((global::KnockOff.Tests.ISampleTarget? target, global::System.Threading.CancellationToken? token) args) { CallCount++; _lastArgs = args; }
 
-			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArgs = default; }
 		}
 
-		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<ExecuteDelegate>
-		{
-			private readonly Execute1Interceptor _interceptor;
-
-			public MethodSequenceImpl(Execute1Interceptor interceptor) => _interceptor = interceptor;
-
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
-			{
-				get
-				{
-					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence)
-						total += tracking.CallCount;
-					return total;
-				}
-			}
-
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<ExecuteDelegate> ThenCall(ExecuteDelegate callback, global::KnockOff.Times times)
-			{
-				var tracking = new MethodTrackingImpl();
-				_interceptor._sequence.Add((callback, times, tracking));
-				return this;
-			}
-
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-			public bool Verify()
-			{
-				foreach (var (_, times, tracking) in _interceptor._sequence)
-				{
-					if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
-			}
-
-			/// <summary>Reset all tracking in the sequence.</summary>
-			public void Reset() => _interceptor.Reset();
-		}
-	}
-
-	/// <summary>Tracks and configures behavior for Execute.</summary>
-	public sealed class Execute2Interceptor
-	{
-		/// <summary>Delegate for Execute.</summary>
-		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> ExecuteDelegate(SampleValidationRuleKnockOff ko, global::KnockOff.Tests.ISampleRuleTarget target, global::System.Threading.CancellationToken? token);
-
-		private readonly global::System.Collections.Generic.List<(ExecuteDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
-		private int _sequenceIndex;
-
-		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
-		public global::KnockOff.IMethodTrackingArgs<(global::KnockOff.Tests.ISampleRuleTarget? target, global::System.Threading.CancellationToken? token)> OnCall(ExecuteDelegate callback)
-		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
-			_sequenceIndex = 0;
-			return tracking;
-		}
-
-		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
-		public global::KnockOff.IMethodSequence<ExecuteDelegate> OnCall(ExecuteDelegate callback, global::KnockOff.Times times)
-		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, times, tracking));
-			_sequenceIndex = 0;
-			return new MethodSequenceImpl(this);
-		}
-
-		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> Invoke(SampleValidationRuleKnockOff ko, bool strict, global::KnockOff.Tests.ISampleRuleTarget target, global::System.Threading.CancellationToken? token)
-		{
-			if (_sequence.Count == 0)
-			{
-				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Execute");
-				return default!;
-			}
-
-			var (callback, times, tracking) = _sequence[_sequenceIndex];
-			tracking.RecordCall((target, token));
-
-			if (!times.IsForever && tracking.CallCount >= times.Count)
-			{
-				if (_sequenceIndex < _sequence.Count - 1)
-					_sequenceIndex++;
-				else if (tracking.CallCount > times.Count)
-					throw global::KnockOff.StubException.SequenceExhausted("Execute");
-			}
-
-			return callback(ko, target, token);
-		}
-
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset()
-		{
-			foreach (var (_, _, tracking) in _sequence)
-				tracking.Reset();
-			_sequenceIndex = 0;
-		}
-
-		/// <summary>Tracks invocations for this callback registration.</summary>
-		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTrackingArgs<(global::KnockOff.Tests.ISampleRuleTarget? target, global::System.Threading.CancellationToken? token)>
+		private sealed class MethodTrackingImpl_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult : global::KnockOff.IMethodTrackingArgs<(global::KnockOff.Tests.ISampleRuleTarget? target, global::System.Threading.CancellationToken? token)>
 		{
 			private (global::KnockOff.Tests.ISampleRuleTarget? target, global::System.Threading.CancellationToken? token) _lastArgs;
 
-			/// <summary>Number of times this callback was invoked.</summary>
 			public int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 			public (global::KnockOff.Tests.ISampleRuleTarget? target, global::System.Threading.CancellationToken? token) LastArgs => _lastArgs;
 
-			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall((global::KnockOff.Tests.ISampleRuleTarget? target, global::System.Threading.CancellationToken? token) args) { CallCount++; _lastArgs = args; }
 
-			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArgs = default; }
 		}
 
-		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<ExecuteDelegate>
+		private sealed class MethodSequenceImpl_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult : global::KnockOff.IMethodSequence<ExecuteDelegate_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult>
 		{
-			private readonly Execute2Interceptor _interceptor;
+			private readonly ExecuteInterceptor _interceptor;
 
-			public MethodSequenceImpl(Execute2Interceptor interceptor) => _interceptor = interceptor;
+			public MethodSequenceImpl_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult(ExecuteInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
 			public int TotalCallCount
 			{
 				get
 				{
 					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence)
+					foreach (var (_, _, tracking) in _interceptor._sequence_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult)
 						total += tracking.CallCount;
 					return total;
 				}
 			}
 
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<ExecuteDelegate> ThenCall(ExecuteDelegate callback, global::KnockOff.Times times)
+			public global::KnockOff.IMethodSequence<ExecuteDelegate_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult> ThenCall(ExecuteDelegate_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult callback, global::KnockOff.Times times)
 			{
-				var tracking = new MethodTrackingImpl();
-				_interceptor._sequence.Add((callback, times, tracking));
+				var tracking = new MethodTrackingImpl_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult();
+				_interceptor._sequence_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult.Add((callback, times, tracking));
 				return this;
 			}
 
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
 			public bool Verify()
 			{
-				foreach (var (_, times, tracking) in _interceptor._sequence)
+				foreach (var (_, times, tracking) in _interceptor._sequence_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult)
 				{
 					if (!times.Verify(tracking.CallCount))
 						return false;
@@ -248,16 +197,50 @@ partial class SampleValidationRuleKnockOff : global::KnockOff.Tests.ISampleValid
 				return true;
 			}
 
-			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
+		private sealed class MethodSequenceImpl_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult : global::KnockOff.IMethodSequence<ExecuteDelegate_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult>
+		{
+			private readonly ExecuteInterceptor _interceptor;
+
+			public MethodSequenceImpl_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult(ExecuteInterceptor interceptor) => _interceptor = interceptor;
+
+			public int TotalCallCount
+			{
+				get
+				{
+					var total = 0;
+					foreach (var (_, _, tracking) in _interceptor._sequence_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult)
+						total += tracking.CallCount;
+					return total;
+				}
+			}
+
+			public global::KnockOff.IMethodSequence<ExecuteDelegate_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult> ThenCall(ExecuteDelegate_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult();
+				_interceptor._sequence_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult.Add((callback, times, tracking));
+				return this;
+			}
+
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _interceptor._sequence_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult)
+				{
+					if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			public void Reset() => _interceptor.Reset();
+		}
+
 	}
 
 	/// <summary>Interceptor for Execute.</summary>
-	public Execute1Interceptor Execute1 { get; } = new();
-
-	/// <summary>Interceptor for Execute.</summary>
-	public Execute2Interceptor Execute2 { get; } = new();
+	public ExecuteInterceptor Execute { get; } = new();
 
 	/// <summary>When true, throws StubException for unconfigured member access.</summary>
 	public bool Strict { get; set; } = false;
@@ -267,12 +250,12 @@ partial class SampleValidationRuleKnockOff : global::KnockOff.Tests.ISampleValid
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> global::KnockOff.Tests.ISampleRule<global::KnockOff.Tests.ISampleTarget>.Execute(global::KnockOff.Tests.ISampleTarget target, global::System.Threading.CancellationToken? token)
 	{
-		return Execute1.Invoke(this, Strict, target, token);
+		return Execute.Invoke_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult(this, Strict, target, token);
 	}
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> global::KnockOff.Tests.ISampleRule.Execute(global::KnockOff.Tests.ISampleRuleTarget target, global::System.Threading.CancellationToken? token)
 	{
-		return Execute2.Invoke(this, Strict, target, token);
+		return Execute.Invoke_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult(this, Strict, target, token);
 	}
 
 }
