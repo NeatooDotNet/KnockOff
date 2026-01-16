@@ -142,7 +142,9 @@ public partial class KnockOffGenerator
 			// Get delegate info
 			else if (typeArg.TypeKind == TypeKind.Delegate && typeArg is INamedTypeSymbol namedDelegate)
 			{
-				var delegateInfo = DelegateInfo.Extract(namedDelegate, isOpenGeneric, openGenericTypeParams);
+				// For open generic delegates, use OriginalDefinition to get the Invoke method
+				var delegateSource = isOpenGeneric ? namedDelegate.OriginalDefinition : namedDelegate;
+				var delegateInfo = DelegateInfo.Extract(delegateSource, isOpenGeneric, openGenericTypeParams);
 				if (delegateInfo is not null)
 				{
 					delegates.Add(delegateInfo);
