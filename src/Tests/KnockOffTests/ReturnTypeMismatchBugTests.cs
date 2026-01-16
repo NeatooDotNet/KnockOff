@@ -4,13 +4,10 @@ namespace KnockOff.Tests;
 /// Tests for Bug 1: Method overloads with different return types.
 ///
 /// When an interface has method overloads where one returns T and another returns Task{T},
-/// KnockOff should generate separate interceptors for each because they have incompatible
-/// return types.
+/// KnockOff generates a single Fetch interceptor with multiple OnCall overloads.
+/// The compiler resolves the correct overload based on the callback's return type.
 ///
-/// Example: ISymptomsAreaFactory with Fetch(long) -> Task{T} and Fetch(entity) -> T
-///
-/// These tests verify the fix: Fetch1 (async) and Fetch2 (sync) should be separate interceptors
-/// with correct return types.
+/// Example: IFactoryWithMixedReturnTypes with Fetch(long) -> Task{T} and Fetch(entity) -> T
 /// </summary>
 public class ReturnTypeMismatchBugTests
 {
@@ -22,15 +19,14 @@ public class ReturnTypeMismatchBugTests
 
 		var entity = new SampleEntity { Id = 1 };
 
-		// Set up sync callback (Fetch2 is the sync overload)
-		stub.Fetch2.OnCall = (ko, e) => new SampleArea { Id = e.Id };
+		// Set up sync callback - compiler resolves based on return type (ISampleArea vs Task<ISampleArea?>)
+		var trackingSync = stub.Fetch.OnCall((ko, e) => new SampleArea { Id = e.Id });
 
 		// Call the sync overload
 		var result = factory.Fetch(entity);
 
-		// Verify tracking on the correct interceptor
-		Assert.True(stub.Fetch2.WasCalled);
-		Assert.False(stub.Fetch1.WasCalled); // Async overload not called
+		// Verify tracking
+		Assert.True(trackingSync.WasCalled);
 		Assert.Equal(1, result.Id);
 	}
 
@@ -40,16 +36,15 @@ public class ReturnTypeMismatchBugTests
 		var stub = new FactoryWithMixedReturnTypesKnockOff();
 		IFactoryWithMixedReturnTypes factory = stub;
 
-		// Set up async callback (Fetch1 is the async overload)
-		stub.Fetch1.OnCall = (ko, id) => Task.FromResult<ISampleArea?>(new SampleArea { Id = (int)id });
+		// Set up async callback
+		var trackingAsync = stub.Fetch.OnCall((ko, id) => Task.FromResult<ISampleArea?>(new SampleArea { Id = (int)id }));
 
 		// Call the async overload
 		var result = await factory.Fetch(42L);
 
 		Assert.NotNull(result);
 		Assert.Equal(42, result!.Id);
-		Assert.Equal(1, stub.Fetch1.CallCount);
-		Assert.False(stub.Fetch2.WasCalled); // Sync overload not called
+		Assert.Equal(1, trackingAsync.CallCount);
 	}
 
 	[Fact]
@@ -60,19 +55,19 @@ public class ReturnTypeMismatchBugTests
 
 		var entity = new SampleEntity { Id = 99 };
 
-		// Set up callbacks for both
-		stub.Fetch1.OnCall = (ko, id) => Task.FromResult<ISampleArea?>(new SampleArea { Id = (int)id });
-		stub.Fetch2.OnCall = (ko, e) => new SampleArea { Id = e.Id };
+		// Set up callbacks for both - different return types resolve to different OnCall overloads
+		var trackingAsync = stub.Fetch.OnCall((ko, id) => Task.FromResult<ISampleArea?>(new SampleArea { Id = (int)id }));
+		var trackingSync = stub.Fetch.OnCall((ko, e) => new SampleArea { Id = e.Id });
 
 		// Call both overloads
-		_ = factory.Fetch(1L);     // Async overload (Fetch1)
-		_ = factory.Fetch(entity); // Sync overload (Fetch2)
+		_ = factory.Fetch(1L);     // Async overload
+		_ = factory.Fetch(entity); // Sync overload
 
 		// Each overload has separate tracking
-		Assert.Equal(1, stub.Fetch1.CallCount);
-		Assert.Equal(1, stub.Fetch2.CallCount);
-		Assert.Equal(1L, stub.Fetch1.LastCallArg);
-		Assert.Same(entity, stub.Fetch2.LastCallArg);
+		Assert.Equal(1, trackingAsync.CallCount);
+		Assert.Equal(1, trackingSync.CallCount);
+		Assert.Equal(1L, trackingAsync.LastArg);
+		Assert.Same(entity, trackingSync.LastArg);
 	}
 }
 
@@ -105,8 +100,8 @@ public class SampleEntity
 /// - Async method takes an ID and returns Task{T}
 /// - Sync method takes an EF entity and returns T directly
 ///
-/// Bug: KnockOff generates ONE interceptor typed for Task{T}, causing
-/// the sync method implementation to fail compilation.
+/// The generator creates a single Fetch interceptor with multiple OnCall
+/// overloads that are resolved by the compiler based on return type.
 /// </summary>
 public interface IFactoryWithMixedReturnTypes
 {
@@ -124,8 +119,8 @@ public interface IFactoryWithMixedReturnTypes
 /// <summary>
 /// Stub for IFactoryWithMixedReturnTypes.
 ///
-/// Expected: Each Fetch overload gets its own interceptor (Fetch1, Fetch2 or similar).
-/// Bug: Both overloads share one interceptor with Task{T} return type, causing CS0266.
+/// The generator creates a single Fetch interceptor with multiple OnCall
+/// overloads for each return type variant.
 /// </summary>
 [KnockOff]
 public partial class FactoryWithMixedReturnTypesKnockOff : IFactoryWithMixedReturnTypes

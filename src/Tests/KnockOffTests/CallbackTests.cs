@@ -12,31 +12,32 @@ public class CallbackTests
 		ISampleService service = knockOff;
 
 		var callbackInvoked = false;
-		knockOff.DoSomething.OnCall = (ko) =>
+		var tracking = knockOff.DoSomething.OnCall((ko) =>
 		{
 			callbackInvoked = true;
 			Assert.Same(knockOff, ko);
-		};
+		});
 
 		service.DoSomething();
 
 		Assert.True(callbackInvoked);
-		Assert.True(knockOff.DoSomething.WasCalled);
+		Assert.True(tracking.WasCalled);
 	}
 
 	[Fact]
-	public void OnCall_ReturnMethod_CallbackReturnsValue()
+	public void OnCall_MethodWithUserImplementation_TracksInvocation()
 	{
+		// GetValue has a user-defined implementation that returns input * 2.
+		// The interceptor only tracks calls, it doesn't allow overriding the implementation.
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		knockOff.GetValue2.OnCall = (ko, input) => input * 10;
-
 		var result = service.GetValue(5);
 
-		// Callback overrides user method (which would return 5*2=10)
-		Assert.Equal(50, result);
-		Assert.Equal(5, knockOff.GetValue2.LastCallArg);
+		// User method returns input * 2
+		Assert.Equal(10, result);
+		Assert.Equal(5, knockOff.GetValue2.LastArg);
+		Assert.Equal(1, knockOff.GetValue2.CallCount);
 	}
 
 	[Fact]
@@ -48,12 +49,12 @@ public class CallbackTests
 		string? capturedName = null;
 		int? capturedValue = null;
 		bool? capturedFlag = null;
-		knockOff.Calculate.OnCall = (ko, name, value, flag) =>
+		var tracking = knockOff.Calculate.OnCall((ko, name, value, flag) =>
 		{
 			capturedName = name;
 			capturedValue = value;
 			capturedFlag = flag;
-		};
+		});
 
 		service.Calculate("test", 42, true);
 
@@ -63,22 +64,19 @@ public class CallbackTests
 	}
 
 	[Fact]
-	public void OnCall_CanAccessOtherHandler()
+	public void OnCall_CanAccessOtherInterceptorState()
 	{
 		var knockOff = new SampleKnockOff();
+		var doSomethingTracking = knockOff.DoSomething.OnCall(ko => { });
 		ISampleService service = knockOff;
 
 		service.DoSomething();
 
-		knockOff.GetValue2.OnCall = (ko, input) =>
-		{
-			Assert.True(ko.DoSomething.WasCalled);
-			return input * 100;
-		};
-
+		// GetValue has user implementation - we just verify tracking works
 		var result = service.GetValue(3);
 
-		Assert.Equal(300, result);
+		Assert.True(doSomethingTracking.WasCalled);
+		Assert.Equal(6, result); // User method returns input * 2
 	}
 
 	[Fact]
@@ -119,38 +117,44 @@ public class CallbackTests
 	}
 
 	[Fact]
-	public void Callback_Reset_ClearsCallback()
+	public void Callback_Reset_ClearsTracking()
 	{
-		// Note: When a user method exists, the generated code calls it directly without checking OnCall.
+		// Note: Reset() only clears tracking state, not the configured callback.
 		// Use GetOptional (no user method) to test OnCall behavior.
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		knockOff.GetOptional.OnCall = (ko) => "callback value";
+		var tracking = knockOff.GetOptional.OnCall((ko) => "callback value");
 
 		var resultBefore = service.GetOptional();
 		Assert.Equal("callback value", resultBefore);
+		Assert.Equal(1, tracking.CallCount);
+		Assert.True(tracking.WasCalled);
 
 		knockOff.GetOptional.Reset();
 
+		// After reset, tracking state is cleared but callback still works
+		Assert.Equal(0, tracking.CallCount);
+		Assert.False(tracking.WasCalled);
+
 		var resultAfter = service.GetOptional();
-		// Now falls back to default (null)
-		Assert.Null(resultAfter);
+		Assert.Equal("callback value", resultAfter);
+		Assert.Equal(1, tracking.CallCount); // Called once more after reset
 	}
 
 	[Fact]
-	public async Task OnCall_AsyncMethod_CallbackReturnsTask()
+	public async Task OnCall_AsyncMethod_WithUserImplementation()
 	{
+		// GetValueAsync has a user-defined implementation that returns input * 3.
+		// The interceptor only tracks calls.
 		var knockOff = new AsyncServiceKnockOff();
 		IAsyncService service = knockOff;
 
-		knockOff.GetValueAsync2.OnCall = (ko, input) =>
-			Task.FromResult(input * 100);
-
 		var result = await service.GetValueAsync(7);
 
-		// Callback overrides user method (which would return 7*3=21)
-		Assert.Equal(700, result);
+		// User method returns input * 3
+		Assert.Equal(21, result);
+		Assert.Equal(7, knockOff.GetValueAsync2.LastArg);
 	}
 
 	[Fact]
@@ -160,16 +164,16 @@ public class CallbackTests
 		IRepository<User> repo = knockOff;
 
 		var mockUser = new User { Id = 42, Name = "MockUser" };
-		knockOff.GetById.OnCall = (ko, id) =>
+		var tracking = knockOff.GetById.OnCall((ko, id) =>
 		{
 			if (id == 42) return mockUser;
 			return null;
-		};
+		});
 
 		var result = repo.GetById(42);
 
 		Assert.Same(mockUser, result);
-		Assert.Equal(42, knockOff.GetById.LastCallArg);
+		Assert.Equal(42, tracking.LastArg);
 	}
 
 	[Fact]

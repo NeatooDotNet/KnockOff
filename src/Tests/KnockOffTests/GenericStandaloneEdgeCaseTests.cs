@@ -15,7 +15,7 @@ public class GenericStandaloneEdgeCaseTests
 		var stub = new NestedTypeParamStub<string>();
 		INestedTypeParamService<string> service = stub;
 		var expected = new List<string> { "a", "b", "c" };
-		stub.GetItems.OnCall = (ko) => expected;
+		stub.GetItems.OnCall((ko) => expected);
 
 		// Act
 		var result = service.GetItems();
@@ -31,7 +31,7 @@ public class GenericStandaloneEdgeCaseTests
 		var stub = new NestedDictStub<int, string>();
 		INestedDictService<int, string> service = stub;
 		var expected = new Dictionary<int, string> { { 1, "one" }, { 2, "two" } };
-		stub.GetMapping.OnCall = (ko) => expected;
+		stub.GetMapping.OnCall((ko) => expected);
 
 		// Act
 		var result = service.GetMapping();
@@ -47,7 +47,7 @@ public class GenericStandaloneEdgeCaseTests
 		var stub = new AsyncNestedStub<User>();
 		IAsyncNestedService<User> service = stub;
 		var expected = new User { Id = 1, Name = "Async" };
-		stub.GetAsync.OnCall = (ko) => Task.FromResult<User?>(expected);
+		stub.GetAsync.OnCall((ko) => Task.FromResult<User?>(expected));
 
 		// Act
 		var result = await service.GetAsync();
@@ -66,7 +66,7 @@ public class GenericStandaloneEdgeCaseTests
 		// Arrange - ICovariantService<out T> allows T to be returned
 		var stub = new CovariantStub<string>();
 		ICovariantService<string> service = stub;
-		stub.Get.OnCall = (ko) => "covariant result";
+		stub.Get.OnCall((ko) => "covariant result");
 
 		// Act
 		var result = service.Get();
@@ -80,7 +80,7 @@ public class GenericStandaloneEdgeCaseTests
 	{
 		// Arrange - covariance allows ICovariantService<string> to be assigned to ICovariantService<object>
 		var stub = new CovariantStub<string>();
-		stub.Get.OnCall = (ko) => "test";
+		stub.Get.OnCall((ko) => "test");
 
 		// Act - this should compile due to covariance
 		ICovariantService<object> baseService = stub;
@@ -97,7 +97,7 @@ public class GenericStandaloneEdgeCaseTests
 		var stub = new ContravariantStub<object>();
 		IContravariantService<object> service = stub;
 		object? captured = null;
-		stub.Process.OnCall = (ko, item) => captured = item;
+		stub.Process.OnCall((ko, item) => captured = item);
 
 		// Act
 		service.Process("test string");
@@ -112,7 +112,7 @@ public class GenericStandaloneEdgeCaseTests
 		// Arrange - contravariance allows IContravariantService<object> to be assigned to IContravariantService<string>
 		var stub = new ContravariantStub<object>();
 		object? captured = null;
-		stub.Process.OnCall = (ko, item) => captured = item;
+		stub.Process.OnCall((ko, item) => captured = item);
 
 		// Act - this should compile due to contravariance
 		IContravariantService<string> derivedService = stub;
@@ -133,14 +133,14 @@ public class GenericStandaloneEdgeCaseTests
 		var stub = new MultiConstraintStub<TestEntityWithInterface>();
 		IMultiConstraintService<TestEntityWithInterface> service = stub;
 		var entity = new TestEntityWithInterface { Id = 42, Name = "Multi" };
-		stub.Save.OnCall = (ko, e) => { };
+		var tracking = stub.Save.OnCall((ko, e) => { });
 
 		// Act
 		service.Save(entity);
 
 		// Assert
-		Assert.Equal(1, stub.Save.CallCount);
-		Assert.Same(entity, stub.Save.LastCallArg);
+		Assert.Equal(1, tracking.CallCount);
+		Assert.Same(entity, tracking.LastArg);
 	}
 
 	[Fact]
@@ -149,7 +149,7 @@ public class GenericStandaloneEdgeCaseTests
 		// Arrange
 		var stub = new StructConstraintStub<int>();
 		IStructConstraintService<int> service = stub;
-		stub.GetDefault.OnCall = (ko) => 42;
+		stub.GetDefault.OnCall((ko) => 42);
 
 		// Act
 		var result = service.GetDefault();
@@ -165,7 +165,7 @@ public class GenericStandaloneEdgeCaseTests
 		var stub = new NewConstraintStub<TestEntity>();
 		INewConstraintService<TestEntity> service = stub;
 		var expected = new TestEntity { Id = 99 };
-		stub.Create.OnCall = (ko) => expected;
+		stub.Create.OnCall((ko) => expected);
 
 		// Act
 		var result = service.Create();
@@ -183,7 +183,7 @@ public class GenericStandaloneEdgeCaseTests
 		INewConstraintService<TestEntity> service = stub;
 
 		// Act
-		stub.Create.OnCall = (ko) => new TestEntity(); // We can use new() here because of constraint
+		stub.Create.OnCall((ko) => new TestEntity()); // We can use new() here because of constraint
 		var result = service.Create();
 
 		// Assert
@@ -200,7 +200,7 @@ public class GenericStandaloneEdgeCaseTests
 		// Arrange
 		var stub = new GenericRepositoryStub<User>();
 		IGenericRepository<User> repo = stub;
-		stub.GetById.OnCall = (ko, id) => null;
+		stub.GetById.OnCall((ko, id) => null);
 
 		// Act
 		var result = repo.GetById(999);
@@ -216,12 +216,13 @@ public class GenericStandaloneEdgeCaseTests
 		var stub = new GenericRepositoryStub<User>();
 		IGenericRepository<User> repo = stub;
 		var user = new User { Id = 1 };
+		var tracking = stub.Save.OnCall((ko, entity) => { });
 
 		// Act
 		repo.Save(user);
 
 		// Assert
-		Assert.Same(user, stub.Save.LastCallArg);
+		Assert.Same(user, tracking.LastArg);
 	}
 
 	#endregion
