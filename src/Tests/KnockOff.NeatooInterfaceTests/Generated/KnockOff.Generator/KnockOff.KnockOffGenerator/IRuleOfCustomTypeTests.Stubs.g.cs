@@ -103,8 +103,8 @@ partial class IRuleOfCustomTypeTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for RunRule.</summary>
-		public sealed class IRule_RunRuleInterceptor
+		/// <summary>Interceptor for RunRule1.</summary>
+		public sealed class IRule_RunRule1Interceptor
 		{
 			/// <summary>Number of times this method was called.</summary>
 			public int CallCount { get; private set; }
@@ -119,6 +119,26 @@ partial class IRuleOfCustomTypeTests
 			public global::System.Func<Stubs.IRule, global::KnockOff.NeatooInterfaceTests.ValidationRules.ICustomValidateBase, global::System.Threading.CancellationToken?, global::System.Threading.Tasks.Task<global::Neatoo.Rules.IRuleMessages>>? OnCall { get; set; }
 
 			public void RecordCall(global::KnockOff.NeatooInterfaceTests.ValidationRules.ICustomValidateBase target, global::System.Threading.CancellationToken? token) { CallCount++; LastCallArgs = (target, token); }
+
+			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+		}
+
+		/// <summary>Interceptor for RunRule2.</summary>
+		public sealed class IRule_RunRule2Interceptor
+		{
+			/// <summary>Number of times this method was called.</summary>
+			public int CallCount { get; private set; }
+
+			/// <summary>Whether this method was called at least once.</summary>
+			public bool WasCalled => CallCount > 0;
+
+			/// <summary>The arguments from the last call.</summary>
+			public (global::Neatoo.IValidateBase? target, global::System.Threading.CancellationToken? token)? LastCallArgs { get; private set; }
+
+			/// <summary>Callback invoked when method is called.</summary>
+			public global::System.Func<Stubs.IRule, global::Neatoo.IValidateBase, global::System.Threading.CancellationToken?, global::System.Threading.Tasks.Task<global::Neatoo.Rules.IRuleMessages>>? OnCall { get; set; }
+
+			public void RecordCall(global::Neatoo.IValidateBase target, global::System.Threading.CancellationToken? token) { CallCount++; LastCallArgs = (target, token); }
 
 			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
 		}
@@ -161,18 +181,21 @@ partial class IRuleOfCustomTypeTests
 			/// <summary>Interceptor for TriggerProperties.</summary>
 			public IRule_TriggerPropertiesInterceptor TriggerProperties { get; } = new();
 
-			/// <summary>Interceptor for RunRule.</summary>
-			public IRule_RunRuleInterceptor RunRule { get; } = new();
+			/// <summary>Interceptor for RunRule1.</summary>
+			public IRule_RunRule1Interceptor RunRule1 { get; } = new();
+
+			/// <summary>Interceptor for RunRule2.</summary>
+			public IRule_RunRule2Interceptor RunRule2 { get; } = new();
 
 			/// <summary>Interceptor for OnRuleAdded.</summary>
 			public IRule_OnRuleAddedInterceptor OnRuleAdded { get; } = new();
 
 			global::System.Threading.Tasks.Task<global::Neatoo.Rules.IRuleMessages> global::Neatoo.Rules.IRule<global::KnockOff.NeatooInterfaceTests.ValidationRules.ICustomValidateBase>.RunRule(global::KnockOff.NeatooInterfaceTests.ValidationRules.ICustomValidateBase target, global::System.Threading.CancellationToken? token)
 			{
-				RunRule.RecordCall(target, token);
-				if (RunRule.OnCall is { } onCall) return onCall(this, target, token);
+				RunRule1.RecordCall(target, token);
+				if (RunRule1.OnCall is { } onCall) return onCall(this, target, token);
 				if (Strict) throw global::KnockOff.StubException.NotConfigured("ICustomValidateBase>", "RunRule");
-				throw new global::System.InvalidOperationException("No implementation provided for RunRule. Set RunRule.OnCall.");
+				throw new global::System.InvalidOperationException("No implementation provided for RunRule. Set RunRule1.OnCall.");
 			}
 
 			global::System.Threading.Tasks.Task<global::Neatoo.Rules.IRuleMessages> global::Neatoo.Rules.IRule.RunRule(global::Neatoo.IValidateBase target, global::System.Threading.CancellationToken? token)

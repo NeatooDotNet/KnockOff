@@ -10,9 +10,17 @@ namespace KnockOff.Documentation.Samples.Tests.Reference;
 public class AttributesSamplesTests
 {
     [Fact]
-    public void BasicUsage_StubGenerated()
+    public void StandaloneBasic_StubGenerated()
     {
-        var stub = new AttrMyServiceKnockOff();
+        var stub = new AttrUserRepositoryStub();
+        Assert.NotNull(stub);
+        Assert.NotNull(stub.GetById);
+    }
+
+    [Fact]
+    public void StandaloneService_StubGenerated()
+    {
+        var stub = new AttrServiceStub();
         Assert.NotNull(stub);
         Assert.NotNull(stub.DoWork);
     }
@@ -20,38 +28,51 @@ public class AttributesSamplesTests
     [Fact]
     public void GenericInterface_StubGenerated()
     {
-        var stub = new AttrUserRepoKnockOff();
+        var stub = new AttrUserRepoStub();
         Assert.NotNull(stub);
         Assert.NotNull(stub.GetById);
     }
 
     [Fact]
-    public void InterfaceInheritance_StubGenerated()
-    {
-        var stub = new AttrAuditableKnockOff();
-        Assert.NotNull(stub);
-        Assert.NotNull(stub.CreatedAt);
-        Assert.NotNull(stub.CreatedBy);
-    }
-
-    [Fact]
     public void InternalClass_StubGenerated()
     {
-        var stub = new AttrInternalServiceKnockOff();
+        var stub = new AttrInternalServiceStub();
         Assert.NotNull(stub);
     }
 
     [Fact]
     public void NestedClass_StubGenerated()
     {
-        var stub = new AttrTestFixture.NestedKnockOff();
+        var stub = new AttrMyTests.NestedStub();
         Assert.NotNull(stub);
     }
 
     [Fact]
-    public void QualifiedNamespace_StubGenerated()
+    public void FullyQualifiedNamespace_StubGenerated()
     {
-        var stub = new AttrQualifiedServiceKnockOff();
+        var stub = new AttrFullyQualifiedStub();
+        Assert.NotNull(stub);
+    }
+
+    [Fact]
+    public void InlineInterface_StubGenerated()
+    {
+        var stub = new AttrInterfaceTests.Stubs.IAttrUserRepository();
+        Assert.NotNull(stub);
+    }
+
+    [Fact]
+    public void InlineClass_StubGenerated()
+    {
+        var stub = new AttrClassTests.Stubs.AttrEmailServiceClass();
+        Assert.NotNull(stub);
+        Assert.NotNull(stub.Object);
+    }
+
+    [Fact]
+    public void InlineDelegate_StubGenerated()
+    {
+        var stub = new AttrDelegateTests.Stubs.Func();
         Assert.NotNull(stub);
     }
 }
