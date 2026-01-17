@@ -661,7 +661,7 @@ internal static class MethodInterceptorRenderer
 			// Make nullable if not already (avoid double ??)
 			var nullableType = lastArgType.EndsWith("?") ? lastArgType : $"{lastArgType}?";
 			w.Line($"/// <summary>The argument from the last call (from most recently called registration).</summary>");
-			w.Line($"public {nullableType} LastCallArg {{ get {{ foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; }} }}");
+			w.Line($"public {nullableType} LastCallArg {{ get {{ for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; }} }}");
 			w.Line();
 		}
 
@@ -671,7 +671,7 @@ internal static class MethodInterceptorRenderer
 			// Make nullable if not already (avoid double ??)
 			var nullableType = lastArgsType.EndsWith("?") ? lastArgsType : $"{lastArgsType}?";
 			w.Line($"/// <summary>The arguments from the last call (from most recently called registration).</summary>");
-			w.Line($"public {nullableType} LastCallArgs {{ get {{ foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; }} }}");
+			w.Line($"public {nullableType} LastCallArgs {{ get {{ for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; }} }}");
 			w.Line();
 		}
 	}

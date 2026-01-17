@@ -20,7 +20,7 @@ partial class FcLoggerStub : global::KnockOff.Documentation.Samples.Comparison.I
 		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The argument from the last call (from most recently called registration).</summary>
-		public string? LastCallArg { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+		public string? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
@@ -174,7 +174,7 @@ partial class FcLoggerStub : global::KnockOff.Documentation.Samples.Comparison.I
 		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The argument from the last call (from most recently called registration).</summary>
-		public string? LastCallArg { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+		public string? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
@@ -328,7 +328,7 @@ partial class FcLoggerStub : global::KnockOff.Documentation.Samples.Comparison.I
 		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The arguments from the last call (from most recently called registration).</summary>
-		public (string? message, global::System.Exception? exception)? LastCallArgs { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+		public (string? message, global::System.Exception? exception)? LastCallArgs { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
 
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
