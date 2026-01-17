@@ -5,51 +5,141 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class SkMinimalServiceKnockOff : global::KnockOff.Documentation.Samples.Skills.ISkMinimalService, global::KnockOff.IKnockOffStub
 {
-	/// <summary>Tracks and configures behavior for GetUser.</summary>
-	public sealed class GetUser2Interceptor
-	{
-		/// <summary>Delegate for GetUser.</summary>
-		public delegate global::KnockOff.Documentation.Samples.Skills.SkUser? GetUserDelegate(SkMinimalServiceKnockOff ko, int id);
-
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
-
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
-
-		/// <summary>The argument from the most recent call.</summary>
-		public int? LastCallArg { get; private set; }
-
-		/// <summary>Callback invoked when this method is called.</summary>
-		public GetUserDelegate? OnCall { get; set; }
-
-		/// <summary>Records a method call.</summary>
-		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
-
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
-	}
-
 	/// <summary>Tracks and configures behavior for GetCount.</summary>
 	public sealed class GetCountInterceptor
 	{
 		/// <summary>Delegate for GetCount.</summary>
 		public delegate int GetCountDelegate(SkMinimalServiceKnockOff ko);
 
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
+		private readonly global::System.Collections.Generic.List<(GetCountDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+		private int _sequenceIndex;
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
+		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking OnCall(GetCountDelegate callback)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequenceIndex = 0;
+			return tracking;
+		}
 
-		/// <summary>Callback invoked when this method is called.</summary>
-		public GetCountDelegate? OnCall { get; set; }
+		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+		public global::KnockOff.IMethodSequence<GetCountDelegate> OnCall(GetCountDelegate callback, global::KnockOff.Times times)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, times, tracking));
+			_sequenceIndex = 0;
+			return new MethodSequenceImpl(this);
+		}
 
-		/// <summary>Records a method call.</summary>
-		public void RecordCall() => CallCount++;
+		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+		internal int Invoke(SkMinimalServiceKnockOff ko, bool strict)
+		{
+			if (_sequence.Count == 0)
+			{
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetCount");
+				return default!;
+			}
+
+			var (callback, times, tracking) = _sequence[_sequenceIndex];
+			tracking.RecordCall();
+
+			if (!times.IsForever && tracking.CallCount >= times.Count)
+			{
+				if (_sequenceIndex < _sequence.Count - 1)
+					_sequenceIndex++;
+				else if (tracking.CallCount > times.Count)
+					throw global::KnockOff.StubException.SequenceExhausted("GetCount");
+			}
+
+			return callback(ko);
+		}
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; OnCall = null; }
+		public void Reset()
+		{
+			foreach (var (_, _, tracking) in _sequence)
+				tracking.Reset();
+			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
+		/// <summary>Tracks invocations for this callback registration.</summary>
+		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking
+		{
+
+			/// <summary>Number of times this callback was invoked.</summary>
+			public int CallCount { get; private set; }
+
+			/// <summary>True if CallCount > 0.</summary>
+			public bool WasCalled => CallCount > 0;
+
+			/// <summary>Records a call to this callback.</summary>
+			public void RecordCall() => CallCount++;
+
+			/// <summary>Resets tracking state.</summary>
+			public void Reset() => CallCount = 0;
+		}
+
+		/// <summary>Sequence implementation for ThenCall chaining.</summary>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<GetCountDelegate>
+		{
+			private readonly GetCountInterceptor _interceptor;
+
+			public MethodSequenceImpl(GetCountInterceptor interceptor) => _interceptor = interceptor;
+
+			/// <summary>Total calls across all callbacks in sequence.</summary>
+			public int TotalCallCount
+			{
+				get
+				{
+					var total = 0;
+					foreach (var (_, _, tracking) in _interceptor._sequence)
+						total += tracking.CallCount;
+					return total;
+				}
+			}
+
+			/// <summary>Add another callback to the sequence.</summary>
+			public global::KnockOff.IMethodSequence<GetCountDelegate> ThenCall(GetCountDelegate callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_interceptor._sequence.Add((callback, times, tracking));
+				return this;
+			}
+
+			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _interceptor._sequence)
+				{
+					if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Reset all tracking in the sequence.</summary>
+			public void Reset() => _interceptor.Reset();
+		}
 	}
 
 	/// <summary>Tracks and configures behavior for GetUsers.</summary>
@@ -58,20 +148,156 @@ partial class SkMinimalServiceKnockOff : global::KnockOff.Documentation.Samples.
 		/// <summary>Delegate for GetUsers.</summary>
 		public delegate global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser> GetUsersDelegate(SkMinimalServiceKnockOff ko);
 
+		private readonly global::System.Collections.Generic.List<(GetUsersDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+		private int _sequenceIndex;
+
+		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking OnCall(GetUsersDelegate callback)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequenceIndex = 0;
+			return tracking;
+		}
+
+		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+		public global::KnockOff.IMethodSequence<GetUsersDelegate> OnCall(GetUsersDelegate callback, global::KnockOff.Times times)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, times, tracking));
+			_sequenceIndex = 0;
+			return new MethodSequenceImpl(this);
+		}
+
+		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+		internal global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser> Invoke(SkMinimalServiceKnockOff ko, bool strict)
+		{
+			if (_sequence.Count == 0)
+			{
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetUsers");
+				return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser>();
+			}
+
+			var (callback, times, tracking) = _sequence[_sequenceIndex];
+			tracking.RecordCall();
+
+			if (!times.IsForever && tracking.CallCount >= times.Count)
+			{
+				if (_sequenceIndex < _sequence.Count - 1)
+					_sequenceIndex++;
+				else if (tracking.CallCount > times.Count)
+					throw global::KnockOff.StubException.SequenceExhausted("GetUsers");
+			}
+
+			return callback(ko);
+		}
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset()
+		{
+			foreach (var (_, _, tracking) in _sequence)
+				tracking.Reset();
+			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
+		/// <summary>Tracks invocations for this callback registration.</summary>
+		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking
+		{
+
+			/// <summary>Number of times this callback was invoked.</summary>
+			public int CallCount { get; private set; }
+
+			/// <summary>True if CallCount > 0.</summary>
+			public bool WasCalled => CallCount > 0;
+
+			/// <summary>Records a call to this callback.</summary>
+			public void RecordCall() => CallCount++;
+
+			/// <summary>Resets tracking state.</summary>
+			public void Reset() => CallCount = 0;
+		}
+
+		/// <summary>Sequence implementation for ThenCall chaining.</summary>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<GetUsersDelegate>
+		{
+			private readonly GetUsersInterceptor _interceptor;
+
+			public MethodSequenceImpl(GetUsersInterceptor interceptor) => _interceptor = interceptor;
+
+			/// <summary>Total calls across all callbacks in sequence.</summary>
+			public int TotalCallCount
+			{
+				get
+				{
+					var total = 0;
+					foreach (var (_, _, tracking) in _interceptor._sequence)
+						total += tracking.CallCount;
+					return total;
+				}
+			}
+
+			/// <summary>Add another callback to the sequence.</summary>
+			public global::KnockOff.IMethodSequence<GetUsersDelegate> ThenCall(GetUsersDelegate callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_interceptor._sequence.Add((callback, times, tracking));
+				return this;
+			}
+
+			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _interceptor._sequence)
+				{
+					if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Reset all tracking in the sequence.</summary>
+			public void Reset() => _interceptor.Reset();
+		}
+	}
+
+	/// <summary>Tracks calls to GetUser (user-defined implementation).</summary>
+	public sealed class GetUser2Interceptor : global::KnockOff.IMethodTracking<int>
+	{
+		private int _lastArg = default!;
+
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>Whether this method was called at least once.</summary>
+		/// <summary>True if CallCount > 0.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called.</summary>
-		public GetUsersDelegate? OnCall { get; set; }
+		/// <summary>Last argument passed to this method. Default if never called.</summary>
+		public int LastArg => _lastArg;
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall() => CallCount++;
+		internal void RecordCall(int id) { CallCount++; _lastArg = id; }
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; OnCall = null; }
+		/// <summary>Resets tracking state.</summary>
+		public void Reset() { CallCount = 0; _lastArg = default!; }
 	}
 
 	/// <summary>Interceptor for GetUser.</summary>
@@ -89,29 +315,36 @@ partial class SkMinimalServiceKnockOff : global::KnockOff.Documentation.Samples.
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkMinimalService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ISkMinimalService Object => this;
 
+	/// <summary>Verifies all method interceptors' Times constraints were satisfied.</summary>
+	public bool Verify()
+	{
+		var result = true;
+		result &= GetCount.Verify();
+		result &= GetUsers.Verify();
+		return result;
+	}
+
+	/// <summary>Verifies all method interceptors' Times constraints and throws if any fail.</summary>
+	public void VerifyAll()
+	{
+		if (!Verify())
+			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
 	global::KnockOff.Documentation.Samples.Skills.SkUser? global::KnockOff.Documentation.Samples.Skills.ISkMinimalService.GetUser(int id)
 	{
 		GetUser2.RecordCall(id);
-		if (GetUser2.OnCall is { } callback) return callback(this, id);
 		return GetUser(id);
 	}
 
 	int global::KnockOff.Documentation.Samples.Skills.ISkMinimalService.GetCount()
 	{
-		GetCount.RecordCall();
-		if (GetCount.OnCall is { } callback)
-			return callback(this);
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkMinimalService", "GetCount");
-		return default!;
+		return GetCount.Invoke(this, Strict);
 	}
 
 	global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser> global::KnockOff.Documentation.Samples.Skills.ISkMinimalService.GetUsers()
 	{
-		GetUsers.RecordCall();
-		if (GetUsers.OnCall is { } callback)
-			return callback(this);
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkMinimalService", "GetUsers");
-		return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser>();
+		return GetUsers.Invoke(this, Strict);
 	}
 
 }

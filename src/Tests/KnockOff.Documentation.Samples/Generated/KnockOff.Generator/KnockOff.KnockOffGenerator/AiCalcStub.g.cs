@@ -5,29 +5,25 @@ namespace KnockOff.Documentation.Samples;
 
 partial class AiCalcStub : global::KnockOff.Documentation.Samples.IAiCalculator, global::KnockOff.IKnockOffStub
 {
-	/// <summary>Tracks and configures behavior for Add.</summary>
-	public sealed class Add2Interceptor
+	/// <summary>Tracks calls to Add (user-defined implementation).</summary>
+	public sealed class Add2Interceptor : global::KnockOff.IMethodTrackingArgs<(int? a, int? b)>
 	{
-		/// <summary>Delegate for Add.</summary>
-		public delegate int AddDelegate(AiCalcStub ko, int a, int b);
+		private (int? a, int? b) _lastArgs;
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>Whether this method was called at least once.</summary>
+		/// <summary>True if CallCount > 0.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The arguments from the most recent call.</summary>
-		public (int? a, int? b)? LastCallArgs { get; private set; }
-
-		/// <summary>Callback invoked when this method is called.</summary>
-		public AddDelegate? OnCall { get; set; }
+		/// <summary>Last arguments passed to this method. Default if never called.</summary>
+		public (int? a, int? b) LastArgs => _lastArgs;
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int? a, int? b) { CallCount++; LastCallArgs = (a, b); }
+		internal void RecordCall((int? a, int? b) args) { CallCount++; _lastArgs = args; }
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
+		/// <summary>Resets tracking state.</summary>
+		public void Reset() { CallCount = 0; _lastArgs = default; }
 	}
 
 	/// <summary>Interceptor for Add.</summary>
@@ -41,8 +37,7 @@ partial class AiCalcStub : global::KnockOff.Documentation.Samples.IAiCalculator,
 
 	int global::KnockOff.Documentation.Samples.IAiCalculator.Add(int a, int b)
 	{
-		Add2.RecordCall(a, b);
-		if (Add2.OnCall is { } callback) return callback(this, a, b);
+		Add2.RecordCall((a, b));
 		return Add(a, b);
 	}
 

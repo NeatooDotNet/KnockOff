@@ -145,15 +145,15 @@ public static class AsyncMethodsUsageExamples
 
         #region async-methods-task-callbacks
         // Task (void equivalent)
-        knockOff.InitializeAsync.OnCall = (ko) =>
+        knockOff.InitializeAsync.OnCall((ko) =>
         {
             // Custom logic
             return Task.CompletedTask;
-        };
+        });
 
         // Task<T>
-        knockOff.GetByIdAsync.OnCall = (ko, id) =>
-            Task.FromResult<AsyncUser?>(new AsyncUser { Id = id, Name = "Mocked" });
+        knockOff.GetByIdAsync.OnCall((ko, id) =>
+            Task.FromResult<AsyncUser?>(new AsyncUser { Id = id, Name = "Mocked" }));
         #endregion
     }
 
@@ -163,7 +163,7 @@ public static class AsyncMethodsUsageExamples
 
         #region async-methods-valuetask-callbacks
         // ValueTask<T>
-        knockOff.CountAsync.OnCall = (ko) => new ValueTask<int>(100);
+        knockOff.CountAsync.OnCall((ko) => new ValueTask<int>(100));
         #endregion
     }
 
@@ -173,12 +173,16 @@ public static class AsyncMethodsUsageExamples
         IAsyncRepository repo = knockOff;
 
         #region async-methods-tracking
+        // Set up callback to get tracking
+        var tracking = knockOff.GetByIdAsync.OnCall((ko, id) =>
+            Task.FromResult<AsyncUser?>(new AsyncUser { Id = id }));
+
         await repo.GetByIdAsync(1);
         await repo.GetByIdAsync(2);
         await repo.GetByIdAsync(3);
 
-        var callCount = knockOff.GetByIdAsync.CallCount;  // 3
-        var lastArg = knockOff.GetByIdAsync.LastCallArg;  // 3
+        var callCount = tracking.CallCount;  // 3
+        var lastArg = tracking.LastArg;      // 3
         #endregion
 
         _ = (callCount, lastArg);
@@ -189,11 +193,11 @@ public static class AsyncMethodsUsageExamples
         var knockOff = new AsyncRepositoryKnockOff();
 
         #region async-methods-simulating-delays
-        knockOff.GetByIdAsync.OnCall = async (ko, id) =>
+        knockOff.GetByIdAsync.OnCall(async (ko, id) =>
         {
             await Task.Delay(100);  // Simulate network latency
             return new AsyncUser { Id = id };
-        };
+        });
         #endregion
     }
 
@@ -203,14 +207,14 @@ public static class AsyncMethodsUsageExamples
 
         #region async-methods-simulating-failures-usage
         // Faulted task
-        knockOff.SaveAsync.OnCall = (ko, entity) =>
-            Task.FromException<int>(new InvalidOperationException("Connection lost"));
+        knockOff.SaveAsync.OnCall((ko, entity) =>
+            Task.FromException<int>(new InvalidOperationException("Connection lost")));
 
         // Or throw directly in callback
-        knockOff.SaveAsync.OnCall = (ko, entity) =>
+        knockOff.SaveAsync.OnCall((ko, entity) =>
         {
             throw new InvalidOperationException("Connection lost");
-        };
+        });
         #endregion
     }
 
@@ -219,13 +223,13 @@ public static class AsyncMethodsUsageExamples
         var knockOff = new AsyncRepositoryKnockOff();
 
         #region async-methods-conditional-behavior
-        knockOff.GetByIdAsync.OnCall = (ko, id) =>
+        knockOff.GetByIdAsync.OnCall((ko, id) =>
         {
             if (id <= 0)
                 return Task.FromException<AsyncUser?>(new ArgumentException("Invalid ID"));
 
             return Task.FromResult<AsyncUser?>(new AsyncUser { Id = id });
-        };
+        });
         #endregion
     }
 
@@ -234,11 +238,11 @@ public static class AsyncMethodsUsageExamples
         var knockOff = new AsyncFetchKnockOff();
 
         #region async-methods-cancellation-usage
-        knockOff.FetchAsync.OnCall = (ko, id, ct) =>
+        knockOff.FetchAsync.OnCall((ko, id, ct) =>
         {
             ct.ThrowIfCancellationRequested();
             return Task.FromResult(new AsyncData { Id = id });
-        };
+        });
         #endregion
     }
 
@@ -253,8 +257,8 @@ public static class AsyncMethodsUsageExamples
             null  // Then not found
         ]);
 
-        knockOff.GetByIdAsync.OnCall = (ko, id) =>
-            Task.FromResult(results.Dequeue());
+        knockOff.GetByIdAsync.OnCall((ko, id) =>
+            Task.FromResult(results.Dequeue()));
         #endregion
     }
 
@@ -266,22 +270,23 @@ public static class AsyncMethodsUsageExamples
         #region async-methods-call-order-usage
         var order = new List<string>();
 
-        knockOff.StartAsync.OnCall = (ko) =>
+        knockOff.StartAsync.OnCall((ko) =>
         {
             order.Add("Start");
             return Task.CompletedTask;
-        };
+        });
 
-        knockOff.ProcessAsync.OnCall = (ko) =>
+        knockOff.ProcessAsync.OnCall((ko) =>
         {
             order.Add("Process");
             return Task.CompletedTask;
-        };
+        });
 
         await service.StartAsync();
         await service.ProcessAsync();
 
         // order is ["Start", "Process"]
+        knockOff.VerifyAll();  // Verifies all configured callbacks were called
         #endregion
 
         _ = order;
@@ -293,13 +298,18 @@ public static class AsyncMethodsUsageExamples
         IAsyncRepository repo = knockOff;
 
         #region async-methods-reset
-        await repo.GetByIdAsync(1);
-        knockOff.GetByIdAsync.Reset();
+        // Set up callback to get tracking
+        var tracking = knockOff.GetByIdAsync.OnCall((ko, id) =>
+            Task.FromResult<AsyncUser?>(new AsyncUser { Id = id }));
 
-        var callCount = knockOff.GetByIdAsync.CallCount;  // 0
-        var onCall = knockOff.GetByIdAsync.OnCall;        // null
+        await repo.GetByIdAsync(1);
+        var callCountBefore = tracking.CallCount;  // 1
+
+        // Reset clears tracking state
+        knockOff.GetByIdAsync.Reset();
+        var callCountAfter = tracking.CallCount;   // 0
         #endregion
 
-        _ = (callCount, onCall);
+        _ = (callCountBefore, callCountAfter);
     }
 }

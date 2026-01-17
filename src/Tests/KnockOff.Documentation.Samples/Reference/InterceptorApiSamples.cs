@@ -135,6 +135,11 @@ public static class InterceptorApiUsageExamples
         var knockOff = new ApiMethodServiceKnockOff();
         IApiMethodService service = knockOff;
 
+        // Set up callbacks to get tracking
+        var initTracking = knockOff.Initialize.OnCall((ko) => { });
+        var getByIdTracking = knockOff.GetById.OnCall((ko, id) => new ApiUser { Id = id });
+        var logTracking = knockOff.Log.OnCall((ko, level, message) => { });
+
         // Call some methods to set up state
         service.Initialize();
         service.GetById(42);
@@ -142,22 +147,22 @@ public static class InterceptorApiUsageExamples
 
         #region interceptor-api-method-interceptor-examples
         // Void method, no params
-        Assert.True(knockOff.Initialize.WasCalled);
-        knockOff.Initialize.OnCall = (ko) => { /* custom */ };
+        Assert.True(initTracking.WasCalled);
+        knockOff.Initialize.OnCall((ko) => { /* custom */ });
 
         // Return method, single param
-        Assert.Equal(42, knockOff.GetById.LastCallArg);
-        knockOff.GetById.OnCall = (ko, id) => new ApiUser { Id = id };
+        Assert.Equal(42, getByIdTracking.LastArg);
+        knockOff.GetById.OnCall((ko, id) => new ApiUser { Id = id });
 
         // Void method, multiple params
-        var args = knockOff.Log.LastCallArgs;
-        Assert.Equal("error", args?.level);
-        Assert.Equal("Failed", args?.message);
+        var args = logTracking.LastArgs;
+        Assert.Equal("error", args.level);
+        Assert.Equal("Failed", args.message);
 
-        knockOff.Log.OnCall = (ko, level, message) =>
+        knockOff.Log.OnCall((ko, level, message) =>
         {
             Console.WriteLine($"[{level}] {message}");
-        };
+        });
         #endregion
     }
 
@@ -206,7 +211,7 @@ public static class InterceptorApiUsageExamples
         var newValue = "NewValue";
 
         #region interceptor-api-indexer-interceptor-examples
-        // Pre-populate backing
+        // Pre-populate backing (using OfXxx pattern)
         knockOff.Indexer.Backing["Key1"] = value1;
         knockOff.Indexer.Backing["Key2"] = value2;
 
@@ -275,11 +280,11 @@ public static class InterceptorApiUsageExamples
         var knockOff = new ApiAsyncRepositoryKnockOff();
 
         #region interceptor-api-async-method-examples
-        knockOff.GetByIdAsync.OnCall = (ko, id) =>
-            Task.FromResult<ApiUser?>(new ApiUser { Id = id });
+        knockOff.GetByIdAsync.OnCall((ko, id) =>
+            Task.FromResult<ApiUser?>(new ApiUser { Id = id }));
 
-        knockOff.SaveAsync.OnCall = (ko, entity) =>
-            Task.FromException<int>(new DbException("Failed"));
+        knockOff.SaveAsync.OnCall((ko, entity) =>
+            Task.FromException<int>(new DbException("Failed")));
         #endregion
     }
 
@@ -288,9 +293,12 @@ public static class InterceptorApiUsageExamples
         var knockOff = new ApiSerializerKnockOff();
         IApiSerializer service = knockOff;
 
-        // Make some calls to set up state
+        // Configure per-type callbacks (OnCall is property for generic methods)
         knockOff.Deserialize.Of<ApiUser>().OnCall = (ko, json) =>
             JsonSerializer.Deserialize<ApiUser>(json)!;
+
+        knockOff.Deserialize.Of<ApiOrder>().OnCall = (ko, json) =>
+            JsonSerializer.Deserialize<ApiOrder>(json)!;
 
         service.Deserialize<ApiUser>("{\"Id\":1}");
         service.Deserialize<ApiUser>("{\"Id\":2}");
@@ -299,11 +307,11 @@ public static class InterceptorApiUsageExamples
         service.Deserialize<ApiOrder>("{\"Id\":5}");
 
         #region interceptor-api-generic-method-interceptor-examples
-        // Configure per type
+        // Configure per type (OnCall is property)
         knockOff.Deserialize.Of<ApiUser>().OnCall = (ko, json) =>
             JsonSerializer.Deserialize<ApiUser>(json)!;
 
-        // Per-type tracking
+        // Per-type tracking via typed handler
         Assert.Equal(2, knockOff.Deserialize.Of<ApiUser>().CallCount);
         Assert.Equal("{\"Id\":2}", knockOff.Deserialize.Of<ApiUser>().LastCallArg);
 
@@ -315,7 +323,7 @@ public static class InterceptorApiUsageExamples
         var types = knockOff.Deserialize.CalledTypeArguments;
         // [typeof(ApiUser), typeof(ApiOrder)]
 
-        // Multiple type parameters
+        // Multiple type parameters (OnCall is property)
         knockOff.Convert.Of<string, int>().OnCall = (ko, s) => s.Length;
 
         // Reset single type

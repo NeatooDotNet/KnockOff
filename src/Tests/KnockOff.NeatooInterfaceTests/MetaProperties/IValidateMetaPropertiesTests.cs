@@ -258,10 +258,13 @@ public class IValidateMetaPropertiesStandaloneTests
         var stub = new ValidateMetaPropertiesStub();
         IValidateMetaProperties meta = stub;
 
+        // Configure callback to enable tracking
+        var tracking = stub.WaitForTasks.OnCall((ko) => Task.CompletedTask);
+
         await meta.WaitForTasks();
 
-        // Standalone stubs use flat API - interceptors on stub directly
-        Assert.True(stub.WaitForTasks1.WasCalled);
+        // Tracking is available via the returned tracking object
+        Assert.True(tracking.WasCalled);
     }
 
     [Fact]

@@ -8,45 +8,277 @@ partial class MethodLoggerKnockOff : global::KnockOff.Documentation.Samples.Guid
 	/// <summary>Tracks and configures behavior for Log.</summary>
 	public sealed class LogInterceptor
 	{
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
+		private readonly global::System.Collections.Generic.List<(global::System.Action<MethodLoggerKnockOff, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+		private int _sequenceIndex;
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
+		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking<string> OnCall(global::System.Action<MethodLoggerKnockOff, string> callback)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequenceIndex = 0;
+			return tracking;
+		}
 
-		/// <summary>The argument from the most recent call.</summary>
-		public string? LastCallArg { get; private set; }
+		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+		public global::KnockOff.IMethodSequence<global::System.Action<MethodLoggerKnockOff, string>> OnCall(global::System.Action<MethodLoggerKnockOff, string> callback, global::KnockOff.Times times)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, times, tracking));
+			_sequenceIndex = 0;
+			return new MethodSequenceImpl(this);
+		}
 
-		/// <summary>Callback invoked when this method is called.</summary>
-		public global::System.Action<MethodLoggerKnockOff, string>? OnCall { get; set; }
+		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+		internal void Invoke(MethodLoggerKnockOff ko, bool strict, string message)
+		{
+			if (_sequence.Count == 0)
+			{
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Log");
+				return;
+			}
 
-		/// <summary>Records a method call.</summary>
-		public void RecordCall(string? message) { CallCount++; LastCallArg = message; }
+			var (callback, times, tracking) = _sequence[_sequenceIndex];
+			tracking.RecordCall(message);
+
+			if (!times.IsForever && tracking.CallCount >= times.Count)
+			{
+				if (_sequenceIndex < _sequence.Count - 1)
+					_sequenceIndex++;
+				else if (tracking.CallCount > times.Count)
+					throw global::KnockOff.StubException.SequenceExhausted("Log");
+			}
+
+			callback(ko, message);
+		}
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+		public void Reset()
+		{
+			foreach (var (_, _, tracking) in _sequence)
+				tracking.Reset();
+			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
+		/// <summary>Tracks invocations for this callback registration.</summary>
+		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking<string>
+		{
+			private string _lastArg = default!;
+
+			/// <summary>Number of times this callback was invoked.</summary>
+			public int CallCount { get; private set; }
+
+			/// <summary>True if CallCount > 0.</summary>
+			public bool WasCalled => CallCount > 0;
+
+			/// <summary>Last argument passed to this callback. Default if never called.</summary>
+			public string LastArg => _lastArg;
+
+			/// <summary>Records a call to this callback.</summary>
+			public void RecordCall(string message) { CallCount++; _lastArg = message; }
+
+			/// <summary>Resets tracking state.</summary>
+			public void Reset() { CallCount = 0; _lastArg = default!; }
+		}
+
+		/// <summary>Sequence implementation for ThenCall chaining.</summary>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<MethodLoggerKnockOff, string>>
+		{
+			private readonly LogInterceptor _interceptor;
+
+			public MethodSequenceImpl(LogInterceptor interceptor) => _interceptor = interceptor;
+
+			/// <summary>Total calls across all callbacks in sequence.</summary>
+			public int TotalCallCount
+			{
+				get
+				{
+					var total = 0;
+					foreach (var (_, _, tracking) in _interceptor._sequence)
+						total += tracking.CallCount;
+					return total;
+				}
+			}
+
+			/// <summary>Add another callback to the sequence.</summary>
+			public global::KnockOff.IMethodSequence<global::System.Action<MethodLoggerKnockOff, string>> ThenCall(global::System.Action<MethodLoggerKnockOff, string> callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_interceptor._sequence.Add((callback, times, tracking));
+				return this;
+			}
+
+			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _interceptor._sequence)
+				{
+					if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Reset all tracking in the sequence.</summary>
+			public void Reset() => _interceptor.Reset();
+		}
 	}
 
 	/// <summary>Tracks and configures behavior for LogError.</summary>
 	public sealed class LogErrorInterceptor
 	{
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
+		private readonly global::System.Collections.Generic.List<(global::System.Action<MethodLoggerKnockOff, string, global::System.Exception> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+		private int _sequenceIndex;
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
+		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTrackingArgs<(string? message, global::System.Exception? ex)> OnCall(global::System.Action<MethodLoggerKnockOff, string, global::System.Exception> callback)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequenceIndex = 0;
+			return tracking;
+		}
 
-		/// <summary>The arguments from the most recent call.</summary>
-		public (string? message, global::System.Exception? ex)? LastCallArgs { get; private set; }
+		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+		public global::KnockOff.IMethodSequence<global::System.Action<MethodLoggerKnockOff, string, global::System.Exception>> OnCall(global::System.Action<MethodLoggerKnockOff, string, global::System.Exception> callback, global::KnockOff.Times times)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, times, tracking));
+			_sequenceIndex = 0;
+			return new MethodSequenceImpl(this);
+		}
 
-		/// <summary>Callback invoked when this method is called.</summary>
-		public global::System.Action<MethodLoggerKnockOff, string, global::System.Exception>? OnCall { get; set; }
+		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+		internal void Invoke(MethodLoggerKnockOff ko, bool strict, string message, global::System.Exception ex)
+		{
+			if (_sequence.Count == 0)
+			{
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "LogError");
+				return;
+			}
 
-		/// <summary>Records a method call.</summary>
-		public void RecordCall(string? message, global::System.Exception? ex) { CallCount++; LastCallArgs = (message, ex); }
+			var (callback, times, tracking) = _sequence[_sequenceIndex];
+			tracking.RecordCall((message, ex));
+
+			if (!times.IsForever && tracking.CallCount >= times.Count)
+			{
+				if (_sequenceIndex < _sequence.Count - 1)
+					_sequenceIndex++;
+				else if (tracking.CallCount > times.Count)
+					throw global::KnockOff.StubException.SequenceExhausted("LogError");
+			}
+
+			callback(ko, message, ex);
+		}
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
+		public void Reset()
+		{
+			foreach (var (_, _, tracking) in _sequence)
+				tracking.Reset();
+			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
+		/// <summary>Tracks invocations for this callback registration.</summary>
+		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTrackingArgs<(string? message, global::System.Exception? ex)>
+		{
+			private (string? message, global::System.Exception? ex) _lastArgs;
+
+			/// <summary>Number of times this callback was invoked.</summary>
+			public int CallCount { get; private set; }
+
+			/// <summary>True if CallCount > 0.</summary>
+			public bool WasCalled => CallCount > 0;
+
+			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
+			public (string? message, global::System.Exception? ex) LastArgs => _lastArgs;
+
+			/// <summary>Records a call to this callback.</summary>
+			public void RecordCall((string? message, global::System.Exception? ex) args) { CallCount++; _lastArgs = args; }
+
+			/// <summary>Resets tracking state.</summary>
+			public void Reset() { CallCount = 0; _lastArgs = default; }
+		}
+
+		/// <summary>Sequence implementation for ThenCall chaining.</summary>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<MethodLoggerKnockOff, string, global::System.Exception>>
+		{
+			private readonly LogErrorInterceptor _interceptor;
+
+			public MethodSequenceImpl(LogErrorInterceptor interceptor) => _interceptor = interceptor;
+
+			/// <summary>Total calls across all callbacks in sequence.</summary>
+			public int TotalCallCount
+			{
+				get
+				{
+					var total = 0;
+					foreach (var (_, _, tracking) in _interceptor._sequence)
+						total += tracking.CallCount;
+					return total;
+				}
+			}
+
+			/// <summary>Add another callback to the sequence.</summary>
+			public global::KnockOff.IMethodSequence<global::System.Action<MethodLoggerKnockOff, string, global::System.Exception>> ThenCall(global::System.Action<MethodLoggerKnockOff, string, global::System.Exception> callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_interceptor._sequence.Add((callback, times, tracking));
+				return this;
+			}
+
+			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _interceptor._sequence)
+				{
+					if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Reset all tracking in the sequence.</summary>
+			public void Reset() => _interceptor.Reset();
+		}
 	}
 
 	/// <summary>Interceptor for Log.</summary>
@@ -61,20 +293,30 @@ partial class MethodLoggerKnockOff : global::KnockOff.Documentation.Samples.Guid
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IMethodLogger instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IMethodLogger Object => this;
 
+	/// <summary>Verifies all method interceptors' Times constraints were satisfied.</summary>
+	public bool Verify()
+	{
+		var result = true;
+		result &= Log.Verify();
+		result &= LogError.Verify();
+		return result;
+	}
+
+	/// <summary>Verifies all method interceptors' Times constraints and throws if any fail.</summary>
+	public void VerifyAll()
+	{
+		if (!Verify())
+			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
 	void global::KnockOff.Documentation.Samples.Guides.IMethodLogger.Log(string message)
 	{
-		Log.RecordCall(message);
-		if (Log.OnCall is { } onCallCallback)
-		{ onCallCallback(this, message); return; }
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMethodLogger", "Log");
+		Log.Invoke(this, Strict, message);
 	}
 
 	void global::KnockOff.Documentation.Samples.Guides.IMethodLogger.LogError(string message, global::System.Exception ex)
 	{
-		LogError.RecordCall(message, ex);
-		if (LogError.OnCall is { } onCallCallback)
-		{ onCallCallback(this, message, ex); return; }
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMethodLogger", "LogError");
+		LogError.Invoke(this, Strict, message, ex);
 	}
 
 }

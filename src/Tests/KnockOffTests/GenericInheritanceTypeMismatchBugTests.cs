@@ -4,14 +4,14 @@ namespace KnockOff.Tests;
 /// Tests for Bug 2: Generic interface inheritance type mismatch.
 ///
 /// When an interface inherits from a generic interface which also has a non-generic base
-/// (e.g., IRule{T} : IRule), KnockOff should generate separate interceptors for each
-/// to handle the different parameter types correctly.
+/// (e.g., IRule{T} : IRule), KnockOff should generate separate tracking for each
+/// overload to handle the different parameter types correctly.
 ///
 /// Example: IConsultationHistoryRule : IRule{IConsultationHistory}
 /// Where IRule{T} : IRule and both have RunRule methods with different parameter types.
 ///
-/// These tests verify the fix: Execute1 (typed) and Execute2 (base) should be separate
-/// interceptors with correct parameter types.
+/// These tests verify the fix: Execute with ISampleTarget and Execute with ISampleRuleTarget
+/// are tracked separately via overloaded OnCall() methods.
 /// </summary>
 public class GenericInheritanceTypeMismatchBugTests
 {
@@ -23,16 +23,15 @@ public class GenericInheritanceTypeMismatchBugTests
 
 		var target = new SampleTarget { Value = "test" };
 
-		// Set up callback for Execute1 (typed version)
+		// Set up callback for Execute with typed parameter (ISampleTarget)
 		var expectedResult = new SampleResult { Success = true };
-		stub.Execute1.OnCall = (ko, t, ct) => Task.FromResult<ISampleResult>(expectedResult);
+		var typedTracking = stub.Execute.OnCall((SampleValidationRuleKnockOff ko, ISampleTarget t, CancellationToken? ct) => Task.FromResult<ISampleResult>(expectedResult));
 
 		// Call the generic version (ISampleRule<T>.Execute)
 		var result = rule.Execute(target, CancellationToken.None);
 
-		// Should be tracked on Execute1 (the typed interceptor)
-		Assert.True(stub.Execute1.WasCalled);
-		Assert.False(stub.Execute2.WasCalled);
+		// Should be tracked on the typed tracking
+		Assert.True(typedTracking.WasCalled);
 	}
 
 	[Fact]
@@ -43,16 +42,15 @@ public class GenericInheritanceTypeMismatchBugTests
 
 		var target = new SampleTarget { Value = "base-call" };
 
-		// Set up callback for Execute2 (base interface version)
+		// Set up callback for Execute with base parameter (ISampleRuleTarget)
 		var expectedResult = new SampleResult { Success = true };
-		stub.Execute2.OnCall = (ko, t, ct) => Task.FromResult<ISampleResult>(expectedResult);
+		var baseTracking = stub.Execute.OnCall((SampleValidationRuleKnockOff ko, ISampleRuleTarget t, CancellationToken? ct) => Task.FromResult<ISampleResult>(expectedResult));
 
 		// Call the non-generic version (ISampleRule.Execute)
 		var result = rule.Execute(target, CancellationToken.None);
 
 		Assert.NotNull(result);
-		Assert.True(stub.Execute2.WasCalled);
-		Assert.False(stub.Execute1.WasCalled);
+		Assert.True(baseTracking.WasCalled);
 	}
 
 	[Fact]
@@ -60,25 +58,25 @@ public class GenericInheritanceTypeMismatchBugTests
 	{
 		var stub = new SampleValidationRuleKnockOff();
 
-		// Set up callbacks for both interceptors
+		// Set up callbacks for both overloads
 		var result1 = new SampleResult { Success = true };
 		var result2 = new SampleResult { Success = false };
-		stub.Execute1.OnCall = (ko, t, ct) => Task.FromResult<ISampleResult>(result1);
-		stub.Execute2.OnCall = (ko, t, ct) => Task.FromResult<ISampleResult>(result2);
+		var typedTracking = stub.Execute.OnCall((SampleValidationRuleKnockOff ko, ISampleTarget t, CancellationToken? ct) => Task.FromResult<ISampleResult>(result1));
+		var baseTracking = stub.Execute.OnCall((SampleValidationRuleKnockOff ko, ISampleRuleTarget t, CancellationToken? ct) => Task.FromResult<ISampleResult>(result2));
 
-		// Call via derived interface (Execute1)
+		// Call via derived interface (typed)
 		ISampleRule<ISampleTarget> typedRule = stub;
 		var target1 = new SampleTarget { Value = "typed" };
 		typedRule.Execute(target1, CancellationToken.None);
 
-		// Call via base interface (Execute2)
+		// Call via base interface
 		ISampleRule baseRule = stub;
 		var target2 = new SampleTarget { Value = "base" };
 		baseRule.Execute(target2, CancellationToken.None);
 
-		// Each method tracked separately
-		Assert.Equal(1, stub.Execute1.CallCount);
-		Assert.Equal(1, stub.Execute2.CallCount);
+		// Each overload tracked separately
+		Assert.Equal(1, typedTracking.CallCount);
+		Assert.Equal(1, baseTracking.CallCount);
 	}
 
 	[Fact]
@@ -88,7 +86,7 @@ public class GenericInheritanceTypeMismatchBugTests
 		ISampleRule<ISampleTarget> rule = stub;
 
 		var expectedResult = new SampleResult { Success = true };
-		stub.Execute1.OnCall = (ko, target, ct) => Task.FromResult<ISampleResult>(expectedResult);
+		stub.Execute.OnCall((SampleValidationRuleKnockOff ko, ISampleTarget target, CancellationToken? ct) => Task.FromResult<ISampleResult>(expectedResult));
 
 		var target = new SampleTarget { Value = "callback" };
 		var result = await rule.Execute(target, CancellationToken.None);

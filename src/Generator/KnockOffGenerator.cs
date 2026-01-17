@@ -51,6 +51,17 @@ public partial class KnockOffGenerator : IIncrementalGenerator
 	#region Standalone Stub Diagnostics (KO0xxx)
 
 	/// <summary>
+	/// KO0100: Method overloads not supported - same method name with different signatures.
+	/// </summary>
+	private static readonly DiagnosticDescriptor KO0100_MethodOverloadsNotSupported = new(
+		id: "KO0100",
+		title: "Method overloads not supported",
+		messageFormat: "Method '{0}' has identical signature in multiple interfaces: {1}. KnockOff cannot distinguish which interface's method was called.",
+		category: "KnockOff",
+		defaultSeverity: DiagnosticSeverity.Error,
+		isEnabledByDefault: true);
+
+	/// <summary>
 	/// KO0008: Generic standalone stub type parameter count must match interface.
 	/// </summary>
 	private static readonly DiagnosticDescriptor KO0008_TypeParameterArityMismatch = new(

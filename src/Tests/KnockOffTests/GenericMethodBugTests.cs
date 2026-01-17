@@ -66,14 +66,17 @@ public class GenericMethodBugTests
 	public void MixedOverloads_NonGeneric_TrackedSeparately()
 	{
 		var knockOff = new MixedOverloadServiceKnockOff();
+		// Configure callbacks for non-generic overloads via overloaded OnCall
+		var stringTracking = knockOff.Process.OnCall((MixedOverloadServiceKnockOff ko, string value) => { });
+		var intTracking = knockOff.Process.OnCall((MixedOverloadServiceKnockOff ko, int value) => { });
 		IMixedOverloadService service = knockOff;
 
 		service.Process("hello");
 		service.Process(42);
 
 		// Non-generic overloads should be tracked
-		Assert.Equal(1, knockOff.Process1.CallCount); // Process(string)
-		Assert.Equal(1, knockOff.Process2.CallCount); // Process(int)
+		Assert.Equal(1, stringTracking.CallCount); // Process(string)
+		Assert.Equal(1, intTracking.CallCount); // Process(int)
 	}
 
 	[Fact]
@@ -94,6 +97,9 @@ public class GenericMethodBugTests
 	public void MixedOverloads_AllOverloads_IndependentTracking()
 	{
 		var knockOff = new MixedOverloadServiceKnockOff();
+		// Configure callbacks for non-generic overloads
+		var stringTracking = knockOff.Process.OnCall((MixedOverloadServiceKnockOff ko, string value) => { });
+		var intTracking = knockOff.Process.OnCall((MixedOverloadServiceKnockOff ko, int value) => { });
 		IMixedOverloadService service = knockOff;
 
 		// Call all overloads
@@ -103,8 +109,8 @@ public class GenericMethodBugTests
 		service.Process<int>(200);          // Generic with T=int
 
 		// All should be tracked independently
-		Assert.Equal(1, knockOff.Process1.CallCount);  // Process(string)
-		Assert.Equal(1, knockOff.Process2.CallCount);  // Process(int)
+		Assert.Equal(1, stringTracking.CallCount);  // Process(string)
+		Assert.Equal(1, intTracking.CallCount);  // Process(int)
 		Assert.Equal(1, knockOff.ProcessGeneric.Of<string>().CallCount);
 		Assert.Equal(1, knockOff.ProcessGeneric.Of<int>().CallCount);
 
@@ -118,7 +124,7 @@ public class GenericMethodBugTests
 		var knockOff = new MixedOverloadServiceKnockOff();
 		IMixedOverloadService service = knockOff;
 
-		knockOff.Format.OnCall = (ko, value) => $"int:{value}";
+		knockOff.Format.OnCall((MixedOverloadServiceKnockOff ko, int value) => $"int:{value}");
 		knockOff.FormatGeneric.Of<double>().OnCall = (ko, value) => $"double:{value}";
 
 		var intResult = service.Format(42);

@@ -213,89 +213,553 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		/// <summary>Delegate for SetValue.</summary>
 		public delegate global::System.Threading.Tasks.Task SetValueDelegate(ValidatePropertyStub ko, object? newValue);
 
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
+		private readonly global::System.Collections.Generic.List<(SetValueDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+		private int _sequenceIndex;
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
+		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking<object?> OnCall(SetValueDelegate callback)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequenceIndex = 0;
+			return tracking;
+		}
 
-		/// <summary>The argument from the most recent call.</summary>
-		public object? LastCallArg { get; private set; }
+		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+		public global::KnockOff.IMethodSequence<SetValueDelegate> OnCall(SetValueDelegate callback, global::KnockOff.Times times)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, times, tracking));
+			_sequenceIndex = 0;
+			return new MethodSequenceImpl(this);
+		}
 
-		/// <summary>Callback invoked when this method is called.</summary>
-		public SetValueDelegate? OnCall { get; set; }
+		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+		internal global::System.Threading.Tasks.Task Invoke(ValidatePropertyStub ko, bool strict, object? newValue)
+		{
+			if (_sequence.Count == 0)
+			{
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SetValue");
+				return global::System.Threading.Tasks.Task.CompletedTask;
+			}
 
-		/// <summary>Records a method call.</summary>
-		public void RecordCall(object? newValue) { CallCount++; LastCallArg = newValue; }
+			var (callback, times, tracking) = _sequence[_sequenceIndex];
+			tracking.RecordCall(newValue);
+
+			if (!times.IsForever && tracking.CallCount >= times.Count)
+			{
+				if (_sequenceIndex < _sequence.Count - 1)
+					_sequenceIndex++;
+				else if (tracking.CallCount > times.Count)
+					throw global::KnockOff.StubException.SequenceExhausted("SetValue");
+			}
+
+			return callback(ko, newValue);
+		}
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+		public void Reset()
+		{
+			foreach (var (_, _, tracking) in _sequence)
+				tracking.Reset();
+			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
+		/// <summary>Tracks invocations for this callback registration.</summary>
+		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking<object?>
+		{
+			private object? _lastArg = default!;
+
+			/// <summary>Number of times this callback was invoked.</summary>
+			public int CallCount { get; private set; }
+
+			/// <summary>True if CallCount > 0.</summary>
+			public bool WasCalled => CallCount > 0;
+
+			/// <summary>Last argument passed to this callback. Default if never called.</summary>
+			public object? LastArg => _lastArg;
+
+			/// <summary>Records a call to this callback.</summary>
+			public void RecordCall(object? newValue) { CallCount++; _lastArg = newValue; }
+
+			/// <summary>Resets tracking state.</summary>
+			public void Reset() { CallCount = 0; _lastArg = default!; }
+		}
+
+		/// <summary>Sequence implementation for ThenCall chaining.</summary>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<SetValueDelegate>
+		{
+			private readonly SetValueInterceptor _interceptor;
+
+			public MethodSequenceImpl(SetValueInterceptor interceptor) => _interceptor = interceptor;
+
+			/// <summary>Total calls across all callbacks in sequence.</summary>
+			public int TotalCallCount
+			{
+				get
+				{
+					var total = 0;
+					foreach (var (_, _, tracking) in _interceptor._sequence)
+						total += tracking.CallCount;
+					return total;
+				}
+			}
+
+			/// <summary>Add another callback to the sequence.</summary>
+			public global::KnockOff.IMethodSequence<SetValueDelegate> ThenCall(SetValueDelegate callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_interceptor._sequence.Add((callback, times, tracking));
+				return this;
+			}
+
+			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _interceptor._sequence)
+				{
+					if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Reset all tracking in the sequence.</summary>
+			public void Reset() => _interceptor.Reset();
+		}
 	}
 
 	/// <summary>Tracks and configures behavior for AddMarkedBusy.</summary>
 	public sealed class AddMarkedBusyInterceptor
 	{
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
+		private readonly global::System.Collections.Generic.List<(global::System.Action<ValidatePropertyStub, long> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+		private int _sequenceIndex;
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
+		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking<long> OnCall(global::System.Action<ValidatePropertyStub, long> callback)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequenceIndex = 0;
+			return tracking;
+		}
 
-		/// <summary>The argument from the most recent call.</summary>
-		public long? LastCallArg { get; private set; }
+		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+		public global::KnockOff.IMethodSequence<global::System.Action<ValidatePropertyStub, long>> OnCall(global::System.Action<ValidatePropertyStub, long> callback, global::KnockOff.Times times)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, times, tracking));
+			_sequenceIndex = 0;
+			return new MethodSequenceImpl(this);
+		}
 
-		/// <summary>Callback invoked when this method is called.</summary>
-		public global::System.Action<ValidatePropertyStub, long>? OnCall { get; set; }
+		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+		internal void Invoke(ValidatePropertyStub ko, bool strict, long id)
+		{
+			if (_sequence.Count == 0)
+			{
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "AddMarkedBusy");
+				return;
+			}
 
-		/// <summary>Records a method call.</summary>
-		public void RecordCall(long? id) { CallCount++; LastCallArg = id; }
+			var (callback, times, tracking) = _sequence[_sequenceIndex];
+			tracking.RecordCall(id);
+
+			if (!times.IsForever && tracking.CallCount >= times.Count)
+			{
+				if (_sequenceIndex < _sequence.Count - 1)
+					_sequenceIndex++;
+				else if (tracking.CallCount > times.Count)
+					throw global::KnockOff.StubException.SequenceExhausted("AddMarkedBusy");
+			}
+
+			callback(ko, id);
+		}
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+		public void Reset()
+		{
+			foreach (var (_, _, tracking) in _sequence)
+				tracking.Reset();
+			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
+		/// <summary>Tracks invocations for this callback registration.</summary>
+		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking<long>
+		{
+			private long _lastArg = default!;
+
+			/// <summary>Number of times this callback was invoked.</summary>
+			public int CallCount { get; private set; }
+
+			/// <summary>True if CallCount > 0.</summary>
+			public bool WasCalled => CallCount > 0;
+
+			/// <summary>Last argument passed to this callback. Default if never called.</summary>
+			public long LastArg => _lastArg;
+
+			/// <summary>Records a call to this callback.</summary>
+			public void RecordCall(long id) { CallCount++; _lastArg = id; }
+
+			/// <summary>Resets tracking state.</summary>
+			public void Reset() { CallCount = 0; _lastArg = default!; }
+		}
+
+		/// <summary>Sequence implementation for ThenCall chaining.</summary>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<ValidatePropertyStub, long>>
+		{
+			private readonly AddMarkedBusyInterceptor _interceptor;
+
+			public MethodSequenceImpl(AddMarkedBusyInterceptor interceptor) => _interceptor = interceptor;
+
+			/// <summary>Total calls across all callbacks in sequence.</summary>
+			public int TotalCallCount
+			{
+				get
+				{
+					var total = 0;
+					foreach (var (_, _, tracking) in _interceptor._sequence)
+						total += tracking.CallCount;
+					return total;
+				}
+			}
+
+			/// <summary>Add another callback to the sequence.</summary>
+			public global::KnockOff.IMethodSequence<global::System.Action<ValidatePropertyStub, long>> ThenCall(global::System.Action<ValidatePropertyStub, long> callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_interceptor._sequence.Add((callback, times, tracking));
+				return this;
+			}
+
+			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _interceptor._sequence)
+				{
+					if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Reset all tracking in the sequence.</summary>
+			public void Reset() => _interceptor.Reset();
+		}
 	}
 
 	/// <summary>Tracks and configures behavior for RemoveMarkedBusy.</summary>
 	public sealed class RemoveMarkedBusyInterceptor
 	{
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
+		private readonly global::System.Collections.Generic.List<(global::System.Action<ValidatePropertyStub, long> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+		private int _sequenceIndex;
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
+		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking<long> OnCall(global::System.Action<ValidatePropertyStub, long> callback)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequenceIndex = 0;
+			return tracking;
+		}
 
-		/// <summary>The argument from the most recent call.</summary>
-		public long? LastCallArg { get; private set; }
+		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+		public global::KnockOff.IMethodSequence<global::System.Action<ValidatePropertyStub, long>> OnCall(global::System.Action<ValidatePropertyStub, long> callback, global::KnockOff.Times times)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, times, tracking));
+			_sequenceIndex = 0;
+			return new MethodSequenceImpl(this);
+		}
 
-		/// <summary>Callback invoked when this method is called.</summary>
-		public global::System.Action<ValidatePropertyStub, long>? OnCall { get; set; }
+		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+		internal void Invoke(ValidatePropertyStub ko, bool strict, long id)
+		{
+			if (_sequence.Count == 0)
+			{
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RemoveMarkedBusy");
+				return;
+			}
 
-		/// <summary>Records a method call.</summary>
-		public void RecordCall(long? id) { CallCount++; LastCallArg = id; }
+			var (callback, times, tracking) = _sequence[_sequenceIndex];
+			tracking.RecordCall(id);
+
+			if (!times.IsForever && tracking.CallCount >= times.Count)
+			{
+				if (_sequenceIndex < _sequence.Count - 1)
+					_sequenceIndex++;
+				else if (tracking.CallCount > times.Count)
+					throw global::KnockOff.StubException.SequenceExhausted("RemoveMarkedBusy");
+			}
+
+			callback(ko, id);
+		}
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+		public void Reset()
+		{
+			foreach (var (_, _, tracking) in _sequence)
+				tracking.Reset();
+			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
+		/// <summary>Tracks invocations for this callback registration.</summary>
+		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking<long>
+		{
+			private long _lastArg = default!;
+
+			/// <summary>Number of times this callback was invoked.</summary>
+			public int CallCount { get; private set; }
+
+			/// <summary>True if CallCount > 0.</summary>
+			public bool WasCalled => CallCount > 0;
+
+			/// <summary>Last argument passed to this callback. Default if never called.</summary>
+			public long LastArg => _lastArg;
+
+			/// <summary>Records a call to this callback.</summary>
+			public void RecordCall(long id) { CallCount++; _lastArg = id; }
+
+			/// <summary>Resets tracking state.</summary>
+			public void Reset() { CallCount = 0; _lastArg = default!; }
+		}
+
+		/// <summary>Sequence implementation for ThenCall chaining.</summary>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<ValidatePropertyStub, long>>
+		{
+			private readonly RemoveMarkedBusyInterceptor _interceptor;
+
+			public MethodSequenceImpl(RemoveMarkedBusyInterceptor interceptor) => _interceptor = interceptor;
+
+			/// <summary>Total calls across all callbacks in sequence.</summary>
+			public int TotalCallCount
+			{
+				get
+				{
+					var total = 0;
+					foreach (var (_, _, tracking) in _interceptor._sequence)
+						total += tracking.CallCount;
+					return total;
+				}
+			}
+
+			/// <summary>Add another callback to the sequence.</summary>
+			public global::KnockOff.IMethodSequence<global::System.Action<ValidatePropertyStub, long>> ThenCall(global::System.Action<ValidatePropertyStub, long> callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_interceptor._sequence.Add((callback, times, tracking));
+				return this;
+			}
+
+			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _interceptor._sequence)
+				{
+					if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Reset all tracking in the sequence.</summary>
+			public void Reset() => _interceptor.Reset();
+		}
 	}
 
 	/// <summary>Tracks and configures behavior for LoadValue.</summary>
 	public sealed class LoadValueInterceptor
 	{
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
+		private readonly global::System.Collections.Generic.List<(global::System.Action<ValidatePropertyStub, object?> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+		private int _sequenceIndex;
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
+		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking<object?> OnCall(global::System.Action<ValidatePropertyStub, object?> callback)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequenceIndex = 0;
+			return tracking;
+		}
 
-		/// <summary>The argument from the most recent call.</summary>
-		public object? LastCallArg { get; private set; }
+		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+		public global::KnockOff.IMethodSequence<global::System.Action<ValidatePropertyStub, object?>> OnCall(global::System.Action<ValidatePropertyStub, object?> callback, global::KnockOff.Times times)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, times, tracking));
+			_sequenceIndex = 0;
+			return new MethodSequenceImpl(this);
+		}
 
-		/// <summary>Callback invoked when this method is called.</summary>
-		public global::System.Action<ValidatePropertyStub, object?>? OnCall { get; set; }
+		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+		internal void Invoke(ValidatePropertyStub ko, bool strict, object? @value)
+		{
+			if (_sequence.Count == 0)
+			{
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "LoadValue");
+				return;
+			}
 
-		/// <summary>Records a method call.</summary>
-		public void RecordCall(object? @value) { CallCount++; LastCallArg = @value; }
+			var (callback, times, tracking) = _sequence[_sequenceIndex];
+			tracking.RecordCall(@value);
+
+			if (!times.IsForever && tracking.CallCount >= times.Count)
+			{
+				if (_sequenceIndex < _sequence.Count - 1)
+					_sequenceIndex++;
+				else if (tracking.CallCount > times.Count)
+					throw global::KnockOff.StubException.SequenceExhausted("LoadValue");
+			}
+
+			callback(ko, @value);
+		}
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+		public void Reset()
+		{
+			foreach (var (_, _, tracking) in _sequence)
+				tracking.Reset();
+			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
+		/// <summary>Tracks invocations for this callback registration.</summary>
+		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking<object?>
+		{
+			private object? _lastArg = default!;
+
+			/// <summary>Number of times this callback was invoked.</summary>
+			public int CallCount { get; private set; }
+
+			/// <summary>True if CallCount > 0.</summary>
+			public bool WasCalled => CallCount > 0;
+
+			/// <summary>Last argument passed to this callback. Default if never called.</summary>
+			public object? LastArg => _lastArg;
+
+			/// <summary>Records a call to this callback.</summary>
+			public void RecordCall(object? @value) { CallCount++; _lastArg = @value; }
+
+			/// <summary>Resets tracking state.</summary>
+			public void Reset() { CallCount = 0; _lastArg = default!; }
+		}
+
+		/// <summary>Sequence implementation for ThenCall chaining.</summary>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<ValidatePropertyStub, object?>>
+		{
+			private readonly LoadValueInterceptor _interceptor;
+
+			public MethodSequenceImpl(LoadValueInterceptor interceptor) => _interceptor = interceptor;
+
+			/// <summary>Total calls across all callbacks in sequence.</summary>
+			public int TotalCallCount
+			{
+				get
+				{
+					var total = 0;
+					foreach (var (_, _, tracking) in _interceptor._sequence)
+						total += tracking.CallCount;
+					return total;
+				}
+			}
+
+			/// <summary>Add another callback to the sequence.</summary>
+			public global::KnockOff.IMethodSequence<global::System.Action<ValidatePropertyStub, object?>> ThenCall(global::System.Action<ValidatePropertyStub, object?> callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_interceptor._sequence.Add((callback, times, tracking));
+				return this;
+			}
+
+			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _interceptor._sequence)
+				{
+					if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Reset all tracking in the sequence.</summary>
+			public void Reset() => _interceptor.Reset();
+		}
 	}
 
 	/// <summary>Tracks and configures behavior for WaitForTasks.</summary>
@@ -304,20 +768,135 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		/// <summary>Delegate for WaitForTasks.</summary>
 		public delegate global::System.Threading.Tasks.Task WaitForTasksDelegate(ValidatePropertyStub ko);
 
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
+		private readonly global::System.Collections.Generic.List<(WaitForTasksDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+		private int _sequenceIndex;
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
+		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking OnCall(WaitForTasksDelegate callback)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequenceIndex = 0;
+			return tracking;
+		}
 
-		/// <summary>Callback invoked when this method is called.</summary>
-		public WaitForTasksDelegate? OnCall { get; set; }
+		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+		public global::KnockOff.IMethodSequence<WaitForTasksDelegate> OnCall(WaitForTasksDelegate callback, global::KnockOff.Times times)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, times, tracking));
+			_sequenceIndex = 0;
+			return new MethodSequenceImpl(this);
+		}
 
-		/// <summary>Records a method call.</summary>
-		public void RecordCall() => CallCount++;
+		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+		internal global::System.Threading.Tasks.Task Invoke(ValidatePropertyStub ko, bool strict)
+		{
+			if (_sequence.Count == 0)
+			{
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "WaitForTasks");
+				return global::System.Threading.Tasks.Task.CompletedTask;
+			}
+
+			var (callback, times, tracking) = _sequence[_sequenceIndex];
+			tracking.RecordCall();
+
+			if (!times.IsForever && tracking.CallCount >= times.Count)
+			{
+				if (_sequenceIndex < _sequence.Count - 1)
+					_sequenceIndex++;
+				else if (tracking.CallCount > times.Count)
+					throw global::KnockOff.StubException.SequenceExhausted("WaitForTasks");
+			}
+
+			return callback(ko);
+		}
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; OnCall = null; }
+		public void Reset()
+		{
+			foreach (var (_, _, tracking) in _sequence)
+				tracking.Reset();
+			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
+		/// <summary>Tracks invocations for this callback registration.</summary>
+		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking
+		{
+
+			/// <summary>Number of times this callback was invoked.</summary>
+			public int CallCount { get; private set; }
+
+			/// <summary>True if CallCount > 0.</summary>
+			public bool WasCalled => CallCount > 0;
+
+			/// <summary>Records a call to this callback.</summary>
+			public void RecordCall() => CallCount++;
+
+			/// <summary>Resets tracking state.</summary>
+			public void Reset() => CallCount = 0;
+		}
+
+		/// <summary>Sequence implementation for ThenCall chaining.</summary>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<WaitForTasksDelegate>
+		{
+			private readonly WaitForTasksInterceptor _interceptor;
+
+			public MethodSequenceImpl(WaitForTasksInterceptor interceptor) => _interceptor = interceptor;
+
+			/// <summary>Total calls across all callbacks in sequence.</summary>
+			public int TotalCallCount
+			{
+				get
+				{
+					var total = 0;
+					foreach (var (_, _, tracking) in _interceptor._sequence)
+						total += tracking.CallCount;
+					return total;
+				}
+			}
+
+			/// <summary>Add another callback to the sequence.</summary>
+			public global::KnockOff.IMethodSequence<WaitForTasksDelegate> ThenCall(WaitForTasksDelegate callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_interceptor._sequence.Add((callback, times, tracking));
+				return this;
+			}
+
+			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _interceptor._sequence)
+				{
+					if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Reset all tracking in the sequence.</summary>
+			public void Reset() => _interceptor.Reset();
+		}
 	}
 
 	/// <summary>Tracks and configures behavior for GetAwaiter.</summary>
@@ -326,20 +905,135 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		/// <summary>Delegate for GetAwaiter.</summary>
 		public delegate global::System.Runtime.CompilerServices.TaskAwaiter GetAwaiterDelegate(ValidatePropertyStub ko);
 
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
+		private readonly global::System.Collections.Generic.List<(GetAwaiterDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+		private int _sequenceIndex;
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
+		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking OnCall(GetAwaiterDelegate callback)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequenceIndex = 0;
+			return tracking;
+		}
 
-		/// <summary>Callback invoked when this method is called.</summary>
-		public GetAwaiterDelegate? OnCall { get; set; }
+		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+		public global::KnockOff.IMethodSequence<GetAwaiterDelegate> OnCall(GetAwaiterDelegate callback, global::KnockOff.Times times)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, times, tracking));
+			_sequenceIndex = 0;
+			return new MethodSequenceImpl(this);
+		}
 
-		/// <summary>Records a method call.</summary>
-		public void RecordCall() => CallCount++;
+		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+		internal global::System.Runtime.CompilerServices.TaskAwaiter Invoke(ValidatePropertyStub ko, bool strict)
+		{
+			if (_sequence.Count == 0)
+			{
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetAwaiter");
+				return default!;
+			}
+
+			var (callback, times, tracking) = _sequence[_sequenceIndex];
+			tracking.RecordCall();
+
+			if (!times.IsForever && tracking.CallCount >= times.Count)
+			{
+				if (_sequenceIndex < _sequence.Count - 1)
+					_sequenceIndex++;
+				else if (tracking.CallCount > times.Count)
+					throw global::KnockOff.StubException.SequenceExhausted("GetAwaiter");
+			}
+
+			return callback(ko);
+		}
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; OnCall = null; }
+		public void Reset()
+		{
+			foreach (var (_, _, tracking) in _sequence)
+				tracking.Reset();
+			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
+		/// <summary>Tracks invocations for this callback registration.</summary>
+		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking
+		{
+
+			/// <summary>Number of times this callback was invoked.</summary>
+			public int CallCount { get; private set; }
+
+			/// <summary>True if CallCount > 0.</summary>
+			public bool WasCalled => CallCount > 0;
+
+			/// <summary>Records a call to this callback.</summary>
+			public void RecordCall() => CallCount++;
+
+			/// <summary>Resets tracking state.</summary>
+			public void Reset() => CallCount = 0;
+		}
+
+		/// <summary>Sequence implementation for ThenCall chaining.</summary>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<GetAwaiterDelegate>
+		{
+			private readonly GetAwaiterInterceptor _interceptor;
+
+			public MethodSequenceImpl(GetAwaiterInterceptor interceptor) => _interceptor = interceptor;
+
+			/// <summary>Total calls across all callbacks in sequence.</summary>
+			public int TotalCallCount
+			{
+				get
+				{
+					var total = 0;
+					foreach (var (_, _, tracking) in _interceptor._sequence)
+						total += tracking.CallCount;
+					return total;
+				}
+			}
+
+			/// <summary>Add another callback to the sequence.</summary>
+			public global::KnockOff.IMethodSequence<GetAwaiterDelegate> ThenCall(GetAwaiterDelegate callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_interceptor._sequence.Add((callback, times, tracking));
+				return this;
+			}
+
+			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _interceptor._sequence)
+				{
+					if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Reset all tracking in the sequence.</summary>
+			public void Reset() => _interceptor.Reset();
+		}
 	}
 
 	/// <summary>Tracks and configures behavior for RunRules.</summary>
@@ -348,23 +1042,139 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		/// <summary>Delegate for RunRules.</summary>
 		public delegate global::System.Threading.Tasks.Task RunRulesDelegate(ValidatePropertyStub ko, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token);
 
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
+		private readonly global::System.Collections.Generic.List<(RunRulesDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+		private int _sequenceIndex;
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
+		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTrackingArgs<(global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token)> OnCall(RunRulesDelegate callback)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequenceIndex = 0;
+			return tracking;
+		}
 
-		/// <summary>The arguments from the most recent call.</summary>
-		public (global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token)? LastCallArgs { get; private set; }
+		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+		public global::KnockOff.IMethodSequence<RunRulesDelegate> OnCall(RunRulesDelegate callback, global::KnockOff.Times times)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, times, tracking));
+			_sequenceIndex = 0;
+			return new MethodSequenceImpl(this);
+		}
 
-		/// <summary>Callback invoked when this method is called.</summary>
-		public RunRulesDelegate? OnCall { get; set; }
+		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+		internal global::System.Threading.Tasks.Task Invoke(ValidatePropertyStub ko, bool strict, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
+		{
+			if (_sequence.Count == 0)
+			{
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
+				return global::System.Threading.Tasks.Task.CompletedTask;
+			}
 
-		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token) { CallCount++; LastCallArgs = (runRules, token); }
+			var (callback, times, tracking) = _sequence[_sequenceIndex];
+			tracking.RecordCall((runRules, token));
+
+			if (!times.IsForever && tracking.CallCount >= times.Count)
+			{
+				if (_sequenceIndex < _sequence.Count - 1)
+					_sequenceIndex++;
+				else if (tracking.CallCount > times.Count)
+					throw global::KnockOff.StubException.SequenceExhausted("RunRules");
+			}
+
+			return callback(ko, runRules, token);
+		}
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
+		public void Reset()
+		{
+			foreach (var (_, _, tracking) in _sequence)
+				tracking.Reset();
+			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
+		/// <summary>Tracks invocations for this callback registration.</summary>
+		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTrackingArgs<(global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token)>
+		{
+			private (global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token) _lastArgs;
+
+			/// <summary>Number of times this callback was invoked.</summary>
+			public int CallCount { get; private set; }
+
+			/// <summary>True if CallCount > 0.</summary>
+			public bool WasCalled => CallCount > 0;
+
+			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
+			public (global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token) LastArgs => _lastArgs;
+
+			/// <summary>Records a call to this callback.</summary>
+			public void RecordCall((global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token) args) { CallCount++; _lastArgs = args; }
+
+			/// <summary>Resets tracking state.</summary>
+			public void Reset() { CallCount = 0; _lastArgs = default; }
+		}
+
+		/// <summary>Sequence implementation for ThenCall chaining.</summary>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<RunRulesDelegate>
+		{
+			private readonly RunRulesInterceptor _interceptor;
+
+			public MethodSequenceImpl(RunRulesInterceptor interceptor) => _interceptor = interceptor;
+
+			/// <summary>Total calls across all callbacks in sequence.</summary>
+			public int TotalCallCount
+			{
+				get
+				{
+					var total = 0;
+					foreach (var (_, _, tracking) in _interceptor._sequence)
+						total += tracking.CallCount;
+					return total;
+				}
+			}
+
+			/// <summary>Add another callback to the sequence.</summary>
+			public global::KnockOff.IMethodSequence<RunRulesDelegate> ThenCall(RunRulesDelegate callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_interceptor._sequence.Add((callback, times, tracking));
+				return this;
+			}
+
+			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _interceptor._sequence)
+				{
+					if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Reset all tracking in the sequence.</summary>
+			public void Reset() => _interceptor.Reset();
+		}
 	}
 
 	/// <summary>Interceptor for PropertyChanged event.</summary>
@@ -484,6 +1294,27 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 	/// <summary>The global::Neatoo.IValidateProperty instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.IValidateProperty Object => this;
 
+	/// <summary>Verifies all method interceptors' Times constraints were satisfied.</summary>
+	public bool Verify()
+	{
+		var result = true;
+		result &= SetValue.Verify();
+		result &= AddMarkedBusy.Verify();
+		result &= RemoveMarkedBusy.Verify();
+		result &= LoadValue.Verify();
+		result &= WaitForTasks.Verify();
+		result &= GetAwaiter.Verify();
+		result &= RunRules.Verify();
+		return result;
+	}
+
+	/// <summary>Verifies all method interceptors' Times constraints and throws if any fail.</summary>
+	public void VerifyAll()
+	{
+		if (!Verify())
+			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
 	string global::Neatoo.IValidateProperty.Name
 	{
 		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "Name"); return Name.Value; }
@@ -537,62 +1368,37 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateProperty.SetValue(object? newValue)
 	{
-		SetValue.RecordCall(newValue);
-		if (SetValue.OnCall is { } callback)
-			return callback(this, newValue);
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "SetValue");
-		return global::System.Threading.Tasks.Task.CompletedTask;
+		return SetValue.Invoke(this, Strict, newValue);
 	}
 
 	void global::Neatoo.IValidateProperty.AddMarkedBusy(long id)
 	{
-		AddMarkedBusy.RecordCall(id);
-		if (AddMarkedBusy.OnCall is { } onCallCallback)
-		{ onCallCallback(this, id); return; }
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "AddMarkedBusy");
+		AddMarkedBusy.Invoke(this, Strict, id);
 	}
 
 	void global::Neatoo.IValidateProperty.RemoveMarkedBusy(long id)
 	{
-		RemoveMarkedBusy.RecordCall(id);
-		if (RemoveMarkedBusy.OnCall is { } onCallCallback)
-		{ onCallCallback(this, id); return; }
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "RemoveMarkedBusy");
+		RemoveMarkedBusy.Invoke(this, Strict, id);
 	}
 
 	void global::Neatoo.IValidateProperty.LoadValue(object? @value)
 	{
-		LoadValue.RecordCall(@value);
-		if (LoadValue.OnCall is { } onCallCallback)
-		{ onCallCallback(this, @value); return; }
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "LoadValue");
+		LoadValue.Invoke(this, Strict, @value);
 	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateProperty.WaitForTasks()
 	{
-		WaitForTasks.RecordCall();
-		if (WaitForTasks.OnCall is { } callback)
-			return callback(this);
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "WaitForTasks");
-		return global::System.Threading.Tasks.Task.CompletedTask;
+		return WaitForTasks.Invoke(this, Strict);
 	}
 
 	global::System.Runtime.CompilerServices.TaskAwaiter global::Neatoo.IValidateProperty.GetAwaiter()
 	{
-		GetAwaiter.RecordCall();
-		if (GetAwaiter.OnCall is { } callback)
-			return callback(this);
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "GetAwaiter");
-		return default!;
+		return GetAwaiter.Invoke(this, Strict);
 	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateProperty.RunRules(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
 	{
-		RunRules.RecordCall(runRules, token);
-		if (RunRules.OnCall is { } callback)
-			return callback(this, runRules, token);
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "RunRules");
-		return global::System.Threading.Tasks.Task.CompletedTask;
+		return RunRules.Invoke(this, Strict, runRules, token);
 	}
 
 	event global::System.ComponentModel.PropertyChangedEventHandler? global::System.ComponentModel.INotifyPropertyChanged.PropertyChanged

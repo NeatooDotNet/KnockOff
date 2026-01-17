@@ -17,9 +17,10 @@ public class InterceptorApiSamplesTests
         var knockOff = new ApiMethodServiceKnockOff();
         IApiMethodService service = knockOff;
 
-        Assert.False(knockOff.Initialize.WasCalled);
+        var tracking = knockOff.Initialize.OnCall((ko) => { });
+        Assert.False(tracking.WasCalled);
         service.Initialize();
-        Assert.True(knockOff.Initialize.WasCalled);
+        Assert.True(tracking.WasCalled);
     }
 
     [Fact]
@@ -28,8 +29,9 @@ public class InterceptorApiSamplesTests
         var knockOff = new ApiMethodServiceKnockOff();
         IApiMethodService service = knockOff;
 
+        var tracking = knockOff.GetById.OnCall((ko, id) => new ApiUser { Id = id });
         service.GetById(42);
-        Assert.Equal(42, knockOff.GetById.LastCallArg);
+        Assert.Equal(42, tracking.LastArg);
     }
 
     [Fact]
@@ -38,10 +40,11 @@ public class InterceptorApiSamplesTests
         var knockOff = new ApiMethodServiceKnockOff();
         IApiMethodService service = knockOff;
 
+        var tracking = knockOff.Log.OnCall((ko, level, message) => { });
         service.Log("error", "Failed");
-        var args = knockOff.Log.LastCallArgs;
-        Assert.Equal("error", args?.level);
-        Assert.Equal("Failed", args?.message);
+        var args = tracking.LastArgs;
+        Assert.Equal("error", args.level);
+        Assert.Equal("Failed", args.message);
     }
 
     [Fact]
@@ -50,7 +53,7 @@ public class InterceptorApiSamplesTests
         var knockOff = new ApiMethodServiceKnockOff();
         IApiMethodService service = knockOff;
 
-        knockOff.GetById.OnCall = (ko, id) => new ApiUser { Id = id, Name = "Test" };
+        knockOff.GetById.OnCall((ko, id) => new ApiUser { Id = id, Name = "Test" });
 
         var user = service.GetById(99);
         Assert.Equal(99, user.Id);
@@ -258,8 +261,8 @@ public class InterceptorApiSamplesTests
         var knockOff = new ApiAsyncRepositoryKnockOff();
         IApiAsyncRepository service = knockOff;
 
-        knockOff.GetByIdAsync.OnCall = (ko, id) =>
-            Task.FromResult<ApiUser?>(new ApiUser { Id = id });
+        knockOff.GetByIdAsync.OnCall((ko, id) =>
+            Task.FromResult<ApiUser?>(new ApiUser { Id = id }));
 
         var user = await service.GetByIdAsync(42);
         Assert.Equal(42, user?.Id);
@@ -271,8 +274,8 @@ public class InterceptorApiSamplesTests
         var knockOff = new ApiAsyncRepositoryKnockOff();
         IApiAsyncRepository service = knockOff;
 
-        knockOff.SaveAsync.OnCall = (ko, entity) =>
-            Task.FromException<int>(new DbException("Failed"));
+        knockOff.SaveAsync.OnCall((ko, entity) =>
+            Task.FromException<int>(new DbException("Failed")));
 
         await Assert.ThrowsAsync<DbException>(() => service.SaveAsync(new ApiEntity()));
     }

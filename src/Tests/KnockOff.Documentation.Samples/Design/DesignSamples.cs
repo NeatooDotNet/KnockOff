@@ -99,9 +99,9 @@ public static class DesignSamples
         IDsUserService service = stub.Object;
 
         // METHOD: Configure and verify
-        stub.GetUser.OnCall = (ko, id) => new DsUser { Id = id };
+        var getUserTracking = stub.GetUser.OnCall((ko, id) => new DsUser { Id = id });
         var user = service.GetUser(42);
-        // Verify: stub.GetUser.CallCount, stub.GetUser.LastCallArg
+        // Verify: getUserTracking.CallCount, getUserTracking.LastArg
 
         // PROPERTY: Configure and verify
         stub.Name.Value = "Test";

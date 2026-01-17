@@ -5,26 +5,21 @@ namespace KnockOff.Documentation.Samples.Comparison;
 
 partial class MigConfigServiceKnockOff : global::KnockOff.Documentation.Samples.Comparison.IMigConfigService, global::KnockOff.IKnockOffStub
 {
-	/// <summary>Tracks and configures behavior for GetConfig.</summary>
-	public sealed class GetConfig2Interceptor
+	/// <summary>Tracks calls to GetConfig (user-defined implementation).</summary>
+	public sealed class GetConfig2Interceptor : global::KnockOff.IMethodTracking
 	{
-		/// <summary>Delegate for GetConfig.</summary>
-		public delegate global::KnockOff.Documentation.Samples.Comparison.MigConfig GetConfigDelegate(MigConfigServiceKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>Whether this method was called at least once.</summary>
+		/// <summary>True if CallCount > 0.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called.</summary>
-		public GetConfigDelegate? OnCall { get; set; }
-
 		/// <summary>Records a method call.</summary>
-		public void RecordCall() => CallCount++;
+		internal void RecordCall() => CallCount++;
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; OnCall = null; }
+		/// <summary>Resets tracking state.</summary>
+		public void Reset() => CallCount = 0;
 	}
 
 	/// <summary>Interceptor for GetConfig.</summary>
@@ -39,7 +34,6 @@ partial class MigConfigServiceKnockOff : global::KnockOff.Documentation.Samples.
 	global::KnockOff.Documentation.Samples.Comparison.MigConfig global::KnockOff.Documentation.Samples.Comparison.IMigConfigService.GetConfig()
 	{
 		GetConfig2.RecordCall();
-		if (GetConfig2.OnCall is { } callback) return callback(this);
 		return GetConfig();
 	}
 

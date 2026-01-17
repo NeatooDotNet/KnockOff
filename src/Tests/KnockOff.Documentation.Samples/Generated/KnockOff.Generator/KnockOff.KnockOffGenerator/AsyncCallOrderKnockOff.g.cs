@@ -11,20 +11,135 @@ partial class AsyncCallOrderKnockOff : global::KnockOff.Documentation.Samples.Gu
 		/// <summary>Delegate for StartAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task StartAsyncDelegate(AsyncCallOrderKnockOff ko);
 
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
+		private readonly global::System.Collections.Generic.List<(StartAsyncDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+		private int _sequenceIndex;
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
+		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking OnCall(StartAsyncDelegate callback)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequenceIndex = 0;
+			return tracking;
+		}
 
-		/// <summary>Callback invoked when this method is called.</summary>
-		public StartAsyncDelegate? OnCall { get; set; }
+		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+		public global::KnockOff.IMethodSequence<StartAsyncDelegate> OnCall(StartAsyncDelegate callback, global::KnockOff.Times times)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, times, tracking));
+			_sequenceIndex = 0;
+			return new MethodSequenceImpl(this);
+		}
 
-		/// <summary>Records a method call.</summary>
-		public void RecordCall() => CallCount++;
+		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+		internal global::System.Threading.Tasks.Task Invoke(AsyncCallOrderKnockOff ko, bool strict)
+		{
+			if (_sequence.Count == 0)
+			{
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "StartAsync");
+				return global::System.Threading.Tasks.Task.CompletedTask;
+			}
+
+			var (callback, times, tracking) = _sequence[_sequenceIndex];
+			tracking.RecordCall();
+
+			if (!times.IsForever && tracking.CallCount >= times.Count)
+			{
+				if (_sequenceIndex < _sequence.Count - 1)
+					_sequenceIndex++;
+				else if (tracking.CallCount > times.Count)
+					throw global::KnockOff.StubException.SequenceExhausted("StartAsync");
+			}
+
+			return callback(ko);
+		}
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; OnCall = null; }
+		public void Reset()
+		{
+			foreach (var (_, _, tracking) in _sequence)
+				tracking.Reset();
+			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
+		/// <summary>Tracks invocations for this callback registration.</summary>
+		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking
+		{
+
+			/// <summary>Number of times this callback was invoked.</summary>
+			public int CallCount { get; private set; }
+
+			/// <summary>True if CallCount > 0.</summary>
+			public bool WasCalled => CallCount > 0;
+
+			/// <summary>Records a call to this callback.</summary>
+			public void RecordCall() => CallCount++;
+
+			/// <summary>Resets tracking state.</summary>
+			public void Reset() => CallCount = 0;
+		}
+
+		/// <summary>Sequence implementation for ThenCall chaining.</summary>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<StartAsyncDelegate>
+		{
+			private readonly StartAsyncInterceptor _interceptor;
+
+			public MethodSequenceImpl(StartAsyncInterceptor interceptor) => _interceptor = interceptor;
+
+			/// <summary>Total calls across all callbacks in sequence.</summary>
+			public int TotalCallCount
+			{
+				get
+				{
+					var total = 0;
+					foreach (var (_, _, tracking) in _interceptor._sequence)
+						total += tracking.CallCount;
+					return total;
+				}
+			}
+
+			/// <summary>Add another callback to the sequence.</summary>
+			public global::KnockOff.IMethodSequence<StartAsyncDelegate> ThenCall(StartAsyncDelegate callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_interceptor._sequence.Add((callback, times, tracking));
+				return this;
+			}
+
+			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _interceptor._sequence)
+				{
+					if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Reset all tracking in the sequence.</summary>
+			public void Reset() => _interceptor.Reset();
+		}
 	}
 
 	/// <summary>Tracks and configures behavior for ProcessAsync.</summary>
@@ -33,20 +148,135 @@ partial class AsyncCallOrderKnockOff : global::KnockOff.Documentation.Samples.Gu
 		/// <summary>Delegate for ProcessAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task ProcessAsyncDelegate(AsyncCallOrderKnockOff ko);
 
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
+		private readonly global::System.Collections.Generic.List<(ProcessAsyncDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+		private int _sequenceIndex;
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
+		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking OnCall(ProcessAsyncDelegate callback)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequenceIndex = 0;
+			return tracking;
+		}
 
-		/// <summary>Callback invoked when this method is called.</summary>
-		public ProcessAsyncDelegate? OnCall { get; set; }
+		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+		public global::KnockOff.IMethodSequence<ProcessAsyncDelegate> OnCall(ProcessAsyncDelegate callback, global::KnockOff.Times times)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, times, tracking));
+			_sequenceIndex = 0;
+			return new MethodSequenceImpl(this);
+		}
 
-		/// <summary>Records a method call.</summary>
-		public void RecordCall() => CallCount++;
+		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+		internal global::System.Threading.Tasks.Task Invoke(AsyncCallOrderKnockOff ko, bool strict)
+		{
+			if (_sequence.Count == 0)
+			{
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ProcessAsync");
+				return global::System.Threading.Tasks.Task.CompletedTask;
+			}
+
+			var (callback, times, tracking) = _sequence[_sequenceIndex];
+			tracking.RecordCall();
+
+			if (!times.IsForever && tracking.CallCount >= times.Count)
+			{
+				if (_sequenceIndex < _sequence.Count - 1)
+					_sequenceIndex++;
+				else if (tracking.CallCount > times.Count)
+					throw global::KnockOff.StubException.SequenceExhausted("ProcessAsync");
+			}
+
+			return callback(ko);
+		}
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; OnCall = null; }
+		public void Reset()
+		{
+			foreach (var (_, _, tracking) in _sequence)
+				tracking.Reset();
+			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
+		/// <summary>Tracks invocations for this callback registration.</summary>
+		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking
+		{
+
+			/// <summary>Number of times this callback was invoked.</summary>
+			public int CallCount { get; private set; }
+
+			/// <summary>True if CallCount > 0.</summary>
+			public bool WasCalled => CallCount > 0;
+
+			/// <summary>Records a call to this callback.</summary>
+			public void RecordCall() => CallCount++;
+
+			/// <summary>Resets tracking state.</summary>
+			public void Reset() => CallCount = 0;
+		}
+
+		/// <summary>Sequence implementation for ThenCall chaining.</summary>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<ProcessAsyncDelegate>
+		{
+			private readonly ProcessAsyncInterceptor _interceptor;
+
+			public MethodSequenceImpl(ProcessAsyncInterceptor interceptor) => _interceptor = interceptor;
+
+			/// <summary>Total calls across all callbacks in sequence.</summary>
+			public int TotalCallCount
+			{
+				get
+				{
+					var total = 0;
+					foreach (var (_, _, tracking) in _interceptor._sequence)
+						total += tracking.CallCount;
+					return total;
+				}
+			}
+
+			/// <summary>Add another callback to the sequence.</summary>
+			public global::KnockOff.IMethodSequence<ProcessAsyncDelegate> ThenCall(ProcessAsyncDelegate callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_interceptor._sequence.Add((callback, times, tracking));
+				return this;
+			}
+
+			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _interceptor._sequence)
+				{
+					if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Reset all tracking in the sequence.</summary>
+			public void Reset() => _interceptor.Reset();
+		}
 	}
 
 	/// <summary>Interceptor for StartAsync.</summary>
@@ -61,22 +291,30 @@ partial class AsyncCallOrderKnockOff : global::KnockOff.Documentation.Samples.Gu
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IAsyncCallOrder instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IAsyncCallOrder Object => this;
 
+	/// <summary>Verifies all method interceptors' Times constraints were satisfied.</summary>
+	public bool Verify()
+	{
+		var result = true;
+		result &= StartAsync.Verify();
+		result &= ProcessAsync.Verify();
+		return result;
+	}
+
+	/// <summary>Verifies all method interceptors' Times constraints and throws if any fail.</summary>
+	public void VerifyAll()
+	{
+		if (!Verify())
+			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
 	global::System.Threading.Tasks.Task global::KnockOff.Documentation.Samples.Guides.IAsyncCallOrder.StartAsync()
 	{
-		StartAsync.RecordCall();
-		if (StartAsync.OnCall is { } callback)
-			return callback(this);
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncCallOrder", "StartAsync");
-		return global::System.Threading.Tasks.Task.CompletedTask;
+		return StartAsync.Invoke(this, Strict);
 	}
 
 	global::System.Threading.Tasks.Task global::KnockOff.Documentation.Samples.Guides.IAsyncCallOrder.ProcessAsync()
 	{
-		ProcessAsync.RecordCall();
-		if (ProcessAsync.OnCall is { } callback)
-			return callback(this);
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncCallOrder", "ProcessAsync");
-		return global::System.Threading.Tasks.Task.CompletedTask;
+		return ProcessAsync.Invoke(this, Strict);
 	}
 
 }

@@ -41,6 +41,7 @@ public class GenericStandaloneStubTests
 	{
 		// Arrange
 		var stub = new GenericRepositoryStub<User>();
+		var tracking = stub.Save.OnCall((ko, entity) => { });
 		IGenericRepository<User> repo = stub;
 
 		// Act
@@ -48,8 +49,8 @@ public class GenericStandaloneStubTests
 		repo.Save(new User { Id = 2 });
 
 		// Assert
-		Assert.Equal(2, stub.Save.CallCount);
-		Assert.True(stub.Save.WasCalled);
+		Assert.Equal(2, tracking.CallCount);
+		Assert.True(tracking.WasCalled);
 	}
 
 	[Fact]
@@ -57,6 +58,7 @@ public class GenericStandaloneStubTests
 	{
 		// Arrange
 		var stub = new GenericRepositoryStub<User>();
+		var tracking = stub.Save.OnCall((ko, entity) => { });
 		IGenericRepository<User> repo = stub;
 		var user = new User { Id = 42, Name = "Test" };
 
@@ -64,7 +66,7 @@ public class GenericStandaloneStubTests
 		repo.Save(user);
 
 		// Assert
-		Assert.Same(user, stub.Save.LastCallArg);
+		Assert.Same(user, tracking.LastArg);
 	}
 
 	#endregion
@@ -78,7 +80,7 @@ public class GenericStandaloneStubTests
 		var stub = new GenericRepositoryStub<User>();
 		IGenericRepository<User> repo = stub;
 		var expected = new User { Id = 123, Name = "Found" };
-		stub.GetById.OnCall = (ko, id) => expected;
+		stub.GetById.OnCall((ko, id) => expected);
 
 		// Act
 		var result = repo.GetById(123);
@@ -94,11 +96,11 @@ public class GenericStandaloneStubTests
 		var stub = new GenericRepositoryStub<User>();
 		IGenericRepository<User> repo = stub;
 		GenericRepositoryStub<User>? capturedKo = null;
-		stub.GetById.OnCall = (ko, id) =>
+		stub.GetById.OnCall((ko, id) =>
 		{
 			capturedKo = ko;
 			return null;
-		};
+		});
 
 		// Act
 		repo.GetById(1);
@@ -145,7 +147,7 @@ public class GenericStandaloneStubTests
 			new() { Id = 1, Name = "User1" },
 			new() { Id = 2, Name = "User2" }
 		};
-		stub.GetAll.OnCall = (ko) => users;
+		stub.GetAll.OnCall((ko) => users);
 
 		// Act
 		var result = repo.GetAll();
@@ -179,15 +181,15 @@ public class GenericStandaloneStubTests
 		// Arrange
 		var stub = new GenericKeyValueStoreStub<string, int>();
 		IGenericKeyValueStore<string, int> store = stub;
-		stub.Get.OnCall = (ko, key) => 42;
+		var tracking = stub.Get.OnCall((ko, key) => 42);
 
 		// Act
 		var result = store.Get("answer");
 
 		// Assert
 		Assert.Equal(42, result);
-		Assert.Equal(1, stub.Get.CallCount);
-		Assert.Equal("answer", stub.Get.LastCallArg);
+		Assert.Equal(1, tracking.CallCount);
+		Assert.Equal("answer", tracking.LastArg);
 	}
 
 	[Fact]
@@ -213,14 +215,14 @@ public class GenericStandaloneStubTests
 		var stub = new ConstrainedRepositoryStub<User>();
 		IConstrainedRepository<User> repo = stub;
 		var user = new User { Id = 1 };
-		stub.Save.OnCall = (ko, entity) => { };
+		var tracking = stub.Save.OnCall((ko, entity) => { });
 
 		// Act
 		repo.Save(user);
 
 		// Assert
-		Assert.Equal(1, stub.Save.CallCount);
-		Assert.Same(user, stub.Save.LastCallArg);
+		Assert.Equal(1, tracking.CallCount);
+		Assert.Same(user, tracking.LastArg);
 	}
 
 	[Fact]
@@ -246,6 +248,7 @@ public class GenericStandaloneStubTests
 	{
 		// Arrange
 		var stub = new GenericRepositoryStub<User>();
+		var tracking = stub.GetById.OnCall((ko, id) => null);
 		IGenericRepository<User> repo = stub;
 		repo.GetById(1);
 		repo.GetById(2);
@@ -253,9 +256,9 @@ public class GenericStandaloneStubTests
 		// Act
 		stub.GetById.Reset();
 
-		// Assert
-		Assert.Equal(0, stub.GetById.CallCount);
-		Assert.False(stub.GetById.WasCalled);
+		// Assert - tracking object is also reset
+		Assert.Equal(0, tracking.CallCount);
+		Assert.False(tracking.WasCalled);
 	}
 
 	#endregion

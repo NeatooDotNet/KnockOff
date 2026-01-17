@@ -783,6 +783,44 @@ public partial class KnockOffGenerator
 		// Create flat, deduplicated collections for the new v10.9+ API
 		var (flatMembers, flatEvents) = FlattenAndDeduplicateMembers(interfaceInfos, allInterfaces);
 
+		// Detect cross-interface signature conflicts (KO0100)
+		// Same method name + same parameter types from DIFFERENT interfaces = conflict
+		var methods = flatMembers.Where(m => !m.IsProperty && !m.IsIndexer).ToList();
+		var conflictGroups = methods
+			.GroupBy(m => GetMethodSignature(m))  // Group by name + param types (not return type)
+			.Where(g => g.Count() > 1)  // Multiple methods with same signature
+			.Where(g => g.Select(m => m.DeclaringInterfaceFullName).Distinct().Count() > 1)  // From DIFFERENT interfaces
+			.ToList();
+
+		foreach (var conflict in conflictGroups)
+		{
+			var interfaces = string.Join(", ", conflict.Select(m => ExtractSimpleTypeName(m.DeclaringInterfaceFullName)).Distinct());
+			var location = classDeclaration.Identifier.GetLocation();
+			var lineSpan = location.GetLineSpan();
+			diagnostics.Add(new DiagnosticInfo(
+				"KO0100",
+				filePath,
+				lineSpan.StartLinePosition.Line,
+				lineSpan.StartLinePosition.Character,
+				new[] { conflict.Key, interfaces }));
+		}
+
+		// If there are blocking diagnostics (KO0100), return early - code generation will be skipped
+		if (diagnostics.Any(d => d.Id == "KO0100"))
+		{
+			return new KnockOffTypeInfo(
+				Namespace: namespaceName,
+				ClassName: classSymbol.Name,
+				ContainingTypes: containingTypes,
+				TypeParameters: classTypeParameters,
+				Interfaces: new EquatableArray<InterfaceInfo>(Array.Empty<InterfaceInfo>()),
+				UserMethods: new EquatableArray<UserMethodInfo>(Array.Empty<UserMethodInfo>()),
+				Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
+				FlatMembers: new EquatableArray<InterfaceMemberInfo>(Array.Empty<InterfaceMemberInfo>()),
+				FlatEvents: new EquatableArray<EventMemberInfo>(Array.Empty<EventMemberInfo>()),
+				Strict: strict);
+		}
+
 		return new KnockOffTypeInfo(
 			Namespace: namespaceName,
 			ClassName: classSymbol.Name,
@@ -880,6 +918,15 @@ public partial class KnockOffGenerator
 			var paramTypes = string.Join(",", member.Parameters.Select(p => p.Type));
 			return $"method:{member.Name}({paramTypes})";
 		}
+	}
+
+	/// <summary>
+	/// Gets method signature for conflict detection: name + parameter types (not return type).
+	/// </summary>
+	private static string GetMethodSignature(InterfaceMemberInfo member)
+	{
+		var paramTypes = string.Join(",", member.Parameters.Select(p => p.Type));
+		return $"{member.Name}({paramTypes})";
 	}
 
 	/// <summary>

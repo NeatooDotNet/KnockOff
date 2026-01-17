@@ -24,45 +24,378 @@ partial class DataProviderStub : global::KnockOff.Benchmarks.Interfaces.IDataPro
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
-	/// <summary>Tracks and configures behavior for GetEnumerator.</summary>
+	/// <summary>Tracks and configures behavior for GetEnumerator (overloaded).</summary>
 	public sealed class GetEnumeratorInterceptor
 	{
-		/// <summary>Delegate for GetEnumerator.</summary>
-		public delegate global::System.Collections.Generic.IEnumerator<string> GetEnumeratorDelegate(DataProviderStub ko);
+		/// <summary>Delegate for GetEnumerator().</summary>
+		public delegate global::System.Collections.Generic.IEnumerator<string> GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_string(DataProviderStub ko);
 
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
+		private readonly global::System.Collections.Generic.List<(GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_string Callback, global::KnockOff.Times Times, MethodTrackingImpl_NoParams_Collections_Generic_IEnumerator_string Tracking)> _sequence_NoParams_Collections_Generic_IEnumerator_string = new();
+		private int _sequenceIndex_NoParams_Collections_Generic_IEnumerator_string;
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
+		/// <summary>Delegate for GetEnumerator().</summary>
+		public delegate global::System.Collections.IEnumerator GetEnumeratorDelegate_NoParams_Collections_IEnumerator(DataProviderStub ko);
 
-		/// <summary>Callback invoked when this method is called.</summary>
-		public GetEnumeratorDelegate? OnCall { get; set; }
+		private readonly global::System.Collections.Generic.List<(GetEnumeratorDelegate_NoParams_Collections_IEnumerator Callback, global::KnockOff.Times Times, MethodTrackingImpl_NoParams_Collections_IEnumerator Tracking)> _sequence_NoParams_Collections_IEnumerator = new();
+		private int _sequenceIndex_NoParams_Collections_IEnumerator;
 
-		/// <summary>Records a method call.</summary>
-		public void RecordCall() => CallCount++;
+		/// <summary>Configures callback for GetEnumerator(). Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking OnCall(GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_string callback)
+		{
+			var tracking = new MethodTrackingImpl_NoParams_Collections_Generic_IEnumerator_string();
+			_sequence_NoParams_Collections_Generic_IEnumerator_string.Clear();
+			_sequence_NoParams_Collections_Generic_IEnumerator_string.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequenceIndex_NoParams_Collections_Generic_IEnumerator_string = 0;
+			return tracking;
+		}
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; OnCall = null; }
+		/// <summary>Configures callback for GetEnumerator() with Times constraint.</summary>
+		public global::KnockOff.IMethodSequence<GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_string> OnCall(GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_string callback, global::KnockOff.Times times)
+		{
+			var tracking = new MethodTrackingImpl_NoParams_Collections_Generic_IEnumerator_string();
+			_sequence_NoParams_Collections_Generic_IEnumerator_string.Clear();
+			_sequence_NoParams_Collections_Generic_IEnumerator_string.Add((callback, times, tracking));
+			_sequenceIndex_NoParams_Collections_Generic_IEnumerator_string = 0;
+			return new MethodSequenceImpl_NoParams_Collections_Generic_IEnumerator_string(this);
+		}
+
+		/// <summary>Configures callback for GetEnumerator(). Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking OnCall(GetEnumeratorDelegate_NoParams_Collections_IEnumerator callback)
+		{
+			var tracking = new MethodTrackingImpl_NoParams_Collections_IEnumerator();
+			_sequence_NoParams_Collections_IEnumerator.Clear();
+			_sequence_NoParams_Collections_IEnumerator.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequenceIndex_NoParams_Collections_IEnumerator = 0;
+			return tracking;
+		}
+
+		/// <summary>Configures callback for GetEnumerator() with Times constraint.</summary>
+		public global::KnockOff.IMethodSequence<GetEnumeratorDelegate_NoParams_Collections_IEnumerator> OnCall(GetEnumeratorDelegate_NoParams_Collections_IEnumerator callback, global::KnockOff.Times times)
+		{
+			var tracking = new MethodTrackingImpl_NoParams_Collections_IEnumerator();
+			_sequence_NoParams_Collections_IEnumerator.Clear();
+			_sequence_NoParams_Collections_IEnumerator.Add((callback, times, tracking));
+			_sequenceIndex_NoParams_Collections_IEnumerator = 0;
+			return new MethodSequenceImpl_NoParams_Collections_IEnumerator(this);
+		}
+
+		/// <summary>Invokes configured callback for GetEnumerator().</summary>
+		internal global::System.Collections.Generic.IEnumerator<string> Invoke_NoParams_Collections_Generic_IEnumerator_string(DataProviderStub ko, bool strict)
+		{
+			if (_sequence_NoParams_Collections_Generic_IEnumerator_string.Count == 0)
+			{
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
+				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
+			}
+
+			var (callback, times, tracking) = _sequence_NoParams_Collections_Generic_IEnumerator_string[_sequenceIndex_NoParams_Collections_Generic_IEnumerator_string];
+			tracking.RecordCall();
+
+			if (!times.IsForever && tracking.CallCount >= times.Count)
+			{
+				if (_sequenceIndex_NoParams_Collections_Generic_IEnumerator_string < _sequence_NoParams_Collections_Generic_IEnumerator_string.Count - 1)
+					_sequenceIndex_NoParams_Collections_Generic_IEnumerator_string++;
+				else if (tracking.CallCount > times.Count)
+					throw global::KnockOff.StubException.SequenceExhausted("GetEnumerator");
+			}
+
+			return callback(ko);
+		}
+
+		/// <summary>Invokes configured callback for GetEnumerator().</summary>
+		internal global::System.Collections.IEnumerator Invoke_NoParams_Collections_IEnumerator(DataProviderStub ko, bool strict)
+		{
+			if (_sequence_NoParams_Collections_IEnumerator.Count == 0)
+			{
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
+				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
+			}
+
+			var (callback, times, tracking) = _sequence_NoParams_Collections_IEnumerator[_sequenceIndex_NoParams_Collections_IEnumerator];
+			tracking.RecordCall();
+
+			if (!times.IsForever && tracking.CallCount >= times.Count)
+			{
+				if (_sequenceIndex_NoParams_Collections_IEnumerator < _sequence_NoParams_Collections_IEnumerator.Count - 1)
+					_sequenceIndex_NoParams_Collections_IEnumerator++;
+				else if (tracking.CallCount > times.Count)
+					throw global::KnockOff.StubException.SequenceExhausted("GetEnumerator");
+			}
+
+			return callback(ko);
+		}
+
+		/// <summary>Resets all tracking state for all overloads.</summary>
+		public void Reset()
+		{
+			foreach (var (_, _, tracking) in _sequence_NoParams_Collections_Generic_IEnumerator_string)
+				tracking.Reset();
+			_sequenceIndex_NoParams_Collections_Generic_IEnumerator_string = 0;
+			foreach (var (_, _, tracking) in _sequence_NoParams_Collections_IEnumerator)
+				tracking.Reset();
+			_sequenceIndex_NoParams_Collections_IEnumerator = 0;
+		}
+
+		/// <summary>Verifies all Times constraints for all overloads were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence_NoParams_Collections_Generic_IEnumerator_string)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			foreach (var (_, times, tracking) in _sequence_NoParams_Collections_IEnumerator)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
+		private sealed class MethodTrackingImpl_NoParams_Collections_Generic_IEnumerator_string : global::KnockOff.IMethodTracking
+		{
+
+			public int CallCount { get; private set; }
+
+			public bool WasCalled => CallCount > 0;
+
+			public void RecordCall() => CallCount++;
+
+			public void Reset() => CallCount = 0;
+		}
+
+		private sealed class MethodTrackingImpl_NoParams_Collections_IEnumerator : global::KnockOff.IMethodTracking
+		{
+
+			public int CallCount { get; private set; }
+
+			public bool WasCalled => CallCount > 0;
+
+			public void RecordCall() => CallCount++;
+
+			public void Reset() => CallCount = 0;
+		}
+
+		private sealed class MethodSequenceImpl_NoParams_Collections_Generic_IEnumerator_string : global::KnockOff.IMethodSequence<GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_string>
+		{
+			private readonly GetEnumeratorInterceptor _interceptor;
+
+			public MethodSequenceImpl_NoParams_Collections_Generic_IEnumerator_string(GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
+
+			public int TotalCallCount
+			{
+				get
+				{
+					var total = 0;
+					foreach (var (_, _, tracking) in _interceptor._sequence_NoParams_Collections_Generic_IEnumerator_string)
+						total += tracking.CallCount;
+					return total;
+				}
+			}
+
+			public global::KnockOff.IMethodSequence<GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_string> ThenCall(GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_string callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl_NoParams_Collections_Generic_IEnumerator_string();
+				_interceptor._sequence_NoParams_Collections_Generic_IEnumerator_string.Add((callback, times, tracking));
+				return this;
+			}
+
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _interceptor._sequence_NoParams_Collections_Generic_IEnumerator_string)
+				{
+					if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			public void Reset() => _interceptor.Reset();
+		}
+
+		private sealed class MethodSequenceImpl_NoParams_Collections_IEnumerator : global::KnockOff.IMethodSequence<GetEnumeratorDelegate_NoParams_Collections_IEnumerator>
+		{
+			private readonly GetEnumeratorInterceptor _interceptor;
+
+			public MethodSequenceImpl_NoParams_Collections_IEnumerator(GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
+
+			public int TotalCallCount
+			{
+				get
+				{
+					var total = 0;
+					foreach (var (_, _, tracking) in _interceptor._sequence_NoParams_Collections_IEnumerator)
+						total += tracking.CallCount;
+					return total;
+				}
+			}
+
+			public global::KnockOff.IMethodSequence<GetEnumeratorDelegate_NoParams_Collections_IEnumerator> ThenCall(GetEnumeratorDelegate_NoParams_Collections_IEnumerator callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl_NoParams_Collections_IEnumerator();
+				_interceptor._sequence_NoParams_Collections_IEnumerator.Add((callback, times, tracking));
+				return this;
+			}
+
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _interceptor._sequence_NoParams_Collections_IEnumerator)
+				{
+					if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			public void Reset() => _interceptor.Reset();
+		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for Dispose.</summary>
 	public sealed class DisposeInterceptor
 	{
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
+		private readonly global::System.Collections.Generic.List<(global::System.Action<DataProviderStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+		private int _sequenceIndex;
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
+		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action<DataProviderStub> callback)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequenceIndex = 0;
+			return tracking;
+		}
 
-		/// <summary>Callback invoked when this method is called.</summary>
-		public global::System.Action<DataProviderStub>? OnCall { get; set; }
+		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+		public global::KnockOff.IMethodSequence<global::System.Action<DataProviderStub>> OnCall(global::System.Action<DataProviderStub> callback, global::KnockOff.Times times)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, times, tracking));
+			_sequenceIndex = 0;
+			return new MethodSequenceImpl(this);
+		}
 
-		/// <summary>Records a method call.</summary>
-		public void RecordCall() => CallCount++;
+		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+		internal void Invoke(DataProviderStub ko, bool strict)
+		{
+			if (_sequence.Count == 0)
+			{
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Dispose");
+				return;
+			}
+
+			var (callback, times, tracking) = _sequence[_sequenceIndex];
+			tracking.RecordCall();
+
+			if (!times.IsForever && tracking.CallCount >= times.Count)
+			{
+				if (_sequenceIndex < _sequence.Count - 1)
+					_sequenceIndex++;
+				else if (tracking.CallCount > times.Count)
+					throw global::KnockOff.StubException.SequenceExhausted("Dispose");
+			}
+
+			callback(ko);
+		}
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; OnCall = null; }
+		public void Reset()
+		{
+			foreach (var (_, _, tracking) in _sequence)
+				tracking.Reset();
+			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
+		/// <summary>Tracks invocations for this callback registration.</summary>
+		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking
+		{
+
+			/// <summary>Number of times this callback was invoked.</summary>
+			public int CallCount { get; private set; }
+
+			/// <summary>True if CallCount > 0.</summary>
+			public bool WasCalled => CallCount > 0;
+
+			/// <summary>Records a call to this callback.</summary>
+			public void RecordCall() => CallCount++;
+
+			/// <summary>Resets tracking state.</summary>
+			public void Reset() => CallCount = 0;
+		}
+
+		/// <summary>Sequence implementation for ThenCall chaining.</summary>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<DataProviderStub>>
+		{
+			private readonly DisposeInterceptor _interceptor;
+
+			public MethodSequenceImpl(DisposeInterceptor interceptor) => _interceptor = interceptor;
+
+			/// <summary>Total calls across all callbacks in sequence.</summary>
+			public int TotalCallCount
+			{
+				get
+				{
+					var total = 0;
+					foreach (var (_, _, tracking) in _interceptor._sequence)
+						total += tracking.CallCount;
+					return total;
+				}
+			}
+
+			/// <summary>Add another callback to the sequence.</summary>
+			public global::KnockOff.IMethodSequence<global::System.Action<DataProviderStub>> ThenCall(global::System.Action<DataProviderStub> callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_interceptor._sequence.Add((callback, times, tracking));
+				return this;
+			}
+
+			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _interceptor._sequence)
+				{
+					if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Reset all tracking in the sequence.</summary>
+			public void Reset() => _interceptor.Reset();
+		}
 	}
 
 	/// <summary>Interceptor for Count. Configure via .Value, track via .GetCount.</summary>
@@ -80,6 +413,22 @@ partial class DataProviderStub : global::KnockOff.Benchmarks.Interfaces.IDataPro
 	/// <summary>The global::KnockOff.Benchmarks.Interfaces.IDataProvider instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Interfaces.IDataProvider Object => this;
 
+	/// <summary>Verifies all method interceptors' Times constraints were satisfied.</summary>
+	public bool Verify()
+	{
+		var result = true;
+		result &= GetEnumerator.Verify();
+		result &= Dispose.Verify();
+		return result;
+	}
+
+	/// <summary>Verifies all method interceptors' Times constraints and throws if any fail.</summary>
+	public void VerifyAll()
+	{
+		if (!Verify())
+			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
 	int global::KnockOff.Benchmarks.Interfaces.IDataProvider.Count
 	{
 		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IDataProvider", "Count"); return Count.Value; }
@@ -87,11 +436,7 @@ partial class DataProviderStub : global::KnockOff.Benchmarks.Interfaces.IDataPro
 
 	global::System.Collections.Generic.IEnumerator<string> global::System.Collections.Generic.IEnumerable<string>.GetEnumerator()
 	{
-		GetEnumerator.RecordCall();
-		if (GetEnumerator.OnCall is { } callback)
-			return callback(this);
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable<string>", "GetEnumerator");
-		throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall or define a protected method 'GetEnumerator' in your partial class.");
+		return GetEnumerator.Invoke_NoParams_Collections_Generic_IEnumerator_string(this, Strict);
 	}
 
 	global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
@@ -99,10 +444,7 @@ partial class DataProviderStub : global::KnockOff.Benchmarks.Interfaces.IDataPro
 
 	void global::System.IDisposable.Dispose()
 	{
-		Dispose.RecordCall();
-		if (Dispose.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IDisposable", "Dispose");
+		Dispose.Invoke(this, Strict);
 	}
 
 }

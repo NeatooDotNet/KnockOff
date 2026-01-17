@@ -205,10 +205,10 @@ public interface IAsyncSaveService
 //     knockOff.IsConnected.OnGet = (ko) => false;
 //
 //     // Configure method to throw
-//     knockOff.SendEmail.OnCall = (ko, to, subject, body) =>
+//     knockOff.SendEmail.OnCall((ko, to, subject, body) =>
 //     {
 //         throw new InvalidOperationException("Not connected");
-//     };
+//     });
 //
 //     // ... test code
 // }
@@ -232,12 +232,12 @@ public interface IAsyncSaveService
 // ============================================================================
 
 #region getting-started-via-callback
-// knockOff.GetUser.OnCall = (ko, id) => new User { Id = id, Name = "Test" };
+// knockOff.GetUser.OnCall((ko, id) => new User { Id = id, Name = "Test" });
 #endregion
 
 #region getting-started-simulating-failures
-// knockOff.SaveAsync.OnCall = (ko, entity) =>
-//     Task.FromException<int>(new DbException("Connection lost"));
+// knockOff.SaveAsync.OnCall((ko, entity) =>
+//     Task.FromException<int>(new DbException("Connection lost")));
 #endregion
 
 #region getting-started-single-method-suffix
@@ -251,10 +251,10 @@ public interface IAsyncSaveService
 #region getting-started-capturing-arguments
 // List<string> sentEmails = new();
 //
-// knockOff.SendEmail.OnCall = (ko, to, subject, body) =>
+// knockOff.SendEmail.OnCall((ko, to, subject, body) =>
 // {
 //     sentEmails.Add(to);
-// };
+// });
 //
 // // ... run test ...
 //
@@ -287,9 +287,9 @@ public partial class ProcessServiceKnockOff : IProcessService { }
 // Assert.False(knockOff.Process1.WasCalled);
 //
 // Simple callbacks - no delegate casting needed
-// knockOff.Process1.OnCall = (ko, data) => { };
-// knockOff.Process2.OnCall = (ko, data, priority) => { };
-// knockOff.Process3.OnCall = (ko, data, priority, async) => { };
+// knockOff.Process1.OnCall((ko, data) => { });
+// knockOff.Process2.OnCall((ko, data, priority) => { });
+// knockOff.Process3.OnCall((ko, data, priority, async) => { });
 //
 // Proper types - no nullable wrappers
 // var args = knockOff.Process3.LastCallArgs;

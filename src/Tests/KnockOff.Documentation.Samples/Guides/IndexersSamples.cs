@@ -292,10 +292,10 @@ public static class IndexersUsageExamples
         var knockOff = new IdxMultiStoreKnockOff();
 
         #region indexers-multiple-interceptor-access
-        _ = knockOff.IndexerString;          // for this[string key]
-        _ = knockOff.IndexerInt32;           // for this[int index]
-        _ = knockOff.IndexerString.Backing;
-        _ = knockOff.IndexerInt32.Backing;
+        _ = knockOff.Indexer.OfString;          // for this[string key]
+        _ = knockOff.Indexer.OfInt32;           // for this[int index]
+        _ = knockOff.Indexer.OfString.Backing;
+        _ = knockOff.Indexer.OfInt32.Backing;
         #endregion
     }
 }

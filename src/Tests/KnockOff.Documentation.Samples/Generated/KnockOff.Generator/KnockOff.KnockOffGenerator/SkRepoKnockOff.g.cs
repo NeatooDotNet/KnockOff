@@ -5,54 +5,46 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class SkRepoKnockOff : global::KnockOff.Documentation.Samples.Skills.ISkRepoService, global::KnockOff.IKnockOffStub
 {
-	/// <summary>Tracks and configures behavior for GetById.</summary>
-	public sealed class GetById2Interceptor
+	/// <summary>Tracks calls to GetById (user-defined implementation).</summary>
+	public sealed class GetById2Interceptor : global::KnockOff.IMethodTracking<int>
 	{
-		/// <summary>Delegate for GetById.</summary>
-		public delegate global::KnockOff.Documentation.Samples.Skills.SkUser? GetByIdDelegate(SkRepoKnockOff ko, int id);
+		private int _lastArg = default!;
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>Whether this method was called at least once.</summary>
+		/// <summary>True if CallCount > 0.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The argument from the most recent call.</summary>
-		public int? LastCallArg { get; private set; }
-
-		/// <summary>Callback invoked when this method is called.</summary>
-		public GetByIdDelegate? OnCall { get; set; }
+		/// <summary>Last argument passed to this method. Default if never called.</summary>
+		public int LastArg => _lastArg;
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
+		internal void RecordCall(int id) { CallCount++; _lastArg = id; }
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+		/// <summary>Resets tracking state.</summary>
+		public void Reset() { CallCount = 0; _lastArg = default!; }
 	}
 
-	/// <summary>Tracks and configures behavior for GetByIdAsync.</summary>
-	public sealed class GetByIdAsync2Interceptor
+	/// <summary>Tracks calls to GetByIdAsync (user-defined implementation).</summary>
+	public sealed class GetByIdAsync2Interceptor : global::KnockOff.IMethodTracking<int>
 	{
-		/// <summary>Delegate for GetByIdAsync.</summary>
-		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.SkUser?> GetByIdAsyncDelegate(SkRepoKnockOff ko, int id);
+		private int _lastArg = default!;
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>Whether this method was called at least once.</summary>
+		/// <summary>True if CallCount > 0.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The argument from the most recent call.</summary>
-		public int? LastCallArg { get; private set; }
-
-		/// <summary>Callback invoked when this method is called.</summary>
-		public GetByIdAsyncDelegate? OnCall { get; set; }
+		/// <summary>Last argument passed to this method. Default if never called.</summary>
+		public int LastArg => _lastArg;
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
+		internal void RecordCall(int id) { CallCount++; _lastArg = id; }
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+		/// <summary>Resets tracking state.</summary>
+		public void Reset() { CallCount = 0; _lastArg = default!; }
 	}
 
 	/// <summary>Interceptor for GetById.</summary>
@@ -70,14 +62,12 @@ partial class SkRepoKnockOff : global::KnockOff.Documentation.Samples.Skills.ISk
 	global::KnockOff.Documentation.Samples.Skills.SkUser? global::KnockOff.Documentation.Samples.Skills.ISkRepoService.GetById(int id)
 	{
 		GetById2.RecordCall(id);
-		if (GetById2.OnCall is { } callback) return callback(this, id);
 		return GetById(id);
 	}
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.SkUser?> global::KnockOff.Documentation.Samples.Skills.ISkRepoService.GetByIdAsync(int id)
 	{
 		GetByIdAsync2.RecordCall(id);
-		if (GetByIdAsync2.OnCall is { } callback) return callback(this, id);
 		return GetByIdAsync(id);
 	}
 

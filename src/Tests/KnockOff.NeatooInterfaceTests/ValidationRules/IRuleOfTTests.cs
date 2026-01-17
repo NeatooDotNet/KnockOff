@@ -200,11 +200,11 @@ public class IRuleOfTStandaloneTests
         var validateStub = new ValidateBaseStubForRuleT();
 
         // Must provide OnCall for methods with return types
-        stub.RunRule.OnCall = (ko, target, token) => Task.FromResult<IRuleMessages>(RuleMessages.None);
+        var tracking = stub.RunRule.OnCall((ko, target, token) => Task.FromResult<IRuleMessages>(RuleMessages.None));
 
         await rule.RunRule(validateStub, null);
 
-        Assert.True(stub.RunRule.WasCalled);
+        Assert.True(tracking.WasCalled);
     }
 }
 

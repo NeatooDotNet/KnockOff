@@ -1,19 +1,12 @@
-# The Duality Pattern
+# User Methods: Compile-Time Defaults
 
-KnockOff provides **two complementary ways** to customize stub behavior. This is a key differentiator from Moq, which only offers runtime configuration.
+KnockOff allows you to define **user methods** in your stub classes to provide default behavior. This is a key differentiator from Moq, which requires runtime setup for every behavior.
 
-## The Two Patterns
+## How It Works
 
-| Pattern | When Defined | Scope | Best For |
-|---------|--------------|-------|----------|
-| **User Methods** | Compile-time | All tests using this stub | Consistent defaults |
-| **Callbacks** | Runtime | Single test | Test-specific overrides |
+Define protected methods in your stub class matching the interface signature. The generator detects them and calls them automatically.
 
-## User Methods: Compile-Time Defaults
-
-Define protected methods in your stub class. The generator detects them and calls them as the default behavior.
-
-<!-- snippet: duality-user-repository-stub -->
+<!-- snippet: user-methods-stub -->
 ```cs
 [KnockOff]
 public partial class DuUserRepositoryStub : IDuUserRepository
@@ -21,20 +14,21 @@ public partial class DuUserRepositoryStub : IDuUserRepository
     // Default: return a test user for any ID
     protected DuUser? GetById(int id) => new DuUser { Id = id, Name = $"User-{id}" };
 
-    // Save: no user method = default behavior (void returns nothing)
+    // Save: no user method = requires OnCall setup or will use default void behavior
 }
 ```
 <!-- endSnippet -->
 
 Now every test using `DuUserRepositoryStub` gets this default behavior automatically:
 
-<!-- snippet: duality-user-method-usage -->
+<!-- snippet: user-methods-usage -->
 ```cs
 public static void UserMethodUsage()
 {
     var stub = new DuUserRepositoryStub();
     IDuUserRepository repo = stub;
 
+    // User method provides default behavior automatically
     var user = repo.GetById(42);
 
     Assert.Equal(42, user?.Id);
@@ -43,64 +37,39 @@ public static void UserMethodUsage()
 ```
 <!-- endSnippet -->
 
-### When to Use User Methods
+## Full Tracking Support
 
-- Behavior is the same across many tests
-- Stub is shared between test classes
-- You want compile-time guarantees
+User methods get the same tracking capabilities as generated methods:
 
-## Callbacks: Runtime Overrides
-
-Set `OnCall`, `OnGet`, or `OnSet` for per-test behavior. Callbacks take precedence over user methods.
-
-<!-- snippet: duality-callback-override -->
+<!-- snippet: user-methods-tracking -->
 ```cs
-public static void CallbackOverride()
+public static void UserMethodWithTracking()
 {
     var stub = new DuUserRepositoryStub();
+    IDuUserRepository repo = stub;
 
-    // Override the user method for just this test
-    stub.GetById2.OnCall = (ko, id) => null;
+    repo.GetById(42);
+    repo.GetById(99);
 
-    var user = stub.Object.GetById(999);
-
-    Assert.Null(user);
+    // User methods still get full tracking
+    Assert.Equal(2, stub.GetById2.CallCount);
+    Assert.Equal(99, stub.GetById2.LastArg);
 }
 ```
 <!-- endSnippet -->
 
-### When to Use Callbacks
+## When to Use User Methods
 
-- Behavior differs between tests
-- You need dynamic return values based on arguments
-- You're testing error conditions
-- You need access to test-local state
+| Scenario | User Method? |
+|----------|--------------|
+| Same behavior in all tests | ✓ Yes |
+| Shared stub across test files | ✓ Yes |
+| Want compile-time guarantees | ✓ Yes |
+| Different behavior per test | Use `OnCall` on methods without user implementations |
 
-## Priority Order
+## Example: Repository with Defaults
 
-When an interface member is invoked:
-
-<!-- pseudo:duality-priority-order -->
-```
-1. CALLBACK (if set)
-   └─ OnCall for methods, OnGet/OnSet for properties
-   └─ If callback exists → use it, stop
-
-2. USER METHOD (if defined)
-   └─ Protected method matching interface signature
-   └─ If user method exists → call it, stop
-
-3. DEFAULT
-   └─ Methods: return default(T)
-   └─ Properties: return backing field value
-```
-<!-- /snippet -->
-
-## Combining Both Patterns
-
-The real power comes from using both together:
-
-<!-- snippet: duality-order-repository-stub -->
+<!-- snippet: user-methods-order-stub -->
 ```cs
 [KnockOff]
 public partial class DuOrderRepositoryStub : IDuOrderRepository
@@ -119,79 +88,30 @@ public partial class DuOrderRepositoryStub : IDuOrderRepository
 ```
 <!-- endSnippet -->
 
-Tests use the defaults, but override when needed:
-
-<!-- snippet: duality-combining-not-found -->
+<!-- snippet: user-methods-order-defaults -->
 ```cs
-public static void CombiningNotFound()
+public static void OrderRepositoryDefaults()
 {
     var stub = new DuOrderRepositoryStub();
-    stub.GetById2.OnCall = (ko, id) => null;  // Override for this test
+    IDuOrderRepository repo = stub;
 
-    // var processor = new OrderProcessor(stub);
-    // var result = processor.Process(orderId: 999);
-    // Assert.False(result);
+    // GetById returns a pending order by default
+    var order = repo.GetById(123);
+    Assert.Equal("Pending", order?.Status);
+
+    // GetByCustomer returns empty by default
+    var orders = repo.GetByCustomer(1);
+    Assert.Empty(orders);
 }
 ```
 <!-- endSnippet -->
-
-<!-- snippet: duality-combining-multiple-orders -->
-```cs
-public static void CombiningMultipleOrders()
-{
-    var stub = new DuOrderRepositoryStub();
-    stub.GetByCustomer2.OnCall = (ko, customerId) => new[]
-    {
-        new DuOrder { Id = 1, CustomerId = customerId },
-        new DuOrder { Id = 2, CustomerId = customerId }
-    };
-
-    // var service = new CustomerService(stub);
-    // var orders = service.GetOrderHistory(customerId: 42);
-    // Assert.Equal(2, orders.Count());
-}
-```
-<!-- endSnippet -->
-
-## Reset Returns to Defaults
-
-`Reset()` clears callbacks and tracking, returning to user method behavior:
-
-<!-- snippet: duality-reset-behavior -->
-```cs
-public static void ResetBehavior()
-{
-    var stub = new DuUserRepositoryStub();
-
-    // Override default
-    stub.GetById2.OnCall = (ko, id) => null;
-    var user1 = stub.Object.GetById(1);  // null
-
-    // Reset
-    stub.GetById2.Reset();
-    var user2 = stub.Object.GetById(1);  // User { Id = 1, Name = "User-1" }
-
-    _ = (user1, user2);
-}
-```
-<!-- endSnippet -->
-
-## Decision Guide
-
-| Question | Answer |
-|----------|--------|
-| Same behavior in all tests? | → User method |
-| Different per test? | → Callback |
-| Shared stub across files? | → User method for defaults |
-| Testing error conditions? | → Callback |
-| Just need a simple return? | → Either works |
 
 ## Why This Matters
 
 1. **DRY defaults** — Define once, use everywhere
 2. **Focused tests** — Tests only show what's different
-3. **Flexible overrides** — Easy to change behavior per test
-4. **Clear intent** — User method = "normal", callback = "special case"
+3. **Compile-time safety** — Errors caught before runtime
+4. **Clear intent** — User method = "normal" behavior for this stub
 
 ## Next
 

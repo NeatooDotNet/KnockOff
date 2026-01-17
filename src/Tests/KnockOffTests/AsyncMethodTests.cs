@@ -9,12 +9,13 @@ public class AsyncMethodTests
 	public async Task AsyncMethod_Task_ReturnsCompletedTask()
 	{
 		var knockOff = new AsyncServiceKnockOff();
+		var tracking = knockOff.DoWorkAsync.OnCall(ko => Task.CompletedTask);
 		IAsyncService service = knockOff;
 
 		await service.DoWorkAsync();
 
-		Assert.True(knockOff.DoWorkAsync.WasCalled);
-		Assert.Equal(1, knockOff.DoWorkAsync.CallCount);
+		Assert.True(tracking.WasCalled);
+		Assert.Equal(1, tracking.CallCount);
 	}
 
 	[Fact]
@@ -26,30 +27,32 @@ public class AsyncMethodTests
 		var result = await service.GetValueAsync(10);
 
 		Assert.Equal(30, result); // User method multiplies by 3
-		Assert.Equal(10, knockOff.GetValueAsync2.LastCallArg);
+		Assert.Equal(10, knockOff.GetValueAsync2.LastArg);
 	}
 
 	[Fact]
 	public async Task AsyncMethod_TaskOfNullableT_ReturnsDefault()
 	{
 		var knockOff = new AsyncServiceKnockOff();
+		var tracking = knockOff.GetOptionalAsync.OnCall(ko => Task.FromResult<string?>(null));
 		IAsyncService service = knockOff;
 
 		var result = await service.GetOptionalAsync();
 
 		Assert.Null(result);
-		Assert.True(knockOff.GetOptionalAsync.WasCalled);
+		Assert.True(tracking.WasCalled);
 	}
 
 	[Fact]
 	public async Task AsyncMethod_ValueTask_ReturnsCompleted()
 	{
 		var knockOff = new AsyncServiceKnockOff();
+		var tracking = knockOff.DoWorkValueTaskAsync.OnCall(ko => default);
 		IAsyncService service = knockOff;
 
 		await service.DoWorkValueTaskAsync();
 
-		Assert.True(knockOff.DoWorkValueTaskAsync.WasCalled);
+		Assert.True(tracking.WasCalled);
 	}
 
 	[Fact]
@@ -61,6 +64,6 @@ public class AsyncMethodTests
 		var result = await service.GetValueValueTaskAsync(5);
 
 		Assert.Equal(20, result); // User method multiplies by 4
-		Assert.Equal(5, knockOff.GetValueValueTaskAsync2.LastCallArg);
+		Assert.Equal(5, knockOff.GetValueValueTaskAsync2.LastArg);
 	}
 }

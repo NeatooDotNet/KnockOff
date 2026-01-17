@@ -5,29 +5,25 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class SkServiceKnockOff : global::KnockOff.Documentation.Samples.Skills.ISkService, global::KnockOff.IKnockOffStub
 {
-	/// <summary>Tracks and configures behavior for GetValue.</summary>
-	public sealed class GetValue2Interceptor
+	/// <summary>Tracks calls to GetValue (user-defined implementation).</summary>
+	public sealed class GetValue2Interceptor : global::KnockOff.IMethodTracking<int>
 	{
-		/// <summary>Delegate for GetValue.</summary>
-		public delegate int GetValueDelegate(SkServiceKnockOff ko, int id);
+		private int _lastArg = default!;
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>Whether this method was called at least once.</summary>
+		/// <summary>True if CallCount > 0.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The argument from the most recent call.</summary>
-		public int? LastCallArg { get; private set; }
-
-		/// <summary>Callback invoked when this method is called.</summary>
-		public GetValueDelegate? OnCall { get; set; }
+		/// <summary>Last argument passed to this method. Default if never called.</summary>
+		public int LastArg => _lastArg;
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
+		internal void RecordCall(int id) { CallCount++; _lastArg = id; }
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+		/// <summary>Resets tracking state.</summary>
+		public void Reset() { CallCount = 0; _lastArg = default!; }
 	}
 
 	/// <summary>Interceptor for GetValue.</summary>
@@ -42,7 +38,6 @@ partial class SkServiceKnockOff : global::KnockOff.Documentation.Samples.Skills.
 	int global::KnockOff.Documentation.Samples.Skills.ISkService.GetValue(int id)
 	{
 		GetValue2.RecordCall(id);
-		if (GetValue2.OnCall is { } callback) return callback(this, id);
 		return GetValue(id);
 	}
 

@@ -84,9 +84,9 @@ public class BpCallbacksExample
         IBpCallbackRepo repo = knockOff;
 
         // Override just for this test
-        knockOff.GetById.OnCall = (ko, id) => id == 1
+        knockOff.GetById.OnCall((ko, id) => id == 1
             ? new User { Id = 1, Name = "Admin" }
-            : null;
+            : null);
 
         // Use through interface
         var admin = repo.GetById(1);
@@ -148,8 +148,9 @@ public class BpDynamicOnGetExample
         var counter = 0;
         knockOff.RequestId.OnGet = (ko) => $"REQ-{++counter}";
 
-        // Depends on stub state
-        knockOff.IsReady.OnGet = (ko) => ko.Initialize.WasCalled;
+        // Track Initialize calls and use tracking in IsReady
+        var initTracking = knockOff.Initialize.OnCall((ko) => { });
+        knockOff.IsReady.OnGet = (ko) => initTracking.WasCalled;
     }
 }
 #endregion
@@ -219,11 +220,11 @@ public class BpOutParamExample
         var knockOff = new BpParserKnockOff();
 
         // CORRECT - explicit delegate type (nested in interceptor class)
-        knockOff.TryParse.OnCall =
+        knockOff.TryParse.OnCall(
             (BpParserKnockOff.TryParseInterceptor.TryParseDelegate)((BpParserKnockOff ko, string input, out int result) =>
             {
                 return int.TryParse(input, out result);
-            });
+            }));
     }
 }
 #endregion

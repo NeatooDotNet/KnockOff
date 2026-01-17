@@ -5,29 +5,25 @@ namespace KnockOff.Documentation.Samples.Comparison;
 
 partial class VsUnitOfWorkKnockOff : global::KnockOff.Documentation.Samples.Comparison.IVsUnitOfWork, global::KnockOff.IKnockOffStub
 {
-	/// <summary>Tracks and configures behavior for SaveChangesAsync.</summary>
-	public sealed class SaveChangesAsync2Interceptor
+	/// <summary>Tracks calls to SaveChangesAsync (user-defined implementation).</summary>
+	public sealed class SaveChangesAsync2Interceptor : global::KnockOff.IMethodTracking<global::System.Threading.CancellationToken>
 	{
-		/// <summary>Delegate for SaveChangesAsync.</summary>
-		public delegate global::System.Threading.Tasks.Task<int> SaveChangesAsyncDelegate(VsUnitOfWorkKnockOff ko, global::System.Threading.CancellationToken cancellationToken);
+		private global::System.Threading.CancellationToken _lastArg = default!;
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>Whether this method was called at least once.</summary>
+		/// <summary>True if CallCount > 0.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The argument from the most recent call.</summary>
-		public global::System.Threading.CancellationToken? LastCallArg { get; private set; }
-
-		/// <summary>Callback invoked when this method is called.</summary>
-		public SaveChangesAsyncDelegate? OnCall { get; set; }
+		/// <summary>Last argument passed to this method. Default if never called.</summary>
+		public global::System.Threading.CancellationToken LastArg => _lastArg;
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::System.Threading.CancellationToken? cancellationToken) { CallCount++; LastCallArg = cancellationToken; }
+		internal void RecordCall(global::System.Threading.CancellationToken cancellationToken) { CallCount++; _lastArg = cancellationToken; }
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+		/// <summary>Resets tracking state.</summary>
+		public void Reset() { CallCount = 0; _lastArg = default!; }
 	}
 
 	/// <summary>Interceptor for SaveChangesAsync.</summary>
@@ -42,7 +38,6 @@ partial class VsUnitOfWorkKnockOff : global::KnockOff.Documentation.Samples.Comp
 	global::System.Threading.Tasks.Task<int> global::KnockOff.Documentation.Samples.Comparison.IVsUnitOfWork.SaveChangesAsync(global::System.Threading.CancellationToken cancellationToken)
 	{
 		SaveChangesAsync2.RecordCall(cancellationToken);
-		if (SaveChangesAsync2.OnCall is { } callback) return callback(this, cancellationToken);
 		return SaveChangesAsync(cancellationToken);
 	}
 

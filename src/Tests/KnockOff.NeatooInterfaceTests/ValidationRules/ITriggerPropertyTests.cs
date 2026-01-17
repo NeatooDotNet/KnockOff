@@ -180,11 +180,12 @@ public class ITriggerPropertyStandaloneTests
     public void IsMatch_TracksCall()
     {
         var stub = new TriggerPropertyStub();
+        var tracking = stub.IsMatch.OnCall((ko, propertyName) => false);
         ITriggerProperty trigger = stub;
 
         trigger.IsMatch("Test");
 
-        Assert.True(stub.IsMatch.WasCalled);
+        Assert.True(tracking.WasCalled);
     }
 }
 
@@ -331,11 +332,12 @@ public class ITriggerPropertyOfTStandaloneTests
     public void GetValue_TracksCall()
     {
         var stub = new TriggerPropertyOfTStub();
+        var tracking = stub.GetValue.OnCall((ko, target) => null);
         ITriggerProperty<IValidateBase> trigger = stub;
 
         var targetStub = new ValidateBaseStubForTrigger();
         trigger.GetValue(targetStub);
 
-        Assert.True(stub.GetValue.WasCalled);
+        Assert.True(tracking.WasCalled);
     }
 }

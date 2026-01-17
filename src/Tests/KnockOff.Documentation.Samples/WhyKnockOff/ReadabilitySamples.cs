@@ -110,7 +110,7 @@ public static class ReadabilitySamples
         mock.Setup(x => x.GetUser(It.IsAny<int>())).Returns(user);
 
         // Moq: Lambda in Verify
-        mock.Verify(x => x.Save(It.IsAny<RdOrder>()), Times.Once);
+        mock.Verify(x => x.Save(It.IsAny<RdOrder>()), Moq.Times.Once);
 
         // Moq: Lambda in Callback to capture
         RdOrder? capturedOrder = null;
@@ -126,19 +126,20 @@ public static class ReadabilitySamples
         var user = new RdUser();
         var stub = new RdUserServiceKnockOff();
         var orderStub = new RdOrderServiceKnockOff();
+        var processTracking = orderStub.Process.OnCall((ko, order) => { });
         IRdOrderService orderService = orderStub;
 
         orderService.Process(new RdOrder());
 
         #region readability-knockoff-approach
-        // KnockOff: Direct assignment
-        stub.GetUser.OnCall = (ko, id) => user;
+        // KnockOff: Callback method
+        stub.GetUser.OnCall((ko, id) => user);
 
-        // KnockOff: Direct property access
-        Assert.Equal(1, orderStub.Process.CallCount);
+        // KnockOff: Tracking via returned interface
+        Assert.Equal(1, processTracking.CallCount);
 
         // KnockOff: Automatic argument tracking
-        var capturedOrder = orderStub.Process.LastCallArg;
+        var capturedOrder = processTracking.LastArg;
         #endregion
 
         _ = capturedOrder;
@@ -159,7 +160,7 @@ public static class ReadabilitySamples
         var stub = new RdUserServiceKnockOff();
 
         #region readability-knockoff-setup-returns
-        stub.GetUser.OnCall = (ko, id) => new RdUser { Id = id, Name = "Test" };
+        stub.GetUser.OnCall((ko, id) => new RdUser { Id = id, Name = "Test" });
         #endregion
     }
 
@@ -170,23 +171,26 @@ public static class ReadabilitySamples
         mock.Object.GetAll();
 
         #region readability-moq-verify
-        mock.Verify(x => x.Save(It.IsAny<RdOrder>()), Times.Once);
-        mock.Verify(x => x.Delete(It.IsAny<int>()), Times.Never);
-        mock.Verify(x => x.GetAll(), Times.AtLeastOnce);
+        mock.Verify(x => x.Save(It.IsAny<RdOrder>()), Moq.Times.Once);
+        mock.Verify(x => x.Delete(It.IsAny<int>()), Moq.Times.Never);
+        mock.Verify(x => x.GetAll(), Moq.Times.AtLeastOnce);
         #endregion
     }
 
     public static void KnockOffVerify()
     {
         var stub = new RdOrderServiceKnockOff();
+        var saveTracking = stub.Save.OnCall((ko, order) => { });
+        var deleteTracking = stub.Delete.OnCall((ko, id) => { });
+        var getAllTracking = stub.GetAll.OnCall(ko => Enumerable.Empty<RdOrder>());
         IRdOrderService service = stub;
         service.Save(new RdOrder());
         _ = service.GetAll();
 
         #region readability-knockoff-verify
-        Assert.Equal(1, stub.Save.CallCount);
-        Assert.Equal(0, stub.Delete.CallCount);
-        Assert.True(stub.GetAll.WasCalled);
+        Assert.Equal(1, saveTracking.CallCount);
+        Assert.Equal(0, deleteTracking.CallCount);
+        Assert.True(getAllTracking.WasCalled);
         #endregion
     }
 
@@ -209,6 +213,7 @@ public static class ReadabilitySamples
     public static void KnockOffCaptureArguments()
     {
         var stub = new RdOrderServiceKnockOff();
+        var tracking = stub.Process.OnCall((ko, order) => { });
         IRdOrderService service = stub;
         var expected = new RdOrder();
         service.Process(expected);
@@ -216,7 +221,7 @@ public static class ReadabilitySamples
         #region readability-knockoff-capture-arguments
         // ... run test ...
 
-        Assert.Equal(expected, stub.Process.LastCallArg);
+        Assert.Equal(expected, tracking.LastArg);
         #endregion
     }
 
@@ -237,14 +242,15 @@ public static class ReadabilitySamples
     public static void KnockOffMultipleArguments()
     {
         var stub = new RdEmailServiceKnockOff();
+        var tracking = stub.SendEmail.OnCall((ko, to, subject, body) => { });
         IRdEmailService service = stub;
         service.SendEmail("user@example.com", "Welcome", "Hello");
 
         #region readability-knockoff-multiple-arguments
-        // Named tuple access - no setup required
-        var args = stub.SendEmail.LastCallArgs;
-        Assert.Equal("user@example.com", args?.to);
-        Assert.Equal("Welcome", args?.subject);
+        // Named tuple access via tracking
+        var args = tracking.LastArgs;
+        Assert.Equal("user@example.com", args.to);
+        Assert.Equal("Welcome", args.subject);
         #endregion
     }
 
@@ -286,8 +292,8 @@ public static class ReadabilitySamples
         // var result = processor.Process(1);
         // Assert.True(result);
 
-        orderRepo.Verify(x => x.Save(It.IsAny<RdOrder>()), Times.Once);
-        notification.Verify(x => x.SendConfirmation(It.IsAny<int>()), Times.Once);
+        orderRepo.Verify(x => x.Save(It.IsAny<RdOrder>()), Moq.Times.Once);
+        notification.Verify(x => x.SendConfirmation(It.IsAny<int>()), Moq.Times.Once);
         #endregion
     }
 
@@ -295,19 +301,21 @@ public static class ReadabilitySamples
     {
         #region readability-knockoff-line-count
         var orderRepo = new RdOrderRepositoryKnockOff();
-        orderRepo.GetById.OnCall = (ko, id) => new RdOrder { Id = 1, Amount = 100m };
+        orderRepo.GetById.OnCall((ko, id) => new RdOrder { Id = 1, Amount = 100m });
+        var saveTracking = orderRepo.Save.OnCall((ko, order) => { });
 
         var payment = new RdPaymentServiceKnockOff();
-        payment.Process.OnCall = (ko, id, amount) => new RdPaymentResult { Success = true };
+        payment.Process.OnCall((ko, id, amount) => new RdPaymentResult { Success = true });
 
         var notification = new RdNotificationServiceKnockOff();
+        var confirmTracking = notification.SendConfirmation.OnCall((ko, orderId) => { });
 
         // var processor = new OrderProcessor(orderRepo, payment, notification);
         // var result = processor.Process(1);
         // Assert.True(result);
 
-        Assert.Equal(1, orderRepo.Save.CallCount);
-        Assert.Equal(1, notification.SendConfirmation.CallCount);
+        Assert.Equal(1, saveTracking.CallCount);
+        Assert.Equal(1, confirmTracking.CallCount);
         #endregion
     }
 }

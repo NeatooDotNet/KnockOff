@@ -347,9 +347,12 @@ public class IRuleManagerStandaloneTests
         var stub = new RuleManagerStub();
         IRuleManager ruleManager = stub;
 
+        // Configure callback to enable tracking (string overload)
+        var tracking = stub.RunRules.OnCall((RuleManagerStub ko, string propertyName, CancellationToken? token) => Task.CompletedTask);
+
         await ruleManager.RunRules("Property", null);
 
-        // Standalone stub uses RunRules1 for the string overload
-        Assert.True(stub.RunRules1.WasCalled);
+        // Tracking is available via the returned tracking object
+        Assert.True(tracking.WasCalled);
     }
 }

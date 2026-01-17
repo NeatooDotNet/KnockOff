@@ -36,29 +36,25 @@ partial class KeyLookupKnockOff : global::KnockOff.Tests.IKeyLookup, global::Kno
 		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 	}
 
-	/// <summary>Tracks and configures behavior for GetData.</summary>
-	public sealed class GetData2Interceptor
+	/// <summary>Tracks calls to GetData (user-defined implementation).</summary>
+	public sealed class GetData2Interceptor : global::KnockOff.IMethodTracking<string>
 	{
-		/// <summary>Delegate for GetData.</summary>
-		public delegate int GetDataDelegate(KeyLookupKnockOff ko, string key);
+		private string _lastArg = default!;
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>Whether this method was called at least once.</summary>
+		/// <summary>True if CallCount > 0.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The argument from the most recent call.</summary>
-		public string? LastCallArg { get; private set; }
-
-		/// <summary>Callback invoked when this method is called.</summary>
-		public GetDataDelegate? OnCall { get; set; }
+		/// <summary>Last argument passed to this method. Default if never called.</summary>
+		public string LastArg => _lastArg;
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string? key) { CallCount++; LastCallArg = key; }
+		internal void RecordCall(string key) { CallCount++; _lastArg = key; }
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+		/// <summary>Resets tracking state.</summary>
+		public void Reset() { CallCount = 0; _lastArg = default!; }
 	}
 
 	/// <summary>Interceptor for Count. Configure via .Value, track via .GetCount.</summary>
@@ -82,7 +78,6 @@ partial class KeyLookupKnockOff : global::KnockOff.Tests.IKeyLookup, global::Kno
 	int global::KnockOff.Tests.IKeyLookup.GetData(string key)
 	{
 		GetData2.RecordCall(key);
-		if (GetData2.OnCall is { } callback) return callback(this, key);
 		return GetData(key);
 	}
 

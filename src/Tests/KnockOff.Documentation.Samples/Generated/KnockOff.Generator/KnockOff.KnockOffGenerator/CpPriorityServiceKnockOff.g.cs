@@ -5,29 +5,25 @@ namespace KnockOff.Documentation.Samples.Skills;
 
 partial class CpPriorityServiceKnockOff : global::KnockOff.Documentation.Samples.Skills.ICpPriorityService, global::KnockOff.IKnockOffStub
 {
-	/// <summary>Tracks and configures behavior for Calculate.</summary>
-	public sealed class Calculate2Interceptor
+	/// <summary>Tracks calls to Calculate (user-defined implementation).</summary>
+	public sealed class Calculate2Interceptor : global::KnockOff.IMethodTracking<int>
 	{
-		/// <summary>Delegate for Calculate.</summary>
-		public delegate int CalculateDelegate(CpPriorityServiceKnockOff ko, int x);
+		private int _lastArg = default!;
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>Whether this method was called at least once.</summary>
+		/// <summary>True if CallCount > 0.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The argument from the most recent call.</summary>
-		public int? LastCallArg { get; private set; }
-
-		/// <summary>Callback invoked when this method is called.</summary>
-		public CalculateDelegate? OnCall { get; set; }
+		/// <summary>Last argument passed to this method. Default if never called.</summary>
+		public int LastArg => _lastArg;
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int? x) { CallCount++; LastCallArg = x; }
+		internal void RecordCall(int x) { CallCount++; _lastArg = x; }
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+		/// <summary>Resets tracking state.</summary>
+		public void Reset() { CallCount = 0; _lastArg = default!; }
 	}
 
 	/// <summary>Interceptor for Calculate.</summary>
@@ -42,7 +38,6 @@ partial class CpPriorityServiceKnockOff : global::KnockOff.Documentation.Samples
 	int global::KnockOff.Documentation.Samples.Skills.ICpPriorityService.Calculate(int x)
 	{
 		Calculate2.RecordCall(x);
-		if (Calculate2.OnCall is { } callback) return callback(this, x);
 		return Calculate(x);
 	}
 

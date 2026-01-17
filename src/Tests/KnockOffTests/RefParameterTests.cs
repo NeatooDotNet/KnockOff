@@ -27,17 +27,17 @@ public class RefParameterTests
 		var knockOff = new RefParameterServiceKnockOff();
 		IRefParameterService service = knockOff;
 
-		knockOff.Increment.OnCall = (RefParameterServiceKnockOff ko, ref int value) =>
+		var tracking = knockOff.Increment.OnCall((RefParameterServiceKnockOff ko, ref int value) =>
 		{
 			value++; // Modify the ref param
-		};
+		});
 
 		int myValue = 5;
 		service.Increment(ref myValue);
 
 		// The ref param should be tracked with its input value (5), not the modified value
-		Assert.Equal(1, knockOff.Increment.CallCount);
-		Assert.Equal(5, knockOff.Increment.LastCallArg);
+		Assert.Equal(1, tracking.CallCount);
+		Assert.Equal(5, tracking.LastArg);
 	}
 
 	[Fact]
@@ -46,10 +46,10 @@ public class RefParameterTests
 		var knockOff = new RefParameterServiceKnockOff();
 		IRefParameterService service = knockOff;
 
-		knockOff.Increment.OnCall = (RefParameterServiceKnockOff ko, ref int value) =>
+		knockOff.Increment.OnCall((RefParameterServiceKnockOff ko, ref int value) =>
 		{
 			value = value * 2; // Double the value
-		};
+		});
 
 		int val = 10;
 		service.Increment(ref val);
@@ -63,7 +63,7 @@ public class RefParameterTests
 		var knockOff = new RefParameterServiceKnockOff();
 		IRefParameterService service = knockOff;
 
-		knockOff.TryUpdate.OnCall = (RefParameterServiceKnockOff ko, string key, ref string value) =>
+		var tracking = knockOff.TryUpdate.OnCall((RefParameterServiceKnockOff ko, string key, ref string value) =>
 		{
 			if (key == "valid")
 			{
@@ -71,7 +71,7 @@ public class RefParameterTests
 				return true;
 			}
 			return false;
-		};
+		});
 
 		string text = "hello";
 		var success = service.TryUpdate("valid", ref text);
@@ -80,11 +80,10 @@ public class RefParameterTests
 		Assert.Equal("HELLO", text);
 
 		// Check tracking - should have both key and the original value
-		Assert.Equal(1, knockOff.TryUpdate.CallCount);
-		var args = knockOff.TryUpdate.LastCallArgs;
-		Assert.NotNull(args);
-		Assert.Equal("valid", args.Value.key);
-		Assert.Equal("hello", args.Value.value); // Original value, before modification
+		Assert.Equal(1, tracking.CallCount);
+		var args = tracking.LastArgs;
+		Assert.Equal("valid", args.key);
+		Assert.Equal("hello", args.value); // Original value, before modification
 	}
 
 	[Fact]
@@ -93,15 +92,15 @@ public class RefParameterTests
 		var knockOff = new RefParameterServiceKnockOff();
 		IRefParameterService service = knockOff;
 
-		knockOff.Increment.OnCall = (RefParameterServiceKnockOff ko, ref int value) => { value++; };
+		var tracking = knockOff.Increment.OnCall((RefParameterServiceKnockOff ko, ref int value) => { value++; });
 
 		int v1 = 1, v2 = 2, v3 = 3;
 		service.Increment(ref v1);
 		service.Increment(ref v2);
 		service.Increment(ref v3);
 
-		Assert.Equal(3, knockOff.Increment.CallCount);
-		Assert.Equal(3, knockOff.Increment.LastCallArg); // Last original value passed
+		Assert.Equal(3, tracking.CallCount);
+		Assert.Equal(3, tracking.LastArg); // Last original value passed
 
 		// And the values were modified
 		Assert.Equal(2, v1);
@@ -115,15 +114,16 @@ public class RefParameterTests
 		var knockOff = new RefParameterServiceKnockOff();
 		IRefParameterService service = knockOff;
 
-		// Increment is a void method - no callback required
+		// Increment is a void method - no callback required, but we need to set one to track
+		var tracking = knockOff.Increment.OnCall((RefParameterServiceKnockOff ko, ref int value) => { });
 		int val = 100;
 		service.Increment(ref val);
 
-		// Value unchanged without callback
+		// Value unchanged with no-op callback
 		Assert.Equal(100, val);
 
-		// But call was still tracked
-		Assert.Equal(1, knockOff.Increment.CallCount);
+		// Call was tracked
+		Assert.Equal(1, tracking.CallCount);
 	}
 
 	[Fact]
@@ -132,19 +132,18 @@ public class RefParameterTests
 		var knockOff = new RefParameterServiceKnockOff();
 		IRefParameterService service = knockOff;
 
-		knockOff.Increment.OnCall = (RefParameterServiceKnockOff ko, ref int v) => { };
+		var tracking = knockOff.Increment.OnCall((RefParameterServiceKnockOff ko, ref int v) => { });
 
 		int x = 1;
 		service.Increment(ref x);
 		service.Increment(ref x);
 
-		Assert.Equal(2, knockOff.Increment.CallCount);
+		Assert.Equal(2, tracking.CallCount);
 
 		knockOff.Increment.Reset();
 
-		Assert.Equal(0, knockOff.Increment.CallCount);
-		Assert.False(knockOff.Increment.WasCalled);
-		Assert.Null(knockOff.Increment.LastCallArg);
+		Assert.Equal(0, tracking.CallCount);
+		Assert.False(tracking.WasCalled);
 	}
 
 	[Fact]
@@ -153,7 +152,7 @@ public class RefParameterTests
 		var knockOff = new RefParameterServiceKnockOff();
 		IRefParameterService service = knockOff;
 
-		knockOff.TryUpdate.OnCall = (RefParameterServiceKnockOff ko, string key, ref string value) =>
+		knockOff.TryUpdate.OnCall((RefParameterServiceKnockOff ko, string key, ref string value) =>
 		{
 			if (key == "modify")
 			{
@@ -161,7 +160,7 @@ public class RefParameterTests
 				return true;
 			}
 			return false;
-		};
+		});
 
 		string text = "original";
 		var result = service.TryUpdate("modify", ref text);
@@ -176,12 +175,13 @@ public class RefParameterTests
 		var knockOff = new RefParameterServiceKnockOff();
 		IRefParameterService service = knockOff;
 
-		Assert.False(knockOff.Increment.WasCalled);
+		var tracking = knockOff.Increment.OnCall((RefParameterServiceKnockOff ko, ref int v) => { });
 
-		knockOff.Increment.OnCall = (RefParameterServiceKnockOff ko, ref int v) => { };
+		Assert.False(tracking.WasCalled);
+
 		int dummy = 0;
 		service.Increment(ref dummy);
 
-		Assert.True(knockOff.Increment.WasCalled);
+		Assert.True(tracking.WasCalled);
 	}
 }

@@ -5,51 +5,42 @@ namespace KnockOff.Documentation.Samples.Concepts;
 
 partial class PatternRepositoryKnockOff : global::KnockOff.Documentation.Samples.Concepts.IPatternRepository, global::KnockOff.IKnockOffStub
 {
-	/// <summary>Tracks and configures behavior for GetByIdAsync.</summary>
-	public sealed class GetByIdAsync2Interceptor
+	/// <summary>Tracks calls to GetByIdAsync (user-defined implementation).</summary>
+	public sealed class GetByIdAsync2Interceptor : global::KnockOff.IMethodTracking<int>
 	{
-		/// <summary>Delegate for GetByIdAsync.</summary>
-		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Concepts.PatternUser?> GetByIdAsyncDelegate(PatternRepositoryKnockOff ko, int id);
+		private int _lastArg = default!;
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>Whether this method was called at least once.</summary>
+		/// <summary>True if CallCount > 0.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The argument from the most recent call.</summary>
-		public int? LastCallArg { get; private set; }
-
-		/// <summary>Callback invoked when this method is called.</summary>
-		public GetByIdAsyncDelegate? OnCall { get; set; }
+		/// <summary>Last argument passed to this method. Default if never called.</summary>
+		public int LastArg => _lastArg;
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
+		internal void RecordCall(int id) { CallCount++; _lastArg = id; }
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+		/// <summary>Resets tracking state.</summary>
+		public void Reset() { CallCount = 0; _lastArg = default!; }
 	}
 
-	/// <summary>Tracks and configures behavior for CountAsync.</summary>
-	public sealed class CountAsync2Interceptor
+	/// <summary>Tracks calls to CountAsync (user-defined implementation).</summary>
+	public sealed class CountAsync2Interceptor : global::KnockOff.IMethodTracking
 	{
-		/// <summary>Delegate for CountAsync.</summary>
-		public delegate global::System.Threading.Tasks.ValueTask<int> CountAsyncDelegate(PatternRepositoryKnockOff ko);
 
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>Whether this method was called at least once.</summary>
+		/// <summary>True if CallCount > 0.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called.</summary>
-		public CountAsyncDelegate? OnCall { get; set; }
-
 		/// <summary>Records a method call.</summary>
-		public void RecordCall() => CallCount++;
+		internal void RecordCall() => CallCount++;
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; OnCall = null; }
+		/// <summary>Resets tracking state.</summary>
+		public void Reset() => CallCount = 0;
 	}
 
 	/// <summary>Interceptor for GetByIdAsync.</summary>
@@ -67,14 +58,12 @@ partial class PatternRepositoryKnockOff : global::KnockOff.Documentation.Samples
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Concepts.PatternUser?> global::KnockOff.Documentation.Samples.Concepts.IPatternRepository.GetByIdAsync(int id)
 	{
 		GetByIdAsync2.RecordCall(id);
-		if (GetByIdAsync2.OnCall is { } callback) return callback(this, id);
 		return GetByIdAsync(id);
 	}
 
 	global::System.Threading.Tasks.ValueTask<int> global::KnockOff.Documentation.Samples.Concepts.IPatternRepository.CountAsync()
 	{
 		CountAsync2.RecordCall();
-		if (CountAsync2.OnCall is { } callback) return callback(this);
 		return CountAsync();
 	}
 

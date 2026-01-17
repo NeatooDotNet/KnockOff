@@ -59,11 +59,11 @@ public static class CompileTimeSafetySamples
         var stub = new CtsEmailServiceKnockOff();
         ICtsEmailService service = stub;
 
-        stub.SendEmail.OnCall = (ko, to, subject, body) => { };
+        var tracking = stub.SendEmail.OnCall((ko, to, subject, body) => { });
 
         service.SendEmail("user@example.com", "Subject", "Body");
 
-        Assert.Equal("user@example.com", stub.SendEmail.LastCallArgs?.to);
+        Assert.Equal("user@example.com", tracking.LastArgs.to);
     }
     #endregion
 }

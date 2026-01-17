@@ -38,6 +38,27 @@ internal static class FlatModelBuilder
 		var (methods, genericHandlers) = BuildMethodModels(typeInfo, nameMap, methodGroups, className);
 		var events = BuildEventModels(typeInfo, nameMap);
 
+		// Group non-generic methods by interceptor name for multi-overload support
+		var flatMethodGroups = methods
+			.Where(m => !m.IsGenericMethod && m.UserMethodCall == null)
+			.GroupBy(m => m.InterceptorName)
+			.Select(g => new FlatMethodGroup(
+				InterceptorName: g.Key,
+				InterceptorClassName: g.First().InterceptorClassName,
+				NeedsNewKeyword: g.Any(m => m.NeedsNewKeyword),
+				Methods: new EquatableArray<FlatMethodModel>(g.ToArray())))
+			.ToList();
+
+		// Group indexers by BaseName for OfXxx pattern
+		var flatIndexerGroups = indexers
+			.GroupBy(i => i.BaseName)
+			.Select(g => new FlatIndexerGroup(
+				BaseName: g.Key,
+				ContainerClassName: $"{g.Key}Container",
+				NeedsNewKeyword: g.Any(i => i.NeedsNewKeyword),
+				Indexers: new EquatableArray<FlatIndexerModel>(g.ToArray())))
+			.ToList();
+
 		// Build containing types models
 		var containingTypes = typeInfo.ContainingTypes.Select(ct => new ContainingTypeModel(
 			Keyword: ct.Keyword,
@@ -52,7 +73,9 @@ internal static class FlatModelBuilder
 			ContainingTypes: containingTypes,
 			Properties: properties,
 			Indexers: indexers,
+			IndexerGroups: new EquatableArray<FlatIndexerGroup>(flatIndexerGroups.ToArray()),
 			Methods: methods,
+			MethodGroups: new EquatableArray<FlatMethodGroup>(flatMethodGroups.ToArray()),
 			GenericMethodHandlers: genericHandlers,
 			Events: events,
 			HasGenericMethods: genericHandlers.Count > 0 || methods.Any(m => m.IsGenericMethod),
@@ -119,26 +142,13 @@ internal static class FlatModelBuilder
 			if (isMixed)
 			{
 				// Mixed group: handle non-generic and generic overloads separately
-
-				// Non-generic overloads get numbered suffixes if multiple, otherwise base name
-				if (nonGenericOverloads.Count == 1)
+				// All non-generic overloads share one interceptor name
+				var finalName = GetUniqueInterceptorName(methodName, usedNames);
+				usedNames.Add(finalName);
+				foreach (var overload in nonGenericOverloads)
 				{
-					var key = GetMemberKey(nonGenericOverloads[0]);
-					var finalName = GetUniqueInterceptorName(methodName, usedNames);
+					var key = GetMemberKey(overload);
 					nameMap[key] = finalName;
-					usedNames.Add(finalName);
-				}
-				else
-				{
-					for (int i = 0; i < nonGenericOverloads.Count; i++)
-					{
-						var key = GetMemberKey(nonGenericOverloads[i]);
-						var suffix = (i + 1).ToString();
-						var baseName = $"{methodName}{suffix}";
-						var finalName = GetUniqueInterceptorName(baseName, usedNames);
-						nameMap[key] = finalName;
-						usedNames.Add(finalName);
-					}
 				}
 
 				// Generic overloads use a handler with Generic suffix
@@ -180,15 +190,14 @@ internal static class FlatModelBuilder
 			}
 			else
 			{
-				// Multiple overloads - use numbered suffixes
-				for (int i = 0; i < overloads.Count; i++)
+				// Multiple overloads - all share the same interceptor name
+				// The interceptor class will have multiple OnCall overloads with suffixed delegates
+				var finalName = GetUniqueInterceptorName(methodName, usedNames);
+				usedNames.Add(finalName);
+				foreach (var overload in overloads)
 				{
-					var key = GetMemberKey(overloads[i]);
-					var suffix = (i + 1).ToString();
-					var baseName = $"{methodName}{suffix}";
-					var finalName = GetUniqueInterceptorName(baseName, usedNames);
+					var key = GetMemberKey(overload);
 					nameMap[key] = finalName;
-					usedNames.Add(finalName);
 				}
 			}
 		}
@@ -560,7 +569,9 @@ internal static class FlatModelBuilder
 					HasGetter: member.HasGetter,
 					HasSetter: member.HasSetter,
 					SimpleInterfaceName: simpleIfaceName,
-					NeedsNewKeyword: NeedsNewKeyword(interceptorName)));
+					NeedsNewKeyword: NeedsNewKeyword(interceptorName),
+					KeyTypeFriendlyName: GetTypeSuffix(keyType),
+					BaseName: "Indexer"));
 			}
 		}
 
@@ -635,23 +646,43 @@ internal static class FlatModelBuilder
 				var key = GetMemberKey(member);
 				var interceptorName = nameMap[key];
 
+				// Compute signature suffix for this method
+				var signatureSuffix = GetSignatureSuffix(member);
+
 				// Check for method delegation (e.g., IRule.RunRule(IValidateBase) -> IRule<T>.RunRule(T))
 				var (delegationTarget, delegationInterface) = FindMethodDelegationTarget(member, typeInfo.Interfaces);
 
 				if (member.IsGenericMethod)
 				{
-					var model = BuildGenericMethodModel(member, interceptorName, typeInfo, className, delegationTarget, delegationInterface);
+					var model = BuildGenericMethodModel(member, interceptorName, typeInfo, className, delegationTarget, delegationInterface, signatureSuffix);
 					methods.Add(model);
 				}
 				else
 				{
-					var model = BuildMethodModel(member, interceptorName, typeInfo, className, delegationTarget, delegationInterface);
+					var model = BuildMethodModel(member, interceptorName, typeInfo, className, delegationTarget, delegationInterface, signatureSuffix);
 					methods.Add(model);
 				}
 			}
 		}
 
-		return (methods.ToEquatableArray(), genericHandlers.ToEquatableArray());
+		// Third pass: Determine which methods are part of overload groups
+		// A method is part of an overload group if there are multiple methods with the same InterceptorName
+		var interceptorNameCounts = methods
+			.Where(m => !m.IsGenericMethod && m.UserMethodCall == null)
+			.GroupBy(m => m.InterceptorName)
+			.ToDictionary(g => g.Key, g => g.Count());
+
+		var finalMethods = methods.Select(m =>
+		{
+			// Check if this method's interceptor name appears multiple times
+			var isPartOfOverloadGroup = !m.IsGenericMethod &&
+			                            m.UserMethodCall == null &&
+			                            interceptorNameCounts.TryGetValue(m.InterceptorName, out var count) &&
+			                            count > 1;
+			return m with { IsPartOfOverloadGroup = isPartOfOverloadGroup };
+		}).ToList();
+
+		return (finalMethods.ToEquatableArray(), genericHandlers.ToEquatableArray());
 	}
 
 	private static FlatMethodModel BuildMethodModel(
@@ -660,7 +691,8 @@ internal static class FlatModelBuilder
 		KnockOffTypeInfo typeInfo,
 		string className,
 		InterfaceMemberInfo? delegationTarget,
-		string? delegationInterface)
+		string? delegationInterface,
+		string signatureSuffix)
 	{
 		var interceptorClassName = $"{interceptorName}Interceptor";
 		var paramArray = member.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
@@ -777,7 +809,9 @@ internal static class FlatModelBuilder
 			IsNullableReturn: member.IsNullable,
 			OfTypeAccess: "",
 			DelegationTarget: delegationTarget,
-			DelegationTargetInterface: delegationInterface);
+			DelegationTargetInterface: delegationInterface,
+			SignatureSuffix: signatureSuffix,
+			IsPartOfOverloadGroup: false); // Will be updated in third pass
 	}
 
 	/// <summary>
@@ -790,7 +824,8 @@ internal static class FlatModelBuilder
 		KnockOffTypeInfo typeInfo,
 		string className,
 		InterfaceMemberInfo? delegationTarget,
-		string? delegationInterface)
+		string? delegationInterface,
+		string signatureSuffix)
 	{
 		var interceptorClassName = $"{interceptorName}Interceptor";
 		var paramArray = member.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
@@ -899,7 +934,9 @@ internal static class FlatModelBuilder
 			IsNullableReturn: member.IsNullable,
 			OfTypeAccess: ofTypeAccess,
 			DelegationTarget: delegationTarget,
-			DelegationTargetInterface: delegationInterface);
+			DelegationTargetInterface: delegationInterface,
+			SignatureSuffix: signatureSuffix,
+			IsPartOfOverloadGroup: false); // Generic methods don't use overload groups
 	}
 
 	/// <summary>
@@ -1142,6 +1179,42 @@ internal static class FlatModelBuilder
 	#endregion
 
 	#region Helper Methods
+
+	/// <summary>
+	/// Gets a signature suffix for a method based on its parameter types and return type.
+	/// Used to distinguish overloads with the same name but different signatures.
+	/// </summary>
+	private static string GetSignatureSuffix(InterfaceMemberInfo member)
+	{
+		var returnSuffix = GetTypeSuffix(member.ReturnType);
+		if (member.Parameters.Count == 0)
+			return $"NoParams_{returnSuffix}";
+		var paramArray = member.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+		return string.Join("_", paramArray.Select(p => GetTypeSuffix(p.Type))) + $"_{returnSuffix}";
+	}
+
+	/// <summary>
+	/// Converts a type name to a suffix-friendly format.
+	/// </summary>
+	private static string GetTypeSuffix(string type)
+	{
+		var simple = type.Replace("global::", "").Replace("System.", "");
+		simple = simple switch
+		{
+			"int" => "Int32",
+			"string" => "String",
+			"bool" => "Boolean",
+			"long" => "Int64",
+			"double" => "Double",
+			"float" => "Single",
+			"decimal" => "Decimal",
+			"char" => "Char",
+			"byte" => "Byte",
+			"void" => "Void",
+			_ => simple.Replace(".", "_").Replace("<", "_").Replace(">", "").Replace(",", "_").Replace(" ", "")
+		};
+		return simple.TrimEnd('?');
+	}
 
 	/// <summary>
 	/// Groups methods by name to handle overloads.

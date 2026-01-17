@@ -1,5 +1,6 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
+using KnockOff;
 using KnockOff.Benchmarks.Interfaces;
 using KnockOff.Benchmarks.Stubs;
 using Moq;
@@ -25,8 +26,9 @@ public class OverloadedMethodInvocationBenchmarks
         _moq = mock.Object;
 
         var stub = new OverloadedServiceStub();
-        stub.Calculate1.OnCall = (ko, v) => v * 2;
-        stub.Calculate2.OnCall = (ko, a, b) => a + b;
+        // Overloaded methods use single interceptor with overloaded OnCall methods
+        stub.Calculate.OnCall((OverloadedServiceStub ko, int v) => v * 2);
+        stub.Calculate.OnCall((OverloadedServiceStub ko, int a, int b) => a + b);
         _knockOff = stub;
     }
 
@@ -88,11 +90,12 @@ public class OverloadedMethodSetupBenchmarks
     public OverloadedServiceStub KnockOff_SetupOverloadedMethods()
     {
         var stub = new OverloadedServiceStub();
-        stub.Process1.OnCall = (ko, v) => { };
-        stub.Process2.OnCall = (ko, v) => { };
-        stub.Process3.OnCall = (ko, a, b) => { };
-        stub.Calculate1.OnCall = (ko, v) => v * 2;
-        stub.Calculate2.OnCall = (ko, a, b) => a + b;
+        // Overloaded methods use single interceptor with overloaded OnCall methods
+        stub.Process.OnCall((OverloadedServiceStub ko, int v) => { });
+        stub.Process.OnCall((OverloadedServiceStub ko, string v) => { });
+        stub.Process.OnCall((OverloadedServiceStub ko, int a, int b) => { });
+        stub.Calculate.OnCall((OverloadedServiceStub ko, int v) => v * 2);
+        stub.Calculate.OnCall((OverloadedServiceStub ko, int a, int b) => a + b);
         return stub;
     }
 }
@@ -106,6 +109,9 @@ public class OverloadedMethodVerificationBenchmarks
 {
     private Mock<IOverloadedService> _moqMock = null!;
     private OverloadedServiceStub _knockOffStub = null!;
+    private IMethodTracking<int> _processIntTracking = null!;
+    private IMethodTracking<string> _processStringTracking = null!;
+    private IMethodTrackingArgs<(int? a, int? b)> _processTwoArgsTracking = null!;
 
     [GlobalSetup]
     public void Setup()
@@ -116,6 +122,11 @@ public class OverloadedMethodVerificationBenchmarks
         _moqMock.Object.Process(1, 2);
 
         _knockOffStub = new OverloadedServiceStub();
+        // Set up callbacks to get tracking objects
+        _processIntTracking = _knockOffStub.Process.OnCall((OverloadedServiceStub ko, int v) => { });
+        _processStringTracking = _knockOffStub.Process.OnCall((OverloadedServiceStub ko, string v) => { });
+        _processTwoArgsTracking = _knockOffStub.Process.OnCall((OverloadedServiceStub ko, int a, int b) => { });
+
         ((IOverloadedService)_knockOffStub).Process(42);
         ((IOverloadedService)_knockOffStub).Process("test");
         ((IOverloadedService)_knockOffStub).Process(1, 2);
@@ -124,16 +135,16 @@ public class OverloadedMethodVerificationBenchmarks
     [Benchmark(Baseline = true)]
     public void Moq_VerifyOverloadedCalls()
     {
-        _moqMock.Verify(x => x.Process(42), Times.Once);
-        _moqMock.Verify(x => x.Process("test"), Times.Once);
-        _moqMock.Verify(x => x.Process(1, 2), Times.Once);
+        _moqMock.Verify(x => x.Process(42), Moq.Times.Once);
+        _moqMock.Verify(x => x.Process("test"), Moq.Times.Once);
+        _moqMock.Verify(x => x.Process(1, 2), Moq.Times.Once);
     }
 
     [Benchmark]
     public bool KnockOff_VerifyOverloadedCalls()
     {
-        return _knockOffStub.Process1.WasCalled && _knockOffStub.Process1.LastCallArg == 42
-            && _knockOffStub.Process2.WasCalled && _knockOffStub.Process2.LastCallArg == "test"
-            && _knockOffStub.Process3.WasCalled && _knockOffStub.Process3.LastCallArgs == (1, 2);
+        return _processIntTracking.WasCalled && _processIntTracking.LastArg == 42
+            && _processStringTracking.WasCalled && _processStringTracking.LastArg == "test"
+            && _processTwoArgsTracking.WasCalled && _processTwoArgsTracking.LastArgs == (1, 2);
     }
 }

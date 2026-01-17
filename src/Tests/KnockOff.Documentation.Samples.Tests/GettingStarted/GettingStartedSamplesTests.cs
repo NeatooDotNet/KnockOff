@@ -32,10 +32,13 @@ public class GettingStartedSamplesTests : SamplesTestBase
         var knockOff = new EmailServiceKnockOff();
         IEmailService emailService = knockOff;
 
+        // Configure callback to enable tracking
+        var tracking = knockOff.SendEmail.OnCall((ko, to, subject, body) => { });
+
         emailService.SendEmail("user@example.com", "Subject", "Body");
 
         // Check if called
-        Assert.True(knockOff.SendEmail.WasCalled);
+        Assert.True(tracking.WasCalled);
     }
 
     [Fact]
@@ -44,12 +47,15 @@ public class GettingStartedSamplesTests : SamplesTestBase
         var knockOff = new EmailServiceKnockOff();
         IEmailService emailService = knockOff;
 
+        // Configure callback to enable tracking
+        var tracking = knockOff.SendEmail.OnCall((ko, to, subject, body) => { });
+
         emailService.SendEmail("a@example.com", "S1", "B1");
         emailService.SendEmail("b@example.com", "S2", "B2");
         emailService.SendEmail("c@example.com", "S3", "B3");
 
         // Check call count
-        Assert.Equal(3, knockOff.SendEmail.CallCount);
+        Assert.Equal(3, tracking.CallCount);
     }
 
     [Fact]
@@ -58,12 +64,15 @@ public class GettingStartedSamplesTests : SamplesTestBase
         var knockOff = new EmailServiceKnockOff();
         IEmailService emailService = knockOff;
 
+        // Configure callback to enable tracking
+        var tracking = knockOff.SendEmail.OnCall((ko, to, subject, body) => { });
+
         emailService.SendEmail("user@example.com", "Welcome", "Hello!");
 
         // Check last arguments (multiple parameters - named tuple)
-        var args = knockOff.SendEmail.LastCallArgs;
-        Assert.Equal("user@example.com", args?.to);
-        Assert.Equal("Welcome", args?.subject);
+        var args = tracking.LastArgs;
+        Assert.Equal("user@example.com", args.to);
+        Assert.Equal("Welcome", args.subject);
     }
 
     [Fact]
@@ -72,13 +81,16 @@ public class GettingStartedSamplesTests : SamplesTestBase
         var knockOff = new EmailServiceKnockOff();
         IEmailService emailService = knockOff;
 
+        // Configure callback to enable tracking
+        var tracking = knockOff.SendEmail.OnCall((ko, to, subject, body) => { });
+
         emailService.SendEmail("first@example.com", "S1", "B1");
         emailService.SendEmail("second@example.com", "S2", "B2");
         emailService.SendEmail("third@example.com", "S3", "B3");
 
         // Check call count and last call
-        Assert.Equal(3, knockOff.SendEmail.CallCount);
-        Assert.Equal("third@example.com", knockOff.SendEmail.LastCallArgs?.to);
+        Assert.Equal(3, tracking.CallCount);
+        Assert.Equal("third@example.com", tracking.LastArgs.to);
     }
 
     // ========================================================================
@@ -147,11 +159,11 @@ public class GettingStartedSamplesTests : SamplesTestBase
         var knockOff = new EmailServiceKnockOff();
         IEmailService emailService = knockOff;
 
-        // Configure method to throw
-        knockOff.SendEmail.OnCall = (ko, to, subject, body) =>
+        // Configure method to throw (OnCall is a method for standalone stubs)
+        knockOff.SendEmail.OnCall((ko, to, subject, body) =>
         {
             throw new InvalidOperationException("Not connected");
-        };
+        });
 
         Assert.Throws<InvalidOperationException>(() =>
             emailService.SendEmail("user@example.com", "Subject", "Body"));
@@ -167,14 +179,18 @@ public class GettingStartedSamplesTests : SamplesTestBase
         var knockOff = new EmailServiceKnockOff();
         IEmailService emailService = knockOff;
 
+        // Configure callback to enable tracking
+        var tracking = knockOff.SendEmail.OnCall((ko, to, subject, body) => { });
+
         emailService.SendEmail("user@example.com", "Subject", "Body");
-        Assert.Equal(1, knockOff.SendEmail.CallCount);
+        Assert.Equal(1, tracking.CallCount);
 
         // Reset specific handler
         knockOff.SendEmail.Reset();
 
-        // After reset:
-        Assert.Equal(0, knockOff.SendEmail.CallCount);
+        // After reset, need to re-configure to get new tracking
+        var newTracking = knockOff.SendEmail.OnCall((ko, to, subject, body) => { });
+        Assert.Equal(0, newTracking.CallCount);
     }
 
     // ========================================================================
@@ -194,18 +210,21 @@ public class GettingStartedSamplesTests : SamplesTestBase
     }
 
     [Fact]
-    public void ReturningValues_Callback_OverridesUserMethod()
+    public void ReturningValues_UserMethod_TrackedViaInterceptor()
     {
         var knockOff = new UserServiceKnockOff();
         IUserServiceSimple userService = knockOff;
 
-        // Via callback
-        knockOff.GetUser2.OnCall = (ko, id) => new User { Id = id, Name = "Test" };
-
+        // User method interceptors provide tracking (not callbacks)
         var user = userService.GetUser(42);
 
+        // User method provides default behavior
         Assert.Equal(42, user.Id);
-        Assert.Equal("Test", user.Name);
+        Assert.Equal("Default", user.Name);
+
+        // Tracking available via interceptor
+        Assert.True(knockOff.GetUser2.WasCalled);
+        Assert.Equal(42, knockOff.GetUser2.LastArg);
     }
 
     // ========================================================================
@@ -218,8 +237,9 @@ public class GettingStartedSamplesTests : SamplesTestBase
         var knockOff = new AsyncServiceKnockOff();
         IAsyncSaveService service = knockOff;
 
-        knockOff.SaveAsync.OnCall = (ko, entity) =>
-            Task.FromException<int>(new InvalidOperationException("Connection lost"));
+        // OnCall is a method for standalone stubs
+        knockOff.SaveAsync.OnCall((ko, entity) =>
+            Task.FromException<int>(new InvalidOperationException("Connection lost")));
 
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
             service.SaveAsync(new object()));
@@ -237,10 +257,11 @@ public class GettingStartedSamplesTests : SamplesTestBase
 
         List<string> sentEmails = new();
 
-        knockOff.SendEmail.OnCall = (ko, to, subject, body) =>
+        // OnCall is a method for standalone stubs
+        knockOff.SendEmail.OnCall((ko, to, subject, body) =>
         {
             sentEmails.Add(to);
-        };
+        });
 
         emailService.SendEmail("admin@example.com", "S1", "B1");
         emailService.SendEmail("user@example.com", "S2", "B2");

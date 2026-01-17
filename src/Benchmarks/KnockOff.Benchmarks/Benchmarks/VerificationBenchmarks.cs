@@ -1,5 +1,6 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
+using KnockOff;
 using KnockOff.Benchmarks.Interfaces;
 using KnockOff.Benchmarks.Stubs;
 using Moq;
@@ -20,6 +21,8 @@ public class VerificationBenchmarks
     private Mock<ICalculator> _moqCalculator = null!;
     private CalculatorStub _knockOffCalculator = null!;
     private ICalculatorCreateExpectations _rocksCalculator = null!;
+    private IMethodTracking _knockOffSimpleTracking = null!;
+    private IMethodTrackingArgs<(int? a, int? b)> _knockOffCalculatorTracking = null!;
 
     [GlobalSetup]
     public void Setup()
@@ -31,6 +34,7 @@ public class VerificationBenchmarks
         _moqSimple.Object.DoWork();
 
         _knockOffSimple = new SimpleServiceStub();
+        _knockOffSimpleTracking = _knockOffSimple.DoWork.OnCall(ko => { });
         ((ISimpleService)_knockOffSimple).DoWork();
         ((ISimpleService)_knockOffSimple).DoWork();
         ((ISimpleService)_knockOffSimple).DoWork();
@@ -48,6 +52,7 @@ public class VerificationBenchmarks
         _ = _moqCalculator.Object.Add(3, 4);
 
         _knockOffCalculator = new CalculatorStub();
+        _knockOffCalculatorTracking = _knockOffCalculator.Add.OnCall((ko, a, b) => 0);
         _ = ((ICalculator)_knockOffCalculator).Add(1, 2);
         _ = ((ICalculator)_knockOffCalculator).Add(3, 4);
 
@@ -63,13 +68,13 @@ public class VerificationBenchmarks
     [Benchmark(Baseline = true)]
     public void Moq_VerifyCalled()
     {
-        _moqSimple.Verify(x => x.DoWork(), Times.AtLeastOnce);
+        _moqSimple.Verify(x => x.DoWork(), Moq.Times.AtLeastOnce());
     }
 
     [Benchmark]
     public void KnockOff_VerifyCalled()
     {
-        _ = _knockOffSimple.DoWork.WasCalled;
+        _ = _knockOffSimpleTracking.WasCalled;
     }
 
     [Benchmark]
@@ -83,13 +88,13 @@ public class VerificationBenchmarks
     [Benchmark]
     public void Moq_VerifyCallCount()
     {
-        _moqSimple.Verify(x => x.DoWork(), Times.Exactly(3));
+        _moqSimple.Verify(x => x.DoWork(), Moq.Times.Exactly(3));
     }
 
     [Benchmark]
     public void KnockOff_VerifyCallCount()
     {
-        _ = _knockOffSimple.DoWork.CallCount == 3;
+        _ = _knockOffSimpleTracking.CallCount == 3;
     }
 
     [Benchmark]
@@ -103,14 +108,14 @@ public class VerificationBenchmarks
     [Benchmark]
     public void Moq_VerifyWithArgs()
     {
-        _moqCalculator.Verify(x => x.Add(1, 2), Times.Once);
+        _moqCalculator.Verify(x => x.Add(1, 2), Moq.Times.Once());
     }
 
     [Benchmark]
     public void KnockOff_VerifyWithArgs()
     {
-        var args = _knockOffCalculator.Add.LastCallArgs;
-        _ = args?.a == 1 && args?.b == 2;
+        var args = _knockOffCalculatorTracking.LastArgs;
+        _ = args.a == 1 && args.b == 2;
     }
 
     [Benchmark]
@@ -124,17 +129,17 @@ public class VerificationBenchmarks
     [Benchmark]
     public void Moq_VerifyMultiple()
     {
-        _moqSimple.Verify(x => x.DoWork(), Times.AtLeastOnce);
-        _moqSimple.Verify(x => x.DoWork(), Times.Exactly(3));
-        _moqCalculator.Verify(x => x.Add(It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(2));
+        _moqSimple.Verify(x => x.DoWork(), Moq.Times.AtLeastOnce());
+        _moqSimple.Verify(x => x.DoWork(), Moq.Times.Exactly(3));
+        _moqCalculator.Verify(x => x.Add(It.IsAny<int>(), It.IsAny<int>()), Moq.Times.Exactly(2));
     }
 
     [Benchmark]
     public void KnockOff_VerifyMultiple()
     {
-        _ = _knockOffSimple.DoWork.WasCalled;
-        _ = _knockOffSimple.DoWork.CallCount == 3;
-        _ = _knockOffCalculator.Add.CallCount == 2;
+        _ = _knockOffSimpleTracking.WasCalled;
+        _ = _knockOffSimpleTracking.CallCount == 3;
+        _ = _knockOffCalculatorTracking.CallCount == 2;
     }
 
     [Benchmark]

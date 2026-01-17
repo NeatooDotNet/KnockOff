@@ -95,7 +95,7 @@ public static class StubPatternsSamples
     public static void StandaloneUsage()
     {
         var stub = new SpUserRepositoryStub();
-        stub.GetById.OnCall = (ko, id) => new SpUser { Id = id };
+        stub.GetById.OnCall((ko, id) => new SpUser { Id = id });
 
         ISpUserRepository repo = stub;
         // or
@@ -122,7 +122,7 @@ public partial class SpUserServiceTests
 
         repoStub.GetById.OnCall = (ko, id) => new SpUser { Id = id };
 
-        // var service = new UserService(repoStub, emailStub);
+        // var service = new UserService(repoStub.Object, emailStub.Object);
         _ = (repoStub, emailStub);
     }
 }
@@ -150,7 +150,7 @@ public partial class SpNotificationTests
     {
         var stub = new Stubs.SpEmailServiceClass();
 
-        // Configure virtual methods
+        // Configure virtual methods (OnCall is a property for inline stubs)
         stub.Send.OnCall = (ko, to, body) => { };
 
         // Use .Object to get the class instance

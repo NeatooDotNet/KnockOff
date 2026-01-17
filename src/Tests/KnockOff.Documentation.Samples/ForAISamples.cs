@@ -111,7 +111,7 @@ public static class ForAISamples
     public static void StandaloneUsage()
     {
         var stub = new AiUserRepositoryStub();
-        stub.GetById.OnCall = (ko, id) => new AiUser { Id = id };
+        stub.GetById.OnCall((ko, id) => new AiUser { Id = id });
         IAiUserRepository repo = stub;
 
         _ = repo;
@@ -123,9 +123,9 @@ public static class ForAISamples
     {
         var stub = new AiProcessorStub();
 
-        // CORRECT - overloads get numeric suffixes
-        stub.Process1.OnCall = (ko, data) => { };
-        stub.Process2.OnCall = (ko, data, n) => { };
+        // OnCall overloads distinguish by delegate signature
+        stub.Process.OnCall((AiProcessorStub ko, string data) => { });
+        stub.Process.OnCall((AiProcessorStub ko, string data, int n) => { });
     }
     #endregion
 }
@@ -220,8 +220,12 @@ public class OrderProcessingTests
         var stub = new AiOrderServiceStub();
         stub.TotalAmount.Value = 150.00m;
 
-        // Override default for this test
-        stub.ValidateAsync2.OnCall = (ko, order) => Task.FromResult(order.Amount > 0);
+        // User methods (GetOrder, ValidateAsync) provide defaults
+        // ValidateAsync2 tracks calls but can't override behavior
+        // (User methods are compile-time only)
+
+        // Track save calls
+        var saveTracking = stub.SaveOrder.OnCall((ko, order) => { });
 
         var processor = new AiOrderProcessor(stub);
 
@@ -230,9 +234,12 @@ public class OrderProcessingTests
 
         // Assert
         Assert.True(result);
-        Assert.Equal(1, stub.GetOrder2.CallCount);
-        Assert.Equal(1, stub.SaveOrder.CallCount);
-        Assert.Equal("Completed", stub.SaveOrder.LastCallArg?.Status);
+        stub.VerifyAll();  // Verifies all configured callbacks were called
+        Assert.Equal(1, saveTracking.CallCount);
+        Assert.Equal("Completed", saveTracking.LastArg?.Status);
+
+        // User method interceptors track calls
+        Assert.True(stub.ValidateAsync2.WasCalled);
     }
 }
 #endregion

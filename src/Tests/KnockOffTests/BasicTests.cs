@@ -49,12 +49,13 @@ public class BasicTests
 	public void Method_VoidNoParams_TracksInvocation()
 	{
 		var knockOff = new SampleKnockOff();
+		var tracking = knockOff.DoSomething.OnCall(ko => { });
 		ISampleService service = knockOff;
 
 		service.DoSomething();
 
-		Assert.True(knockOff.DoSomething.WasCalled);
-		Assert.Equal(1, knockOff.DoSomething.CallCount);
+		Assert.True(tracking.WasCalled);
+		Assert.Equal(1, tracking.CallCount);
 	}
 
 	[Fact]
@@ -68,7 +69,7 @@ public class BasicTests
 		Assert.Equal(84, result);
 		Assert.Equal(1, knockOff.GetValue2.CallCount);
 
-		int? lastArg = knockOff.GetValue2.LastCallArg;
+		int lastArg = knockOff.GetValue2.LastArg;
 		Assert.Equal(42, lastArg);
 	}
 
@@ -76,15 +77,15 @@ public class BasicTests
 	public void Method_WithMultipleParams_TracksArgs_AsNamedTuple()
 	{
 		var knockOff = new SampleKnockOff();
+		var tracking = knockOff.Calculate.OnCall((ko, name, value, flag) => { });
 		ISampleService service = knockOff;
 
 		service.Calculate("test", 100, true);
 
-		var args = knockOff.Calculate.LastCallArgs;
-		Assert.NotNull(args);
-		Assert.Equal("test", args.Value.name);
-		Assert.Equal(100, args.Value.value);
-		Assert.True(args.Value.flag);
+		var args = tracking.LastArgs;
+		Assert.Equal("test", args.name);
+		Assert.Equal(100, args.value);
+		Assert.True(args.flag);
 	}
 
 	[Fact]
@@ -98,19 +99,20 @@ public class BasicTests
 		service.GetValue(3);
 
 		Assert.Equal(3, knockOff.GetValue2.CallCount);
-		Assert.Equal(3, knockOff.GetValue2.LastCallArg); // Last call was GetValue(3)
+		Assert.Equal(3, knockOff.GetValue2.LastArg); // Last call was GetValue(3)
 	}
 
 	[Fact]
 	public void Method_WithNullableReturn_NoUserMethod_ReturnsDefault()
 	{
 		var knockOff = new SampleKnockOff();
+		var tracking = knockOff.GetOptional.OnCall(ko => null);
 		ISampleService service = knockOff;
 
 		var result = service.GetOptional();
 
 		Assert.Null(result);
-		Assert.True(knockOff.GetOptional.WasCalled);
+		Assert.True(tracking.WasCalled);
 	}
 
 	[Fact]
@@ -128,6 +130,7 @@ public class BasicTests
 	public void Reset_ClearsTrackingState()
 	{
 		var knockOff = new SampleKnockOff();
+		var doSomethingTracking = knockOff.DoSomething.OnCall(ko => { });
 		ISampleService service = knockOff;
 
 		service.Name = "Test";
@@ -140,27 +143,22 @@ public class BasicTests
 
 		Assert.Equal(0, knockOff.Name.SetCount);
 		Assert.Equal(0, knockOff.GetValue2.CallCount);
-		Assert.Equal(0, knockOff.DoSomething.CallCount);
-		Assert.False(knockOff.DoSomething.WasCalled);
+		// After reset, the tracking object is also reset
+		Assert.False(doSomethingTracking.WasCalled);
 	}
 
 	[Fact]
 	public void TupleDestructuring_Works()
 	{
 		var knockOff = new SampleKnockOff();
+		var tracking = knockOff.Calculate.OnCall((ko, name, value, flag) => { });
 		ISampleService service = knockOff;
 
 		service.Calculate("test", 42, true);
 
-		if (knockOff.Calculate.LastCallArgs is var (name, value, flag))
-		{
-			Assert.Equal("test", name);
-			Assert.Equal(42, value);
-			Assert.True(flag);
-		}
-		else
-		{
-			Assert.Fail("LastCallArgs should not be null");
-		}
+		var (name, value, flag) = tracking.LastArgs;
+		Assert.Equal("test", name);
+		Assert.Equal(42, value);
+		Assert.True(flag);
 	}
 }

@@ -120,37 +120,39 @@ public class EntityBaseStandaloneTests
         var stub = new EntityBaseStub();
         IEntityBase entity = stub;
 
-        stub.Indexer.OnGet = (ko, propertyName) => null!;
+        stub.Indexer.OfString.OnGet = (ko, propertyName) => null!;
 
         _ = entity["FirstName"];
         _ = entity["LastName"];
 
-        Assert.Equal(2, stub.Indexer.GetCount);
-        Assert.Equal("LastName", stub.Indexer.LastGetKey);
+        Assert.Equal(2, stub.Indexer.OfString.GetCount);
+        Assert.Equal("LastName", stub.Indexer.OfString.LastGetKey);
     }
 
     [Fact]
     public void Delete_TracksCall()
     {
         var stub = new EntityBaseStub();
+        var tracking = stub.Delete.OnCall(ko => { });
         IEntityBase entity = stub;
 
         entity.Delete();
 
-        Assert.True(stub.Delete.WasCalled);
-        Assert.Equal(1, stub.Delete.CallCount);
+        Assert.True(tracking.WasCalled);
+        Assert.Equal(1, tracking.CallCount);
     }
 
     [Fact]
     public void UnDelete_TracksCall()
     {
         var stub = new EntityBaseStub();
+        var tracking = stub.UnDelete.OnCall(ko => { });
         IEntityBase entity = stub;
 
         entity.UnDelete();
 
-        Assert.True(stub.UnDelete.WasCalled);
-        Assert.Equal(1, stub.UnDelete.CallCount);
+        Assert.True(tracking.WasCalled);
+        Assert.Equal(1, tracking.CallCount);
     }
 
     [Fact]
@@ -159,13 +161,13 @@ public class EntityBaseStandaloneTests
         var stub = new EntityBaseStub();
         IEntityBase entity = stub;
 
-        stub.Save.OnCall = (ko) => Task.FromResult<IEntityBase>(ko);
+        var tracking = stub.Save.OnCall((ko) => Task.FromResult<IEntityBase>(ko));
 
         var result = await entity.Save();
 
         Assert.Same(entity, result);
-        Assert.True(stub.Save.WasCalled);
-        Assert.Equal(1, stub.Save.CallCount);
+        Assert.True(tracking.WasCalled);
+        Assert.Equal(1, tracking.CallCount);
     }
 
     [Fact]
@@ -175,7 +177,7 @@ public class EntityBaseStandaloneTests
         var savedStub = new EntityBaseStub();
         IEntityBase entity = stub;
 
-        stub.Save.OnCall = (ko) => Task.FromResult<IEntityBase>(savedStub);
+        stub.Save.OnCall((ko) => Task.FromResult<IEntityBase>(savedStub));
 
         var result = await entity.Save();
 
@@ -212,12 +214,13 @@ public class EntityBaseStandaloneTests
     public async Task WaitForTasks_TracksCall()
     {
         var stub = new EntityBaseStub();
+        // WaitForTasks is overloaded - use OnCall with no-arg lambda for the parameterless overload
+        var tracking = stub.WaitForTasks.OnCall((ko) => Task.CompletedTask);
         IEntityBase entity = stub;
 
         await entity.WaitForTasks();
 
-        // WaitForTasks has overloads, so it's WaitForTasks1 (no-arg overload)
-        Assert.True(stub.WaitForTasks1.WasCalled);
+        Assert.True(tracking.WasCalled);
     }
 
     [Fact]
@@ -236,6 +239,7 @@ public class EntityBaseStandaloneTests
     public void Reset_ClearsAllTracking()
     {
         var stub = new EntityBaseStub();
+        var deleteTracking = stub.Delete.OnCall(ko => { });
         IEntityBase entity = stub;
 
         stub.IsNew.Value = true;
@@ -250,8 +254,8 @@ public class EntityBaseStandaloneTests
 
         // Verify reset
         Assert.Equal(0, stub.IsNew.GetCount);
-        Assert.False(stub.Delete.WasCalled);
-        Assert.Equal(0, stub.Delete.CallCount);
+        Assert.False(deleteTracking.WasCalled);
+        Assert.Equal(0, deleteTracking.CallCount);
     }
 }
 
@@ -318,47 +322,51 @@ public class ValidateBaseStandaloneTests
     public async Task RunRules_WithPropertyName_TracksCall()
     {
         var stub = new ValidateBaseStub();
+        // RunRules is overloaded - use explicit delegate type to disambiguate
+        var tracking = stub.RunRules.OnCall((ValidateBaseStub.RunRulesInterceptor.RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task)((ko, propertyName, token) => Task.CompletedTask));
         IValidateBase validate = stub;
 
         await validate.RunRules("FirstName", null);
 
-        // RunRules has overloads, so interceptor is named RunRules1 for string overload
-        Assert.True(stub.RunRules1.WasCalled);
-        Assert.Equal(1, stub.RunRules1.CallCount);
+        Assert.True(tracking.WasCalled);
+        Assert.Equal(1, tracking.CallCount);
     }
 
     [Fact]
     public async Task RunRules_WithFlag_TracksCall()
     {
         var stub = new ValidateBaseStub();
+        // RunRules is overloaded - use explicit delegate type to disambiguate
+        var tracking = stub.RunRules.OnCall((ValidateBaseStub.RunRulesInterceptor.RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task)((ko, flag, token) => Task.CompletedTask));
         IValidateBase validate = stub;
 
         await validate.RunRules(RunRulesFlag.All, null);
 
-        // RunRules has overloads, so interceptor is named RunRules2 for RunRulesFlag overload
-        Assert.True(stub.RunRules2.WasCalled);
+        Assert.True(tracking.WasCalled);
     }
 
     [Fact]
     public void ClearAllMessages_TracksCall()
     {
         var stub = new ValidateBaseStub();
+        var tracking = stub.ClearAllMessages.OnCall(ko => { });
         IValidateBase validate = stub;
 
         validate.ClearAllMessages();
 
-        Assert.True(stub.ClearAllMessages.WasCalled);
+        Assert.True(tracking.WasCalled);
     }
 
     [Fact]
     public void ClearSelfMessages_TracksCall()
     {
         var stub = new ValidateBaseStub();
+        var tracking = stub.ClearSelfMessages.OnCall(ko => { });
         IValidateBase validate = stub;
 
         validate.ClearSelfMessages();
 
-        Assert.True(stub.ClearSelfMessages.WasCalled);
+        Assert.True(tracking.WasCalled);
     }
 
     [Fact]
@@ -367,12 +375,12 @@ public class ValidateBaseStandaloneTests
         var stub = new ValidateBaseStub();
         IValidateBase validate = stub;
 
-        stub.GetProperty.OnCall = (ko, name) => null!;
+        var tracking = stub.GetProperty.OnCall((ko, name) => null!);
 
         _ = validate.GetProperty("Age");
 
-        Assert.True(stub.GetProperty.WasCalled);
-        Assert.Equal("Age", stub.GetProperty.LastCallArg);
+        Assert.True(tracking.WasCalled);
+        Assert.Equal("Age", tracking.LastArg);
     }
 
     [Fact]

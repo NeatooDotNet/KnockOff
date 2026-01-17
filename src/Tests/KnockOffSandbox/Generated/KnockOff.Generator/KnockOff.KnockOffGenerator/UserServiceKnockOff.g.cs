@@ -58,67 +58,294 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 	/// <summary>Tracks and configures behavior for DoWork.</summary>
 	public sealed class DoWorkInterceptor
 	{
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
+		private readonly global::System.Collections.Generic.List<(global::System.Action<UserServiceKnockOff> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+		private int _sequenceIndex;
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
+		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action<UserServiceKnockOff> callback)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequenceIndex = 0;
+			return tracking;
+		}
 
-		/// <summary>Callback invoked when this method is called.</summary>
-		public global::System.Action<UserServiceKnockOff>? OnCall { get; set; }
+		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+		public global::KnockOff.IMethodSequence<global::System.Action<UserServiceKnockOff>> OnCall(global::System.Action<UserServiceKnockOff> callback, global::KnockOff.Times times)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, times, tracking));
+			_sequenceIndex = 0;
+			return new MethodSequenceImpl(this);
+		}
 
-		/// <summary>Records a method call.</summary>
-		public void RecordCall() => CallCount++;
+		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+		internal void Invoke(UserServiceKnockOff ko, bool strict)
+		{
+			if (_sequence.Count == 0)
+			{
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "DoWork");
+				return;
+			}
+
+			var (callback, times, tracking) = _sequence[_sequenceIndex];
+			tracking.RecordCall();
+
+			if (!times.IsForever && tracking.CallCount >= times.Count)
+			{
+				if (_sequenceIndex < _sequence.Count - 1)
+					_sequenceIndex++;
+				else if (tracking.CallCount > times.Count)
+					throw global::KnockOff.StubException.SequenceExhausted("DoWork");
+			}
+
+			callback(ko);
+		}
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; OnCall = null; }
-	}
+		public void Reset()
+		{
+			foreach (var (_, _, tracking) in _sequence)
+				tracking.Reset();
+			_sequenceIndex = 0;
+		}
 
-	/// <summary>Tracks and configures behavior for GetGreeting.</summary>
-	public sealed class GetGreeting2Interceptor
-	{
-		/// <summary>Delegate for GetGreeting.</summary>
-		public delegate string GetGreetingDelegate(UserServiceKnockOff ko, string name);
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
 
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
+		/// <summary>Tracks invocations for this callback registration.</summary>
+		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking
+		{
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
+			/// <summary>Number of times this callback was invoked.</summary>
+			public int CallCount { get; private set; }
 
-		/// <summary>The argument from the most recent call.</summary>
-		public string? LastCallArg { get; private set; }
+			/// <summary>True if CallCount > 0.</summary>
+			public bool WasCalled => CallCount > 0;
 
-		/// <summary>Callback invoked when this method is called.</summary>
-		public GetGreetingDelegate? OnCall { get; set; }
+			/// <summary>Records a call to this callback.</summary>
+			public void RecordCall() => CallCount++;
 
-		/// <summary>Records a method call.</summary>
-		public void RecordCall(string? name) { CallCount++; LastCallArg = name; }
+			/// <summary>Resets tracking state.</summary>
+			public void Reset() => CallCount = 0;
+		}
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+		/// <summary>Sequence implementation for ThenCall chaining.</summary>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<UserServiceKnockOff>>
+		{
+			private readonly DoWorkInterceptor _interceptor;
+
+			public MethodSequenceImpl(DoWorkInterceptor interceptor) => _interceptor = interceptor;
+
+			/// <summary>Total calls across all callbacks in sequence.</summary>
+			public int TotalCallCount
+			{
+				get
+				{
+					var total = 0;
+					foreach (var (_, _, tracking) in _interceptor._sequence)
+						total += tracking.CallCount;
+					return total;
+				}
+			}
+
+			/// <summary>Add another callback to the sequence.</summary>
+			public global::KnockOff.IMethodSequence<global::System.Action<UserServiceKnockOff>> ThenCall(global::System.Action<UserServiceKnockOff> callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_interceptor._sequence.Add((callback, times, tracking));
+				return this;
+			}
+
+			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _interceptor._sequence)
+				{
+					if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Reset all tracking in the sequence.</summary>
+			public void Reset() => _interceptor.Reset();
+		}
 	}
 
 	/// <summary>Tracks and configures behavior for Process.</summary>
 	public sealed class ProcessInterceptor
 	{
+		private readonly global::System.Collections.Generic.List<(global::System.Action<UserServiceKnockOff, string, int, bool> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+		private int _sequenceIndex;
+
+		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTrackingArgs<(string? id, int? count, bool? urgent)> OnCall(global::System.Action<UserServiceKnockOff, string, int, bool> callback)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequenceIndex = 0;
+			return tracking;
+		}
+
+		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+		public global::KnockOff.IMethodSequence<global::System.Action<UserServiceKnockOff, string, int, bool>> OnCall(global::System.Action<UserServiceKnockOff, string, int, bool> callback, global::KnockOff.Times times)
+		{
+			var tracking = new MethodTrackingImpl();
+			_sequence.Clear();
+			_sequence.Add((callback, times, tracking));
+			_sequenceIndex = 0;
+			return new MethodSequenceImpl(this);
+		}
+
+		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+		internal void Invoke(UserServiceKnockOff ko, bool strict, string id, int count, bool urgent)
+		{
+			if (_sequence.Count == 0)
+			{
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
+				return;
+			}
+
+			var (callback, times, tracking) = _sequence[_sequenceIndex];
+			tracking.RecordCall((id, count, urgent));
+
+			if (!times.IsForever && tracking.CallCount >= times.Count)
+			{
+				if (_sequenceIndex < _sequence.Count - 1)
+					_sequenceIndex++;
+				else if (tracking.CallCount > times.Count)
+					throw global::KnockOff.StubException.SequenceExhausted("Process");
+			}
+
+			callback(ko, id, count, urgent);
+		}
+
+		/// <summary>Resets all tracking state.</summary>
+		public void Reset()
+		{
+			foreach (var (_, _, tracking) in _sequence)
+				tracking.Reset();
+			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
+		/// <summary>Tracks invocations for this callback registration.</summary>
+		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTrackingArgs<(string? id, int? count, bool? urgent)>
+		{
+			private (string? id, int? count, bool? urgent) _lastArgs;
+
+			/// <summary>Number of times this callback was invoked.</summary>
+			public int CallCount { get; private set; }
+
+			/// <summary>True if CallCount > 0.</summary>
+			public bool WasCalled => CallCount > 0;
+
+			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
+			public (string? id, int? count, bool? urgent) LastArgs => _lastArgs;
+
+			/// <summary>Records a call to this callback.</summary>
+			public void RecordCall((string? id, int? count, bool? urgent) args) { CallCount++; _lastArgs = args; }
+
+			/// <summary>Resets tracking state.</summary>
+			public void Reset() { CallCount = 0; _lastArgs = default; }
+		}
+
+		/// <summary>Sequence implementation for ThenCall chaining.</summary>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<UserServiceKnockOff, string, int, bool>>
+		{
+			private readonly ProcessInterceptor _interceptor;
+
+			public MethodSequenceImpl(ProcessInterceptor interceptor) => _interceptor = interceptor;
+
+			/// <summary>Total calls across all callbacks in sequence.</summary>
+			public int TotalCallCount
+			{
+				get
+				{
+					var total = 0;
+					foreach (var (_, _, tracking) in _interceptor._sequence)
+						total += tracking.CallCount;
+					return total;
+				}
+			}
+
+			/// <summary>Add another callback to the sequence.</summary>
+			public global::KnockOff.IMethodSequence<global::System.Action<UserServiceKnockOff, string, int, bool>> ThenCall(global::System.Action<UserServiceKnockOff, string, int, bool> callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_interceptor._sequence.Add((callback, times, tracking));
+				return this;
+			}
+
+			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _interceptor._sequence)
+				{
+					if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Reset all tracking in the sequence.</summary>
+			public void Reset() => _interceptor.Reset();
+		}
+	}
+
+	/// <summary>Tracks calls to GetGreeting (user-defined implementation).</summary>
+	public sealed class GetGreeting2Interceptor : global::KnockOff.IMethodTracking<string>
+	{
+		private string _lastArg = default!;
+
 		/// <summary>Number of times this method was called.</summary>
 		public int CallCount { get; private set; }
 
-		/// <summary>Whether this method was called at least once.</summary>
+		/// <summary>True if CallCount > 0.</summary>
 		public bool WasCalled => CallCount > 0;
 
-		/// <summary>The arguments from the most recent call.</summary>
-		public (string? id, int? count, bool? urgent)? LastCallArgs { get; private set; }
-
-		/// <summary>Callback invoked when this method is called.</summary>
-		public global::System.Action<UserServiceKnockOff, string, int, bool>? OnCall { get; set; }
+		/// <summary>Last argument passed to this method. Default if never called.</summary>
+		public string LastArg => _lastArg;
 
 		/// <summary>Records a method call.</summary>
-		public void RecordCall(string? id, int? count, bool? urgent) { CallCount++; LastCallArgs = (id, count, urgent); }
+		internal void RecordCall(string name) { CallCount++; _lastArg = name; }
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArgs = null; OnCall = null; }
+		/// <summary>Resets tracking state.</summary>
+		public void Reset() { CallCount = 0; _lastArg = default!; }
 	}
 
 	/// <summary>Interceptor for Name. Configure via .Value, track via .GetCount.</summary>
@@ -142,6 +369,22 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 	/// <summary>The global::KnockOff.Sandbox.IUserService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Sandbox.IUserService Object => this;
 
+	/// <summary>Verifies all method interceptors' Times constraints were satisfied.</summary>
+	public bool Verify()
+	{
+		var result = true;
+		result &= DoWork.Verify();
+		result &= Process.Verify();
+		return result;
+	}
+
+	/// <summary>Verifies all method interceptors' Times constraints and throws if any fail.</summary>
+	public void VerifyAll()
+	{
+		if (!Verify())
+			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
 	string global::KnockOff.Sandbox.IUserService.Name
 	{
 		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserService", "Name"); return Name.Value; }
@@ -155,25 +398,18 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 
 	void global::KnockOff.Sandbox.IUserService.DoWork()
 	{
-		DoWork.RecordCall();
-		if (DoWork.OnCall is { } onCallCallback)
-		{ onCallCallback(this); return; }
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserService", "DoWork");
+		DoWork.Invoke(this, Strict);
 	}
 
 	string global::KnockOff.Sandbox.IUserService.GetGreeting(string name)
 	{
 		GetGreeting2.RecordCall(name);
-		if (GetGreeting2.OnCall is { } callback) return callback(this, name);
 		return GetGreeting(name);
 	}
 
 	void global::KnockOff.Sandbox.IUserService.Process(string id, int count, bool urgent)
 	{
-		Process.RecordCall(id, count, urgent);
-		if (Process.OnCall is { } onCallCallback)
-		{ onCallCallback(this, id, count, urgent); return; }
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserService", "Process");
+		Process.Invoke(this, Strict, id, count, urgent);
 	}
 
 }

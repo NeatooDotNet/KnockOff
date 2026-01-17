@@ -34,9 +34,9 @@ public class FrameworkComparisonSamplesTests
         sut.Process(1);
 
         // Assert
-        mock.Verify(x => x.GetOrder(1), Times.Once);
-        mock.Verify(x => x.ValidateOrder(It.IsAny<Order>()), Times.Once);
-        mock.Verify(x => x.SaveOrder(It.IsAny<Order>()), Times.Once);
+        mock.Verify(x => x.GetOrder(1), Moq.Times.Once());
+        mock.Verify(x => x.ValidateOrder(It.IsAny<Order>()), Moq.Times.Once());
+        mock.Verify(x => x.SaveOrder(It.IsAny<Order>()), Moq.Times.Once());
     }
     #endregion
 
@@ -46,9 +46,10 @@ public class FrameworkComparisonSamplesTests
     {
         // Arrange
         var stub = new OrderServiceStub();
-        stub.GetOrder.OnCall = (ko, id) => new Order { Id = id, CustomerId = 1 };
-        stub.ValidateOrder.OnCall = (ko, _) => true;
-        stub.CalculateTotal.OnCall = (ko, _) => 100m;
+        var getOrderTracking = stub.GetOrder.OnCall((ko, id) => new Order { Id = id, CustomerId = 1 });
+        var validateTracking = stub.ValidateOrder.OnCall((ko, _) => true);
+        stub.CalculateTotal.OnCall((ko, _) => 100m);
+        var saveTracking = stub.SaveOrder.OnCall((ko, _) => { });
 
         var sut = new OrderProcessor(stub);
 
@@ -56,9 +57,9 @@ public class FrameworkComparisonSamplesTests
         sut.Process(1);
 
         // Assert
-        Assert.Equal(1, stub.GetOrder.CallCount);
-        Assert.Equal(1, stub.ValidateOrder.CallCount);
-        Assert.Equal(1, stub.SaveOrder.CallCount);
+        Assert.Equal(1, getOrderTracking.CallCount);
+        Assert.Equal(1, validateTracking.CallCount);
+        Assert.Equal(1, saveTracking.CallCount);
     }
     #endregion
 
@@ -105,9 +106,9 @@ public class FrameworkComparisonSamplesTests
 
         // Assert
         Assert.True(result);
-        orderRepo.Verify(x => x.Save(It.Is<FcOrder>(o => o.Status == "Completed")), Times.Once);
-        notificationService.Verify(x => x.SendOrderConfirmation(100, 1), Times.Once);
-        inventoryService.Verify(x => x.ReleaseItems(It.IsAny<IEnumerable<FcOrderItem>>()), Times.Never);
+        orderRepo.Verify(x => x.Save(It.Is<FcOrder>(o => o.Status == "Completed")), Moq.Times.Once());
+        notificationService.Verify(x => x.SendOrderConfirmation(100, 1), Moq.Times.Once());
+        inventoryService.Verify(x => x.ReleaseItems(It.IsAny<IEnumerable<FcOrderItem>>()), Moq.Times.Never());
     }
     #endregion
 
@@ -125,16 +126,19 @@ public class FrameworkComparisonSamplesTests
         };
 
         var orderRepo = new FcOrderRepositoryStub();
-        orderRepo.GetById.OnCall = (ko, id) => order;
+        orderRepo.GetById.OnCall((ko, id) => order);
+        var saveTracking = orderRepo.Save.OnCall((ko, o) => { });
 
         var paymentService = new FcPaymentServiceStub();
-        paymentService.ProcessPayment.OnCall = (ko, customerId, amount) =>
-            new FcPaymentResult { Success = true, TransactionId = "TXN-123" };
+        paymentService.ProcessPayment.OnCall((ko, customerId, amount) =>
+            new FcPaymentResult { Success = true, TransactionId = "TXN-123" });
 
         var notificationService = new FcNotificationServiceStub();
+        var notifTracking = notificationService.SendOrderConfirmation.OnCall((ko, custId, orderId) => { });
 
         var inventoryService = new FcInventoryServiceStub();
-        inventoryService.ReserveItems.OnCall = (ko, items) => true;
+        inventoryService.ReserveItems.OnCall((ko, items) => true);
+        var releaseTracking = inventoryService.ReleaseItems.OnCall((ko, items) => { });
 
         var processor = new FcOrderProcessor(
             orderRepo,
@@ -147,10 +151,10 @@ public class FrameworkComparisonSamplesTests
 
         // Assert
         Assert.True(result);
-        Assert.Equal(1, orderRepo.Save.CallCount);
-        Assert.Equal("Completed", orderRepo.Save.LastCallArg?.Status);
-        Assert.Equal(1, notificationService.SendOrderConfirmation.CallCount);
-        Assert.Equal(0, inventoryService.ReleaseItems.CallCount);
+        Assert.Equal(1, saveTracking.CallCount);
+        Assert.Equal("Completed", saveTracking.LastArg?.Status);
+        Assert.Equal(1, notifTracking.CallCount);
+        Assert.Equal(0, releaseTracking.CallCount);
     }
     #endregion
 
@@ -242,13 +246,13 @@ public class FrameworkComparisonSamplesTests
         Assert.False(result);
         notificationService.Verify(
             x => x.SendPaymentFailure(100, "Insufficient funds"),
-            Times.Once);
+            Moq.Times.Once());
         inventoryService.Verify(
             x => x.ReleaseItems(It.IsAny<IEnumerable<FcOrderItem>>()),
-            Times.Once);
+            Moq.Times.Once());
         orderRepo.Verify(
             x => x.Save(It.Is<FcOrder>(o => o.Status == "PaymentFailed")),
-            Times.Once);
+            Moq.Times.Once());
     }
     #endregion
 
@@ -266,16 +270,19 @@ public class FrameworkComparisonSamplesTests
         };
 
         var orderRepo = new FcOrderRepositoryStub();
-        orderRepo.GetById.OnCall = (ko, id) => order;
+        orderRepo.GetById.OnCall((ko, id) => order);
+        var saveTracking = orderRepo.Save.OnCall((ko, o) => { });
 
         var paymentService = new FcPaymentServiceStub();
-        paymentService.ProcessPayment.OnCall = (ko, customerId, amount) =>
-            new FcPaymentResult { Success = false, ErrorMessage = "Insufficient funds" };
+        paymentService.ProcessPayment.OnCall((ko, customerId, amount) =>
+            new FcPaymentResult { Success = false, ErrorMessage = "Insufficient funds" });
 
         var notificationService = new FcNotificationServiceStub();
+        var notifTracking = notificationService.SendPaymentFailure.OnCall((ko, custId, msg) => { });
 
         var inventoryService = new FcInventoryServiceStub();
-        inventoryService.ReserveItems.OnCall = (ko, items) => true;
+        inventoryService.ReserveItems.OnCall((ko, items) => true);
+        var releaseTracking = inventoryService.ReleaseItems.OnCall((ko, items) => { });
 
         var processor = new FcOrderProcessor(
             orderRepo,
@@ -288,10 +295,10 @@ public class FrameworkComparisonSamplesTests
 
         // Assert
         Assert.False(result);
-        Assert.Equal(1, notificationService.SendPaymentFailure.CallCount);
-        Assert.Equal((100, "Insufficient funds"), notificationService.SendPaymentFailure.LastCallArgs);
-        Assert.Equal(1, inventoryService.ReleaseItems.CallCount);
-        Assert.Equal("PaymentFailed", orderRepo.Save.LastCallArg?.Status);
+        Assert.Equal(1, notifTracking.CallCount);
+        Assert.Equal((100, "Insufficient funds"), notifTracking.LastArgs);
+        Assert.Equal(1, releaseTracking.CallCount);
+        Assert.Equal("PaymentFailed", saveTracking.LastArg?.Status);
     }
     #endregion
 
@@ -368,8 +375,8 @@ public class FrameworkComparisonSamplesTests
 
         // Assert
         Assert.Equal("Widget", result?.Name);
-        repository.Verify(x => x.GetByIdAsync(It.IsAny<int>()), Times.Never);
-        logger.Verify(x => x.LogInfo(It.Is<string>(s => s.Contains("Cache hit"))), Times.Once);
+        repository.Verify(x => x.GetByIdAsync(It.IsAny<int>()), Moq.Times.Never());
+        logger.Verify(x => x.LogInfo(It.Is<string>(s => s.Contains("Cache hit"))), Moq.Times.Once());
     }
     #endregion
 
@@ -381,11 +388,13 @@ public class FrameworkComparisonSamplesTests
         var cachedProduct = new FcProduct { Id = 1, Name = "Widget", Price = 19.99m };
 
         var repository = new FcProductRepositoryStub();
+        var repoTracking = repository.GetByIdAsync.OnCall((ko, id) => Task.FromResult<FcProduct?>(null));
 
         var cache = new FcCacheServiceStub();
         cache.Get.Of<FcProduct>().OnCall = (ko, key) => cachedProduct;
 
         var logger = new FcLoggerStub();
+        var logTracking = logger.LogInfo.OnCall((ko, message) => { });
 
         var service = new FcCachedProductService(repository, cache, logger);
 
@@ -394,8 +403,8 @@ public class FrameworkComparisonSamplesTests
 
         // Assert
         Assert.Equal("Widget", result?.Name);
-        Assert.Equal(0, repository.GetByIdAsync.CallCount);
-        Assert.True(logger.LogInfo.LastCallArg?.Contains("Cache hit"));
+        Assert.Equal(0, repoTracking.CallCount);
+        Assert.True(logTracking.LastArg?.Contains("Cache hit"));
     }
     #endregion
 
@@ -460,13 +469,13 @@ public class FrameworkComparisonSamplesTests
 
         // Assert
         Assert.Equal("Widget", result?.Name);
-        repository.Verify(x => x.GetByIdAsync(1), Times.Once);
+        repository.Verify(x => x.GetByIdAsync(1), Moq.Times.Once());
         cache.Verify(
             x => x.Set("product:1", product, It.IsAny<TimeSpan>()),
-            Times.Once);
+            Moq.Times.Once());
         logger.Verify(
             x => x.LogInfo(It.Is<string>(s => s.Contains("Cache miss"))),
-            Times.Once);
+            Moq.Times.Once());
     }
     #endregion
 
@@ -478,12 +487,13 @@ public class FrameworkComparisonSamplesTests
         var product = new FcProduct { Id = 1, Name = "Widget", Price = 19.99m };
 
         var repository = new FcProductRepositoryStub();
-        repository.GetByIdAsync.OnCall = (ko, id) => Task.FromResult<FcProduct?>(product);
+        var repoTracking = repository.GetByIdAsync.OnCall((ko, id) => Task.FromResult<FcProduct?>(product));
 
         var cache = new FcCacheServiceStub();
         cache.Get.Of<FcProduct>().OnCall = (ko, key) => null;
 
         var logger = new FcLoggerStub();
+        var logTracking = logger.LogInfo.OnCall((ko, message) => { });
 
         var service = new FcCachedProductService(repository, cache, logger);
 
@@ -492,10 +502,10 @@ public class FrameworkComparisonSamplesTests
 
         // Assert
         Assert.Equal("Widget", result?.Name);
-        Assert.Equal(1, repository.GetByIdAsync.CallCount);
+        Assert.Equal(1, repoTracking.CallCount);
         Assert.Equal(1, cache.Set.Of<FcProduct>().CallCount);
         Assert.Equal("product:1", cache.Set.Of<FcProduct>().LastCallArg);
-        Assert.True(logger.LogInfo.LastCallArg?.Contains("Cache miss"));
+        Assert.True(logTracking.LastArg?.Contains("Cache miss"));
     }
     #endregion
 

@@ -43,13 +43,13 @@ public class GeneratedCodeSamplesTests
         var knockOff = new GenLoggerKnockOff();
         IGenLogger logger = knockOff;
 
+        var tracking = knockOff.Log.OnCall((ko, level, message, code) => { });
         logger.Log("ERROR", "Something failed", 500);
 
-        var args = knockOff.Log.LastCallArgs;
-        Assert.NotNull(args);
-        Assert.Equal("ERROR", args.Value.level);
-        Assert.Equal("Something failed", args.Value.message);
-        Assert.Equal(500, args.Value.code);
+        var args = tracking.LastArgs;
+        Assert.Equal("ERROR", args.level);
+        Assert.Equal("Something failed", args.message);
+        Assert.Equal(500, args.code);
     }
 
     [Fact]
@@ -62,12 +62,12 @@ public class GeneratedCodeSamplesTests
         string? capturedMessage = null;
         int? capturedCode = null;
 
-        knockOff.Log.OnCall = (ko, level, message, code) =>
+        knockOff.Log.OnCall((ko, level, message, code) =>
         {
             capturedLevel = level;
             capturedMessage = message;
             capturedCode = code;
-        };
+        });
 
         logger.Log("WARN", "Low memory", 300);
 
@@ -85,10 +85,13 @@ public class GeneratedCodeSamplesTests
         IGenAuditLogger loggerService = logger;
         IGenAuditor auditorService = auditor;
 
+        var logTracking = logger.Log.OnCall((ko, message) => { });
+        var auditTracking = auditor.Audit.OnCall((ko, action) => { });
+
         loggerService.Log("test message");
         auditorService.Audit("test action");
 
-        Assert.True(logger.Log.WasCalled);
-        Assert.True(auditor.Audit.WasCalled);
+        Assert.True(logTracking.WasCalled);
+        Assert.True(auditTracking.WasCalled);
     }
 }

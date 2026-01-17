@@ -132,7 +132,7 @@ public static class StrictModeSamples
 
         // KnockOff - standalone
         var stub1 = new SmUserServiceKnockOff().Strict();
-        stub1.GetUser.OnCall = (ko, id) => new User();
+        stub1.GetUser.OnCall((ko, id) => new User());
 
         // KnockOff - inline
         var stub2 = new SmInlineTests.Stubs.ISmUserService().Strict();

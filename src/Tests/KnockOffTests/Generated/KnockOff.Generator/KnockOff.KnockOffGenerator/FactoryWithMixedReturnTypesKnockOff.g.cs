@@ -5,61 +5,254 @@ namespace KnockOff.Tests;
 
 partial class FactoryWithMixedReturnTypesKnockOff : global::KnockOff.Tests.IFactoryWithMixedReturnTypes, global::KnockOff.IKnockOffStub
 {
-	/// <summary>Tracks and configures behavior for Fetch.</summary>
-	public sealed class Fetch1Interceptor
+	/// <summary>Tracks and configures behavior for Fetch (overloaded).</summary>
+	public sealed class FetchInterceptor
 	{
-		/// <summary>Delegate for Fetch.</summary>
-		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleArea?> FetchDelegate(FactoryWithMixedReturnTypesKnockOff ko, long id);
+		/// <summary>Delegate for Fetch(long).</summary>
+		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleArea?> FetchDelegate_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea(FactoryWithMixedReturnTypesKnockOff ko, long id);
 
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
+		private readonly global::System.Collections.Generic.List<(FetchDelegate_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea Callback, global::KnockOff.Times Times, MethodTrackingImpl_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea Tracking)> _sequence_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea = new();
+		private int _sequenceIndex_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea;
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
+		/// <summary>Delegate for Fetch(global::KnockOff.Tests.SampleEntity).</summary>
+		public delegate global::KnockOff.Tests.ISampleArea FetchDelegate_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea(FactoryWithMixedReturnTypesKnockOff ko, global::KnockOff.Tests.SampleEntity entity);
 
-		/// <summary>The argument from the most recent call.</summary>
-		public long? LastCallArg { get; private set; }
+		private readonly global::System.Collections.Generic.List<(FetchDelegate_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea Callback, global::KnockOff.Times Times, MethodTrackingImpl_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea Tracking)> _sequence_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea = new();
+		private int _sequenceIndex_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea;
 
-		/// <summary>Callback invoked when this method is called.</summary>
-		public FetchDelegate? OnCall { get; set; }
+		/// <summary>Configures callback for Fetch(long). Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking<long> OnCall(FetchDelegate_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea callback)
+		{
+			var tracking = new MethodTrackingImpl_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea();
+			_sequence_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea.Clear();
+			_sequence_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequenceIndex_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea = 0;
+			return tracking;
+		}
 
-		/// <summary>Records a method call.</summary>
-		public void RecordCall(long? id) { CallCount++; LastCallArg = id; }
+		/// <summary>Configures callback for Fetch(long) with Times constraint.</summary>
+		public global::KnockOff.IMethodSequence<FetchDelegate_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea> OnCall(FetchDelegate_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea callback, global::KnockOff.Times times)
+		{
+			var tracking = new MethodTrackingImpl_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea();
+			_sequence_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea.Clear();
+			_sequence_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea.Add((callback, times, tracking));
+			_sequenceIndex_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea = 0;
+			return new MethodSequenceImpl_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea(this);
+		}
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
-	}
+		/// <summary>Configures callback for Fetch(global::KnockOff.Tests.SampleEntity). Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking<global::KnockOff.Tests.SampleEntity> OnCall(FetchDelegate_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea callback)
+		{
+			var tracking = new MethodTrackingImpl_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea();
+			_sequence_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea.Clear();
+			_sequence_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequenceIndex_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea = 0;
+			return tracking;
+		}
 
-	/// <summary>Tracks and configures behavior for Fetch.</summary>
-	public sealed class Fetch2Interceptor
-	{
-		/// <summary>Delegate for Fetch.</summary>
-		public delegate global::KnockOff.Tests.ISampleArea FetchDelegate(FactoryWithMixedReturnTypesKnockOff ko, global::KnockOff.Tests.SampleEntity entity);
+		/// <summary>Configures callback for Fetch(global::KnockOff.Tests.SampleEntity) with Times constraint.</summary>
+		public global::KnockOff.IMethodSequence<FetchDelegate_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea> OnCall(FetchDelegate_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea callback, global::KnockOff.Times times)
+		{
+			var tracking = new MethodTrackingImpl_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea();
+			_sequence_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea.Clear();
+			_sequence_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea.Add((callback, times, tracking));
+			_sequenceIndex_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea = 0;
+			return new MethodSequenceImpl_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea(this);
+		}
 
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
+		/// <summary>Invokes configured callback for Fetch(long).</summary>
+		internal global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleArea?> Invoke_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea(FactoryWithMixedReturnTypesKnockOff ko, bool strict, long id)
+		{
+			if (_sequence_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea.Count == 0)
+			{
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Fetch");
+				return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.ISampleArea?>(default!);
+			}
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
+			var (callback, times, tracking) = _sequence_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea[_sequenceIndex_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea];
+			tracking.RecordCall(id);
 
-		/// <summary>The argument from the most recent call.</summary>
-		public global::KnockOff.Tests.SampleEntity? LastCallArg { get; private set; }
+			if (!times.IsForever && tracking.CallCount >= times.Count)
+			{
+				if (_sequenceIndex_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea < _sequence_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea.Count - 1)
+					_sequenceIndex_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea++;
+				else if (tracking.CallCount > times.Count)
+					throw global::KnockOff.StubException.SequenceExhausted("Fetch");
+			}
 
-		/// <summary>Callback invoked when this method is called.</summary>
-		public FetchDelegate? OnCall { get; set; }
+			return callback(ko, id);
+		}
 
-		/// <summary>Records a method call.</summary>
-		public void RecordCall(global::KnockOff.Tests.SampleEntity? entity) { CallCount++; LastCallArg = entity; }
+		/// <summary>Invokes configured callback for Fetch(global::KnockOff.Tests.SampleEntity).</summary>
+		internal global::KnockOff.Tests.ISampleArea Invoke_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea(FactoryWithMixedReturnTypesKnockOff ko, bool strict, global::KnockOff.Tests.SampleEntity entity)
+		{
+			if (_sequence_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea.Count == 0)
+			{
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Fetch");
+				throw new global::System.InvalidOperationException("No implementation provided for Fetch. Configure via OnCall.");
+			}
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+			var (callback, times, tracking) = _sequence_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea[_sequenceIndex_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea];
+			tracking.RecordCall(entity);
+
+			if (!times.IsForever && tracking.CallCount >= times.Count)
+			{
+				if (_sequenceIndex_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea < _sequence_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea.Count - 1)
+					_sequenceIndex_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea++;
+				else if (tracking.CallCount > times.Count)
+					throw global::KnockOff.StubException.SequenceExhausted("Fetch");
+			}
+
+			return callback(ko, entity);
+		}
+
+		/// <summary>Resets all tracking state for all overloads.</summary>
+		public void Reset()
+		{
+			foreach (var (_, _, tracking) in _sequence_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea)
+				tracking.Reset();
+			_sequenceIndex_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea = 0;
+			foreach (var (_, _, tracking) in _sequence_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea)
+				tracking.Reset();
+			_sequenceIndex_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea = 0;
+		}
+
+		/// <summary>Verifies all Times constraints for all overloads were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			foreach (var (_, times, tracking) in _sequence_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
+		private sealed class MethodTrackingImpl_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea : global::KnockOff.IMethodTracking<long>
+		{
+			private long _lastArg = default!;
+
+			public int CallCount { get; private set; }
+
+			public bool WasCalled => CallCount > 0;
+
+			public long LastArg => _lastArg;
+
+			public void RecordCall(long id) { CallCount++; _lastArg = id; }
+
+			public void Reset() { CallCount = 0; _lastArg = default!; }
+		}
+
+		private sealed class MethodTrackingImpl_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea : global::KnockOff.IMethodTracking<global::KnockOff.Tests.SampleEntity>
+		{
+			private global::KnockOff.Tests.SampleEntity _lastArg = default!;
+
+			public int CallCount { get; private set; }
+
+			public bool WasCalled => CallCount > 0;
+
+			public global::KnockOff.Tests.SampleEntity LastArg => _lastArg;
+
+			public void RecordCall(global::KnockOff.Tests.SampleEntity entity) { CallCount++; _lastArg = entity; }
+
+			public void Reset() { CallCount = 0; _lastArg = default!; }
+		}
+
+		private sealed class MethodSequenceImpl_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea : global::KnockOff.IMethodSequence<FetchDelegate_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea>
+		{
+			private readonly FetchInterceptor _interceptor;
+
+			public MethodSequenceImpl_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea(FetchInterceptor interceptor) => _interceptor = interceptor;
+
+			public int TotalCallCount
+			{
+				get
+				{
+					var total = 0;
+					foreach (var (_, _, tracking) in _interceptor._sequence_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea)
+						total += tracking.CallCount;
+					return total;
+				}
+			}
+
+			public global::KnockOff.IMethodSequence<FetchDelegate_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea> ThenCall(FetchDelegate_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea();
+				_interceptor._sequence_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea.Add((callback, times, tracking));
+				return this;
+			}
+
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _interceptor._sequence_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea)
+				{
+					if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			public void Reset() => _interceptor.Reset();
+		}
+
+		private sealed class MethodSequenceImpl_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea : global::KnockOff.IMethodSequence<FetchDelegate_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea>
+		{
+			private readonly FetchInterceptor _interceptor;
+
+			public MethodSequenceImpl_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea(FetchInterceptor interceptor) => _interceptor = interceptor;
+
+			public int TotalCallCount
+			{
+				get
+				{
+					var total = 0;
+					foreach (var (_, _, tracking) in _interceptor._sequence_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea)
+						total += tracking.CallCount;
+					return total;
+				}
+			}
+
+			public global::KnockOff.IMethodSequence<FetchDelegate_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea> ThenCall(FetchDelegate_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea();
+				_interceptor._sequence_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea.Add((callback, times, tracking));
+				return this;
+			}
+
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _interceptor._sequence_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea)
+				{
+					if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			public void Reset() => _interceptor.Reset();
+		}
+
 	}
 
 	/// <summary>Interceptor for Fetch.</summary>
-	public Fetch1Interceptor Fetch1 { get; } = new();
-
-	/// <summary>Interceptor for Fetch.</summary>
-	public Fetch2Interceptor Fetch2 { get; } = new();
+	public FetchInterceptor Fetch { get; } = new();
 
 	/// <summary>When true, throws StubException for unconfigured member access.</summary>
 	public bool Strict { get; set; } = false;
@@ -67,22 +260,29 @@ partial class FactoryWithMixedReturnTypesKnockOff : global::KnockOff.Tests.IFact
 	/// <summary>The global::KnockOff.Tests.IFactoryWithMixedReturnTypes instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IFactoryWithMixedReturnTypes Object => this;
 
+	/// <summary>Verifies all method interceptors' Times constraints were satisfied.</summary>
+	public bool Verify()
+	{
+		var result = true;
+		result &= Fetch.Verify();
+		return result;
+	}
+
+	/// <summary>Verifies all method interceptors' Times constraints and throws if any fail.</summary>
+	public void VerifyAll()
+	{
+		if (!Verify())
+			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
 	global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleArea?> global::KnockOff.Tests.IFactoryWithMixedReturnTypes.Fetch(long id)
 	{
-		Fetch1.RecordCall(id);
-		if (Fetch1.OnCall is { } callback)
-			return callback(this, id);
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFactoryWithMixedReturnTypes", "Fetch");
-		return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.ISampleArea?>(default!);
+		return Fetch.Invoke_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea(this, Strict, id);
 	}
 
 	global::KnockOff.Tests.ISampleArea global::KnockOff.Tests.IFactoryWithMixedReturnTypes.Fetch(global::KnockOff.Tests.SampleEntity entity)
 	{
-		Fetch2.RecordCall(entity);
-		if (Fetch2.OnCall is { } callback)
-			return callback(this, entity);
-		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFactoryWithMixedReturnTypes", "Fetch");
-		throw new global::System.InvalidOperationException("No implementation provided for Fetch. Set Fetch2.OnCall or define a protected method 'Fetch' in your partial class.");
+		return Fetch.Invoke_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea(this, Strict, entity);
 	}
 
 }

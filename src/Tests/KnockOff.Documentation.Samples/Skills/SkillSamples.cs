@@ -290,7 +290,7 @@ public partial class SkPriorityServiceKnockOff : ISkPriorityService
 // var knockOff = new SkPriorityServiceKnockOff();
 // ISkPriorityService service = knockOff;
 // No callback -> uses user method: service.Calculate(5) returns 10
-// Callback -> overrides: knockOff.Calculate2.OnCall = (ko, x) => x * 100;
+// Callback -> overrides: knockOff.Calculate2.OnCall((ko, x) => x * 100);
 // Reset -> back to user method: knockOff.Calculate2.Reset();
 
 // ============================================================================

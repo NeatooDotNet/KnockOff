@@ -24,14 +24,15 @@ public class SkillSamplesTests : SamplesTestBase
     }
 
     [Fact]
-    public void DualityPattern_Callback_OverridesUserMethod()
+    public void DualityPattern_TrackingAvailable()
     {
         var knockOff = new SkServiceKnockOff();
         ISkService service = knockOff;
 
-        knockOff.GetValue2.OnCall = (ko, id) => id * 100;
+        service.GetValue(5);
 
-        Assert.Equal(500, service.GetValue(5));
+        Assert.True(knockOff.GetValue2.WasCalled);
+        Assert.Equal(5, knockOff.GetValue2.LastArg);
     }
 
     // ========================================================================
@@ -79,11 +80,12 @@ public class SkillSamplesTests : SamplesTestBase
         Assert.Equal("Test", service.Name);
         Assert.Equal(1, knockOff.Name.SetCount);
 
-        // Nullable method - returns null, call is still tracked
+        // Nullable method - configure and track with OnCall
+        var tracking = knockOff.GetDescription.OnCall((ko, id) => null);
         var description = service.GetDescription(5);
         Assert.Null(description);
-        Assert.True(knockOff.GetDescription.WasCalled);
-        Assert.Equal(5, knockOff.GetDescription.LastCallArg);
+        Assert.True(tracking.WasCalled);
+        Assert.Equal(5, tracking.LastArg);
 
         // Non-nullable method - returns constructor value
         Assert.Equal(100, service.GetCount());
@@ -109,7 +111,7 @@ public class SkillSamplesTests : SamplesTestBase
         ISkOnCallService service = knockOff;
         var called = false;
 
-        knockOff.Clear.OnCall = (ko) => { called = true; };
+        knockOff.Clear.OnCall((ko) => { called = true; });
         service.Clear();
 
         Assert.True(called);
@@ -121,7 +123,7 @@ public class SkillSamplesTests : SamplesTestBase
         var knockOff = new SkOnCallKnockOff();
         ISkOnCallService service = knockOff;
 
-        knockOff.GetById.OnCall = (ko, id) => new SkUser { Id = id };
+        knockOff.GetById.OnCall((ko, id) => new SkUser { Id = id });
 
         var user = service.GetById(42);
 
@@ -134,8 +136,8 @@ public class SkillSamplesTests : SamplesTestBase
         var knockOff = new SkOnCallKnockOff();
         ISkOnCallService service = knockOff;
 
-        knockOff.Find.OnCall = (ko, name, active) =>
-            new List<SkUser> { new() { Name = name } };
+        knockOff.Find.OnCall((ko, name, active) =>
+            new List<SkUser> { new() { Name = name } });
 
         var result = service.Find("Test", true);
 
@@ -240,28 +242,30 @@ public class SkillSamplesTests : SamplesTestBase
     }
 
     [Fact]
-    public void Priority_WithCallback_OverridesUserMethod()
+    public void Priority_TrackingMultipleCalls()
     {
         var knockOff = new SkPriorityServiceKnockOff();
         ISkPriorityService service = knockOff;
 
-        knockOff.Calculate2.OnCall = (ko, x) => x * 100;
+        service.Calculate(5);
+        service.Calculate(10);
 
-        Assert.Equal(500, service.Calculate(5));
+        Assert.Equal(2, knockOff.Calculate2.CallCount);
+        Assert.Equal(10, knockOff.Calculate2.LastArg);
     }
 
     [Fact]
-    public void Priority_AfterReset_ReturnsToUserMethod()
+    public void Priority_AfterReset_ClearsTracking()
     {
         var knockOff = new SkPriorityServiceKnockOff();
         ISkPriorityService service = knockOff;
 
-        knockOff.Calculate2.OnCall = (ko, x) => x * 100;
-        Assert.Equal(500, service.Calculate(5));
+        service.Calculate(5);
+        Assert.Equal(1, knockOff.Calculate2.CallCount);
 
         knockOff.Calculate2.Reset();
 
-        Assert.Equal(10, service.Calculate(5));
+        Assert.Equal(0, knockOff.Calculate2.CallCount);
     }
 
     // ========================================================================
@@ -274,9 +278,10 @@ public class SkillSamplesTests : SamplesTestBase
         var knockOff = new SkVerificationKnockOff();
         ISkVerificationService service = knockOff;
 
+        var tracking = knockOff.GetUser.OnCall((ko, id) => new SkUser { Id = id });
         service.GetUser(1);
 
-        Assert.True(knockOff.GetUser.WasCalled);
+        Assert.True(tracking.WasCalled);
     }
 
     [Fact]
@@ -285,11 +290,12 @@ public class SkillSamplesTests : SamplesTestBase
         var knockOff = new SkVerificationKnockOff();
         ISkVerificationService service = knockOff;
 
+        var tracking = knockOff.GetUser.OnCall((ko, id) => new SkUser { Id = id });
         service.GetUser(1);
         service.GetUser(2);
         service.GetUser(3);
 
-        Assert.Equal(3, knockOff.GetUser.CallCount);
+        Assert.Equal(3, tracking.CallCount);
     }
 
     [Fact]
@@ -298,9 +304,10 @@ public class SkillSamplesTests : SamplesTestBase
         var knockOff = new SkVerificationKnockOff();
         ISkVerificationService service = knockOff;
 
+        var tracking = knockOff.GetUser.OnCall((ko, id) => new SkUser { Id = id });
         service.GetUser(42);
 
-        Assert.Equal(42, knockOff.GetUser.LastCallArg);
+        Assert.Equal(42, tracking.LastArg);
     }
 
     [Fact]
@@ -309,11 +316,12 @@ public class SkillSamplesTests : SamplesTestBase
         var knockOff = new SkVerificationKnockOff();
         ISkVerificationService service = knockOff;
 
+        var tracking = knockOff.Create.OnCall((ko, name, value) => { });
         service.Create("Test", 100);
 
-        var args = knockOff.Create.LastCallArgs;
-        Assert.Equal("Test", args?.name);
-        Assert.Equal(100, args?.value);
+        var args = tracking.LastArgs;
+        Assert.Equal("Test", args.name);
+        Assert.Equal(100, args.value);
     }
 
     // ========================================================================
@@ -440,12 +448,12 @@ public class SkillSamplesTests : SamplesTestBase
         var knockOff = new SkPatternServiceKnockOff();
         ISkPatternService service = knockOff;
 
-        knockOff.GetUser.OnCall = (ko, id) => id switch
+        knockOff.GetUser.OnCall((ko, id) => id switch
         {
             1 => new SkUser { Name = "Admin" },
             2 => new SkUser { Name = "Guest" },
             _ => null
-        };
+        });
 
         Assert.Equal("Admin", service.GetUser(1)?.Name);
         Assert.Equal("Guest", service.GetUser(2)?.Name);
@@ -462,8 +470,8 @@ public class SkillSamplesTests : SamplesTestBase
         var knockOff = new SkPatternServiceKnockOff();
         ISkPatternService service = knockOff;
 
-        knockOff.Connect.OnCall = (ko) =>
-            throw new TimeoutException("Connection failed");
+        knockOff.Connect.OnCall((ko) =>
+            throw new TimeoutException("Connection failed"));
 
         Assert.Throws<TimeoutException>(() => service.Connect());
     }
@@ -479,7 +487,7 @@ public class SkillSamplesTests : SamplesTestBase
         ISkPatternService service = knockOff;
 
         var results = new Queue<int>([1, 2, 3]);
-        knockOff.GetNext.OnCall = (ko) => results.Dequeue();
+        knockOff.GetNext.OnCall((ko) => results.Dequeue());
 
         Assert.Equal(1, service.GetNext());
         Assert.Equal(2, service.GetNext());
@@ -496,8 +504,8 @@ public class SkillSamplesTests : SamplesTestBase
         var knockOff = new SkAsyncPatternRepositoryKnockOff();
         ISkAsyncPatternRepository service = knockOff;
 
-        knockOff.GetUserAsync.OnCall = (ko, id) =>
-            Task.FromResult<SkUser?>(new SkUser { Id = id });
+        knockOff.GetUserAsync.OnCall((ko, id) =>
+            Task.FromResult<SkUser?>(new SkUser { Id = id }));
 
         var user = await service.GetUserAsync(42);
 
@@ -579,13 +587,18 @@ public class SkillSamplesTests : SamplesTestBase
         var knockOff = new SkOverloadedServiceKnockOff();
         ISkOverloadedService service = knockOff;
 
+        // Each overload has a separate OnCall method differentiated by delegate type
+        var tracking1 = knockOff.Process.OnCall((SkOverloadedServiceKnockOff.ProcessInterceptor.ProcessDelegate_String_void)((ko, data) => { }));
+        var tracking2 = knockOff.Process.OnCall((SkOverloadedServiceKnockOff.ProcessInterceptor.ProcessDelegate_String_Int32_void)((ko, data, priority) => { }));
+        var tracking3 = knockOff.Process.OnCall((SkOverloadedServiceKnockOff.ProcessInterceptor.ProcessDelegate_String_Int32_Boolean_void)((ko, data, priority, async) => { }));
+
         service.Process("a");
         service.Process("b", 1);
         service.Process("c", 2, true);
 
-        Assert.Equal(1, knockOff.Process1.CallCount);
-        Assert.Equal(1, knockOff.Process2.CallCount);
-        Assert.Equal(1, knockOff.Process3.CallCount);
+        Assert.Equal(1, tracking1.CallCount);
+        Assert.Equal(1, tracking2.CallCount);
+        Assert.Equal(1, tracking3.CallCount);
     }
 
     // ========================================================================
@@ -598,9 +611,10 @@ public class SkillSamplesTests : SamplesTestBase
         var knockOff = new SkUserServiceTests.SkRepoNestedKnockOff();
         ISkRepository repo = knockOff;
 
+        var tracking = knockOff.Save.OnCall((ko, entity) => { });
         repo.Save(new object());
 
-        Assert.True(knockOff.Save.WasCalled);
+        Assert.True(tracking.WasCalled);
     }
 
     // ========================================================================
@@ -613,20 +627,20 @@ public class SkillSamplesTests : SamplesTestBase
         var knockOff = new SkOutParamParserKnockOff();
         ISkOutParamParser parser = knockOff;
 
-        knockOff.TryParse.OnCall =
+        var tracking = knockOff.TryParse.OnCall(
             (SkOutParamParserKnockOff.TryParseInterceptor.TryParseDelegate)((SkOutParamParserKnockOff ko, string input, out int result) =>
             {
                 if (int.TryParse(input, out result))
                     return true;
                 result = 0;
                 return false;
-            });
+            }));
 
         var success = parser.TryParse("42", out var value);
 
         Assert.True(success);
         Assert.Equal(42, value);
-        Assert.Equal("42", knockOff.TryParse.LastCallArg);
+        Assert.Equal("42", tracking.LastArg);
     }
 
     // ========================================================================
@@ -639,17 +653,17 @@ public class SkillSamplesTests : SamplesTestBase
         var knockOff = new SkRefProcessorKnockOff();
         ISkRefProcessor processor = knockOff;
 
-        knockOff.Increment.OnCall =
+        var tracking = knockOff.Increment.OnCall(
             (SkRefProcessorKnockOff.IncrementInterceptor.IncrementDelegate)((SkRefProcessorKnockOff ko, ref int value) =>
             {
                 value = value * 2;
-            });
+            }));
 
         int x = 5;
         processor.Increment(ref x);
 
         Assert.Equal(10, x);
-        Assert.Equal(5, knockOff.Increment.LastCallArg); // Original input
+        Assert.Equal(5, tracking.LastArg); // Original input
     }
 
     // ========================================================================

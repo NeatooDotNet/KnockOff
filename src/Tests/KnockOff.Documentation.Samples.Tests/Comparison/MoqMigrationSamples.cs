@@ -142,10 +142,10 @@ public class MoqMigrationSamples
         mock.Object.Update(new MoqMigUser());
         mock.Object.Update(new MoqMigUser());
 
-        mock.Verify(x => x.Save(It.IsAny<MoqMigUser>()), Times.Once);
-        mock.Verify(x => x.Delete(It.IsAny<int>()), Times.Never);
-        mock.Verify(x => x.GetAll(), Times.AtLeastOnce);
-        mock.Verify(x => x.Update(It.IsAny<MoqMigUser>()), Times.Exactly(3));
+        mock.Verify(x => x.Save(It.IsAny<MoqMigUser>()), Moq.Times.Once());
+        mock.Verify(x => x.Delete(It.IsAny<int>()), Moq.Times.Never());
+        mock.Verify(x => x.GetAll(), Moq.Times.AtLeastOnce());
+        mock.Verify(x => x.Update(It.IsAny<MoqMigUser>()), Moq.Times.Exactly(3));
     }
     #endregion
 
