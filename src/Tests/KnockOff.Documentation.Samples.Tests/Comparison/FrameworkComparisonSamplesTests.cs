@@ -391,7 +391,7 @@ public class FrameworkComparisonSamplesTests
         var repoTracking = repository.GetByIdAsync.OnCall((ko, id) => Task.FromResult<FcProduct?>(null));
 
         var cache = new FcCacheServiceStub();
-        cache.Get.Of<FcProduct>().OnCall = (ko, key) => cachedProduct;
+        cache.Get.Of<FcProduct>().OnCall((ko, key) => cachedProduct);
 
         var logger = new FcLoggerStub();
         var logTracking = logger.LogInfo.OnCall((ko, message) => { });
@@ -490,7 +490,7 @@ public class FrameworkComparisonSamplesTests
         var repoTracking = repository.GetByIdAsync.OnCall((ko, id) => Task.FromResult<FcProduct?>(product));
 
         var cache = new FcCacheServiceStub();
-        cache.Get.Of<FcProduct>().OnCall = (ko, key) => null;
+        cache.Get.Of<FcProduct>().OnCall((ko, key) => null);
 
         var logger = new FcLoggerStub();
         var logTracking = logger.LogInfo.OnCall((ko, message) => { });

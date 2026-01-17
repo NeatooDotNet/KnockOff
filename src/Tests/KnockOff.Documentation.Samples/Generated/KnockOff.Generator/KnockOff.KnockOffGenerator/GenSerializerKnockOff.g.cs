@@ -55,10 +55,12 @@ partial class GenSerializerKnockOff : global::KnockOff.Documentation.Samples.Gui
 		}
 
 		/// <summary>Typed handler for Deserialize with specific type arguments.</summary>
-		public sealed class DeserializeTypedHandler<T> : IGenericMethodCallTracker, IResettable
+		public sealed class DeserializeTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 		{
 			/// <summary>Delegate for Deserialize.</summary>
 			public delegate T DeserializeDelegate(GenSerializerKnockOff ko, string json);
+
+			private DeserializeDelegate? _onCall;
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -69,14 +71,17 @@ partial class GenSerializerKnockOff : global::KnockOff.Documentation.Samples.Gui
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public DeserializeDelegate? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(DeserializeDelegate callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal DeserializeDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
 			public void RecordCall(string? json) { CallCount++; LastCallArg = json; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+			public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }
 		}
 	}
 
@@ -115,10 +120,12 @@ partial class GenSerializerKnockOff : global::KnockOff.Documentation.Samples.Gui
 		}
 
 		/// <summary>Typed handler for Process with specific type arguments.</summary>
-		public sealed class ProcessTypedHandler<T> : IGenericMethodCallTracker, IResettable
+		public sealed class ProcessTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 		{
 			/// <summary>Delegate for Process.</summary>
 			public delegate void ProcessDelegate(GenSerializerKnockOff ko, T @value);
+
+			private ProcessDelegate? _onCall;
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -126,14 +133,17 @@ partial class GenSerializerKnockOff : global::KnockOff.Documentation.Samples.Gui
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public ProcessDelegate? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(ProcessDelegate callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal ProcessDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
 			public void RecordCall() => CallCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; OnCall = null; }
+			public void Reset() { CallCount = 0; _onCall = null; }
 		}
 	}
 
@@ -174,7 +184,7 @@ partial class GenSerializerKnockOff : global::KnockOff.Documentation.Samples.Gui
 	T global::KnockOff.Documentation.Samples.Guides.IGenSerializer.Deserialize<T>(string json)
 	{
 		Deserialize.Of<T>().RecordCall(json);
-		if (Deserialize.Of<T>().OnCall is { } callback)
+		if (Deserialize.Of<T>().Callback is { } callback)
 			return callback(this, json);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenSerializer", "Deserialize");
 		return SmartDefault<T>("Deserialize");
@@ -183,7 +193,7 @@ partial class GenSerializerKnockOff : global::KnockOff.Documentation.Samples.Gui
 	void global::KnockOff.Documentation.Samples.Guides.IGenSerializer.Process<T>(T @value)
 	{
 		Process.Of<T>().RecordCall();
-		if (Process.Of<T>().OnCall is { } onCallCallback)
+		if (Process.Of<T>().Callback is { } onCallCallback)
 		{ onCallCallback(this, @value); return; }
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenSerializer", "Process");
 	}

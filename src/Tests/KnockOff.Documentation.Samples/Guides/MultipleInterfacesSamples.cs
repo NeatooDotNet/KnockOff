@@ -63,8 +63,8 @@ public partial class MultiDataContextTests
         var uow = new Stubs.IMultiUnitOfWork();
 
         // Configure via flat API (OnCall is a property for inline stubs)
-        repo.Add.OnCall = (ko, user) => { };
-        uow.SaveChangesAsync.OnCall = (ko, ct) => Task.FromResult(repo.Add.CallCount);
+        repo.Add.OnCall((ko, user) => { });
+        uow.SaveChangesAsync.OnCall((ko, ct) => Task.FromResult(repo.Add.CallCount));
 
         // Use in test
         IMultiRepository repoService = repo.Object;

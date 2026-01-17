@@ -10,6 +10,18 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<IhUserWriteRepositoryKnockOff, global::KnockOff.Documentation.Samples.Guides.IhUser> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private global::KnockOff.Documentation.Samples.Guides.IhUser? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public global::KnockOff.Documentation.Samples.Guides.IhUser? LastCallArg { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<global::KnockOff.Documentation.Samples.Guides.IhUser> OnCall(global::System.Action<IhUserWriteRepositoryKnockOff, global::KnockOff.Documentation.Samples.Guides.IhUser> callback)
@@ -36,6 +48,8 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = entity;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 				return;
 			}
@@ -57,6 +71,8 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -67,7 +83,6 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -141,6 +156,7 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for Delete.</summary>
@@ -148,6 +164,18 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<IhUserWriteRepositoryKnockOff, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<IhUserWriteRepositoryKnockOff, int> callback)
@@ -174,6 +202,8 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = id;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Delete");
 				return;
 			}
@@ -195,6 +225,8 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -205,7 +237,6 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -279,6 +310,7 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for GetById.</summary>
@@ -289,6 +321,18 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 
 		private readonly global::System.Collections.Generic.List<(GetByIdDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(GetByIdDelegate callback)
@@ -315,6 +359,8 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = id;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
 				return default!;
 			}
@@ -336,6 +382,8 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -346,7 +394,6 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -420,6 +467,7 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for GetAll.</summary>
@@ -430,6 +478,14 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 
 		private readonly global::System.Collections.Generic.List<(GetAllDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetAllDelegate callback)
@@ -456,6 +512,7 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetAll");
 				return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Guides.IhUser>();
 			}
@@ -477,6 +534,7 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -487,7 +545,6 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -557,6 +614,7 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Interceptor for Add.</summary>

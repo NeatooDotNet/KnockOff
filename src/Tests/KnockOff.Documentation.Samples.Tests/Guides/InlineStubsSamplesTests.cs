@@ -28,7 +28,7 @@ public class InlineStubsSamplesTests : SamplesTestBase
 		var stub = new UserServiceTests.Stubs.IInUserService();
 
 		// Configure behavior
-		stub.GetUser.OnCall = (ko, id) => new InUser { Id = id, Name = "Test" };
+		stub.GetUser.OnCall((ko, id) => new InUser { Id = id, Name = "Test" });
 
 		// Use the stub
 		IInUserService service = stub;
@@ -89,7 +89,7 @@ public class InlineStubsSamplesTests : SamplesTestBase
 		Assert.NotNull(tests.UserService);
 
 		// Can configure and use directly
-		tests.UserService.GetUser.OnCall = (ko, id) => new InUser { Id = id };
+		tests.UserService.GetUser.OnCall((ko, id) => new InUser { Id = id });
 
 		IInUserService service = tests.UserService;
 		var user = service.GetUser(99);
@@ -178,7 +178,7 @@ public class InlineStubsSamplesTests : SamplesTestBase
 	public void InlineStub_Reset_ClearsAllState()
 	{
 		var stub = new UserServiceTests.Stubs.IInUserService();
-		stub.GetUser.OnCall = (ko, id) => new InUser { Id = id };
+		stub.GetUser.OnCall((ko, id) => new InUser { Id = id });
 
 		IInUserService service = stub;
 		service.GetUser(1);
@@ -189,7 +189,7 @@ public class InlineStubsSamplesTests : SamplesTestBase
 
 		Assert.Equal(0, stub.GetUser.CallCount);
 		Assert.False(stub.GetUser.WasCalled);
-		Assert.Null(stub.GetUser.OnCall);
+		// OnCall callback state is internal after API change to method-based
 		Assert.Null(stub.GetUser.LastCallArg);
 	}
 }

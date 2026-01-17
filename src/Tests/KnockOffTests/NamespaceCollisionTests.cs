@@ -29,7 +29,7 @@ public class NamespaceCollisionTests
 		// Arrange: Test inline stub pattern with namespace collision
 		var stub = new DomainModel.Tests.NamespaceCollisionInlineTests.Stubs.IPersonDbContext();
 		// Inline stubs use OnCall as a property
-		stub.SavePerson.OnCall = (ko, person) => { };
+		stub.SavePerson.OnCall((ko, person) => { });
 		global::Person.Ef.IPersonDbContext service = stub;
 
 		// Act

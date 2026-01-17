@@ -29,6 +29,14 @@ partial class PropConnectionKnockOff : global::KnockOff.Documentation.Samples.Gu
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<PropConnectionKnockOff> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(global::System.Action<PropConnectionKnockOff> callback)
@@ -55,6 +63,7 @@ partial class PropConnectionKnockOff : global::KnockOff.Documentation.Samples.Gu
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Connect");
 				return;
 			}
@@ -76,6 +85,7 @@ partial class PropConnectionKnockOff : global::KnockOff.Documentation.Samples.Gu
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -86,7 +96,6 @@ partial class PropConnectionKnockOff : global::KnockOff.Documentation.Samples.Gu
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -156,6 +165,7 @@ partial class PropConnectionKnockOff : global::KnockOff.Documentation.Samples.Gu
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Interceptor for IsConnected. Configure via .Value, track via .GetCount.</summary>

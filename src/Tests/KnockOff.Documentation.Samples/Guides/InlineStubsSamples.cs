@@ -299,8 +299,8 @@ public static class ClassStubUsageExamples
 	{
 		#region inline-stubs-class-stub-usage
 		var stub = new CsEmailServiceTests.Stubs.CsEmailService();
-		stub.Send.OnCall = (ko, to, subject, body) =>
-			Console.WriteLine($"STUBBED: {to}");
+		stub.Send.OnCall((ko, to, subject, body) =>
+			Console.WriteLine($"STUBBED: {to}"));
 
 		// Use .Object to get the class instance
 		CsEmailService service = stub.Object;
@@ -351,7 +351,7 @@ public static class ClassStubUsageExamples
 
 		// With callback (property uses OnGet property, method uses OnCall property)
 		stub.ConnectionString.OnGet = (ko) => "Server=test";
-		stub.Execute.OnCall = (ko, sql) => sql.Length;
+		stub.Execute.OnCall((ko, sql) => sql.Length);
 
 		var configuredConnection = stub.Object.ConnectionString;  // "Server=test"
 		var configuredExecute = stub.Object.Execute("SELECT 1");  // 8

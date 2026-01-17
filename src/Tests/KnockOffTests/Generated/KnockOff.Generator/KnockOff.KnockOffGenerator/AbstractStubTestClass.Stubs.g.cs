@@ -25,25 +25,32 @@ partial class AbstractStubTestClass
 		}
 
 		/// <summary>Interceptor for AbstractRepository.Connect.</summary>
-		public sealed class AbstractRepository_ConnectInterceptor
+		public sealed class AbstractRepository_ConnectInterceptor : global::KnockOff.IMethodTracking
 		{
+			private global::System.Action<Stubs.AbstractRepository>? _onCall;
+
 			/// <summary>Number of times this method was called.</summary>
 			public int CallCount { get; private set; }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when method is called. If set, called instead of base.</summary>
-			public global::System.Action<Stubs.AbstractRepository>? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.AbstractRepository> callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal global::System.Action<Stubs.AbstractRepository>? Callback => _onCall;
 
 			public void RecordCall() { CallCount++; }
 
-			public void Reset() { CallCount = 0; OnCall = null; }
+			public void Reset() { CallCount = 0; _onCall = null; }
 		}
 
 		/// <summary>Interceptor for AbstractRepository.Execute.</summary>
-		public sealed class AbstractRepository_ExecuteInterceptor
+		public sealed class AbstractRepository_ExecuteInterceptor : global::KnockOff.IMethodTracking
 		{
+			private global::System.Func<Stubs.AbstractRepository, string, int>? _onCall;
+
 			/// <summary>Number of times this method was called.</summary>
 			public int CallCount { get; private set; }
 
@@ -53,12 +60,15 @@ partial class AbstractStubTestClass
 			/// <summary>The argument from the last call.</summary>
 			public string? LastCallArg { get; private set; }
 
-			/// <summary>Callback invoked when method is called. If set, called instead of base.</summary>
-			public global::System.Func<Stubs.AbstractRepository, string, int>? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(global::System.Func<Stubs.AbstractRepository, string, int> callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal global::System.Func<Stubs.AbstractRepository, string, int>? Callback => _onCall;
 
 			public void RecordCall(string command) { CallCount++; LastCallArg = command; }
 
-			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+			public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }
 		}
 
 		/// <summary>Stub for global::KnockOff.Tests.AbstractRepository via composition.</summary>
@@ -115,14 +125,14 @@ partial class AbstractStubTestClass
 				public override void Connect()
 				{
 					_stub?.Connect.RecordCall();
-					if (_stub?.Connect.OnCall is { } onCall) { onCall(_stub); return; }
+					if (_stub?.Connect.Callback is { } onCall) { onCall(_stub); return; }
 				}
 
 				/// <inheritdoc />
 				public override int Execute(string command)
 				{
 					_stub?.Execute.RecordCall(command);
-					if (_stub?.Execute.OnCall is { } onCall) return onCall(_stub, command);
+					if (_stub?.Execute.Callback is { } onCall) return onCall(_stub, command);
 					return default!;
 				}
 

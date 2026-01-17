@@ -10,6 +10,14 @@ partial class ApiMethodServiceKnockOff : global::KnockOff.Documentation.Samples.
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<ApiMethodServiceKnockOff> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(global::System.Action<ApiMethodServiceKnockOff> callback)
@@ -36,6 +44,7 @@ partial class ApiMethodServiceKnockOff : global::KnockOff.Documentation.Samples.
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Initialize");
 				return;
 			}
@@ -57,6 +66,7 @@ partial class ApiMethodServiceKnockOff : global::KnockOff.Documentation.Samples.
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -67,7 +77,6 @@ partial class ApiMethodServiceKnockOff : global::KnockOff.Documentation.Samples.
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -137,6 +146,7 @@ partial class ApiMethodServiceKnockOff : global::KnockOff.Documentation.Samples.
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for GetById.</summary>
@@ -147,6 +157,18 @@ partial class ApiMethodServiceKnockOff : global::KnockOff.Documentation.Samples.
 
 		private readonly global::System.Collections.Generic.List<(GetByIdDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(GetByIdDelegate callback)
@@ -173,6 +195,8 @@ partial class ApiMethodServiceKnockOff : global::KnockOff.Documentation.Samples.
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = id;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
 				return new global::KnockOff.Documentation.Samples.Reference.ApiUser();
 			}
@@ -194,6 +218,8 @@ partial class ApiMethodServiceKnockOff : global::KnockOff.Documentation.Samples.
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -204,7 +230,6 @@ partial class ApiMethodServiceKnockOff : global::KnockOff.Documentation.Samples.
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -278,6 +303,7 @@ partial class ApiMethodServiceKnockOff : global::KnockOff.Documentation.Samples.
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for Log.</summary>
@@ -285,6 +311,18 @@ partial class ApiMethodServiceKnockOff : global::KnockOff.Documentation.Samples.
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<ApiMethodServiceKnockOff, string, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private (string? level, string? message)? _unconfiguredLastArgs;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The arguments from the last call (from most recently called registration).</summary>
+		public (string? level, string? message)? LastCallArgs { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTrackingArgs<(string? level, string? message)> OnCall(global::System.Action<ApiMethodServiceKnockOff, string, string> callback)
@@ -311,6 +349,8 @@ partial class ApiMethodServiceKnockOff : global::KnockOff.Documentation.Samples.
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArgs = ((level, message));
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Log");
 				return;
 			}
@@ -332,6 +372,8 @@ partial class ApiMethodServiceKnockOff : global::KnockOff.Documentation.Samples.
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArgs = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -342,7 +384,6 @@ partial class ApiMethodServiceKnockOff : global::KnockOff.Documentation.Samples.
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -416,6 +457,7 @@ partial class ApiMethodServiceKnockOff : global::KnockOff.Documentation.Samples.
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Interceptor for Initialize.</summary>

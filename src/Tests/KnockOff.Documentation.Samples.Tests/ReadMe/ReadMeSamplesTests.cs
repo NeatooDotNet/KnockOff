@@ -22,8 +22,8 @@ public class ReadMeSamplesTests
         var userStub = new UserTests.Stubs.IUserService();
         var emailStub = new UserTests.Stubs.EmailService();
 
-        userStub.GetUser.OnCall = (ko, id) => new User { Id = id, Email = "test@example.com" };
-        emailStub.Send.OnCall = (ko, to, subject, body) => { };
+        userStub.GetUser.OnCall((ko, id) => new User { Id = id, Email = "test@example.com" });
+        emailStub.Send.OnCall((ko, to, subject, body) => { });
 
         var service = new OrderService(userStub, emailStub.Object);
         service.ShipOrder(orderId: 42, userId: 1);

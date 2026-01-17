@@ -180,6 +180,18 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 
 		private readonly global::System.Collections.Generic.List<(IndexOfDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private global::Neatoo.IValidateBase? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public global::Neatoo.IValidateBase? LastCallArg { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<global::Neatoo.IValidateBase> OnCall(IndexOfDelegate callback)
@@ -206,6 +218,8 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = item;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IndexOf");
 				return default!;
 			}
@@ -227,6 +241,8 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -237,7 +253,6 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -311,6 +326,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for Insert.</summary>
@@ -318,6 +334,18 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<ValidateListBaseOfTStub, int, global::Neatoo.IValidateBase> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private (int? index, global::Neatoo.IValidateBase? item)? _unconfiguredLastArgs;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The arguments from the last call (from most recently called registration).</summary>
+		public (int? index, global::Neatoo.IValidateBase? item)? LastCallArgs { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTrackingArgs<(int? index, global::Neatoo.IValidateBase? item)> OnCall(global::System.Action<ValidateListBaseOfTStub, int, global::Neatoo.IValidateBase> callback)
@@ -344,6 +372,8 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArgs = ((index, item));
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Insert");
 				return;
 			}
@@ -365,6 +395,8 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArgs = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -375,7 +407,6 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -449,6 +480,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for RemoveAt.</summary>
@@ -456,6 +488,18 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<ValidateListBaseOfTStub, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<ValidateListBaseOfTStub, int> callback)
@@ -482,6 +526,8 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = index;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RemoveAt");
 				return;
 			}
@@ -503,6 +549,8 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -513,7 +561,6 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -587,6 +634,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for Add.</summary>
@@ -594,6 +642,18 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<ValidateListBaseOfTStub, global::Neatoo.IValidateBase> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private global::Neatoo.IValidateBase? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public global::Neatoo.IValidateBase? LastCallArg { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<global::Neatoo.IValidateBase> OnCall(global::System.Action<ValidateListBaseOfTStub, global::Neatoo.IValidateBase> callback)
@@ -620,6 +680,8 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = item;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 				return;
 			}
@@ -641,6 +703,8 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -651,7 +715,6 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -725,6 +788,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for Clear.</summary>
@@ -732,6 +796,14 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<ValidateListBaseOfTStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(global::System.Action<ValidateListBaseOfTStub> callback)
@@ -758,6 +830,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Clear");
 				return;
 			}
@@ -779,6 +852,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -789,7 +863,6 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -859,6 +932,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for Contains.</summary>
@@ -869,6 +943,18 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 
 		private readonly global::System.Collections.Generic.List<(ContainsDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private global::Neatoo.IValidateBase? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public global::Neatoo.IValidateBase? LastCallArg { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<global::Neatoo.IValidateBase> OnCall(ContainsDelegate callback)
@@ -895,6 +981,8 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = item;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Contains");
 				return default!;
 			}
@@ -916,6 +1004,8 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -926,7 +1016,6 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1000,6 +1089,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for CopyTo.</summary>
@@ -1007,6 +1097,18 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<ValidateListBaseOfTStub, global::Neatoo.IValidateBase[], int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private (global::Neatoo.IValidateBase[]? array, int? arrayIndex)? _unconfiguredLastArgs;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The arguments from the last call (from most recently called registration).</summary>
+		public (global::Neatoo.IValidateBase[]? array, int? arrayIndex)? LastCallArgs { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTrackingArgs<(global::Neatoo.IValidateBase[]? array, int? arrayIndex)> OnCall(global::System.Action<ValidateListBaseOfTStub, global::Neatoo.IValidateBase[], int> callback)
@@ -1033,6 +1135,8 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArgs = ((array, arrayIndex));
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "CopyTo");
 				return;
 			}
@@ -1054,6 +1158,8 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArgs = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1064,7 +1170,6 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1138,6 +1243,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for Remove.</summary>
@@ -1148,6 +1254,18 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 
 		private readonly global::System.Collections.Generic.List<(RemoveDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private global::Neatoo.IValidateBase? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public global::Neatoo.IValidateBase? LastCallArg { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<global::Neatoo.IValidateBase> OnCall(RemoveDelegate callback)
@@ -1174,6 +1292,8 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = item;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Remove");
 				return default!;
 			}
@@ -1195,6 +1315,8 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1205,7 +1327,6 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1279,11 +1400,14 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
-	/// <summary>Tracks and configures behavior for GetEnumerator (overloaded).</summary>
+	/// <summary>Tracks and configures behavior for GetEnumerator.</summary>
 	public sealed class GetEnumeratorInterceptor
 	{
+		private int _unconfiguredCallCount;
+
 		/// <summary>Delegate for GetEnumerator().</summary>
 		public delegate global::System.Collections.Generic.IEnumerator<global::Neatoo.IValidateBase> GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase(ValidateListBaseOfTStub ko);
 
@@ -1295,6 +1419,12 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 
 		private readonly global::System.Collections.Generic.List<(GetEnumeratorDelegate_NoParams_Collections_IEnumerator Callback, global::KnockOff.Times Times, MethodTrackingImpl_NoParams_Collections_IEnumerator Tracking)> _sequence_NoParams_Collections_IEnumerator = new();
 		private int _sequenceIndex_NoParams_Collections_IEnumerator;
+
+		/// <summary>Total number of times this method was called (across all overloads and registrations).</summary>
+		public int CallCount => _unconfiguredCallCount + _sequence_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase.Sum(s => s.Tracking.CallCount) + _sequence_NoParams_Collections_IEnumerator.Sum(s => s.Tracking.CallCount);
+
+		/// <summary>Whether this method was called at least once (any overload).</summary>
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>Configures callback for GetEnumerator(). Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase callback)
@@ -1341,6 +1471,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		{
 			if (_sequence_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
 			}
@@ -1364,6 +1495,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		{
 			if (_sequence_NoParams_Collections_IEnumerator.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
 			}
@@ -1382,9 +1514,10 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			return callback(ko);
 		}
 
-		/// <summary>Resets all tracking state for all overloads.</summary>
+		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase)
 				tracking.Reset();
 			_sequenceIndex_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase = 0;
@@ -1393,12 +1526,11 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			_sequenceIndex_NoParams_Collections_IEnumerator = 0;
 		}
 
-		/// <summary>Verifies all Times constraints for all overloads were satisfied. For Forever, verifies called at least once.</summary>
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
 		public bool Verify()
 		{
 			foreach (var (_, times, tracking) in _sequence_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1409,7 +1541,6 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			}
 			foreach (var (_, times, tracking) in _sequence_NoParams_Collections_IEnumerator)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1421,36 +1552,48 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			return true;
 		}
 
+		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase : global::KnockOff.IMethodTracking
 		{
 
+			/// <summary>Number of times this callback was invoked.</summary>
 			public int CallCount { get; private set; }
 
+			/// <summary>True if CallCount > 0.</summary>
 			public bool WasCalled => CallCount > 0;
 
+			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
 
+			/// <summary>Resets tracking state.</summary>
 			public void Reset() => CallCount = 0;
 		}
 
+		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl_NoParams_Collections_IEnumerator : global::KnockOff.IMethodTracking
 		{
 
+			/// <summary>Number of times this callback was invoked.</summary>
 			public int CallCount { get; private set; }
 
+			/// <summary>True if CallCount > 0.</summary>
 			public bool WasCalled => CallCount > 0;
 
+			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
 
+			/// <summary>Resets tracking state.</summary>
 			public void Reset() => CallCount = 0;
 		}
 
+		/// <summary>Sequence implementation for ThenCall chaining.</summary>
 		private sealed class MethodSequenceImpl_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase : global::KnockOff.IMethodSequence<GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase>
 		{
 			private readonly GetEnumeratorInterceptor _interceptor;
 
 			public MethodSequenceImpl_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase(GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
 
+			/// <summary>Total calls across all callbacks in sequence.</summary>
 			public int TotalCallCount
 			{
 				get
@@ -1462,6 +1605,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 				}
 			}
 
+			/// <summary>Add another callback to the sequence.</summary>
 			public global::KnockOff.IMethodSequence<GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase> ThenCall(GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase callback, global::KnockOff.Times times)
 			{
 				var tracking = new MethodTrackingImpl_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase();
@@ -1469,6 +1613,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 				return this;
 			}
 
+			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
 			public bool Verify()
 			{
 				foreach (var (_, times, tracking) in _interceptor._sequence_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase)
@@ -1479,15 +1624,18 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 				return true;
 			}
 
+			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
 
+		/// <summary>Sequence implementation for ThenCall chaining.</summary>
 		private sealed class MethodSequenceImpl_NoParams_Collections_IEnumerator : global::KnockOff.IMethodSequence<GetEnumeratorDelegate_NoParams_Collections_IEnumerator>
 		{
 			private readonly GetEnumeratorInterceptor _interceptor;
 
 			public MethodSequenceImpl_NoParams_Collections_IEnumerator(GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
 
+			/// <summary>Total calls across all callbacks in sequence.</summary>
 			public int TotalCallCount
 			{
 				get
@@ -1499,6 +1647,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 				}
 			}
 
+			/// <summary>Add another callback to the sequence.</summary>
 			public global::KnockOff.IMethodSequence<GetEnumeratorDelegate_NoParams_Collections_IEnumerator> ThenCall(GetEnumeratorDelegate_NoParams_Collections_IEnumerator callback, global::KnockOff.Times times)
 			{
 				var tracking = new MethodTrackingImpl_NoParams_Collections_IEnumerator();
@@ -1506,6 +1655,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 				return this;
 			}
 
+			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
 			public bool Verify()
 			{
 				foreach (var (_, times, tracking) in _interceptor._sequence_NoParams_Collections_IEnumerator)
@@ -1516,14 +1666,17 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 				return true;
 			}
 
+			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
 
 	}
 
-	/// <summary>Tracks and configures behavior for WaitForTasks (overloaded).</summary>
+	/// <summary>Tracks and configures behavior for WaitForTasks.</summary>
 	public sealed class WaitForTasksInterceptor
 	{
+		private int _unconfiguredCallCount;
+
 		/// <summary>Delegate for WaitForTasks().</summary>
 		public delegate global::System.Threading.Tasks.Task WaitForTasksDelegate_NoParams_Threading_Tasks_Task(ValidateListBaseOfTStub ko);
 
@@ -1535,6 +1688,12 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 
 		private readonly global::System.Collections.Generic.List<(WaitForTasksDelegate_Threading_CancellationToken_Threading_Tasks_Task Callback, global::KnockOff.Times Times, MethodTrackingImpl_Threading_CancellationToken_Threading_Tasks_Task Tracking)> _sequence_Threading_CancellationToken_Threading_Tasks_Task = new();
 		private int _sequenceIndex_Threading_CancellationToken_Threading_Tasks_Task;
+
+		/// <summary>Total number of times this method was called (across all overloads and registrations).</summary>
+		public int CallCount => _unconfiguredCallCount + _sequence_NoParams_Threading_Tasks_Task.Sum(s => s.Tracking.CallCount) + _sequence_Threading_CancellationToken_Threading_Tasks_Task.Sum(s => s.Tracking.CallCount);
+
+		/// <summary>Whether this method was called at least once (any overload).</summary>
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>Configures callback for WaitForTasks(). Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(WaitForTasksDelegate_NoParams_Threading_Tasks_Task callback)
@@ -1581,6 +1740,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		{
 			if (_sequence_NoParams_Threading_Tasks_Task.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -1604,6 +1764,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		{
 			if (_sequence_Threading_CancellationToken_Threading_Tasks_Task.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -1622,9 +1783,10 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			return callback(ko, token);
 		}
 
-		/// <summary>Resets all tracking state for all overloads.</summary>
+		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence_NoParams_Threading_Tasks_Task)
 				tracking.Reset();
 			_sequenceIndex_NoParams_Threading_Tasks_Task = 0;
@@ -1633,12 +1795,11 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			_sequenceIndex_Threading_CancellationToken_Threading_Tasks_Task = 0;
 		}
 
-		/// <summary>Verifies all Times constraints for all overloads were satisfied. For Forever, verifies called at least once.</summary>
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
 		public bool Verify()
 		{
 			foreach (var (_, times, tracking) in _sequence_NoParams_Threading_Tasks_Task)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1649,7 +1810,6 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			}
 			foreach (var (_, times, tracking) in _sequence_Threading_CancellationToken_Threading_Tasks_Task)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1661,39 +1821,52 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			return true;
 		}
 
+		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl_NoParams_Threading_Tasks_Task : global::KnockOff.IMethodTracking
 		{
 
+			/// <summary>Number of times this callback was invoked.</summary>
 			public int CallCount { get; private set; }
 
+			/// <summary>True if CallCount > 0.</summary>
 			public bool WasCalled => CallCount > 0;
 
+			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
 
+			/// <summary>Resets tracking state.</summary>
 			public void Reset() => CallCount = 0;
 		}
 
+		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl_Threading_CancellationToken_Threading_Tasks_Task : global::KnockOff.IMethodTracking<global::System.Threading.CancellationToken>
 		{
 			private global::System.Threading.CancellationToken _lastArg = default!;
 
+			/// <summary>Number of times this callback was invoked.</summary>
 			public int CallCount { get; private set; }
 
+			/// <summary>True if CallCount > 0.</summary>
 			public bool WasCalled => CallCount > 0;
 
+			/// <summary>Last argument passed to this callback. Default if never called.</summary>
 			public global::System.Threading.CancellationToken LastArg => _lastArg;
 
+			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall(global::System.Threading.CancellationToken token) { CallCount++; _lastArg = token; }
 
+			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArg = default!; }
 		}
 
+		/// <summary>Sequence implementation for ThenCall chaining.</summary>
 		private sealed class MethodSequenceImpl_NoParams_Threading_Tasks_Task : global::KnockOff.IMethodSequence<WaitForTasksDelegate_NoParams_Threading_Tasks_Task>
 		{
 			private readonly WaitForTasksInterceptor _interceptor;
 
 			public MethodSequenceImpl_NoParams_Threading_Tasks_Task(WaitForTasksInterceptor interceptor) => _interceptor = interceptor;
 
+			/// <summary>Total calls across all callbacks in sequence.</summary>
 			public int TotalCallCount
 			{
 				get
@@ -1705,6 +1878,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 				}
 			}
 
+			/// <summary>Add another callback to the sequence.</summary>
 			public global::KnockOff.IMethodSequence<WaitForTasksDelegate_NoParams_Threading_Tasks_Task> ThenCall(WaitForTasksDelegate_NoParams_Threading_Tasks_Task callback, global::KnockOff.Times times)
 			{
 				var tracking = new MethodTrackingImpl_NoParams_Threading_Tasks_Task();
@@ -1712,6 +1886,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 				return this;
 			}
 
+			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
 			public bool Verify()
 			{
 				foreach (var (_, times, tracking) in _interceptor._sequence_NoParams_Threading_Tasks_Task)
@@ -1722,15 +1897,18 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 				return true;
 			}
 
+			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
 
+		/// <summary>Sequence implementation for ThenCall chaining.</summary>
 		private sealed class MethodSequenceImpl_Threading_CancellationToken_Threading_Tasks_Task : global::KnockOff.IMethodSequence<WaitForTasksDelegate_Threading_CancellationToken_Threading_Tasks_Task>
 		{
 			private readonly WaitForTasksInterceptor _interceptor;
 
 			public MethodSequenceImpl_Threading_CancellationToken_Threading_Tasks_Task(WaitForTasksInterceptor interceptor) => _interceptor = interceptor;
 
+			/// <summary>Total calls across all callbacks in sequence.</summary>
 			public int TotalCallCount
 			{
 				get
@@ -1742,6 +1920,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 				}
 			}
 
+			/// <summary>Add another callback to the sequence.</summary>
 			public global::KnockOff.IMethodSequence<WaitForTasksDelegate_Threading_CancellationToken_Threading_Tasks_Task> ThenCall(WaitForTasksDelegate_Threading_CancellationToken_Threading_Tasks_Task callback, global::KnockOff.Times times)
 			{
 				var tracking = new MethodTrackingImpl_Threading_CancellationToken_Threading_Tasks_Task();
@@ -1749,6 +1928,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 				return this;
 			}
 
+			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
 			public bool Verify()
 			{
 				foreach (var (_, times, tracking) in _interceptor._sequence_Threading_CancellationToken_Threading_Tasks_Task)
@@ -1759,14 +1939,17 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 				return true;
 			}
 
+			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
 
 	}
 
-	/// <summary>Tracks and configures behavior for RunRules (overloaded).</summary>
+	/// <summary>Tracks and configures behavior for RunRules.</summary>
 	public sealed class RunRulesInterceptor
 	{
+		private int _unconfiguredCallCount;
+
 		/// <summary>Delegate for RunRules(string, global::System.Threading.CancellationToken?).</summary>
 		public delegate global::System.Threading.Tasks.Task RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task(ValidateListBaseOfTStub ko, string propertyName, global::System.Threading.CancellationToken? token);
 
@@ -1778,6 +1961,12 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 
 		private readonly global::System.Collections.Generic.List<(RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task Callback, global::KnockOff.Times Times, MethodTrackingImpl_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task Tracking)> _sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task = new();
 		private int _sequenceIndex_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task;
+
+		/// <summary>Total number of times this method was called (across all overloads and registrations).</summary>
+		public int CallCount => _unconfiguredCallCount + _sequence_String_Threading_CancellationToken_Threading_Tasks_Task.Sum(s => s.Tracking.CallCount) + _sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task.Sum(s => s.Tracking.CallCount);
+
+		/// <summary>Whether this method was called at least once (any overload).</summary>
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>Configures callback for RunRules(string, global::System.Threading.CancellationToken?). Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTrackingArgs<(string? propertyName, global::System.Threading.CancellationToken? token)> OnCall(RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task callback)
@@ -1824,6 +2013,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		{
 			if (_sequence_String_Threading_CancellationToken_Threading_Tasks_Task.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -1847,6 +2037,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		{
 			if (_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -1865,9 +2056,10 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			return callback(ko, runRules, token);
 		}
 
-		/// <summary>Resets all tracking state for all overloads.</summary>
+		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence_String_Threading_CancellationToken_Threading_Tasks_Task)
 				tracking.Reset();
 			_sequenceIndex_String_Threading_CancellationToken_Threading_Tasks_Task = 0;
@@ -1876,12 +2068,11 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			_sequenceIndex_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task = 0;
 		}
 
-		/// <summary>Verifies all Times constraints for all overloads were satisfied. For Forever, verifies called at least once.</summary>
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
 		public bool Verify()
 		{
 			foreach (var (_, times, tracking) in _sequence_String_Threading_CancellationToken_Threading_Tasks_Task)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1892,7 +2083,6 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			}
 			foreach (var (_, times, tracking) in _sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1904,42 +2094,56 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			return true;
 		}
 
+		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl_String_Threading_CancellationToken_Threading_Tasks_Task : global::KnockOff.IMethodTrackingArgs<(string? propertyName, global::System.Threading.CancellationToken? token)>
 		{
 			private (string? propertyName, global::System.Threading.CancellationToken? token) _lastArgs;
 
+			/// <summary>Number of times this callback was invoked.</summary>
 			public int CallCount { get; private set; }
 
+			/// <summary>True if CallCount > 0.</summary>
 			public bool WasCalled => CallCount > 0;
 
+			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 			public (string? propertyName, global::System.Threading.CancellationToken? token) LastArgs => _lastArgs;
 
+			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall((string? propertyName, global::System.Threading.CancellationToken? token) args) { CallCount++; _lastArgs = args; }
 
+			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArgs = default; }
 		}
 
+		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task : global::KnockOff.IMethodTrackingArgs<(global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token)>
 		{
 			private (global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token) _lastArgs;
 
+			/// <summary>Number of times this callback was invoked.</summary>
 			public int CallCount { get; private set; }
 
+			/// <summary>True if CallCount > 0.</summary>
 			public bool WasCalled => CallCount > 0;
 
+			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 			public (global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token) LastArgs => _lastArgs;
 
+			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall((global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token) args) { CallCount++; _lastArgs = args; }
 
+			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArgs = default; }
 		}
 
+		/// <summary>Sequence implementation for ThenCall chaining.</summary>
 		private sealed class MethodSequenceImpl_String_Threading_CancellationToken_Threading_Tasks_Task : global::KnockOff.IMethodSequence<RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task>
 		{
 			private readonly RunRulesInterceptor _interceptor;
 
 			public MethodSequenceImpl_String_Threading_CancellationToken_Threading_Tasks_Task(RunRulesInterceptor interceptor) => _interceptor = interceptor;
 
+			/// <summary>Total calls across all callbacks in sequence.</summary>
 			public int TotalCallCount
 			{
 				get
@@ -1951,6 +2155,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 				}
 			}
 
+			/// <summary>Add another callback to the sequence.</summary>
 			public global::KnockOff.IMethodSequence<RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task> ThenCall(RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task callback, global::KnockOff.Times times)
 			{
 				var tracking = new MethodTrackingImpl_String_Threading_CancellationToken_Threading_Tasks_Task();
@@ -1958,6 +2163,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 				return this;
 			}
 
+			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
 			public bool Verify()
 			{
 				foreach (var (_, times, tracking) in _interceptor._sequence_String_Threading_CancellationToken_Threading_Tasks_Task)
@@ -1968,15 +2174,18 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 				return true;
 			}
 
+			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
 
+		/// <summary>Sequence implementation for ThenCall chaining.</summary>
 		private sealed class MethodSequenceImpl_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task : global::KnockOff.IMethodSequence<RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task>
 		{
 			private readonly RunRulesInterceptor _interceptor;
 
 			public MethodSequenceImpl_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(RunRulesInterceptor interceptor) => _interceptor = interceptor;
 
+			/// <summary>Total calls across all callbacks in sequence.</summary>
 			public int TotalCallCount
 			{
 				get
@@ -1988,6 +2197,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 				}
 			}
 
+			/// <summary>Add another callback to the sequence.</summary>
 			public global::KnockOff.IMethodSequence<RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task> ThenCall(RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task callback, global::KnockOff.Times times)
 			{
 				var tracking = new MethodTrackingImpl_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task();
@@ -1995,6 +2205,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 				return this;
 			}
 
+			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
 			public bool Verify()
 			{
 				foreach (var (_, times, tracking) in _interceptor._sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task)
@@ -2005,6 +2216,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 				return true;
 			}
 
+			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
 
@@ -2015,6 +2227,14 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<ValidateListBaseOfTStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(global::System.Action<ValidateListBaseOfTStub> callback)
@@ -2041,6 +2261,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ClearAllMessages");
 				return;
 			}
@@ -2062,6 +2283,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -2072,7 +2294,6 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -2142,6 +2363,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for ClearSelfMessages.</summary>
@@ -2149,6 +2371,14 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<ValidateListBaseOfTStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(global::System.Action<ValidateListBaseOfTStub> callback)
@@ -2175,6 +2405,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ClearSelfMessages");
 				return;
 			}
@@ -2196,6 +2427,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -2206,7 +2438,6 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -2276,6 +2507,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Interceptor for CollectionChanged event.</summary>

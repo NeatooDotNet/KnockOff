@@ -55,10 +55,12 @@ partial class ConstrainedGenericServiceKnockOff : global::KnockOff.Tests.IConstr
 		}
 
 		/// <summary>Typed handler for CreateEntity with specific type arguments.</summary>
-		public sealed class CreateEntityTypedHandler<T> : IGenericMethodCallTracker, IResettable where T : class, global::KnockOff.Tests.IEntity, new()
+		public sealed class CreateEntityTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : class, global::KnockOff.Tests.IEntity, new()
 		{
 			/// <summary>Delegate for CreateEntity.</summary>
 			public delegate T CreateEntityDelegate(ConstrainedGenericServiceKnockOff ko);
+
+			private CreateEntityDelegate? _onCall;
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -66,14 +68,17 @@ partial class ConstrainedGenericServiceKnockOff : global::KnockOff.Tests.IConstr
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public CreateEntityDelegate? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(CreateEntityDelegate callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal CreateEntityDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
 			public void RecordCall() => CallCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; OnCall = null; }
+			public void Reset() { CallCount = 0; _onCall = null; }
 		}
 	}
 
@@ -112,10 +117,12 @@ partial class ConstrainedGenericServiceKnockOff : global::KnockOff.Tests.IConstr
 		}
 
 		/// <summary>Typed handler for SaveEntity with specific type arguments.</summary>
-		public sealed class SaveEntityTypedHandler<T> : IGenericMethodCallTracker, IResettable where T : global::KnockOff.Tests.IEntity
+		public sealed class SaveEntityTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : global::KnockOff.Tests.IEntity
 		{
 			/// <summary>Delegate for SaveEntity.</summary>
 			public delegate void SaveEntityDelegate(ConstrainedGenericServiceKnockOff ko, T entity);
+
+			private SaveEntityDelegate? _onCall;
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -123,14 +130,17 @@ partial class ConstrainedGenericServiceKnockOff : global::KnockOff.Tests.IConstr
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public SaveEntityDelegate? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(SaveEntityDelegate callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal SaveEntityDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
 			public void RecordCall() => CallCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; OnCall = null; }
+			public void Reset() { CallCount = 0; _onCall = null; }
 		}
 	}
 
@@ -171,7 +181,7 @@ partial class ConstrainedGenericServiceKnockOff : global::KnockOff.Tests.IConstr
 	T global::KnockOff.Tests.IConstrainedGenericService.CreateEntity<T>() where T : class
 	{
 		CreateEntity.Of<T>().RecordCall();
-		if (CreateEntity.Of<T>().OnCall is { } callback)
+		if (CreateEntity.Of<T>().Callback is { } callback)
 			return callback(this);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IConstrainedGenericService", "CreateEntity");
 		return SmartDefault<T>("CreateEntity");
@@ -180,7 +190,7 @@ partial class ConstrainedGenericServiceKnockOff : global::KnockOff.Tests.IConstr
 	void global::KnockOff.Tests.IConstrainedGenericService.SaveEntity<T>(T entity)
 	{
 		SaveEntity.Of<T>().RecordCall();
-		if (SaveEntity.Of<T>().OnCall is { } onCallCallback)
+		if (SaveEntity.Of<T>().Callback is { } onCallCallback)
 		{ onCallCallback(this, entity); return; }
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IConstrainedGenericService", "SaveEntity");
 	}

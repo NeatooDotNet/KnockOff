@@ -294,11 +294,11 @@ public static class InterceptorApiUsageExamples
         IApiSerializer service = knockOff;
 
         // Configure per-type callbacks (OnCall is property for generic methods)
-        knockOff.Deserialize.Of<ApiUser>().OnCall = (ko, json) =>
-            JsonSerializer.Deserialize<ApiUser>(json)!;
+        knockOff.Deserialize.Of<ApiUser>().OnCall((ko, json) =>
+            JsonSerializer.Deserialize<ApiUser>(json)!);
 
-        knockOff.Deserialize.Of<ApiOrder>().OnCall = (ko, json) =>
-            JsonSerializer.Deserialize<ApiOrder>(json)!;
+        knockOff.Deserialize.Of<ApiOrder>().OnCall((ko, json) =>
+            JsonSerializer.Deserialize<ApiOrder>(json)!);
 
         service.Deserialize<ApiUser>("{\"Id\":1}");
         service.Deserialize<ApiUser>("{\"Id\":2}");
@@ -308,8 +308,8 @@ public static class InterceptorApiUsageExamples
 
         #region interceptor-api-generic-method-interceptor-examples
         // Configure per type (OnCall is property)
-        knockOff.Deserialize.Of<ApiUser>().OnCall = (ko, json) =>
-            JsonSerializer.Deserialize<ApiUser>(json)!;
+        knockOff.Deserialize.Of<ApiUser>().OnCall((ko, json) =>
+            JsonSerializer.Deserialize<ApiUser>(json)!);
 
         // Per-type tracking via typed handler
         Assert.Equal(2, knockOff.Deserialize.Of<ApiUser>().CallCount);
@@ -324,7 +324,7 @@ public static class InterceptorApiUsageExamples
         // [typeof(ApiUser), typeof(ApiOrder)]
 
         // Multiple type parameters (OnCall is property)
-        knockOff.Convert.Of<string, int>().OnCall = (ko, s) => s.Length;
+        knockOff.Convert.Of<string, int>().OnCall((ko, s) => s.Length);
 
         // Reset single type
         knockOff.Deserialize.Of<ApiUser>().Reset();

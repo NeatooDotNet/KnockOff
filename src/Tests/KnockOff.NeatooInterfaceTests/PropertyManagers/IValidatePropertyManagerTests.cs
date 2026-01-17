@@ -135,7 +135,7 @@ public partial class IValidatePropertyManagerTests
         var stub = new Stubs.IValidatePropertyManager();
         IValidatePropertyManager<IValidateProperty> manager = stub;
 
-        stub.HasProperty.OnCall = (ko, name) => name == "ExistingProperty";
+        stub.HasProperty.OnCall((ko, name) => name == "ExistingProperty");
 
         Assert.True(manager.HasProperty("ExistingProperty"));
         Assert.False(manager.HasProperty("NonExistent"));
@@ -148,7 +148,7 @@ public partial class IValidatePropertyManagerTests
         IValidatePropertyManager<IValidateProperty> manager = stub;
 
         var propertyStub = new ValidatePropertyStubForManager();
-        stub.GetProperty.OnCall = (ko, name) => propertyStub;
+        stub.GetProperty.OnCall((ko, name) => propertyStub);
 
         manager.GetProperty("Name");
 
@@ -163,7 +163,7 @@ public partial class IValidatePropertyManagerTests
         IValidatePropertyManager<IValidateProperty> manager = stub;
 
         var propertyStub = new ValidatePropertyStubForManager();
-        stub.GetProperty.OnCall = (ko, name) => propertyStub;
+        stub.GetProperty.OnCall((ko, name) => propertyStub);
 
         var result = manager.GetProperty("TestProperty");
 

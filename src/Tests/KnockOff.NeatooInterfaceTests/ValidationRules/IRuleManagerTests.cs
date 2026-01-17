@@ -62,11 +62,11 @@ public partial class IRuleManagerTests
         IRuleManager ruleManager = stub;
         string? capturedPropertyName = null;
 
-        stub.RunRules.OnCall = (ko, propOrFlag, token, extra) =>
+        stub.RunRules.OnCall((ko, propOrFlag, token) =>
         {
             capturedPropertyName = propOrFlag?.ToString();
             return Task.CompletedTask;
-        };
+        });
 
         await ruleManager.RunRules("TargetProperty", null);
 
@@ -91,11 +91,11 @@ public partial class IRuleManagerTests
         IRuleManager ruleManager = stub;
         CancellationToken? capturedToken = null;
 
-        stub.RunRules.OnCall = (ko, prop, token, extra) =>
+        stub.RunRules.OnCall((Stubs.IRuleManager_RunRulesInterceptor.RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task)((ko, prop, token) =>
         {
             capturedToken = token;
             return Task.CompletedTask;
-        };
+        }));
 
         using var cts = new CancellationTokenSource();
         await ruleManager.RunRules("Property", cts.Token);
@@ -127,11 +127,11 @@ public partial class IRuleManagerTests
         IRuleManager ruleManager = stub;
         IRule? capturedRule = null;
 
-        stub.RunRule.OnCall = (ko, rule, token) =>
+        stub.RunRule.OnCall ((ko, rule, token) =>
         {
             capturedRule = rule;
             return Task.CompletedTask;
-        };
+        });
 
         var ruleStub = new RuleStubForManager();
         await ruleManager.RunRule(ruleStub, null);

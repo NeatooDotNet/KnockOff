@@ -551,8 +551,8 @@ public class SkillSamplesTests : SamplesTestBase
         var knockOff = new SkGenericSerializerKnockOff();
         ISkGenericSerializer service = knockOff;
 
-        knockOff.Deserialize.Of<SkUser>().OnCall = (ko, json) =>
-            new SkUser { Name = "FromJson" };
+        knockOff.Deserialize.Of<SkUser>().OnCall((ko, json) =>
+            new SkUser { Name = "FromJson" });
 
         var user = service.Deserialize<SkUser>("{}");
 
@@ -565,8 +565,8 @@ public class SkillSamplesTests : SamplesTestBase
         var knockOff = new SkGenericSerializerKnockOff();
         ISkGenericSerializer service = knockOff;
 
-        knockOff.Deserialize.Of<SkUser>().OnCall = (ko, json) => new SkUser();
-        knockOff.Deserialize.Of<SkOrder>().OnCall = (ko, json) => new SkOrder();
+        knockOff.Deserialize.Of<SkUser>().OnCall((ko, json) => new SkUser());
+        knockOff.Deserialize.Of<SkOrder>().OnCall((ko, json) => new SkOrder());
 
         service.Deserialize<SkUser>("{}");
         service.Deserialize<SkUser>("{}");
@@ -675,7 +675,7 @@ public class SkillSamplesTests : SamplesTestBase
     {
         #region skill-SKILL-inline-stub-usage
         var stub = new SkInlineUserServiceTests.Stubs.ISkInlineUserService();
-        stub.GetUser.OnCall = (ko, id) => new SkUser { Id = id };
+        stub.GetUser.OnCall((ko, id) => new SkUser { Id = id });
 
         ISkInlineUserService service = stub;  // Implicit conversion
         var user = service.GetUser(42);

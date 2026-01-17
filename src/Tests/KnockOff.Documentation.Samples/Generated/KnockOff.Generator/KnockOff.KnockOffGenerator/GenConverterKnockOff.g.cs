@@ -55,10 +55,12 @@ partial class GenConverterKnockOff : global::KnockOff.Documentation.Samples.Guid
 		}
 
 		/// <summary>Typed handler for Convert with specific type arguments.</summary>
-		public sealed class ConvertTypedHandler<TIn, TOut> : IGenericMethodCallTracker, IResettable
+		public sealed class ConvertTypedHandler<TIn, TOut> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 		{
 			/// <summary>Delegate for Convert.</summary>
 			public delegate TOut ConvertDelegate(GenConverterKnockOff ko, TIn input);
+
+			private ConvertDelegate? _onCall;
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -66,14 +68,17 @@ partial class GenConverterKnockOff : global::KnockOff.Documentation.Samples.Guid
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public ConvertDelegate? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(ConvertDelegate callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal ConvertDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
 			public void RecordCall() => CallCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; OnCall = null; }
+			public void Reset() { CallCount = 0; _onCall = null; }
 		}
 	}
 
@@ -111,7 +116,7 @@ partial class GenConverterKnockOff : global::KnockOff.Documentation.Samples.Guid
 	TOut global::KnockOff.Documentation.Samples.Guides.IGenConverter.Convert<TIn, TOut>(TIn input)
 	{
 		Convert.Of<TIn, TOut>().RecordCall();
-		if (Convert.Of<TIn, TOut>().OnCall is { } callback)
+		if (Convert.Of<TIn, TOut>().Callback is { } callback)
 			return callback(this, input);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenConverter", "Convert");
 		return SmartDefault<TOut>("Convert");

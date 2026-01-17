@@ -8,44 +8,318 @@ partial class InlineGenericInheritanceStub
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for Execute1.</summary>
+		/// <summary>Tracks and configures behavior for Execute1.</summary>
 		public sealed class ISampleValidationRule_Execute1Interceptor
 		{
-			/// <summary>Number of times this method was called.</summary>
-			public int CallCount { get; private set; }
+			/// <summary>Delegate for Execute1.</summary>
+			public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> Execute1Delegate(Stubs.ISampleValidationRule ko, global::KnockOff.Tests.ISampleTarget target, global::System.Threading.CancellationToken? token);
+
+			private readonly global::System.Collections.Generic.List<(Execute1Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+			private int _sequenceIndex;
+			private int _unconfiguredCallCount;
+			private (global::KnockOff.Tests.ISampleTarget target, global::System.Threading.CancellationToken? token)? _unconfiguredLastArgs;
+
+			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+			public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>The arguments from the last call.</summary>
-			public (global::KnockOff.Tests.ISampleTarget? target, global::System.Threading.CancellationToken? token)? LastCallArgs { get; private set; }
+			/// <summary>The arguments from the last call (from most recently called registration).</summary>
+			public (global::KnockOff.Tests.ISampleTarget target, global::System.Threading.CancellationToken? token)? LastCallArgs { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
 
-			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Func<Stubs.ISampleValidationRule, global::KnockOff.Tests.ISampleTarget, global::System.Threading.CancellationToken?, global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult>>? OnCall { get; set; }
 
-			public void RecordCall(global::KnockOff.Tests.ISampleTarget target, global::System.Threading.CancellationToken? token) { CallCount++; LastCallArgs = (target, token); }
+			/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTrackingArgs<(global::KnockOff.Tests.ISampleTarget target, global::System.Threading.CancellationToken? token)> OnCall(Execute1Delegate callback)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequenceIndex = 0;
+				return tracking;
+			}
 
-			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+			/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+			public global::KnockOff.IMethodSequence<Execute1Delegate> OnCall(Execute1Delegate callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, times, tracking));
+				_sequenceIndex = 0;
+				return new MethodSequenceImpl(this);
+			}
+
+			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+			internal global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> Invoke(Stubs.ISampleValidationRule ko, global::KnockOff.Tests.ISampleTarget target, global::System.Threading.CancellationToken? token)
+			{
+				if (_sequence.Count == 0)
+				{
+					_unconfiguredCallCount++;
+					_unconfiguredLastArgs = ((target, token));
+					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Execute1");
+					return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.ISampleResult>(default!);
+				}
+
+				var (callback, times, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall((target, token));
+
+				if (!times.IsForever && tracking.CallCount >= times.Count)
+				{
+					if (_sequenceIndex < _sequence.Count - 1)
+						_sequenceIndex++;
+					else if (tracking.CallCount > times.Count)
+						throw global::KnockOff.StubException.SequenceExhausted("Execute1");
+				}
+
+				return callback(ko, target, token);
+			}
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset()
+			{
+				_unconfiguredCallCount = 0;
+				_unconfiguredLastArgs = default;
+				foreach (var (_, _, tracking) in _sequence)
+					tracking.Reset();
+				_sequenceIndex = 0;
+			}
+
+			/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _sequence)
+				{
+					if (times.IsForever)
+					{
+						if (!tracking.WasCalled)
+							return false;
+					}
+					else if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Tracks invocations for this callback registration.</summary>
+			private sealed class MethodTrackingImpl : global::KnockOff.IMethodTrackingArgs<(global::KnockOff.Tests.ISampleTarget target, global::System.Threading.CancellationToken? token)>
+			{
+				private (global::KnockOff.Tests.ISampleTarget target, global::System.Threading.CancellationToken? token) _lastArgs;
+
+				/// <summary>Number of times this callback was invoked.</summary>
+				public int CallCount { get; private set; }
+
+				/// <summary>True if CallCount > 0.</summary>
+				public bool WasCalled => CallCount > 0;
+
+				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
+				public (global::KnockOff.Tests.ISampleTarget target, global::System.Threading.CancellationToken? token) LastArgs => _lastArgs;
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall((global::KnockOff.Tests.ISampleTarget target, global::System.Threading.CancellationToken? token) args) { CallCount++; _lastArgs = args; }
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() { CallCount = 0; _lastArgs = default; }
+			}
+
+			/// <summary>Sequence implementation for ThenCall chaining.</summary>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<Execute1Delegate>
+			{
+				private readonly ISampleValidationRule_Execute1Interceptor _interceptor;
+
+				public MethodSequenceImpl(ISampleValidationRule_Execute1Interceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Total calls across all callbacks in sequence.</summary>
+				public int TotalCallCount
+				{
+					get
+					{
+						var total = 0;
+						foreach (var (_, _, tracking) in _interceptor._sequence)
+							total += tracking.CallCount;
+						return total;
+					}
+				}
+
+				/// <summary>Add another callback to the sequence.</summary>
+				public global::KnockOff.IMethodSequence<Execute1Delegate> ThenCall(Execute1Delegate callback, global::KnockOff.Times times)
+				{
+					var tracking = new MethodTrackingImpl();
+					_interceptor._sequence.Add((callback, times, tracking));
+					return this;
+				}
+
+				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+				public bool Verify()
+				{
+					foreach (var (_, times, tracking) in _interceptor._sequence)
+					{
+						if (!times.Verify(tracking.CallCount))
+							return false;
+					}
+					return true;
+				}
+
+				/// <summary>Reset all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+			}
+
 		}
 
-		/// <summary>Interceptor for Execute2.</summary>
+		/// <summary>Tracks and configures behavior for Execute2.</summary>
 		public sealed class ISampleValidationRule_Execute2Interceptor
 		{
-			/// <summary>Number of times this method was called.</summary>
-			public int CallCount { get; private set; }
+			/// <summary>Delegate for Execute2.</summary>
+			public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> Execute2Delegate(Stubs.ISampleValidationRule ko, global::KnockOff.Tests.ISampleRuleTarget target, global::System.Threading.CancellationToken? token);
+
+			private readonly global::System.Collections.Generic.List<(Execute2Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+			private int _sequenceIndex;
+			private int _unconfiguredCallCount;
+			private (global::KnockOff.Tests.ISampleRuleTarget target, global::System.Threading.CancellationToken? token)? _unconfiguredLastArgs;
+
+			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+			public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>The arguments from the last call.</summary>
-			public (global::KnockOff.Tests.ISampleRuleTarget? target, global::System.Threading.CancellationToken? token)? LastCallArgs { get; private set; }
+			/// <summary>The arguments from the last call (from most recently called registration).</summary>
+			public (global::KnockOff.Tests.ISampleRuleTarget target, global::System.Threading.CancellationToken? token)? LastCallArgs { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
 
-			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Func<Stubs.ISampleValidationRule, global::KnockOff.Tests.ISampleRuleTarget, global::System.Threading.CancellationToken?, global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult>>? OnCall { get; set; }
 
-			public void RecordCall(global::KnockOff.Tests.ISampleRuleTarget target, global::System.Threading.CancellationToken? token) { CallCount++; LastCallArgs = (target, token); }
+			/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTrackingArgs<(global::KnockOff.Tests.ISampleRuleTarget target, global::System.Threading.CancellationToken? token)> OnCall(Execute2Delegate callback)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequenceIndex = 0;
+				return tracking;
+			}
 
-			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+			/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+			public global::KnockOff.IMethodSequence<Execute2Delegate> OnCall(Execute2Delegate callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, times, tracking));
+				_sequenceIndex = 0;
+				return new MethodSequenceImpl(this);
+			}
+
+			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+			internal global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> Invoke(Stubs.ISampleValidationRule ko, global::KnockOff.Tests.ISampleRuleTarget target, global::System.Threading.CancellationToken? token)
+			{
+				if (_sequence.Count == 0)
+				{
+					_unconfiguredCallCount++;
+					_unconfiguredLastArgs = ((target, token));
+					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Execute2");
+					return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.ISampleResult>(default!);
+				}
+
+				var (callback, times, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall((target, token));
+
+				if (!times.IsForever && tracking.CallCount >= times.Count)
+				{
+					if (_sequenceIndex < _sequence.Count - 1)
+						_sequenceIndex++;
+					else if (tracking.CallCount > times.Count)
+						throw global::KnockOff.StubException.SequenceExhausted("Execute2");
+				}
+
+				return callback(ko, target, token);
+			}
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset()
+			{
+				_unconfiguredCallCount = 0;
+				_unconfiguredLastArgs = default;
+				foreach (var (_, _, tracking) in _sequence)
+					tracking.Reset();
+				_sequenceIndex = 0;
+			}
+
+			/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _sequence)
+				{
+					if (times.IsForever)
+					{
+						if (!tracking.WasCalled)
+							return false;
+					}
+					else if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Tracks invocations for this callback registration.</summary>
+			private sealed class MethodTrackingImpl : global::KnockOff.IMethodTrackingArgs<(global::KnockOff.Tests.ISampleRuleTarget target, global::System.Threading.CancellationToken? token)>
+			{
+				private (global::KnockOff.Tests.ISampleRuleTarget target, global::System.Threading.CancellationToken? token) _lastArgs;
+
+				/// <summary>Number of times this callback was invoked.</summary>
+				public int CallCount { get; private set; }
+
+				/// <summary>True if CallCount > 0.</summary>
+				public bool WasCalled => CallCount > 0;
+
+				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
+				public (global::KnockOff.Tests.ISampleRuleTarget target, global::System.Threading.CancellationToken? token) LastArgs => _lastArgs;
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall((global::KnockOff.Tests.ISampleRuleTarget target, global::System.Threading.CancellationToken? token) args) { CallCount++; _lastArgs = args; }
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() { CallCount = 0; _lastArgs = default; }
+			}
+
+			/// <summary>Sequence implementation for ThenCall chaining.</summary>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<Execute2Delegate>
+			{
+				private readonly ISampleValidationRule_Execute2Interceptor _interceptor;
+
+				public MethodSequenceImpl(ISampleValidationRule_Execute2Interceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Total calls across all callbacks in sequence.</summary>
+				public int TotalCallCount
+				{
+					get
+					{
+						var total = 0;
+						foreach (var (_, _, tracking) in _interceptor._sequence)
+							total += tracking.CallCount;
+						return total;
+					}
+				}
+
+				/// <summary>Add another callback to the sequence.</summary>
+				public global::KnockOff.IMethodSequence<Execute2Delegate> ThenCall(Execute2Delegate callback, global::KnockOff.Times times)
+				{
+					var tracking = new MethodTrackingImpl();
+					_interceptor._sequence.Add((callback, times, tracking));
+					return this;
+				}
+
+				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+				public bool Verify()
+				{
+					foreach (var (_, times, tracking) in _interceptor._sequence)
+					{
+						if (!times.Verify(tracking.CallCount))
+							return false;
+					}
+					return true;
+				}
+
+				/// <summary>Reset all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+			}
+
 		}
 
 		/// <summary>Stub implementation of global::KnockOff.Tests.ISampleValidationRule.</summary>
@@ -59,18 +333,12 @@ partial class InlineGenericInheritanceStub
 
 			global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> global::KnockOff.Tests.ISampleRule<global::KnockOff.Tests.ISampleTarget>.Execute(global::KnockOff.Tests.ISampleTarget target, global::System.Threading.CancellationToken? token)
 			{
-				Execute1.RecordCall(target, token);
-				if (Execute1.OnCall is { } onCall) return onCall(this, target, token);
-				if (Strict) throw global::KnockOff.StubException.NotConfigured("ISampleTarget>", "Execute");
-				throw new global::System.InvalidOperationException("No implementation provided for Execute. Set Execute1.OnCall.");
+				return Execute1.Invoke(this, target, token);
 			}
 
 			global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> global::KnockOff.Tests.ISampleRule.Execute(global::KnockOff.Tests.ISampleRuleTarget target, global::System.Threading.CancellationToken? token)
 			{
-				Execute2.RecordCall(target, token);
-				if (Execute2.OnCall is { } onCall) return onCall(this, target, token);
-				if (Strict) throw global::KnockOff.StubException.NotConfigured("ISampleRule", "Execute");
-				throw new global::System.InvalidOperationException("No implementation provided for Execute. Set Execute2.OnCall.");
+				return Execute2.Invoke(this, target, token);
 			}
 
 			/// <summary>The global::KnockOff.Tests.ISampleValidationRule instance. Use for passing to code expecting the interface.</summary>

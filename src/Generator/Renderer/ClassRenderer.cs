@@ -238,8 +238,12 @@ internal static class ClassRenderer
         var indent1 = indent + "\t";
 
         w.Line($"{indent}/// <summary>Interceptor for {stubClassName}.{method.MethodName}.</summary>");
-        w.Line($"{indent}public sealed class {method.InterceptorClassName}{method.TypeParameterList}{method.ConstraintClauses}");
+        w.Line($"{indent}public sealed class {method.InterceptorClassName}{method.TypeParameterList} : global::KnockOff.IMethodTracking{method.ConstraintClauses}");
         w.Line($"{indent}{{");
+
+        // Private callback field
+        w.Line($"{indent1}private {method.DelegateType}? _onCall;");
+        w.Line();
 
         // CallCount and WasCalled
         w.Line($"{indent1}/// <summary>Number of times this method was called.</summary>");
@@ -263,9 +267,14 @@ internal static class ClassRenderer
             w.Line();
         }
 
-        // OnCall callback
-        w.Line($"{indent1}/// <summary>Callback invoked when method is called. If set, called instead of base.</summary>");
-        w.Line($"{indent1}public {method.DelegateType}? OnCall {{ get; set; }}");
+        // OnCall method (returns IMethodTracking for consistency)
+        w.Line($"{indent1}/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>");
+        w.Line($"{indent1}public global::KnockOff.IMethodTracking OnCall({method.DelegateType} callback) {{ _onCall = callback; return this; }}");
+        w.Line();
+
+        // Callback property for internal use by invocation logic
+        w.Line($"{indent1}/// <summary>Gets the configured callback (internal use).</summary>");
+        w.Line($"{indent1}internal {method.DelegateType}? Callback => _onCall;");
         w.Line();
 
         // RecordCall method
@@ -293,7 +302,7 @@ internal static class ClassRenderer
         {
             w.Append("LastCallArgs = default; ");
         }
-        w.Line("OnCall = null; }");
+        w.Line("_onCall = null; }");
 
         w.Line($"{indent}}}");
         w.Line();
@@ -553,14 +562,14 @@ internal static class ClassRenderer
             w.Line($"{indent1}_stub?.{method.HandlerName}.RecordCall({method.InputArgumentList});");
         }
 
-        // Check for OnCall callback (null check for calls during base constructor)
+        // Check for Callback (null check for calls during base constructor)
         if (method.IsVoid || method.IsTask || method.IsValueTask)
         {
-            w.Line($"{indent1}if (_stub?.{method.HandlerName}.OnCall is {{ }} onCall) {{ onCall({method.OnCallArgumentList}); return; }}");
+            w.Line($"{indent1}if (_stub?.{method.HandlerName}.Callback is {{ }} onCall) {{ onCall({method.OnCallArgumentList}); return; }}");
         }
         else
         {
-            w.Line($"{indent1}if (_stub?.{method.HandlerName}.OnCall is {{ }} onCall) return onCall({method.OnCallArgumentList});");
+            w.Line($"{indent1}if (_stub?.{method.HandlerName}.Callback is {{ }} onCall) return onCall({method.OnCallArgumentList});");
         }
 
         // Default behavior - delegate to base or return default for abstract

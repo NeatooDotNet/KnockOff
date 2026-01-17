@@ -60,7 +60,7 @@ public class OpenGenericInlineStubTests
 	public void OpenGenericInterface_OnCall_Works()
 	{
 		var stub = new OpenGenericInterfaceTest.Stubs.IOGRepository<string>();
-		stub.GetById.OnCall = (ko, id) => $"Item-{id}";
+		stub.GetById.OnCall((ko, id) => $"Item-{id}");
 
 		IOGRepository<string> repo = stub;
 		var result = repo.GetById(123);
@@ -227,7 +227,7 @@ public partial class OpenGenericClassTests
 	public void SingleTypeParam_InterceptorTracksInvocations()
 	{
 		var stub = new Stubs.OGRepository<User>();
-		stub.GetById.OnCall = (ko, id) => new User { Id = id };
+		stub.GetById.OnCall((ko, id) => new User { Id = id });
 
 		OGRepository<User> repo = stub.Object;
 		var user = repo.GetById(42);
@@ -253,7 +253,7 @@ public partial class OpenGenericClassTests
 	{
 		// TKey: notnull, TValue: new()
 		var stub = new Stubs.OGCache<string, List<int>>();
-		stub.Get.OnCall = (ko, key) => new List<int> { 1, 2, 3 };
+		stub.Get.OnCall((ko, key) => new List<int> { 1, 2, 3 });
 
 		OGCache<string, List<int>> cache = stub.Object;
 		var result = cache.Get("test");

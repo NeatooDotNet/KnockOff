@@ -157,7 +157,7 @@ public partial class AiNotificationTests
     public void Test()
     {
         var stub = new Stubs.AiEmailServiceClass();
-        stub.Send.OnCall = (ko, to, body) => { };
+        stub.Send.OnCall((ko, to, body) => { });
 
         // Use .Object to get the class instance
         AiEmailServiceClass service = stub.Object;

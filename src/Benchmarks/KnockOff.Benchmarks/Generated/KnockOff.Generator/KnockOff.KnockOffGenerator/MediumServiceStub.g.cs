@@ -10,6 +10,14 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<MediumServiceStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(global::System.Action<MediumServiceStub> callback)
@@ -36,6 +44,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Method1");
 				return;
 			}
@@ -57,6 +66,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -67,7 +77,6 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -137,6 +146,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for Method2.</summary>
@@ -144,6 +154,18 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<MediumServiceStub, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<MediumServiceStub, int> callback)
@@ -170,6 +192,8 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = param;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Method2");
 				return;
 			}
@@ -191,6 +215,8 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -201,7 +227,6 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -275,6 +300,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for Method3.</summary>
@@ -282,6 +308,18 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<MediumServiceStub, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private string? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public string? LastCallArg { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<string> OnCall(global::System.Action<MediumServiceStub, string> callback)
@@ -308,6 +346,8 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = param;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Method3");
 				return;
 			}
@@ -329,6 +369,8 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -339,7 +381,6 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -413,6 +454,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for Method4.</summary>
@@ -420,6 +462,18 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<MediumServiceStub, int, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private (int? a, string? b)? _unconfiguredLastArgs;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The arguments from the last call (from most recently called registration).</summary>
+		public (int? a, string? b)? LastCallArgs { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTrackingArgs<(int? a, string? b)> OnCall(global::System.Action<MediumServiceStub, int, string> callback)
@@ -446,6 +500,8 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArgs = ((a, b));
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Method4");
 				return;
 			}
@@ -467,6 +523,8 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArgs = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -477,7 +535,6 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -551,6 +608,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for Method5.</summary>
@@ -558,6 +616,18 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<MediumServiceStub, int, int, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private (int? a, int? b, int? c)? _unconfiguredLastArgs;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The arguments from the last call (from most recently called registration).</summary>
+		public (int? a, int? b, int? c)? LastCallArgs { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTrackingArgs<(int? a, int? b, int? c)> OnCall(global::System.Action<MediumServiceStub, int, int, int> callback)
@@ -584,6 +654,8 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArgs = ((a, b, c));
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Method5");
 				return;
 			}
@@ -605,6 +677,8 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArgs = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -615,7 +689,6 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -689,6 +762,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for Method6.</summary>
@@ -699,6 +773,14 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 		private readonly global::System.Collections.Generic.List<(Method6Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(Method6Delegate callback)
@@ -725,6 +807,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Method6");
 				return default!;
 			}
@@ -746,6 +829,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -756,7 +840,6 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -826,6 +909,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for Method7.</summary>
@@ -836,6 +920,14 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 		private readonly global::System.Collections.Generic.List<(Method7Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(Method7Delegate callback)
@@ -862,8 +954,9 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Method7");
-				throw new global::System.InvalidOperationException("No implementation provided for Method7. Configure via Method7.OnCall.");
+				throw new global::System.InvalidOperationException("No implementation provided for Method7. Configure via OnCall.");
 			}
 
 			var (callback, times, tracking) = _sequence[_sequenceIndex];
@@ -883,6 +976,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -893,7 +987,6 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -963,6 +1056,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for Method8.</summary>
@@ -973,6 +1067,18 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 		private readonly global::System.Collections.Generic.List<(Method8Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(Method8Delegate callback)
@@ -999,6 +1105,8 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = param;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Method8");
 				return default!;
 			}
@@ -1020,6 +1128,8 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1030,7 +1140,6 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1104,6 +1213,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for Method9.</summary>
@@ -1114,6 +1224,18 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 		private readonly global::System.Collections.Generic.List<(Method9Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private string? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public string? LastCallArg { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<string> OnCall(Method9Delegate callback)
@@ -1140,8 +1262,10 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = param;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Method9");
-				throw new global::System.InvalidOperationException("No implementation provided for Method9. Configure via Method9.OnCall.");
+				throw new global::System.InvalidOperationException("No implementation provided for Method9. Configure via OnCall.");
 			}
 
 			var (callback, times, tracking) = _sequence[_sequenceIndex];
@@ -1161,6 +1285,8 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1171,7 +1297,6 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1245,6 +1370,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for Method10.</summary>
@@ -1255,6 +1381,18 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 		private readonly global::System.Collections.Generic.List<(Method10Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private (int? a, string? b)? _unconfiguredLastArgs;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The arguments from the last call (from most recently called registration).</summary>
+		public (int? a, string? b)? LastCallArgs { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTrackingArgs<(int? a, string? b)> OnCall(Method10Delegate callback)
@@ -1281,6 +1419,8 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArgs = ((a, b));
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Method10");
 				return default!;
 			}
@@ -1302,6 +1442,8 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArgs = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1312,7 +1454,6 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1386,6 +1527,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Interceptor for Method1.</summary>

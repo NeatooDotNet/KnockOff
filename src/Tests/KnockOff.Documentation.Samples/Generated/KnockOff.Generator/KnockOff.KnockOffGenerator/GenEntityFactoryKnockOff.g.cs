@@ -55,10 +55,12 @@ partial class GenEntityFactoryKnockOff : global::KnockOff.Documentation.Samples.
 		}
 
 		/// <summary>Typed handler for Create with specific type arguments.</summary>
-		public sealed class CreateTypedHandler<T> : IGenericMethodCallTracker, IResettable where T : class, global::KnockOff.Documentation.Samples.Guides.IGenEntity, new()
+		public sealed class CreateTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : class, global::KnockOff.Documentation.Samples.Guides.IGenEntity, new()
 		{
 			/// <summary>Delegate for Create.</summary>
 			public delegate T CreateDelegate(GenEntityFactoryKnockOff ko);
+
+			private CreateDelegate? _onCall;
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -66,14 +68,17 @@ partial class GenEntityFactoryKnockOff : global::KnockOff.Documentation.Samples.
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public CreateDelegate? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(CreateDelegate callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal CreateDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
 			public void RecordCall() => CallCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; OnCall = null; }
+			public void Reset() { CallCount = 0; _onCall = null; }
 		}
 	}
 
@@ -111,7 +116,7 @@ partial class GenEntityFactoryKnockOff : global::KnockOff.Documentation.Samples.
 	T global::KnockOff.Documentation.Samples.Guides.IGenEntityFactory.Create<T>() where T : class
 	{
 		Create.Of<T>().RecordCall();
-		if (Create.Of<T>().OnCall is { } callback)
+		if (Create.Of<T>().Callback is { } callback)
 			return callback(this);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenEntityFactory", "Create");
 		return SmartDefault<T>("Create");

@@ -64,6 +64,22 @@ internal static class MethodInterceptorRenderer
 		// Sequence storage
 		w.Line($"private readonly global::System.Collections.Generic.List<({delegateType} Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();");
 		w.Line("private int _sequenceIndex;");
+		w.Line("private int _unconfiguredCallCount;");
+		// Track arguments for unconfigured calls
+		if (model.LastArgType != null)
+		{
+			var nullableType = model.LastArgType.EndsWith("?") ? model.LastArgType : $"{model.LastArgType}?";
+			w.Line($"private {nullableType} _unconfiguredLastArg;");
+		}
+		if (model.LastArgsType != null)
+		{
+			var nullableType = model.LastArgsType.EndsWith("?") ? model.LastArgsType : $"{model.LastArgsType}?";
+			w.Line($"private {nullableType} _unconfiguredLastArgs;");
+		}
+		w.Line();
+
+		// Backward compatibility: aggregate tracking properties
+		RenderBackwardCompatibleTrackingProperties(w, model.TrackableParameters, model.LastArgType, model.LastArgsType);
 		w.Line();
 
 		// OnCall() returning IMethodTracking
@@ -96,7 +112,7 @@ internal static class MethodInterceptorRenderer
 		RenderInvokeMethod(w, model, options, null);
 
 		// Reset method
-		RenderResetMethod(w, model.Overloads);
+		RenderResetMethod(w, model.Overloads, model.LastArgType, model.LastArgsType);
 
 		// Verify method
 		RenderVerifyMethod(w, model.Overloads);
@@ -105,7 +121,8 @@ internal static class MethodInterceptorRenderer
 		RenderMethodTrackingImpl(w, model.TrackableParameters, model.LastArgType, model.LastArgsType, model.TrackingInterface, null);
 
 		// Nested MethodSequenceImpl
-		RenderMethodSequenceImpl(w, model.InterceptorClassName, delegateType, null);
+		var fullInterceptorClassName = model.InterceptorClassName + options.InterceptorTypeParameters;
+		RenderMethodSequenceImpl(w, fullInterceptorClassName, delegateType, null);
 	}
 
 	#endregion
@@ -118,6 +135,10 @@ internal static class MethodInterceptorRenderer
 		InterceptorRenderOptions options)
 	{
 		var ownerWithParams = GetOwnerWithParams(model);
+
+		// Track unconfigured calls (shared across all overloads)
+		w.Line("private int _unconfiguredCallCount;");
+		w.Line();
 
 		// Generate delegates and sequences for each unique overload
 		foreach (var overload in model.Overloads)
@@ -132,6 +153,10 @@ internal static class MethodInterceptorRenderer
 			w.Line($"private int _sequenceIndex_{overload.SignatureSuffix};");
 			w.Line();
 		}
+
+		// Backward compatibility: aggregate tracking properties across all overloads
+		RenderOverloadBackwardCompatibleProperties(w, model.Overloads);
+		w.Line();
 
 		// OnCall overloads for each unique signature
 		foreach (var overload in model.Overloads)
@@ -182,9 +207,10 @@ internal static class MethodInterceptorRenderer
 		}
 
 		// Nested sequence classes for each unique signature
+		var fullInterceptorClassName = model.InterceptorClassName + options.InterceptorTypeParameters;
 		foreach (var overload in model.Overloads)
 		{
-			RenderMethodSequenceImpl(w, model.InterceptorClassName, overload.DelegateName, overload.SignatureSuffix);
+			RenderMethodSequenceImpl(w, fullInterceptorClassName, overload.DelegateName, overload.SignatureSuffix);
 		}
 	}
 
@@ -214,10 +240,21 @@ internal static class MethodInterceptorRenderer
 
 			var trackingArgs = UnifiedInterceptorBuilder.BuildTrackingArgs(model.TrackableParameters);
 
-			// No sequence configured
+			// No sequence configured - track call and return default
 			w.Line("if (_sequence.Count == 0)");
 			using (w.Braces())
 			{
+				w.Line("_unconfiguredCallCount++;");
+				// Track last arg/args for unconfigured calls
+				if (model.LastArgType != null && model.TrackableParameters.Count > 0)
+				{
+					var firstParam = model.TrackableParameters.First().EscapedName;
+					w.Line($"_unconfiguredLastArg = {firstParam};");
+				}
+				if (model.LastArgsType != null)
+				{
+					w.Line($"_unconfiguredLastArgs = ({trackingArgs});");
+				}
 				w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.MethodName}\");");
 				if (model.IsVoid)
 					w.Line("return;");
@@ -282,6 +319,7 @@ internal static class MethodInterceptorRenderer
 			w.Line($"if (_sequence_{overload.SignatureSuffix}.Count == 0)");
 			using (w.Braces())
 			{
+				w.Line("_unconfiguredCallCount++;");
 				w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.MethodName}\");");
 				if (overload.IsVoid)
 					w.Line("return;");
@@ -322,11 +360,16 @@ internal static class MethodInterceptorRenderer
 
 	#region Reset and Verify Methods
 
-	private static void RenderResetMethod(CodeWriter w, EquatableArray<MethodOverloadSignature> overloads)
+	private static void RenderResetMethod(CodeWriter w, EquatableArray<MethodOverloadSignature> overloads, string? lastArgType = null, string? lastArgsType = null)
 	{
 		w.Line("/// <summary>Resets all tracking state.</summary>");
 		using (w.Block("public void Reset()"))
 		{
+			w.Line("_unconfiguredCallCount = 0;");
+			if (lastArgType != null)
+				w.Line("_unconfiguredLastArg = default;");
+			if (lastArgsType != null)
+				w.Line("_unconfiguredLastArgs = default;");
 			if (overloads.Count == 0)
 			{
 				// Single-signature
@@ -586,6 +629,71 @@ internal static class MethodInterceptorRenderer
 			parts.Add($"{p.RefPrefix}{p.EscapedName}");
 		}
 		return string.Join(", ", parts);
+	}
+
+	#endregion
+
+	#region Backward Compatibility Properties
+
+	/// <summary>
+	/// Renders aggregate tracking properties for backward compatibility (single-signature).
+	/// These allow the old pattern: stub.Method.WasCalled, stub.Method.CallCount
+	/// </summary>
+	private static void RenderBackwardCompatibleTrackingProperties(
+		CodeWriter w,
+		EquatableArray<ParameterModel> trackableParams,
+		string? lastArgType,
+		string? lastArgsType)
+	{
+		// CallCount - total across all registrations plus unconfigured calls
+		w.Line("/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>");
+		w.Line("public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }");
+		w.Line();
+
+		// WasCalled - true if any registration was called
+		w.Line("/// <summary>Whether this method was called at least once.</summary>");
+		w.Line("public bool WasCalled => CallCount > 0;");
+		w.Line();
+
+		// LastCallArg - for single param methods
+		if (lastArgType != null)
+		{
+			// Make nullable if not already (avoid double ??)
+			var nullableType = lastArgType.EndsWith("?") ? lastArgType : $"{lastArgType}?";
+			w.Line($"/// <summary>The argument from the last call (from most recently called registration).</summary>");
+			w.Line($"public {nullableType} LastCallArg {{ get {{ foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; }} }}");
+			w.Line();
+		}
+
+		// LastCallArgs - for multi-param methods
+		if (lastArgsType != null)
+		{
+			// Make nullable if not already (avoid double ??)
+			var nullableType = lastArgsType.EndsWith("?") ? lastArgsType : $"{lastArgsType}?";
+			w.Line($"/// <summary>The arguments from the last call (from most recently called registration).</summary>");
+			w.Line($"public {nullableType} LastCallArgs {{ get {{ foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; }} }}");
+			w.Line();
+		}
+	}
+
+	/// <summary>
+	/// Renders aggregate tracking properties for overload groups.
+	/// Aggregates across all overload sequences.
+	/// </summary>
+	private static void RenderOverloadBackwardCompatibleProperties(
+		CodeWriter w,
+		EquatableArray<MethodOverloadSignature> overloads)
+	{
+		// Build a sum expression across all sequences, plus unconfigured calls
+		var sumParts = overloads.Select(o => $"_sequence_{o.SignatureSuffix}.Sum(s => s.Tracking.CallCount)");
+		var sumExpr = "_unconfiguredCallCount + " + string.Join(" + ", sumParts);
+
+		w.Line("/// <summary>Total number of times this method was called (across all overloads and registrations).</summary>");
+		w.Line($"public int CallCount => {sumExpr};");
+		w.Line();
+
+		w.Line("/// <summary>Whether this method was called at least once (any overload).</summary>");
+		w.Line("public bool WasCalled => CallCount > 0;");
 	}
 
 	#endregion

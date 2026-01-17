@@ -388,19 +388,19 @@ public static class GenericsUsageExamples
         var knockOff = new GenSerializerKnockOff();
 
         // Configure for specific type using Of<T>()
-        knockOff.Deserialize.Of<GenUser>().OnCall = (ko, json) =>
-            new GenUser { Id = 1, Name = "FromJson" };
+        knockOff.Deserialize.Of<GenUser>().OnCall((ko, json) =>
+            new GenUser { Id = 1, Name = "FromJson" });
 
-        knockOff.Deserialize.Of<GenOrder>().OnCall = (ko, json) =>
-            new GenOrder { Id = 123 };
+        knockOff.Deserialize.Of<GenOrder>().OnCall((ko, json) =>
+            new GenOrder { Id = 123 });
         #endregion
     }
 
     public static void GenericMethodTracking()
     {
         var knockOff = new GenSerializerKnockOff();
-        knockOff.Deserialize.Of<GenUser>().OnCall = (ko, json) => new GenUser();
-        knockOff.Deserialize.Of<GenOrder>().OnCall = (ko, json) => new GenOrder();
+        knockOff.Deserialize.Of<GenUser>().OnCall((ko, json) => new GenUser());
+        knockOff.Deserialize.Of<GenOrder>().OnCall((ko, json) => new GenOrder());
 
         #region generics-generic-method-tracking
         IGenSerializer service = knockOff;
@@ -430,8 +430,8 @@ public static class GenericsUsageExamples
         var knockOff = new GenConverterKnockOff();
 
         #region generics-generic-method-multi-usage
-        knockOff.Convert.Of<string, int>().OnCall = (ko, s) => s.Length;
-        knockOff.Convert.Of<int, string>().OnCall = (ko, i) => i.ToString();
+        knockOff.Convert.Of<string, int>().OnCall((ko, s) => s.Length);
+        knockOff.Convert.Of<int, string>().OnCall((ko, i) => i.ToString());
         #endregion
     }
 
@@ -441,7 +441,7 @@ public static class GenericsUsageExamples
 
         #region generics-generic-method-constrained-usage
         // Constraints enforced at compile time
-        knockOff.Create.Of<GenEmployee>().OnCall = (ko) => new GenEmployee();
+        knockOff.Create.Of<GenEmployee>().OnCall((ko) => new GenEmployee());
         #endregion
     }
 }

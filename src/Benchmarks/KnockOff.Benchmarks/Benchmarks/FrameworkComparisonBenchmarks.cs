@@ -131,8 +131,8 @@ public class FrameworkComparisonBenchmarks
         var getByIdTracking = repository.GetByIdAsync.OnCall((ko, id) => Task.FromResult<FcBenchProduct?>(product));
 
         var cache = new FcBenchCacheServiceStub();
-        cache.Get.Of<FcBenchProduct>().OnCall = (ko, key) => null;
-        cache.Set.Of<FcBenchProduct>().OnCall = (ko, key, value, expiration) => { };
+        cache.Get.Of<FcBenchProduct>().OnCall((ko, key) => null);
+        cache.Set.Of<FcBenchProduct>().OnCall((ko, key, value, expiration) => { });
 
         var logger = new FcBenchLoggerStub();
         var logInfoTracking = logger.LogInfo.OnCall((ko, message) => { });

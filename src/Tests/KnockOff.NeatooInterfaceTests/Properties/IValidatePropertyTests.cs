@@ -251,11 +251,11 @@ public partial class IValidatePropertyTests
         IValidateProperty property = stub;
         RunRulesFlag? capturedFlag = null;
 
-        stub.RunRules.OnCall = (ko, flag, token) =>
+        stub.RunRules.OnCall((ko, flag, token) =>
         {
             capturedFlag = flag;
             return Task.CompletedTask;
-        };
+        });
 
         await property.RunRules(RunRulesFlag.All, null);
 
@@ -340,7 +340,7 @@ public partial class IValidatePropertyTests
         IValidateProperty property = stub;
 
         // Configure GetAwaiter directly (stubs override DIMs with explicit implementations)
-        stub.GetAwaiter.OnCall = (ko) => Task.CompletedTask.GetAwaiter();
+        stub.GetAwaiter.OnCall((ko) => Task.CompletedTask.GetAwaiter());
 
         var awaiter = property.GetAwaiter();
 

@@ -85,6 +85,18 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 
 		private readonly global::System.Collections.Generic.List<(IndexOfDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private string? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public string? LastCallArg { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<string> OnCall(IndexOfDelegate callback)
@@ -111,6 +123,8 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = item;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IndexOf");
 				return default!;
 			}
@@ -132,6 +146,8 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -142,7 +158,6 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -216,6 +231,7 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for Insert.</summary>
@@ -223,6 +239,18 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<ListStringKnockOff, int, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private (int? index, string? item)? _unconfiguredLastArgs;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The arguments from the last call (from most recently called registration).</summary>
+		public (int? index, string? item)? LastCallArgs { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTrackingArgs<(int? index, string? item)> OnCall(global::System.Action<ListStringKnockOff, int, string> callback)
@@ -249,6 +277,8 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArgs = ((index, item));
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Insert");
 				return;
 			}
@@ -270,6 +300,8 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArgs = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -280,7 +312,6 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -354,6 +385,7 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for RemoveAt.</summary>
@@ -361,6 +393,18 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<ListStringKnockOff, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<ListStringKnockOff, int> callback)
@@ -387,6 +431,8 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = index;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RemoveAt");
 				return;
 			}
@@ -408,6 +454,8 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -418,7 +466,6 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -492,6 +539,7 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for Add.</summary>
@@ -499,6 +547,18 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<ListStringKnockOff, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private string? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public string? LastCallArg { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<string> OnCall(global::System.Action<ListStringKnockOff, string> callback)
@@ -525,6 +585,8 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = item;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 				return;
 			}
@@ -546,6 +608,8 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -556,7 +620,6 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -630,6 +693,7 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for Clear.</summary>
@@ -637,6 +701,14 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<ListStringKnockOff> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(global::System.Action<ListStringKnockOff> callback)
@@ -663,6 +735,7 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Clear");
 				return;
 			}
@@ -684,6 +757,7 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -694,7 +768,6 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -764,6 +837,7 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for Contains.</summary>
@@ -774,6 +848,18 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 
 		private readonly global::System.Collections.Generic.List<(ContainsDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private string? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public string? LastCallArg { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<string> OnCall(ContainsDelegate callback)
@@ -800,6 +886,8 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = item;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Contains");
 				return default!;
 			}
@@ -821,6 +909,8 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -831,7 +921,6 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -905,6 +994,7 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for CopyTo.</summary>
@@ -912,6 +1002,18 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<ListStringKnockOff, string[], int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private (string[]? array, int? arrayIndex)? _unconfiguredLastArgs;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The arguments from the last call (from most recently called registration).</summary>
+		public (string[]? array, int? arrayIndex)? LastCallArgs { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTrackingArgs<(string[]? array, int? arrayIndex)> OnCall(global::System.Action<ListStringKnockOff, string[], int> callback)
@@ -938,6 +1040,8 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArgs = ((array, arrayIndex));
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "CopyTo");
 				return;
 			}
@@ -959,6 +1063,8 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArgs = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -969,7 +1075,6 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1043,6 +1148,7 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for Remove.</summary>
@@ -1053,6 +1159,18 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 
 		private readonly global::System.Collections.Generic.List<(RemoveDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private string? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public string? LastCallArg { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<string> OnCall(RemoveDelegate callback)
@@ -1079,6 +1197,8 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = item;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Remove");
 				return default!;
 			}
@@ -1100,6 +1220,8 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1110,7 +1232,6 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1184,11 +1305,14 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
-	/// <summary>Tracks and configures behavior for GetEnumerator (overloaded).</summary>
+	/// <summary>Tracks and configures behavior for GetEnumerator.</summary>
 	public sealed class GetEnumeratorInterceptor
 	{
+		private int _unconfiguredCallCount;
+
 		/// <summary>Delegate for GetEnumerator().</summary>
 		public delegate global::System.Collections.Generic.IEnumerator<string> GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_string(ListStringKnockOff ko);
 
@@ -1200,6 +1324,12 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 
 		private readonly global::System.Collections.Generic.List<(GetEnumeratorDelegate_NoParams_Collections_IEnumerator Callback, global::KnockOff.Times Times, MethodTrackingImpl_NoParams_Collections_IEnumerator Tracking)> _sequence_NoParams_Collections_IEnumerator = new();
 		private int _sequenceIndex_NoParams_Collections_IEnumerator;
+
+		/// <summary>Total number of times this method was called (across all overloads and registrations).</summary>
+		public int CallCount => _unconfiguredCallCount + _sequence_NoParams_Collections_Generic_IEnumerator_string.Sum(s => s.Tracking.CallCount) + _sequence_NoParams_Collections_IEnumerator.Sum(s => s.Tracking.CallCount);
+
+		/// <summary>Whether this method was called at least once (any overload).</summary>
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>Configures callback for GetEnumerator(). Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_string callback)
@@ -1246,6 +1376,7 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 		{
 			if (_sequence_NoParams_Collections_Generic_IEnumerator_string.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
 			}
@@ -1269,6 +1400,7 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 		{
 			if (_sequence_NoParams_Collections_IEnumerator.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
 			}
@@ -1287,9 +1419,10 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 			return callback(ko);
 		}
 
-		/// <summary>Resets all tracking state for all overloads.</summary>
+		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence_NoParams_Collections_Generic_IEnumerator_string)
 				tracking.Reset();
 			_sequenceIndex_NoParams_Collections_Generic_IEnumerator_string = 0;
@@ -1298,12 +1431,11 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 			_sequenceIndex_NoParams_Collections_IEnumerator = 0;
 		}
 
-		/// <summary>Verifies all Times constraints for all overloads were satisfied. For Forever, verifies called at least once.</summary>
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
 		public bool Verify()
 		{
 			foreach (var (_, times, tracking) in _sequence_NoParams_Collections_Generic_IEnumerator_string)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1314,7 +1446,6 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 			}
 			foreach (var (_, times, tracking) in _sequence_NoParams_Collections_IEnumerator)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1326,36 +1457,48 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 			return true;
 		}
 
+		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl_NoParams_Collections_Generic_IEnumerator_string : global::KnockOff.IMethodTracking
 		{
 
+			/// <summary>Number of times this callback was invoked.</summary>
 			public int CallCount { get; private set; }
 
+			/// <summary>True if CallCount > 0.</summary>
 			public bool WasCalled => CallCount > 0;
 
+			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
 
+			/// <summary>Resets tracking state.</summary>
 			public void Reset() => CallCount = 0;
 		}
 
+		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl_NoParams_Collections_IEnumerator : global::KnockOff.IMethodTracking
 		{
 
+			/// <summary>Number of times this callback was invoked.</summary>
 			public int CallCount { get; private set; }
 
+			/// <summary>True if CallCount > 0.</summary>
 			public bool WasCalled => CallCount > 0;
 
+			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
 
+			/// <summary>Resets tracking state.</summary>
 			public void Reset() => CallCount = 0;
 		}
 
+		/// <summary>Sequence implementation for ThenCall chaining.</summary>
 		private sealed class MethodSequenceImpl_NoParams_Collections_Generic_IEnumerator_string : global::KnockOff.IMethodSequence<GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_string>
 		{
 			private readonly GetEnumeratorInterceptor _interceptor;
 
 			public MethodSequenceImpl_NoParams_Collections_Generic_IEnumerator_string(GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
 
+			/// <summary>Total calls across all callbacks in sequence.</summary>
 			public int TotalCallCount
 			{
 				get
@@ -1367,6 +1510,7 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 				}
 			}
 
+			/// <summary>Add another callback to the sequence.</summary>
 			public global::KnockOff.IMethodSequence<GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_string> ThenCall(GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_string callback, global::KnockOff.Times times)
 			{
 				var tracking = new MethodTrackingImpl_NoParams_Collections_Generic_IEnumerator_string();
@@ -1374,6 +1518,7 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 				return this;
 			}
 
+			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
 			public bool Verify()
 			{
 				foreach (var (_, times, tracking) in _interceptor._sequence_NoParams_Collections_Generic_IEnumerator_string)
@@ -1384,15 +1529,18 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 				return true;
 			}
 
+			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
 
+		/// <summary>Sequence implementation for ThenCall chaining.</summary>
 		private sealed class MethodSequenceImpl_NoParams_Collections_IEnumerator : global::KnockOff.IMethodSequence<GetEnumeratorDelegate_NoParams_Collections_IEnumerator>
 		{
 			private readonly GetEnumeratorInterceptor _interceptor;
 
 			public MethodSequenceImpl_NoParams_Collections_IEnumerator(GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
 
+			/// <summary>Total calls across all callbacks in sequence.</summary>
 			public int TotalCallCount
 			{
 				get
@@ -1404,6 +1552,7 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 				}
 			}
 
+			/// <summary>Add another callback to the sequence.</summary>
 			public global::KnockOff.IMethodSequence<GetEnumeratorDelegate_NoParams_Collections_IEnumerator> ThenCall(GetEnumeratorDelegate_NoParams_Collections_IEnumerator callback, global::KnockOff.Times times)
 			{
 				var tracking = new MethodTrackingImpl_NoParams_Collections_IEnumerator();
@@ -1411,6 +1560,7 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 				return this;
 			}
 
+			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
 			public bool Verify()
 			{
 				foreach (var (_, times, tracking) in _interceptor._sequence_NoParams_Collections_IEnumerator)
@@ -1421,6 +1571,7 @@ partial class ListStringKnockOff : global::System.Collections.Generic.IList<stri
 				return true;
 			}
 
+			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
 

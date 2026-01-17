@@ -116,18 +116,22 @@ internal static class InlineRenderer
         }
 
         // Use shared renderer for method interceptors
+        // Set indent level for nested class context (inside partial class and Stubs class)
         var methodTypeParams = FormatTypeParameterList(iface.TypeParameters);
         var methodConstraints = FormatConstraints(iface.TypeParameters);
+        var previousIndent = w.Indent;
+        w.SetIndent(2);  // Inline stubs are nested 2 levels deep
         foreach (var method in iface.Methods)
         {
             var options = new InterceptorRenderOptions(
-                BaseIndent: 2,  // Inline stubs are nested 2 levels deep (\t\t)
+                BaseIndent: 2,
                 IncludeStrictParameter: false,
                 StrictAccessExpression: "ko.Strict",
                 InterceptorTypeParameters: methodTypeParams,
                 InterceptorConstraints: methodConstraints);
             MethodInterceptorRenderer.RenderInterceptorClass(w, method, options);
         }
+        w.SetIndent(previousIndent);
 
         foreach (var handler in iface.GenericMethodHandlers)
         {
@@ -379,12 +383,16 @@ internal static class InlineRenderer
     private static void RenderTypedHandlerClass(CodeWriter w, InlineGenericMethodHandlerModel handler)
     {
         w.Line($"\t\t\t/// <summary>Typed handler for {handler.MethodName} with specific type arguments.</summary>");
-        w.Line($"\t\t\tpublic sealed class {handler.TypedHandlerClassName}<{handler.TypeParameterNames}> : IGenericMethodCallTracker, IResettable{handler.MethodConstraintClauses}");
+        w.Line($"\t\t\tpublic sealed class {handler.TypedHandlerClassName}<{handler.TypeParameterNames}> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking{handler.MethodConstraintClauses}");
         w.Line("\t\t\t{");
 
         // Delegate
         w.Line($"\t\t\t\t/// <summary>Delegate for {handler.MethodName}.</summary>");
         w.Line($"\t\t\t\t{handler.DelegateSignature}");
+        w.Line();
+
+        // Private callback field
+        w.Line($"\t\t\t\tprivate {handler.MethodName}Delegate? _onCall;");
         w.Line();
 
         // CallCount
@@ -411,8 +419,14 @@ internal static class InlineRenderer
         w.Line("\t\t\t\tpublic bool WasCalled => CallCount > 0;");
         w.Line();
 
-        w.Line("\t\t\t\t/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>");
-        w.Line($"\t\t\t\tpublic {handler.MethodName}Delegate? OnCall {{ get; set; }}");
+        // OnCall method (returns IMethodTracking for consistency with regular method interceptors)
+        w.Line("\t\t\t\t/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>");
+        w.Line($"\t\t\t\tpublic global::KnockOff.IMethodTracking OnCall({handler.MethodName}Delegate callback) {{ _onCall = callback; return this; }}");
+        w.Line();
+
+        // Callback property for internal use by invocation logic
+        w.Line("\t\t\t\t/// <summary>Gets the configured callback (internal use).</summary>");
+        w.Line($"\t\t\t\tinternal {handler.MethodName}Delegate? Callback => _onCall;");
         w.Line();
 
         // RecordCall
@@ -438,15 +452,15 @@ internal static class InlineRenderer
         w.Line("\t\t\t\t/// <summary>Resets all tracking state.</summary>");
         if (handler.NonGenericParameters.Count == 0)
         {
-            w.Line("\t\t\t\tpublic void Reset() { CallCount = 0; OnCall = null; }");
+            w.Line("\t\t\t\tpublic void Reset() { CallCount = 0; _onCall = null; }");
         }
         else if (handler.NonGenericParameters.Count == 1)
         {
-            w.Line("\t\t\t\tpublic void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }");
+            w.Line("\t\t\t\tpublic void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }");
         }
         else
         {
-            w.Line("\t\t\t\tpublic void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }");
+            w.Line("\t\t\t\tpublic void Reset() { CallCount = 0; LastCallArgs = default; _onCall = null; }");
         }
 
         w.Line("\t\t\t}");
@@ -685,8 +699,8 @@ internal static class InlineRenderer
             w.Line($"\t\t\t\ttypedHandler.RecordCall({impl.NonGenericArgList});");
         }
 
-        // Check for OnCall callback
-        w.Line($"\t\t\t\tif (typedHandler.OnCall is {{ }} onCallCallback)");
+        // Check for Callback
+        w.Line($"\t\t\t\tif (typedHandler.Callback is {{ }} onCallCallback)");
         if (impl.IsVoid)
         {
             w.Line($"\t\t\t\t{{ onCallCallback({impl.OnCallArgs}); return; }}");

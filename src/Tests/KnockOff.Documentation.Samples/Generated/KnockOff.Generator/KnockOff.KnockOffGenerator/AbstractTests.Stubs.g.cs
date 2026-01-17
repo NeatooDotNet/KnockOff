@@ -25,8 +25,10 @@ partial class AbstractTests
 		}
 
 		/// <summary>Interceptor for BaseRepository.Execute.</summary>
-		public sealed class BaseRepository_ExecuteInterceptor
+		public sealed class BaseRepository_ExecuteInterceptor : global::KnockOff.IMethodTracking
 		{
+			private global::System.Func<Stubs.BaseRepository, string, int>? _onCall;
+
 			/// <summary>Number of times this method was called.</summary>
 			public int CallCount { get; private set; }
 
@@ -36,12 +38,15 @@ partial class AbstractTests
 			/// <summary>The argument from the last call.</summary>
 			public string? LastCallArg { get; private set; }
 
-			/// <summary>Callback invoked when method is called. If set, called instead of base.</summary>
-			public global::System.Func<Stubs.BaseRepository, string, int>? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(global::System.Func<Stubs.BaseRepository, string, int> callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal global::System.Func<Stubs.BaseRepository, string, int>? Callback => _onCall;
 
 			public void RecordCall(string sql) { CallCount++; LastCallArg = sql; }
 
-			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+			public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }
 		}
 
 		/// <summary>Stub for global::KnockOff.Documentation.Samples.Guides.InlineStubs.BaseRepository via composition.</summary>
@@ -95,7 +100,7 @@ partial class AbstractTests
 				public override int Execute(string sql)
 				{
 					_stub?.Execute.RecordCall(sql);
-					if (_stub?.Execute.OnCall is { } onCall) return onCall(_stub, sql);
+					if (_stub?.Execute.Callback is { } onCall) return onCall(_stub, sql);
 					return default!;
 				}
 

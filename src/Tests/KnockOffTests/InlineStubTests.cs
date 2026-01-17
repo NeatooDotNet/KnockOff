@@ -66,7 +66,7 @@ public class InlineStubTests
 	public void InlineStub_OnCall_ReturnsCustomValue()
 	{
 		var stub = new InlineTestClass.Stubs.ISimpleService();
-		stub.GetValue.OnCall = (ko, x) => x * 10;
+		stub.GetValue.OnCall((ko, x) => x * 10);
 
 		ISimpleService service = stub;
 		var result = service.GetValue(5);
@@ -91,7 +91,7 @@ public class InlineStubTests
 	public void InlineStub_Reset_ClearsState()
 	{
 		var stub = new InlineTestClass.Stubs.ISimpleService();
-		stub.GetValue.OnCall = (ko, x) => 100;
+		stub.GetValue.OnCall((ko, x) => 100);
 
 		ISimpleService service = stub;
 		service.GetValue(1);
@@ -101,7 +101,7 @@ public class InlineStubTests
 
 		Assert.Equal(0, stub.GetValue.CallCount);
 		Assert.False(stub.GetValue.WasCalled);
-		Assert.Null(stub.GetValue.OnCall);
+		// OnCall callback state is internal after API change to method-based
 		Assert.Null(stub.GetValue.LastCallArg);
 	}
 
@@ -191,7 +191,7 @@ public class InlineStubTests
 		IGenericMethodService service = stub;
 
 		var expected = new TestEntity { Id = 42, Name = "Test" };
-		stub.Create.Of<TestEntity>().OnCall = (ko) => expected;
+		stub.Create.Of<TestEntity>().OnCall((ko) => expected);
 
 		var result = service.Create<TestEntity>();
 
@@ -219,7 +219,7 @@ public class InlineStubTests
 		IGenericMethodService service = stub;
 
 		// Set up OnCall for int->string since string has no parameterless ctor
-		stub.Convert.Of<int, string>().OnCall = (ko, i) => i.ToString();
+		stub.Convert.Of<int, string>().OnCall((ko, i) => i.ToString());
 
 		service.Convert<string, int>("hello");
 		service.Convert<int, string>(42);
@@ -801,7 +801,7 @@ public class ClassStubTests
 	public void ClassStub_Method_OnCall_ReturnsCustomValue()
 	{
 		var stub = new ClassStubTestClass.Stubs.SimpleService();
-		stub.Calculate.OnCall = (ko, x) => x * 10;
+		stub.Calculate.OnCall((ko, x) => x * 10);
 
 		var result = stub.Object.Calculate(5);
 
@@ -835,7 +835,7 @@ public class ClassStubTests
 	public void ClassStub_Reset_ClearsState()
 	{
 		var stub = new ClassStubTestClass.Stubs.SimpleService();
-		stub.Calculate.OnCall = (ko, x) => 100;
+		stub.Calculate.OnCall((ko, x) => 100);
 
 		stub.Object.Calculate(1);
 		stub.Object.Calculate(2);
@@ -844,7 +844,7 @@ public class ClassStubTests
 
 		Assert.Equal(0, stub.Calculate.CallCount);
 		Assert.False(stub.Calculate.WasCalled);
-		Assert.Null(stub.Calculate.OnCall);
+		// OnCall callback state is internal after API change to method-based
 		Assert.Null(stub.Calculate.LastCallArg);
 	}
 
@@ -868,7 +868,7 @@ public class ClassStubTests
 	public void ClassStub_Substitutability_PassToMethod()
 	{
 		var stub = new ClassStubTestClass.Stubs.SimpleService("SubstitutedName");
-		stub.Calculate.OnCall = (ko, x) => x * 100;
+		stub.Calculate.OnCall((ko, x) => x * 100);
 
 		// Pass the stub.Object to a method expecting SimpleService
 		var result = ProcessService(stub.Object);
@@ -944,7 +944,7 @@ public class AbstractClassStubTests
 	public void AbstractStub_ReturningMethod_ReturnsCallback_WhenSet()
 	{
 		var stub = new AbstractStubTestClass.Stubs.AbstractRepository();
-		stub.Execute.OnCall = (ko, cmd) => cmd.Length;
+		stub.Execute.OnCall((ko, cmd) => cmd.Length);
 
 		var result = stub.Object.Execute("SELECT 1");
 

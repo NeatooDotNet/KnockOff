@@ -37,8 +37,10 @@ partial class CsEmailServiceTests
 		}
 
 		/// <summary>Interceptor for CsEmailService.Send.</summary>
-		public sealed class CsEmailService_SendInterceptor
+		public sealed class CsEmailService_SendInterceptor : global::KnockOff.IMethodTracking
 		{
+			private global::System.Action<Stubs.CsEmailService, string, string, string>? _onCall;
+
 			/// <summary>Number of times this method was called.</summary>
 			public int CallCount { get; private set; }
 
@@ -48,12 +50,15 @@ partial class CsEmailServiceTests
 			/// <summary>The arguments from the last call.</summary>
 			public (string? to, string? subject, string? body)? LastCallArgs { get; private set; }
 
-			/// <summary>Callback invoked when method is called. If set, called instead of base.</summary>
-			public global::System.Action<Stubs.CsEmailService, string, string, string>? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.CsEmailService, string, string, string> callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal global::System.Action<Stubs.CsEmailService, string, string, string>? Callback => _onCall;
 
 			public void RecordCall(string to, string subject, string body) { CallCount++; LastCallArgs = (to, subject, body); }
 
-			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+			public void Reset() { CallCount = 0; LastCallArgs = default; _onCall = null; }
 		}
 
 		/// <summary>Stub for global::KnockOff.Documentation.Samples.Guides.InlineStubs.CsEmailService via composition.</summary>
@@ -113,7 +118,7 @@ partial class CsEmailServiceTests
 				public override void Send(string to, string subject, string body)
 				{
 					_stub?.Send.RecordCall(to, subject, body);
-					if (_stub?.Send.OnCall is { } onCall) { onCall(_stub, to, subject, body); return; }
+					if (_stub?.Send.Callback is { } onCall) { onCall(_stub, to, subject, body); return; }
 					base.Send(to, subject, body);
 				}
 

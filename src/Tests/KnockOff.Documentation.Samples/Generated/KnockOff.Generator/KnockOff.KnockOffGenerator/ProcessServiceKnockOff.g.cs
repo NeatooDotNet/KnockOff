@@ -5,9 +5,11 @@ namespace KnockOff.Documentation.Samples.GettingStarted;
 
 partial class ProcessServiceKnockOff : global::KnockOff.Documentation.Samples.GettingStarted.IProcessService, global::KnockOff.IKnockOffStub
 {
-	/// <summary>Tracks and configures behavior for Process (overloaded).</summary>
+	/// <summary>Tracks and configures behavior for Process.</summary>
 	public sealed class ProcessInterceptor
 	{
+		private int _unconfiguredCallCount;
+
 		/// <summary>Delegate for Process(string).</summary>
 		public delegate void ProcessDelegate_String_void(ProcessServiceKnockOff ko, string data);
 
@@ -25,6 +27,12 @@ partial class ProcessServiceKnockOff : global::KnockOff.Documentation.Samples.Ge
 
 		private readonly global::System.Collections.Generic.List<(ProcessDelegate_String_Int32_Boolean_void Callback, global::KnockOff.Times Times, MethodTrackingImpl_String_Int32_Boolean_void Tracking)> _sequence_String_Int32_Boolean_void = new();
 		private int _sequenceIndex_String_Int32_Boolean_void;
+
+		/// <summary>Total number of times this method was called (across all overloads and registrations).</summary>
+		public int CallCount => _unconfiguredCallCount + _sequence_String_void.Sum(s => s.Tracking.CallCount) + _sequence_String_Int32_void.Sum(s => s.Tracking.CallCount) + _sequence_String_Int32_Boolean_void.Sum(s => s.Tracking.CallCount);
+
+		/// <summary>Whether this method was called at least once (any overload).</summary>
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>Configures callback for Process(string). Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<string> OnCall(ProcessDelegate_String_void callback)
@@ -91,6 +99,7 @@ partial class ProcessServiceKnockOff : global::KnockOff.Documentation.Samples.Ge
 		{
 			if (_sequence_String_void.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return;
 			}
@@ -114,6 +123,7 @@ partial class ProcessServiceKnockOff : global::KnockOff.Documentation.Samples.Ge
 		{
 			if (_sequence_String_Int32_void.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return;
 			}
@@ -137,6 +147,7 @@ partial class ProcessServiceKnockOff : global::KnockOff.Documentation.Samples.Ge
 		{
 			if (_sequence_String_Int32_Boolean_void.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return;
 			}
@@ -155,9 +166,10 @@ partial class ProcessServiceKnockOff : global::KnockOff.Documentation.Samples.Ge
 			callback(ko, data, priority, async);
 		}
 
-		/// <summary>Resets all tracking state for all overloads.</summary>
+		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence_String_void)
 				tracking.Reset();
 			_sequenceIndex_String_void = 0;
@@ -169,12 +181,11 @@ partial class ProcessServiceKnockOff : global::KnockOff.Documentation.Samples.Ge
 			_sequenceIndex_String_Int32_Boolean_void = 0;
 		}
 
-		/// <summary>Verifies all Times constraints for all overloads were satisfied. For Forever, verifies called at least once.</summary>
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
 		public bool Verify()
 		{
 			foreach (var (_, times, tracking) in _sequence_String_void)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -185,7 +196,6 @@ partial class ProcessServiceKnockOff : global::KnockOff.Documentation.Samples.Ge
 			}
 			foreach (var (_, times, tracking) in _sequence_String_Int32_void)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -196,7 +206,6 @@ partial class ProcessServiceKnockOff : global::KnockOff.Documentation.Samples.Ge
 			}
 			foreach (var (_, times, tracking) in _sequence_String_Int32_Boolean_void)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -208,57 +217,77 @@ partial class ProcessServiceKnockOff : global::KnockOff.Documentation.Samples.Ge
 			return true;
 		}
 
+		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl_String_void : global::KnockOff.IMethodTracking<string>
 		{
 			private string _lastArg = default!;
 
+			/// <summary>Number of times this callback was invoked.</summary>
 			public int CallCount { get; private set; }
 
+			/// <summary>True if CallCount > 0.</summary>
 			public bool WasCalled => CallCount > 0;
 
+			/// <summary>Last argument passed to this callback. Default if never called.</summary>
 			public string LastArg => _lastArg;
 
+			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall(string data) { CallCount++; _lastArg = data; }
 
+			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArg = default!; }
 		}
 
+		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl_String_Int32_void : global::KnockOff.IMethodTrackingArgs<(string? data, int? priority)>
 		{
 			private (string? data, int? priority) _lastArgs;
 
+			/// <summary>Number of times this callback was invoked.</summary>
 			public int CallCount { get; private set; }
 
+			/// <summary>True if CallCount > 0.</summary>
 			public bool WasCalled => CallCount > 0;
 
+			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 			public (string? data, int? priority) LastArgs => _lastArgs;
 
+			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall((string? data, int? priority) args) { CallCount++; _lastArgs = args; }
 
+			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArgs = default; }
 		}
 
+		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl_String_Int32_Boolean_void : global::KnockOff.IMethodTrackingArgs<(string? data, int? priority, bool? async)>
 		{
 			private (string? data, int? priority, bool? async) _lastArgs;
 
+			/// <summary>Number of times this callback was invoked.</summary>
 			public int CallCount { get; private set; }
 
+			/// <summary>True if CallCount > 0.</summary>
 			public bool WasCalled => CallCount > 0;
 
+			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 			public (string? data, int? priority, bool? async) LastArgs => _lastArgs;
 
+			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall((string? data, int? priority, bool? async) args) { CallCount++; _lastArgs = args; }
 
+			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArgs = default; }
 		}
 
+		/// <summary>Sequence implementation for ThenCall chaining.</summary>
 		private sealed class MethodSequenceImpl_String_void : global::KnockOff.IMethodSequence<ProcessDelegate_String_void>
 		{
 			private readonly ProcessInterceptor _interceptor;
 
 			public MethodSequenceImpl_String_void(ProcessInterceptor interceptor) => _interceptor = interceptor;
 
+			/// <summary>Total calls across all callbacks in sequence.</summary>
 			public int TotalCallCount
 			{
 				get
@@ -270,6 +299,7 @@ partial class ProcessServiceKnockOff : global::KnockOff.Documentation.Samples.Ge
 				}
 			}
 
+			/// <summary>Add another callback to the sequence.</summary>
 			public global::KnockOff.IMethodSequence<ProcessDelegate_String_void> ThenCall(ProcessDelegate_String_void callback, global::KnockOff.Times times)
 			{
 				var tracking = new MethodTrackingImpl_String_void();
@@ -277,6 +307,7 @@ partial class ProcessServiceKnockOff : global::KnockOff.Documentation.Samples.Ge
 				return this;
 			}
 
+			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
 			public bool Verify()
 			{
 				foreach (var (_, times, tracking) in _interceptor._sequence_String_void)
@@ -287,15 +318,18 @@ partial class ProcessServiceKnockOff : global::KnockOff.Documentation.Samples.Ge
 				return true;
 			}
 
+			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
 
+		/// <summary>Sequence implementation for ThenCall chaining.</summary>
 		private sealed class MethodSequenceImpl_String_Int32_void : global::KnockOff.IMethodSequence<ProcessDelegate_String_Int32_void>
 		{
 			private readonly ProcessInterceptor _interceptor;
 
 			public MethodSequenceImpl_String_Int32_void(ProcessInterceptor interceptor) => _interceptor = interceptor;
 
+			/// <summary>Total calls across all callbacks in sequence.</summary>
 			public int TotalCallCount
 			{
 				get
@@ -307,6 +341,7 @@ partial class ProcessServiceKnockOff : global::KnockOff.Documentation.Samples.Ge
 				}
 			}
 
+			/// <summary>Add another callback to the sequence.</summary>
 			public global::KnockOff.IMethodSequence<ProcessDelegate_String_Int32_void> ThenCall(ProcessDelegate_String_Int32_void callback, global::KnockOff.Times times)
 			{
 				var tracking = new MethodTrackingImpl_String_Int32_void();
@@ -314,6 +349,7 @@ partial class ProcessServiceKnockOff : global::KnockOff.Documentation.Samples.Ge
 				return this;
 			}
 
+			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
 			public bool Verify()
 			{
 				foreach (var (_, times, tracking) in _interceptor._sequence_String_Int32_void)
@@ -324,15 +360,18 @@ partial class ProcessServiceKnockOff : global::KnockOff.Documentation.Samples.Ge
 				return true;
 			}
 
+			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
 
+		/// <summary>Sequence implementation for ThenCall chaining.</summary>
 		private sealed class MethodSequenceImpl_String_Int32_Boolean_void : global::KnockOff.IMethodSequence<ProcessDelegate_String_Int32_Boolean_void>
 		{
 			private readonly ProcessInterceptor _interceptor;
 
 			public MethodSequenceImpl_String_Int32_Boolean_void(ProcessInterceptor interceptor) => _interceptor = interceptor;
 
+			/// <summary>Total calls across all callbacks in sequence.</summary>
 			public int TotalCallCount
 			{
 				get
@@ -344,6 +383,7 @@ partial class ProcessServiceKnockOff : global::KnockOff.Documentation.Samples.Ge
 				}
 			}
 
+			/// <summary>Add another callback to the sequence.</summary>
 			public global::KnockOff.IMethodSequence<ProcessDelegate_String_Int32_Boolean_void> ThenCall(ProcessDelegate_String_Int32_Boolean_void callback, global::KnockOff.Times times)
 			{
 				var tracking = new MethodTrackingImpl_String_Int32_Boolean_void();
@@ -351,6 +391,7 @@ partial class ProcessServiceKnockOff : global::KnockOff.Documentation.Samples.Ge
 				return this;
 			}
 
+			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
 			public bool Verify()
 			{
 				foreach (var (_, times, tracking) in _interceptor._sequence_String_Int32_Boolean_void)
@@ -361,6 +402,7 @@ partial class ProcessServiceKnockOff : global::KnockOff.Documentation.Samples.Ge
 				return true;
 			}
 
+			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
 

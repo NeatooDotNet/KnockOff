@@ -51,7 +51,7 @@ public static class DesignSamples
         IDsUserService service = stub.Object;
 
         // METHOD: Configure and verify
-        stub.GetUser.OnCall = (ko, id) => new DsUser { Id = id };
+        stub.GetUser.OnCall((ko, id) => new DsUser { Id = id });
         var user = service.GetUser(42);
         // Verify: stub.GetUser.CallCount, stub.GetUser.LastCallArg
 
@@ -75,7 +75,7 @@ public static class DesignSamples
         DsEmailService service = stub.Object;
 
         // METHOD: Configure and verify
-        stub.Send.OnCall = (ko, to, body) => { /* custom behavior */ };
+        stub.Send.OnCall((ko, to, body) => { /* custom behavior */ });
         service.Send("test@example.com", "Hello");
         // Verify: stub.Send.CallCount, stub.Send.LastCallArgs
 

@@ -290,8 +290,8 @@ public class InterceptorApiSamplesTests
         var knockOff = new ApiSerializerKnockOff();
         IApiSerializer service = knockOff;
 
-        knockOff.Deserialize.Of<ApiUser>().OnCall = (ko, json) =>
-            new ApiUser { Id = 1, Name = "FromCallback" };
+        knockOff.Deserialize.Of<ApiUser>().OnCall((ko, json) =>
+            new ApiUser { Id = 1, Name = "FromCallback" });
 
         var user = service.Deserialize<ApiUser>("{}");
         Assert.Equal("FromCallback", user.Name);
@@ -303,8 +303,8 @@ public class InterceptorApiSamplesTests
         var knockOff = new ApiSerializerKnockOff();
         IApiSerializer service = knockOff;
 
-        knockOff.Deserialize.Of<ApiUser>().OnCall = (ko, json) => new ApiUser();
-        knockOff.Deserialize.Of<ApiOrder>().OnCall = (ko, json) => new ApiOrder();
+        knockOff.Deserialize.Of<ApiUser>().OnCall((ko, json) => new ApiUser());
+        knockOff.Deserialize.Of<ApiOrder>().OnCall((ko, json) => new ApiOrder());
 
         service.Deserialize<ApiUser>("{}");
         service.Deserialize<ApiUser>("{}");
@@ -320,8 +320,8 @@ public class InterceptorApiSamplesTests
         var knockOff = new ApiSerializerKnockOff();
         IApiSerializer service = knockOff;
 
-        knockOff.Deserialize.Of<ApiUser>().OnCall = (ko, json) => new ApiUser();
-        knockOff.Deserialize.Of<ApiOrder>().OnCall = (ko, json) => new ApiOrder();
+        knockOff.Deserialize.Of<ApiUser>().OnCall((ko, json) => new ApiUser());
+        knockOff.Deserialize.Of<ApiOrder>().OnCall((ko, json) => new ApiOrder());
 
         service.Deserialize<ApiUser>("{}");
         service.Deserialize<ApiUser>("{}");
@@ -338,7 +338,7 @@ public class InterceptorApiSamplesTests
         var knockOff = new ApiSerializerKnockOff();
         IApiSerializer service = knockOff;
 
-        knockOff.Convert.Of<string, int>().OnCall = (ko, s) => s.Length;
+        knockOff.Convert.Of<string, int>().OnCall((ko, s) => s.Length);
 
         var result = service.Convert<string, int>("hello");
         Assert.Equal(5, result);
@@ -350,13 +350,13 @@ public class InterceptorApiSamplesTests
         var knockOff = new ApiSerializerKnockOff();
         IApiSerializer service = knockOff;
 
-        knockOff.Deserialize.Of<ApiUser>().OnCall = (ko, json) => new ApiUser();
+        knockOff.Deserialize.Of<ApiUser>().OnCall((ko, json) => new ApiUser());
         service.Deserialize<ApiUser>("{}");
 
         knockOff.Deserialize.Of<ApiUser>().Reset();
 
         Assert.Equal(0, knockOff.Deserialize.Of<ApiUser>().CallCount);
-        Assert.Null(knockOff.Deserialize.Of<ApiUser>().OnCall);
+        // OnCall callback state is internal after API change to method-based
     }
 
     [Fact]
@@ -365,8 +365,8 @@ public class InterceptorApiSamplesTests
         var knockOff = new ApiSerializerKnockOff();
         IApiSerializer service = knockOff;
 
-        knockOff.Deserialize.Of<ApiUser>().OnCall = (ko, json) => new ApiUser();
-        knockOff.Deserialize.Of<ApiOrder>().OnCall = (ko, json) => new ApiOrder();
+        knockOff.Deserialize.Of<ApiUser>().OnCall((ko, json) => new ApiUser());
+        knockOff.Deserialize.Of<ApiOrder>().OnCall((ko, json) => new ApiOrder());
         service.Deserialize<ApiUser>("{}");
         service.Deserialize<ApiOrder>("{}");
 

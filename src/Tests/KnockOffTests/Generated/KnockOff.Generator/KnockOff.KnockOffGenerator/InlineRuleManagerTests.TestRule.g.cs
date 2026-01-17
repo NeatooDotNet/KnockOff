@@ -110,6 +110,18 @@ partial class TestRule : global::Neatoo.Rules.IRule, global::KnockOff.IKnockOffS
 
 		private readonly global::System.Collections.Generic.List<(RunRuleDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private (global::Neatoo.IValidateBase? target, global::System.Threading.CancellationToken? token)? _unconfiguredLastArgs;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The arguments from the last call (from most recently called registration).</summary>
+		public (global::Neatoo.IValidateBase? target, global::System.Threading.CancellationToken? token)? LastCallArgs { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTrackingArgs<(global::Neatoo.IValidateBase? target, global::System.Threading.CancellationToken? token)> OnCall(RunRuleDelegate callback)
@@ -136,8 +148,10 @@ partial class TestRule : global::Neatoo.Rules.IRule, global::KnockOff.IKnockOffS
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArgs = ((target, token));
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RunRule");
-				throw new global::System.InvalidOperationException("No implementation provided for RunRule. Configure via RunRule.OnCall.");
+				throw new global::System.InvalidOperationException("No implementation provided for RunRule. Configure via OnCall.");
 			}
 
 			var (callback, times, tracking) = _sequence[_sequenceIndex];
@@ -157,6 +171,8 @@ partial class TestRule : global::Neatoo.Rules.IRule, global::KnockOff.IKnockOffS
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArgs = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -167,7 +183,6 @@ partial class TestRule : global::Neatoo.Rules.IRule, global::KnockOff.IKnockOffS
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -241,6 +256,7 @@ partial class TestRule : global::Neatoo.Rules.IRule, global::KnockOff.IKnockOffS
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for OnRuleAdded.</summary>
@@ -248,6 +264,18 @@ partial class TestRule : global::Neatoo.Rules.IRule, global::KnockOff.IKnockOffS
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<TestRule, global::Neatoo.Rules.IRuleManager, uint> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private (global::Neatoo.Rules.IRuleManager? ruleManager, uint? uniqueIndex)? _unconfiguredLastArgs;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The arguments from the last call (from most recently called registration).</summary>
+		public (global::Neatoo.Rules.IRuleManager? ruleManager, uint? uniqueIndex)? LastCallArgs { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTrackingArgs<(global::Neatoo.Rules.IRuleManager? ruleManager, uint? uniqueIndex)> OnCall(global::System.Action<TestRule, global::Neatoo.Rules.IRuleManager, uint> callback)
@@ -274,6 +302,8 @@ partial class TestRule : global::Neatoo.Rules.IRule, global::KnockOff.IKnockOffS
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArgs = ((ruleManager, uniqueIndex));
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "OnRuleAdded");
 				return;
 			}
@@ -295,6 +325,8 @@ partial class TestRule : global::Neatoo.Rules.IRule, global::KnockOff.IKnockOffS
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArgs = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -305,7 +337,6 @@ partial class TestRule : global::Neatoo.Rules.IRule, global::KnockOff.IKnockOffS
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -379,6 +410,7 @@ partial class TestRule : global::Neatoo.Rules.IRule, global::KnockOff.IKnockOffS
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Interceptor for Executed. Configure via .Value, track via .GetCount.</summary>

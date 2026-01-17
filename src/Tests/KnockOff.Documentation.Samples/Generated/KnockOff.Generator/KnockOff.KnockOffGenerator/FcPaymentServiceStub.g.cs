@@ -13,6 +13,18 @@ partial class FcPaymentServiceStub : global::KnockOff.Documentation.Samples.Comp
 
 		private readonly global::System.Collections.Generic.List<(ProcessPaymentDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private (int? customerId, decimal? amount)? _unconfiguredLastArgs;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The arguments from the last call (from most recently called registration).</summary>
+		public (int? customerId, decimal? amount)? LastCallArgs { get { foreach (var s in _sequence) if (s.Tracking.CallCount > 0) return s.Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTrackingArgs<(int? customerId, decimal? amount)> OnCall(ProcessPaymentDelegate callback)
@@ -39,6 +51,8 @@ partial class FcPaymentServiceStub : global::KnockOff.Documentation.Samples.Comp
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArgs = ((customerId, amount));
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ProcessPayment");
 				return new global::KnockOff.Documentation.Samples.Comparison.FcPaymentResult();
 			}
@@ -60,6 +74,8 @@ partial class FcPaymentServiceStub : global::KnockOff.Documentation.Samples.Comp
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArgs = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -70,7 +86,6 @@ partial class FcPaymentServiceStub : global::KnockOff.Documentation.Samples.Comp
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -144,6 +159,7 @@ partial class FcPaymentServiceStub : global::KnockOff.Documentation.Samples.Comp
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Interceptor for ProcessPayment.</summary>

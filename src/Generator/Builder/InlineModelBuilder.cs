@@ -347,14 +347,28 @@ internal static class InlineModelBuilder
 
     private static string GetDefaultExpressionForReturn(string returnType, bool isNullable)
     {
-        if (isNullable)
-            return "default!";
-
-        // Task types return completed task
+        // Task types return completed task (check before isNullable because Task is treated as void-like)
         if (returnType == "global::System.Threading.Tasks.Task")
             return "global::System.Threading.Tasks.Task.CompletedTask";
         if (returnType == "global::System.Threading.Tasks.ValueTask")
             return "default";
+
+        // Task<T> types return Task.FromResult(default!)
+        if (returnType.StartsWith("global::System.Threading.Tasks.Task<"))
+        {
+            var innerType = returnType.Substring("global::System.Threading.Tasks.Task<".Length, returnType.Length - "global::System.Threading.Tasks.Task<".Length - 1);
+            return $"global::System.Threading.Tasks.Task.FromResult<{innerType}>(default!)";
+        }
+
+        // ValueTask<T> types return ValueTask with default result
+        if (returnType.StartsWith("global::System.Threading.Tasks.ValueTask<"))
+        {
+            var innerType = returnType.Substring("global::System.Threading.Tasks.ValueTask<".Length, returnType.Length - "global::System.Threading.Tasks.ValueTask<".Length - 1);
+            return $"new global::System.Threading.Tasks.ValueTask<{innerType}>(({innerType})default!)";
+        }
+
+        if (isNullable)
+            return "default!";
 
         return "default!";
     }
@@ -362,7 +376,22 @@ internal static class InlineModelBuilder
     private static bool IsUninstantiableType(string returnType)
     {
         // Interface or abstract types that can't have a default instance
-        // For now, be conservative and return false - we'll use default!
+        // Check for interface types (IEnumerator<T>, IEnumerable<T>, etc.)
+        if (returnType.StartsWith("global::System.Collections.Generic.IEnumerable<") ||
+            returnType.StartsWith("global::System.Collections.Generic.IEnumerator<") ||
+            returnType.StartsWith("global::System.Collections.Generic.IAsyncEnumerable<") ||
+            returnType.StartsWith("global::System.Collections.Generic.IAsyncEnumerator<") ||
+            returnType.StartsWith("global::System.Collections.IEnumerable") ||
+            returnType.StartsWith("global::System.Collections.IEnumerator") ||
+            returnType.StartsWith("global::System.IFormattable") ||
+            returnType.StartsWith("global::System.ICustomFormatter") ||
+            returnType.StartsWith("global::System.IDisposable") ||
+            returnType.StartsWith("global::System.Data.IDataReader"))
+        {
+            return true;
+        }
+        // Note: Task/ValueTask types are NOT included here - they have sensible defaults
+        // (Task.CompletedTask, default(ValueTask), Task.FromResult, etc.)
         return false;
     }
 

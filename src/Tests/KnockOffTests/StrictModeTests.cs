@@ -167,7 +167,7 @@ public class StrictModeTests
 	public void InlineStub_Strict_WithOnCall_DoesNotThrow()
 	{
 		var stub = new StrictModeInlineTests.Stubs.IStrictModeTest(strict: true);
-		stub.GetValue.OnCall = (ko, x) => x * 2;
+		stub.GetValue.OnCall((ko, x) => x * 2);
 		IStrictModeTest service = stub;
 
 		var result = service.GetValue(5);

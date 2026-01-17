@@ -37,20 +37,25 @@ partial class MixedStubTestClass
 		}
 
 		/// <summary>Interceptor for MixedService.VirtualMethod.</summary>
-		public sealed class MixedService_VirtualMethodInterceptor
+		public sealed class MixedService_VirtualMethodInterceptor : global::KnockOff.IMethodTracking
 		{
+			private global::System.Action<Stubs.MixedService>? _onCall;
+
 			/// <summary>Number of times this method was called.</summary>
 			public int CallCount { get; private set; }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when method is called. If set, called instead of base.</summary>
-			public global::System.Action<Stubs.MixedService>? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.MixedService> callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal global::System.Action<Stubs.MixedService>? Callback => _onCall;
 
 			public void RecordCall() { CallCount++; }
 
-			public void Reset() { CallCount = 0; OnCall = null; }
+			public void Reset() { CallCount = 0; _onCall = null; }
 		}
 
 		/// <summary>Stub for global::KnockOff.Tests.MixedService via composition.</summary>
@@ -110,7 +115,7 @@ partial class MixedStubTestClass
 				public override void VirtualMethod()
 				{
 					_stub?.VirtualMethod.RecordCall();
-					if (_stub?.VirtualMethod.OnCall is { } onCall) { onCall(_stub); return; }
+					if (_stub?.VirtualMethod.Callback is { } onCall) { onCall(_stub); return; }
 					base.VirtualMethod();
 				}
 
