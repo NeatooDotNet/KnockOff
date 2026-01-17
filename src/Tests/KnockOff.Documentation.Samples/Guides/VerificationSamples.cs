@@ -100,13 +100,15 @@ public static class VerificationSamples
     public static void WasMethodCalled()
     {
         var stub = new VfEmailServiceStub();
+        var sendTracking = stub.SendEmail.OnCall((ko, to, subject, body) => { });
         IVfEmailService service = stub;
         service.SendEmail("user@test.com", "Subject", "Body");
 
         var deleteStub = new VfProcessorStub();
+        var deleteTracking = deleteStub.Delete.OnCall(ko => { });
 
-        Assert.True(stub.SendEmail.WasCalled);
-        Assert.False(deleteStub.Delete.WasCalled);
+        Assert.True(sendTracking.WasCalled);
+        Assert.False(deleteTracking.WasCalled);
     }
     #endregion
 
@@ -114,13 +116,14 @@ public static class VerificationSamples
     public static void HowManyTimes()
     {
         var stub = new VfProcessorStub();
+        var tracking = stub.Process.OnCall((ko, value) => { });
         IVfProcessor service = stub;
 
         service.Process("a");
         service.Process("b");
         service.Process("c");
 
-        Assert.Equal(3, stub.Process.CallCount);
+        Assert.Equal(3, tracking.CallCount);
     }
     #endregion
 
@@ -128,11 +131,12 @@ public static class VerificationSamples
     public static void SingleParameterCapture()
     {
         var stub = new VfRepositoryStub();
+        var tracking = stub.GetById.OnCall((ko, id) => null);
         IVfRepository service = stub;
 
         service.GetById(42);
 
-        int? lastId = stub.GetById.LastCallArg;  // 42
+        int? lastId = tracking.LastArg;  // 42
 
         _ = lastId;
     }
@@ -142,14 +146,15 @@ public static class VerificationSamples
     public static void MultipleParameterCapture()
     {
         var stub = new VfEmailServiceStub();
+        var tracking = stub.SendEmail.OnCall((ko, to, subject, body) => { });
         IVfEmailService service = stub;
 
         service.SendEmail("user@test.com", "Subject", "Body");
 
-        var args = stub.SendEmail.LastCallArgs;
-        Assert.Equal("user@test.com", args?.to);
-        Assert.Equal("Subject", args?.subject);
-        Assert.Equal("Body", args?.body);
+        var args = tracking.LastArgs;
+        Assert.Equal("user@test.com", args.to);
+        Assert.Equal("Subject", args.subject);
+        Assert.Equal("Body", args.body);
     }
     #endregion
 
@@ -157,12 +162,13 @@ public static class VerificationSamples
     public static void NoParametersMethod()
     {
         var stub = new VfProcessorStub();
+        var tracking = stub.Initialize.OnCall(ko => { });
         IVfProcessor service = stub;
 
         service.Initialize();
 
-        Assert.True(stub.Initialize.WasCalled);
-        Assert.Equal(1, stub.Initialize.CallCount);
+        Assert.True(tracking.WasCalled);
+        Assert.Equal(1, tracking.CallCount);
     }
     #endregion
 
@@ -284,10 +290,11 @@ public static class VerificationSamples
         var eventStub = new VfEventSourceStub();
         var serializerStub = new VfSerializerStub();
 
-        // Method
+        // Method - set up tracking then reset
+        var tracking = processStub.Process.OnCall((ko, value) => { });
         processStub.Process.Reset();
-        Assert.Equal(0, processStub.Process.CallCount);
-        Assert.False(processStub.Process.WasCalled);
+        Assert.Equal(0, tracking.CallCount);
+        Assert.False(tracking.WasCalled);
 
         // Property
         nameStub.Name.Reset();
@@ -313,11 +320,12 @@ public static class VerificationSamples
         var stub = new VfProcessorStub();
         IVfProcessor service = stub;
 
-        stub.Process.OnCall = (ko, value) =>
+        var initTracking = stub.Initialize.OnCall(ko => { });
+        stub.Process.OnCall((ko, value) =>
         {
-            if (!ko.Initialize.WasCalled)
+            if (!initTracking.WasCalled)
                 throw new InvalidOperationException("Not initialized");
-        };
+        });
 
         // This throws because Initialize wasn't called first
         Assert.Throws<InvalidOperationException>(() => service.Process("test"));
@@ -332,10 +340,11 @@ public static class VerificationSamples
     public static void VerifyExactCallCount()
     {
         var stub = new VfRepositoryStub();
+        var tracking = stub.Save.OnCall((ko, user) => { });
         IVfRepository service = stub;
         service.Save(new VfUser());
 
-        Assert.Equal(1, stub.Save.CallCount);  // Called exactly once
+        Assert.Equal(1, tracking.CallCount);  // Called exactly once
     }
     #endregion
 
@@ -343,9 +352,10 @@ public static class VerificationSamples
     public static void VerifyNeverCalled()
     {
         var stub = new VfProcessorStub();
+        var tracking = stub.Delete.OnCall(ko => { });
 
-        Assert.False(stub.Delete.WasCalled);
-        Assert.Equal(0, stub.Delete.CallCount);
+        Assert.False(tracking.WasCalled);
+        Assert.Equal(0, tracking.CallCount);
     }
     #endregion
 
@@ -357,9 +367,9 @@ public static class VerificationSamples
 
         var callOrder = new List<string>();
 
-        stub.Initialize.OnCall = (ko) => callOrder.Add("Initialize");
-        stub.Process.OnCall = (ko, value) => callOrder.Add("Process");
-        stub.Cleanup.OnCall = (ko) => callOrder.Add("Cleanup");
+        stub.Initialize.OnCall(ko => callOrder.Add("Initialize"));
+        stub.Process.OnCall((ko, value) => callOrder.Add("Process"));
+        stub.Cleanup.OnCall(ko => callOrder.Add("Cleanup"));
 
         service.Initialize();
         service.Process("test");
@@ -377,10 +387,10 @@ public static class VerificationSamples
 
         var allCalls = new List<(string to, string subject, string body)>();
 
-        stub.SendEmail.OnCall = (ko, to, subject, body) =>
+        stub.SendEmail.OnCall((ko, to, subject, body) =>
         {
             allCalls.Add((to, subject, body));
-        };
+        });
 
         service.SendEmail("a@test.com", "S1", "B1");
         service.SendEmail("b@test.com", "S2", "B2");

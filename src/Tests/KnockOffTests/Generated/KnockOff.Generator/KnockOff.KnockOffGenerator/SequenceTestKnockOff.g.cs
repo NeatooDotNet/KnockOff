@@ -65,6 +65,23 @@ partial class SequenceTestKnockOff : global::KnockOff.Tests.ISequenceTestService
 			_sequenceIndex = 0;
 		}
 
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTrackingArgs<(int? a, int? b)>
 		{
@@ -186,6 +203,23 @@ partial class SequenceTestKnockOff : global::KnockOff.Tests.ISequenceTestService
 			_sequenceIndex = 0;
 		}
 
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking
 		{
@@ -281,7 +315,7 @@ partial class SequenceTestKnockOff : global::KnockOff.Tests.ISequenceTestService
 			if (_sequence.Count == 0)
 			{
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetMessage");
-				return default!;
+				throw new global::System.InvalidOperationException("No implementation provided for GetMessage. Configure via GetMessage.OnCall.");
 			}
 
 			var (callback, times, tracking) = _sequence[_sequenceIndex];
@@ -304,6 +338,23 @@ partial class SequenceTestKnockOff : global::KnockOff.Tests.ISequenceTestService
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -384,6 +435,23 @@ partial class SequenceTestKnockOff : global::KnockOff.Tests.ISequenceTestService
 
 	/// <summary>The global::KnockOff.Tests.ISequenceTestService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.ISequenceTestService Object => this;
+
+	/// <summary>Verifies all method interceptors' Times constraints were satisfied.</summary>
+	public bool Verify()
+	{
+		var result = true;
+		result &= Add.Verify();
+		result &= DoWork.Verify();
+		result &= GetMessage.Verify();
+		return result;
+	}
+
+	/// <summary>Verifies all method interceptors' Times constraints and throws if any fail.</summary>
+	public void VerifyAll()
+	{
+		if (!Verify())
+			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
 
 	int global::KnockOff.Tests.ISequenceTestService.Add(int a, int b)
 	{

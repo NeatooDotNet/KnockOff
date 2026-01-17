@@ -66,7 +66,7 @@ partial class SampleValidationRuleKnockOff : global::KnockOff.Tests.ISampleValid
 			if (_sequence_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult.Count == 0)
 			{
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Execute");
-				return default!;
+				throw new global::System.InvalidOperationException("No implementation provided for Execute. Configure via OnCall.");
 			}
 
 			var (callback, times, tracking) = _sequence_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult[_sequenceIndex_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult];
@@ -89,7 +89,7 @@ partial class SampleValidationRuleKnockOff : global::KnockOff.Tests.ISampleValid
 			if (_sequence_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult.Count == 0)
 			{
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Execute");
-				return default!;
+				throw new global::System.InvalidOperationException("No implementation provided for Execute. Configure via OnCall.");
 			}
 
 			var (callback, times, tracking) = _sequence_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult[_sequenceIndex_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult];
@@ -117,17 +117,29 @@ partial class SampleValidationRuleKnockOff : global::KnockOff.Tests.ISampleValid
 			_sequenceIndex_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult = 0;
 		}
 
-		/// <summary>Verifies all Times constraints for all overloads were satisfied.</summary>
+		/// <summary>Verifies all Times constraints for all overloads were satisfied. For Forever, verifies called at least once.</summary>
 		public bool Verify()
 		{
 			foreach (var (_, times, tracking) in _sequence_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult)
 			{
-				if (!times.Verify(tracking.CallCount))
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
 					return false;
 			}
 			foreach (var (_, times, tracking) in _sequence_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult)
 			{
-				if (!times.Verify(tracking.CallCount))
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
 					return false;
 			}
 			return true;
@@ -247,6 +259,21 @@ partial class SampleValidationRuleKnockOff : global::KnockOff.Tests.ISampleValid
 
 	/// <summary>The global::KnockOff.Tests.ISampleValidationRule instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.ISampleValidationRule Object => this;
+
+	/// <summary>Verifies all method interceptors' Times constraints were satisfied.</summary>
+	public bool Verify()
+	{
+		var result = true;
+		result &= Execute.Verify();
+		return result;
+	}
+
+	/// <summary>Verifies all method interceptors' Times constraints and throws if any fail.</summary>
+	public void VerifyAll()
+	{
+		if (!Verify())
+			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> global::KnockOff.Tests.ISampleRule<global::KnockOff.Tests.ISampleTarget>.Execute(global::KnockOff.Tests.ISampleTarget target, global::System.Threading.CancellationToken? token)
 	{

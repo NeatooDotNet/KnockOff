@@ -307,7 +307,7 @@ public partial class VsOverrideServiceKnockOff : IVsOverrideService
 #region knockoff-vs-moq-sequential-returns-usage
 // var knockOff = new VsSequenceKnockOff();
 // var returnValues = new Queue<int>([1, 2, 3]);
-// knockOff.GetNext.OnCall = (ko) => returnValues.Dequeue();
+// knockOff.GetNext.OnCall((ko) => returnValues.Dequeue());
 #endregion
 
 #region knockoff-vs-moq-per-test-override-usage
@@ -317,7 +317,7 @@ public partial class VsOverrideServiceKnockOff : IVsOverrideService
 //     var knockOff = new VsOverrideServiceKnockOff();
 //
 //     // Override just for this test
-//     knockOff.GetUser.OnCall = (ko, id) => new VsUser { Id = id, Name = "Special" };
+//     knockOff.GetUser.OnCall((ko, id) => new VsUser { Id = id, Name = "Special" });
 //
 //     var user = knockOff.AsIVsOverrideService().GetUser(42);
 //     Assert.Equal("Special", user.Name);
@@ -328,12 +328,12 @@ public partial class VsOverrideServiceKnockOff : IVsOverrideService
 // var knockOff = new UserServiceKnockOff();
 // IUserService service = knockOff;
 //
-// knockOff.GetUser.OnCall = (ko, id) => new User { Name = "First" };
+// var tracking = knockOff.GetUser.OnCall((ko, id) => new User { Name = "First" });
 // var user1 = service.GetUser(1);
 //
 // knockOff.GetUser.Reset(); // Clears callback and tracking
 //
 // // Now falls back to user method or default
 // var user2 = service.GetUser(2);
-// Assert.Equal(0, knockOff.GetUser.CallCount); // Reset cleared count
+// // tracking.CallCount would still show 1 from before reset
 #endregion

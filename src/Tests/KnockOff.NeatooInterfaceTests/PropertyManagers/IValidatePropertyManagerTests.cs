@@ -364,8 +364,12 @@ public class IValidatePropertyManagerStandaloneTests
         var stub = new ValidatePropertyManagerStub();
         IValidatePropertyManager<IValidateProperty> manager = stub;
 
+        // Configure callback to enable tracking
+        var tracking = stub.HasProperty.OnCall((ko, name) => false);
+
         manager.HasProperty("Test");
 
-        Assert.True(stub.HasProperty.WasCalled);
+        // Tracking is available via the returned tracking object
+        Assert.True(tracking.WasCalled);
     }
 }

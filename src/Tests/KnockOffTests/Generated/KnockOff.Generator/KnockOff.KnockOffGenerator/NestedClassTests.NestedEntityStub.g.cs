@@ -314,6 +314,19 @@ partial class NestedEntityStub : global::Neatoo.IEntityBase, global::Neatoo.IVal
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
 	}
 
+	/// <summary>Container for indexer interceptors with OfXxx access pattern.</summary>
+	public sealed class IndexerContainer
+	{
+		/// <summary>Gets the interceptor for indexer with String key type.</summary>
+		public IndexerInterceptor OfString { get; } = new();
+
+		/// <summary>Resets all indexer interceptors.</summary>
+		public void Reset()
+		{
+			OfString.Reset();
+		}
+	}
+
 	/// <summary>Tracks and configures behavior for Delete.</summary>
 	public sealed class DeleteInterceptor
 	{
@@ -369,6 +382,23 @@ partial class NestedEntityStub : global::Neatoo.IEntityBase, global::Neatoo.IVal
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -488,6 +518,23 @@ partial class NestedEntityStub : global::Neatoo.IEntityBase, global::Neatoo.IVal
 			_sequenceIndex = 0;
 		}
 
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking
 		{
@@ -583,7 +630,7 @@ partial class NestedEntityStub : global::Neatoo.IEntityBase, global::Neatoo.IVal
 			if (_sequence.Count == 0)
 			{
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
-				return default!;
+				throw new global::System.InvalidOperationException("No implementation provided for Save. Configure via Save.OnCall.");
 			}
 
 			var (callback, times, tracking) = _sequence[_sequenceIndex];
@@ -606,6 +653,23 @@ partial class NestedEntityStub : global::Neatoo.IEntityBase, global::Neatoo.IVal
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -703,7 +767,7 @@ partial class NestedEntityStub : global::Neatoo.IEntityBase, global::Neatoo.IVal
 			if (_sequence.Count == 0)
 			{
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetProperty");
-				return default!;
+				throw new global::System.InvalidOperationException("No implementation provided for GetProperty. Configure via GetProperty.OnCall.");
 			}
 
 			var (callback, times, tracking) = _sequence[_sequenceIndex];
@@ -726,6 +790,23 @@ partial class NestedEntityStub : global::Neatoo.IEntityBase, global::Neatoo.IVal
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -851,6 +932,23 @@ partial class NestedEntityStub : global::Neatoo.IEntityBase, global::Neatoo.IVal
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -1029,17 +1127,29 @@ partial class NestedEntityStub : global::Neatoo.IEntityBase, global::Neatoo.IVal
 			_sequenceIndex_Threading_CancellationToken_Threading_Tasks_Task = 0;
 		}
 
-		/// <summary>Verifies all Times constraints for all overloads were satisfied.</summary>
+		/// <summary>Verifies all Times constraints for all overloads were satisfied. For Forever, verifies called at least once.</summary>
 		public bool Verify()
 		{
 			foreach (var (_, times, tracking) in _sequence_NoParams_Threading_Tasks_Task)
 			{
-				if (!times.Verify(tracking.CallCount))
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
 					return false;
 			}
 			foreach (var (_, times, tracking) in _sequence_Threading_CancellationToken_Threading_Tasks_Task)
 			{
-				if (!times.Verify(tracking.CallCount))
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
 					return false;
 			}
 			return true;
@@ -1260,17 +1370,29 @@ partial class NestedEntityStub : global::Neatoo.IEntityBase, global::Neatoo.IVal
 			_sequenceIndex_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task = 0;
 		}
 
-		/// <summary>Verifies all Times constraints for all overloads were satisfied.</summary>
+		/// <summary>Verifies all Times constraints for all overloads were satisfied. For Forever, verifies called at least once.</summary>
 		public bool Verify()
 		{
 			foreach (var (_, times, tracking) in _sequence_String_Threading_CancellationToken_Threading_Tasks_Task)
 			{
-				if (!times.Verify(tracking.CallCount))
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
 					return false;
 			}
 			foreach (var (_, times, tracking) in _sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task)
 			{
-				if (!times.Verify(tracking.CallCount))
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
 					return false;
 			}
 			return true;
@@ -1439,6 +1561,23 @@ partial class NestedEntityStub : global::Neatoo.IEntityBase, global::Neatoo.IVal
 			_sequenceIndex = 0;
 		}
 
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking
 		{
@@ -1554,6 +1693,23 @@ partial class NestedEntityStub : global::Neatoo.IEntityBase, global::Neatoo.IVal
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -1715,8 +1871,8 @@ partial class NestedEntityStub : global::Neatoo.IEntityBase, global::Neatoo.IVal
 	/// <summary>Interceptor for IsNew. Configure via .Value, track via .GetCount.</summary>
 	public IsNewInterceptor IsNew { get; } = new();
 
-	/// <summary>Interceptor for indexer. Configure callbacks and track access.</summary>
-	public IndexerInterceptor Indexer { get; } = new();
+	/// <summary>Interceptor for indexer. Access via .Of{KeyType} (e.g., .OfInt32, .OfString).</summary>
+	public IndexerContainer Indexer { get; } = new();
 
 	/// <summary>Interceptor for Delete.</summary>
 	public DeleteInterceptor Delete { get; } = new();
@@ -1756,6 +1912,29 @@ partial class NestedEntityStub : global::Neatoo.IEntityBase, global::Neatoo.IVal
 
 	/// <summary>The global::Neatoo.IEntityBase instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.IEntityBase Object => this;
+
+	/// <summary>Verifies all method interceptors' Times constraints were satisfied.</summary>
+	public bool Verify()
+	{
+		var result = true;
+		result &= Delete.Verify();
+		result &= UnDelete.Verify();
+		result &= Save.Verify();
+		result &= GetProperty.Verify();
+		result &= TryGetProperty.Verify();
+		result &= WaitForTasks.Verify();
+		result &= RunRules.Verify();
+		result &= ClearAllMessages.Verify();
+		result &= ClearSelfMessages.Verify();
+		return result;
+	}
+
+	/// <summary>Verifies all method interceptors' Times constraints and throws if any fail.</summary>
+	public void VerifyAll()
+	{
+		if (!Verify())
+			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
 
 	global::Neatoo.IValidateBase? global::Neatoo.IEntityBase.Root
 	{
@@ -1834,12 +2013,12 @@ partial class NestedEntityStub : global::Neatoo.IEntityBase, global::Neatoo.IVal
 
 	global::Neatoo.IEntityProperty global::Neatoo.IEntityBase.this[string propertyName]
 	{
-		get { Indexer.RecordGet(propertyName); if (Indexer.OnGet is { } onGet) return onGet(this, propertyName); if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase", "this[]"); return Indexer.Backing.TryGetValue(propertyName, out var v) ? v : default!; }
+		get { Indexer.OfString.RecordGet(propertyName); if (Indexer.OfString.OnGet is { } onGet) return onGet(this, propertyName); if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase", "this[]"); return Indexer.OfString.Backing.TryGetValue(propertyName, out var v) ? v : default!; }
 	}
 
 	global::Neatoo.IValidateProperty global::Neatoo.IValidateBase.this[string propertyName]
 	{
-		get { Indexer.RecordGet(propertyName); if (Indexer.OnGet is { } onGet) return onGet(this, propertyName); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "this[]"); return Indexer.Backing.TryGetValue(propertyName, out var v) ? v : default!; }
+		get { Indexer.OfString.RecordGet(propertyName); if (Indexer.OfString.OnGet is { } onGet) return onGet(this, propertyName); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "this[]"); return Indexer.OfString.Backing.TryGetValue(propertyName, out var v) ? v : default!; }
 	}
 
 	void global::Neatoo.IEntityBase.Delete()

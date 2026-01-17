@@ -173,7 +173,7 @@ partial class RegularExpressionRuleStub : global::Neatoo.Rules.Rules.IRegularExp
 			if (_sequence.Count == 0)
 			{
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RunRule");
-				return default!;
+				throw new global::System.InvalidOperationException("No implementation provided for RunRule. Configure via RunRule.OnCall.");
 			}
 
 			var (callback, times, tracking) = _sequence[_sequenceIndex];
@@ -196,6 +196,23 @@ partial class RegularExpressionRuleStub : global::Neatoo.Rules.Rules.IRegularExp
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -319,6 +336,23 @@ partial class RegularExpressionRuleStub : global::Neatoo.Rules.Rules.IRegularExp
 			_sequenceIndex = 0;
 		}
 
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTrackingArgs<(global::Neatoo.Rules.IRuleManager? ruleManager, uint? uniqueIndex)>
 		{
@@ -415,6 +449,22 @@ partial class RegularExpressionRuleStub : global::Neatoo.Rules.Rules.IRegularExp
 
 	/// <summary>The global::Neatoo.Rules.Rules.IRegularExpressionRule instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.Rules.Rules.IRegularExpressionRule Object => this;
+
+	/// <summary>Verifies all method interceptors' Times constraints were satisfied.</summary>
+	public bool Verify()
+	{
+		var result = true;
+		result &= RunRule.Verify();
+		result &= OnRuleAdded.Verify();
+		return result;
+	}
+
+	/// <summary>Verifies all method interceptors' Times constraints and throws if any fail.</summary>
+	public void VerifyAll()
+	{
+		if (!Verify())
+			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
 
 	string global::Neatoo.Rules.Rules.IRegularExpressionRule.ErrorMessage
 	{

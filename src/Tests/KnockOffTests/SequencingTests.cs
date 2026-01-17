@@ -265,14 +265,14 @@ public class IndexerOfXxxTests
         var stub = new IndexerTestKnockOff();
 
         // Configure via IndexerString
-        stub.IndexerString.Backing["key1"] = "value1";
+        stub.Indexer.OfString.Backing["key1"] = "value1";
 
         IIndexerTestService svc = stub;
         var result = svc["key1"];
 
         Assert.Equal("value1", result);
-        Assert.Equal(1, stub.IndexerString.GetCount);
-        Assert.Equal("key1", stub.IndexerString.LastGetKey);
+        Assert.Equal(1, stub.Indexer.OfString.GetCount);
+        Assert.Equal("key1", stub.Indexer.OfString.LastGetKey);
     }
 
     [Fact]
@@ -281,15 +281,15 @@ public class IndexerOfXxxTests
         var stub = new IndexerTestKnockOff();
 
         // Configure via IndexerInt32
-        stub.IndexerInt32.Backing[0] = 100;
-        stub.IndexerInt32.Backing[1] = 200;
+        stub.Indexer.OfInt32.Backing[0] = 100;
+        stub.Indexer.OfInt32.Backing[1] = 200;
 
         IIndexerTestService svc = stub;
         Assert.Equal(100, svc[0]);
         Assert.Equal(200, svc[1]);
 
-        Assert.Equal(2, stub.IndexerInt32.GetCount);
-        Assert.Equal(1, stub.IndexerInt32.LastGetKey);
+        Assert.Equal(2, stub.Indexer.OfInt32.GetCount);
+        Assert.Equal(1, stub.Indexer.OfInt32.LastGetKey);
     }
 
     [Fact]
@@ -297,7 +297,7 @@ public class IndexerOfXxxTests
     {
         var stub = new IndexerTestKnockOff();
 
-        stub.IndexerString.OnGet = (ko, key) => $"Value for {key}";
+        stub.Indexer.OfString.OnGet = (ko, key) => $"Value for {key}";
 
         IIndexerTestService svc = stub;
         Assert.Equal("Value for foo", svc["foo"]);
@@ -313,8 +313,8 @@ public class IndexerOfXxxTests
         svc["key1"] = "value1";
         svc["key2"] = "value2";
 
-        Assert.Equal(2, stub.IndexerString.SetCount);
-        Assert.Equal(("key2", "value2"), stub.IndexerString.LastSetEntry);
+        Assert.Equal(2, stub.Indexer.OfString.SetCount);
+        Assert.Equal(("key2", "value2"), stub.Indexer.OfString.LastSetEntry);
     }
 
     [Fact]
@@ -323,7 +323,7 @@ public class IndexerOfXxxTests
         var stub = new IndexerTestKnockOff();
         var callbackCalls = new System.Collections.Generic.List<(string key, string value)>();
 
-        stub.IndexerString.OnSet = (ko, key, value) =>
+        stub.Indexer.OfString.OnSet = (ko, key, value) =>
         {
             callbackCalls.Add((key, value));
         };
@@ -343,8 +343,8 @@ public class IndexerOfXxxTests
         var stub = new IndexerTestKnockOff();
 
         // Configure both indexers
-        stub.IndexerString.Backing["test"] = "string value";
-        stub.IndexerInt32.Backing[42] = 42;
+        stub.Indexer.OfString.Backing["test"] = "string value";
+        stub.Indexer.OfInt32.Backing[42] = 42;
 
         IIndexerTestService svc = stub;
 
@@ -353,8 +353,8 @@ public class IndexerOfXxxTests
         Assert.Equal(42, svc[42]);
 
         // Verify tracking is independent
-        Assert.Equal(1, stub.IndexerString.GetCount);
-        Assert.Equal(1, stub.IndexerInt32.GetCount);
+        Assert.Equal(1, stub.Indexer.OfString.GetCount);
+        Assert.Equal(1, stub.Indexer.OfInt32.GetCount);
     }
 }
 

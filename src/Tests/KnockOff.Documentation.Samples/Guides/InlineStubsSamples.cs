@@ -78,15 +78,15 @@ public partial class UserServiceTests
 // var stub = new UserServiceTests.Stubs.IInUserService();
 //
 // // Configure behavior
-// stub.GetUser.OnCall = (ko, id) => new InUser { Id = id, Name = "Test" };
+// var tracking = stub.GetUser.OnCall((ko, id) => new InUser { Id = id, Name = "Test" });
 //
 // // Use the stub (implicit interface conversion)
 // IInUserService service = stub;
 // var user = service.GetUser(42);
 //
 // // Verify interactions
-// Assert.True(stub.GetUser.WasCalled);
-// Assert.Equal(42, stub.GetUser.LastCallArg);
+// Assert.True(tracking.WasCalled);
+// Assert.Equal(42, tracking.LastArg);
 #endregion
 
 // ============================================================================
@@ -121,8 +121,8 @@ public partial class PartialPropertyTests
 	protected partial Stubs.IInLogger Logger { get; }
 
 	// Use directly in tests - no instantiation needed:
-	// UserService.GetUser.OnCall = (ko, id) => new InUser { Id = id };
-	// Logger.Log.OnCall = (ko, msg) => Console.WriteLine(msg);
+	// UserService.GetUser.OnCall((ko, id) => new InUser { Id = id });
+	// Logger.Log.OnCall((ko, msg) => Console.WriteLine(msg));
 }
 #endregion
 #endif
@@ -306,8 +306,8 @@ public static class ClassStubUsageExamples
 		CsEmailService service = stub.Object;
 		service.Send("test@example.com", "Hello", "World");
 
-		var wasCalled = stub.Send.WasCalled;                // true
-		var lastTo = stub.Send.LastCallArgs?.to;            // "test@example.com"
+		var wasCalled = stub.Send.WasCalled;               // true
+		var lastTo = stub.Send.LastCallArgs?.to;           // "test@example.com"
 		#endregion
 
 		_ = (wasCalled, lastTo);
@@ -318,7 +318,7 @@ public static class ClassStubUsageExamples
 	{
 		var stub = new MixedTests.Stubs.MixedService();
 
-		// Virtual member - has interceptor
+		// Virtual member - has interceptor (property uses OnGet property, not method)
 		stub.VirtualProp.OnGet = (ko) => "Intercepted";
 		var virtualValue = stub.Object.VirtualProp;  // "Intercepted"
 
@@ -349,7 +349,7 @@ public static class ClassStubUsageExamples
 		var defaultConnection = stub.Object.ConnectionString;  // null
 		var defaultExecute = stub.Object.Execute("SELECT 1");  // 0
 
-		// With callback
+		// With callback (property uses OnGet property, method uses OnCall property)
 		stub.ConnectionString.OnGet = (ko) => "Server=test";
 		stub.Execute.OnCall = (ko, sql) => sql.Length;
 

@@ -120,13 +120,13 @@ public class EntityBaseStandaloneTests
         var stub = new EntityBaseStub();
         IEntityBase entity = stub;
 
-        stub.Indexer.OnGet = (ko, propertyName) => null!;
+        stub.Indexer.OfString.OnGet = (ko, propertyName) => null!;
 
         _ = entity["FirstName"];
         _ = entity["LastName"];
 
-        Assert.Equal(2, stub.Indexer.GetCount);
-        Assert.Equal("LastName", stub.Indexer.LastGetKey);
+        Assert.Equal(2, stub.Indexer.OfString.GetCount);
+        Assert.Equal("LastName", stub.Indexer.OfString.LastGetKey);
     }
 
     [Fact]

@@ -266,10 +266,13 @@ public static class PropertiesUsageExamples
         var knockOff = new PropConnectionKnockOff();
 
         #region properties-conditional-usage
+        // Track Connect calls
+        var connectTracking = knockOff.Connect.OnCall((ko) => { });
+
         knockOff.IsConnected.OnGet = (ko) =>
         {
-            // Check other interceptor state
-            return ko.Connect.WasCalled;
+            // Check tracking state from Connect
+            return connectTracking.WasCalled;
         };
         #endregion
     }

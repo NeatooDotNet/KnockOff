@@ -206,12 +206,14 @@ public static class InterfaceInheritanceUsageExamples
     public static void ValidationPatternUsage()
     {
         var knockOff = new IhOrderKnockOff();
+        var totalAccessCount = 0;
 
         #region interface-inheritance-validation-usage
         // Configure validation (flat API)
-        knockOff.IsValid.OnGet = (ko) => ko.Total.GetCount > 0;
-        knockOff.GetErrors.OnCall = (ko) =>
-            ko.IsValid.OnGet!(ko) ? [] : ["No total calculated"];
+        knockOff.Total.OnGet = (ko) => { totalAccessCount++; return 100m; };
+        knockOff.IsValid.OnGet = (ko) => totalAccessCount > 0;
+        knockOff.GetErrors.OnCall(ko =>
+            knockOff.IsValid.OnGet!(ko) ? [] : ["No total calculated"]);
         #endregion
     }
 
@@ -222,10 +224,10 @@ public static class InterfaceInheritanceUsageExamples
 
         #region interface-inheritance-repository-usage
         // All members accessed via flat API regardless of declaring interface
-        knockOff.GetById.OnCall = (ko, id) => users.FirstOrDefault(u => u.Id == id);
-        knockOff.GetAll.OnCall = (ko) => users;
-        knockOff.Add.OnCall = (ko, user) => users.Add(user);
-        knockOff.Delete.OnCall = (ko, id) => users.RemoveAll(u => u.Id == id);
+        knockOff.GetById.OnCall((ko, id) => users.FirstOrDefault(u => u.Id == id));
+        knockOff.GetAll.OnCall(ko => users);
+        knockOff.Add.OnCall((ko, user) => users.Add(user));
+        knockOff.Delete.OnCall((ko, id) => users.RemoveAll(u => u.Id == id));
         #endregion
     }
 }

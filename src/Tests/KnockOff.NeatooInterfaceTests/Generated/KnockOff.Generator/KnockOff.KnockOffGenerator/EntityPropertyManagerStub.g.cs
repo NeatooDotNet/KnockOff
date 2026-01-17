@@ -236,6 +236,23 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			_sequenceIndex = 0;
 		}
 
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking
 		{
@@ -354,6 +371,23 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -476,6 +510,23 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			_sequenceIndex = 0;
 		}
 
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking<string>
 		{
@@ -575,7 +626,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			if (_sequence.Count == 0)
 			{
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetProperty");
-				return default!;
+				throw new global::System.InvalidOperationException("No implementation provided for GetProperty. Configure via GetProperty.OnCall.");
 			}
 
 			var (callback, times, tracking) = _sequence[_sequenceIndex];
@@ -598,6 +649,23 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -719,6 +787,23 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -845,6 +930,23 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			_sequenceIndex = 0;
 		}
 
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTrackingArgs<(global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token)>
 		{
@@ -966,6 +1068,23 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			_sequenceIndex = 0;
 		}
 
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking
 		{
@@ -1081,6 +1200,23 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -1200,6 +1336,23 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			_sequenceIndex = 0;
 		}
 
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking
 		{
@@ -1315,6 +1468,23 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -1499,6 +1669,30 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 
 	/// <summary>The global::Neatoo.IEntityPropertyManager instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.IEntityPropertyManager Object => this;
+
+	/// <summary>Verifies all method interceptors' Times constraints were satisfied.</summary>
+	public bool Verify()
+	{
+		var result = true;
+		result &= MarkSelfUnmodified.Verify();
+		result &= WaitForTasks.Verify();
+		result &= HasProperty.Verify();
+		result &= GetProperty.Verify();
+		result &= SetProperties.Verify();
+		result &= RunRules.Verify();
+		result &= PauseAllActions.Verify();
+		result &= ResumeAllActions.Verify();
+		result &= ClearAllMessages.Verify();
+		result &= ClearSelfMessages.Verify();
+		return result;
+	}
+
+	/// <summary>Verifies all method interceptors' Times constraints and throws if any fail.</summary>
+	public void VerifyAll()
+	{
+		if (!Verify())
+			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
 
 	bool global::Neatoo.IEntityPropertyManager.IsModified
 	{

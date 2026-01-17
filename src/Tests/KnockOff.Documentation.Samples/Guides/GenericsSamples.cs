@@ -236,14 +236,15 @@ public static class GenericsUsageExamples
     public static void TrackingExample()
     {
         var knockOff = new GenUserRepositoryKnockOff();
+        var saveTracking = knockOff.Save.OnCall((ko, user) => { });
         IGenRepository<GenUser> repo = knockOff;
 
         #region generics-tracking
         var user = new GenUser { Id = 1, Name = "Test" };
         repo.Save(user);
 
-        // LastCallArg is strongly typed as GenUser
-        GenUser? savedUser = knockOff.Save.LastCallArg;  // same as user
+        // LastArg is strongly typed as GenUser
+        GenUser? savedUser = saveTracking.LastArg;  // same as user
         #endregion
 
         _ = savedUser;
@@ -254,14 +255,14 @@ public static class GenericsUsageExamples
         var knockOff = new GenUserRepositoryKnockOff();
 
         #region generics-callbacks
-        knockOff.GetById.OnCall = (ko, id) =>
-            new GenUser { Id = id, Name = $"User-{id}" };
+        knockOff.GetById.OnCall((ko, id) =>
+            new GenUser { Id = id, Name = $"User-{id}" });
 
-        knockOff.Save.OnCall = (ko, user) =>
+        knockOff.Save.OnCall((ko, user) =>
         {
             // user is typed as GenUser, not T
             Console.WriteLine($"Saving: {user.Name}");
-        };
+        });
         #endregion
     }
 
@@ -270,17 +271,17 @@ public static class GenericsUsageExamples
         var knockOff = new GenStringCacheKnockOff();
 
         #region generics-multiple-params-usage
-        knockOff.Get.OnCall = (ko, key) => key switch
+        knockOff.Get.OnCall((ko, key) => key switch
         {
             "admin" => new GenUser { Name = "Admin" },
             _ => null
-        };
+        });
 
-        knockOff.Set.OnCall = (ko, key, value) =>
+        knockOff.Set.OnCall((ko, key, value) =>
         {
             // string key, GenUser value
             Console.WriteLine($"Cached {key}: {value.Name}");
-        };
+        });
         #endregion
     }
 
@@ -289,7 +290,7 @@ public static class GenericsUsageExamples
         var knockOff = new GenUserFactoryKnockOff();
 
         #region generics-factory-usage
-        knockOff.Create.OnCall = (ko) => new GenUser { Name = "Created" };
+        knockOff.Create.OnCall(ko => new GenUser { Name = "Created" });
         #endregion
     }
 
@@ -304,10 +305,10 @@ public static class GenericsUsageExamples
             new GenProduct { Id = 2, Name = "Gadget" }
         };
 
-        knockOff.GetAll.OnCall = (ko) => products;
+        knockOff.GetAll.OnCall(ko => products);
 
-        knockOff.FindFirst.OnCall = (ko, predicate) =>
-            products.FirstOrDefault(predicate);
+        knockOff.FindFirst.OnCall((ko, predicate) =>
+            products.FirstOrDefault(predicate));
         #endregion
     }
 
@@ -317,11 +318,11 @@ public static class GenericsUsageExamples
         var users = new List<GenUser> { new GenUser { Id = 1, Name = "Test" } };
 
         #region generics-async-usage
-        knockOff.GetByIdAsync.OnCall = (ko, id) =>
-            Task.FromResult<GenUser?>(new GenUser { Id = id });
+        knockOff.GetByIdAsync.OnCall((ko, id) =>
+            Task.FromResult<GenUser?>(new GenUser { Id = id }));
 
-        knockOff.GetAllAsync.OnCall = (ko) =>
-            Task.FromResult<IEnumerable<GenUser>>(users);
+        knockOff.GetAllAsync.OnCall(ko =>
+            Task.FromResult<IEnumerable<GenUser>>(users));
         #endregion
 
         _ = users;
@@ -335,11 +336,11 @@ public static class GenericsUsageExamples
         var orderRepo = new GenericRepoStub<GenOrder>();
 
         // Configure user repository
-        userRepo.GetById.OnCall = (ko, id) => new GenUser { Id = id, Name = $"User-{id}" };
-        userRepo.GetAll.OnCall = (ko) => new List<GenUser>();
+        userRepo.GetById.OnCall((ko, id) => new GenUser { Id = id, Name = $"User-{id}" });
+        userRepo.GetAll.OnCall(ko => new List<GenUser>());
 
         // Configure order repository
-        orderRepo.GetById.OnCall = (ko, id) => new GenOrder { Id = id };
+        orderRepo.GetById.OnCall((ko, id) => new GenOrder { Id = id });
         #endregion
     }
 
@@ -347,14 +348,15 @@ public static class GenericsUsageExamples
     {
         #region docs:generics:standalone-tracking
         var stub = new GenericRepoStub<GenUser>();
+        var saveTracking = stub.Save.OnCall((ko, entity) => { });
         IGenericRepo<GenUser> repo = stub;
 
         var user = new GenUser { Id = 1, Name = "Test" };
         repo.Save(user);
 
-        // Tracking works with the type parameter
-        var callCount = stub.Save.CallCount;      // 1
-        var lastArg = stub.Save.LastCallArg;      // same as user
+        // Tracking works via the returned tracking interface
+        var callCount = saveTracking.CallCount;   // 1
+        var lastArg = saveTracking.LastArg;       // same as user
         #endregion
 
         _ = callCount;
@@ -367,8 +369,8 @@ public static class GenericsUsageExamples
         var cache = new GenericKeyValueStub<string, GenUser>();
         IGenericKeyValue<string, GenUser> service = cache;
 
-        cache.Get.OnCall = (ko, key) => new GenUser { Name = key };
-        cache.Set.OnCall = (ko, key, value) => { /* stored */ };
+        cache.Get.OnCall((ko, key) => new GenUser { Name = key });
+        cache.Set.OnCall((ko, key, value) => { /* stored */ });
 
         var result = service.Get("admin");  // returns GenUser with Name="admin"
         #endregion
@@ -407,7 +409,7 @@ public static class GenericsUsageExamples
         service.Deserialize<GenUser>("{...}");
         service.Deserialize<GenOrder>("{...}");
 
-        // Per-type tracking
+        // Per-type tracking via typed handler
         Assert.Equal(2, knockOff.Deserialize.Of<GenUser>().CallCount);
         Assert.Equal(1, knockOff.Deserialize.Of<GenOrder>().CallCount);
 

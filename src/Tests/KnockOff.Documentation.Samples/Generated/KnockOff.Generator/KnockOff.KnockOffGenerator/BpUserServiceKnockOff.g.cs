@@ -5,27 +5,6 @@ namespace KnockOff.Documentation.Samples.Guides;
 
 partial class BpUserServiceKnockOff : global::KnockOff.Documentation.Samples.Guides.IBpUserService, global::KnockOff.IKnockOffStub
 {
-	/// <summary>Tracks calls to GetUser (user-defined implementation).</summary>
-	public sealed class GetUser2Interceptor : global::KnockOff.IMethodTracking<int>
-	{
-		private int _lastArg = default!;
-
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
-
-		/// <summary>True if CallCount > 0.</summary>
-		public bool WasCalled => CallCount > 0;
-
-		/// <summary>Last argument passed to this method. Default if never called.</summary>
-		public int LastArg => _lastArg;
-
-		/// <summary>Records a method call.</summary>
-		internal void RecordCall(int id) { CallCount++; _lastArg = id; }
-
-		/// <summary>Resets tracking state.</summary>
-		public void Reset() { CallCount = 0; _lastArg = default!; }
-	}
-
 	/// <summary>Tracks and configures behavior for GetCount.</summary>
 	public sealed class GetCountInterceptor
 	{
@@ -84,6 +63,23 @@ partial class BpUserServiceKnockOff : global::KnockOff.Documentation.Samples.Gui
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -206,6 +202,23 @@ partial class BpUserServiceKnockOff : global::KnockOff.Documentation.Samples.Gui
 			_sequenceIndex = 0;
 		}
 
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking
 		{
@@ -323,6 +336,23 @@ partial class BpUserServiceKnockOff : global::KnockOff.Documentation.Samples.Gui
 			_sequenceIndex = 0;
 		}
 
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking<global::KnockOff.Documentation.Samples.SampleDomain.User>
 		{
@@ -387,6 +417,27 @@ partial class BpUserServiceKnockOff : global::KnockOff.Documentation.Samples.Gui
 		}
 	}
 
+	/// <summary>Tracks calls to GetUser (user-defined implementation).</summary>
+	public sealed class GetUser2Interceptor : global::KnockOff.IMethodTracking<int>
+	{
+		private int _lastArg = default!;
+
+		/// <summary>Number of times this method was called.</summary>
+		public int CallCount { get; private set; }
+
+		/// <summary>True if CallCount > 0.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>Last argument passed to this method. Default if never called.</summary>
+		public int LastArg => _lastArg;
+
+		/// <summary>Records a method call.</summary>
+		internal void RecordCall(int id) { CallCount++; _lastArg = id; }
+
+		/// <summary>Resets tracking state.</summary>
+		public void Reset() { CallCount = 0; _lastArg = default!; }
+	}
+
 	/// <summary>Interceptor for GetUser.</summary>
 	public GetUser2Interceptor GetUser2 { get; } = new();
 
@@ -404,6 +455,23 @@ partial class BpUserServiceKnockOff : global::KnockOff.Documentation.Samples.Gui
 
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IBpUserService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IBpUserService Object => this;
+
+	/// <summary>Verifies all method interceptors' Times constraints were satisfied.</summary>
+	public bool Verify()
+	{
+		var result = true;
+		result &= GetCount.Verify();
+		result &= GetUsers.Verify();
+		result &= Save.Verify();
+		return result;
+	}
+
+	/// <summary>Verifies all method interceptors' Times constraints and throws if any fail.</summary>
+	public void VerifyAll()
+	{
+		if (!Verify())
+			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
 
 	global::KnockOff.Documentation.Samples.SampleDomain.User? global::KnockOff.Documentation.Samples.Guides.IBpUserService.GetUser(int id)
 	{

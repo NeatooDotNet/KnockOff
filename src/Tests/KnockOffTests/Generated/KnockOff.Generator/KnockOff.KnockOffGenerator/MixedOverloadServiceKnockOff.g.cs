@@ -132,17 +132,29 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 			_sequenceIndex_Int32_void = 0;
 		}
 
-		/// <summary>Verifies all Times constraints for all overloads were satisfied.</summary>
+		/// <summary>Verifies all Times constraints for all overloads were satisfied. For Forever, verifies called at least once.</summary>
 		public bool Verify()
 		{
 			foreach (var (_, times, tracking) in _sequence_String_void)
 			{
-				if (!times.Verify(tracking.CallCount))
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
 					return false;
 			}
 			foreach (var (_, times, tracking) in _sequence_Int32_void)
 			{
-				if (!times.Verify(tracking.CallCount))
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
 					return false;
 			}
 			return true;
@@ -289,7 +301,7 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 			if (_sequence.Count == 0)
 			{
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Format");
-				return default!;
+				throw new global::System.InvalidOperationException("No implementation provided for Format. Configure via Format.OnCall.");
 			}
 
 			var (callback, times, tracking) = _sequence[_sequenceIndex];
@@ -312,6 +324,23 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -509,6 +538,22 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 
 	/// <summary>The global::KnockOff.Tests.IMixedOverloadService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IMixedOverloadService Object => this;
+
+	/// <summary>Verifies all method interceptors' Times constraints were satisfied.</summary>
+	public bool Verify()
+	{
+		var result = true;
+		result &= Process.Verify();
+		result &= Format.Verify();
+		return result;
+	}
+
+	/// <summary>Verifies all method interceptors' Times constraints and throws if any fail.</summary>
+	public void VerifyAll()
+	{
+		if (!Verify())
+			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
 
 	/// <summary>Gets a smart default value for a generic type at runtime.</summary>
 	private static T SmartDefault<T>(string methodName)

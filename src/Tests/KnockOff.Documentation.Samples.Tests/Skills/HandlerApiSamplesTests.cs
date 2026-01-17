@@ -20,9 +20,10 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaServiceKnockOff();
         IHaService service = knockOff;
 
+        var tracking = knockOff.Initialize.OnCall((ko) => { });
         service.Initialize();
 
-        Assert.True(knockOff.Initialize.WasCalled);
+        Assert.True(tracking.WasCalled);
     }
 
     [Fact]
@@ -32,7 +33,7 @@ public class HandlerApiSamplesTests : SamplesTestBase
         IHaService service = knockOff;
         var called = false;
 
-        knockOff.Initialize.OnCall = (ko) => { called = true; };
+        knockOff.Initialize.OnCall((ko) => { called = true; });
         service.Initialize();
 
         Assert.True(called);
@@ -44,10 +45,10 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaServiceKnockOff();
         IHaService service = knockOff;
 
-        knockOff.GetById.OnCall = (ko, id) => new HaUser { Id = id };
+        var tracking = knockOff.GetById.OnCall((ko, id) => new HaUser { Id = id });
         service.GetById(42);
 
-        Assert.Equal(42, knockOff.GetById.LastCallArg);
+        Assert.Equal(42, tracking.LastArg);
     }
 
     [Fact]
@@ -56,12 +57,12 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaServiceKnockOff();
         IHaService service = knockOff;
 
-        knockOff.Create.OnCall = (ko, name, value) => new HaEntity { Name = name };
+        var tracking = knockOff.Create.OnCall((ko, name, value) => new HaEntity { Name = name });
         service.Create("Test", 100);
 
-        var args = knockOff.Create.LastCallArgs;
-        Assert.Equal("Test", args?.name);
-        Assert.Equal(100, args?.value);
+        var args = tracking.LastArgs;
+        Assert.Equal("Test", args.name);
+        Assert.Equal(100, args.value);
     }
 
     // ========================================================================
@@ -312,11 +313,15 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaOverloadServiceKnockOff();
         IHaOverloadService service = knockOff;
 
+        // Overloads use single interceptor with overloaded OnCall methods
+        var tracking1 = knockOff.Process.OnCall((HaOverloadServiceKnockOff ko, string data) => { });
+        var tracking2 = knockOff.Process.OnCall((HaOverloadServiceKnockOff ko, string data, int priority) => { });
+
         service.Process("a");
         service.Process("b", 1);
 
-        Assert.Equal(1, knockOff.Process1.CallCount);
-        Assert.Equal(1, knockOff.Process2.CallCount);
+        Assert.Equal(1, tracking1.CallCount);
+        Assert.Equal(1, tracking2.CallCount);
     }
 
     [Fact]
@@ -327,8 +332,9 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var oneParam = false;
         var twoParam = false;
 
-        knockOff.Process1.OnCall = (ko, data) => oneParam = true;
-        knockOff.Process2.OnCall = (ko, data, priority) => twoParam = true;
+        // Overloads use single interceptor with overloaded OnCall methods
+        knockOff.Process.OnCall((HaOverloadServiceKnockOff ko, string data) => { oneParam = true; });
+        knockOff.Process.OnCall((HaOverloadServiceKnockOff ko, string data, int priority) => { twoParam = true; });
 
         service.Process("a");
         service.Process("b", 1);
@@ -343,8 +349,9 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaOverloadServiceKnockOff();
         IHaOverloadService service = knockOff;
 
-        knockOff.Calculate1.OnCall = (ko, value) => value * 2;
-        knockOff.Calculate2.OnCall = (ko, a, b) => a + b;
+        // Overloads use single interceptor with overloaded OnCall methods
+        knockOff.Calculate.OnCall((HaOverloadServiceKnockOff ko, int value) => value * 2);
+        knockOff.Calculate.OnCall((HaOverloadServiceKnockOff ko, int a, int b) => a + b);
 
         Assert.Equal(10, service.Calculate(5));
         Assert.Equal(8, service.Calculate(3, 5));
@@ -360,12 +367,12 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaParserKnockOff();
         IHaParser parser = knockOff;
 
-        knockOff.TryParse.OnCall =
+        knockOff.TryParse.OnCall(
             (HaParserKnockOff.TryParseInterceptor.TryParseDelegate)((HaParserKnockOff ko, string input, out int result) =>
             {
                 result = int.Parse(input);
                 return true;
-            });
+            }));
 
         var success = parser.TryParse("42", out var value);
 
@@ -379,12 +386,12 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaParserKnockOff();
         IHaParser parser = knockOff;
 
-        knockOff.GetData.OnCall =
+        knockOff.GetData.OnCall(
             (HaParserKnockOff.GetDataInterceptor.GetDataDelegate)((HaParserKnockOff ko, out string name, out int count) =>
             {
                 name = "Test";
                 count = 42;
-            });
+            }));
 
         parser.GetData(out var resultName, out var resultCount);
 
@@ -402,11 +409,11 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaProcessorKnockOff();
         IHaProcessor processor = knockOff;
 
-        knockOff.Increment.OnCall =
+        knockOff.Increment.OnCall(
             (HaProcessorKnockOff.IncrementInterceptor.IncrementDelegate)((HaProcessorKnockOff ko, ref int value) =>
             {
                 value = value * 2;
-            });
+            }));
 
         int x = 5;
         processor.Increment(ref x);
@@ -420,12 +427,12 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaProcessorKnockOff();
         IHaProcessor processor = knockOff;
 
-        knockOff.TryUpdate.OnCall =
+        knockOff.TryUpdate.OnCall(
             (HaProcessorKnockOff.TryUpdateInterceptor.TryUpdateDelegate)((HaProcessorKnockOff ko, string key, ref string value) =>
             {
                 value = value.ToUpper();
                 return true;
-            });
+            }));
 
         string val = "test";
         var success = processor.TryUpdate("key", ref val);
@@ -444,17 +451,17 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaProcessorKnockOff();
         IHaProcessor processor = knockOff;
 
-        knockOff.Increment.OnCall =
+        var tracking = knockOff.Increment.OnCall(
             (HaProcessorKnockOff.IncrementInterceptor.IncrementDelegate)((HaProcessorKnockOff ko, ref int value) =>
             {
                 value = value * 2;
-            });
+            }));
 
         int x = 5;
         processor.Increment(ref x);
 
         Assert.Equal(10, x); // Modified
-        Assert.Equal(5, knockOff.Increment.LastCallArg); // Original input value
+        Assert.Equal(5, tracking.LastArg); // Original input value
     }
 
     // ========================================================================
@@ -467,8 +474,8 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaAsyncRepositoryKnockOff();
         IHaAsyncRepository repo = knockOff;
 
-        knockOff.GetByIdAsync.OnCall = (ko, id) =>
-            Task.FromResult<HaUser?>(new HaUser { Id = id });
+        knockOff.GetByIdAsync.OnCall((ko, id) =>
+            Task.FromResult<HaUser?>(new HaUser { Id = id }));
 
         var user = await repo.GetByIdAsync(42);
 
@@ -482,8 +489,8 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaAsyncRepositoryKnockOff();
         IHaAsyncRepository repo = knockOff;
 
-        knockOff.SaveAsync.OnCall = (ko, entity) =>
-            Task.FromException<int>(new InvalidOperationException("Failed"));
+        knockOff.SaveAsync.OnCall((ko, entity) =>
+            Task.FromException<int>(new InvalidOperationException("Failed")));
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => repo.SaveAsync(new object()));
     }

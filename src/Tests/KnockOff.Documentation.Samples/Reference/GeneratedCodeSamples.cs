@@ -60,18 +60,18 @@ public static class MultipleParametersExample
         IGenLogger logger = knockOff;
 
         // Callback receives individual parameters
-        knockOff.Log.OnCall = (ko, level, message, code) =>
+        var tracking = knockOff.Log.OnCall((ko, level, message, code) =>
         {
             Console.WriteLine($"[{level}] {message} ({code})");
-        };
+        });
 
         logger.Log("INFO", "Started", 100);
 
-        // Tracking uses LastCallArgs tuple
-        var args = knockOff.Log.LastCallArgs;
-        var level = args?.level;    // "INFO"
-        var message = args?.message; // "Started"
-        var code = args?.code;      // 100
+        // Tracking uses LastArgs tuple
+        var args = tracking.LastArgs;
+        var level = args.level;    // "INFO"
+        var message = args.message; // "Started"
+        var code = args.code;      // 100
 
         _ = (level, message, code);
     }
@@ -107,8 +107,8 @@ public static class SeparateStubsExample
         var logger = new GenAuditLoggerKnockOff();
         var auditor = new GenAuditorKnockOff();
 
-        logger.Log.OnCall = (ko, msg) => Console.WriteLine(msg);
-        auditor.Audit.OnCall = (ko, action) => Console.WriteLine($"Audit: {action}");
+        logger.Log.OnCall((ko, msg) => Console.WriteLine(msg));
+        auditor.Audit.OnCall((ko, action) => Console.WriteLine($"Audit: {action}"));
     }
 }
 #endregion

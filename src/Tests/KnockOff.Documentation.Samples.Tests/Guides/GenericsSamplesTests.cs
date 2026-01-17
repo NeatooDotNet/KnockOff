@@ -101,8 +101,8 @@ public class GenericsSamplesTests
         var userRepo = new GenericRepoStub<GenUser>();
         var orderRepo = new GenericRepoStub<GenOrder>();
 
-        userRepo.GetById.OnCall = (ko, id) => new GenUser { Id = id, Name = $"User-{id}" };
-        orderRepo.GetById.OnCall = (ko, id) => new GenOrder { Id = id };
+        userRepo.GetById.OnCall((ko, id) => new GenUser { Id = id, Name = $"User-{id}" });
+        orderRepo.GetById.OnCall((ko, id) => new GenOrder { Id = id });
 
         IGenericRepo<GenUser> userService = userRepo;
         IGenericRepo<GenOrder> orderService = orderRepo;
@@ -120,11 +120,12 @@ public class GenericsSamplesTests
         var stub = new GenericRepoStub<GenUser>();
         IGenericRepo<GenUser> repo = stub;
 
+        var tracking = stub.Save.OnCall((ko, entity) => { });
         var user = new GenUser { Id = 1, Name = "Test" };
         repo.Save(user);
 
-        Assert.Equal(1, stub.Save.CallCount);
-        Assert.Same(user, stub.Save.LastCallArg);
+        Assert.Equal(1, tracking.CallCount);
+        Assert.Same(user, tracking.LastArg);
     }
 
     [Fact]
@@ -133,7 +134,7 @@ public class GenericsSamplesTests
         var cache = new GenericKeyValueStub<string, GenUser>();
         IGenericKeyValue<string, GenUser> service = cache;
 
-        cache.Get.OnCall = (ko, key) => new GenUser { Name = key };
+        cache.Get.OnCall((ko, key) => new GenUser { Name = key });
 
         var result = service.Get("admin");
 

@@ -28,7 +28,7 @@ public class RealisticBenchmarks
         mock.Object.DoWork();
 
         // Assert
-        mock.Verify(x => x.DoWork(), Times.Once);
+        mock.Verify(x => x.DoWork(), Moq.Times.Once());
     }
 
     [Benchmark]
@@ -37,13 +37,13 @@ public class RealisticBenchmarks
         // Arrange
         var stub = new SimpleServiceStub();
         var callCount = 0;
-        stub.DoWork.OnCall = ko => callCount++;
+        var tracking = stub.DoWork.OnCall(ko => callCount++);
 
         // Act
         ((ISimpleService)stub).DoWork();
 
         // Assert
-        _ = stub.DoWork.CallCount == 1;
+        _ = tracking.CallCount == 1;
     }
 
     [Benchmark]
@@ -81,9 +81,9 @@ public class RealisticBenchmarks
         sut.Process(1);
 
         // Assert
-        mock.Verify(x => x.GetOrder(1), Times.Once);
-        mock.Verify(x => x.ValidateOrder(It.IsAny<Order>()), Times.Once);
-        mock.Verify(x => x.SaveOrder(It.IsAny<Order>()), Times.Once);
+        mock.Verify(x => x.GetOrder(1), Moq.Times.Once());
+        mock.Verify(x => x.ValidateOrder(It.IsAny<Order>()), Moq.Times.Once());
+        mock.Verify(x => x.SaveOrder(It.IsAny<Order>()), Moq.Times.Once());
     }
 
     [Benchmark]
@@ -91,18 +91,19 @@ public class RealisticBenchmarks
     {
         // Arrange
         var stub = new OrderServiceStub();
-        stub.GetOrder.OnCall = (ko, id) => new Order { Id = id, CustomerId = 1 };
-        stub.ValidateOrder.OnCall = (ko, _) => true;
-        stub.CalculateTotal.OnCall = (ko, _) => 100m;
+        var getOrderTracking = stub.GetOrder.OnCall((ko, id) => new Order { Id = id, CustomerId = 1 });
+        var validateOrderTracking = stub.ValidateOrder.OnCall((ko, _) => true);
+        stub.CalculateTotal.OnCall((ko, _) => 100m);
+        var saveOrderTracking = stub.SaveOrder.OnCall((ko, _) => { });
 
         // Act
         var sut = new OrderProcessor(stub);
         sut.Process(1);
 
         // Assert
-        _ = stub.GetOrder.CallCount == 1;
-        _ = stub.ValidateOrder.CallCount == 1;
-        _ = stub.SaveOrder.CallCount == 1;
+        _ = getOrderTracking.CallCount == 1;
+        _ = validateOrderTracking.CallCount == 1;
+        _ = saveOrderTracking.CallCount == 1;
     }
 
     [Benchmark]
@@ -157,8 +158,8 @@ public class TestSuiteBenchmarks
             _ = mock.Object.GetOrder(i);
             _ = mock.Object.ValidateOrder(new Order());
 
-            mock.Verify(x => x.GetOrder(i), Times.Once);
-            mock.Verify(x => x.ValidateOrder(It.IsAny<Order>()), Times.Once);
+            mock.Verify(x => x.GetOrder(i), Moq.Times.Once());
+            mock.Verify(x => x.ValidateOrder(It.IsAny<Order>()), Moq.Times.Once());
         }
     }
 
@@ -170,14 +171,14 @@ public class TestSuiteBenchmarks
             // Simulate a typical test
             var stub = new OrderServiceStub();
             var capturedI = i;
-            stub.GetOrder.OnCall = (ko, _) => new Order { Id = capturedI };
-            stub.ValidateOrder.OnCall = (ko, _) => true;
+            var getOrderTracking = stub.GetOrder.OnCall((ko, _) => new Order { Id = capturedI });
+            var validateOrderTracking = stub.ValidateOrder.OnCall((ko, _) => true);
 
             _ = ((IOrderService)stub).GetOrder(i);
             _ = ((IOrderService)stub).ValidateOrder(new Order());
 
-            _ = stub.GetOrder.CallCount == 1;
-            _ = stub.ValidateOrder.CallCount == 1;
+            _ = getOrderTracking.CallCount == 1;
+            _ = validateOrderTracking.CallCount == 1;
         }
     }
 

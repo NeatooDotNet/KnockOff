@@ -94,7 +94,7 @@ public class MoqComparisonSamples
         var service = mock.Object;
         var user = service.GetUser(42);
 
-        mock.Verify(x => x.GetUser(42), Times.Once);
+        mock.Verify(x => x.GetUser(42), Moq.Times.Once());
     }
     #endregion
 
@@ -109,7 +109,7 @@ public class MoqComparisonSamples
         var user = mock.Object.CurrentUser;
         mock.Object.CurrentUser = new MoqUser { Name = "New" };
 
-        mock.VerifySet(x => x.CurrentUser = It.IsAny<MoqUser>(), Times.Once);
+        mock.VerifySet(x => x.CurrentUser = It.IsAny<MoqUser>(), Moq.Times.Once());
     }
     #endregion
 
@@ -201,10 +201,10 @@ public class MoqComparisonSamples
         mock.Object.Update(new MoqEntity());
         mock.Object.Update(new MoqEntity());
 
-        mock.Verify(x => x.Save(It.IsAny<MoqEntity>()), Times.Once);
-        mock.Verify(x => x.Delete(It.IsAny<int>()), Times.Never);
-        mock.Verify(x => x.GetAll(), Times.AtLeastOnce);
-        mock.Verify(x => x.Update(It.IsAny<MoqEntity>()), Times.Exactly(3));
+        mock.Verify(x => x.Save(It.IsAny<MoqEntity>()), Moq.Times.Once());
+        mock.Verify(x => x.Delete(It.IsAny<int>()), Moq.Times.Never());
+        mock.Verify(x => x.GetAll(), Moq.Times.AtLeastOnce());
+        mock.Verify(x => x.Update(It.IsAny<MoqEntity>()), Moq.Times.Exactly(3));
     }
     #endregion
 

@@ -62,7 +62,7 @@ public partial class DelegateTests
 
 // Usage in test:
 // var uniqueStub = new DelegateTests.Stubs.IsUniqueRule();
-// uniqueStub.Interceptor.OnCall = (ko, value) => value != "duplicate";
+// var tracking = uniqueStub.Interceptor.OnCall((ko, value) => value != "duplicate");
 //
 // // Implicit conversion to delegate
 // IsUniqueRule rule = uniqueStub;
@@ -70,8 +70,8 @@ public partial class DelegateTests
 // Assert.False(rule("duplicate"));
 //
 // // Verify calls
-// Assert.Equal(2, uniqueStub.Interceptor.CallCount);
-// Assert.Equal("duplicate", uniqueStub.Interceptor.LastCallArg);
+// Assert.Equal(2, tracking.CallCount);
+// Assert.Equal("duplicate", tracking.LastArg);
 #endregion
 
 // ============================================================================
@@ -87,13 +87,13 @@ public partial class VoidDelegateTests
 // Usage:
 // var logStub = new VoidDelegateTests.Stubs.LogAction();
 // var messages = new List<string>();
-// logStub.Interceptor.OnCall = (ko, msg) => messages.Add(msg);
+// var tracking = logStub.Interceptor.OnCall((ko, msg) => messages.Add(msg));
 //
 // LogAction logger = logStub;
 // logger("Hello");
 // logger("World");
 //
-// Assert.Equal(2, logStub.Interceptor.CallCount);
+// Assert.Equal(2, tracking.CallCount);
 // Assert.Equal(["Hello", "World"], messages);
 #endregion
 
@@ -113,7 +113,7 @@ public partial class VoidDelegateTests
 // }
 
 // var stub = new DelegateTests.Stubs.IsUniqueRule();
-// stub.Interceptor.OnCall = (ko, v) => v.Length > 3;
+// stub.Interceptor.OnCall((ko, v) => v.Length > 3);
 //
 // // Implicit conversion - no cast needed
 // var validator = new Validator(stub);
@@ -153,14 +153,14 @@ public partial class GenericDelegateTests
 
 // Usage:
 // var factoryStub = new GenericDelegateTests.Stubs.Factory();
-// factoryStub.Interceptor.OnCall = (ko) => new DelUser { Id = 1, Name = "Created" };
+// factoryStub.Interceptor.OnCall((ko) => new DelUser { Id = 1, Name = "Created" });
 //
 // Factory<DelUser> factory = factoryStub;
 // var user = factory();
 // Assert.Equal("Created", user.Name);
 //
 // var converterStub = new GenericDelegateTests.Stubs.Converter();
-// converterStub.Interceptor.OnCall = (ko, num) => $"Number: {num}";
+// converterStub.Interceptor.OnCall((ko, num) => $"Number: {num}");
 //
 // Converter<int, string> converter = converterStub;
 // Assert.Equal("Number: 42", converter(42));
@@ -180,14 +180,14 @@ public partial class ValidationPatternTests
 // var uniqueCheck = new ValidationPatternTests.Stubs.IsUniqueRule();
 //
 // // Default: always valid
-// uniqueCheck.Interceptor.OnCall = (ko, value) => true;
+// uniqueCheck.Interceptor.OnCall((ko, value) => true);
 //
 // var entity = new Entity(uniqueCheck);
 // entity.Name = "anything";  // Passes validation
 //
 // // Test invalid scenario
 // uniqueCheck.Interceptor.Reset();
-// uniqueCheck.Interceptor.OnCall = (ko, value) => false;
+// uniqueCheck.Interceptor.OnCall((ko, value) => false);
 //
 // entity.Name = "duplicate";  // Triggers validation error
 // Assert.True(entity.HasErrors);

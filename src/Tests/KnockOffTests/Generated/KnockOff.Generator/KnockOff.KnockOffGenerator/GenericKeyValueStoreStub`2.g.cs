@@ -40,7 +40,7 @@ partial class GenericKeyValueStoreStub<TKey, TValue> : global::KnockOff.Tests.IG
 			if (_sequence.Count == 0)
 			{
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Get");
-				return default!;
+				throw new global::System.InvalidOperationException("No implementation provided for Get. Configure via Get.OnCall.");
 			}
 
 			var (callback, times, tracking) = _sequence[_sequenceIndex];
@@ -63,6 +63,23 @@ partial class GenericKeyValueStoreStub<TKey, TValue> : global::KnockOff.Tests.IG
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -186,6 +203,23 @@ partial class GenericKeyValueStoreStub<TKey, TValue> : global::KnockOff.Tests.IG
 			_sequenceIndex = 0;
 		}
 
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTrackingArgs<(TKey? key, TValue? @value)>
 		{
@@ -261,6 +295,22 @@ partial class GenericKeyValueStoreStub<TKey, TValue> : global::KnockOff.Tests.IG
 
 	/// <summary>The global::KnockOff.Tests.IGenericKeyValueStore<TKey, TValue> instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IGenericKeyValueStore<TKey, TValue> Object => this;
+
+	/// <summary>Verifies all method interceptors' Times constraints were satisfied.</summary>
+	public bool Verify()
+	{
+		var result = true;
+		result &= Get.Verify();
+		result &= Set.Verify();
+		return result;
+	}
+
+	/// <summary>Verifies all method interceptors' Times constraints and throws if any fail.</summary>
+	public void VerifyAll()
+	{
+		if (!Verify())
+			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
 
 	TValue global::KnockOff.Tests.IGenericKeyValueStore<TKey, TValue>.Get(TKey key)
 	{

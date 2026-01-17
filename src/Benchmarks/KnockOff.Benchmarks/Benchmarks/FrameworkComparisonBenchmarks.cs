@@ -40,9 +40,9 @@ public class FrameworkComparisonBenchmarks
         sut.Process(1);
 
         // Assert
-        mock.Verify(x => x.GetOrder(1), Times.Once);
-        mock.Verify(x => x.ValidateOrder(It.IsAny<Order>()), Times.Once);
-        mock.Verify(x => x.SaveOrder(It.IsAny<Order>()), Times.Once);
+        mock.Verify(x => x.GetOrder(1), Moq.Times.Once());
+        mock.Verify(x => x.ValidateOrder(It.IsAny<Order>()), Moq.Times.Once());
+        mock.Verify(x => x.SaveOrder(It.IsAny<Order>()), Moq.Times.Once());
     }
 
     [Benchmark]
@@ -50,9 +50,10 @@ public class FrameworkComparisonBenchmarks
     {
         // Arrange
         var stub = new OrderServiceStub();
-        stub.GetOrder.OnCall = (ko, id) => new Order { Id = id, CustomerId = 1 };
-        stub.ValidateOrder.OnCall = (ko, _) => true;
-        stub.CalculateTotal.OnCall = (ko, _) => 100m;
+        var getOrderTracking = stub.GetOrder.OnCall((ko, id) => new Order { Id = id, CustomerId = 1 });
+        var validateOrderTracking = stub.ValidateOrder.OnCall((ko, _) => true);
+        stub.CalculateTotal.OnCall((ko, _) => 100m);
+        var saveOrderTracking = stub.SaveOrder.OnCall((ko, _) => { });
 
         var sut = new OrderProcessor(stub);
 
@@ -60,9 +61,9 @@ public class FrameworkComparisonBenchmarks
         sut.Process(1);
 
         // Assert
-        _ = stub.GetOrder.CallCount == 1;
-        _ = stub.ValidateOrder.CallCount == 1;
-        _ = stub.SaveOrder.CallCount == 1;
+        _ = getOrderTracking.CallCount == 1;
+        _ = validateOrderTracking.CallCount == 1;
+        _ = saveOrderTracking.CallCount == 1;
     }
 
     [Benchmark]
@@ -113,9 +114,9 @@ public class FrameworkComparisonBenchmarks
         var result = await service.GetProductAsync(1);
 
         // Assert
-        repository.Verify(x => x.GetByIdAsync(1), Times.Once);
-        cache.Verify(x => x.Set("product:1", product, It.IsAny<TimeSpan>()), Times.Once);
-        logger.Verify(x => x.LogInfo(It.Is<string>(s => s.Contains("Cache miss"))), Times.Once);
+        repository.Verify(x => x.GetByIdAsync(1), Moq.Times.Once());
+        cache.Verify(x => x.Set("product:1", product, It.IsAny<TimeSpan>()), Moq.Times.Once());
+        logger.Verify(x => x.LogInfo(It.Is<string>(s => s.Contains("Cache miss"))), Moq.Times.Once());
 
         return result;
     }
@@ -127,12 +128,14 @@ public class FrameworkComparisonBenchmarks
         var product = new FcBenchProduct { Id = 1, Name = "Widget", Price = 19.99m };
 
         var repository = new FcBenchProductRepositoryStub();
-        repository.GetByIdAsync.OnCall = (ko, id) => Task.FromResult<FcBenchProduct?>(product);
+        var getByIdTracking = repository.GetByIdAsync.OnCall((ko, id) => Task.FromResult<FcBenchProduct?>(product));
 
         var cache = new FcBenchCacheServiceStub();
         cache.Get.Of<FcBenchProduct>().OnCall = (ko, key) => null;
+        cache.Set.Of<FcBenchProduct>().OnCall = (ko, key, value, expiration) => { };
 
         var logger = new FcBenchLoggerStub();
+        var logInfoTracking = logger.LogInfo.OnCall((ko, message) => { });
 
         var service = new FcBenchCachedProductService(repository, cache, logger);
 
@@ -140,9 +143,9 @@ public class FrameworkComparisonBenchmarks
         var result = await service.GetProductAsync(1);
 
         // Assert
-        _ = repository.GetByIdAsync.CallCount == 1;
+        _ = getByIdTracking.CallCount == 1;
         _ = cache.Set.Of<FcBenchProduct>().CallCount == 1;
-        _ = logger.LogInfo.LastCallArg?.Contains("Cache miss");
+        _ = logInfoTracking.LastArg?.Contains("Cache miss");
 
         return result;
     }

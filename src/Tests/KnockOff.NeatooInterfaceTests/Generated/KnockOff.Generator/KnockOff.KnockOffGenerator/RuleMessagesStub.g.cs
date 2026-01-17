@@ -77,48 +77,77 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; }
 	}
 
-	/// <summary>Tracks and configures behavior for Add.</summary>
-	public sealed class Add1Interceptor
+	/// <summary>Tracks and configures behavior for Add (overloaded).</summary>
+	public sealed class AddInterceptor
 	{
-		private readonly global::System.Collections.Generic.List<(global::System.Action<RuleMessagesStub, string, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
-		private int _sequenceIndex;
+		/// <summary>Delegate for Add(string, string).</summary>
+		public delegate void AddDelegate_String_String_void(RuleMessagesStub ko, string propertyName, string message);
 
-		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
-		public global::KnockOff.IMethodTrackingArgs<(string? propertyName, string? message)> OnCall(global::System.Action<RuleMessagesStub, string, string> callback)
+		private readonly global::System.Collections.Generic.List<(AddDelegate_String_String_void Callback, global::KnockOff.Times Times, MethodTrackingImpl_String_String_void Tracking)> _sequence_String_String_void = new();
+		private int _sequenceIndex_String_String_void;
+
+		/// <summary>Delegate for Add(global::Neatoo.Rules.IRuleMessage).</summary>
+		public delegate void AddDelegate_Neatoo_Rules_IRuleMessage_void(RuleMessagesStub ko, global::Neatoo.Rules.IRuleMessage item);
+
+		private readonly global::System.Collections.Generic.List<(AddDelegate_Neatoo_Rules_IRuleMessage_void Callback, global::KnockOff.Times Times, MethodTrackingImpl_Neatoo_Rules_IRuleMessage_void Tracking)> _sequence_Neatoo_Rules_IRuleMessage_void = new();
+		private int _sequenceIndex_Neatoo_Rules_IRuleMessage_void;
+
+		/// <summary>Configures callback for Add(string, string). Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTrackingArgs<(string? propertyName, string? message)> OnCall(AddDelegate_String_String_void callback)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
-			_sequenceIndex = 0;
+			var tracking = new MethodTrackingImpl_String_String_void();
+			_sequence_String_String_void.Clear();
+			_sequence_String_String_void.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequenceIndex_String_String_void = 0;
 			return tracking;
 		}
 
-		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<RuleMessagesStub, string, string>> OnCall(global::System.Action<RuleMessagesStub, string, string> callback, global::KnockOff.Times times)
+		/// <summary>Configures callback for Add(string, string) with Times constraint.</summary>
+		public global::KnockOff.IMethodSequence<AddDelegate_String_String_void> OnCall(AddDelegate_String_String_void callback, global::KnockOff.Times times)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, times, tracking));
-			_sequenceIndex = 0;
-			return new MethodSequenceImpl(this);
+			var tracking = new MethodTrackingImpl_String_String_void();
+			_sequence_String_String_void.Clear();
+			_sequence_String_String_void.Add((callback, times, tracking));
+			_sequenceIndex_String_String_void = 0;
+			return new MethodSequenceImpl_String_String_void(this);
 		}
 
-		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(RuleMessagesStub ko, bool strict, string propertyName, string message)
+		/// <summary>Configures callback for Add(global::Neatoo.Rules.IRuleMessage). Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking<global::Neatoo.Rules.IRuleMessage> OnCall(AddDelegate_Neatoo_Rules_IRuleMessage_void callback)
 		{
-			if (_sequence.Count == 0)
+			var tracking = new MethodTrackingImpl_Neatoo_Rules_IRuleMessage_void();
+			_sequence_Neatoo_Rules_IRuleMessage_void.Clear();
+			_sequence_Neatoo_Rules_IRuleMessage_void.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequenceIndex_Neatoo_Rules_IRuleMessage_void = 0;
+			return tracking;
+		}
+
+		/// <summary>Configures callback for Add(global::Neatoo.Rules.IRuleMessage) with Times constraint.</summary>
+		public global::KnockOff.IMethodSequence<AddDelegate_Neatoo_Rules_IRuleMessage_void> OnCall(AddDelegate_Neatoo_Rules_IRuleMessage_void callback, global::KnockOff.Times times)
+		{
+			var tracking = new MethodTrackingImpl_Neatoo_Rules_IRuleMessage_void();
+			_sequence_Neatoo_Rules_IRuleMessage_void.Clear();
+			_sequence_Neatoo_Rules_IRuleMessage_void.Add((callback, times, tracking));
+			_sequenceIndex_Neatoo_Rules_IRuleMessage_void = 0;
+			return new MethodSequenceImpl_Neatoo_Rules_IRuleMessage_void(this);
+		}
+
+		/// <summary>Invokes configured callback for Add(string, string).</summary>
+		internal void Invoke_String_String_void(RuleMessagesStub ko, bool strict, string propertyName, string message)
+		{
+			if (_sequence_String_String_void.Count == 0)
 			{
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 				return;
 			}
 
-			var (callback, times, tracking) = _sequence[_sequenceIndex];
+			var (callback, times, tracking) = _sequence_String_String_void[_sequenceIndex_String_String_void];
 			tracking.RecordCall((propertyName, message));
 
 			if (!times.IsForever && tracking.CallCount >= times.Count)
 			{
-				if (_sequenceIndex < _sequence.Count - 1)
-					_sequenceIndex++;
+				if (_sequenceIndex_String_String_void < _sequence_String_String_void.Count - 1)
+					_sequenceIndex_String_String_void++;
 				else if (tracking.CallCount > times.Count)
 					throw global::KnockOff.StubException.SequenceExhausted("Add");
 			}
@@ -126,66 +155,125 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 			callback(ko, propertyName, message);
 		}
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset()
+		/// <summary>Invokes configured callback for Add(global::Neatoo.Rules.IRuleMessage).</summary>
+		internal void Invoke_Neatoo_Rules_IRuleMessage_void(RuleMessagesStub ko, bool strict, global::Neatoo.Rules.IRuleMessage item)
 		{
-			foreach (var (_, _, tracking) in _sequence)
-				tracking.Reset();
-			_sequenceIndex = 0;
+			if (_sequence_Neatoo_Rules_IRuleMessage_void.Count == 0)
+			{
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
+				return;
+			}
+
+			var (callback, times, tracking) = _sequence_Neatoo_Rules_IRuleMessage_void[_sequenceIndex_Neatoo_Rules_IRuleMessage_void];
+			tracking.RecordCall(item);
+
+			if (!times.IsForever && tracking.CallCount >= times.Count)
+			{
+				if (_sequenceIndex_Neatoo_Rules_IRuleMessage_void < _sequence_Neatoo_Rules_IRuleMessage_void.Count - 1)
+					_sequenceIndex_Neatoo_Rules_IRuleMessage_void++;
+				else if (tracking.CallCount > times.Count)
+					throw global::KnockOff.StubException.SequenceExhausted("Add");
+			}
+
+			callback(ko, item);
 		}
 
-		/// <summary>Tracks invocations for this callback registration.</summary>
-		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTrackingArgs<(string? propertyName, string? message)>
+		/// <summary>Resets all tracking state for all overloads.</summary>
+		public void Reset()
+		{
+			foreach (var (_, _, tracking) in _sequence_String_String_void)
+				tracking.Reset();
+			_sequenceIndex_String_String_void = 0;
+			foreach (var (_, _, tracking) in _sequence_Neatoo_Rules_IRuleMessage_void)
+				tracking.Reset();
+			_sequenceIndex_Neatoo_Rules_IRuleMessage_void = 0;
+		}
+
+		/// <summary>Verifies all Times constraints for all overloads were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence_String_String_void)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			foreach (var (_, times, tracking) in _sequence_Neatoo_Rules_IRuleMessage_void)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
+		private sealed class MethodTrackingImpl_String_String_void : global::KnockOff.IMethodTrackingArgs<(string? propertyName, string? message)>
 		{
 			private (string? propertyName, string? message) _lastArgs;
 
-			/// <summary>Number of times this callback was invoked.</summary>
 			public int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 			public (string? propertyName, string? message) LastArgs => _lastArgs;
 
-			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall((string? propertyName, string? message) args) { CallCount++; _lastArgs = args; }
 
-			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArgs = default; }
 		}
 
-		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<RuleMessagesStub, string, string>>
+		private sealed class MethodTrackingImpl_Neatoo_Rules_IRuleMessage_void : global::KnockOff.IMethodTracking<global::Neatoo.Rules.IRuleMessage>
 		{
-			private readonly Add1Interceptor _interceptor;
+			private global::Neatoo.Rules.IRuleMessage _lastArg = default!;
 
-			public MethodSequenceImpl(Add1Interceptor interceptor) => _interceptor = interceptor;
+			public int CallCount { get; private set; }
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
+			public bool WasCalled => CallCount > 0;
+
+			public global::Neatoo.Rules.IRuleMessage LastArg => _lastArg;
+
+			public void RecordCall(global::Neatoo.Rules.IRuleMessage item) { CallCount++; _lastArg = item; }
+
+			public void Reset() { CallCount = 0; _lastArg = default!; }
+		}
+
+		private sealed class MethodSequenceImpl_String_String_void : global::KnockOff.IMethodSequence<AddDelegate_String_String_void>
+		{
+			private readonly AddInterceptor _interceptor;
+
+			public MethodSequenceImpl_String_String_void(AddInterceptor interceptor) => _interceptor = interceptor;
+
 			public int TotalCallCount
 			{
 				get
 				{
 					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence)
+					foreach (var (_, _, tracking) in _interceptor._sequence_String_String_void)
 						total += tracking.CallCount;
 					return total;
 				}
 			}
 
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<RuleMessagesStub, string, string>> ThenCall(global::System.Action<RuleMessagesStub, string, string> callback, global::KnockOff.Times times)
+			public global::KnockOff.IMethodSequence<AddDelegate_String_String_void> ThenCall(AddDelegate_String_String_void callback, global::KnockOff.Times times)
 			{
-				var tracking = new MethodTrackingImpl();
-				_interceptor._sequence.Add((callback, times, tracking));
+				var tracking = new MethodTrackingImpl_String_String_void();
+				_interceptor._sequence_String_String_void.Add((callback, times, tracking));
 				return this;
 			}
 
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
 			public bool Verify()
 			{
-				foreach (var (_, times, tracking) in _interceptor._sequence)
+				foreach (var (_, times, tracking) in _interceptor._sequence_String_String_void)
 				{
 					if (!times.Verify(tracking.CallCount))
 						return false;
@@ -193,9 +281,46 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 				return true;
 			}
 
-			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
+		private sealed class MethodSequenceImpl_Neatoo_Rules_IRuleMessage_void : global::KnockOff.IMethodSequence<AddDelegate_Neatoo_Rules_IRuleMessage_void>
+		{
+			private readonly AddInterceptor _interceptor;
+
+			public MethodSequenceImpl_Neatoo_Rules_IRuleMessage_void(AddInterceptor interceptor) => _interceptor = interceptor;
+
+			public int TotalCallCount
+			{
+				get
+				{
+					var total = 0;
+					foreach (var (_, _, tracking) in _interceptor._sequence_Neatoo_Rules_IRuleMessage_void)
+						total += tracking.CallCount;
+					return total;
+				}
+			}
+
+			public global::KnockOff.IMethodSequence<AddDelegate_Neatoo_Rules_IRuleMessage_void> ThenCall(AddDelegate_Neatoo_Rules_IRuleMessage_void callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl_Neatoo_Rules_IRuleMessage_void();
+				_interceptor._sequence_Neatoo_Rules_IRuleMessage_void.Add((callback, times, tracking));
+				return this;
+			}
+
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _interceptor._sequence_Neatoo_Rules_IRuleMessage_void)
+				{
+					if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			public void Reset() => _interceptor.Reset();
+		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for IndexOf.</summary>
@@ -256,6 +381,23 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -379,6 +521,23 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 			_sequenceIndex = 0;
 		}
 
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTrackingArgs<(int? index, global::Neatoo.Rules.IRuleMessage? item)>
 		{
@@ -500,6 +659,23 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 			_sequenceIndex = 0;
 		}
 
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking<int>
 		{
@@ -542,127 +718,6 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 
 			/// <summary>Add another callback to the sequence.</summary>
 			public global::KnockOff.IMethodSequence<global::System.Action<RuleMessagesStub, int>> ThenCall(global::System.Action<RuleMessagesStub, int> callback, global::KnockOff.Times times)
-			{
-				var tracking = new MethodTrackingImpl();
-				_interceptor._sequence.Add((callback, times, tracking));
-				return this;
-			}
-
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-			public bool Verify()
-			{
-				foreach (var (_, times, tracking) in _interceptor._sequence)
-				{
-					if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
-			}
-
-			/// <summary>Reset all tracking in the sequence.</summary>
-			public void Reset() => _interceptor.Reset();
-		}
-	}
-
-	/// <summary>Tracks and configures behavior for Add.</summary>
-	public sealed class Add2Interceptor
-	{
-		private readonly global::System.Collections.Generic.List<(global::System.Action<RuleMessagesStub, global::Neatoo.Rules.IRuleMessage> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
-		private int _sequenceIndex;
-
-		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
-		public global::KnockOff.IMethodTracking<global::Neatoo.Rules.IRuleMessage> OnCall(global::System.Action<RuleMessagesStub, global::Neatoo.Rules.IRuleMessage> callback)
-		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
-			_sequenceIndex = 0;
-			return tracking;
-		}
-
-		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<RuleMessagesStub, global::Neatoo.Rules.IRuleMessage>> OnCall(global::System.Action<RuleMessagesStub, global::Neatoo.Rules.IRuleMessage> callback, global::KnockOff.Times times)
-		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, times, tracking));
-			_sequenceIndex = 0;
-			return new MethodSequenceImpl(this);
-		}
-
-		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(RuleMessagesStub ko, bool strict, global::Neatoo.Rules.IRuleMessage item)
-		{
-			if (_sequence.Count == 0)
-			{
-				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
-				return;
-			}
-
-			var (callback, times, tracking) = _sequence[_sequenceIndex];
-			tracking.RecordCall(item);
-
-			if (!times.IsForever && tracking.CallCount >= times.Count)
-			{
-				if (_sequenceIndex < _sequence.Count - 1)
-					_sequenceIndex++;
-				else if (tracking.CallCount > times.Count)
-					throw global::KnockOff.StubException.SequenceExhausted("Add");
-			}
-
-			callback(ko, item);
-		}
-
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset()
-		{
-			foreach (var (_, _, tracking) in _sequence)
-				tracking.Reset();
-			_sequenceIndex = 0;
-		}
-
-		/// <summary>Tracks invocations for this callback registration.</summary>
-		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking<global::Neatoo.Rules.IRuleMessage>
-		{
-			private global::Neatoo.Rules.IRuleMessage _lastArg = default!;
-
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
-
-			/// <summary>True if CallCount > 0.</summary>
-			public bool WasCalled => CallCount > 0;
-
-			/// <summary>Last argument passed to this callback. Default if never called.</summary>
-			public global::Neatoo.Rules.IRuleMessage LastArg => _lastArg;
-
-			/// <summary>Records a call to this callback.</summary>
-			public void RecordCall(global::Neatoo.Rules.IRuleMessage item) { CallCount++; _lastArg = item; }
-
-			/// <summary>Resets tracking state.</summary>
-			public void Reset() { CallCount = 0; _lastArg = default!; }
-		}
-
-		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<RuleMessagesStub, global::Neatoo.Rules.IRuleMessage>>
-		{
-			private readonly Add2Interceptor _interceptor;
-
-			public MethodSequenceImpl(Add2Interceptor interceptor) => _interceptor = interceptor;
-
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
-			{
-				get
-				{
-					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence)
-						total += tracking.CallCount;
-					return total;
-				}
-			}
-
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<RuleMessagesStub, global::Neatoo.Rules.IRuleMessage>> ThenCall(global::System.Action<RuleMessagesStub, global::Neatoo.Rules.IRuleMessage> callback, global::KnockOff.Times times)
 			{
 				var tracking = new MethodTrackingImpl();
 				_interceptor._sequence.Add((callback, times, tracking));
@@ -740,6 +795,23 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -862,6 +934,23 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 			_sequenceIndex = 0;
 		}
 
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking<global::Neatoo.Rules.IRuleMessage>
 		{
@@ -981,6 +1070,23 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -1107,6 +1213,23 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 			_sequenceIndex = 0;
 		}
 
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking<global::Neatoo.Rules.IRuleMessage>
 		{
@@ -1171,51 +1294,77 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		}
 	}
 
-	/// <summary>Tracks and configures behavior for GetEnumerator.</summary>
+	/// <summary>Tracks and configures behavior for GetEnumerator (overloaded).</summary>
 	public sealed class GetEnumeratorInterceptor
 	{
-		/// <summary>Delegate for GetEnumerator.</summary>
-		public delegate global::System.Collections.Generic.IEnumerator<global::Neatoo.Rules.IRuleMessage> GetEnumeratorDelegate(RuleMessagesStub ko);
+		/// <summary>Delegate for GetEnumerator().</summary>
+		public delegate global::System.Collections.Generic.IEnumerator<global::Neatoo.Rules.IRuleMessage> GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage(RuleMessagesStub ko);
 
-		private readonly global::System.Collections.Generic.List<(GetEnumeratorDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
-		private int _sequenceIndex;
+		private readonly global::System.Collections.Generic.List<(GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage Callback, global::KnockOff.Times Times, MethodTrackingImpl_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage Tracking)> _sequence_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage = new();
+		private int _sequenceIndex_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage;
 
-		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
-		public global::KnockOff.IMethodTracking OnCall(GetEnumeratorDelegate callback)
+		/// <summary>Delegate for GetEnumerator().</summary>
+		public delegate global::System.Collections.IEnumerator GetEnumeratorDelegate_NoParams_Collections_IEnumerator(RuleMessagesStub ko);
+
+		private readonly global::System.Collections.Generic.List<(GetEnumeratorDelegate_NoParams_Collections_IEnumerator Callback, global::KnockOff.Times Times, MethodTrackingImpl_NoParams_Collections_IEnumerator Tracking)> _sequence_NoParams_Collections_IEnumerator = new();
+		private int _sequenceIndex_NoParams_Collections_IEnumerator;
+
+		/// <summary>Configures callback for GetEnumerator(). Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking OnCall(GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage callback)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
-			_sequenceIndex = 0;
+			var tracking = new MethodTrackingImpl_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage();
+			_sequence_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage.Clear();
+			_sequence_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequenceIndex_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage = 0;
 			return tracking;
 		}
 
-		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
-		public global::KnockOff.IMethodSequence<GetEnumeratorDelegate> OnCall(GetEnumeratorDelegate callback, global::KnockOff.Times times)
+		/// <summary>Configures callback for GetEnumerator() with Times constraint.</summary>
+		public global::KnockOff.IMethodSequence<GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage> OnCall(GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage callback, global::KnockOff.Times times)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, times, tracking));
-			_sequenceIndex = 0;
-			return new MethodSequenceImpl(this);
+			var tracking = new MethodTrackingImpl_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage();
+			_sequence_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage.Clear();
+			_sequence_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage.Add((callback, times, tracking));
+			_sequenceIndex_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage = 0;
+			return new MethodSequenceImpl_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage(this);
 		}
 
-		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Collections.Generic.IEnumerator<global::Neatoo.Rules.IRuleMessage> Invoke(RuleMessagesStub ko, bool strict)
+		/// <summary>Configures callback for GetEnumerator(). Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking OnCall(GetEnumeratorDelegate_NoParams_Collections_IEnumerator callback)
 		{
-			if (_sequence.Count == 0)
+			var tracking = new MethodTrackingImpl_NoParams_Collections_IEnumerator();
+			_sequence_NoParams_Collections_IEnumerator.Clear();
+			_sequence_NoParams_Collections_IEnumerator.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequenceIndex_NoParams_Collections_IEnumerator = 0;
+			return tracking;
+		}
+
+		/// <summary>Configures callback for GetEnumerator() with Times constraint.</summary>
+		public global::KnockOff.IMethodSequence<GetEnumeratorDelegate_NoParams_Collections_IEnumerator> OnCall(GetEnumeratorDelegate_NoParams_Collections_IEnumerator callback, global::KnockOff.Times times)
+		{
+			var tracking = new MethodTrackingImpl_NoParams_Collections_IEnumerator();
+			_sequence_NoParams_Collections_IEnumerator.Clear();
+			_sequence_NoParams_Collections_IEnumerator.Add((callback, times, tracking));
+			_sequenceIndex_NoParams_Collections_IEnumerator = 0;
+			return new MethodSequenceImpl_NoParams_Collections_IEnumerator(this);
+		}
+
+		/// <summary>Invokes configured callback for GetEnumerator().</summary>
+		internal global::System.Collections.Generic.IEnumerator<global::Neatoo.Rules.IRuleMessage> Invoke_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage(RuleMessagesStub ko, bool strict)
+		{
+			if (_sequence_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage.Count == 0)
 			{
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
-				return default!;
+				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
 			}
 
-			var (callback, times, tracking) = _sequence[_sequenceIndex];
+			var (callback, times, tracking) = _sequence_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage[_sequenceIndex_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage];
 			tracking.RecordCall();
 
 			if (!times.IsForever && tracking.CallCount >= times.Count)
 			{
-				if (_sequenceIndex < _sequence.Count - 1)
-					_sequenceIndex++;
+				if (_sequenceIndex_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage < _sequence_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage.Count - 1)
+					_sequenceIndex_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage++;
 				else if (tracking.CallCount > times.Count)
 					throw global::KnockOff.StubException.SequenceExhausted("GetEnumerator");
 			}
@@ -1223,62 +1372,119 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 			return callback(ko);
 		}
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset()
+		/// <summary>Invokes configured callback for GetEnumerator().</summary>
+		internal global::System.Collections.IEnumerator Invoke_NoParams_Collections_IEnumerator(RuleMessagesStub ko, bool strict)
 		{
-			foreach (var (_, _, tracking) in _sequence)
-				tracking.Reset();
-			_sequenceIndex = 0;
+			if (_sequence_NoParams_Collections_IEnumerator.Count == 0)
+			{
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
+				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
+			}
+
+			var (callback, times, tracking) = _sequence_NoParams_Collections_IEnumerator[_sequenceIndex_NoParams_Collections_IEnumerator];
+			tracking.RecordCall();
+
+			if (!times.IsForever && tracking.CallCount >= times.Count)
+			{
+				if (_sequenceIndex_NoParams_Collections_IEnumerator < _sequence_NoParams_Collections_IEnumerator.Count - 1)
+					_sequenceIndex_NoParams_Collections_IEnumerator++;
+				else if (tracking.CallCount > times.Count)
+					throw global::KnockOff.StubException.SequenceExhausted("GetEnumerator");
+			}
+
+			return callback(ko);
 		}
 
-		/// <summary>Tracks invocations for this callback registration.</summary>
-		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking
+		/// <summary>Resets all tracking state for all overloads.</summary>
+		public void Reset()
+		{
+			foreach (var (_, _, tracking) in _sequence_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage)
+				tracking.Reset();
+			_sequenceIndex_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage = 0;
+			foreach (var (_, _, tracking) in _sequence_NoParams_Collections_IEnumerator)
+				tracking.Reset();
+			_sequenceIndex_NoParams_Collections_IEnumerator = 0;
+		}
+
+		/// <summary>Verifies all Times constraints for all overloads were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			foreach (var (_, times, tracking) in _sequence_NoParams_Collections_IEnumerator)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
+		private sealed class MethodTrackingImpl_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage : global::KnockOff.IMethodTracking
 		{
 
-			/// <summary>Number of times this callback was invoked.</summary>
 			public int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
 
-			/// <summary>Resets tracking state.</summary>
 			public void Reset() => CallCount = 0;
 		}
 
-		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<GetEnumeratorDelegate>
+		private sealed class MethodTrackingImpl_NoParams_Collections_IEnumerator : global::KnockOff.IMethodTracking
+		{
+
+			public int CallCount { get; private set; }
+
+			public bool WasCalled => CallCount > 0;
+
+			public void RecordCall() => CallCount++;
+
+			public void Reset() => CallCount = 0;
+		}
+
+		private sealed class MethodSequenceImpl_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage : global::KnockOff.IMethodSequence<GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage>
 		{
 			private readonly GetEnumeratorInterceptor _interceptor;
 
-			public MethodSequenceImpl(GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
+			public MethodSequenceImpl_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage(GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
 			public int TotalCallCount
 			{
 				get
 				{
 					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence)
+					foreach (var (_, _, tracking) in _interceptor._sequence_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage)
 						total += tracking.CallCount;
 					return total;
 				}
 			}
 
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<GetEnumeratorDelegate> ThenCall(GetEnumeratorDelegate callback, global::KnockOff.Times times)
+			public global::KnockOff.IMethodSequence<GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage> ThenCall(GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage callback, global::KnockOff.Times times)
 			{
-				var tracking = new MethodTrackingImpl();
-				_interceptor._sequence.Add((callback, times, tracking));
+				var tracking = new MethodTrackingImpl_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage();
+				_interceptor._sequence_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage.Add((callback, times, tracking));
 				return this;
 			}
 
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
 			public bool Verify()
 			{
-				foreach (var (_, times, tracking) in _interceptor._sequence)
+				foreach (var (_, times, tracking) in _interceptor._sequence_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage)
 				{
 					if (!times.Verify(tracking.CallCount))
 						return false;
@@ -1286,9 +1492,46 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 				return true;
 			}
 
-			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
+		private sealed class MethodSequenceImpl_NoParams_Collections_IEnumerator : global::KnockOff.IMethodSequence<GetEnumeratorDelegate_NoParams_Collections_IEnumerator>
+		{
+			private readonly GetEnumeratorInterceptor _interceptor;
+
+			public MethodSequenceImpl_NoParams_Collections_IEnumerator(GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
+
+			public int TotalCallCount
+			{
+				get
+				{
+					var total = 0;
+					foreach (var (_, _, tracking) in _interceptor._sequence_NoParams_Collections_IEnumerator)
+						total += tracking.CallCount;
+					return total;
+				}
+			}
+
+			public global::KnockOff.IMethodSequence<GetEnumeratorDelegate_NoParams_Collections_IEnumerator> ThenCall(GetEnumeratorDelegate_NoParams_Collections_IEnumerator callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl_NoParams_Collections_IEnumerator();
+				_interceptor._sequence_NoParams_Collections_IEnumerator.Add((callback, times, tracking));
+				return this;
+			}
+
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _interceptor._sequence_NoParams_Collections_IEnumerator)
+				{
+					if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			public void Reset() => _interceptor.Reset();
+		}
+
 	}
 
 	/// <summary>Interceptor for Count. Configure via .Value, track via .GetCount.</summary>
@@ -1301,7 +1544,7 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 	public IndexerInterceptor Indexer { get; } = new();
 
 	/// <summary>Interceptor for Add.</summary>
-	public Add1Interceptor Add1 { get; } = new();
+	public AddInterceptor Add { get; } = new();
 
 	/// <summary>Interceptor for IndexOf.</summary>
 	public IndexOfInterceptor IndexOf { get; } = new();
@@ -1311,9 +1554,6 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 
 	/// <summary>Interceptor for RemoveAt.</summary>
 	public RemoveAtInterceptor RemoveAt { get; } = new();
-
-	/// <summary>Interceptor for Add.</summary>
-	public Add2Interceptor Add2 { get; } = new();
 
 	/// <summary>Interceptor for Clear.</summary>
 	public ClearInterceptor Clear { get; } = new();
@@ -1336,6 +1576,29 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 	/// <summary>The global::Neatoo.Rules.IRuleMessages instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.Rules.IRuleMessages Object => this;
 
+	/// <summary>Verifies all method interceptors' Times constraints were satisfied.</summary>
+	public bool Verify()
+	{
+		var result = true;
+		result &= Add.Verify();
+		result &= IndexOf.Verify();
+		result &= Insert.Verify();
+		result &= RemoveAt.Verify();
+		result &= Clear.Verify();
+		result &= Contains.Verify();
+		result &= CopyTo.Verify();
+		result &= Remove.Verify();
+		result &= GetEnumerator.Verify();
+		return result;
+	}
+
+	/// <summary>Verifies all method interceptors' Times constraints and throws if any fail.</summary>
+	public void VerifyAll()
+	{
+		if (!Verify())
+			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
 	int global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>.Count
 	{
 		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "Count"); return Count.Value; }
@@ -1354,7 +1617,7 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 
 	void global::Neatoo.Rules.IRuleMessages.Add(string propertyName, string message)
 	{
-		Add1.Invoke(this, Strict, propertyName, message);
+		Add.Invoke_String_String_void(this, Strict, propertyName, message);
 	}
 
 	int global::System.Collections.Generic.IList<global::Neatoo.Rules.IRuleMessage>.IndexOf(global::Neatoo.Rules.IRuleMessage item)
@@ -1374,7 +1637,7 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 
 	void global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>.Add(global::Neatoo.Rules.IRuleMessage item)
 	{
-		Add2.Invoke(this, Strict, item);
+		Add.Invoke_Neatoo_Rules_IRuleMessage_void(this, Strict, item);
 	}
 
 	void global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>.Clear()
@@ -1399,7 +1662,7 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 
 	global::System.Collections.Generic.IEnumerator<global::Neatoo.Rules.IRuleMessage> global::System.Collections.Generic.IEnumerable<global::Neatoo.Rules.IRuleMessage>.GetEnumerator()
 	{
-		return GetEnumerator.Invoke(this, Strict);
+		return GetEnumerator.Invoke_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage(this, Strict);
 	}
 
 	global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()

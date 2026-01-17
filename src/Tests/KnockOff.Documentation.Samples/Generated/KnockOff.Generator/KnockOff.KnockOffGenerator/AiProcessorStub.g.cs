@@ -5,48 +5,77 @@ namespace KnockOff.Documentation.Samples;
 
 partial class AiProcessorStub : global::KnockOff.Documentation.Samples.IAiProcessor, global::KnockOff.IKnockOffStub
 {
-	/// <summary>Tracks and configures behavior for Process.</summary>
-	public sealed class Process1Interceptor
+	/// <summary>Tracks and configures behavior for Process (overloaded).</summary>
+	public sealed class ProcessInterceptor
 	{
-		private readonly global::System.Collections.Generic.List<(global::System.Action<AiProcessorStub, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
-		private int _sequenceIndex;
+		/// <summary>Delegate for Process(string).</summary>
+		public delegate void ProcessDelegate_String_void(AiProcessorStub ko, string data);
 
-		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
-		public global::KnockOff.IMethodTracking<string> OnCall(global::System.Action<AiProcessorStub, string> callback)
+		private readonly global::System.Collections.Generic.List<(ProcessDelegate_String_void Callback, global::KnockOff.Times Times, MethodTrackingImpl_String_void Tracking)> _sequence_String_void = new();
+		private int _sequenceIndex_String_void;
+
+		/// <summary>Delegate for Process(string, int).</summary>
+		public delegate void ProcessDelegate_String_Int32_void(AiProcessorStub ko, string data, int n);
+
+		private readonly global::System.Collections.Generic.List<(ProcessDelegate_String_Int32_void Callback, global::KnockOff.Times Times, MethodTrackingImpl_String_Int32_void Tracking)> _sequence_String_Int32_void = new();
+		private int _sequenceIndex_String_Int32_void;
+
+		/// <summary>Configures callback for Process(string). Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking<string> OnCall(ProcessDelegate_String_void callback)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
-			_sequenceIndex = 0;
+			var tracking = new MethodTrackingImpl_String_void();
+			_sequence_String_void.Clear();
+			_sequence_String_void.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequenceIndex_String_void = 0;
 			return tracking;
 		}
 
-		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<AiProcessorStub, string>> OnCall(global::System.Action<AiProcessorStub, string> callback, global::KnockOff.Times times)
+		/// <summary>Configures callback for Process(string) with Times constraint.</summary>
+		public global::KnockOff.IMethodSequence<ProcessDelegate_String_void> OnCall(ProcessDelegate_String_void callback, global::KnockOff.Times times)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, times, tracking));
-			_sequenceIndex = 0;
-			return new MethodSequenceImpl(this);
+			var tracking = new MethodTrackingImpl_String_void();
+			_sequence_String_void.Clear();
+			_sequence_String_void.Add((callback, times, tracking));
+			_sequenceIndex_String_void = 0;
+			return new MethodSequenceImpl_String_void(this);
 		}
 
-		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(AiProcessorStub ko, bool strict, string data)
+		/// <summary>Configures callback for Process(string, int). Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTrackingArgs<(string? data, int? n)> OnCall(ProcessDelegate_String_Int32_void callback)
 		{
-			if (_sequence.Count == 0)
+			var tracking = new MethodTrackingImpl_String_Int32_void();
+			_sequence_String_Int32_void.Clear();
+			_sequence_String_Int32_void.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequenceIndex_String_Int32_void = 0;
+			return tracking;
+		}
+
+		/// <summary>Configures callback for Process(string, int) with Times constraint.</summary>
+		public global::KnockOff.IMethodSequence<ProcessDelegate_String_Int32_void> OnCall(ProcessDelegate_String_Int32_void callback, global::KnockOff.Times times)
+		{
+			var tracking = new MethodTrackingImpl_String_Int32_void();
+			_sequence_String_Int32_void.Clear();
+			_sequence_String_Int32_void.Add((callback, times, tracking));
+			_sequenceIndex_String_Int32_void = 0;
+			return new MethodSequenceImpl_String_Int32_void(this);
+		}
+
+		/// <summary>Invokes configured callback for Process(string).</summary>
+		internal void Invoke_String_void(AiProcessorStub ko, bool strict, string data)
+		{
+			if (_sequence_String_void.Count == 0)
 			{
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return;
 			}
 
-			var (callback, times, tracking) = _sequence[_sequenceIndex];
+			var (callback, times, tracking) = _sequence_String_void[_sequenceIndex_String_void];
 			tracking.RecordCall(data);
 
 			if (!times.IsForever && tracking.CallCount >= times.Count)
 			{
-				if (_sequenceIndex < _sequence.Count - 1)
-					_sequenceIndex++;
+				if (_sequenceIndex_String_void < _sequence_String_void.Count - 1)
+					_sequenceIndex_String_void++;
 				else if (tracking.CallCount > times.Count)
 					throw global::KnockOff.StubException.SequenceExhausted("Process");
 			}
@@ -54,120 +83,22 @@ partial class AiProcessorStub : global::KnockOff.Documentation.Samples.IAiProces
 			callback(ko, data);
 		}
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset()
+		/// <summary>Invokes configured callback for Process(string, int).</summary>
+		internal void Invoke_String_Int32_void(AiProcessorStub ko, bool strict, string data, int n)
 		{
-			foreach (var (_, _, tracking) in _sequence)
-				tracking.Reset();
-			_sequenceIndex = 0;
-		}
-
-		/// <summary>Tracks invocations for this callback registration.</summary>
-		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking<string>
-		{
-			private string _lastArg = default!;
-
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
-
-			/// <summary>True if CallCount > 0.</summary>
-			public bool WasCalled => CallCount > 0;
-
-			/// <summary>Last argument passed to this callback. Default if never called.</summary>
-			public string LastArg => _lastArg;
-
-			/// <summary>Records a call to this callback.</summary>
-			public void RecordCall(string data) { CallCount++; _lastArg = data; }
-
-			/// <summary>Resets tracking state.</summary>
-			public void Reset() { CallCount = 0; _lastArg = default!; }
-		}
-
-		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<AiProcessorStub, string>>
-		{
-			private readonly Process1Interceptor _interceptor;
-
-			public MethodSequenceImpl(Process1Interceptor interceptor) => _interceptor = interceptor;
-
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
-			{
-				get
-				{
-					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence)
-						total += tracking.CallCount;
-					return total;
-				}
-			}
-
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<AiProcessorStub, string>> ThenCall(global::System.Action<AiProcessorStub, string> callback, global::KnockOff.Times times)
-			{
-				var tracking = new MethodTrackingImpl();
-				_interceptor._sequence.Add((callback, times, tracking));
-				return this;
-			}
-
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-			public bool Verify()
-			{
-				foreach (var (_, times, tracking) in _interceptor._sequence)
-				{
-					if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
-			}
-
-			/// <summary>Reset all tracking in the sequence.</summary>
-			public void Reset() => _interceptor.Reset();
-		}
-	}
-
-	/// <summary>Tracks and configures behavior for Process.</summary>
-	public sealed class Process2Interceptor
-	{
-		private readonly global::System.Collections.Generic.List<(global::System.Action<AiProcessorStub, string, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
-		private int _sequenceIndex;
-
-		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
-		public global::KnockOff.IMethodTrackingArgs<(string? data, int? n)> OnCall(global::System.Action<AiProcessorStub, string, int> callback)
-		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
-			_sequenceIndex = 0;
-			return tracking;
-		}
-
-		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<AiProcessorStub, string, int>> OnCall(global::System.Action<AiProcessorStub, string, int> callback, global::KnockOff.Times times)
-		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, times, tracking));
-			_sequenceIndex = 0;
-			return new MethodSequenceImpl(this);
-		}
-
-		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(AiProcessorStub ko, bool strict, string data, int n)
-		{
-			if (_sequence.Count == 0)
+			if (_sequence_String_Int32_void.Count == 0)
 			{
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return;
 			}
 
-			var (callback, times, tracking) = _sequence[_sequenceIndex];
+			var (callback, times, tracking) = _sequence_String_Int32_void[_sequenceIndex_String_Int32_void];
 			tracking.RecordCall((data, n));
 
 			if (!times.IsForever && tracking.CallCount >= times.Count)
 			{
-				if (_sequenceIndex < _sequence.Count - 1)
-					_sequenceIndex++;
+				if (_sequenceIndex_String_Int32_void < _sequence_String_Int32_void.Count - 1)
+					_sequenceIndex_String_Int32_void++;
 				else if (tracking.CallCount > times.Count)
 					throw global::KnockOff.StubException.SequenceExhausted("Process");
 			}
@@ -175,66 +106,102 @@ partial class AiProcessorStub : global::KnockOff.Documentation.Samples.IAiProces
 			callback(ko, data, n);
 		}
 
-		/// <summary>Resets all tracking state.</summary>
+		/// <summary>Resets all tracking state for all overloads.</summary>
 		public void Reset()
 		{
-			foreach (var (_, _, tracking) in _sequence)
+			foreach (var (_, _, tracking) in _sequence_String_void)
 				tracking.Reset();
-			_sequenceIndex = 0;
+			_sequenceIndex_String_void = 0;
+			foreach (var (_, _, tracking) in _sequence_String_Int32_void)
+				tracking.Reset();
+			_sequenceIndex_String_Int32_void = 0;
 		}
 
-		/// <summary>Tracks invocations for this callback registration.</summary>
-		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTrackingArgs<(string? data, int? n)>
+		/// <summary>Verifies all Times constraints for all overloads were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence_String_void)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			foreach (var (_, times, tracking) in _sequence_String_Int32_void)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
+		private sealed class MethodTrackingImpl_String_void : global::KnockOff.IMethodTracking<string>
+		{
+			private string _lastArg = default!;
+
+			public int CallCount { get; private set; }
+
+			public bool WasCalled => CallCount > 0;
+
+			public string LastArg => _lastArg;
+
+			public void RecordCall(string data) { CallCount++; _lastArg = data; }
+
+			public void Reset() { CallCount = 0; _lastArg = default!; }
+		}
+
+		private sealed class MethodTrackingImpl_String_Int32_void : global::KnockOff.IMethodTrackingArgs<(string? data, int? n)>
 		{
 			private (string? data, int? n) _lastArgs;
 
-			/// <summary>Number of times this callback was invoked.</summary>
 			public int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 			public (string? data, int? n) LastArgs => _lastArgs;
 
-			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall((string? data, int? n) args) { CallCount++; _lastArgs = args; }
 
-			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArgs = default; }
 		}
 
-		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<AiProcessorStub, string, int>>
+		private sealed class MethodSequenceImpl_String_void : global::KnockOff.IMethodSequence<ProcessDelegate_String_void>
 		{
-			private readonly Process2Interceptor _interceptor;
+			private readonly ProcessInterceptor _interceptor;
 
-			public MethodSequenceImpl(Process2Interceptor interceptor) => _interceptor = interceptor;
+			public MethodSequenceImpl_String_void(ProcessInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
 			public int TotalCallCount
 			{
 				get
 				{
 					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence)
+					foreach (var (_, _, tracking) in _interceptor._sequence_String_void)
 						total += tracking.CallCount;
 					return total;
 				}
 			}
 
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<AiProcessorStub, string, int>> ThenCall(global::System.Action<AiProcessorStub, string, int> callback, global::KnockOff.Times times)
+			public global::KnockOff.IMethodSequence<ProcessDelegate_String_void> ThenCall(ProcessDelegate_String_void callback, global::KnockOff.Times times)
 			{
-				var tracking = new MethodTrackingImpl();
-				_interceptor._sequence.Add((callback, times, tracking));
+				var tracking = new MethodTrackingImpl_String_void();
+				_interceptor._sequence_String_void.Add((callback, times, tracking));
 				return this;
 			}
 
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
 			public bool Verify()
 			{
-				foreach (var (_, times, tracking) in _interceptor._sequence)
+				foreach (var (_, times, tracking) in _interceptor._sequence_String_void)
 				{
 					if (!times.Verify(tracking.CallCount))
 						return false;
@@ -242,16 +209,50 @@ partial class AiProcessorStub : global::KnockOff.Documentation.Samples.IAiProces
 				return true;
 			}
 
-			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
+		private sealed class MethodSequenceImpl_String_Int32_void : global::KnockOff.IMethodSequence<ProcessDelegate_String_Int32_void>
+		{
+			private readonly ProcessInterceptor _interceptor;
+
+			public MethodSequenceImpl_String_Int32_void(ProcessInterceptor interceptor) => _interceptor = interceptor;
+
+			public int TotalCallCount
+			{
+				get
+				{
+					var total = 0;
+					foreach (var (_, _, tracking) in _interceptor._sequence_String_Int32_void)
+						total += tracking.CallCount;
+					return total;
+				}
+			}
+
+			public global::KnockOff.IMethodSequence<ProcessDelegate_String_Int32_void> ThenCall(ProcessDelegate_String_Int32_void callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl_String_Int32_void();
+				_interceptor._sequence_String_Int32_void.Add((callback, times, tracking));
+				return this;
+			}
+
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _interceptor._sequence_String_Int32_void)
+				{
+					if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			public void Reset() => _interceptor.Reset();
+		}
+
 	}
 
 	/// <summary>Interceptor for Process.</summary>
-	public Process1Interceptor Process1 { get; } = new();
-
-	/// <summary>Interceptor for Process.</summary>
-	public Process2Interceptor Process2 { get; } = new();
+	public ProcessInterceptor Process { get; } = new();
 
 	/// <summary>When true, throws StubException for unconfigured member access.</summary>
 	public bool Strict { get; set; } = false;
@@ -259,14 +260,29 @@ partial class AiProcessorStub : global::KnockOff.Documentation.Samples.IAiProces
 	/// <summary>The global::KnockOff.Documentation.Samples.IAiProcessor instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.IAiProcessor Object => this;
 
+	/// <summary>Verifies all method interceptors' Times constraints were satisfied.</summary>
+	public bool Verify()
+	{
+		var result = true;
+		result &= Process.Verify();
+		return result;
+	}
+
+	/// <summary>Verifies all method interceptors' Times constraints and throws if any fail.</summary>
+	public void VerifyAll()
+	{
+		if (!Verify())
+			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
 	void global::KnockOff.Documentation.Samples.IAiProcessor.Process(string data)
 	{
-		Process1.Invoke(this, Strict, data);
+		Process.Invoke_String_void(this, Strict, data);
 	}
 
 	void global::KnockOff.Documentation.Samples.IAiProcessor.Process(string data, int n)
 	{
-		Process2.Invoke(this, Strict, data, n);
+		Process.Invoke_String_Int32_void(this, Strict, data, n);
 	}
 
 }

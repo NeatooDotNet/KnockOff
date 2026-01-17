@@ -15,8 +15,8 @@ public class MultipleInterfacesSamplesTests
         var repo = new MultiRepositoryKnockOff();
         var uow = new MultiUnitOfWorkKnockOff();
 
-        repo.GetById.OnCall = (ko, id) => new MultiUser { Id = id };
-        uow.SaveChangesAsync.OnCall = (ko, ct) => Task.FromResult(1);
+        repo.GetById.OnCall((ko, id) => new MultiUser { Id = id });
+        uow.SaveChangesAsync.OnCall((ko, ct) => Task.FromResult(1));
 
         IMultiRepository repoService = repo;
         IMultiUnitOfWork uowService = uow;

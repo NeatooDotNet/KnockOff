@@ -8,11 +8,32 @@ Every interface member gets a dedicated Interceptor class directly on the stub c
 |------------------|--------------|----------------|
 | Method | `{MethodName}Interceptor` | `stub.MethodName` |
 | Property | `{PropertyName}Interceptor` | `stub.PropertyName` |
-| Indexer | `{KeyType}IndexerInterceptor` | `stub.StringIndexer`, `stub.IntIndexer`, etc. |
+| Indexer | `IndexerContainer` | `stub.Indexer.OfString`, `stub.Indexer.OfInt32`, etc. |
 | Event | `{EventName}Interceptor` | `stub.EventName` |
 | Generic Method | `{MethodName}Interceptor` | `stub.MethodName.Of<T>()` |
 
 **Note:** When a user method with the same name exists in the stub class, the interceptor gets a `2` suffix (e.g., `GetValue2Interceptor`).
+
+## Stub-Level Verification
+
+Stubs with method interceptors have verification methods:
+
+| Method | Description |
+|--------|-------------|
+| `Verify()` | Returns `true` if all method interceptor Times constraints are satisfied. For callbacks without explicit Times, infers "at least once". |
+| `VerifyAll()` | Throws `VerificationException` if `Verify()` returns `false`. |
+
+```cs
+var stub = new MyServiceStub();
+// ... use stub ...
+
+// Soft verification
+if (!stub.Verify())
+    Console.WriteLine("Verification failed");
+
+// Throws on failure
+stub.VerifyAll();
+```
 
 ## Method Interceptor
 
@@ -137,9 +158,11 @@ Assert.Equal(0, knockOff.Name.GetCount);
 
 For interface indexers: `T this[K key] { get; }`, `T this[K key] { get; set; }`
 
-Interceptor naming: `{KeyTypeName}IndexerInterceptor`
-- `this[string key]` → `StringIndexerInterceptor`
-- `this[int index]` → `IntIndexerInterceptor`
+Access via the `OfXxx` pattern on the `Indexer` container:
+- `this[string key]` → `stub.Indexer.OfString`
+- `this[int index]` → `stub.Indexer.OfInt32`
+
+When an interface has only one indexer type, you can still use `stub.Indexer.OfString` (the pattern is consistent).
 
 ### Properties
 
@@ -167,9 +190,9 @@ Interceptor naming: `{KeyTypeName}IndexerInterceptor`
 
 ### Backing Dictionary
 
-Each indexer has a backing dictionary:
-- `{KeyType}IndexerBacking` — e.g., `StringIndexerBacking`, `IntIndexerBacking`
-- Type: `Dictionary<TKey, TValue>`
+Each indexer interceptor has a backing dictionary accessed via `.Backing`:
+- `stub.Indexer.OfString.Backing` — Type: `Dictionary<string, TValue>`
+- `stub.Indexer.OfInt32.Backing` — Type: `Dictionary<int, TValue>`
 
 ### Getter Behavior
 
@@ -190,33 +213,37 @@ When **`OnGet` is set**:
 
 <!-- snippet: interceptor-api-indexer-interceptor-examples -->
 ```cs
-// Pre-populate backing
-knockOff.Indexer.Backing["Key1"] = value1;
-knockOff.Indexer.Backing["Key2"] = value2;
+// Pre-populate backing (using OfXxx pattern)
+knockOff.Indexer.OfString.Backing["Key1"] = value1;
+knockOff.Indexer.OfString.Backing["Key2"] = value2;
 
 // Track access
 _ = store["Key1"];
 _ = store["Key2"];
-Assert.Equal(2, knockOff.Indexer.GetCount);
-Assert.Equal("Key2", knockOff.Indexer.LastGetKey);
+Assert.Equal(2, knockOff.Indexer.OfString.GetCount);
+Assert.Equal("Key2", knockOff.Indexer.OfString.LastGetKey);
 
 // Dynamic getter
-knockOff.Indexer.OnGet = (ko, key) =>
+knockOff.Indexer.OfString.OnGet = (ko, key) =>
 {
     if (key == "special") return specialValue;
-    return ko.Indexer.Backing.GetValueOrDefault(key);
+    return ko.Indexer.OfString.Backing.GetValueOrDefault(key);
 };
 
 // Track setter
 store["NewKey"] = newValue;
-Assert.Equal("NewKey", knockOff.Indexer.LastSetEntry?.Key);
+Assert.Equal("NewKey", knockOff.Indexer.OfString.LastSetEntry?.Key);
 
 // Interceptor setter
-knockOff.Indexer.OnSet = (ko, key, value) =>
+knockOff.Indexer.OfString.OnSet = (ko, key, value) =>
 {
     // Custom logic
     // Value does NOT go to backing dictionary
 };
+
+// Multiple indexer types
+knockOff.Indexer.OfInt32.Backing[0] = 100;
+Assert.Equal(100, store[0]);
 ```
 <!-- endSnippet -->
 

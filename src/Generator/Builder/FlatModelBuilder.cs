@@ -49,6 +49,16 @@ internal static class FlatModelBuilder
 				Methods: new EquatableArray<FlatMethodModel>(g.ToArray())))
 			.ToList();
 
+		// Group indexers by BaseName for OfXxx pattern
+		var flatIndexerGroups = indexers
+			.GroupBy(i => i.BaseName)
+			.Select(g => new FlatIndexerGroup(
+				BaseName: g.Key,
+				ContainerClassName: $"{g.Key}Container",
+				NeedsNewKeyword: g.Any(i => i.NeedsNewKeyword),
+				Indexers: new EquatableArray<FlatIndexerModel>(g.ToArray())))
+			.ToList();
+
 		// Build containing types models
 		var containingTypes = typeInfo.ContainingTypes.Select(ct => new ContainingTypeModel(
 			Keyword: ct.Keyword,
@@ -63,6 +73,7 @@ internal static class FlatModelBuilder
 			ContainingTypes: containingTypes,
 			Properties: properties,
 			Indexers: indexers,
+			IndexerGroups: new EquatableArray<FlatIndexerGroup>(flatIndexerGroups.ToArray()),
 			Methods: methods,
 			MethodGroups: new EquatableArray<FlatMethodGroup>(flatMethodGroups.ToArray()),
 			GenericMethodHandlers: genericHandlers,
@@ -558,7 +569,9 @@ internal static class FlatModelBuilder
 					HasGetter: member.HasGetter,
 					HasSetter: member.HasSetter,
 					SimpleInterfaceName: simpleIfaceName,
-					NeedsNewKeyword: NeedsNewKeyword(interceptorName)));
+					NeedsNewKeyword: NeedsNewKeyword(interceptorName),
+					KeyTypeFriendlyName: GetTypeSuffix(keyType),
+					BaseName: "Indexer"));
 			}
 		}
 

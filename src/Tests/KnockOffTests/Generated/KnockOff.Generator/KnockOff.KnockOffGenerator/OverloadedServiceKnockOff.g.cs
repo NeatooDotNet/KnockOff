@@ -117,17 +117,29 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 			_sequenceIndex_Int32_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_User = 0;
 		}
 
-		/// <summary>Verifies all Times constraints for all overloads were satisfied.</summary>
+		/// <summary>Verifies all Times constraints for all overloads were satisfied. For Forever, verifies called at least once.</summary>
 		public bool Verify()
 		{
 			foreach (var (_, times, tracking) in _sequence_Int32_Threading_Tasks_Task_KnockOff_Tests_User)
 			{
-				if (!times.Verify(tracking.CallCount))
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
 					return false;
 			}
 			foreach (var (_, times, tracking) in _sequence_Int32_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_User)
 			{
-				if (!times.Verify(tracking.CallCount))
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
 					return false;
 			}
 			return true;
@@ -403,22 +415,40 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 			_sequenceIndex_String_Int32_Boolean_void = 0;
 		}
 
-		/// <summary>Verifies all Times constraints for all overloads were satisfied.</summary>
+		/// <summary>Verifies all Times constraints for all overloads were satisfied. For Forever, verifies called at least once.</summary>
 		public bool Verify()
 		{
 			foreach (var (_, times, tracking) in _sequence_String_void)
 			{
-				if (!times.Verify(tracking.CallCount))
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
 					return false;
 			}
 			foreach (var (_, times, tracking) in _sequence_String_Int32_void)
 			{
-				if (!times.Verify(tracking.CallCount))
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
 					return false;
 			}
 			foreach (var (_, times, tracking) in _sequence_String_Int32_Boolean_void)
 			{
-				if (!times.Verify(tracking.CallCount))
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
 					return false;
 			}
 			return true;
@@ -694,17 +724,29 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 			_sequenceIndex_Int32_Int32_Int32 = 0;
 		}
 
-		/// <summary>Verifies all Times constraints for all overloads were satisfied.</summary>
+		/// <summary>Verifies all Times constraints for all overloads were satisfied. For Forever, verifies called at least once.</summary>
 		public bool Verify()
 		{
 			foreach (var (_, times, tracking) in _sequence_Int32_Int32)
 			{
-				if (!times.Verify(tracking.CallCount))
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
 					return false;
 			}
 			foreach (var (_, times, tracking) in _sequence_Int32_Int32_Int32)
 			{
-				if (!times.Verify(tracking.CallCount))
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
 					return false;
 			}
 			return true;
@@ -830,6 +872,23 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 
 	/// <summary>The global::KnockOff.Tests.IOverloadedService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IOverloadedService Object => this;
+
+	/// <summary>Verifies all method interceptors' Times constraints were satisfied.</summary>
+	public bool Verify()
+	{
+		var result = true;
+		result &= GetByIdAsync.Verify();
+		result &= Process.Verify();
+		result &= Calculate.Verify();
+		return result;
+	}
+
+	/// <summary>Verifies all method interceptors' Times constraints and throws if any fail.</summary>
+	public void VerifyAll()
+	{
+		if (!Verify())
+			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> global::KnockOff.Tests.IOverloadedService.GetByIdAsync(int id)
 	{

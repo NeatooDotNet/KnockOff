@@ -55,8 +55,9 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
     {
         var knockOff = new MigUserServiceKnockOff();
 
-        knockOff.GetUser.OnCall = (ko, id) =>
-            new MigUser { Id = id, Name = "Test" };
+        // OnCall is a method for standalone stubs
+        knockOff.GetUser.OnCall((ko, id) =>
+            new MigUser { Id = id, Name = "Test" });
 
         IMigUserService service = knockOff;
         var user = service.GetUser(42);
@@ -74,8 +75,9 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
     {
         var knockOff = new MigUserServiceKnockOff();
 
-        knockOff.GetUserAsync.OnCall = (ko, id) =>
-            Task.FromResult<MigUser?>(new MigUser { Id = id });
+        // OnCall is a method for standalone stubs
+        knockOff.GetUserAsync.OnCall((ko, id) =>
+            Task.FromResult<MigUser?>(new MigUser { Id = id }));
 
         IMigUserService service = knockOff;
         var user = await service.GetUserAsync(42);
@@ -94,8 +96,11 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
         var knockOff = new MigUserServiceKnockOff();
         IMigUserService service = knockOff;
 
-        // Set up GetAll to return empty collection (required for non-nullable return type)
-        knockOff.GetAll.OnCall = (ko) => Enumerable.Empty<MigUser>();
+        // Set up callbacks to enable tracking
+        var saveTracking = knockOff.Save.OnCall((ko, user) => { });
+        var deleteTracking = knockOff.Delete.OnCall((ko, id) => { });
+        var getAllTracking = knockOff.GetAll.OnCall((ko) => Enumerable.Empty<MigUser>());
+        var updateTracking = knockOff.Update.OnCall((ko, user) => { });
 
         service.Save(new MigUser());
         _ = service.GetAll();
@@ -103,10 +108,10 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
         service.Update(new MigUser());
         service.Update(new MigUser());
 
-        Assert.Equal(1, knockOff.Save.CallCount);
-        Assert.Equal(0, knockOff.Delete.CallCount);
-        Assert.True(knockOff.GetAll.WasCalled);
-        Assert.Equal(3, knockOff.Update.CallCount);
+        Assert.Equal(1, saveTracking.CallCount);
+        Assert.Equal(0, deleteTracking.CallCount);
+        Assert.True(getAllTracking.WasCalled);
+        Assert.Equal(3, updateTracking.CallCount);
     }
 
     // ========================================================================
@@ -119,9 +124,12 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
         var knockOff = new MigUserServiceKnockOff();
         IMigUserService service = knockOff;
 
+        // Set up callback to enable tracking
+        var tracking = knockOff.Save.OnCall((ko, user) => { });
+
         service.Save(new MigUser { Id = 42 });
 
-        var captured = knockOff.Save.LastCallArg;
+        var captured = tracking.LastArg;
         Assert.Equal(42, captured?.Id);
     }
 
@@ -132,10 +140,11 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
         IMigUserService service = knockOff;
         var customList = new List<MigUser>();
 
-        knockOff.Save.OnCall = (ko, user) =>
+        // OnCall is a method for standalone stubs
+        knockOff.Save.OnCall((ko, user) =>
         {
             customList.Add(user);
-        };
+        });
 
         service.Save(new MigUser { Id = 1 });
         service.Save(new MigUser { Id = 2 });
@@ -189,17 +198,20 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
     // ========================================================================
 
     [Fact]
-    public void StaticReturns_Callback()
+    public void StaticReturns_Tracking()
     {
         var knockOff = new MigConfigServiceKnockOff();
         IMigConfigService service = knockOff;
 
-        // Override user method with callback
-        knockOff.GetConfig2.OnCall = (ko) => new MigConfig { Timeout = 60 };
-
+        // User method interceptors provide tracking, not callbacks
         var config = service.GetConfig();
 
-        Assert.Equal(60, config.Timeout);
+        // Verify the call was tracked
+        Assert.True(knockOff.GetConfig2.WasCalled);
+        Assert.Equal(1, knockOff.GetConfig2.CallCount);
+
+        // User method returns default behavior
+        Assert.Equal(30, config.Timeout);
     }
 
     // ========================================================================
@@ -212,12 +224,13 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
         var knockOff = new MigUserServiceKnockOff();
         IMigUserService service = knockOff;
 
-        knockOff.GetUser.OnCall = (ko, id) => id switch
+        // OnCall is a method for standalone stubs
+        knockOff.GetUser.OnCall((ko, id) => id switch
         {
             1 => new MigUser { Name = "Admin" },
             2 => new MigUser { Name = "Guest" },
             _ => new MigUser { Name = "Unknown" }
-        };
+        });
 
         Assert.Equal("Admin", service.GetUser(1).Name);
         Assert.Equal("Guest", service.GetUser(2).Name);
@@ -234,8 +247,9 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
         var knockOff = new MigConnectionKnockOff();
         IMigConnection connection = knockOff;
 
-        knockOff.Connect.OnCall = (ko) =>
-            throw new TimeoutException();
+        // OnCall is a method for standalone stubs
+        knockOff.Connect.OnCall((ko) =>
+            throw new TimeoutException());
 
         Assert.Throws<TimeoutException>(() => connection.Connect());
     }
@@ -251,7 +265,8 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
         IMigSequence sequence = knockOff;
 
         var values = new Queue<int>([1, 2, 3]);
-        knockOff.GetNext.OnCall = (ko) => values.Dequeue();
+        // OnCall is a method for standalone stubs
+        knockOff.GetNext.OnCall((ko) => values.Dequeue());
 
         Assert.Equal(1, sequence.GetNext());
         Assert.Equal(2, sequence.GetNext());
@@ -273,11 +288,12 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
         IMigLogger logger = knockOff;
         var errors = new List<string>();
 
-        knockOff.Log.OnCall = (ko, message) =>
+        // OnCall is a method for standalone stubs
+        knockOff.Log.OnCall((ko, message) =>
         {
             if (message.Contains("error"))
                 errors.Add(message);
-        };
+        });
 
         logger.Log("info: starting");
         logger.Log("error: something failed");
@@ -315,11 +331,12 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
         var nextId = 100;
         var savedEntities = new List<MigEntity>();
 
-        knockOff.Save.OnCall = (ko, entity) =>
+        // OnCall is a method for standalone stubs
+        knockOff.Save.OnCall((ko, entity) =>
         {
             entity.Id = nextId++;
             savedEntities.Add(entity);
-        };
+        });
 
         service.Save(new MigEntity());
         service.Save(new MigEntity());
@@ -334,15 +351,17 @@ public class MigrationFromMoqSamplesTests : SamplesTestBase
     // ========================================================================
 
     [Fact]
-    public void AutomaticTracking_NoSetupNeeded()
+    public void AutomaticTracking_WithCallback()
     {
         var knockOff = new MigProcessorKnockOff();
         IMigProcessor processor = knockOff;
 
-        // No setup needed - just call the method
+        // Set up callback to enable tracking
+        var tracking = knockOff.Process.OnCall((ko, data) => { });
+
         processor.Process("data");
 
-        // Args are captured automatically
-        Assert.Equal("data", knockOff.Process.LastCallArg);
+        // Args are captured by the tracking object
+        Assert.Equal("data", tracking.LastArg);
     }
 }

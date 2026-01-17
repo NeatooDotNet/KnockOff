@@ -5,27 +5,6 @@ namespace KnockOff.Documentation.Samples.ReadMe;
 
 partial class CalculatorKnockOff : global::KnockOff.Documentation.Samples.ReadMe.ICalculator, global::KnockOff.IKnockOffStub
 {
-	/// <summary>Tracks calls to Add (user-defined implementation).</summary>
-	public sealed class Add2Interceptor : global::KnockOff.IMethodTrackingArgs<(int? a, int? b)>
-	{
-		private (int? a, int? b) _lastArgs;
-
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
-
-		/// <summary>True if CallCount > 0.</summary>
-		public bool WasCalled => CallCount > 0;
-
-		/// <summary>Last arguments passed to this method. Default if never called.</summary>
-		public (int? a, int? b) LastArgs => _lastArgs;
-
-		/// <summary>Records a method call.</summary>
-		internal void RecordCall((int? a, int? b) args) { CallCount++; _lastArgs = args; }
-
-		/// <summary>Resets tracking state.</summary>
-		public void Reset() { CallCount = 0; _lastArgs = default; }
-	}
-
 	/// <summary>Tracks and configures behavior for Multiply.</summary>
 	public sealed class MultiplyInterceptor
 	{
@@ -84,6 +63,23 @@ partial class CalculatorKnockOff : global::KnockOff.Documentation.Samples.ReadMe
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -150,6 +146,27 @@ partial class CalculatorKnockOff : global::KnockOff.Documentation.Samples.ReadMe
 		}
 	}
 
+	/// <summary>Tracks calls to Add (user-defined implementation).</summary>
+	public sealed class Add2Interceptor : global::KnockOff.IMethodTrackingArgs<(int? a, int? b)>
+	{
+		private (int? a, int? b) _lastArgs;
+
+		/// <summary>Number of times this method was called.</summary>
+		public int CallCount { get; private set; }
+
+		/// <summary>True if CallCount > 0.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>Last arguments passed to this method. Default if never called.</summary>
+		public (int? a, int? b) LastArgs => _lastArgs;
+
+		/// <summary>Records a method call.</summary>
+		internal void RecordCall((int? a, int? b) args) { CallCount++; _lastArgs = args; }
+
+		/// <summary>Resets tracking state.</summary>
+		public void Reset() { CallCount = 0; _lastArgs = default; }
+	}
+
 	/// <summary>Interceptor for Add.</summary>
 	public Add2Interceptor Add2 { get; } = new();
 
@@ -161,6 +178,21 @@ partial class CalculatorKnockOff : global::KnockOff.Documentation.Samples.ReadMe
 
 	/// <summary>The global::KnockOff.Documentation.Samples.ReadMe.ICalculator instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.ReadMe.ICalculator Object => this;
+
+	/// <summary>Verifies all method interceptors' Times constraints were satisfied.</summary>
+	public bool Verify()
+	{
+		var result = true;
+		result &= Multiply.Verify();
+		return result;
+	}
+
+	/// <summary>Verifies all method interceptors' Times constraints and throws if any fail.</summary>
+	public void VerifyAll()
+	{
+		if (!Verify())
+			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
 
 	int global::KnockOff.Documentation.Samples.ReadMe.ICalculator.Add(int a, int b)
 	{

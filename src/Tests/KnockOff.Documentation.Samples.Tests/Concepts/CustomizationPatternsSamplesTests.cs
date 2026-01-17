@@ -74,10 +74,11 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         IPatternCallbackService service = knockOff;
         var callbackExecuted = false;
 
-        knockOff.DoSomething.OnCall = (ko) =>
+        // OnCall is a method for standalone stubs
+        knockOff.DoSomething.OnCall((ko) =>
         {
             callbackExecuted = true;
-        };
+        });
 
         service.DoSomething();
 
@@ -90,7 +91,8 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new PatternCallbackServiceKnockOff();
         IPatternCallbackService service = knockOff;
 
-        knockOff.GetUser.OnCall = (ko, id) => new PatternUser { Id = id, Name = "Mocked" };
+        // OnCall is a method for standalone stubs
+        knockOff.GetUser.OnCall((ko, id) => new PatternUser { Id = id, Name = "Mocked" });
 
         var user = service.GetUser(42);
 
@@ -104,10 +106,11 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new PatternCallbackServiceKnockOff();
         IPatternCallbackService service = knockOff;
 
-        knockOff.Calculate.OnCall = (ko, name, value, flag) =>
+        // OnCall is a method for standalone stubs
+        knockOff.Calculate.OnCall((ko, name, value, flag) =>
         {
             return flag ? value * 2 : value;
-        };
+        });
 
         Assert.Equal(100, service.Calculate("test", 50, true));
         Assert.Equal(50, service.Calculate("test", 50, false));
@@ -155,14 +158,18 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new PatternKoAccessServiceKnockOff();
         IPatternKoAccessService service = knockOff;
 
-        knockOff.GetUser.OnCall = (ko, id) =>
+        // Configure Initialize with empty callback to track calls
+        var initTracking = knockOff.Initialize.OnCall((ko) => { });
+
+        // OnCall is a method for standalone stubs
+        knockOff.GetUser.OnCall((ko, id) =>
         {
-            // Access other interceptors
-            if (ko.Initialize.WasCalled)
+            // Access tracking from captured variable
+            if (initTracking.WasCalled)
                 return new PatternUser { Id = id, Name = "Initialized" };
 
             return new PatternUser { Id = id, Name = "Not Initialized" };
-        };
+        });
 
         // Before Initialize is called
         var user1 = service.GetUser(1);
@@ -183,11 +190,12 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         // Set up backing field value
         knockOff.Name.Value = "Test Name";
 
-        knockOff.GetUser.OnCall = (ko, id) =>
+        // OnCall is a method for standalone stubs
+        knockOff.GetUser.OnCall((ko, id) =>
         {
             // Access backing fields via interceptor
             return new PatternUser { Id = id, Name = ko.Name.Value };
-        };
+        });
 
         var user = service.GetUser(1);
         Assert.Equal("Test Name", user.Name);
@@ -251,32 +259,33 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
     }
 
     [Fact]
-    public void Priority_WithCallback_OverridesUserMethod()
+    public void Priority_UserMethod_TrackedViaInterceptor()
     {
         var knockOff = new PatternServiceKnockOff();
         IPatternService service = knockOff;
 
-        // Set callback → overrides user method
-        knockOff.Calculate2.OnCall = (ko, input) => input * 100;
-
+        // User method interceptors provide tracking, not callbacks
         var result = service.Calculate(5);
 
-        Assert.Equal(500, result); // callback
+        Assert.Equal(10, result); // user method: 5 * 2
+        Assert.True(knockOff.Calculate2.WasCalled);
+        Assert.Equal(5, knockOff.Calculate2.LastArg);
     }
 
     [Fact]
-    public void Priority_AfterReset_ReturnsToUserMethod()
+    public void Priority_AfterReset_TrackingCleared()
     {
         var knockOff = new PatternServiceKnockOff();
         IPatternService service = knockOff;
 
-        knockOff.Calculate2.OnCall = (ko, input) => input * 100;
-        Assert.Equal(500, service.Calculate(5)); // callback
+        service.Calculate(5);
+        Assert.Equal(1, knockOff.Calculate2.CallCount);
 
-        // Reset clears callback → back to user method
+        // Reset clears tracking
         knockOff.Calculate2.Reset();
 
-        Assert.Equal(10, service.Calculate(5)); // user method
+        Assert.Equal(0, knockOff.Calculate2.CallCount);
+        Assert.False(knockOff.Calculate2.WasCalled);
     }
 
     // ========================================================================
@@ -284,25 +293,26 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
     // ========================================================================
 
     [Fact]
-    public void Reset_ClearsTrackingAndCallback()
+    public void Reset_ClearsTracking()
     {
         var knockOff = new PatternUserServiceKnockOff();
         IPatternUserService service = knockOff;
 
-        knockOff.GetUser2.OnCall = (ko, id) => new PatternUser { Name = "Callback" };
+        // User method interceptors provide tracking only
         service.GetUser(1);
         service.GetUser(2);
 
         Assert.Equal(2, knockOff.GetUser2.CallCount);
 
-        // Reset
+        // Reset clears tracking
         knockOff.GetUser2.Reset();
 
         Assert.Equal(0, knockOff.GetUser2.CallCount);  // Tracking cleared
 
-        // Now uses user method
+        // User method continues to provide behavior
         var user = service.GetUser(3);
         Assert.Equal("Default User", user.Name);
+        Assert.Equal(1, knockOff.GetUser2.CallCount);  // New call tracked
     }
 
     // ========================================================================
@@ -320,37 +330,36 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
     }
 
     [Fact]
-    public void CombiningPatterns_CallbackOverridesDefault()
+    public void CombiningPatterns_UserMethodTracking()
     {
         var knockOff = new PatternCombinedRepositoryKnockOff();
         IPatternCombinedRepository repo = knockOff;
 
-        // Override for specific IDs
-        knockOff.GetById2.OnCall = (ko, id) => id switch
-        {
-            1 => new PatternUser { Id = 1, Name = "Admin" },
-            2 => new PatternUser { Id = 2, Name = "Guest" },
-            _ => null  // Fall through to "not found"
-        };
+        // User method interceptors provide tracking
+        repo.GetById(1);
+        repo.GetById(2);
 
-        Assert.Equal("Admin", repo.GetById(1)?.Name);
-        Assert.Null(repo.GetById(999));  // Still null
+        Assert.Equal(2, knockOff.GetById2.CallCount);
+        Assert.Equal(2, knockOff.GetById2.LastArg);  // Last ID called
     }
 
     [Fact]
-    public void CombiningPatterns_ResetAndNewCallback()
+    public void CombiningPatterns_ResetClearsTracking()
     {
         var knockOff = new PatternCombinedRepositoryKnockOff();
         IPatternCombinedRepository repo = knockOff;
 
-        knockOff.GetById2.OnCall = (ko, id) => new PatternUser { Id = id, Name = "First" };
-        Assert.Equal("First", repo.GetById(1)?.Name);
+        repo.GetById(1);
+        Assert.Equal(1, knockOff.GetById2.CallCount);
 
-        // Reset and use different callback
+        // Reset clears tracking
         knockOff.GetById2.Reset();
-        knockOff.GetById2.OnCall = (ko, id) =>
-            new PatternUser { Id = id, Name = $"User-{id}" };
 
-        Assert.Equal("User-999", repo.GetById(999)?.Name);
+        Assert.Equal(0, knockOff.GetById2.CallCount);
+        Assert.False(knockOff.GetById2.WasCalled);
+
+        // User method still works
+        Assert.Null(repo.GetById(999));  // null from user method
+        Assert.True(knockOff.GetById2.WasCalled);  // New call tracked
     }
 }

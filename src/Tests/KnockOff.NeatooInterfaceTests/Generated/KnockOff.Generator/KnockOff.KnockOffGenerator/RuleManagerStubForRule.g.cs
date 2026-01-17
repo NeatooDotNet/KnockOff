@@ -39,51 +39,77 @@ partial class RuleManagerStubForRule : global::Neatoo.Rules.IRuleManager, global
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
-	/// <summary>Tracks and configures behavior for RunRules.</summary>
-	public sealed class RunRules1Interceptor
+	/// <summary>Tracks and configures behavior for RunRules (overloaded).</summary>
+	public sealed class RunRulesInterceptor
 	{
-		/// <summary>Delegate for RunRules.</summary>
-		public delegate global::System.Threading.Tasks.Task RunRulesDelegate(RuleManagerStubForRule ko, string propertyName, global::System.Threading.CancellationToken? token);
+		/// <summary>Delegate for RunRules(string, global::System.Threading.CancellationToken?).</summary>
+		public delegate global::System.Threading.Tasks.Task RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task(RuleManagerStubForRule ko, string propertyName, global::System.Threading.CancellationToken? token);
 
-		private readonly global::System.Collections.Generic.List<(RunRulesDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
-		private int _sequenceIndex;
+		private readonly global::System.Collections.Generic.List<(RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task Callback, global::KnockOff.Times Times, MethodTrackingImpl_String_Threading_CancellationToken_Threading_Tasks_Task Tracking)> _sequence_String_Threading_CancellationToken_Threading_Tasks_Task = new();
+		private int _sequenceIndex_String_Threading_CancellationToken_Threading_Tasks_Task;
 
-		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
-		public global::KnockOff.IMethodTrackingArgs<(string? propertyName, global::System.Threading.CancellationToken? token)> OnCall(RunRulesDelegate callback)
+		/// <summary>Delegate for RunRules(global::Neatoo.RunRulesFlag, global::System.Threading.CancellationToken?).</summary>
+		public delegate global::System.Threading.Tasks.Task RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(RuleManagerStubForRule ko, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token);
+
+		private readonly global::System.Collections.Generic.List<(RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task Callback, global::KnockOff.Times Times, MethodTrackingImpl_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task Tracking)> _sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task = new();
+		private int _sequenceIndex_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task;
+
+		/// <summary>Configures callback for RunRules(string, global::System.Threading.CancellationToken?). Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTrackingArgs<(string? propertyName, global::System.Threading.CancellationToken? token)> OnCall(RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task callback)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
-			_sequenceIndex = 0;
+			var tracking = new MethodTrackingImpl_String_Threading_CancellationToken_Threading_Tasks_Task();
+			_sequence_String_Threading_CancellationToken_Threading_Tasks_Task.Clear();
+			_sequence_String_Threading_CancellationToken_Threading_Tasks_Task.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequenceIndex_String_Threading_CancellationToken_Threading_Tasks_Task = 0;
 			return tracking;
 		}
 
-		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
-		public global::KnockOff.IMethodSequence<RunRulesDelegate> OnCall(RunRulesDelegate callback, global::KnockOff.Times times)
+		/// <summary>Configures callback for RunRules(string, global::System.Threading.CancellationToken?) with Times constraint.</summary>
+		public global::KnockOff.IMethodSequence<RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task> OnCall(RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task callback, global::KnockOff.Times times)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, times, tracking));
-			_sequenceIndex = 0;
-			return new MethodSequenceImpl(this);
+			var tracking = new MethodTrackingImpl_String_Threading_CancellationToken_Threading_Tasks_Task();
+			_sequence_String_Threading_CancellationToken_Threading_Tasks_Task.Clear();
+			_sequence_String_Threading_CancellationToken_Threading_Tasks_Task.Add((callback, times, tracking));
+			_sequenceIndex_String_Threading_CancellationToken_Threading_Tasks_Task = 0;
+			return new MethodSequenceImpl_String_Threading_CancellationToken_Threading_Tasks_Task(this);
 		}
 
-		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task Invoke(RuleManagerStubForRule ko, bool strict, string propertyName, global::System.Threading.CancellationToken? token)
+		/// <summary>Configures callback for RunRules(global::Neatoo.RunRulesFlag, global::System.Threading.CancellationToken?). Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTrackingArgs<(global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token)> OnCall(RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task callback)
 		{
-			if (_sequence.Count == 0)
+			var tracking = new MethodTrackingImpl_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task();
+			_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task.Clear();
+			_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequenceIndex_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task = 0;
+			return tracking;
+		}
+
+		/// <summary>Configures callback for RunRules(global::Neatoo.RunRulesFlag, global::System.Threading.CancellationToken?) with Times constraint.</summary>
+		public global::KnockOff.IMethodSequence<RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task> OnCall(RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task callback, global::KnockOff.Times times)
+		{
+			var tracking = new MethodTrackingImpl_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task();
+			_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task.Clear();
+			_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task.Add((callback, times, tracking));
+			_sequenceIndex_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task = 0;
+			return new MethodSequenceImpl_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(this);
+		}
+
+		/// <summary>Invokes configured callback for RunRules(string, global::System.Threading.CancellationToken?).</summary>
+		internal global::System.Threading.Tasks.Task Invoke_String_Threading_CancellationToken_Threading_Tasks_Task(RuleManagerStubForRule ko, bool strict, string propertyName, global::System.Threading.CancellationToken? token)
+		{
+			if (_sequence_String_Threading_CancellationToken_Threading_Tasks_Task.Count == 0)
 			{
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
-			var (callback, times, tracking) = _sequence[_sequenceIndex];
+			var (callback, times, tracking) = _sequence_String_Threading_CancellationToken_Threading_Tasks_Task[_sequenceIndex_String_Threading_CancellationToken_Threading_Tasks_Task];
 			tracking.RecordCall((propertyName, token));
 
 			if (!times.IsForever && tracking.CallCount >= times.Count)
 			{
-				if (_sequenceIndex < _sequence.Count - 1)
-					_sequenceIndex++;
+				if (_sequenceIndex_String_Threading_CancellationToken_Threading_Tasks_Task < _sequence_String_Threading_CancellationToken_Threading_Tasks_Task.Count - 1)
+					_sequenceIndex_String_Threading_CancellationToken_Threading_Tasks_Task++;
 				else if (tracking.CallCount > times.Count)
 					throw global::KnockOff.StubException.SequenceExhausted("RunRules");
 			}
@@ -91,123 +117,22 @@ partial class RuleManagerStubForRule : global::Neatoo.Rules.IRuleManager, global
 			return callback(ko, propertyName, token);
 		}
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset()
+		/// <summary>Invokes configured callback for RunRules(global::Neatoo.RunRulesFlag, global::System.Threading.CancellationToken?).</summary>
+		internal global::System.Threading.Tasks.Task Invoke_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(RuleManagerStubForRule ko, bool strict, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
 		{
-			foreach (var (_, _, tracking) in _sequence)
-				tracking.Reset();
-			_sequenceIndex = 0;
-		}
-
-		/// <summary>Tracks invocations for this callback registration.</summary>
-		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTrackingArgs<(string? propertyName, global::System.Threading.CancellationToken? token)>
-		{
-			private (string? propertyName, global::System.Threading.CancellationToken? token) _lastArgs;
-
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
-
-			/// <summary>True if CallCount > 0.</summary>
-			public bool WasCalled => CallCount > 0;
-
-			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
-			public (string? propertyName, global::System.Threading.CancellationToken? token) LastArgs => _lastArgs;
-
-			/// <summary>Records a call to this callback.</summary>
-			public void RecordCall((string? propertyName, global::System.Threading.CancellationToken? token) args) { CallCount++; _lastArgs = args; }
-
-			/// <summary>Resets tracking state.</summary>
-			public void Reset() { CallCount = 0; _lastArgs = default; }
-		}
-
-		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<RunRulesDelegate>
-		{
-			private readonly RunRules1Interceptor _interceptor;
-
-			public MethodSequenceImpl(RunRules1Interceptor interceptor) => _interceptor = interceptor;
-
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
-			{
-				get
-				{
-					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence)
-						total += tracking.CallCount;
-					return total;
-				}
-			}
-
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<RunRulesDelegate> ThenCall(RunRulesDelegate callback, global::KnockOff.Times times)
-			{
-				var tracking = new MethodTrackingImpl();
-				_interceptor._sequence.Add((callback, times, tracking));
-				return this;
-			}
-
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-			public bool Verify()
-			{
-				foreach (var (_, times, tracking) in _interceptor._sequence)
-				{
-					if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
-			}
-
-			/// <summary>Reset all tracking in the sequence.</summary>
-			public void Reset() => _interceptor.Reset();
-		}
-	}
-
-	/// <summary>Tracks and configures behavior for RunRules.</summary>
-	public sealed class RunRules2Interceptor
-	{
-		/// <summary>Delegate for RunRules.</summary>
-		public delegate global::System.Threading.Tasks.Task RunRulesDelegate(RuleManagerStubForRule ko, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token);
-
-		private readonly global::System.Collections.Generic.List<(RunRulesDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
-		private int _sequenceIndex;
-
-		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
-		public global::KnockOff.IMethodTrackingArgs<(global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token)> OnCall(RunRulesDelegate callback)
-		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
-			_sequenceIndex = 0;
-			return tracking;
-		}
-
-		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
-		public global::KnockOff.IMethodSequence<RunRulesDelegate> OnCall(RunRulesDelegate callback, global::KnockOff.Times times)
-		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, times, tracking));
-			_sequenceIndex = 0;
-			return new MethodSequenceImpl(this);
-		}
-
-		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task Invoke(RuleManagerStubForRule ko, bool strict, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
-		{
-			if (_sequence.Count == 0)
+			if (_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task.Count == 0)
 			{
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
-			var (callback, times, tracking) = _sequence[_sequenceIndex];
+			var (callback, times, tracking) = _sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task[_sequenceIndex_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task];
 			tracking.RecordCall((runRules, token));
 
 			if (!times.IsForever && tracking.CallCount >= times.Count)
 			{
-				if (_sequenceIndex < _sequence.Count - 1)
-					_sequenceIndex++;
+				if (_sequenceIndex_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task < _sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task.Count - 1)
+					_sequenceIndex_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task++;
 				else if (tracking.CallCount > times.Count)
 					throw global::KnockOff.StubException.SequenceExhausted("RunRules");
 			}
@@ -215,66 +140,102 @@ partial class RuleManagerStubForRule : global::Neatoo.Rules.IRuleManager, global
 			return callback(ko, runRules, token);
 		}
 
-		/// <summary>Resets all tracking state.</summary>
+		/// <summary>Resets all tracking state for all overloads.</summary>
 		public void Reset()
 		{
-			foreach (var (_, _, tracking) in _sequence)
+			foreach (var (_, _, tracking) in _sequence_String_Threading_CancellationToken_Threading_Tasks_Task)
 				tracking.Reset();
-			_sequenceIndex = 0;
+			_sequenceIndex_String_Threading_CancellationToken_Threading_Tasks_Task = 0;
+			foreach (var (_, _, tracking) in _sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task)
+				tracking.Reset();
+			_sequenceIndex_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task = 0;
 		}
 
-		/// <summary>Tracks invocations for this callback registration.</summary>
-		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTrackingArgs<(global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token)>
+		/// <summary>Verifies all Times constraints for all overloads were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
 		{
-			private (global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token) _lastArgs;
+			foreach (var (_, times, tracking) in _sequence_String_Threading_CancellationToken_Threading_Tasks_Task)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			foreach (var (_, times, tracking) in _sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
 
-			/// <summary>Number of times this callback was invoked.</summary>
+		private sealed class MethodTrackingImpl_String_Threading_CancellationToken_Threading_Tasks_Task : global::KnockOff.IMethodTrackingArgs<(string? propertyName, global::System.Threading.CancellationToken? token)>
+		{
+			private (string? propertyName, global::System.Threading.CancellationToken? token) _lastArgs;
+
 			public int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
-			public (global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token) LastArgs => _lastArgs;
+			public (string? propertyName, global::System.Threading.CancellationToken? token) LastArgs => _lastArgs;
 
-			/// <summary>Records a call to this callback.</summary>
-			public void RecordCall((global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token) args) { CallCount++; _lastArgs = args; }
+			public void RecordCall((string? propertyName, global::System.Threading.CancellationToken? token) args) { CallCount++; _lastArgs = args; }
 
-			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArgs = default; }
 		}
 
-		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<RunRulesDelegate>
+		private sealed class MethodTrackingImpl_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task : global::KnockOff.IMethodTrackingArgs<(global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token)>
 		{
-			private readonly RunRules2Interceptor _interceptor;
+			private (global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token) _lastArgs;
 
-			public MethodSequenceImpl(RunRules2Interceptor interceptor) => _interceptor = interceptor;
+			public int CallCount { get; private set; }
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
+			public bool WasCalled => CallCount > 0;
+
+			public (global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token) LastArgs => _lastArgs;
+
+			public void RecordCall((global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token) args) { CallCount++; _lastArgs = args; }
+
+			public void Reset() { CallCount = 0; _lastArgs = default; }
+		}
+
+		private sealed class MethodSequenceImpl_String_Threading_CancellationToken_Threading_Tasks_Task : global::KnockOff.IMethodSequence<RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task>
+		{
+			private readonly RunRulesInterceptor _interceptor;
+
+			public MethodSequenceImpl_String_Threading_CancellationToken_Threading_Tasks_Task(RunRulesInterceptor interceptor) => _interceptor = interceptor;
+
 			public int TotalCallCount
 			{
 				get
 				{
 					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence)
+					foreach (var (_, _, tracking) in _interceptor._sequence_String_Threading_CancellationToken_Threading_Tasks_Task)
 						total += tracking.CallCount;
 					return total;
 				}
 			}
 
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<RunRulesDelegate> ThenCall(RunRulesDelegate callback, global::KnockOff.Times times)
+			public global::KnockOff.IMethodSequence<RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task> ThenCall(RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task callback, global::KnockOff.Times times)
 			{
-				var tracking = new MethodTrackingImpl();
-				_interceptor._sequence.Add((callback, times, tracking));
+				var tracking = new MethodTrackingImpl_String_Threading_CancellationToken_Threading_Tasks_Task();
+				_interceptor._sequence_String_Threading_CancellationToken_Threading_Tasks_Task.Add((callback, times, tracking));
 				return this;
 			}
 
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
 			public bool Verify()
 			{
-				foreach (var (_, times, tracking) in _interceptor._sequence)
+				foreach (var (_, times, tracking) in _interceptor._sequence_String_Threading_CancellationToken_Threading_Tasks_Task)
 				{
 					if (!times.Verify(tracking.CallCount))
 						return false;
@@ -282,9 +243,46 @@ partial class RuleManagerStubForRule : global::Neatoo.Rules.IRuleManager, global
 				return true;
 			}
 
-			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
+		private sealed class MethodSequenceImpl_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task : global::KnockOff.IMethodSequence<RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task>
+		{
+			private readonly RunRulesInterceptor _interceptor;
+
+			public MethodSequenceImpl_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(RunRulesInterceptor interceptor) => _interceptor = interceptor;
+
+			public int TotalCallCount
+			{
+				get
+				{
+					var total = 0;
+					foreach (var (_, _, tracking) in _interceptor._sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task)
+						total += tracking.CallCount;
+					return total;
+				}
+			}
+
+			public global::KnockOff.IMethodSequence<RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task> ThenCall(RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task();
+				_interceptor._sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task.Add((callback, times, tracking));
+				return this;
+			}
+
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _interceptor._sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task)
+				{
+					if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			public void Reset() => _interceptor.Reset();
+		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for RunRule.</summary>
@@ -345,6 +343,23 @@ partial class RuleManagerStubForRule : global::Neatoo.Rules.IRuleManager, global
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -586,10 +601,7 @@ partial class RuleManagerStubForRule : global::Neatoo.Rules.IRuleManager, global
 	public RulesInterceptor Rules { get; } = new();
 
 	/// <summary>Interceptor for RunRules.</summary>
-	public RunRules1Interceptor RunRules1 { get; } = new();
-
-	/// <summary>Interceptor for RunRules.</summary>
-	public RunRules2Interceptor RunRules2 { get; } = new();
+	public RunRulesInterceptor RunRules { get; } = new();
 
 	/// <summary>Interceptor for RunRule.</summary>
 	public RunRuleInterceptor RunRule { get; } = new();
@@ -608,6 +620,22 @@ partial class RuleManagerStubForRule : global::Neatoo.Rules.IRuleManager, global
 
 	/// <summary>The global::Neatoo.Rules.IRuleManager instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.Rules.IRuleManager Object => this;
+
+	/// <summary>Verifies all method interceptors' Times constraints were satisfied.</summary>
+	public bool Verify()
+	{
+		var result = true;
+		result &= RunRules.Verify();
+		result &= RunRule.Verify();
+		return result;
+	}
+
+	/// <summary>Verifies all method interceptors' Times constraints and throws if any fail.</summary>
+	public void VerifyAll()
+	{
+		if (!Verify())
+			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
 
 	/// <summary>Gets a smart default value for a generic type at runtime.</summary>
 	private static T SmartDefault<T>(string methodName)
@@ -638,12 +666,12 @@ partial class RuleManagerStubForRule : global::Neatoo.Rules.IRuleManager, global
 
 	global::System.Threading.Tasks.Task global::Neatoo.Rules.IRuleManager.RunRules(string propertyName, global::System.Threading.CancellationToken? token)
 	{
-		return RunRules1.Invoke(this, Strict, propertyName, token);
+		return RunRules.Invoke_String_Threading_CancellationToken_Threading_Tasks_Task(this, Strict, propertyName, token);
 	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.Rules.IRuleManager.RunRules(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
 	{
-		return RunRules2.Invoke(this, Strict, runRules, token);
+		return RunRules.Invoke_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(this, Strict, runRules, token);
 	}
 
 	void global::Neatoo.Rules.IRuleManager.AddRule<T>(global::Neatoo.Rules.IRule<T> rule)

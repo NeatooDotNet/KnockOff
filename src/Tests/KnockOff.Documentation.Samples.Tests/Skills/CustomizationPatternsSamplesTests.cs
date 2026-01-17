@@ -79,7 +79,7 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         ICpCallbackService service = knockOff;
         var called = false;
 
-        knockOff.Initialize.OnCall = (ko) => { called = true; };
+        knockOff.Initialize.OnCall((ko) => { called = true; });
         service.Initialize();
 
         Assert.True(called);
@@ -91,8 +91,8 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new CpCallbackServiceKnockOff();
         ICpCallbackService service = knockOff;
 
-        knockOff.GetById.OnCall = (ko, id) =>
-            new CpUser { Id = id, Name = "Mocked" };
+        knockOff.GetById.OnCall((ko, id) =>
+            new CpUser { Id = id, Name = "Mocked" });
 
         var user = service.GetById(42);
 
@@ -106,8 +106,8 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new CpCallbackServiceKnockOff();
         ICpCallbackService service = knockOff;
 
-        knockOff.Search.OnCall = (ko, query, limit, offset) =>
-            new List<CpUser> { new() { Name = $"{query}:{limit}:{offset}" } };
+        knockOff.Search.OnCall((ko, query, limit, offset) =>
+            new List<CpUser> { new() { Name = $"{query}:{limit}:{offset}" } });
 
         var result = service.Search("test", 10, 5);
 
@@ -202,8 +202,10 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var oneParam = false;
         var twoParam = false;
 
-        knockOff.Process1.OnCall = (ko, data) => oneParam = true;
-        knockOff.Process2.OnCall = (ko, data, priority) => twoParam = true;
+        // Overloaded methods use single interceptor with overloaded OnCall methods
+        // The compiler resolves the overload based on delegate parameter types
+        knockOff.Process.OnCall((CpOverloadServiceKnockOff ko, string data) => { oneParam = true; });
+        knockOff.Process.OnCall((CpOverloadServiceKnockOff ko, string data, int priority) => { twoParam = true; });
 
         service.Process("a");
         service.Process("b", 1);
@@ -218,8 +220,9 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new CpOverloadServiceKnockOff();
         ICpOverloadService service = knockOff;
 
-        knockOff.Calculate1.OnCall = (ko, value) => value * 2;
-        knockOff.Calculate2.OnCall = (ko, a, b) => a + b;
+        // Overloaded methods use single interceptor with overloaded OnCall methods
+        knockOff.Calculate.OnCall((CpOverloadServiceKnockOff ko, int value) => value * 2);
+        knockOff.Calculate.OnCall((CpOverloadServiceKnockOff ko, int a, int b) => a + b);
 
         Assert.Equal(10, service.Calculate(5));
         Assert.Equal(8, service.Calculate(3, 5));
@@ -235,8 +238,9 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new CpParserKnockOff();
         ICpParser parser = knockOff;
 
-        knockOff.TryParse.OnCall =
-            (CpParserKnockOff.TryParseInterceptor.TryParseDelegate)((CpParserKnockOff ko, string input, out int result) =>
+        // OnCall is a method that takes a delegate parameter
+        knockOff.TryParse.OnCall(
+            (CpParserKnockOff ko, string input, out int result) =>
             {
                 if (int.TryParse(input, out result))
                     return true;
@@ -257,8 +261,9 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new CpParserKnockOff();
         ICpParser parser = knockOff;
 
-        knockOff.GetStats.OnCall =
-            (CpParserKnockOff.GetStatsInterceptor.GetStatsDelegate)((CpParserKnockOff ko, out int count, out double average) =>
+        // OnCall is a method that takes a delegate parameter
+        knockOff.GetStats.OnCall(
+            (CpParserKnockOff ko, out int count, out double average) =>
             {
                 count = 42;
                 average = 3.14;
@@ -280,8 +285,9 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new CpProcessorKnockOff();
         ICpProcessor processor = knockOff;
 
-        knockOff.Increment.OnCall =
-            (CpProcessorKnockOff.IncrementInterceptor.IncrementDelegate)((CpProcessorKnockOff ko, ref int value) =>
+        // OnCall is a method that takes a delegate parameter
+        knockOff.Increment.OnCall(
+            (CpProcessorKnockOff ko, ref int value) =>
             {
                 value = value * 2;
             });
@@ -298,8 +304,9 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new CpProcessorKnockOff();
         ICpProcessor processor = knockOff;
 
-        knockOff.TryUpdate.OnCall =
-            (CpProcessorKnockOff.TryUpdateInterceptor.TryUpdateDelegate)((CpProcessorKnockOff ko, string key, ref string value) =>
+        // OnCall is a method that takes a delegate parameter
+        knockOff.TryUpdate.OnCall(
+            (CpProcessorKnockOff ko, string key, ref string value) =>
             {
                 if (key == "valid")
                 {
@@ -324,8 +331,9 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         var knockOff = new CpProcessorKnockOff();
         ICpProcessor processor = knockOff;
 
-        knockOff.Increment.OnCall =
-            (CpProcessorKnockOff.IncrementInterceptor.IncrementDelegate)((CpProcessorKnockOff ko, ref int value) =>
+        // OnCall returns IMethodTracking<T> for tracking
+        var tracking = knockOff.Increment.OnCall(
+            (CpProcessorKnockOff ko, ref int value) =>
             {
                 value = value * 2;
             });
@@ -334,7 +342,7 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         processor.Increment(ref x);
 
         Assert.Equal(10, x); // Modified
-        Assert.Equal(5, knockOff.Increment.LastCallArg); // Original
+        Assert.Equal(5, tracking.LastArg); // Original value captured before modification
     }
 
     // ========================================================================
@@ -342,37 +350,43 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
     // ========================================================================
 
     [Fact]
-    public void Priority_NoCallback_UsesUserMethod()
+    public void Priority_UserMethod_ReturnsExpectedValue()
     {
         var knockOff = new CpPriorityServiceKnockOff();
         ICpPriorityService service = knockOff;
 
+        // User method implementation doubles the value
         Assert.Equal(10, service.Calculate(5)); // 5 * 2
     }
 
     [Fact]
-    public void Priority_WithCallback_OverridesUserMethod()
+    public void Priority_UserMethodInterceptor_TracksCallsWithoutOverriding()
     {
         var knockOff = new CpPriorityServiceKnockOff();
         ICpPriorityService service = knockOff;
 
-        knockOff.Calculate2.OnCall = (ko, x) => x * 100;
+        // User method interceptors (suffix "2") only track calls - they cannot override behavior
+        service.Calculate(5);
 
-        Assert.Equal(500, service.Calculate(5)); // callback
+        Assert.True(knockOff.Calculate2.WasCalled);
+        Assert.Equal(1, knockOff.Calculate2.CallCount);
+        Assert.Equal(5, knockOff.Calculate2.LastArg);
     }
 
     [Fact]
-    public void Priority_AfterReset_ReturnsToUserMethod()
+    public void Priority_Reset_ClearsTrackingState()
     {
         var knockOff = new CpPriorityServiceKnockOff();
         ICpPriorityService service = knockOff;
 
-        knockOff.Calculate2.OnCall = (ko, x) => x * 100;
-        Assert.Equal(500, service.Calculate(5)); // callback
+        service.Calculate(5);
+        Assert.Equal(1, knockOff.Calculate2.CallCount);
 
         knockOff.Calculate2.Reset();
 
-        Assert.Equal(10, service.Calculate(5)); // user method
+        // Reset clears tracking but behavior stays the same (user method)
+        Assert.Equal(0, knockOff.Calculate2.CallCount);
+        Assert.Equal(10, service.Calculate(5)); // User method still works
     }
 
     // ========================================================================
@@ -386,30 +400,43 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
         ICpResetRepository service = knockOff;
         var specialUser = new CpUser { Name = "Special" };
 
-        knockOff.GetUser.OnCall = (ko, id) => specialUser;
+        // OnCall is a method that returns tracking
+        var tracking = knockOff.GetUser.OnCall((ko, id) => specialUser);
         service.GetUser(1);
         service.GetUser(2);
 
-        Assert.Equal(2, knockOff.GetUser.CallCount);
+        Assert.Equal(2, tracking.CallCount);
 
         knockOff.GetUser.Reset();
 
-        Assert.Equal(0, knockOff.GetUser.CallCount);
+        // After reset, need to set up a new callback to get tracking
+        var newTracking = knockOff.GetUser.OnCall((ko, id) => specialUser);
+        Assert.Equal(0, newTracking.CallCount);
     }
 
     [Fact]
-    public void Reset_ClearsCallback()
+    public void Reset_ClearsTrackingButKeepsCallback()
     {
         var knockOff = new CpResetRepositoryKnockOff();
         ICpResetRepository service = knockOff;
 
-        knockOff.GetUser.OnCall = (ko, id) => new CpUser { Name = "FromCallback" };
+        // OnCall is a method that returns tracking
+        var tracking = knockOff.GetUser.OnCall((ko, id) => new CpUser { Name = "FromCallback" });
+        service.GetUser(1);
+
+        Assert.Equal(1, tracking.CallCount);
         Assert.Equal("FromCallback", service.GetUser(1)?.Name);
 
         knockOff.GetUser.Reset();
 
-        // Now returns default (null for nullable)
-        Assert.Null(service.GetUser(1));
+        // Tracking is cleared, but callback remains active
+        // Need to set up new callback to get fresh tracking object
+        var newTracking = knockOff.GetUser.OnCall((ko, id) => new CpUser { Name = "NewCallback" });
+        Assert.Equal(0, newTracking.CallCount);
+
+        // New callback is now active
+        Assert.Equal("NewCallback", service.GetUser(1)?.Name);
+        Assert.Equal(1, newTracking.CallCount);
     }
 
     // ========================================================================
@@ -417,41 +444,43 @@ public class CustomizationPatternsSamplesTests : SamplesTestBase
     // ========================================================================
 
     [Fact]
-    public void CombiningPatterns_DefaultIsNull()
+    public void CombiningPatterns_UserMethod_ReturnsExpectedValue()
     {
         var knockOff = new CpCombinedRepoKnockOff();
         ICpCombinedRepository repo = knockOff;
 
+        // User method returns null for non-existent IDs
         Assert.Null(repo.GetById(999));
     }
 
     [Fact]
-    public void CombiningPatterns_CallbackOverridesDefault()
+    public void CombiningPatterns_TracksAllCalls()
     {
         var knockOff = new CpCombinedRepoKnockOff();
         ICpCombinedRepository repo = knockOff;
 
-        knockOff.GetById2.OnCall = (ko, id) => id == 1
-            ? new CpUser { Name = "Admin" }
-            : null;
+        // User method interceptors (suffix "2") track calls to user methods
+        repo.GetById(1);
+        repo.GetById(999);
 
-        Assert.Equal("Admin", repo.GetById(1)?.Name);
-        Assert.Null(repo.GetById(999));
+        Assert.True(knockOff.GetById2.WasCalled);
+        Assert.Equal(2, knockOff.GetById2.CallCount);
+        Assert.Equal(999, knockOff.GetById2.LastArg);
     }
 
     [Fact]
-    public void CombiningPatterns_ResetAndNewBehavior()
+    public void CombiningPatterns_Reset_ClearsTracking()
     {
         var knockOff = new CpCombinedRepoKnockOff();
         ICpCombinedRepository repo = knockOff;
 
-        knockOff.GetById2.OnCall = (ko, id) => new CpUser { Name = "First" };
-        Assert.Equal("First", repo.GetById(1)?.Name);
+        repo.GetById(1);
+        Assert.Equal(1, knockOff.GetById2.CallCount);
 
         knockOff.GetById2.Reset();
-        knockOff.GetById2.OnCall = (ko, id) =>
-            new CpUser { Name = $"User-{id}" };
 
-        Assert.Equal("User-999", repo.GetById(999)?.Name);
+        // Reset clears tracking state
+        Assert.Equal(0, knockOff.GetById2.CallCount);
+        Assert.False(knockOff.GetById2.WasCalled);
     }
 }

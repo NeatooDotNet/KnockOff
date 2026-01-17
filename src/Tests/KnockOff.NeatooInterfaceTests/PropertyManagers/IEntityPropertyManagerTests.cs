@@ -362,8 +362,12 @@ public class IEntityPropertyManagerStandaloneTests
         var stub = new EntityPropertyManagerStub();
         IEntityPropertyManager manager = stub;
 
+        // Configure callback to enable tracking
+        var tracking = stub.MarkSelfUnmodified.OnCall((ko) => { });
+
         manager.MarkSelfUnmodified();
 
-        Assert.True(stub.MarkSelfUnmodified.WasCalled);
+        // Tracking is available via the returned tracking object
+        Assert.True(tracking.WasCalled);
     }
 }

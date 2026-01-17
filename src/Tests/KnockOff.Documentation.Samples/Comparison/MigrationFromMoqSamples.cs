@@ -215,13 +215,13 @@ public partial class MigSaveServiceKnockOff : IMigSaveService { }
 #endregion
 
 #region migration-from-moq-convert-setup-returns
-// knockOff.GetUser.OnCall = (ko, id) =>
-//     new User { Id = id, Name = "Test" };
+// knockOff.GetUser.OnCall((ko, id) =>
+//     new User { Id = id, Name = "Test" });
 #endregion
 
 #region migration-from-moq-convert-async-returns
-// knockOff.GetUserAsync.OnCall = (ko, id) =>
-//     Task.FromResult<User?>(new User { Id = id });
+// knockOff.GetUserAsync.OnCall((ko, id) =>
+//     Task.FromResult<User?>(new User { Id = id }));
 #endregion
 
 #region migration-from-moq-convert-verification
@@ -232,14 +232,12 @@ public partial class MigSaveServiceKnockOff : IMigSaveService { }
 #endregion
 
 #region migration-from-moq-convert-callback
-// // Arguments are captured automatically
-// var captured = knockOff.Save.LastCallArg;
-//
-// // Or use callback for custom logic
-// knockOff.Save.OnCall = (ko, user) =>
+// // Arguments are captured automatically via tracking object
+// var tracking = knockOff.Save.OnCall((ko, user) =>
 // {
 //     customList.Add(user);
-// };
+// });
+// var captured = tracking.LastArg;
 #endregion
 
 #region migration-from-moq-convert-property-setup
@@ -251,26 +249,26 @@ public partial class MigSaveServiceKnockOff : IMigSaveService { }
 #endregion
 
 #region migration-from-moq-static-returns-callback
-// knockOff.GetConfig.OnCall = (ko) => new MigConfig { Timeout = 30 };
+// knockOff.GetConfig.OnCall((ko) => new MigConfig { Timeout = 30 });
 #endregion
 
 #region migration-from-moq-conditional-returns
-// knockOff.GetUser.OnCall = (ko, id) => id switch
+// knockOff.GetUser.OnCall((ko, id) => id switch
 // {
 //     1 => new User { Name = "Admin" },
 //     2 => new User { Name = "Guest" },
 //     _ => null
-// };
+// });
 #endregion
 
 #region migration-from-moq-throwing-exceptions-usage
-// knockOff.Connect.OnCall = (ko) =>
-//     throw new TimeoutException();
+// knockOff.Connect.OnCall((ko) =>
+//     throw new TimeoutException());
 #endregion
 
 #region migration-from-moq-sequential-returns-usage
 // var values = new Queue<int>([1, 2, 3]);
-// knockOff.GetNext.OnCall = (ko) => values.Dequeue();
+// knockOff.GetNext.OnCall((ko) => values.Dequeue());
 #endregion
 
 #region migration-from-moq-multiple-interfaces-usage
@@ -279,16 +277,16 @@ public partial class MigSaveServiceKnockOff : IMigSaveService { }
 // IMigRepository repo = repoKnockOff.AsIMigRepository();
 //
 // var uowKnockOff = new MigUnitOfWorkKnockOff();
-// uowKnockOff.SaveChangesAsync.OnCall = (ko, ct) => Task.FromResult(1);
+// uowKnockOff.SaveChangesAsync.OnCall((ko, ct) => Task.FromResult(1));
 // IMigUnitOfWork uow = uowKnockOff.AsIMigUnitOfWork();
 #endregion
 
 #region migration-from-moq-argument-matching-usage
-// knockOff.Log.OnCall = (ko, message) =>
+// knockOff.Log.OnCall((ko, message) =>
 // {
 //     if (message.Contains("error"))
 //         errors.Add(message);
-// };
+// });
 #endregion
 
 #region migration-from-moq-simple-verification
@@ -298,11 +296,11 @@ public partial class MigSaveServiceKnockOff : IMigSaveService { }
 #endregion
 
 #region migration-from-moq-complex-callbacks-usage
-// knockOff.Save.OnCall = (ko, entity) =>
+// knockOff.Save.OnCall((ko, entity) =>
 // {
 //     entity.Id = nextId++;
 //     savedEntities.Add(entity);
-// };
+// });
 #endregion
 
 #region migration-from-moq-automatic-tracking-usage

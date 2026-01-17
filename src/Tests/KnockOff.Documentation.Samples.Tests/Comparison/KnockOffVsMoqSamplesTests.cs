@@ -34,7 +34,7 @@ public class KnockOffVsMoqSamplesTests : SamplesTestBase
         service.GetUser(42);
 
         Assert.Equal(1, knockOff.GetUser2.CallCount);
-        Assert.Equal(42, knockOff.GetUser2.LastCallArg);
+        Assert.Equal(42, knockOff.GetUser2.LastArg);
     }
 
     // ========================================================================
@@ -93,9 +93,10 @@ public class KnockOffVsMoqSamplesTests : SamplesTestBase
         var knockOff = new VsRepositoryKnockOff();
         IVsRepository repo = knockOff;
 
+        var tracking = knockOff.Save.OnCall((ko, entity) => { });
         repo.Save(new VsEntity { Id = 1 });
 
-        var captured = knockOff.Save.LastCallArg;
+        var captured = tracking.LastArg;
         Assert.Equal(1, captured?.Id);
     }
 
@@ -105,12 +106,13 @@ public class KnockOffVsMoqSamplesTests : SamplesTestBase
         var knockOff = new VsRepositoryKnockOff();
         IVsRepository repo = knockOff;
 
+        var tracking = knockOff.Save.OnCall((ko, entity) => { });
         repo.Save(new VsEntity { Id = 1 });
         repo.Save(new VsEntity { Id = 2 });
         repo.Save(new VsEntity { Id = 3 });
 
-        Assert.Equal(3, knockOff.Save.CallCount);
-        Assert.Equal(3, knockOff.Save.LastCallArg?.Id);
+        Assert.Equal(3, tracking.CallCount);
+        Assert.Equal(3, tracking.LastArg?.Id);
     }
 
     // ========================================================================
@@ -175,8 +177,11 @@ public class KnockOffVsMoqSamplesTests : SamplesTestBase
         var knockOff = new VsVerificationRepositoryKnockOff();
         IVsVerificationRepository repo = knockOff;
 
-        // Set up GetAll to return empty collection (required for non-nullable return type)
-        knockOff.GetAll.OnCall = (ko) => Enumerable.Empty<VsEntity>();
+        // Set up callbacks to enable tracking
+        var saveTracking = knockOff.Save.OnCall((ko, e) => { });
+        var deleteTracking = knockOff.Delete.OnCall((ko, id) => { });
+        var getAllTracking = knockOff.GetAll.OnCall((ko) => Enumerable.Empty<VsEntity>());
+        var updateTracking = knockOff.Update.OnCall((ko, e) => { });
 
         repo.Save(new VsEntity());
         repo.Update(new VsEntity());
@@ -184,10 +189,10 @@ public class KnockOffVsMoqSamplesTests : SamplesTestBase
         repo.Update(new VsEntity());
         _ = repo.GetAll();
 
-        Assert.Equal(1, knockOff.Save.CallCount);      // Times.Once
-        Assert.Equal(0, knockOff.Delete.CallCount);    // Times.Never
-        Assert.True(knockOff.GetAll.WasCalled);        // Times.AtLeastOnce
-        Assert.Equal(3, knockOff.Update.CallCount);    // Times.Exactly(3)
+        Assert.Equal(1, saveTracking.CallCount);      // Times.Once
+        Assert.Equal(0, deleteTracking.CallCount);    // Times.Never
+        Assert.True(getAllTracking.WasCalled);        // Times.AtLeastOnce
+        Assert.Equal(3, updateTracking.CallCount);    // Times.Exactly(3)
     }
 
     // ========================================================================
@@ -201,7 +206,7 @@ public class KnockOffVsMoqSamplesTests : SamplesTestBase
         IVsSequence sequence = knockOff;
 
         var returnValues = new Queue<int>([1, 2, 3]);
-        knockOff.GetNext.OnCall = (ko) => returnValues.Dequeue();
+        knockOff.GetNext.OnCall((ko) => returnValues.Dequeue());
 
         Assert.Equal(1, sequence.GetNext());
         Assert.Equal(2, sequence.GetNext());
@@ -224,16 +229,16 @@ public class KnockOffVsMoqSamplesTests : SamplesTestBase
     }
 
     [Fact]
-    public void PerTestOverride_CallbackOverrides()
+    public void PerTestOverride_TracksCall()
     {
         var knockOff = new VsOverrideServiceKnockOff();
         IVsOverrideService service = knockOff;
 
-        knockOff.GetUser2.OnCall = (ko, id) => new VsUser { Id = id, Name = "Special" };
-
+        // User method interceptors track calls but cannot override behavior
         var user = service.GetUser(42);
 
-        Assert.Equal("Special", user.Name);
+        Assert.Equal(42, knockOff.GetUser2.LastArg);
+        Assert.True(knockOff.GetUser2.WasCalled);
     }
 
     // ========================================================================
@@ -241,20 +246,20 @@ public class KnockOffVsMoqSamplesTests : SamplesTestBase
     // ========================================================================
 
     [Fact]
-    public void ResetAndReuse_ClearsCallbackAndTracking()
+    public void ResetAndReuse_ClearsTracking()
     {
         var knockOff = new VsOverrideServiceKnockOff();
         IVsOverrideService service = knockOff;
 
-        knockOff.GetUser2.OnCall = (ko, id) => new VsUser { Name = "First" };
+        // User method interceptors track calls
         var user1 = service.GetUser(1);
-        Assert.Equal("First", user1.Name);
+        Assert.Equal(1, knockOff.GetUser2.CallCount);
 
         knockOff.GetUser2.Reset();
 
-        // Now falls back to user method
+        // Reset clears tracking state
         var user2 = service.GetUser(2);
-        Assert.Equal("Default", user2.Name);
         Assert.Equal(1, knockOff.GetUser2.CallCount); // Reset cleared previous count
+        Assert.Equal(2, knockOff.GetUser2.LastArg);
     }
 }

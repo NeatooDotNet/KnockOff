@@ -77,6 +77,13 @@ internal static class FlatRenderer
 					RenderIndexerInterceptorClass(w, indexer, classNameWithTypeParams);
 			}
 
+			// Render indexer container classes for groups with multiple indexers
+			foreach (var group in unit.IndexerGroups)
+			{
+				if (group.Indexers.Count > 1 && renderedInterceptorClasses.Add(group.ContainerClassName))
+					RenderIndexerContainerClass(w, group);
+			}
+
 			// Render method interceptor classes using groups (handles overloads)
 			foreach (var group in unit.MethodGroups)
 			{
@@ -109,18 +116,22 @@ internal static class FlatRenderer
 			// Standard members (Strict mode, Object accessor)
 			RenderStandardMembers(w, unit);
 
-			// Build set of interceptor names that have multiple overloads (need suffixed Invoke)
+			// Build set of interceptor names that have multiple UNIQUE overloads (need suffixed Invoke)
+			// Must match the deduplication logic in RenderMethodGroupInterceptorClass
 			var multiOverloadInterceptors = new HashSet<string>(
 				unit.MethodGroups
-					.Where(g => g.Methods.Count > 1)
+					.Where(g => g.Methods.Select(GetSignatureSuffix).Distinct().Count() > 1)
 					.Select(g => g.InterceptorName));
+
+			// Build indexer access map for multi-indexer groups
+			var indexerAccessMap = BuildIndexerAccessMap(unit.IndexerGroups);
 
 			// Explicit interface implementations (NOT deduplicated - one per interface member)
 			foreach (var prop in unit.Properties)
 				RenderPropertyImplementation(w, prop);
 
 			foreach (var indexer in unit.Indexers)
-				RenderIndexerImplementation(w, indexer);
+				RenderIndexerImplementation(w, indexer, indexerAccessMap);
 
 			foreach (var method in unit.Methods)
 				RenderMethodImplementation(w, method, multiOverloadInterceptors);
@@ -137,6 +148,40 @@ internal static class FlatRenderer
 
 		return w.ToString();
 	}
+
+	#region Indexer Access Helpers
+
+	/// <summary>
+	/// Builds a map from indexer InterceptorName to the property access expression.
+	/// For single-indexer groups: "Indexer"
+	/// For multi-indexer groups: "Indexer.OfInt32", "Indexer.OfString", etc.
+	/// </summary>
+	private static Dictionary<string, string> BuildIndexerAccessMap(EquatableArray<FlatIndexerGroup> groups)
+	{
+		var map = new Dictionary<string, string>();
+
+		foreach (var group in groups)
+		{
+			if (group.Indexers.Count == 1)
+			{
+				// Single indexer - direct access
+				var indexer = group.Indexers.GetArray()![0];
+				map[indexer.InterceptorName] = group.BaseName;
+			}
+			else
+			{
+				// Multiple indexers - container with OfXxx pattern
+				foreach (var indexer in group.Indexers)
+				{
+					map[indexer.InterceptorName] = $"{group.BaseName}.Of{indexer.KeyTypeFriendlyName}";
+				}
+			}
+		}
+
+		return map;
+	}
+
+	#endregion
 
 	#region Type Parameter Formatting
 
@@ -290,6 +335,42 @@ internal static class FlatRenderer
 
 	#endregion
 
+	#region Indexer Container Class (for OfXxx pattern)
+
+	private static void RenderIndexerContainerClass(CodeWriter w, FlatIndexerGroup group)
+	{
+		// Deduplicate by KeyTypeFriendlyName - same key type shares the same interceptor in container
+		var uniqueByKeyType = group.Indexers
+			.GroupBy(i => i.KeyTypeFriendlyName)
+			.Select(g => g.First())
+			.ToList();
+
+		w.Line($"/// <summary>Container for indexer interceptors with OfXxx access pattern.</summary>");
+		using (w.Block($"public sealed class {group.ContainerClassName}"))
+		{
+			// Of{KeyType} properties (container owns its interceptors)
+			foreach (var indexer in uniqueByKeyType)
+			{
+				w.Line($"/// <summary>Gets the interceptor for indexer with {indexer.KeyTypeFriendlyName} key type.</summary>");
+				w.Line($"public {indexer.InterceptorClassName} Of{indexer.KeyTypeFriendlyName} {{ get; }} = new();");
+				w.Line();
+			}
+
+			// Reset method (resets all)
+			w.Line("/// <summary>Resets all indexer interceptors.</summary>");
+			using (w.Block("public void Reset()"))
+			{
+				foreach (var indexer in uniqueByKeyType)
+				{
+					w.Line($"Of{indexer.KeyTypeFriendlyName}.Reset();");
+				}
+			}
+		}
+		w.Line();
+	}
+
+	#endregion
+
 	#region Indexer Interceptor Class
 
 	private static void RenderIndexerInterceptorClass(CodeWriter w, FlatIndexerModel indexer, string className)
@@ -426,6 +507,27 @@ internal static class FlatRenderer
 				w.Line("foreach (var (_, _, tracking) in _sequence)");
 				w.Line("\ttracking.Reset();");
 				w.Line("_sequenceIndex = 0;");
+			}
+			w.Line();
+
+			// Verify method
+			w.Line("/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>");
+			using (w.Block("public bool Verify()"))
+			{
+				w.Line("foreach (var (_, times, tracking) in _sequence)");
+				using (w.Braces())
+				{
+					w.Line("// For Forever, infer \"at least once\"");
+					w.Line("if (times.IsForever)");
+					using (w.Braces())
+					{
+						w.Line("if (!tracking.WasCalled)");
+						w.Line("\treturn false;");
+					}
+					w.Line("else if (!times.Verify(tracking.CallCount))");
+					w.Line("\treturn false;");
+				}
+				w.Line("return true;");
 			}
 			w.Line();
 
@@ -792,7 +894,7 @@ internal static class FlatRenderer
 			w.Line();
 
 			// Verify method
-			w.Line("/// <summary>Verifies all Times constraints for all overloads were satisfied.</summary>");
+			w.Line("/// <summary>Verifies all Times constraints for all overloads were satisfied. For Forever, verifies called at least once.</summary>");
 			using (w.Block("public bool Verify()"))
 			{
 				foreach (var method in uniqueMethods)
@@ -801,7 +903,14 @@ internal static class FlatRenderer
 					w.Line($"foreach (var (_, times, tracking) in _sequence_{suffix})");
 					using (w.Braces())
 					{
-						w.Line("if (!times.Verify(tracking.CallCount))");
+						w.Line("// For Forever, infer \"at least once\"");
+						w.Line("if (times.IsForever)");
+						using (w.Braces())
+						{
+							w.Line("if (!tracking.WasCalled)");
+							w.Line("\treturn false;");
+						}
+						w.Line("else if (!times.Verify(tracking.CallCount))");
 						w.Line("\treturn false;");
 					}
 				}
@@ -1362,15 +1471,28 @@ internal static class FlatRenderer
 			w.Line();
 		}
 
-		// Indexers
-		foreach (var indexer in unit.Indexers)
+		// Indexers - use container pattern for groups with multiple indexers
+		foreach (var group in unit.IndexerGroups)
 		{
-			if (!renderedProperties.Add(indexer.InterceptorName))
+			if (!renderedProperties.Add(group.BaseName))
 				continue;
-			var newKeyword = indexer.NeedsNewKeyword ? "new " : "";
-			w.Line($"/// <summary>Interceptor for indexer. Configure callbacks and track access.</summary>");
-			w.Line($"public {newKeyword}{indexer.InterceptorClassName} {indexer.InterceptorName} {{ get; }} = new();");
-			w.Line();
+			var newKeyword = group.NeedsNewKeyword ? "new " : "";
+
+			if (group.Indexers.Count == 1)
+			{
+				// Single indexer - direct access pattern
+				var indexer = group.Indexers.GetArray()![0];
+				w.Line($"/// <summary>Interceptor for indexer. Configure callbacks and track access.</summary>");
+				w.Line($"public {newKeyword}{indexer.InterceptorClassName} {group.BaseName} {{ get; }} = new();");
+				w.Line();
+			}
+			else
+			{
+				// Multiple indexers - container pattern with OfXxx access
+				w.Line($"/// <summary>Interceptor for indexer. Access via .Of{{KeyType}} (e.g., .OfInt32, .OfString).</summary>");
+				w.Line($"public {newKeyword}{group.ContainerClassName} {group.BaseName} {{ get; }} = new();");
+				w.Line();
+			}
 		}
 
 		// Methods (only non-generic - generic methods use handler properties)
@@ -1426,11 +1548,48 @@ internal static class FlatRenderer
 		w.Line($"public {primaryInterface} Object => this;");
 		w.Line();
 
+		// Verify and VerifyAll methods (only if there are method interceptors)
+		if (unit.MethodGroups.Count > 0)
+		{
+			RenderVerifyMethods(w, unit);
+		}
+
 		// SmartDefault helper (only if there are generic methods)
 		if (unit.HasGenericMethods)
 		{
 			RenderSmartDefaultMethod(w);
 		}
+	}
+
+	private static void RenderVerifyMethods(CodeWriter w, FlatGenerationUnit unit)
+	{
+		// Get unique interceptor names (method groups define the interceptor names)
+		var interceptorNames = unit.MethodGroups
+			.Select(g => g.InterceptorName)
+			.Distinct()
+			.ToList();
+
+		// Verify method - returns bool
+		w.Line("/// <summary>Verifies all method interceptors' Times constraints were satisfied.</summary>");
+		using (w.Block("public bool Verify()"))
+		{
+			w.Line("var result = true;");
+			foreach (var name in interceptorNames)
+			{
+				w.Line($"result &= {name}.Verify();");
+			}
+			w.Line("return result;");
+		}
+		w.Line();
+
+		// VerifyAll method - throws if verification fails
+		w.Line("/// <summary>Verifies all method interceptors' Times constraints and throws if any fail.</summary>");
+		using (w.Block("public void VerifyAll()"))
+		{
+			w.Line("if (!Verify())");
+			w.Line("\tthrow new global::KnockOff.VerificationException(\"One or more method verifications failed.\");");
+		}
+		w.Line();
 	}
 
 	private static void RenderSmartDefaultMethod(CodeWriter w)
@@ -1528,19 +1687,24 @@ internal static class FlatRenderer
 
 	#region Indexer Implementation
 
-	private static void RenderIndexerImplementation(CodeWriter w, FlatIndexerModel indexer)
+	private static void RenderIndexerImplementation(CodeWriter w, FlatIndexerModel indexer, Dictionary<string, string> indexerAccessMap)
 	{
+		// Get the correct access expression (e.g., "Indexer" or "Indexer.OfInt32")
+		var accessExpr = indexerAccessMap.TryGetValue(indexer.InterceptorName, out var mapped)
+			? mapped
+			: indexer.InterceptorName;
+
 		w.Line($"{indexer.ReturnType} {indexer.DeclaringInterface}.this[{indexer.KeyType} {indexer.KeyParamName}]");
 		using (w.Braces())
 		{
 			if (indexer.HasGetter)
 			{
-				w.Line($"get {{ {indexer.InterceptorName}.RecordGet({indexer.KeyParamName}); if ({indexer.InterceptorName}.OnGet is {{ }} onGet) return onGet(this, {indexer.KeyParamName}); if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{indexer.SimpleInterfaceName}\", \"this[]\"); return {indexer.InterceptorName}.Backing.TryGetValue({indexer.KeyParamName}, out var v) ? v : {indexer.DefaultExpression}; }}");
+				w.Line($"get {{ {accessExpr}.RecordGet({indexer.KeyParamName}); if ({accessExpr}.OnGet is {{ }} onGet) return onGet(this, {indexer.KeyParamName}); if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{indexer.SimpleInterfaceName}\", \"this[]\"); return {accessExpr}.Backing.TryGetValue({indexer.KeyParamName}, out var v) ? v : {indexer.DefaultExpression}; }}");
 			}
 
 			if (indexer.HasSetter)
 			{
-				w.Line($"set {{ {indexer.InterceptorName}.RecordSet({indexer.KeyParamName}, value); if ({indexer.InterceptorName}.OnSet is {{ }} onSet) {{ onSet(this, {indexer.KeyParamName}, value); return; }} if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{indexer.SimpleInterfaceName}\", \"this[]\"); {indexer.InterceptorName}.Backing[{indexer.KeyParamName}] = value; }}");
+				w.Line($"set {{ {accessExpr}.RecordSet({indexer.KeyParamName}, value); if ({accessExpr}.OnSet is {{ }} onSet) {{ onSet(this, {indexer.KeyParamName}, value); return; }} if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{indexer.SimpleInterfaceName}\", \"this[]\"); {accessExpr}.Backing[{indexer.KeyParamName}] = value; }}");
 			}
 		}
 		w.Line();

@@ -223,10 +223,13 @@ public static class MethodsUsageExamples
         IMethodSingleParam service = knockOff;
 
         #region methods-single-param
+        // Set up callback to get tracking
+        var tracking = knockOff.GetUser.OnCall((ko, id) => new MethodUser { Id = id });
+
         service.GetUser(42);
 
         // Tracking - single parameter uses raw type (not a tuple)
-        int? lastId = knockOff.GetUser.LastCallArg;  // 42, not (42,)
+        int? lastId = tracking.LastArg;  // 42, not (42,)
         #endregion
 
         _ = lastId; // Use variable
@@ -238,16 +241,19 @@ public static class MethodsUsageExamples
         IMethodMultiParam service = knockOff;
 
         #region methods-multiple-params
+        // Set up callback to get tracking
+        var tracking = knockOff.Process.OnCall((ko, name, value, flag) => { });
+
         service.Process("test", 42, true);
 
         // Tracking - named tuple with original parameter names
-        var args = knockOff.Process.LastCallArgs;
-        var name = args?.name;   // "test"
-        var value = args?.value; // 42
-        var flag = args?.flag;   // true
+        var args = tracking.LastArgs;
+        var name2 = args.name;   // "test"
+        var value2 = args.value; // 42
+        var flag2 = args.flag;   // true
         #endregion
 
-        _ = (name, value, flag); // Use variables
+        _ = (name2, value2, flag2); // Use variables
     }
 
     public static void VoidCallbacks()
@@ -257,22 +263,22 @@ public static class MethodsUsageExamples
 
         #region methods-void-callbacks
         // No parameters
-        serviceKnockOff.Initialize.OnCall = (ko) =>
+        serviceKnockOff.Initialize.OnCall((ko) =>
         {
             // Custom initialization logic
-        };
+        });
 
         // Single parameter
-        loggerKnockOff.Log.OnCall = (ko, message) =>
+        loggerKnockOff.Log.OnCall((ko, message) =>
         {
             Console.WriteLine($"Logged: {message}");
-        };
+        });
 
         // Multiple parameters
-        loggerKnockOff.LogError.OnCall = (ko, message, ex) =>
+        loggerKnockOff.LogError.OnCall((ko, message, ex) =>
         {
             Console.WriteLine($"Error: {message} - {ex.Message}");
-        };
+        });
         #endregion
     }
 
@@ -282,10 +288,10 @@ public static class MethodsUsageExamples
 
         #region methods-return-callbacks
         // No parameters
-        knockOff.Count.OnCall = (ko) => 42;
+        knockOff.Count.OnCall((ko) => 42);
 
         // Single parameter
-        knockOff.GetById.OnCall = (ko, id) => new MethodUser { Id = id };
+        knockOff.GetById.OnCall((ko, id) => new MethodUser { Id = id });
         #endregion
     }
 
@@ -295,19 +301,21 @@ public static class MethodsUsageExamples
         IMethodPriority service = knockOff;
 
         #region methods-priority-order-usage
-        // No callback → uses user method
+        // User method provides implementation
         var result1 = service.Calculate(5);  // 10 (5 * 2)
+        var result2 = service.Calculate(10); // 20 (10 * 2)
 
-        // Callback → overrides user method
-        knockOff.Calculate2.OnCall = (ko, x) => x * 100;
-        var result2 = service.Calculate(5);  // 500 (callback)
+        // Interceptor with "2" suffix tracks calls (no OnCall - user method is implementation)
+        Assert.Equal(2, knockOff.Calculate2.CallCount);
+        Assert.True(knockOff.Calculate2.WasCalled);
+        Assert.Equal(10, knockOff.Calculate2.LastArg);
 
-        // Reset → back to user method
+        // Reset clears tracking
         knockOff.Calculate2.Reset();
-        var result3 = service.Calculate(5);  // 10 (user method again)
+        Assert.Equal(0, knockOff.Calculate2.CallCount);
         #endregion
 
-        _ = (result1, result2, result3); // Use variables
+        _ = (result1, result2); // Use variables
     }
 
     public static void SimulatingFailures()
@@ -315,10 +323,10 @@ public static class MethodsUsageExamples
         var knockOff = new MethodFailureKnockOff();
 
         #region methods-simulating-failures-usage
-        knockOff.Save.OnCall = (ko, entity) =>
+        knockOff.Save.OnCall((ko, entity) =>
         {
             throw new InvalidOperationException("Connection failed");
-        };
+        });
         #endregion
     }
 
@@ -327,12 +335,12 @@ public static class MethodsUsageExamples
         var knockOff = new MethodRepositoryKnockOff();
 
         #region methods-conditional-returns
-        knockOff.GetById.OnCall = (ko, id) => id switch
+        knockOff.GetById.OnCall((ko, id) => id switch
         {
             1 => new MethodUser { Id = 1, Name = "Admin" },
             2 => new MethodUser { Id = 2, Name = "Guest" },
             _ => null
-        };
+        });
         #endregion
     }
 
@@ -342,11 +350,11 @@ public static class MethodsUsageExamples
 
         #region methods-capturing-arguments
         var capturedIds = new List<int>();
-        knockOff.GetById.OnCall = (ko, id) =>
+        knockOff.GetById.OnCall((ko, id) =>
         {
             capturedIds.Add(id);
             return new MethodUser { Id = id };
-        };
+        });
         #endregion
     }
 
@@ -358,15 +366,16 @@ public static class MethodsUsageExamples
         #region methods-verifying-call-order-usage
         var callOrder = new List<string>();
 
-        knockOff.Initialize.OnCall = (ko) => callOrder.Add("Initialize");
-        knockOff.Process.OnCall = (ko) => callOrder.Add("Process");
-        knockOff.Cleanup.OnCall = (ko) => callOrder.Add("Cleanup");
+        knockOff.Initialize.OnCall((ko) => callOrder.Add("Initialize"));
+        knockOff.Process.OnCall((ko) => callOrder.Add("Process"));
+        knockOff.Cleanup.OnCall((ko) => callOrder.Add("Cleanup"));
 
         service.Initialize();
         service.Process();
         service.Cleanup();
 
         // callOrder is ["Initialize", "Process", "Cleanup"]
+        knockOff.VerifyAll();  // Verifies all configured callbacks were called
         #endregion
 
         _ = callOrder; // Use variable
@@ -379,7 +388,7 @@ public static class MethodsUsageExamples
 
         #region methods-sequential-returns-usage
         var results = new Queue<int>([1, 2, 3]);
-        knockOff.GetNext.OnCall = (ko) => results.Dequeue();
+        knockOff.GetNext.OnCall((ko) => results.Dequeue());
 
         var first = service.GetNext();   // 1
         var second = service.GetNext();  // 2
@@ -394,11 +403,22 @@ public static class MethodsUsageExamples
         var knockOff = new MethodHandlerStateKnockOff();
 
         #region methods-accessing-handler-state-usage
-        knockOff.Process.OnCall = (ko) =>
+        // Set up Initialize to get its tracking
+        var initTracking = knockOff.Initialize.OnCall((ko) => { });
+
+        knockOff.Process.OnCall((ko) =>
         {
-            if (!ko.Initialize.WasCalled)
+            // Use tracked state from another method
+            if (!initTracking.WasCalled)
                 throw new InvalidOperationException("Not initialized");
-        };
+        });
         #endregion
     }
+}
+
+// Minimal Assert class for compilation (tests use xUnit)
+file static class Assert
+{
+    public static void True(bool condition) { }
+    public static void Equal<T>(T expected, T actual) { }
 }

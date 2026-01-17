@@ -64,7 +64,8 @@ public class FirstStubTests
     {
         // Arrange
         var stub = new UserRepositoryStub();
-        stub.GetById.OnCall = (ko, id) => new RmUser { Id = id, Name = "Original" };
+        stub.GetById.OnCall((ko, id) => new RmUser { Id = id, Name = "Original" });
+        var saveTracking = stub.Save.OnCall((ko, user) => { });
 
         var service = new RmUserService(stub);
 
@@ -72,8 +73,8 @@ public class FirstStubTests
         service.Rename(userId: 1, newName: "Updated");
 
         // Assert
-        Assert.Equal(1, stub.Save.CallCount);
-        Assert.Equal("Updated", stub.Save.LastCallArg?.Name);
+        Assert.Equal(1, saveTracking.CallCount);
+        Assert.Equal("Updated", saveTracking.LastArg?.Name);
     }
 }
 #endregion
@@ -122,7 +123,7 @@ public partial class UserTests
         var userStub = new Stubs.IUserService();
         var emailStub = new Stubs.EmailService();
 
-        // Configure behavior (unified API for both interface and class stubs)
+        // Configure behavior (OnCall is property for inline stubs)
         userStub.GetUser.OnCall = (ko, id) => new User { Id = id, Email = "test@example.com" };
         emailStub.Send.OnCall = (ko, to, subject, body) => { };
 
@@ -130,7 +131,7 @@ public partial class UserTests
         var service = new OrderService(userStub, emailStub.Object);
         service.ShipOrder(orderId: 42, userId: 1);
 
-        // Verify
+        // Verify (tracking directly on interceptor for inline stubs)
         System.Diagnostics.Debug.Assert(userStub.GetUser.WasCalled);
         System.Diagnostics.Debug.Assert(userStub.GetUser.LastCallArg == 1);
         System.Diagnostics.Debug.Assert(emailStub.Send.LastCallArgs?.to == "test@example.com");
@@ -168,14 +169,16 @@ public class CalculatorUsageExample
         ICalculator calculator = calc;
 
         var result = calculator.Add(2, 3);      // Returns 5 (uses your method)
-        var callCount = calc.Add2.CallCount;    // 1 (Add2: renamed to avoid collision)
+        calc.VerifyAll();                       // Verifies all configured callbacks were called
     }
 
-    public void Test2_OverrideForThisTest()
+    public void Test2_TrackingExample()
     {
         var calc = new CalculatorKnockOff();
-        calc.Add2.OnCall = (ko, a, b) => 999;   // Override just here
-        var result = ((ICalculator)calc).Add(2, 3);  // Returns 999
+        // User method interceptors are tracking-only (no OnCall)
+        ICalculator calculator = calc;
+        var result = calculator.Add(2, 3);  // Returns 5 (uses user method)
+        var wasCalled = calc.Add2.WasCalled; // true - can track calls
     }
 }
 #endregion
@@ -193,6 +196,7 @@ public partial class ValidationTests
     public void RejectsNonUniqueName()
     {
         var uniqueCheck = new Stubs.IsUniqueRule();
+        // OnCall is property for inline delegate stubs
         uniqueCheck.Interceptor.OnCall = (ko, value) => value != "duplicate";
 
         IsUniqueRule rule = uniqueCheck;  // Implicit conversion
@@ -261,19 +265,19 @@ public class VerificationUsageExample
     public void TracksCallsAndArguments()
     {
         var stub = new DataServiceStub();
-        stub.GetDescription.OnCall = (ko, id) => $"Item {id}";
+        var tracking = stub.GetDescription.OnCall((ko, id) => $"Item {id}");
         IDataService service = stub;
 
         service.GetDescription(1);
         service.GetDescription(2);
         service.GetDescription(42);
 
-        // Assert method calls
-        Assert.True(stub.GetDescription.WasCalled);
-        Assert.Equal(3, stub.GetDescription.CallCount);
-        Assert.Equal(42, stub.GetDescription.LastCallArg);
+        // Assert method calls (via tracking object)
+        Assert.True(tracking.WasCalled);
+        Assert.Equal(3, tracking.CallCount);
+        Assert.Equal(42, tracking.LastArg);
 
-        // Assert property access
+        // Assert property access (properties still use interceptor directly)
         service.Name = "First";
         service.Name = "Second";
         Assert.Equal(2, stub.Name.SetCount);

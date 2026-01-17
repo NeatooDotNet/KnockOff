@@ -24,27 +24,6 @@ partial class AiOrderServiceStub : global::KnockOff.Documentation.Samples.IAiOrd
 		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 	}
 
-	/// <summary>Tracks calls to GetOrder (user-defined implementation).</summary>
-	public sealed class GetOrder2Interceptor : global::KnockOff.IMethodTracking<int>
-	{
-		private int _lastArg = default!;
-
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
-
-		/// <summary>True if CallCount > 0.</summary>
-		public bool WasCalled => CallCount > 0;
-
-		/// <summary>Last argument passed to this method. Default if never called.</summary>
-		public int LastArg => _lastArg;
-
-		/// <summary>Records a method call.</summary>
-		internal void RecordCall(int id) { CallCount++; _lastArg = id; }
-
-		/// <summary>Resets tracking state.</summary>
-		public void Reset() { CallCount = 0; _lastArg = default!; }
-	}
-
 	/// <summary>Tracks and configures behavior for SaveOrder.</summary>
 	public sealed class SaveOrderInterceptor
 	{
@@ -100,6 +79,23 @@ partial class AiOrderServiceStub : global::KnockOff.Documentation.Samples.IAiOrd
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
+		}
+
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -166,6 +162,27 @@ partial class AiOrderServiceStub : global::KnockOff.Documentation.Samples.IAiOrd
 		}
 	}
 
+	/// <summary>Tracks calls to GetOrder (user-defined implementation).</summary>
+	public sealed class GetOrder2Interceptor : global::KnockOff.IMethodTracking<int>
+	{
+		private int _lastArg = default!;
+
+		/// <summary>Number of times this method was called.</summary>
+		public int CallCount { get; private set; }
+
+		/// <summary>True if CallCount > 0.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>Last argument passed to this method. Default if never called.</summary>
+		public int LastArg => _lastArg;
+
+		/// <summary>Records a method call.</summary>
+		internal void RecordCall(int id) { CallCount++; _lastArg = id; }
+
+		/// <summary>Resets tracking state.</summary>
+		public void Reset() { CallCount = 0; _lastArg = default!; }
+	}
+
 	/// <summary>Tracks calls to ValidateAsync (user-defined implementation).</summary>
 	public sealed class ValidateAsync2Interceptor : global::KnockOff.IMethodTracking<global::KnockOff.Documentation.Samples.AiOrder>
 	{
@@ -204,6 +221,21 @@ partial class AiOrderServiceStub : global::KnockOff.Documentation.Samples.IAiOrd
 
 	/// <summary>The global::KnockOff.Documentation.Samples.IAiOrderService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.IAiOrderService Object => this;
+
+	/// <summary>Verifies all method interceptors' Times constraints were satisfied.</summary>
+	public bool Verify()
+	{
+		var result = true;
+		result &= SaveOrder.Verify();
+		return result;
+	}
+
+	/// <summary>Verifies all method interceptors' Times constraints and throws if any fail.</summary>
+	public void VerifyAll()
+	{
+		if (!Verify())
+			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
 
 	decimal global::KnockOff.Documentation.Samples.IAiOrderService.TotalAmount
 	{

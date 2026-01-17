@@ -234,7 +234,7 @@ partial class GenericMethodWithUserMethodKnockOff : global::KnockOff.Tests.IGene
 		if (Create2.Of<T>().OnCall is { } callback)
 			return callback(this);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodWithUserMethod", "Create");
-		return SmartDefault<T>("Create");
+		return Create<T>();
 	}
 
 	T global::KnockOff.Tests.IGenericMethodWithUserMethod.Transform<T>(T @value)
@@ -243,7 +243,7 @@ partial class GenericMethodWithUserMethodKnockOff : global::KnockOff.Tests.IGene
 		if (Transform2.Of<T>().OnCall is { } callback)
 			return callback(this, @value);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodWithUserMethod", "Transform");
-		return SmartDefault<T>("Transform");
+		return Transform<T>(@value);
 	}
 
 	TOut global::KnockOff.Tests.IGenericMethodWithUserMethod.Convert<TIn, TOut>(TIn input)
@@ -252,7 +252,7 @@ partial class GenericMethodWithUserMethodKnockOff : global::KnockOff.Tests.IGene
 		if (Convert2.Of<TIn, TOut>().OnCall is { } callback)
 			return callback(this, input);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodWithUserMethod", "Convert");
-		return SmartDefault<TOut>("Convert");
+		return Convert<TIn, TOut>(input);
 	}
 
 }

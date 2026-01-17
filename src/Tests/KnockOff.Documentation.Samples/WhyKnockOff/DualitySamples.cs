@@ -1,5 +1,6 @@
 /// <summary>
-/// Code samples for docs/why-knockoff/duality-pattern.md
+/// Code samples for docs/why-knockoff/user-methods.md
+/// Demonstrates user-defined methods for providing default stub behavior.
 /// </summary>
 
 namespace KnockOff.Documentation.Samples.WhyKnockOff;
@@ -21,7 +22,7 @@ public class DuOrder
     public string Status { get; set; } = string.Empty;
 }
 
-#region duality-user-repository-interface
+#region user-methods-interface
 public interface IDuUserRepository
 {
     DuUser? GetById(int id);
@@ -40,18 +41,18 @@ public interface IDuOrderRepository
 // KnockOff Stubs
 // ============================================================================
 
-#region duality-user-repository-stub
+#region user-methods-stub
 [KnockOff]
 public partial class DuUserRepositoryStub : IDuUserRepository
 {
     // Default: return a test user for any ID
     protected DuUser? GetById(int id) => new DuUser { Id = id, Name = $"User-{id}" };
 
-    // Save: no user method = default behavior (void returns nothing)
+    // Save: no user method = requires OnCall setup or will use default void behavior
 }
 #endregion
 
-#region duality-order-repository-stub
+#region user-methods-order-stub
 [KnockOff]
 public partial class DuOrderRepositoryStub : IDuOrderRepository
 {
@@ -74,12 +75,13 @@ public partial class DuOrderRepositoryStub : IDuOrderRepository
 
 public static class DualitySamples
 {
-    #region duality-user-method-usage
+    #region user-methods-usage
     public static void UserMethodUsage()
     {
         var stub = new DuUserRepositoryStub();
         IDuUserRepository repo = stub;
 
+        // User method provides default behavior automatically
         var user = repo.GetById(42);
 
         Assert.Equal(42, user?.Id);
@@ -87,62 +89,34 @@ public static class DualitySamples
     }
     #endregion
 
-    #region duality-callback-override
-    public static void CallbackOverride()
+    #region user-methods-tracking
+    public static void UserMethodWithTracking()
     {
         var stub = new DuUserRepositoryStub();
+        IDuUserRepository repo = stub;
 
-        // Override the user method for just this test
-        stub.GetById2.OnCall = (ko, id) => null;
+        repo.GetById(42);
+        repo.GetById(99);
 
-        var user = stub.Object.GetById(999);
-
-        Assert.Null(user);
+        // User methods still get full tracking
+        Assert.Equal(2, stub.GetById2.CallCount);
+        Assert.Equal(99, stub.GetById2.LastArg);
     }
     #endregion
 
-    #region duality-combining-not-found
-    public static void CombiningNotFound()
+    #region user-methods-order-defaults
+    public static void OrderRepositoryDefaults()
     {
         var stub = new DuOrderRepositoryStub();
-        stub.GetById2.OnCall = (ko, id) => null;  // Override for this test
+        IDuOrderRepository repo = stub;
 
-        // var processor = new OrderProcessor(stub);
-        // var result = processor.Process(orderId: 999);
-        // Assert.False(result);
-    }
-    #endregion
+        // GetById returns a pending order by default
+        var order = repo.GetById(123);
+        Assert.Equal("Pending", order?.Status);
 
-    #region duality-combining-multiple-orders
-    public static void CombiningMultipleOrders()
-    {
-        var stub = new DuOrderRepositoryStub();
-        stub.GetByCustomer2.OnCall = (ko, customerId) => new[]
-        {
-            new DuOrder { Id = 1, CustomerId = customerId },
-            new DuOrder { Id = 2, CustomerId = customerId }
-        };
-
-        // var service = new CustomerService(stub);
-        // var orders = service.GetOrderHistory(customerId: 42);
-        // Assert.Equal(2, orders.Count());
-    }
-    #endregion
-
-    #region duality-reset-behavior
-    public static void ResetBehavior()
-    {
-        var stub = new DuUserRepositoryStub();
-
-        // Override default
-        stub.GetById2.OnCall = (ko, id) => null;
-        var user1 = stub.Object.GetById(1);  // null
-
-        // Reset
-        stub.GetById2.Reset();
-        var user2 = stub.Object.GetById(1);  // User { Id = 1, Name = "User-1" }
-
-        _ = (user1, user2);
+        // GetByCustomer returns empty by default
+        var orders = repo.GetByCustomer(1);
+        Assert.Empty(orders);
     }
     #endregion
 }
@@ -151,6 +125,5 @@ public static class DualitySamples
 file static class Assert
 {
     public static void Equal<T>(T expected, T actual) { }
-    public static void Null<T>(T value) { }
-    public static void False(bool condition) { }
+    public static void Empty<T>(IEnumerable<T> collection) { }
 }

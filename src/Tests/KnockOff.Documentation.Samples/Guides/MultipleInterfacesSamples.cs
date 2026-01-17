@@ -62,14 +62,13 @@ public partial class MultiDataContextTests
         var repo = new Stubs.IMultiRepository();
         var uow = new Stubs.IMultiUnitOfWork();
 
-        // Configure via flat API
+        // Configure via flat API (OnCall is a property for inline stubs)
+        repo.Add.OnCall = (ko, user) => { };
         uow.SaveChangesAsync.OnCall = (ko, ct) => Task.FromResult(repo.Add.CallCount);
 
-        repo.Add.OnCall = (ko, user) => { };
-
         // Use in test
-        IMultiRepository repoService = repo;
-        IMultiUnitOfWork uowService = uow;
+        IMultiRepository repoService = repo.Object;
+        IMultiUnitOfWork uowService = uow.Object;
 
         repoService.Add(new MultiUser { Name = "New" });
         repoService.Add(new MultiUser { Name = "Another" });
@@ -96,8 +95,8 @@ public static class MultipleInterfacesUsageExamples
         var uow = new MultiUnitOfWorkKnockOff();
 
         // Configure each independently
-        repo.GetById.OnCall = (ko, id) => new MultiUser { Id = id };
-        uow.SaveChangesAsync.OnCall = (ko, ct) => Task.FromResult(1);
+        repo.GetById.OnCall((ko, id) => new MultiUser { Id = id });
+        uow.SaveChangesAsync.OnCall((ko, ct) => Task.FromResult(1));
         #endregion
     }
 
@@ -109,8 +108,8 @@ public static class MultipleInterfacesUsageExamples
         var uow = new MultiUnitOfWorkKnockOff();
 
         // Configure independently
-        repo.GetById.OnCall = (ko, id) => new MultiUser { Id = id };
-        uow.SaveChangesAsync.OnCall = (ko, ct) => Task.FromResult(1);
+        repo.GetById.OnCall((ko, id) => new MultiUser { Id = id });
+        uow.SaveChangesAsync.OnCall((ko, ct) => Task.FromResult(1));
 
         // v10.9 - Option B: Inline stubs on test class
         // Use [KnockOff<IMultiRepository>] and [KnockOff<IMultiUnitOfWork>]

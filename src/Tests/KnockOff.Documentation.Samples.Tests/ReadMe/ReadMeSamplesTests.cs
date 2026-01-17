@@ -49,11 +49,13 @@ public class ReadMeSamplesTests
     }
 
     [Fact]
-    public void ReusableStub_OverrideForThisTest()
+    public void ReusableStub_TracksUserMethodCalls()
     {
         var calc = new CalculatorKnockOff();
-        calc.Add2.OnCall = (ko, a, b) => 999;
-        Assert.Equal(999, ((ICalculator)calc).Add(2, 3));
+        // User method interceptors (suffix "2") track calls but cannot override behavior
+        ((ICalculator)calc).Add(2, 3);
+        Assert.Equal(1, calc.Add2.CallCount);
+        Assert.Equal((2, 3), calc.Add2.LastArgs);
     }
 
     // ========================================================================
@@ -103,16 +105,16 @@ public class ReadMeSamplesTests
     {
         // This tests the pattern shown in readme-verification
         var stub = new DataServiceStub();
-        stub.GetDescription.OnCall = (ko, id) => $"Item {id}";
+        var tracking = stub.GetDescription.OnCall((ko, id) => $"Item {id}");
         IDataService service = stub;
 
         service.GetDescription(1);
         service.GetDescription(2);
         service.GetDescription(42);
 
-        Assert.True(stub.GetDescription.WasCalled);
-        Assert.Equal(3, stub.GetDescription.CallCount);
-        Assert.Equal(42, stub.GetDescription.LastCallArg);
+        Assert.True(tracking.WasCalled);
+        Assert.Equal(3, tracking.CallCount);
+        Assert.Equal(42, tracking.LastArg);
 
         service.Name = "First";
         service.Name = "Second";

@@ -315,10 +315,13 @@ public class IRuleMessagesStandaloneTests
         var stub = new RuleMessagesStub();
         IRuleMessages messages = stub;
 
+        // Configure callback to enable tracking (string overload)
+        var tracking = stub.Add.OnCall((RuleMessagesStub ko, string propertyName, string message) => { });
+
         messages.Add("Property", "Message");
 
-        // Standalone stub uses Add1 for the string overload
-        Assert.True(stub.Add1.WasCalled);
+        // Tracking is available via the returned tracking object
+        Assert.True(tracking.WasCalled);
     }
 
     [Fact]

@@ -175,19 +175,19 @@ public static class CustomizationPatternsUsageExamples
 
         #region customization-patterns-callback-method
         // Void method
-        knockOff.DoSomething.OnCall = (ko) =>
+        knockOff.DoSomething.OnCall((ko) =>
         {
             // Custom logic for this test
-        };
+        });
 
         // Method with return value
-        knockOff.GetUser.OnCall = (ko, id) => new PatternUser { Id = id, Name = "Mocked" };
+        knockOff.GetUser.OnCall((ko, id) => new PatternUser { Id = id, Name = "Mocked" });
 
         // Method with multiple parameters (individual params)
-        knockOff.Calculate.OnCall = (ko, name, value, flag) =>
+        knockOff.Calculate.OnCall((ko, name, value, flag) =>
         {
             return flag ? value * 2 : value;
-        };
+        });
         #endregion
     }
 
@@ -236,15 +236,18 @@ public static class CustomizationPatternsUsageExamples
         IPatternKoAccessService service = knockOff;
 
         #region customization-patterns-callback-ko-access
-        knockOff.GetUser.OnCall = (ko, id) =>
+        // Track Initialize calls
+        var initTracking = knockOff.Initialize.OnCall((ko) => { /* initialization logic */ });
+
+        knockOff.GetUser.OnCall((ko, id) =>
         {
-            // Access other interceptors
-            if (ko.Initialize.WasCalled)
+            // Access tracking from other callbacks
+            if (initTracking.WasCalled)
                 return new PatternUser { Id = id, Name = "Initialized" };
 
             // Access backing fields via interceptor
             return new PatternUser { Id = id, Name = ko.Name.Value };
-        };
+        });
         #endregion
     }
 
@@ -255,17 +258,18 @@ public static class CustomizationPatternsUsageExamples
         var knockOff = new PatternServiceKnockOff();
         IPatternService service = knockOff;
 
-        // No callback set → uses user method
+        // User method always provides implementation
         var result1 = service.Calculate(5);  // Returns 10 (5 * 2)
+        var result2 = service.Calculate(10); // Returns 20 (10 * 2)
 
-        // Set callback → overrides user method
-        // Note: Interceptor has "2" suffix because user method "Calculate" exists
-        knockOff.Calculate2.OnCall = (ko, input) => input * 100;
-        var result2 = service.Calculate(5);  // Returns 500 (callback)
+        // Interceptor with "2" suffix tracks calls (no OnCall - user method is the implementation)
+        Assert.Equal(2, knockOff.Calculate2.CallCount);
+        Assert.True(knockOff.Calculate2.WasCalled);
+        Assert.Equal(10, knockOff.Calculate2.LastArg);
 
-        // Reset clears callback → back to user method
+        // Reset clears tracking
         knockOff.Calculate2.Reset();
-        var result3 = service.Calculate(5);  // Returns 10 (user method)
+        Assert.Equal(0, knockOff.Calculate2.CallCount);
         #endregion
     }
 
@@ -276,18 +280,16 @@ public static class CustomizationPatternsUsageExamples
 
         #region customization-patterns-reset-behavior
         // Set up state
-        knockOff.GetUser.OnCall = (ko, id) => new PatternUser { Name = "Callback" };
+        var tracking = knockOff.GetUser.OnCall((ko, id) => new PatternUser { Name = "Callback" });
         service.GetUser(1);
         service.GetUser(2);
 
-        Assert.Equal(2, knockOff.GetUser.CallCount);
+        Assert.Equal(2, tracking.CallCount);
 
         // Reset
         knockOff.GetUser.Reset();
 
-        Assert.Equal(0, knockOff.GetUser.CallCount);  // Tracking cleared
-        Assert.Null(knockOff.GetUser.OnCall);  // Callback cleared
-
+        // After reset, tracking object's callback is cleared
         // Now uses default (no user method defined)
         var user = service.GetUser(3);
         #endregion
@@ -296,29 +298,23 @@ public static class CustomizationPatternsUsageExamples
     public static void CombiningPatternsUsageExample()
     {
         #region customization-patterns-combining-patterns-usage
-        // Test 1: Uses default (null)
+        // User method returns null (not found)
         var knockOff = new PatternCombinedRepositoryKnockOff();
         IPatternCombinedRepository repo = knockOff;
         Assert.Null(repo.GetById(999));
 
-        // Test 2: Override for specific IDs
-        // Note: Interceptor has "2" suffix because user method "GetById" exists
-        knockOff.GetById2.OnCall = (ko, id) => id switch
-        {
-            1 => new PatternUser { Id = 1, Name = "Admin" },
-            2 => new PatternUser { Id = 2, Name = "Guest" },
-            _ => null  // Fall through to "not found"
-        };
+        // User method is the implementation - always used
+        Assert.Null(repo.GetById(1));
+        Assert.Null(repo.GetById(2));
 
-        Assert.Equal("Admin", repo.GetById(1)?.Name);
-        Assert.Null(repo.GetById(999));  // Still null
+        // Interceptor with "2" suffix tracks calls (no OnCall)
+        Assert.Equal(3, knockOff.GetById2.CallCount);
+        Assert.True(knockOff.GetById2.WasCalled);
+        Assert.Equal(2, knockOff.GetById2.LastArg);
 
-        // Test 3: Reset and use different callback
+        // Reset clears tracking
         knockOff.GetById2.Reset();
-        knockOff.GetById2.OnCall = (ko, id) =>
-            new PatternUser { Id = id, Name = $"User-{id}" };
-
-        Assert.Equal("User-999", repo.GetById(999)?.Name);
+        Assert.Equal(0, knockOff.GetById2.CallCount);
         #endregion
     }
 }
@@ -326,6 +322,7 @@ public static class CustomizationPatternsUsageExamples
 // Minimal Assert class for compilation (tests use xUnit)
 file static class Assert
 {
+    public static void True(bool condition) { }
     public static void Equal<T>(T expected, T actual) { }
     public static void Null(object? value) { }
 }

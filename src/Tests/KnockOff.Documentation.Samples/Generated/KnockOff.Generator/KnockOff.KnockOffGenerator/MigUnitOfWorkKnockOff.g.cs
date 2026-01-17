@@ -65,6 +65,23 @@ partial class MigUnitOfWorkKnockOff : global::KnockOff.Documentation.Samples.Com
 			_sequenceIndex = 0;
 		}
 
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+		public bool Verify()
+		{
+			foreach (var (_, times, tracking) in _sequence)
+			{
+				// For Forever, infer "at least once"
+				if (times.IsForever)
+				{
+					if (!tracking.WasCalled)
+						return false;
+				}
+				else if (!times.Verify(tracking.CallCount))
+					return false;
+			}
+			return true;
+		}
+
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking<global::System.Threading.CancellationToken>
 		{
@@ -137,6 +154,21 @@ partial class MigUnitOfWorkKnockOff : global::KnockOff.Documentation.Samples.Com
 
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IMigUnitOfWork instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IMigUnitOfWork Object => this;
+
+	/// <summary>Verifies all method interceptors' Times constraints were satisfied.</summary>
+	public bool Verify()
+	{
+		var result = true;
+		result &= SaveChangesAsync.Verify();
+		return result;
+	}
+
+	/// <summary>Verifies all method interceptors' Times constraints and throws if any fail.</summary>
+	public void VerifyAll()
+	{
+		if (!Verify())
+			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
 
 	global::System.Threading.Tasks.Task<int> global::KnockOff.Documentation.Samples.Comparison.IMigUnitOfWork.SaveChangesAsync(global::System.Threading.CancellationToken cancellationToken)
 	{
