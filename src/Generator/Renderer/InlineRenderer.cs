@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using KnockOff.Model.Inline;
 using KnockOff.Model.Shared;
+using KnockOff.Renderer.Shared;
 
 namespace KnockOff.Renderer;
 
@@ -114,9 +115,18 @@ internal static class InlineRenderer
             RenderIndexerInterceptorClass(w, indexer, iface.StubClassName);
         }
 
+        // Use shared renderer for method interceptors
+        var methodTypeParams = FormatTypeParameterList(iface.TypeParameters);
+        var methodConstraints = FormatConstraints(iface.TypeParameters);
         foreach (var method in iface.Methods)
         {
-            RenderMethodInterceptorClass(w, method);
+            var options = new InterceptorRenderOptions(
+                BaseIndent: 2,  // Inline stubs are nested 2 levels deep (\t\t)
+                IncludeStrictParameter: false,
+                StrictAccessExpression: "ko.Strict",
+                InterceptorTypeParameters: methodTypeParams,
+                InterceptorConstraints: methodConstraints);
+            MethodInterceptorRenderer.RenderInterceptorClass(w, method, options);
         }
 
         foreach (var handler in iface.GenericMethodHandlers)
@@ -308,68 +318,8 @@ internal static class InlineRenderer
         w.Line();
     }
 
-    private static void RenderMethodInterceptorClass(CodeWriter w, InlineMethodModel method)
-    {
-        var typeParamList = method.TypeParameterList;
-        var constraintClause = method.ConstraintClauses;
-
-        w.Line($"\t\t/// <summary>Interceptor for {method.MethodName}.</summary>");
-        w.Line($"\t\tpublic sealed class {method.InterceptorClassName}{typeParamList}{constraintClause}");
-        w.Line("\t\t{");
-
-        // CallCount and WasCalled
-        w.Line("\t\t\t/// <summary>Number of times this method was called.</summary>");
-        w.Line("\t\t\tpublic int CallCount { get; private set; }");
-        w.Line();
-        w.Line("\t\t\t/// <summary>Whether this method was called at least once.</summary>");
-        w.Line("\t\t\tpublic bool WasCalled => CallCount > 0;");
-        w.Line();
-
-        // LastCallArg/LastCallArgs
-        if (method.LastCallArgType != null)
-        {
-            w.Line($"\t\t\t/// <summary>The argument from the last call.</summary>");
-            w.Line($"\t\t\tpublic {method.LastCallArgType} LastCallArg {{ get; private set; }}");
-            w.Line();
-        }
-        else if (method.LastCallArgsType != null)
-        {
-            w.Line($"\t\t\t/// <summary>The arguments from the last call.</summary>");
-            w.Line($"\t\t\tpublic {method.LastCallArgsType} LastCallArgs {{ get; private set; }}");
-            w.Line();
-        }
-
-        // OnCall callback
-        w.Line($"\t\t\t/// <summary>Callback invoked when method is called.</summary>");
-        w.Line($"\t\t\tpublic {method.DelegateType}? OnCall {{ get; set; }}");
-        w.Line();
-
-        // RecordCall method
-        w.Append($"\t\t\tpublic void RecordCall({method.RecordCallParameters}) {{ CallCount++; ");
-        if (method.LastCallArgType != null)
-        {
-            var paramName = method.InputParameters.GetArray()![0].Name;
-            w.Append($"LastCallArg = {paramName}; ");
-        }
-        else if (method.LastCallArgsType != null)
-        {
-            var paramNames = string.Join(", ", method.InputParameters.Select(p => p.Name));
-            w.Append($"LastCallArgs = ({paramNames}); ");
-        }
-        w.Line("}");
-        w.Line();
-
-        // Reset method
-        w.Append("\t\t\tpublic void Reset() { CallCount = 0; ");
-        if (method.LastCallArgType != null)
-            w.Append("LastCallArg = default; ");
-        else if (method.LastCallArgsType != null)
-            w.Append("LastCallArgs = default; ");
-        w.Line("OnCall = null; }");
-
-        w.Line("\t\t}");
-        w.Line();
-    }
+    // NOTE: RenderMethodInterceptorClass has been removed.
+    // Method interceptors now use the shared MethodInterceptorRenderer.RenderInterceptorClass.
 
     private static void RenderGenericMethodHandler(CodeWriter w, InlineGenericMethodHandlerModel handler)
     {
@@ -696,33 +646,16 @@ internal static class InlineRenderer
         w.Line($"\t\t\t{impl.ReturnType} {impl.InterfaceFullName}.{impl.MemberName}({impl.ParameterDeclarations})");
         w.Line("\t\t\t{");
 
-        // Initialize out parameters first
-        foreach (var outParamInit in impl.OutParameterInitializations)
-        {
-            w.Line($"\t\t\t\t{outParamInit}");
-        }
+        // Build invoke args (this + parameters)
+        var invokeArgs = string.IsNullOrEmpty(impl.ArgumentList)
+            ? "this"
+            : $"this, {impl.ArgumentList}";
 
-        // Record the call
-        w.Line($"\t\t\t\t{impl.InterceptorName}.RecordCall({impl.RecordCallArgs});");
-
-        // Check for OnCall callback
+        // Call the interceptor's Invoke method (handles out params, tracking, callbacks, strict, defaults)
         if (impl.IsVoid)
-        {
-            w.Line($"\t\t\t\tif ({impl.InterceptorName}.OnCall is {{ }} onCall) {{ onCall({impl.OnCallArgs}); return; }}");
-            w.Line($"\t\t\t\tif (Strict) throw global::KnockOff.StubException.NotConfigured(\"{impl.SimpleInterfaceName}\", \"{impl.MemberName}\");");
-        }
-        else if (impl.DefaultStrategy == DefaultValueStrategy.ThrowException)
-        {
-            w.Line($"\t\t\t\tif ({impl.InterceptorName}.OnCall is {{ }} onCall) return onCall({impl.OnCallArgs});");
-            w.Line($"\t\t\t\tif (Strict) throw global::KnockOff.StubException.NotConfigured(\"{impl.SimpleInterfaceName}\", \"{impl.MemberName}\");");
-            w.Line($"\t\t\t\tthrow new global::System.InvalidOperationException(\"No implementation provided for {impl.MemberName}. Set {impl.InterceptorName}.OnCall.\");");
-        }
+            w.Line($"\t\t\t\t{impl.InterceptorName}.Invoke{impl.InvokeSuffix}({invokeArgs});");
         else
-        {
-            w.Line($"\t\t\t\tif ({impl.InterceptorName}.OnCall is {{ }} onCall) return onCall({impl.OnCallArgs});");
-            w.Line($"\t\t\t\tif (Strict) throw global::KnockOff.StubException.NotConfigured(\"{impl.SimpleInterfaceName}\", \"{impl.MemberName}\");");
-            w.Line($"\t\t\t\treturn {impl.DefaultExpression};");
-        }
+            w.Line($"\t\t\t\treturn {impl.InterceptorName}.Invoke{impl.InvokeSuffix}({invokeArgs});");
 
         w.Line("\t\t\t}");
         w.Line();

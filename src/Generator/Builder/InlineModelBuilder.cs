@@ -128,7 +128,7 @@ internal static class InlineModelBuilder
         // Build models for interceptor classes
         var properties = new List<InlinePropertyModel>();
         var indexers = new List<InlineIndexerModel>();
-        var methods = new List<InlineMethodModel>();
+        var methods = new List<UnifiedMethodInterceptorModel>();
         var genericHandlers = new List<InlineGenericMethodHandlerModel>();
         var events = new List<InlineEventModel>();
 
@@ -270,62 +270,100 @@ internal static class InlineModelBuilder
             ConstraintClauses: constraintClause);
     }
 
-    private static InlineMethodModel BuildMethodModel(
+    private static UnifiedMethodInterceptorModel BuildMethodModel(
         MethodGroupInfo group,
         string stubClassName,
         string typeParamList,
         string constraintClause)
     {
         var interceptClassName = $"{stubClassName}_{group.Name}Interceptor";
-        var inputParams = GetInputCombinedParameters(group.CombinedParameters).ToArray();
-
-        // Build delegate type
-        var delegateParamTypes = string.Join(", ", inputParams.Select(p => p.NullableType));
         var stubClassRef = $"Stubs.{stubClassName}{typeParamList}";
-        var delegateParams = string.IsNullOrEmpty(delegateParamTypes)
-            ? stubClassRef
-            : $"{stubClassRef}, {delegateParamTypes}";
-        var delegateType = group.IsVoid
-            ? $"global::System.Action<{delegateParams}>"
-            : $"global::System.Func<{delegateParams}, {group.ReturnType}>";
 
-        // Build RecordCall parameters
-        var recordParams = string.Join(", ", inputParams.Select(p => $"{p.NullableType} {p.Name}"));
-
-        // LastCallArg/Args types
-        string? lastCallArgType = null;
-        string? lastCallArgsType = null;
-        if (inputParams.Length == 1)
+        // Build MethodSignatureInfo for each overload
+        var signatures = new List<MethodSignatureInfo>();
+        foreach (var overload in group.Overloads)
         {
-            lastCallArgType = MakeNullable(inputParams[0].Type);
+            // Skip generic overloads - they're handled separately
+            if (overload.IsGenericMethod)
+                continue;
+
+            var parameters = (overload.Parameters.GetArray() ?? Array.Empty<ParameterInfo>())
+                .Select(p => new ParameterModel(
+                    Name: p.Name,
+                    EscapedName: EscapeIdentifier(p.Name),
+                    Type: p.Type,
+                    NullableType: MakeNullable(p.Type),
+                    RefKind: p.RefKind,
+                    RefPrefix: GetRefKindPrefix(p.RefKind)))
+                .ToEquatableArray();
+
+            var trackableParams = UnifiedInterceptorBuilder.GetTrackableParameters(parameters);
+            var hasRefOrOut = parameters.Any(p => p.RefKind == RefKind.Ref || p.RefKind == RefKind.Out);
+
+            // Determine default expression
+            var defaultExpr = group.IsVoid ? "" : GetDefaultExpressionForReturn(group.ReturnType, group.IsNullable);
+            var throwsOnDefault = !group.IsVoid && !group.IsNullable && IsUninstantiableType(group.ReturnType);
+
+            signatures.Add(new MethodSignatureInfo(
+                Parameters: parameters,
+                TrackableParameters: trackableParams,
+                ParameterDeclarations: UnifiedInterceptorBuilder.BuildParameterDeclarations(parameters),
+                ReturnType: group.ReturnType,
+                IsVoid: group.IsVoid,
+                HasRefOrOutParams: hasRefOrOut,
+                DefaultExpression: defaultExpr,
+                ThrowsOnDefault: throwsOnDefault));
         }
-        else if (inputParams.Length > 1)
+
+        // If no non-generic overloads, create empty model
+        if (signatures.Count == 0)
         {
-            lastCallArgsType = $"({string.Join(", ", inputParams.Select(p => $"{MakeNullable(p.Type)} {p.Name}"))})?";
+            return UnifiedInterceptorBuilder.BuildMethodInterceptor(
+                interceptorClassName: interceptClassName,
+                methodName: group.Name,
+                ownerClassName: stubClassRef,
+                ownerTypeParameters: "",
+                overloads: new List<MethodSignatureInfo>
+                {
+                    new MethodSignatureInfo(
+                        Parameters: EquatableArray<ParameterModel>.Empty,
+                        TrackableParameters: EquatableArray<ParameterModel>.Empty,
+                        ParameterDeclarations: "",
+                        ReturnType: group.ReturnType,
+                        IsVoid: group.IsVoid,
+                        HasRefOrOutParams: false,
+                        DefaultExpression: group.IsVoid ? "" : "default!",
+                        ThrowsOnDefault: false)
+                });
         }
 
-        // Build input parameters model
-        var inputParamModels = inputParams.Select(p => new ParameterModel(
-            Name: p.Name,
-            EscapedName: EscapeIdentifier(p.Name),
-            Type: p.Type,
-            NullableType: p.NullableType,
-            RefKind: p.RefKind,
-            RefPrefix: GetRefKindPrefix(p.RefKind))).ToEquatableArray();
+        return UnifiedInterceptorBuilder.BuildMethodInterceptor(
+            interceptorClassName: interceptClassName,
+            methodName: group.Name,
+            ownerClassName: stubClassRef,
+            ownerTypeParameters: "",
+            overloads: signatures);
+    }
 
-        return new InlineMethodModel(
-            InterceptorClassName: interceptClassName,
-            MethodName: group.Name,
-            ReturnType: group.ReturnType,
-            IsVoid: group.IsVoid,
-            InputParameters: inputParamModels,
-            DelegateType: delegateType,
-            RecordCallParameters: recordParams,
-            LastCallArgType: lastCallArgType,
-            LastCallArgsType: lastCallArgsType,
-            StubClassName: stubClassRef,
-            TypeParameterList: typeParamList,
-            ConstraintClauses: constraintClause);
+    private static string GetDefaultExpressionForReturn(string returnType, bool isNullable)
+    {
+        if (isNullable)
+            return "default!";
+
+        // Task types return completed task
+        if (returnType == "global::System.Threading.Tasks.Task")
+            return "global::System.Threading.Tasks.Task.CompletedTask";
+        if (returnType == "global::System.Threading.Tasks.ValueTask")
+            return "default";
+
+        return "default!";
+    }
+
+    private static bool IsUninstantiableType(string returnType)
+    {
+        // Interface or abstract types that can't have a default instance
+        // For now, be conservative and return false - we'll use default!
+        return false;
     }
 
     private static InlineGenericMethodHandlerModel BuildGenericMethodHandlerModel(
@@ -609,6 +647,7 @@ internal static class InlineModelBuilder
             InterceptorName: member.Name,
             ParameterDeclarations: "",
             ArgumentList: "",
+            InvokeSuffix: "",  // Properties don't use invoke suffix
             RecordCallArgs: "",
             OnCallArgs: "this",
             DefaultExpression: "default!",
@@ -658,6 +697,7 @@ internal static class InlineModelBuilder
             InterceptorName: indexerName,
             ParameterDeclarations: paramList,
             ArgumentList: argList,
+            InvokeSuffix: "",  // Indexers don't use invoke suffix
             RecordCallArgs: argList,
             OnCallArgs: $"this, {argList}",
             DefaultExpression: defaultExpr,
@@ -701,15 +741,7 @@ internal static class InlineModelBuilder
         string stubClassName)
     {
         var paramList = string.Join(", ", member.Parameters.Select(p => FormatParameter(p)));
-        var inputParams = GetInputParameters(member.Parameters).ToArray();
-        var combinedInputParams = GetInputCombinedParameters(group.CombinedParameters).ToArray();
-
-        // Map combined params to actual args
-        var memberParamsByName = inputParams.ToDictionary(p => p.Name, p => p.Name);
-        var mappedArgs = combinedInputParams.Select(cp =>
-            memberParamsByName.ContainsKey(cp.Name) ? cp.Name : "null").ToArray();
-        var recordArgs = string.Join(", ", mappedArgs);
-        var onCallArgs = mappedArgs.Length > 0 ? $"this, {recordArgs}" : "this";
+        var argList = string.Join(", ", member.Parameters.Select(p => FormatArgument(p)));
 
         var defaultExpr = GetDefaultForType(member.ReturnType, member.DefaultStrategy, member.ConcreteTypeForNew);
 
@@ -718,6 +750,27 @@ internal static class InlineModelBuilder
             .Where(p => p.RefKind == RefKind.Out)
             .Select(p => $"{p.Name} = default!;")
             .ToEquatableArray();
+
+        // Compute invoke suffix for multi-overload groups
+        // Count unique signatures (excluding generic methods)
+        var nonGenericOverloads = group.Overloads.Where(o => !o.IsGenericMethod).ToArray();
+        var isMultiOverload = GetUniqueSignatureCount(nonGenericOverloads, group.ReturnType) > 1;
+
+        var invokeSuffix = "";
+        if (isMultiOverload)
+        {
+            // Build ParameterModel array for suffix computation
+            var paramModels = member.Parameters
+                .Select(p => new ParameterModel(
+                    Name: p.Name,
+                    EscapedName: EscapeIdentifier(p.Name),
+                    Type: p.Type,
+                    NullableType: MakeNullable(p.Type),
+                    RefKind: p.RefKind,
+                    RefPrefix: GetRefKindPrefix(p.RefKind)))
+                .ToEquatableArray();
+            invokeSuffix = "_" + UnifiedInterceptorBuilder.GetSignatureSuffix(paramModels, group.ReturnType);
+        }
 
         return new InlineInterfaceImplementation(
             Kind: InlineMemberKind.Method,
@@ -731,9 +784,10 @@ internal static class InlineModelBuilder
             HasSetter: false,
             InterceptorName: group.Name,
             ParameterDeclarations: paramList,
-            ArgumentList: string.Join(", ", member.Parameters.Select(p => FormatArgument(p))),
-            RecordCallArgs: recordArgs,
-            OnCallArgs: onCallArgs,
+            ArgumentList: argList,
+            InvokeSuffix: invokeSuffix,
+            RecordCallArgs: "",  // No longer used with new Invoke pattern
+            OnCallArgs: "",      // No longer used with new Invoke pattern
             DefaultExpression: defaultExpr,
             DefaultStrategy: member.DefaultStrategy,
             IsNullable: member.IsNullable,
@@ -748,6 +802,26 @@ internal static class InlineModelBuilder
             KeyArg: null,
             DelegationTarget: null,
             OutParameterInitializations: outParamInits);
+    }
+
+    private static int GetUniqueSignatureCount(MethodOverloadInfo[] overloads, string returnType)
+    {
+        var seen = new HashSet<string>();
+        foreach (var overload in overloads)
+        {
+            var paramModels = (overload.Parameters.GetArray() ?? Array.Empty<ParameterInfo>())
+                .Select(p => new ParameterModel(
+                    Name: p.Name,
+                    EscapedName: EscapeIdentifier(p.Name),
+                    Type: p.Type,
+                    NullableType: MakeNullable(p.Type),
+                    RefKind: p.RefKind,
+                    RefPrefix: GetRefKindPrefix(p.RefKind)))
+                .ToEquatableArray();
+            var suffix = UnifiedInterceptorBuilder.GetSignatureSuffix(paramModels, returnType);
+            seen.Add(suffix);
+        }
+        return seen.Count;
     }
 
     private static InlineInterfaceImplementation BuildGenericMethodImplementation(
@@ -795,6 +869,7 @@ internal static class InlineModelBuilder
             InterceptorName: group.Name,
             ParameterDeclarations: paramList,
             ArgumentList: argList,
+            InvokeSuffix: "",  // Generic methods use Of<T>() pattern, not invoke suffix
             RecordCallArgs: nonGenericArgList,
             OnCallArgs: member.Parameters.Count > 0 ? $"this, {argList}" : "this",
             DefaultExpression: defaultExpr,
@@ -857,6 +932,7 @@ internal static class InlineModelBuilder
             InterceptorName: "",
             ParameterDeclarations: paramList,
             ArgumentList: "",
+            InvokeSuffix: "",  // Delegation methods don't use invoke suffix
             RecordCallArgs: "",
             OnCallArgs: "",
             DefaultExpression: "",
@@ -894,6 +970,7 @@ internal static class InlineModelBuilder
             InterceptorName: $"{evt.Name}Interceptor",
             ParameterDeclarations: "",
             ArgumentList: "",
+            InvokeSuffix: "",  // Events don't use invoke suffix
             RecordCallArgs: "",
             OnCallArgs: "",
             DefaultExpression: "",

@@ -5,6 +5,7 @@ using System.Linq;
 using KnockOff;
 using KnockOff.Model.Flat;
 using KnockOff.Model.Shared;
+using KnockOff.Renderer.Shared;
 
 namespace KnockOff.Renderer;
 
@@ -85,10 +86,18 @@ internal static class FlatRenderer
 			}
 
 			// Render method interceptor classes using groups (handles overloads)
+			// Use shared renderer for unified API between inline and flat stubs
 			foreach (var group in unit.MethodGroups)
 			{
 				if (renderedInterceptorClasses.Add(group.InterceptorClassName))
-					RenderMethodGroupInterceptorClass(w, group, classNameWithTypeParams);
+				{
+					var unifiedModel = ModelAdapters.ToUnifiedModel(group, unit.ClassName, typeParams);
+					var options = new InterceptorRenderOptions(
+						BaseIndent: 0,
+						IncludeStrictParameter: true,
+						StrictAccessExpression: "strict");
+					MethodInterceptorRenderer.RenderInterceptorClass(w, unifiedModel, options);
+				}
 			}
 
 			// Render user-defined method interceptor classes (tracking-only, not in groups)

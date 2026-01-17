@@ -32,6 +32,8 @@ internal sealed record InlineInterfaceImplementation(
     string ParameterDeclarations,
     /// <summary>Argument list for method calls.</summary>
     string ArgumentList,
+    /// <summary>Invoke suffix for overloaded methods (e.g., "_String_Int32" for overload resolution).</summary>
+    string InvokeSuffix,
     /// <summary>Arguments for RecordCall.</summary>
     string RecordCallArgs,
     /// <summary>Arguments for OnCall invocation.</summary>
