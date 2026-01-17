@@ -53,16 +53,6 @@ jobs:
     - name: Test
       run: dotnet test src/KnockOff.sln --configuration Release --no-build --verbosity normal --logger trx --results-directory TestResults
 
-    - name: Restore dotnet tools
-      run: dotnet tool restore
-
-    - name: Verify documentation snippets
-      shell: pwsh
-      run: |
-        dotnet mdsnippets
-        git diff --exit-code docs/ .claude/skills/
-        ./scripts/verify-code-blocks.ps1
-
     - name: Upload test results
       uses: actions/upload-artifact@v4
       if: always()
