@@ -108,7 +108,7 @@ public partial class AttrInterfaceTests
     public void Test()
     {
         var stub = new Stubs.IAttrUserRepository();
-        stub.GetById.OnCall = (ko, id) => new AttrUser { Id = id };
+        stub.GetById.OnCall((ko, id) => new AttrUser { Id = id });
 
         IAttrUserRepository repo = stub;  // Implicit conversion
 
@@ -124,7 +124,7 @@ public partial class AttrClassTests
     public void Test()
     {
         var stub = new Stubs.AttrEmailServiceClass("smtp.test.com", 587);
-        stub.Send.OnCall = (ko, to, body) => { };
+        stub.Send.OnCall((ko, to, body) => { });
 
         AttrEmailServiceClass service = stub.Object;  // Use .Object for class instance
 

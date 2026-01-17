@@ -13,6 +13,14 @@ partial class CovariantStub<T> : global::KnockOff.Tests.ICovariantService<T>, gl
 
 		private readonly global::System.Collections.Generic.List<(GetDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetDelegate callback)
@@ -39,8 +47,9 @@ partial class CovariantStub<T> : global::KnockOff.Tests.ICovariantService<T>, gl
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Get");
-				throw new global::System.InvalidOperationException("No implementation provided for Get. Configure via Get.OnCall.");
+				throw new global::System.InvalidOperationException("No implementation provided for Get. Configure via OnCall.");
 			}
 
 			var (callback, times, tracking) = _sequence[_sequenceIndex];
@@ -60,6 +69,7 @@ partial class CovariantStub<T> : global::KnockOff.Tests.ICovariantService<T>, gl
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -70,7 +80,6 @@ partial class CovariantStub<T> : global::KnockOff.Tests.ICovariantService<T>, gl
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -140,6 +149,7 @@ partial class CovariantStub<T> : global::KnockOff.Tests.ICovariantService<T>, gl
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Interceptor for Get.</summary>

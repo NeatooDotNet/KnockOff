@@ -290,8 +290,8 @@ public class InterceptorApiSamplesTests
         var knockOff = new ApiSerializerKnockOff();
         IApiSerializer service = knockOff;
 
-        knockOff.Deserialize.Of<ApiUser>().OnCall = (ko, json) =>
-            new ApiUser { Id = 1, Name = "FromCallback" };
+        knockOff.Deserialize.Of<ApiUser>().OnCall((ko, json) =>
+            new ApiUser { Id = 1, Name = "FromCallback" });
 
         var user = service.Deserialize<ApiUser>("{}");
         Assert.Equal("FromCallback", user.Name);
@@ -303,8 +303,8 @@ public class InterceptorApiSamplesTests
         var knockOff = new ApiSerializerKnockOff();
         IApiSerializer service = knockOff;
 
-        knockOff.Deserialize.Of<ApiUser>().OnCall = (ko, json) => new ApiUser();
-        knockOff.Deserialize.Of<ApiOrder>().OnCall = (ko, json) => new ApiOrder();
+        knockOff.Deserialize.Of<ApiUser>().OnCall((ko, json) => new ApiUser());
+        knockOff.Deserialize.Of<ApiOrder>().OnCall((ko, json) => new ApiOrder());
 
         service.Deserialize<ApiUser>("{}");
         service.Deserialize<ApiUser>("{}");
@@ -320,8 +320,8 @@ public class InterceptorApiSamplesTests
         var knockOff = new ApiSerializerKnockOff();
         IApiSerializer service = knockOff;
 
-        knockOff.Deserialize.Of<ApiUser>().OnCall = (ko, json) => new ApiUser();
-        knockOff.Deserialize.Of<ApiOrder>().OnCall = (ko, json) => new ApiOrder();
+        knockOff.Deserialize.Of<ApiUser>().OnCall((ko, json) => new ApiUser());
+        knockOff.Deserialize.Of<ApiOrder>().OnCall((ko, json) => new ApiOrder());
 
         service.Deserialize<ApiUser>("{}");
         service.Deserialize<ApiUser>("{}");
@@ -338,7 +338,7 @@ public class InterceptorApiSamplesTests
         var knockOff = new ApiSerializerKnockOff();
         IApiSerializer service = knockOff;
 
-        knockOff.Convert.Of<string, int>().OnCall = (ko, s) => s.Length;
+        knockOff.Convert.Of<string, int>().OnCall((ko, s) => s.Length);
 
         var result = service.Convert<string, int>("hello");
         Assert.Equal(5, result);
@@ -350,13 +350,13 @@ public class InterceptorApiSamplesTests
         var knockOff = new ApiSerializerKnockOff();
         IApiSerializer service = knockOff;
 
-        knockOff.Deserialize.Of<ApiUser>().OnCall = (ko, json) => new ApiUser();
+        knockOff.Deserialize.Of<ApiUser>().OnCall((ko, json) => new ApiUser());
         service.Deserialize<ApiUser>("{}");
 
         knockOff.Deserialize.Of<ApiUser>().Reset();
 
         Assert.Equal(0, knockOff.Deserialize.Of<ApiUser>().CallCount);
-        Assert.Null(knockOff.Deserialize.Of<ApiUser>().OnCall);
+        // OnCall callback state is internal after API change to method-based
     }
 
     [Fact]
@@ -365,8 +365,8 @@ public class InterceptorApiSamplesTests
         var knockOff = new ApiSerializerKnockOff();
         IApiSerializer service = knockOff;
 
-        knockOff.Deserialize.Of<ApiUser>().OnCall = (ko, json) => new ApiUser();
-        knockOff.Deserialize.Of<ApiOrder>().OnCall = (ko, json) => new ApiOrder();
+        knockOff.Deserialize.Of<ApiUser>().OnCall((ko, json) => new ApiUser());
+        knockOff.Deserialize.Of<ApiOrder>().OnCall((ko, json) => new ApiOrder());
         service.Deserialize<ApiUser>("{}");
         service.Deserialize<ApiOrder>("{}");
 
@@ -374,5 +374,59 @@ public class InterceptorApiSamplesTests
 
         Assert.Equal(0, knockOff.Deserialize.TotalCallCount);
         Assert.Empty(knockOff.Deserialize.CalledTypeArguments);
+    }
+
+    // ========================================================================
+    // Sequence Tests - LastCallArg/LastCallArgs
+    // ========================================================================
+
+    [Fact]
+    public void MethodInterceptor_Sequence_LastCallArg_ReturnsFromMostRecentRegistration()
+    {
+        // This test would fail with the old buggy foreach logic that returned FIRST called registration
+        var knockOff = new ApiMethodServiceKnockOff();
+        IApiMethodService service = knockOff;
+
+        // Set up sequence: first call returns user with id 100, subsequent calls return user with id 200
+        knockOff.GetById
+            .OnCall((ko, id) => new ApiUser { Id = 100, Name = "First" }, Times.Once)
+            .ThenCall((ko, id) => new ApiUser { Id = 200, Name = "Second" }, Times.Forever);
+
+        // Call once - uses first registration
+        service.GetById(1);
+
+        // Call again - uses second registration
+        service.GetById(2);
+
+        // LastCallArg should return the argument from the LAST (most recent) call, which used the second registration
+        // With the old buggy foreach logic, this would incorrectly return 1 (from first registration)
+        // With the fixed reverse iteration, this correctly returns 2 (from second registration)
+        Assert.Equal(2, knockOff.GetById.LastCallArg);
+    }
+
+    [Fact]
+    public void MethodInterceptor_Sequence_LastCallArgs_ReturnsFromMostRecentRegistration()
+    {
+        // This test would fail with the old buggy foreach logic that returned FIRST called registration
+        var knockOff = new ApiMethodServiceKnockOff();
+        IApiMethodService service = knockOff;
+
+        // Set up sequence with different behaviors
+        knockOff.Log
+            .OnCall((ko, level, message) => { /* first behavior */ }, Times.Once)
+            .ThenCall((ko, level, message) => { /* second behavior */ }, Times.Forever);
+
+        // Call once - uses first registration
+        service.Log("info", "First message");
+
+        // Call again - uses second registration
+        service.Log("error", "Second message");
+
+        // LastCallArgs should return the arguments from the LAST (most recent) call
+        // With the old buggy foreach logic, this would incorrectly return ("info", "First message")
+        // With the fixed reverse iteration, this correctly returns ("error", "Second message")
+        var args = knockOff.Log.LastCallArgs;
+        Assert.Equal("error", args?.level);
+        Assert.Equal("Second message", args?.message);
     }
 }

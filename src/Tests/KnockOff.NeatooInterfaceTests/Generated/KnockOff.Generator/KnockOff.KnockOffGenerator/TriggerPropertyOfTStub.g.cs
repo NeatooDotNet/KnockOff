@@ -32,6 +32,18 @@ partial class TriggerPropertyOfTStub : global::Neatoo.Rules.ITriggerProperty<glo
 
 		private readonly global::System.Collections.Generic.List<(GetValueDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private global::Neatoo.IValidateBase? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public global::Neatoo.IValidateBase? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<global::Neatoo.IValidateBase> OnCall(GetValueDelegate callback)
@@ -58,6 +70,8 @@ partial class TriggerPropertyOfTStub : global::Neatoo.Rules.ITriggerProperty<glo
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = target;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetValue");
 				return default!;
 			}
@@ -79,6 +93,8 @@ partial class TriggerPropertyOfTStub : global::Neatoo.Rules.ITriggerProperty<glo
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -89,7 +105,6 @@ partial class TriggerPropertyOfTStub : global::Neatoo.Rules.ITriggerProperty<glo
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -163,6 +178,7 @@ partial class TriggerPropertyOfTStub : global::Neatoo.Rules.ITriggerProperty<glo
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for IsMatch.</summary>
@@ -173,6 +189,18 @@ partial class TriggerPropertyOfTStub : global::Neatoo.Rules.ITriggerProperty<glo
 
 		private readonly global::System.Collections.Generic.List<(IsMatchDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private string? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public string? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<string> OnCall(IsMatchDelegate callback)
@@ -199,6 +227,8 @@ partial class TriggerPropertyOfTStub : global::Neatoo.Rules.ITriggerProperty<glo
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = propertyName;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsMatch");
 				return default!;
 			}
@@ -220,6 +250,8 @@ partial class TriggerPropertyOfTStub : global::Neatoo.Rules.ITriggerProperty<glo
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -230,7 +262,6 @@ partial class TriggerPropertyOfTStub : global::Neatoo.Rules.ITriggerProperty<glo
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -304,6 +335,7 @@ partial class TriggerPropertyOfTStub : global::Neatoo.Rules.ITriggerProperty<glo
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Interceptor for PropertyName. Configure via .Value, track via .GetCount.</summary>

@@ -55,10 +55,12 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 		}
 
 		/// <summary>Typed handler for Create with specific type arguments.</summary>
-		public sealed class CreateTypedHandler<T> : IGenericMethodCallTracker, IResettable where T : new()
+		public sealed class CreateTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : new()
 		{
 			/// <summary>Delegate for Create.</summary>
 			public delegate T CreateDelegate(GenericMethodServiceKnockOff ko);
+
+			private CreateDelegate? _onCall;
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -66,14 +68,17 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public CreateDelegate? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(CreateDelegate callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal CreateDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
 			public void RecordCall() => CallCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; OnCall = null; }
+			public void Reset() { CallCount = 0; _onCall = null; }
 		}
 	}
 
@@ -112,10 +117,12 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 		}
 
 		/// <summary>Typed handler for Process with specific type arguments.</summary>
-		public sealed class ProcessTypedHandler<T> : IGenericMethodCallTracker, IResettable
+		public sealed class ProcessTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 		{
 			/// <summary>Delegate for Process.</summary>
 			public delegate void ProcessDelegate(GenericMethodServiceKnockOff ko, T @value);
+
+			private ProcessDelegate? _onCall;
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -123,14 +130,17 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public ProcessDelegate? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(ProcessDelegate callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal ProcessDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
 			public void RecordCall() => CallCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; OnCall = null; }
+			public void Reset() { CallCount = 0; _onCall = null; }
 		}
 	}
 
@@ -169,10 +179,12 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 		}
 
 		/// <summary>Typed handler for Deserialize with specific type arguments.</summary>
-		public sealed class DeserializeTypedHandler<T> : IGenericMethodCallTracker, IResettable
+		public sealed class DeserializeTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 		{
 			/// <summary>Delegate for Deserialize.</summary>
 			public delegate T DeserializeDelegate(GenericMethodServiceKnockOff ko, string json);
+
+			private DeserializeDelegate? _onCall;
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -183,14 +195,17 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public DeserializeDelegate? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(DeserializeDelegate callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal DeserializeDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
 			public void RecordCall(string? json) { CallCount++; LastCallArg = json; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+			public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }
 		}
 	}
 
@@ -229,10 +244,12 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 		}
 
 		/// <summary>Typed handler for Convert with specific type arguments.</summary>
-		public sealed class ConvertTypedHandler<TIn, TOut> : IGenericMethodCallTracker, IResettable
+		public sealed class ConvertTypedHandler<TIn, TOut> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 		{
 			/// <summary>Delegate for Convert.</summary>
 			public delegate TOut ConvertDelegate(GenericMethodServiceKnockOff ko, TIn input);
+
+			private ConvertDelegate? _onCall;
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -240,14 +257,17 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public ConvertDelegate? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(ConvertDelegate callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal ConvertDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
 			public void RecordCall() => CallCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; OnCall = null; }
+			public void Reset() { CallCount = 0; _onCall = null; }
 		}
 	}
 
@@ -286,10 +306,12 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 		}
 
 		/// <summary>Typed handler for Find with specific type arguments.</summary>
-		public sealed class FindTypedHandler<T> : IGenericMethodCallTracker, IResettable where T : class
+		public sealed class FindTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : class
 		{
 			/// <summary>Delegate for Find.</summary>
 			public delegate T? FindDelegate(GenericMethodServiceKnockOff ko, int id);
+
+			private FindDelegate? _onCall;
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -300,14 +322,17 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public FindDelegate? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(FindDelegate callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal FindDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
 			public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+			public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }
 		}
 	}
 
@@ -346,10 +371,12 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 		}
 
 		/// <summary>Typed handler for Transfer with specific type arguments.</summary>
-		public sealed class TransferTypedHandler<TSource, TDest> : IGenericMethodCallTracker, IResettable
+		public sealed class TransferTypedHandler<TSource, TDest> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 		{
 			/// <summary>Delegate for Transfer.</summary>
 			public delegate void TransferDelegate(GenericMethodServiceKnockOff ko, TSource source, TDest destination);
+
+			private TransferDelegate? _onCall;
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -357,14 +384,17 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public TransferDelegate? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(TransferDelegate callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal TransferDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
 			public void RecordCall() => CallCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; OnCall = null; }
+			public void Reset() { CallCount = 0; _onCall = null; }
 		}
 	}
 
@@ -417,7 +447,7 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 	T global::KnockOff.Tests.IGenericMethodService.Create<T>()
 	{
 		Create.Of<T>().RecordCall();
-		if (Create.Of<T>().OnCall is { } callback)
+		if (Create.Of<T>().Callback is { } callback)
 			return callback(this);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Create");
 		return SmartDefault<T>("Create");
@@ -426,7 +456,7 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 	void global::KnockOff.Tests.IGenericMethodService.Process<T>(T @value)
 	{
 		Process.Of<T>().RecordCall();
-		if (Process.Of<T>().OnCall is { } onCallCallback)
+		if (Process.Of<T>().Callback is { } onCallCallback)
 		{ onCallCallback(this, @value); return; }
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Process");
 	}
@@ -434,7 +464,7 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 	T global::KnockOff.Tests.IGenericMethodService.Deserialize<T>(string json)
 	{
 		Deserialize.Of<T>().RecordCall(json);
-		if (Deserialize.Of<T>().OnCall is { } callback)
+		if (Deserialize.Of<T>().Callback is { } callback)
 			return callback(this, json);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Deserialize");
 		return SmartDefault<T>("Deserialize");
@@ -443,7 +473,7 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 	TOut global::KnockOff.Tests.IGenericMethodService.Convert<TIn, TOut>(TIn input)
 	{
 		Convert.Of<TIn, TOut>().RecordCall();
-		if (Convert.Of<TIn, TOut>().OnCall is { } callback)
+		if (Convert.Of<TIn, TOut>().Callback is { } callback)
 			return callback(this, input);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Convert");
 		return SmartDefault<TOut>("Convert");
@@ -452,7 +482,7 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 	T? global::KnockOff.Tests.IGenericMethodService.Find<T>(int id) where T : class
 	{
 		Find.Of<T>().RecordCall(id);
-		if (Find.Of<T>().OnCall is { } callback)
+		if (Find.Of<T>().Callback is { } callback)
 			return callback(this, id);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Find");
 		return default!;
@@ -461,7 +491,7 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 	void global::KnockOff.Tests.IGenericMethodService.Transfer<TSource, TDest>(TSource source, TDest destination)
 	{
 		Transfer.Of<TSource, TDest>().RecordCall();
-		if (Transfer.Of<TSource, TDest>().OnCall is { } onCallCallback)
+		if (Transfer.Of<TSource, TDest>().Callback is { } onCallCallback)
 		{ onCallCallback(this, source, destination); return; }
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Transfer");
 	}

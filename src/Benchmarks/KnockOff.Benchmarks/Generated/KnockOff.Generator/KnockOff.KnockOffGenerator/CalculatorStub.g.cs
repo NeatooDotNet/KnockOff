@@ -13,6 +13,18 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 
 		private readonly global::System.Collections.Generic.List<(AddDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private (int? a, int? b)? _unconfiguredLastArgs;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The arguments from the last call (from most recently called registration).</summary>
+		public (int? a, int? b)? LastCallArgs { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTrackingArgs<(int? a, int? b)> OnCall(AddDelegate callback)
@@ -39,6 +51,8 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArgs = ((a, b));
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 				return default!;
 			}
@@ -60,6 +74,8 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArgs = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -70,7 +86,6 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -144,6 +159,7 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for Subtract.</summary>
@@ -154,6 +170,18 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 
 		private readonly global::System.Collections.Generic.List<(SubtractDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private (int? a, int? b)? _unconfiguredLastArgs;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The arguments from the last call (from most recently called registration).</summary>
+		public (int? a, int? b)? LastCallArgs { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTrackingArgs<(int? a, int? b)> OnCall(SubtractDelegate callback)
@@ -180,6 +208,8 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArgs = ((a, b));
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Subtract");
 				return default!;
 			}
@@ -201,6 +231,8 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArgs = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -211,7 +243,6 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -285,6 +316,7 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for Multiply.</summary>
@@ -295,6 +327,18 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 
 		private readonly global::System.Collections.Generic.List<(MultiplyDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private (int? a, int? b)? _unconfiguredLastArgs;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The arguments from the last call (from most recently called registration).</summary>
+		public (int? a, int? b)? LastCallArgs { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTrackingArgs<(int? a, int? b)> OnCall(MultiplyDelegate callback)
@@ -321,6 +365,8 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArgs = ((a, b));
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Multiply");
 				return default!;
 			}
@@ -342,6 +388,8 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArgs = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -352,7 +400,6 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -426,6 +473,7 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for Divide.</summary>
@@ -436,6 +484,18 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 
 		private readonly global::System.Collections.Generic.List<(DivideDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private (double? a, double? b)? _unconfiguredLastArgs;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The arguments from the last call (from most recently called registration).</summary>
+		public (double? a, double? b)? LastCallArgs { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTrackingArgs<(double? a, double? b)> OnCall(DivideDelegate callback)
@@ -462,6 +522,8 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArgs = ((a, b));
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Divide");
 				return default!;
 			}
@@ -483,6 +545,8 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArgs = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -493,7 +557,6 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -567,6 +630,7 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for Square.</summary>
@@ -577,6 +641,18 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 
 		private readonly global::System.Collections.Generic.List<(SquareDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(SquareDelegate callback)
@@ -603,6 +679,8 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = x;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Square");
 				return default!;
 			}
@@ -624,6 +702,8 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -634,7 +714,6 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -708,6 +787,7 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Interceptor for Add.</summary>

@@ -12,6 +12,16 @@ internal sealed class CodeWriter
     private readonly StringBuilder _sb = new();
     private int _indent = 0;
 
+    /// <summary>
+    /// Sets the current indentation level.
+    /// </summary>
+    public void SetIndent(int level) => _indent = level;
+
+    /// <summary>
+    /// Gets the current indentation level.
+    /// </summary>
+    public int Indent => _indent;
+
     public void Line(string text = "")
     {
         if (string.IsNullOrEmpty(text))

@@ -13,6 +13,14 @@ partial class HaDefaultsServiceKnockOff : global::KnockOff.Documentation.Samples
 
 		private readonly global::System.Collections.Generic.List<(GetCountDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetCountDelegate callback)
@@ -39,6 +47,7 @@ partial class HaDefaultsServiceKnockOff : global::KnockOff.Documentation.Samples
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetCount");
 				return default!;
 			}
@@ -60,6 +69,7 @@ partial class HaDefaultsServiceKnockOff : global::KnockOff.Documentation.Samples
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -70,7 +80,6 @@ partial class HaDefaultsServiceKnockOff : global::KnockOff.Documentation.Samples
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -140,6 +149,7 @@ partial class HaDefaultsServiceKnockOff : global::KnockOff.Documentation.Samples
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for GetItems.</summary>
@@ -150,6 +160,14 @@ partial class HaDefaultsServiceKnockOff : global::KnockOff.Documentation.Samples
 
 		private readonly global::System.Collections.Generic.List<(GetItemsDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetItemsDelegate callback)
@@ -176,6 +194,7 @@ partial class HaDefaultsServiceKnockOff : global::KnockOff.Documentation.Samples
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetItems");
 				return new global::System.Collections.Generic.List<string>();
 			}
@@ -197,6 +216,7 @@ partial class HaDefaultsServiceKnockOff : global::KnockOff.Documentation.Samples
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -207,7 +227,6 @@ partial class HaDefaultsServiceKnockOff : global::KnockOff.Documentation.Samples
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -277,6 +296,7 @@ partial class HaDefaultsServiceKnockOff : global::KnockOff.Documentation.Samples
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for GetIList.</summary>
@@ -287,6 +307,14 @@ partial class HaDefaultsServiceKnockOff : global::KnockOff.Documentation.Samples
 
 		private readonly global::System.Collections.Generic.List<(GetIListDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetIListDelegate callback)
@@ -313,6 +341,7 @@ partial class HaDefaultsServiceKnockOff : global::KnockOff.Documentation.Samples
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetIList");
 				return new global::System.Collections.Generic.List<string>();
 			}
@@ -334,6 +363,7 @@ partial class HaDefaultsServiceKnockOff : global::KnockOff.Documentation.Samples
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -344,7 +374,6 @@ partial class HaDefaultsServiceKnockOff : global::KnockOff.Documentation.Samples
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -414,6 +443,7 @@ partial class HaDefaultsServiceKnockOff : global::KnockOff.Documentation.Samples
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for GetOptional.</summary>
@@ -424,6 +454,14 @@ partial class HaDefaultsServiceKnockOff : global::KnockOff.Documentation.Samples
 
 		private readonly global::System.Collections.Generic.List<(GetOptionalDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetOptionalDelegate callback)
@@ -450,6 +488,7 @@ partial class HaDefaultsServiceKnockOff : global::KnockOff.Documentation.Samples
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetOptional");
 				return default!;
 			}
@@ -471,6 +510,7 @@ partial class HaDefaultsServiceKnockOff : global::KnockOff.Documentation.Samples
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -481,7 +521,6 @@ partial class HaDefaultsServiceKnockOff : global::KnockOff.Documentation.Samples
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -551,6 +590,7 @@ partial class HaDefaultsServiceKnockOff : global::KnockOff.Documentation.Samples
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for GetDisposable.</summary>
@@ -561,6 +601,14 @@ partial class HaDefaultsServiceKnockOff : global::KnockOff.Documentation.Samples
 
 		private readonly global::System.Collections.Generic.List<(GetDisposableDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetDisposableDelegate callback)
@@ -587,8 +635,9 @@ partial class HaDefaultsServiceKnockOff : global::KnockOff.Documentation.Samples
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetDisposable");
-				throw new global::System.InvalidOperationException("No implementation provided for GetDisposable. Configure via GetDisposable.OnCall.");
+				throw new global::System.InvalidOperationException("No implementation provided for GetDisposable. Configure via OnCall.");
 			}
 
 			var (callback, times, tracking) = _sequence[_sequenceIndex];
@@ -608,6 +657,7 @@ partial class HaDefaultsServiceKnockOff : global::KnockOff.Documentation.Samples
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -618,7 +668,6 @@ partial class HaDefaultsServiceKnockOff : global::KnockOff.Documentation.Samples
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -688,6 +737,7 @@ partial class HaDefaultsServiceKnockOff : global::KnockOff.Documentation.Samples
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Interceptor for GetCount.</summary>

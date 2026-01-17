@@ -5,6 +5,7 @@ using System.Linq;
 using KnockOff;
 using KnockOff.Model.Flat;
 using KnockOff.Model.Shared;
+using KnockOff.Renderer.Shared;
 
 namespace KnockOff.Renderer;
 
@@ -85,10 +86,18 @@ internal static class FlatRenderer
 			}
 
 			// Render method interceptor classes using groups (handles overloads)
+			// Use shared renderer for unified API between inline and flat stubs
 			foreach (var group in unit.MethodGroups)
 			{
 				if (renderedInterceptorClasses.Add(group.InterceptorClassName))
-					RenderMethodGroupInterceptorClass(w, group, classNameWithTypeParams);
+				{
+					var unifiedModel = ModelAdapters.ToUnifiedModel(group, unit.ClassName, typeParams);
+					var options = new InterceptorRenderOptions(
+						BaseIndent: 0,
+						IncludeStrictParameter: true,
+						StrictAccessExpression: "strict");
+					MethodInterceptorRenderer.RenderInterceptorClass(w, unifiedModel, options);
+				}
 			}
 
 			// Render user-defined method interceptor classes (tracking-only, not in groups)
@@ -1286,12 +1295,16 @@ internal static class FlatRenderer
 	private static void RenderTypedHandlerClass(CodeWriter w, FlatGenericMethodHandlerModel handler, string className)
 	{
 		w.Line($"/// <summary>Typed handler for {handler.MethodName} with specific type arguments.</summary>");
-		w.Line($"public sealed class {handler.TypedHandlerClassName}<{handler.TypeParameterNames}> : IGenericMethodCallTracker, IResettable{handler.ConstraintClauses}");
+		w.Line($"public sealed class {handler.TypedHandlerClassName}<{handler.TypeParameterNames}> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking{handler.ConstraintClauses}");
 		using (w.Braces())
 		{
 			// Delegate
 			w.Line($"/// <summary>Delegate for {handler.MethodName}.</summary>");
 			w.Line(handler.DelegateSignature);
+			w.Line();
+
+			// Private callback field
+			w.Line($"private {handler.MethodName}Delegate? _onCall;");
 			w.Line();
 
 			// CallCount
@@ -1319,9 +1332,14 @@ internal static class FlatRenderer
 			w.Line("public bool WasCalled => CallCount > 0;");
 			w.Line();
 
-			// OnCall
-			w.Line("/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>");
-			w.Line($"public {handler.MethodName}Delegate? OnCall {{ get; set; }}");
+			// OnCall method (returns IMethodTracking for consistency with regular method interceptors)
+			w.Line("/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>");
+			w.Line($"public global::KnockOff.IMethodTracking OnCall({handler.MethodName}Delegate callback) {{ _onCall = callback; return this; }}");
+			w.Line();
+
+			// Callback property for internal use by invocation logic
+			w.Line("/// <summary>Gets the configured callback (internal use).</summary>");
+			w.Line($"internal {handler.MethodName}Delegate? Callback => _onCall;");
 			w.Line();
 
 			// RecordCall
@@ -1347,15 +1365,15 @@ internal static class FlatRenderer
 			w.Line("/// <summary>Resets all tracking state.</summary>");
 			if (handler.NonGenericParams.Count == 0)
 			{
-				w.Line("public void Reset() { CallCount = 0; OnCall = null; }");
+				w.Line("public void Reset() { CallCount = 0; _onCall = null; }");
 			}
 			else if (handler.NonGenericParams.Count == 1)
 			{
-				w.Line("public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }");
+				w.Line("public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }");
 			}
 			else
 			{
-				w.Line("public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }");
+				w.Line("public void Reset() { CallCount = 0; LastCallArgs = default; _onCall = null; }");
 			}
 		}
 	}
@@ -1723,7 +1741,7 @@ internal static class FlatRenderer
 			return;
 		}
 
-		// Generic methods use the old pattern (OnCall property on typed handler)
+		// Generic methods use method-based OnCall API via typed handlers
 		if (method.IsGenericMethod)
 		{
 			RenderGenericMethodImplementation(w, method);
@@ -1780,7 +1798,7 @@ internal static class FlatRenderer
 
 	private static void RenderGenericMethodImplementation(CodeWriter w, FlatMethodModel method)
 	{
-		// Generic methods still use the old OnCall property pattern
+		// Generic methods use the method-based OnCall API via typed handlers
 		w.Line($"{method.ReturnType} {method.DeclaringInterface}.{method.MethodName}{method.TypeParameterDecl}({method.ParameterDeclarations}){method.ConstraintClauses}");
 		using (w.Braces())
 		{
@@ -1802,7 +1820,7 @@ internal static class FlatRenderer
 
 			if (method.IsVoid)
 			{
-				w.Line($"if ({interceptorAccess}.OnCall is {{ }} onCallCallback)");
+				w.Line($"if ({interceptorAccess}.Callback is {{ }} onCallCallback)");
 				w.Line($"{{ onCallCallback({onCallArgs}); return; }}");
 				w.Line($"if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{method.SimpleInterfaceName}\", \"{method.MethodName}\");");
 				// User-defined method takes priority over default
@@ -1813,18 +1831,18 @@ internal static class FlatRenderer
 			}
 			else if (method.ThrowsOnDefault)
 			{
-				w.Line($"if ({interceptorAccess}.OnCall is {{ }} callback)");
+				w.Line($"if ({interceptorAccess}.Callback is {{ }} callback)");
 				w.Line($"\treturn callback({onCallArgs});");
 				w.Line($"if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{method.SimpleInterfaceName}\", \"{method.MethodName}\");");
 				// User-defined method takes priority over throwing
 				if (method.UserMethodCall != null)
 					w.Line($"return {method.UserMethodCall};");
 				else
-					w.Line($"throw new global::System.InvalidOperationException(\"No implementation provided for {method.MethodName}. Set {interceptorAccess}.OnCall or define a protected method '{method.MethodName}' in your partial class.\");");
+					w.Line($"throw new global::System.InvalidOperationException(\"No implementation provided for {method.MethodName}. Use {interceptorAccess}.OnCall(callback) or define a protected method '{method.MethodName}' in your partial class.\");");
 			}
 			else
 			{
-				w.Line($"if ({interceptorAccess}.OnCall is {{ }} callback)");
+				w.Line($"if ({interceptorAccess}.Callback is {{ }} callback)");
 				w.Line($"\treturn callback({onCallArgs});");
 				w.Line($"if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{method.SimpleInterfaceName}\", \"{method.MethodName}\");");
 				// User-defined method takes priority over default

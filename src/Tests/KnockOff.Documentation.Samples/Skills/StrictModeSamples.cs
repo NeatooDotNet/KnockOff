@@ -94,7 +94,7 @@ public static class StrictModeSamples
         // Or extension method
         var stub2 = new SmInlineTests.Stubs.ISmUserService().Strict();
 
-        stub2.GetUser.OnCall = (ko, id) => new User { Id = id };  // Configure what you expect
+        stub2.GetUser.OnCall((ko, id) => new User { Id = id });  // Configure what you expect
 
         ISmUserService service = stub2;
         _ = service.GetUser(1);     // OK - OnCall configured
@@ -136,7 +136,7 @@ public static class StrictModeSamples
 
         // KnockOff - inline
         var stub2 = new SmInlineTests.Stubs.ISmUserService().Strict();
-        stub2.GetUser.OnCall = (ko, id) => new User();
+        stub2.GetUser.OnCall((ko, id) => new User());
     }
     #endregion
 

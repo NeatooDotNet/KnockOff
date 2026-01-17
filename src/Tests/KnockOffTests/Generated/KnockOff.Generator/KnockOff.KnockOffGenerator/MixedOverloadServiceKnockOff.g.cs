@@ -20,9 +20,11 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 		void Reset();
 	}
 
-	/// <summary>Tracks and configures behavior for Process (overloaded).</summary>
+	/// <summary>Tracks and configures behavior for Process.</summary>
 	public sealed class ProcessInterceptor
 	{
+		private int _unconfiguredCallCount;
+
 		/// <summary>Delegate for Process(string).</summary>
 		public delegate void ProcessDelegate_String_void(MixedOverloadServiceKnockOff ko, string @value);
 
@@ -34,6 +36,12 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 
 		private readonly global::System.Collections.Generic.List<(ProcessDelegate_Int32_void Callback, global::KnockOff.Times Times, MethodTrackingImpl_Int32_void Tracking)> _sequence_Int32_void = new();
 		private int _sequenceIndex_Int32_void;
+
+		/// <summary>Total number of times this method was called (across all overloads and registrations).</summary>
+		public int CallCount => _unconfiguredCallCount + _sequence_String_void.Sum(s => s.Tracking.CallCount) + _sequence_Int32_void.Sum(s => s.Tracking.CallCount);
+
+		/// <summary>Whether this method was called at least once (any overload).</summary>
+		public bool WasCalled => CallCount > 0;
 
 		/// <summary>Configures callback for Process(string). Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<string> OnCall(ProcessDelegate_String_void callback)
@@ -80,6 +88,7 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 		{
 			if (_sequence_String_void.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return;
 			}
@@ -103,6 +112,7 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 		{
 			if (_sequence_Int32_void.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return;
 			}
@@ -121,9 +131,10 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 			callback(ko, @value);
 		}
 
-		/// <summary>Resets all tracking state for all overloads.</summary>
+		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence_String_void)
 				tracking.Reset();
 			_sequenceIndex_String_void = 0;
@@ -132,12 +143,11 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 			_sequenceIndex_Int32_void = 0;
 		}
 
-		/// <summary>Verifies all Times constraints for all overloads were satisfied. For Forever, verifies called at least once.</summary>
+		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
 		public bool Verify()
 		{
 			foreach (var (_, times, tracking) in _sequence_String_void)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -148,7 +158,6 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 			}
 			foreach (var (_, times, tracking) in _sequence_Int32_void)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -160,42 +169,56 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 			return true;
 		}
 
+		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl_String_void : global::KnockOff.IMethodTracking<string>
 		{
 			private string _lastArg = default!;
 
+			/// <summary>Number of times this callback was invoked.</summary>
 			public int CallCount { get; private set; }
 
+			/// <summary>True if CallCount > 0.</summary>
 			public bool WasCalled => CallCount > 0;
 
+			/// <summary>Last argument passed to this callback. Default if never called.</summary>
 			public string LastArg => _lastArg;
 
+			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall(string @value) { CallCount++; _lastArg = @value; }
 
+			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArg = default!; }
 		}
 
+		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl_Int32_void : global::KnockOff.IMethodTracking<int>
 		{
 			private int _lastArg = default!;
 
+			/// <summary>Number of times this callback was invoked.</summary>
 			public int CallCount { get; private set; }
 
+			/// <summary>True if CallCount > 0.</summary>
 			public bool WasCalled => CallCount > 0;
 
+			/// <summary>Last argument passed to this callback. Default if never called.</summary>
 			public int LastArg => _lastArg;
 
+			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall(int @value) { CallCount++; _lastArg = @value; }
 
+			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArg = default!; }
 		}
 
+		/// <summary>Sequence implementation for ThenCall chaining.</summary>
 		private sealed class MethodSequenceImpl_String_void : global::KnockOff.IMethodSequence<ProcessDelegate_String_void>
 		{
 			private readonly ProcessInterceptor _interceptor;
 
 			public MethodSequenceImpl_String_void(ProcessInterceptor interceptor) => _interceptor = interceptor;
 
+			/// <summary>Total calls across all callbacks in sequence.</summary>
 			public int TotalCallCount
 			{
 				get
@@ -207,6 +230,7 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 				}
 			}
 
+			/// <summary>Add another callback to the sequence.</summary>
 			public global::KnockOff.IMethodSequence<ProcessDelegate_String_void> ThenCall(ProcessDelegate_String_void callback, global::KnockOff.Times times)
 			{
 				var tracking = new MethodTrackingImpl_String_void();
@@ -214,6 +238,7 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 				return this;
 			}
 
+			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
 			public bool Verify()
 			{
 				foreach (var (_, times, tracking) in _interceptor._sequence_String_void)
@@ -224,15 +249,18 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 				return true;
 			}
 
+			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
 
+		/// <summary>Sequence implementation for ThenCall chaining.</summary>
 		private sealed class MethodSequenceImpl_Int32_void : global::KnockOff.IMethodSequence<ProcessDelegate_Int32_void>
 		{
 			private readonly ProcessInterceptor _interceptor;
 
 			public MethodSequenceImpl_Int32_void(ProcessInterceptor interceptor) => _interceptor = interceptor;
 
+			/// <summary>Total calls across all callbacks in sequence.</summary>
 			public int TotalCallCount
 			{
 				get
@@ -244,6 +272,7 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 				}
 			}
 
+			/// <summary>Add another callback to the sequence.</summary>
 			public global::KnockOff.IMethodSequence<ProcessDelegate_Int32_void> ThenCall(ProcessDelegate_Int32_void callback, global::KnockOff.Times times)
 			{
 				var tracking = new MethodTrackingImpl_Int32_void();
@@ -251,6 +280,7 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 				return this;
 			}
 
+			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
 			public bool Verify()
 			{
 				foreach (var (_, times, tracking) in _interceptor._sequence_Int32_void)
@@ -261,6 +291,7 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 				return true;
 			}
 
+			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
 
@@ -274,6 +305,18 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 
 		private readonly global::System.Collections.Generic.List<(FormatDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(FormatDelegate callback)
@@ -300,8 +343,10 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = @value;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Format");
-				throw new global::System.InvalidOperationException("No implementation provided for Format. Configure via Format.OnCall.");
+				throw new global::System.InvalidOperationException("No implementation provided for Format. Configure via OnCall.");
 			}
 
 			var (callback, times, tracking) = _sequence[_sequenceIndex];
@@ -321,6 +366,8 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -331,7 +378,6 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -405,6 +451,7 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Interceptor for Process (generic method with Of&lt;T&gt;() access).</summary>
@@ -442,10 +489,12 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 		}
 
 		/// <summary>Typed handler for Process with specific type arguments.</summary>
-		public sealed class ProcessTypedHandler<T> : IGenericMethodCallTracker, IResettable
+		public sealed class ProcessTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 		{
 			/// <summary>Delegate for Process.</summary>
 			public delegate void ProcessDelegate(MixedOverloadServiceKnockOff ko, T @value);
+
+			private ProcessDelegate? _onCall;
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -453,14 +502,17 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public ProcessDelegate? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(ProcessDelegate callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal ProcessDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
 			public void RecordCall() => CallCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; OnCall = null; }
+			public void Reset() { CallCount = 0; _onCall = null; }
 		}
 	}
 
@@ -499,10 +551,12 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 		}
 
 		/// <summary>Typed handler for Format with specific type arguments.</summary>
-		public sealed class FormatTypedHandler<T> : IGenericMethodCallTracker, IResettable
+		public sealed class FormatTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 		{
 			/// <summary>Delegate for Format.</summary>
 			public delegate string FormatDelegate(MixedOverloadServiceKnockOff ko, T @value);
+
+			private FormatDelegate? _onCall;
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -510,14 +564,17 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public FormatDelegate? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(FormatDelegate callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal FormatDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
 			public void RecordCall() => CallCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; OnCall = null; }
+			public void Reset() { CallCount = 0; _onCall = null; }
 		}
 	}
 
@@ -590,7 +647,7 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 	void global::KnockOff.Tests.IMixedOverloadService.Process<T>(T @value)
 	{
 		ProcessGeneric.Of<T>().RecordCall();
-		if (ProcessGeneric.Of<T>().OnCall is { } onCallCallback)
+		if (ProcessGeneric.Of<T>().Callback is { } onCallCallback)
 		{ onCallCallback(this, @value); return; }
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMixedOverloadService", "Process");
 	}
@@ -603,7 +660,7 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 	string global::KnockOff.Tests.IMixedOverloadService.Format<T>(T @value)
 	{
 		FormatGeneric.Of<T>().RecordCall();
-		if (FormatGeneric.Of<T>().OnCall is { } callback)
+		if (FormatGeneric.Of<T>().Callback is { } callback)
 			return callback(this, @value);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMixedOverloadService", "Format");
 		return SmartDefault<string>("Format");

@@ -118,158 +118,1475 @@ partial class DictionaryStringStringStubTests
 			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
 		}
 
-		/// <summary>Interceptor for Add.</summary>
+		/// <summary>Tracks and configures behavior for Add.</summary>
 		public sealed class IDictionary_AddInterceptor
 		{
-			/// <summary>Number of times this method was called.</summary>
-			public int CallCount { get; private set; }
+			private int _unconfiguredCallCount;
 
-			/// <summary>Whether this method was called at least once.</summary>
+			/// <summary>Delegate for Add(string, string).</summary>
+			public delegate void AddDelegate_String_String_void(Stubs.IDictionary ko, string key, string @value);
+
+			private readonly global::System.Collections.Generic.List<(AddDelegate_String_String_void Callback, global::KnockOff.Times Times, MethodTrackingImpl_String_String_void Tracking)> _sequence_String_String_void = new();
+			private int _sequenceIndex_String_String_void;
+
+			/// <summary>Delegate for Add(global::System.Collections.Generic.KeyValuePair<string, string>).</summary>
+			public delegate void AddDelegate_Collections_Generic_KeyValuePair_string_string_void(Stubs.IDictionary ko, global::System.Collections.Generic.KeyValuePair<string, string> item);
+
+			private readonly global::System.Collections.Generic.List<(AddDelegate_Collections_Generic_KeyValuePair_string_string_void Callback, global::KnockOff.Times Times, MethodTrackingImpl_Collections_Generic_KeyValuePair_string_string_void Tracking)> _sequence_Collections_Generic_KeyValuePair_string_string_void = new();
+			private int _sequenceIndex_Collections_Generic_KeyValuePair_string_string_void;
+
+			/// <summary>Total number of times this method was called (across all overloads and registrations).</summary>
+			public int CallCount => _unconfiguredCallCount + _sequence_String_String_void.Sum(s => s.Tracking.CallCount) + _sequence_Collections_Generic_KeyValuePair_string_string_void.Sum(s => s.Tracking.CallCount);
+
+			/// <summary>Whether this method was called at least once (any overload).</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>The arguments from the last call.</summary>
-			public (string? key, string? value, global::System.Collections.Generic.KeyValuePair<string, string>? item)? LastCallArgs { get; private set; }
+			/// <summary>Configures callback for Add(string, string). Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTrackingArgs<(string key, string @value)> OnCall(AddDelegate_String_String_void callback)
+			{
+				var tracking = new MethodTrackingImpl_String_String_void();
+				_sequence_String_String_void.Clear();
+				_sequence_String_String_void.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequenceIndex_String_String_void = 0;
+				return tracking;
+			}
 
-			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Action<Stubs.IDictionary, string?, string?, global::System.Collections.Generic.KeyValuePair<string, string>?>? OnCall { get; set; }
+			/// <summary>Configures callback for Add(string, string) with Times constraint.</summary>
+			public global::KnockOff.IMethodSequence<AddDelegate_String_String_void> OnCall(AddDelegate_String_String_void callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl_String_String_void();
+				_sequence_String_String_void.Clear();
+				_sequence_String_String_void.Add((callback, times, tracking));
+				_sequenceIndex_String_String_void = 0;
+				return new MethodSequenceImpl_String_String_void(this);
+			}
 
-			public void RecordCall(string? key, string? value, global::System.Collections.Generic.KeyValuePair<string, string>? item) { CallCount++; LastCallArgs = (key, value, item); }
+			/// <summary>Configures callback for Add(global::System.Collections.Generic.KeyValuePair<string, string>). Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<global::System.Collections.Generic.KeyValuePair<string, string>> OnCall(AddDelegate_Collections_Generic_KeyValuePair_string_string_void callback)
+			{
+				var tracking = new MethodTrackingImpl_Collections_Generic_KeyValuePair_string_string_void();
+				_sequence_Collections_Generic_KeyValuePair_string_string_void.Clear();
+				_sequence_Collections_Generic_KeyValuePair_string_string_void.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequenceIndex_Collections_Generic_KeyValuePair_string_string_void = 0;
+				return tracking;
+			}
 
-			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+			/// <summary>Configures callback for Add(global::System.Collections.Generic.KeyValuePair<string, string>) with Times constraint.</summary>
+			public global::KnockOff.IMethodSequence<AddDelegate_Collections_Generic_KeyValuePair_string_string_void> OnCall(AddDelegate_Collections_Generic_KeyValuePair_string_string_void callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl_Collections_Generic_KeyValuePair_string_string_void();
+				_sequence_Collections_Generic_KeyValuePair_string_string_void.Clear();
+				_sequence_Collections_Generic_KeyValuePair_string_string_void.Add((callback, times, tracking));
+				_sequenceIndex_Collections_Generic_KeyValuePair_string_string_void = 0;
+				return new MethodSequenceImpl_Collections_Generic_KeyValuePair_string_string_void(this);
+			}
+
+			/// <summary>Invokes configured callback for Add(string, string).</summary>
+			internal void Invoke_String_String_void(Stubs.IDictionary ko, string key, string @value)
+			{
+				if (_sequence_String_String_void.Count == 0)
+				{
+					_unconfiguredCallCount++;
+					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
+					return;
+				}
+
+				var (callback, times, tracking) = _sequence_String_String_void[_sequenceIndex_String_String_void];
+				tracking.RecordCall((key, @value));
+
+				if (!times.IsForever && tracking.CallCount >= times.Count)
+				{
+					if (_sequenceIndex_String_String_void < _sequence_String_String_void.Count - 1)
+						_sequenceIndex_String_String_void++;
+					else if (tracking.CallCount > times.Count)
+						throw global::KnockOff.StubException.SequenceExhausted("Add");
+				}
+
+				callback(ko, key, @value);
+			}
+
+			/// <summary>Invokes configured callback for Add(global::System.Collections.Generic.KeyValuePair<string, string>).</summary>
+			internal void Invoke_Collections_Generic_KeyValuePair_string_string_void(Stubs.IDictionary ko, global::System.Collections.Generic.KeyValuePair<string, string> item)
+			{
+				if (_sequence_Collections_Generic_KeyValuePair_string_string_void.Count == 0)
+				{
+					_unconfiguredCallCount++;
+					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
+					return;
+				}
+
+				var (callback, times, tracking) = _sequence_Collections_Generic_KeyValuePair_string_string_void[_sequenceIndex_Collections_Generic_KeyValuePair_string_string_void];
+				tracking.RecordCall(item);
+
+				if (!times.IsForever && tracking.CallCount >= times.Count)
+				{
+					if (_sequenceIndex_Collections_Generic_KeyValuePair_string_string_void < _sequence_Collections_Generic_KeyValuePair_string_string_void.Count - 1)
+						_sequenceIndex_Collections_Generic_KeyValuePair_string_string_void++;
+					else if (tracking.CallCount > times.Count)
+						throw global::KnockOff.StubException.SequenceExhausted("Add");
+				}
+
+				callback(ko, item);
+			}
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset()
+			{
+				_unconfiguredCallCount = 0;
+				foreach (var (_, _, tracking) in _sequence_String_String_void)
+					tracking.Reset();
+				_sequenceIndex_String_String_void = 0;
+				foreach (var (_, _, tracking) in _sequence_Collections_Generic_KeyValuePair_string_string_void)
+					tracking.Reset();
+				_sequenceIndex_Collections_Generic_KeyValuePair_string_string_void = 0;
+			}
+
+			/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _sequence_String_String_void)
+				{
+					if (times.IsForever)
+					{
+						if (!tracking.WasCalled)
+							return false;
+					}
+					else if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				foreach (var (_, times, tracking) in _sequence_Collections_Generic_KeyValuePair_string_string_void)
+				{
+					if (times.IsForever)
+					{
+						if (!tracking.WasCalled)
+							return false;
+					}
+					else if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Tracks invocations for this callback registration.</summary>
+			private sealed class MethodTrackingImpl_String_String_void : global::KnockOff.IMethodTrackingArgs<(string key, string @value)>
+			{
+				private (string key, string @value) _lastArgs;
+
+				/// <summary>Number of times this callback was invoked.</summary>
+				public int CallCount { get; private set; }
+
+				/// <summary>True if CallCount > 0.</summary>
+				public bool WasCalled => CallCount > 0;
+
+				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
+				public (string key, string @value) LastArgs => _lastArgs;
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall((string key, string @value) args) { CallCount++; _lastArgs = args; }
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() { CallCount = 0; _lastArgs = default; }
+			}
+
+			/// <summary>Tracks invocations for this callback registration.</summary>
+			private sealed class MethodTrackingImpl_Collections_Generic_KeyValuePair_string_string_void : global::KnockOff.IMethodTracking<global::System.Collections.Generic.KeyValuePair<string, string>>
+			{
+				private global::System.Collections.Generic.KeyValuePair<string, string> _lastArg = default!;
+
+				/// <summary>Number of times this callback was invoked.</summary>
+				public int CallCount { get; private set; }
+
+				/// <summary>True if CallCount > 0.</summary>
+				public bool WasCalled => CallCount > 0;
+
+				/// <summary>Last argument passed to this callback. Default if never called.</summary>
+				public global::System.Collections.Generic.KeyValuePair<string, string> LastArg => _lastArg;
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall(global::System.Collections.Generic.KeyValuePair<string, string> item) { CallCount++; _lastArg = item; }
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() { CallCount = 0; _lastArg = default!; }
+			}
+
+			/// <summary>Sequence implementation for ThenCall chaining.</summary>
+			private sealed class MethodSequenceImpl_String_String_void : global::KnockOff.IMethodSequence<AddDelegate_String_String_void>
+			{
+				private readonly IDictionary_AddInterceptor _interceptor;
+
+				public MethodSequenceImpl_String_String_void(IDictionary_AddInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Total calls across all callbacks in sequence.</summary>
+				public int TotalCallCount
+				{
+					get
+					{
+						var total = 0;
+						foreach (var (_, _, tracking) in _interceptor._sequence_String_String_void)
+							total += tracking.CallCount;
+						return total;
+					}
+				}
+
+				/// <summary>Add another callback to the sequence.</summary>
+				public global::KnockOff.IMethodSequence<AddDelegate_String_String_void> ThenCall(AddDelegate_String_String_void callback, global::KnockOff.Times times)
+				{
+					var tracking = new MethodTrackingImpl_String_String_void();
+					_interceptor._sequence_String_String_void.Add((callback, times, tracking));
+					return this;
+				}
+
+				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+				public bool Verify()
+				{
+					foreach (var (_, times, tracking) in _interceptor._sequence_String_String_void)
+					{
+						if (!times.Verify(tracking.CallCount))
+							return false;
+					}
+					return true;
+				}
+
+				/// <summary>Reset all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+			}
+
+			/// <summary>Sequence implementation for ThenCall chaining.</summary>
+			private sealed class MethodSequenceImpl_Collections_Generic_KeyValuePair_string_string_void : global::KnockOff.IMethodSequence<AddDelegate_Collections_Generic_KeyValuePair_string_string_void>
+			{
+				private readonly IDictionary_AddInterceptor _interceptor;
+
+				public MethodSequenceImpl_Collections_Generic_KeyValuePair_string_string_void(IDictionary_AddInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Total calls across all callbacks in sequence.</summary>
+				public int TotalCallCount
+				{
+					get
+					{
+						var total = 0;
+						foreach (var (_, _, tracking) in _interceptor._sequence_Collections_Generic_KeyValuePair_string_string_void)
+							total += tracking.CallCount;
+						return total;
+					}
+				}
+
+				/// <summary>Add another callback to the sequence.</summary>
+				public global::KnockOff.IMethodSequence<AddDelegate_Collections_Generic_KeyValuePair_string_string_void> ThenCall(AddDelegate_Collections_Generic_KeyValuePair_string_string_void callback, global::KnockOff.Times times)
+				{
+					var tracking = new MethodTrackingImpl_Collections_Generic_KeyValuePair_string_string_void();
+					_interceptor._sequence_Collections_Generic_KeyValuePair_string_string_void.Add((callback, times, tracking));
+					return this;
+				}
+
+				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+				public bool Verify()
+				{
+					foreach (var (_, times, tracking) in _interceptor._sequence_Collections_Generic_KeyValuePair_string_string_void)
+					{
+						if (!times.Verify(tracking.CallCount))
+							return false;
+					}
+					return true;
+				}
+
+				/// <summary>Reset all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+			}
+
 		}
 
-		/// <summary>Interceptor for ContainsKey.</summary>
+		/// <summary>Tracks and configures behavior for ContainsKey.</summary>
 		public sealed class IDictionary_ContainsKeyInterceptor
 		{
-			/// <summary>Number of times this method was called.</summary>
-			public int CallCount { get; private set; }
+			/// <summary>Delegate for ContainsKey.</summary>
+			public delegate bool ContainsKeyDelegate(Stubs.IDictionary ko, string key);
+
+			private readonly global::System.Collections.Generic.List<(ContainsKeyDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+			private int _sequenceIndex;
+			private int _unconfiguredCallCount;
+			private string? _unconfiguredLastArg;
+
+			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+			public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>The argument from the last call.</summary>
-			public string? LastCallArg { get; private set; }
+			/// <summary>The argument from the last call (from most recently called registration).</summary>
+			public string? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
-			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Func<Stubs.IDictionary, string, bool>? OnCall { get; set; }
 
-			public void RecordCall(string key) { CallCount++; LastCallArg = key; }
+			/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<string> OnCall(ContainsKeyDelegate callback)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequenceIndex = 0;
+				return tracking;
+			}
 
-			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+			/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+			public global::KnockOff.IMethodSequence<ContainsKeyDelegate> OnCall(ContainsKeyDelegate callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, times, tracking));
+				_sequenceIndex = 0;
+				return new MethodSequenceImpl(this);
+			}
+
+			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+			internal bool Invoke(Stubs.IDictionary ko, string key)
+			{
+				if (_sequence.Count == 0)
+				{
+					_unconfiguredCallCount++;
+					_unconfiguredLastArg = key;
+					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ContainsKey");
+					return default!;
+				}
+
+				var (callback, times, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall(key);
+
+				if (!times.IsForever && tracking.CallCount >= times.Count)
+				{
+					if (_sequenceIndex < _sequence.Count - 1)
+						_sequenceIndex++;
+					else if (tracking.CallCount > times.Count)
+						throw global::KnockOff.StubException.SequenceExhausted("ContainsKey");
+				}
+
+				return callback(ko, key);
+			}
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset()
+			{
+				_unconfiguredCallCount = 0;
+				_unconfiguredLastArg = default;
+				foreach (var (_, _, tracking) in _sequence)
+					tracking.Reset();
+				_sequenceIndex = 0;
+			}
+
+			/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _sequence)
+				{
+					if (times.IsForever)
+					{
+						if (!tracking.WasCalled)
+							return false;
+					}
+					else if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Tracks invocations for this callback registration.</summary>
+			private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking<string>
+			{
+				private string _lastArg = default!;
+
+				/// <summary>Number of times this callback was invoked.</summary>
+				public int CallCount { get; private set; }
+
+				/// <summary>True if CallCount > 0.</summary>
+				public bool WasCalled => CallCount > 0;
+
+				/// <summary>Last argument passed to this callback. Default if never called.</summary>
+				public string LastArg => _lastArg;
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall(string key) { CallCount++; _lastArg = key; }
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() { CallCount = 0; _lastArg = default!; }
+			}
+
+			/// <summary>Sequence implementation for ThenCall chaining.</summary>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<ContainsKeyDelegate>
+			{
+				private readonly IDictionary_ContainsKeyInterceptor _interceptor;
+
+				public MethodSequenceImpl(IDictionary_ContainsKeyInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Total calls across all callbacks in sequence.</summary>
+				public int TotalCallCount
+				{
+					get
+					{
+						var total = 0;
+						foreach (var (_, _, tracking) in _interceptor._sequence)
+							total += tracking.CallCount;
+						return total;
+					}
+				}
+
+				/// <summary>Add another callback to the sequence.</summary>
+				public global::KnockOff.IMethodSequence<ContainsKeyDelegate> ThenCall(ContainsKeyDelegate callback, global::KnockOff.Times times)
+				{
+					var tracking = new MethodTrackingImpl();
+					_interceptor._sequence.Add((callback, times, tracking));
+					return this;
+				}
+
+				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+				public bool Verify()
+				{
+					foreach (var (_, times, tracking) in _interceptor._sequence)
+					{
+						if (!times.Verify(tracking.CallCount))
+							return false;
+					}
+					return true;
+				}
+
+				/// <summary>Reset all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+			}
+
 		}
 
-		/// <summary>Interceptor for Remove.</summary>
+		/// <summary>Tracks and configures behavior for Remove.</summary>
 		public sealed class IDictionary_RemoveInterceptor
 		{
-			/// <summary>Number of times this method was called.</summary>
-			public int CallCount { get; private set; }
+			private int _unconfiguredCallCount;
 
-			/// <summary>Whether this method was called at least once.</summary>
+			/// <summary>Delegate for Remove(string).</summary>
+			public delegate bool RemoveDelegate_String_Boolean(Stubs.IDictionary ko, string key);
+
+			private readonly global::System.Collections.Generic.List<(RemoveDelegate_String_Boolean Callback, global::KnockOff.Times Times, MethodTrackingImpl_String_Boolean Tracking)> _sequence_String_Boolean = new();
+			private int _sequenceIndex_String_Boolean;
+
+			/// <summary>Delegate for Remove(global::System.Collections.Generic.KeyValuePair<string, string>).</summary>
+			public delegate bool RemoveDelegate_Collections_Generic_KeyValuePair_string_string_Boolean(Stubs.IDictionary ko, global::System.Collections.Generic.KeyValuePair<string, string> item);
+
+			private readonly global::System.Collections.Generic.List<(RemoveDelegate_Collections_Generic_KeyValuePair_string_string_Boolean Callback, global::KnockOff.Times Times, MethodTrackingImpl_Collections_Generic_KeyValuePair_string_string_Boolean Tracking)> _sequence_Collections_Generic_KeyValuePair_string_string_Boolean = new();
+			private int _sequenceIndex_Collections_Generic_KeyValuePair_string_string_Boolean;
+
+			/// <summary>Total number of times this method was called (across all overloads and registrations).</summary>
+			public int CallCount => _unconfiguredCallCount + _sequence_String_Boolean.Sum(s => s.Tracking.CallCount) + _sequence_Collections_Generic_KeyValuePair_string_string_Boolean.Sum(s => s.Tracking.CallCount);
+
+			/// <summary>Whether this method was called at least once (any overload).</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>The arguments from the last call.</summary>
-			public (string? key, global::System.Collections.Generic.KeyValuePair<string, string>? item)? LastCallArgs { get; private set; }
+			/// <summary>Configures callback for Remove(string). Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<string> OnCall(RemoveDelegate_String_Boolean callback)
+			{
+				var tracking = new MethodTrackingImpl_String_Boolean();
+				_sequence_String_Boolean.Clear();
+				_sequence_String_Boolean.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequenceIndex_String_Boolean = 0;
+				return tracking;
+			}
 
-			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Func<Stubs.IDictionary, string?, global::System.Collections.Generic.KeyValuePair<string, string>?, bool>? OnCall { get; set; }
+			/// <summary>Configures callback for Remove(string) with Times constraint.</summary>
+			public global::KnockOff.IMethodSequence<RemoveDelegate_String_Boolean> OnCall(RemoveDelegate_String_Boolean callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl_String_Boolean();
+				_sequence_String_Boolean.Clear();
+				_sequence_String_Boolean.Add((callback, times, tracking));
+				_sequenceIndex_String_Boolean = 0;
+				return new MethodSequenceImpl_String_Boolean(this);
+			}
 
-			public void RecordCall(string? key, global::System.Collections.Generic.KeyValuePair<string, string>? item) { CallCount++; LastCallArgs = (key, item); }
+			/// <summary>Configures callback for Remove(global::System.Collections.Generic.KeyValuePair<string, string>). Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<global::System.Collections.Generic.KeyValuePair<string, string>> OnCall(RemoveDelegate_Collections_Generic_KeyValuePair_string_string_Boolean callback)
+			{
+				var tracking = new MethodTrackingImpl_Collections_Generic_KeyValuePair_string_string_Boolean();
+				_sequence_Collections_Generic_KeyValuePair_string_string_Boolean.Clear();
+				_sequence_Collections_Generic_KeyValuePair_string_string_Boolean.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequenceIndex_Collections_Generic_KeyValuePair_string_string_Boolean = 0;
+				return tracking;
+			}
 
-			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+			/// <summary>Configures callback for Remove(global::System.Collections.Generic.KeyValuePair<string, string>) with Times constraint.</summary>
+			public global::KnockOff.IMethodSequence<RemoveDelegate_Collections_Generic_KeyValuePair_string_string_Boolean> OnCall(RemoveDelegate_Collections_Generic_KeyValuePair_string_string_Boolean callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl_Collections_Generic_KeyValuePair_string_string_Boolean();
+				_sequence_Collections_Generic_KeyValuePair_string_string_Boolean.Clear();
+				_sequence_Collections_Generic_KeyValuePair_string_string_Boolean.Add((callback, times, tracking));
+				_sequenceIndex_Collections_Generic_KeyValuePair_string_string_Boolean = 0;
+				return new MethodSequenceImpl_Collections_Generic_KeyValuePair_string_string_Boolean(this);
+			}
+
+			/// <summary>Invokes configured callback for Remove(string).</summary>
+			internal bool Invoke_String_Boolean(Stubs.IDictionary ko, string key)
+			{
+				if (_sequence_String_Boolean.Count == 0)
+				{
+					_unconfiguredCallCount++;
+					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Remove");
+					return default!;
+				}
+
+				var (callback, times, tracking) = _sequence_String_Boolean[_sequenceIndex_String_Boolean];
+				tracking.RecordCall(key);
+
+				if (!times.IsForever && tracking.CallCount >= times.Count)
+				{
+					if (_sequenceIndex_String_Boolean < _sequence_String_Boolean.Count - 1)
+						_sequenceIndex_String_Boolean++;
+					else if (tracking.CallCount > times.Count)
+						throw global::KnockOff.StubException.SequenceExhausted("Remove");
+				}
+
+				return callback(ko, key);
+			}
+
+			/// <summary>Invokes configured callback for Remove(global::System.Collections.Generic.KeyValuePair<string, string>).</summary>
+			internal bool Invoke_Collections_Generic_KeyValuePair_string_string_Boolean(Stubs.IDictionary ko, global::System.Collections.Generic.KeyValuePair<string, string> item)
+			{
+				if (_sequence_Collections_Generic_KeyValuePair_string_string_Boolean.Count == 0)
+				{
+					_unconfiguredCallCount++;
+					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Remove");
+					return default!;
+				}
+
+				var (callback, times, tracking) = _sequence_Collections_Generic_KeyValuePair_string_string_Boolean[_sequenceIndex_Collections_Generic_KeyValuePair_string_string_Boolean];
+				tracking.RecordCall(item);
+
+				if (!times.IsForever && tracking.CallCount >= times.Count)
+				{
+					if (_sequenceIndex_Collections_Generic_KeyValuePair_string_string_Boolean < _sequence_Collections_Generic_KeyValuePair_string_string_Boolean.Count - 1)
+						_sequenceIndex_Collections_Generic_KeyValuePair_string_string_Boolean++;
+					else if (tracking.CallCount > times.Count)
+						throw global::KnockOff.StubException.SequenceExhausted("Remove");
+				}
+
+				return callback(ko, item);
+			}
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset()
+			{
+				_unconfiguredCallCount = 0;
+				foreach (var (_, _, tracking) in _sequence_String_Boolean)
+					tracking.Reset();
+				_sequenceIndex_String_Boolean = 0;
+				foreach (var (_, _, tracking) in _sequence_Collections_Generic_KeyValuePair_string_string_Boolean)
+					tracking.Reset();
+				_sequenceIndex_Collections_Generic_KeyValuePair_string_string_Boolean = 0;
+			}
+
+			/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _sequence_String_Boolean)
+				{
+					if (times.IsForever)
+					{
+						if (!tracking.WasCalled)
+							return false;
+					}
+					else if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				foreach (var (_, times, tracking) in _sequence_Collections_Generic_KeyValuePair_string_string_Boolean)
+				{
+					if (times.IsForever)
+					{
+						if (!tracking.WasCalled)
+							return false;
+					}
+					else if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Tracks invocations for this callback registration.</summary>
+			private sealed class MethodTrackingImpl_String_Boolean : global::KnockOff.IMethodTracking<string>
+			{
+				private string _lastArg = default!;
+
+				/// <summary>Number of times this callback was invoked.</summary>
+				public int CallCount { get; private set; }
+
+				/// <summary>True if CallCount > 0.</summary>
+				public bool WasCalled => CallCount > 0;
+
+				/// <summary>Last argument passed to this callback. Default if never called.</summary>
+				public string LastArg => _lastArg;
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall(string key) { CallCount++; _lastArg = key; }
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() { CallCount = 0; _lastArg = default!; }
+			}
+
+			/// <summary>Tracks invocations for this callback registration.</summary>
+			private sealed class MethodTrackingImpl_Collections_Generic_KeyValuePair_string_string_Boolean : global::KnockOff.IMethodTracking<global::System.Collections.Generic.KeyValuePair<string, string>>
+			{
+				private global::System.Collections.Generic.KeyValuePair<string, string> _lastArg = default!;
+
+				/// <summary>Number of times this callback was invoked.</summary>
+				public int CallCount { get; private set; }
+
+				/// <summary>True if CallCount > 0.</summary>
+				public bool WasCalled => CallCount > 0;
+
+				/// <summary>Last argument passed to this callback. Default if never called.</summary>
+				public global::System.Collections.Generic.KeyValuePair<string, string> LastArg => _lastArg;
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall(global::System.Collections.Generic.KeyValuePair<string, string> item) { CallCount++; _lastArg = item; }
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() { CallCount = 0; _lastArg = default!; }
+			}
+
+			/// <summary>Sequence implementation for ThenCall chaining.</summary>
+			private sealed class MethodSequenceImpl_String_Boolean : global::KnockOff.IMethodSequence<RemoveDelegate_String_Boolean>
+			{
+				private readonly IDictionary_RemoveInterceptor _interceptor;
+
+				public MethodSequenceImpl_String_Boolean(IDictionary_RemoveInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Total calls across all callbacks in sequence.</summary>
+				public int TotalCallCount
+				{
+					get
+					{
+						var total = 0;
+						foreach (var (_, _, tracking) in _interceptor._sequence_String_Boolean)
+							total += tracking.CallCount;
+						return total;
+					}
+				}
+
+				/// <summary>Add another callback to the sequence.</summary>
+				public global::KnockOff.IMethodSequence<RemoveDelegate_String_Boolean> ThenCall(RemoveDelegate_String_Boolean callback, global::KnockOff.Times times)
+				{
+					var tracking = new MethodTrackingImpl_String_Boolean();
+					_interceptor._sequence_String_Boolean.Add((callback, times, tracking));
+					return this;
+				}
+
+				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+				public bool Verify()
+				{
+					foreach (var (_, times, tracking) in _interceptor._sequence_String_Boolean)
+					{
+						if (!times.Verify(tracking.CallCount))
+							return false;
+					}
+					return true;
+				}
+
+				/// <summary>Reset all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+			}
+
+			/// <summary>Sequence implementation for ThenCall chaining.</summary>
+			private sealed class MethodSequenceImpl_Collections_Generic_KeyValuePair_string_string_Boolean : global::KnockOff.IMethodSequence<RemoveDelegate_Collections_Generic_KeyValuePair_string_string_Boolean>
+			{
+				private readonly IDictionary_RemoveInterceptor _interceptor;
+
+				public MethodSequenceImpl_Collections_Generic_KeyValuePair_string_string_Boolean(IDictionary_RemoveInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Total calls across all callbacks in sequence.</summary>
+				public int TotalCallCount
+				{
+					get
+					{
+						var total = 0;
+						foreach (var (_, _, tracking) in _interceptor._sequence_Collections_Generic_KeyValuePair_string_string_Boolean)
+							total += tracking.CallCount;
+						return total;
+					}
+				}
+
+				/// <summary>Add another callback to the sequence.</summary>
+				public global::KnockOff.IMethodSequence<RemoveDelegate_Collections_Generic_KeyValuePair_string_string_Boolean> ThenCall(RemoveDelegate_Collections_Generic_KeyValuePair_string_string_Boolean callback, global::KnockOff.Times times)
+				{
+					var tracking = new MethodTrackingImpl_Collections_Generic_KeyValuePair_string_string_Boolean();
+					_interceptor._sequence_Collections_Generic_KeyValuePair_string_string_Boolean.Add((callback, times, tracking));
+					return this;
+				}
+
+				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+				public bool Verify()
+				{
+					foreach (var (_, times, tracking) in _interceptor._sequence_Collections_Generic_KeyValuePair_string_string_Boolean)
+					{
+						if (!times.Verify(tracking.CallCount))
+							return false;
+					}
+					return true;
+				}
+
+				/// <summary>Reset all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+			}
+
 		}
 
-		/// <summary>Interceptor for TryGetValue.</summary>
+		/// <summary>Tracks and configures behavior for TryGetValue.</summary>
 		public sealed class IDictionary_TryGetValueInterceptor
 		{
-			/// <summary>Number of times this method was called.</summary>
-			public int CallCount { get; private set; }
+			/// <summary>Delegate for TryGetValue.</summary>
+			public delegate bool TryGetValueDelegate(Stubs.IDictionary ko, string key, out string @value);
+
+			private readonly global::System.Collections.Generic.List<(TryGetValueDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+			private int _sequenceIndex;
+			private int _unconfiguredCallCount;
+			private string? _unconfiguredLastArg;
+
+			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+			public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>The argument from the last call.</summary>
-			public string? LastCallArg { get; private set; }
+			/// <summary>The argument from the last call (from most recently called registration).</summary>
+			public string? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
-			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Func<Stubs.IDictionary, string, bool>? OnCall { get; set; }
 
-			public void RecordCall(string key) { CallCount++; LastCallArg = key; }
+			/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<string> OnCall(TryGetValueDelegate callback)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequenceIndex = 0;
+				return tracking;
+			}
 
-			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+			/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+			public global::KnockOff.IMethodSequence<TryGetValueDelegate> OnCall(TryGetValueDelegate callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, times, tracking));
+				_sequenceIndex = 0;
+				return new MethodSequenceImpl(this);
+			}
+
+			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+			internal bool Invoke(Stubs.IDictionary ko, string key, out string @value)
+			{
+				@value = default!;
+				if (_sequence.Count == 0)
+				{
+					_unconfiguredCallCount++;
+					_unconfiguredLastArg = key;
+					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "TryGetValue");
+					return default!;
+				}
+
+				var (callback, times, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall(key);
+
+				if (!times.IsForever && tracking.CallCount >= times.Count)
+				{
+					if (_sequenceIndex < _sequence.Count - 1)
+						_sequenceIndex++;
+					else if (tracking.CallCount > times.Count)
+						throw global::KnockOff.StubException.SequenceExhausted("TryGetValue");
+				}
+
+				return callback(ko, key, out @value);
+			}
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset()
+			{
+				_unconfiguredCallCount = 0;
+				_unconfiguredLastArg = default;
+				foreach (var (_, _, tracking) in _sequence)
+					tracking.Reset();
+				_sequenceIndex = 0;
+			}
+
+			/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _sequence)
+				{
+					if (times.IsForever)
+					{
+						if (!tracking.WasCalled)
+							return false;
+					}
+					else if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Tracks invocations for this callback registration.</summary>
+			private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking<string>
+			{
+				private string _lastArg = default!;
+
+				/// <summary>Number of times this callback was invoked.</summary>
+				public int CallCount { get; private set; }
+
+				/// <summary>True if CallCount > 0.</summary>
+				public bool WasCalled => CallCount > 0;
+
+				/// <summary>Last argument passed to this callback. Default if never called.</summary>
+				public string LastArg => _lastArg;
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall(string key) { CallCount++; _lastArg = key; }
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() { CallCount = 0; _lastArg = default!; }
+			}
+
+			/// <summary>Sequence implementation for ThenCall chaining.</summary>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<TryGetValueDelegate>
+			{
+				private readonly IDictionary_TryGetValueInterceptor _interceptor;
+
+				public MethodSequenceImpl(IDictionary_TryGetValueInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Total calls across all callbacks in sequence.</summary>
+				public int TotalCallCount
+				{
+					get
+					{
+						var total = 0;
+						foreach (var (_, _, tracking) in _interceptor._sequence)
+							total += tracking.CallCount;
+						return total;
+					}
+				}
+
+				/// <summary>Add another callback to the sequence.</summary>
+				public global::KnockOff.IMethodSequence<TryGetValueDelegate> ThenCall(TryGetValueDelegate callback, global::KnockOff.Times times)
+				{
+					var tracking = new MethodTrackingImpl();
+					_interceptor._sequence.Add((callback, times, tracking));
+					return this;
+				}
+
+				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+				public bool Verify()
+				{
+					foreach (var (_, times, tracking) in _interceptor._sequence)
+					{
+						if (!times.Verify(tracking.CallCount))
+							return false;
+					}
+					return true;
+				}
+
+				/// <summary>Reset all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+			}
+
 		}
 
-		/// <summary>Interceptor for Clear.</summary>
+		/// <summary>Tracks and configures behavior for Clear.</summary>
 		public sealed class IDictionary_ClearInterceptor
 		{
-			/// <summary>Number of times this method was called.</summary>
-			public int CallCount { get; private set; }
+			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IDictionary> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+			private int _sequenceIndex;
+			private int _unconfiguredCallCount;
+
+			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+			public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Action<Stubs.IDictionary>? OnCall { get; set; }
 
-			public void RecordCall() { CallCount++; }
+			/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.IDictionary> callback)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequenceIndex = 0;
+				return tracking;
+			}
 
-			public void Reset() { CallCount = 0; OnCall = null; }
+			/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDictionary>> OnCall(global::System.Action<Stubs.IDictionary> callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, times, tracking));
+				_sequenceIndex = 0;
+				return new MethodSequenceImpl(this);
+			}
+
+			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+			internal void Invoke(Stubs.IDictionary ko)
+			{
+				if (_sequence.Count == 0)
+				{
+					_unconfiguredCallCount++;
+					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Clear");
+					return;
+				}
+
+				var (callback, times, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall();
+
+				if (!times.IsForever && tracking.CallCount >= times.Count)
+				{
+					if (_sequenceIndex < _sequence.Count - 1)
+						_sequenceIndex++;
+					else if (tracking.CallCount > times.Count)
+						throw global::KnockOff.StubException.SequenceExhausted("Clear");
+				}
+
+				callback(ko);
+			}
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset()
+			{
+				_unconfiguredCallCount = 0;
+				foreach (var (_, _, tracking) in _sequence)
+					tracking.Reset();
+				_sequenceIndex = 0;
+			}
+
+			/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _sequence)
+				{
+					if (times.IsForever)
+					{
+						if (!tracking.WasCalled)
+							return false;
+					}
+					else if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Tracks invocations for this callback registration.</summary>
+			private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking
+			{
+
+				/// <summary>Number of times this callback was invoked.</summary>
+				public int CallCount { get; private set; }
+
+				/// <summary>True if CallCount > 0.</summary>
+				public bool WasCalled => CallCount > 0;
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall() => CallCount++;
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() => CallCount = 0;
+			}
+
+			/// <summary>Sequence implementation for ThenCall chaining.</summary>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDictionary>>
+			{
+				private readonly IDictionary_ClearInterceptor _interceptor;
+
+				public MethodSequenceImpl(IDictionary_ClearInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Total calls across all callbacks in sequence.</summary>
+				public int TotalCallCount
+				{
+					get
+					{
+						var total = 0;
+						foreach (var (_, _, tracking) in _interceptor._sequence)
+							total += tracking.CallCount;
+						return total;
+					}
+				}
+
+				/// <summary>Add another callback to the sequence.</summary>
+				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDictionary>> ThenCall(global::System.Action<Stubs.IDictionary> callback, global::KnockOff.Times times)
+				{
+					var tracking = new MethodTrackingImpl();
+					_interceptor._sequence.Add((callback, times, tracking));
+					return this;
+				}
+
+				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+				public bool Verify()
+				{
+					foreach (var (_, times, tracking) in _interceptor._sequence)
+					{
+						if (!times.Verify(tracking.CallCount))
+							return false;
+					}
+					return true;
+				}
+
+				/// <summary>Reset all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+			}
+
 		}
 
-		/// <summary>Interceptor for Contains.</summary>
+		/// <summary>Tracks and configures behavior for Contains.</summary>
 		public sealed class IDictionary_ContainsInterceptor
 		{
-			/// <summary>Number of times this method was called.</summary>
-			public int CallCount { get; private set; }
+			/// <summary>Delegate for Contains.</summary>
+			public delegate bool ContainsDelegate(Stubs.IDictionary ko, global::System.Collections.Generic.KeyValuePair<string, string> item);
+
+			private readonly global::System.Collections.Generic.List<(ContainsDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+			private int _sequenceIndex;
+			private int _unconfiguredCallCount;
+			private global::System.Collections.Generic.KeyValuePair<string, string>? _unconfiguredLastArg;
+
+			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+			public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>The argument from the last call.</summary>
-			public global::System.Collections.Generic.KeyValuePair<string, string>? LastCallArg { get; private set; }
+			/// <summary>The argument from the last call (from most recently called registration).</summary>
+			public global::System.Collections.Generic.KeyValuePair<string, string>? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
-			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Func<Stubs.IDictionary, global::System.Collections.Generic.KeyValuePair<string, string>, bool>? OnCall { get; set; }
 
-			public void RecordCall(global::System.Collections.Generic.KeyValuePair<string, string> item) { CallCount++; LastCallArg = item; }
+			/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<global::System.Collections.Generic.KeyValuePair<string, string>> OnCall(ContainsDelegate callback)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequenceIndex = 0;
+				return tracking;
+			}
 
-			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+			/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+			public global::KnockOff.IMethodSequence<ContainsDelegate> OnCall(ContainsDelegate callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, times, tracking));
+				_sequenceIndex = 0;
+				return new MethodSequenceImpl(this);
+			}
+
+			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+			internal bool Invoke(Stubs.IDictionary ko, global::System.Collections.Generic.KeyValuePair<string, string> item)
+			{
+				if (_sequence.Count == 0)
+				{
+					_unconfiguredCallCount++;
+					_unconfiguredLastArg = item;
+					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Contains");
+					return default!;
+				}
+
+				var (callback, times, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall(item);
+
+				if (!times.IsForever && tracking.CallCount >= times.Count)
+				{
+					if (_sequenceIndex < _sequence.Count - 1)
+						_sequenceIndex++;
+					else if (tracking.CallCount > times.Count)
+						throw global::KnockOff.StubException.SequenceExhausted("Contains");
+				}
+
+				return callback(ko, item);
+			}
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset()
+			{
+				_unconfiguredCallCount = 0;
+				_unconfiguredLastArg = default;
+				foreach (var (_, _, tracking) in _sequence)
+					tracking.Reset();
+				_sequenceIndex = 0;
+			}
+
+			/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _sequence)
+				{
+					if (times.IsForever)
+					{
+						if (!tracking.WasCalled)
+							return false;
+					}
+					else if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Tracks invocations for this callback registration.</summary>
+			private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking<global::System.Collections.Generic.KeyValuePair<string, string>>
+			{
+				private global::System.Collections.Generic.KeyValuePair<string, string> _lastArg = default!;
+
+				/// <summary>Number of times this callback was invoked.</summary>
+				public int CallCount { get; private set; }
+
+				/// <summary>True if CallCount > 0.</summary>
+				public bool WasCalled => CallCount > 0;
+
+				/// <summary>Last argument passed to this callback. Default if never called.</summary>
+				public global::System.Collections.Generic.KeyValuePair<string, string> LastArg => _lastArg;
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall(global::System.Collections.Generic.KeyValuePair<string, string> item) { CallCount++; _lastArg = item; }
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() { CallCount = 0; _lastArg = default!; }
+			}
+
+			/// <summary>Sequence implementation for ThenCall chaining.</summary>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<ContainsDelegate>
+			{
+				private readonly IDictionary_ContainsInterceptor _interceptor;
+
+				public MethodSequenceImpl(IDictionary_ContainsInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Total calls across all callbacks in sequence.</summary>
+				public int TotalCallCount
+				{
+					get
+					{
+						var total = 0;
+						foreach (var (_, _, tracking) in _interceptor._sequence)
+							total += tracking.CallCount;
+						return total;
+					}
+				}
+
+				/// <summary>Add another callback to the sequence.</summary>
+				public global::KnockOff.IMethodSequence<ContainsDelegate> ThenCall(ContainsDelegate callback, global::KnockOff.Times times)
+				{
+					var tracking = new MethodTrackingImpl();
+					_interceptor._sequence.Add((callback, times, tracking));
+					return this;
+				}
+
+				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+				public bool Verify()
+				{
+					foreach (var (_, times, tracking) in _interceptor._sequence)
+					{
+						if (!times.Verify(tracking.CallCount))
+							return false;
+					}
+					return true;
+				}
+
+				/// <summary>Reset all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+			}
+
 		}
 
-		/// <summary>Interceptor for CopyTo.</summary>
+		/// <summary>Tracks and configures behavior for CopyTo.</summary>
 		public sealed class IDictionary_CopyToInterceptor
 		{
-			/// <summary>Number of times this method was called.</summary>
-			public int CallCount { get; private set; }
+			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IDictionary, global::System.Collections.Generic.KeyValuePair<string, string>[], int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+			private int _sequenceIndex;
+			private int _unconfiguredCallCount;
+			private (global::System.Collections.Generic.KeyValuePair<string, string>[] array, int arrayIndex)? _unconfiguredLastArgs;
+
+			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+			public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>The arguments from the last call.</summary>
-			public (global::System.Collections.Generic.KeyValuePair<string, string>[]? array, int? arrayIndex)? LastCallArgs { get; private set; }
+			/// <summary>The arguments from the last call (from most recently called registration).</summary>
+			public (global::System.Collections.Generic.KeyValuePair<string, string>[] array, int arrayIndex)? LastCallArgs { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
 
-			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Action<Stubs.IDictionary, global::System.Collections.Generic.KeyValuePair<string, string>[], int>? OnCall { get; set; }
 
-			public void RecordCall(global::System.Collections.Generic.KeyValuePair<string, string>[] array, int arrayIndex) { CallCount++; LastCallArgs = (array, arrayIndex); }
+			/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTrackingArgs<(global::System.Collections.Generic.KeyValuePair<string, string>[] array, int arrayIndex)> OnCall(global::System.Action<Stubs.IDictionary, global::System.Collections.Generic.KeyValuePair<string, string>[], int> callback)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequenceIndex = 0;
+				return tracking;
+			}
 
-			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+			/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDictionary, global::System.Collections.Generic.KeyValuePair<string, string>[], int>> OnCall(global::System.Action<Stubs.IDictionary, global::System.Collections.Generic.KeyValuePair<string, string>[], int> callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, times, tracking));
+				_sequenceIndex = 0;
+				return new MethodSequenceImpl(this);
+			}
+
+			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+			internal void Invoke(Stubs.IDictionary ko, global::System.Collections.Generic.KeyValuePair<string, string>[] array, int arrayIndex)
+			{
+				if (_sequence.Count == 0)
+				{
+					_unconfiguredCallCount++;
+					_unconfiguredLastArgs = ((array, arrayIndex));
+					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "CopyTo");
+					return;
+				}
+
+				var (callback, times, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall((array, arrayIndex));
+
+				if (!times.IsForever && tracking.CallCount >= times.Count)
+				{
+					if (_sequenceIndex < _sequence.Count - 1)
+						_sequenceIndex++;
+					else if (tracking.CallCount > times.Count)
+						throw global::KnockOff.StubException.SequenceExhausted("CopyTo");
+				}
+
+				callback(ko, array, arrayIndex);
+			}
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset()
+			{
+				_unconfiguredCallCount = 0;
+				_unconfiguredLastArgs = default;
+				foreach (var (_, _, tracking) in _sequence)
+					tracking.Reset();
+				_sequenceIndex = 0;
+			}
+
+			/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _sequence)
+				{
+					if (times.IsForever)
+					{
+						if (!tracking.WasCalled)
+							return false;
+					}
+					else if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Tracks invocations for this callback registration.</summary>
+			private sealed class MethodTrackingImpl : global::KnockOff.IMethodTrackingArgs<(global::System.Collections.Generic.KeyValuePair<string, string>[] array, int arrayIndex)>
+			{
+				private (global::System.Collections.Generic.KeyValuePair<string, string>[] array, int arrayIndex) _lastArgs;
+
+				/// <summary>Number of times this callback was invoked.</summary>
+				public int CallCount { get; private set; }
+
+				/// <summary>True if CallCount > 0.</summary>
+				public bool WasCalled => CallCount > 0;
+
+				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
+				public (global::System.Collections.Generic.KeyValuePair<string, string>[] array, int arrayIndex) LastArgs => _lastArgs;
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall((global::System.Collections.Generic.KeyValuePair<string, string>[] array, int arrayIndex) args) { CallCount++; _lastArgs = args; }
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() { CallCount = 0; _lastArgs = default; }
+			}
+
+			/// <summary>Sequence implementation for ThenCall chaining.</summary>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDictionary, global::System.Collections.Generic.KeyValuePair<string, string>[], int>>
+			{
+				private readonly IDictionary_CopyToInterceptor _interceptor;
+
+				public MethodSequenceImpl(IDictionary_CopyToInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Total calls across all callbacks in sequence.</summary>
+				public int TotalCallCount
+				{
+					get
+					{
+						var total = 0;
+						foreach (var (_, _, tracking) in _interceptor._sequence)
+							total += tracking.CallCount;
+						return total;
+					}
+				}
+
+				/// <summary>Add another callback to the sequence.</summary>
+				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDictionary, global::System.Collections.Generic.KeyValuePair<string, string>[], int>> ThenCall(global::System.Action<Stubs.IDictionary, global::System.Collections.Generic.KeyValuePair<string, string>[], int> callback, global::KnockOff.Times times)
+				{
+					var tracking = new MethodTrackingImpl();
+					_interceptor._sequence.Add((callback, times, tracking));
+					return this;
+				}
+
+				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+				public bool Verify()
+				{
+					foreach (var (_, times, tracking) in _interceptor._sequence)
+					{
+						if (!times.Verify(tracking.CallCount))
+							return false;
+					}
+					return true;
+				}
+
+				/// <summary>Reset all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+			}
+
 		}
 
-		/// <summary>Interceptor for GetEnumerator.</summary>
+		/// <summary>Tracks and configures behavior for GetEnumerator.</summary>
 		public sealed class IDictionary_GetEnumeratorInterceptor
 		{
-			/// <summary>Number of times this method was called.</summary>
-			public int CallCount { get; private set; }
+			/// <summary>Delegate for GetEnumerator.</summary>
+			public delegate global::System.Collections.Generic.IEnumerator<global::System.Collections.Generic.KeyValuePair<string, string>> GetEnumeratorDelegate(Stubs.IDictionary ko);
+
+			private readonly global::System.Collections.Generic.List<(GetEnumeratorDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+			private int _sequenceIndex;
+			private int _unconfiguredCallCount;
+
+			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+			public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Func<Stubs.IDictionary, global::System.Collections.Generic.IEnumerator<global::System.Collections.Generic.KeyValuePair<string, string>>>? OnCall { get; set; }
 
-			public void RecordCall() { CallCount++; }
+			/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking OnCall(GetEnumeratorDelegate callback)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequenceIndex = 0;
+				return tracking;
+			}
 
-			public void Reset() { CallCount = 0; OnCall = null; }
+			/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+			public global::KnockOff.IMethodSequence<GetEnumeratorDelegate> OnCall(GetEnumeratorDelegate callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, times, tracking));
+				_sequenceIndex = 0;
+				return new MethodSequenceImpl(this);
+			}
+
+			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+			internal global::System.Collections.Generic.IEnumerator<global::System.Collections.Generic.KeyValuePair<string, string>> Invoke(Stubs.IDictionary ko)
+			{
+				if (_sequence.Count == 0)
+				{
+					_unconfiguredCallCount++;
+					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
+					throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
+				}
+
+				var (callback, times, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall();
+
+				if (!times.IsForever && tracking.CallCount >= times.Count)
+				{
+					if (_sequenceIndex < _sequence.Count - 1)
+						_sequenceIndex++;
+					else if (tracking.CallCount > times.Count)
+						throw global::KnockOff.StubException.SequenceExhausted("GetEnumerator");
+				}
+
+				return callback(ko);
+			}
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset()
+			{
+				_unconfiguredCallCount = 0;
+				foreach (var (_, _, tracking) in _sequence)
+					tracking.Reset();
+				_sequenceIndex = 0;
+			}
+
+			/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _sequence)
+				{
+					if (times.IsForever)
+					{
+						if (!tracking.WasCalled)
+							return false;
+					}
+					else if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Tracks invocations for this callback registration.</summary>
+			private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking
+			{
+
+				/// <summary>Number of times this callback was invoked.</summary>
+				public int CallCount { get; private set; }
+
+				/// <summary>True if CallCount > 0.</summary>
+				public bool WasCalled => CallCount > 0;
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall() => CallCount++;
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() => CallCount = 0;
+			}
+
+			/// <summary>Sequence implementation for ThenCall chaining.</summary>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<GetEnumeratorDelegate>
+			{
+				private readonly IDictionary_GetEnumeratorInterceptor _interceptor;
+
+				public MethodSequenceImpl(IDictionary_GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Total calls across all callbacks in sequence.</summary>
+				public int TotalCallCount
+				{
+					get
+					{
+						var total = 0;
+						foreach (var (_, _, tracking) in _interceptor._sequence)
+							total += tracking.CallCount;
+						return total;
+					}
+				}
+
+				/// <summary>Add another callback to the sequence.</summary>
+				public global::KnockOff.IMethodSequence<GetEnumeratorDelegate> ThenCall(GetEnumeratorDelegate callback, global::KnockOff.Times times)
+				{
+					var tracking = new MethodTrackingImpl();
+					_interceptor._sequence.Add((callback, times, tracking));
+					return this;
+				}
+
+				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+				public bool Verify()
+				{
+					foreach (var (_, times, tracking) in _interceptor._sequence)
+					{
+						if (!times.Verify(tracking.CallCount))
+							return false;
+					}
+					return true;
+				}
+
+				/// <summary>Reset all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+			}
+
 		}
 
 		/// <summary>Stub implementation of global::System.Collections.Generic.IDictionary<string, string>.</summary>
@@ -316,34 +1633,22 @@ partial class DictionaryStringStringStubTests
 
 			void global::System.Collections.Generic.IDictionary<string, string>.Add(string key, string value)
 			{
-				Add.RecordCall(key, value, null);
-				if (Add.OnCall is { } onCall) { onCall(this, key, value, null); return; }
-				if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, string>", "Add");
+				Add.Invoke_String_String_void(this, key, value);
 			}
 
 			bool global::System.Collections.Generic.IDictionary<string, string>.ContainsKey(string key)
 			{
-				ContainsKey.RecordCall(key);
-				if (ContainsKey.OnCall is { } onCall) return onCall(this, key);
-				if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, string>", "ContainsKey");
-				return default!;
+				return ContainsKey.Invoke(this, key);
 			}
 
 			bool global::System.Collections.Generic.IDictionary<string, string>.Remove(string key)
 			{
-				Remove.RecordCall(key, null);
-				if (Remove.OnCall is { } onCall) return onCall(this, key, null);
-				if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, string>", "Remove");
-				return default!;
+				return Remove.Invoke_String_Boolean(this, key);
 			}
 
 			bool global::System.Collections.Generic.IDictionary<string, string>.TryGetValue(string key, out string value)
 			{
-				value = default!;
-				TryGetValue.RecordCall(key);
-				if (TryGetValue.OnCall is { } onCall) return onCall(this, key);
-				if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, string>", "TryGetValue");
-				return default!;
+				return TryGetValue.Invoke(this, key, out value);
 			}
 
 			string global::System.Collections.Generic.IDictionary<string, string>.this[string key]
@@ -388,39 +1693,27 @@ partial class DictionaryStringStringStubTests
 
 			void global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, string>>.Add(global::System.Collections.Generic.KeyValuePair<string, string> item)
 			{
-				Add.RecordCall(null, null, item);
-				if (Add.OnCall is { } onCall) { onCall(this, null, null, item); return; }
-				if (Strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, string>>", "Add");
+				Add.Invoke_Collections_Generic_KeyValuePair_string_string_void(this, item);
 			}
 
 			void global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, string>>.Clear()
 			{
-				Clear.RecordCall();
-				if (Clear.OnCall is { } onCall) { onCall(this); return; }
-				if (Strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, string>>", "Clear");
+				Clear.Invoke(this);
 			}
 
 			bool global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, string>>.Contains(global::System.Collections.Generic.KeyValuePair<string, string> item)
 			{
-				Contains.RecordCall(item);
-				if (Contains.OnCall is { } onCall) return onCall(this, item);
-				if (Strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, string>>", "Contains");
-				return default!;
+				return Contains.Invoke(this, item);
 			}
 
 			void global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, string>>.CopyTo(global::System.Collections.Generic.KeyValuePair<string, string>[] array, int arrayIndex)
 			{
-				CopyTo.RecordCall(array, arrayIndex);
-				if (CopyTo.OnCall is { } onCall) { onCall(this, array, arrayIndex); return; }
-				if (Strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, string>>", "CopyTo");
+				CopyTo.Invoke(this, array, arrayIndex);
 			}
 
 			bool global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, string>>.Remove(global::System.Collections.Generic.KeyValuePair<string, string> item)
 			{
-				Remove.RecordCall(null, item);
-				if (Remove.OnCall is { } onCall) return onCall(this, null, item);
-				if (Strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, string>>", "Remove");
-				return default!;
+				return Remove.Invoke_Collections_Generic_KeyValuePair_string_string_Boolean(this, item);
 			}
 
 			int global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, string>>.Count
@@ -447,18 +1740,12 @@ partial class DictionaryStringStringStubTests
 
 			global::System.Collections.Generic.IEnumerator<global::System.Collections.Generic.KeyValuePair<string, string>> global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.KeyValuePair<string, string>>.GetEnumerator()
 			{
-				GetEnumerator.RecordCall();
-				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
-				if (Strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, string>>", "GetEnumerator");
-				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
+				return GetEnumerator.Invoke(this);
 			}
 
 			global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
 			{
-				GetEnumerator.RecordCall();
-				if (GetEnumerator.OnCall is { } onCall) return onCall(this);
-				if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerable", "GetEnumerator");
-				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Set GetEnumerator.OnCall.");
+				return GetEnumerator.Invoke(this);
 			}
 
 			/// <summary>The global::System.Collections.Generic.IDictionary<string, string> instance. Use for passing to code expecting the interface.</summary>

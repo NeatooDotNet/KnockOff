@@ -124,8 +124,8 @@ public partial class UserTests
         var emailStub = new Stubs.EmailService();
 
         // Configure behavior (OnCall is property for inline stubs)
-        userStub.GetUser.OnCall = (ko, id) => new User { Id = id, Email = "test@example.com" };
-        emailStub.Send.OnCall = (ko, to, subject, body) => { };
+        userStub.GetUser.OnCall((ko, id) => new User { Id = id, Email = "test@example.com" });
+        emailStub.Send.OnCall((ko, to, subject, body) => { });
 
         // Inject and test (.Object for class stubs)
         var service = new OrderService(userStub, emailStub.Object);

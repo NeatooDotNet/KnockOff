@@ -27,44 +27,318 @@ partial class ITriggerPropertyOfTTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for GetValue.</summary>
+		/// <summary>Tracks and configures behavior for GetValue.</summary>
 		public sealed class ITriggerProperty_GetValueInterceptor
 		{
-			/// <summary>Number of times this method was called.</summary>
-			public int CallCount { get; private set; }
+			/// <summary>Delegate for GetValue.</summary>
+			public delegate object? GetValueDelegate(Stubs.ITriggerProperty ko, global::Neatoo.IValidateBase target);
+
+			private readonly global::System.Collections.Generic.List<(GetValueDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+			private int _sequenceIndex;
+			private int _unconfiguredCallCount;
+			private global::Neatoo.IValidateBase? _unconfiguredLastArg;
+
+			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+			public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>The argument from the last call.</summary>
-			public global::Neatoo.IValidateBase? LastCallArg { get; private set; }
+			/// <summary>The argument from the last call (from most recently called registration).</summary>
+			public global::Neatoo.IValidateBase? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
-			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Func<Stubs.ITriggerProperty, global::Neatoo.IValidateBase, object?>? OnCall { get; set; }
 
-			public void RecordCall(global::Neatoo.IValidateBase target) { CallCount++; LastCallArg = target; }
+			/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<global::Neatoo.IValidateBase> OnCall(GetValueDelegate callback)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequenceIndex = 0;
+				return tracking;
+			}
 
-			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+			/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+			public global::KnockOff.IMethodSequence<GetValueDelegate> OnCall(GetValueDelegate callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, times, tracking));
+				_sequenceIndex = 0;
+				return new MethodSequenceImpl(this);
+			}
+
+			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+			internal object? Invoke(Stubs.ITriggerProperty ko, global::Neatoo.IValidateBase target)
+			{
+				if (_sequence.Count == 0)
+				{
+					_unconfiguredCallCount++;
+					_unconfiguredLastArg = target;
+					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetValue");
+					return default!;
+				}
+
+				var (callback, times, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall(target);
+
+				if (!times.IsForever && tracking.CallCount >= times.Count)
+				{
+					if (_sequenceIndex < _sequence.Count - 1)
+						_sequenceIndex++;
+					else if (tracking.CallCount > times.Count)
+						throw global::KnockOff.StubException.SequenceExhausted("GetValue");
+				}
+
+				return callback(ko, target);
+			}
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset()
+			{
+				_unconfiguredCallCount = 0;
+				_unconfiguredLastArg = default;
+				foreach (var (_, _, tracking) in _sequence)
+					tracking.Reset();
+				_sequenceIndex = 0;
+			}
+
+			/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _sequence)
+				{
+					if (times.IsForever)
+					{
+						if (!tracking.WasCalled)
+							return false;
+					}
+					else if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Tracks invocations for this callback registration.</summary>
+			private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking<global::Neatoo.IValidateBase>
+			{
+				private global::Neatoo.IValidateBase _lastArg = default!;
+
+				/// <summary>Number of times this callback was invoked.</summary>
+				public int CallCount { get; private set; }
+
+				/// <summary>True if CallCount > 0.</summary>
+				public bool WasCalled => CallCount > 0;
+
+				/// <summary>Last argument passed to this callback. Default if never called.</summary>
+				public global::Neatoo.IValidateBase LastArg => _lastArg;
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall(global::Neatoo.IValidateBase target) { CallCount++; _lastArg = target; }
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() { CallCount = 0; _lastArg = default!; }
+			}
+
+			/// <summary>Sequence implementation for ThenCall chaining.</summary>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<GetValueDelegate>
+			{
+				private readonly ITriggerProperty_GetValueInterceptor _interceptor;
+
+				public MethodSequenceImpl(ITriggerProperty_GetValueInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Total calls across all callbacks in sequence.</summary>
+				public int TotalCallCount
+				{
+					get
+					{
+						var total = 0;
+						foreach (var (_, _, tracking) in _interceptor._sequence)
+							total += tracking.CallCount;
+						return total;
+					}
+				}
+
+				/// <summary>Add another callback to the sequence.</summary>
+				public global::KnockOff.IMethodSequence<GetValueDelegate> ThenCall(GetValueDelegate callback, global::KnockOff.Times times)
+				{
+					var tracking = new MethodTrackingImpl();
+					_interceptor._sequence.Add((callback, times, tracking));
+					return this;
+				}
+
+				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+				public bool Verify()
+				{
+					foreach (var (_, times, tracking) in _interceptor._sequence)
+					{
+						if (!times.Verify(tracking.CallCount))
+							return false;
+					}
+					return true;
+				}
+
+				/// <summary>Reset all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+			}
+
 		}
 
-		/// <summary>Interceptor for IsMatch.</summary>
+		/// <summary>Tracks and configures behavior for IsMatch.</summary>
 		public sealed class ITriggerProperty_IsMatchInterceptor
 		{
-			/// <summary>Number of times this method was called.</summary>
-			public int CallCount { get; private set; }
+			/// <summary>Delegate for IsMatch.</summary>
+			public delegate bool IsMatchDelegate(Stubs.ITriggerProperty ko, string propertyName);
+
+			private readonly global::System.Collections.Generic.List<(IsMatchDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+			private int _sequenceIndex;
+			private int _unconfiguredCallCount;
+			private string? _unconfiguredLastArg;
+
+			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+			public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>The argument from the last call.</summary>
-			public string? LastCallArg { get; private set; }
+			/// <summary>The argument from the last call (from most recently called registration).</summary>
+			public string? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
-			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Func<Stubs.ITriggerProperty, string, bool>? OnCall { get; set; }
 
-			public void RecordCall(string propertyName) { CallCount++; LastCallArg = propertyName; }
+			/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<string> OnCall(IsMatchDelegate callback)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequenceIndex = 0;
+				return tracking;
+			}
 
-			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+			/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+			public global::KnockOff.IMethodSequence<IsMatchDelegate> OnCall(IsMatchDelegate callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, times, tracking));
+				_sequenceIndex = 0;
+				return new MethodSequenceImpl(this);
+			}
+
+			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+			internal bool Invoke(Stubs.ITriggerProperty ko, string propertyName)
+			{
+				if (_sequence.Count == 0)
+				{
+					_unconfiguredCallCount++;
+					_unconfiguredLastArg = propertyName;
+					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "IsMatch");
+					return default!;
+				}
+
+				var (callback, times, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall(propertyName);
+
+				if (!times.IsForever && tracking.CallCount >= times.Count)
+				{
+					if (_sequenceIndex < _sequence.Count - 1)
+						_sequenceIndex++;
+					else if (tracking.CallCount > times.Count)
+						throw global::KnockOff.StubException.SequenceExhausted("IsMatch");
+				}
+
+				return callback(ko, propertyName);
+			}
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset()
+			{
+				_unconfiguredCallCount = 0;
+				_unconfiguredLastArg = default;
+				foreach (var (_, _, tracking) in _sequence)
+					tracking.Reset();
+				_sequenceIndex = 0;
+			}
+
+			/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _sequence)
+				{
+					if (times.IsForever)
+					{
+						if (!tracking.WasCalled)
+							return false;
+					}
+					else if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Tracks invocations for this callback registration.</summary>
+			private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking<string>
+			{
+				private string _lastArg = default!;
+
+				/// <summary>Number of times this callback was invoked.</summary>
+				public int CallCount { get; private set; }
+
+				/// <summary>True if CallCount > 0.</summary>
+				public bool WasCalled => CallCount > 0;
+
+				/// <summary>Last argument passed to this callback. Default if never called.</summary>
+				public string LastArg => _lastArg;
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall(string propertyName) { CallCount++; _lastArg = propertyName; }
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() { CallCount = 0; _lastArg = default!; }
+			}
+
+			/// <summary>Sequence implementation for ThenCall chaining.</summary>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<IsMatchDelegate>
+			{
+				private readonly ITriggerProperty_IsMatchInterceptor _interceptor;
+
+				public MethodSequenceImpl(ITriggerProperty_IsMatchInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Total calls across all callbacks in sequence.</summary>
+				public int TotalCallCount
+				{
+					get
+					{
+						var total = 0;
+						foreach (var (_, _, tracking) in _interceptor._sequence)
+							total += tracking.CallCount;
+						return total;
+					}
+				}
+
+				/// <summary>Add another callback to the sequence.</summary>
+				public global::KnockOff.IMethodSequence<IsMatchDelegate> ThenCall(IsMatchDelegate callback, global::KnockOff.Times times)
+				{
+					var tracking = new MethodTrackingImpl();
+					_interceptor._sequence.Add((callback, times, tracking));
+					return this;
+				}
+
+				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+				public bool Verify()
+				{
+					foreach (var (_, times, tracking) in _interceptor._sequence)
+					{
+						if (!times.Verify(tracking.CallCount))
+							return false;
+					}
+					return true;
+				}
+
+				/// <summary>Reset all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+			}
+
 		}
 
 		/// <summary>Stub implementation of global::Neatoo.Rules.ITriggerProperty<global::Neatoo.IValidateBase>.</summary>
@@ -81,18 +355,12 @@ partial class ITriggerPropertyOfTTests
 
 			object? global::Neatoo.Rules.ITriggerProperty<global::Neatoo.IValidateBase>.GetValue(global::Neatoo.IValidateBase target)
 			{
-				GetValue.RecordCall(target);
-				if (GetValue.OnCall is { } onCall) return onCall(this, target);
-				if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "GetValue");
-				return default!;
+				return GetValue.Invoke(this, target);
 			}
 
 			bool global::Neatoo.Rules.ITriggerProperty.IsMatch(string propertyName)
 			{
-				IsMatch.RecordCall(propertyName);
-				if (IsMatch.OnCall is { } onCall) return onCall(this, propertyName);
-				if (Strict) throw global::KnockOff.StubException.NotConfigured("ITriggerProperty", "IsMatch");
-				return default!;
+				return IsMatch.Invoke(this, propertyName);
 			}
 
 			string global::Neatoo.Rules.ITriggerProperty.PropertyName

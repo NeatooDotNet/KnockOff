@@ -8,24 +8,161 @@ partial class EquatableStringStubTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for Equals.</summary>
+		/// <summary>Tracks and configures behavior for Equals.</summary>
 		public sealed class IEquatable_EqualsInterceptor
 		{
-			/// <summary>Number of times this method was called.</summary>
-			public int CallCount { get; private set; }
+			/// <summary>Delegate for Equals.</summary>
+			public delegate bool EqualsDelegate(Stubs.IEquatable ko, string? other);
+
+			private readonly global::System.Collections.Generic.List<(EqualsDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+			private int _sequenceIndex;
+			private int _unconfiguredCallCount;
+			private string? _unconfiguredLastArg;
+
+			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+			public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>The argument from the last call.</summary>
-			public string? LastCallArg { get; private set; }
+			/// <summary>The argument from the last call (from most recently called registration).</summary>
+			public string? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
-			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Func<Stubs.IEquatable, string?, bool>? OnCall { get; set; }
 
-			public void RecordCall(string? other) { CallCount++; LastCallArg = other; }
+			/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<string?> OnCall(EqualsDelegate callback)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequenceIndex = 0;
+				return tracking;
+			}
 
-			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+			/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+			public global::KnockOff.IMethodSequence<EqualsDelegate> OnCall(EqualsDelegate callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, times, tracking));
+				_sequenceIndex = 0;
+				return new MethodSequenceImpl(this);
+			}
+
+			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+			internal bool Invoke(Stubs.IEquatable ko, string? other)
+			{
+				if (_sequence.Count == 0)
+				{
+					_unconfiguredCallCount++;
+					_unconfiguredLastArg = other;
+					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Equals");
+					return default!;
+				}
+
+				var (callback, times, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall(other);
+
+				if (!times.IsForever && tracking.CallCount >= times.Count)
+				{
+					if (_sequenceIndex < _sequence.Count - 1)
+						_sequenceIndex++;
+					else if (tracking.CallCount > times.Count)
+						throw global::KnockOff.StubException.SequenceExhausted("Equals");
+				}
+
+				return callback(ko, other);
+			}
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset()
+			{
+				_unconfiguredCallCount = 0;
+				_unconfiguredLastArg = default;
+				foreach (var (_, _, tracking) in _sequence)
+					tracking.Reset();
+				_sequenceIndex = 0;
+			}
+
+			/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _sequence)
+				{
+					if (times.IsForever)
+					{
+						if (!tracking.WasCalled)
+							return false;
+					}
+					else if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Tracks invocations for this callback registration.</summary>
+			private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking<string?>
+			{
+				private string? _lastArg = default!;
+
+				/// <summary>Number of times this callback was invoked.</summary>
+				public int CallCount { get; private set; }
+
+				/// <summary>True if CallCount > 0.</summary>
+				public bool WasCalled => CallCount > 0;
+
+				/// <summary>Last argument passed to this callback. Default if never called.</summary>
+				public string? LastArg => _lastArg;
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall(string? other) { CallCount++; _lastArg = other; }
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() { CallCount = 0; _lastArg = default!; }
+			}
+
+			/// <summary>Sequence implementation for ThenCall chaining.</summary>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<EqualsDelegate>
+			{
+				private readonly IEquatable_EqualsInterceptor _interceptor;
+
+				public MethodSequenceImpl(IEquatable_EqualsInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Total calls across all callbacks in sequence.</summary>
+				public int TotalCallCount
+				{
+					get
+					{
+						var total = 0;
+						foreach (var (_, _, tracking) in _interceptor._sequence)
+							total += tracking.CallCount;
+						return total;
+					}
+				}
+
+				/// <summary>Add another callback to the sequence.</summary>
+				public global::KnockOff.IMethodSequence<EqualsDelegate> ThenCall(EqualsDelegate callback, global::KnockOff.Times times)
+				{
+					var tracking = new MethodTrackingImpl();
+					_interceptor._sequence.Add((callback, times, tracking));
+					return this;
+				}
+
+				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+				public bool Verify()
+				{
+					foreach (var (_, times, tracking) in _interceptor._sequence)
+					{
+						if (!times.Verify(tracking.CallCount))
+							return false;
+					}
+					return true;
+				}
+
+				/// <summary>Reset all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+			}
+
 		}
 
 		/// <summary>Stub implementation of global::System.IEquatable<string>.</summary>
@@ -36,10 +173,7 @@ partial class EquatableStringStubTests
 
 			bool global::System.IEquatable<string>.Equals(string? other)
 			{
-				Equals.RecordCall(other);
-				if (Equals.OnCall is { } onCall) return onCall(this, other);
-				if (Strict) throw global::KnockOff.StubException.NotConfigured("IEquatable<string>", "Equals");
-				return default!;
+				return Equals.Invoke(this, other);
 			}
 
 			/// <summary>The global::System.IEquatable<string> instance. Use for passing to code expecting the interface.</summary>

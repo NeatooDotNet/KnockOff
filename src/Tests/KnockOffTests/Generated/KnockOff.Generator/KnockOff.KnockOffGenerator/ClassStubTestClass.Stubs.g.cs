@@ -65,25 +65,32 @@ partial class ClassStubTestClass
 		}
 
 		/// <summary>Interceptor for SimpleService.DoWork.</summary>
-		public sealed class SimpleService_DoWorkInterceptor
+		public sealed class SimpleService_DoWorkInterceptor : global::KnockOff.IMethodTracking
 		{
+			private global::System.Action<Stubs.SimpleService>? _onCall;
+
 			/// <summary>Number of times this method was called.</summary>
 			public int CallCount { get; private set; }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when method is called. If set, called instead of base.</summary>
-			public global::System.Action<Stubs.SimpleService>? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.SimpleService> callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal global::System.Action<Stubs.SimpleService>? Callback => _onCall;
 
 			public void RecordCall() { CallCount++; }
 
-			public void Reset() { CallCount = 0; OnCall = null; }
+			public void Reset() { CallCount = 0; _onCall = null; }
 		}
 
 		/// <summary>Interceptor for SimpleService.Calculate.</summary>
-		public sealed class SimpleService_CalculateInterceptor
+		public sealed class SimpleService_CalculateInterceptor : global::KnockOff.IMethodTracking
 		{
+			private global::System.Func<Stubs.SimpleService, int, int>? _onCall;
+
 			/// <summary>Number of times this method was called.</summary>
 			public int CallCount { get; private set; }
 
@@ -93,17 +100,22 @@ partial class ClassStubTestClass
 			/// <summary>The argument from the last call.</summary>
 			public int? LastCallArg { get; private set; }
 
-			/// <summary>Callback invoked when method is called. If set, called instead of base.</summary>
-			public global::System.Func<Stubs.SimpleService, int, int>? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(global::System.Func<Stubs.SimpleService, int, int> callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal global::System.Func<Stubs.SimpleService, int, int>? Callback => _onCall;
 
 			public void RecordCall(int x) { CallCount++; LastCallArg = x; }
 
-			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+			public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }
 		}
 
 		/// <summary>Interceptor for SimpleService.Format.</summary>
-		public sealed class SimpleService_FormatInterceptor
+		public sealed class SimpleService_FormatInterceptor : global::KnockOff.IMethodTracking
 		{
+			private global::System.Func<Stubs.SimpleService, string, int, string>? _onCall;
+
 			/// <summary>Number of times this method was called.</summary>
 			public int CallCount { get; private set; }
 
@@ -113,12 +125,15 @@ partial class ClassStubTestClass
 			/// <summary>The arguments from the last call.</summary>
 			public (string? input, int? count)? LastCallArgs { get; private set; }
 
-			/// <summary>Callback invoked when method is called. If set, called instead of base.</summary>
-			public global::System.Func<Stubs.SimpleService, string, int, string>? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(global::System.Func<Stubs.SimpleService, string, int, string> callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal global::System.Func<Stubs.SimpleService, string, int, string>? Callback => _onCall;
 
 			public void RecordCall(string input, int count) { CallCount++; LastCallArgs = (input, count); }
 
-			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+			public void Reset() { CallCount = 0; LastCallArgs = default; _onCall = null; }
 		}
 
 		/// <summary>Stub for global::KnockOff.Tests.SimpleService via composition.</summary>
@@ -214,7 +229,7 @@ partial class ClassStubTestClass
 				public override void DoWork()
 				{
 					_stub?.DoWork.RecordCall();
-					if (_stub?.DoWork.OnCall is { } onCall) { onCall(_stub); return; }
+					if (_stub?.DoWork.Callback is { } onCall) { onCall(_stub); return; }
 					base.DoWork();
 				}
 
@@ -222,7 +237,7 @@ partial class ClassStubTestClass
 				public override int Calculate(int x)
 				{
 					_stub?.Calculate.RecordCall(x);
-					if (_stub?.Calculate.OnCall is { } onCall) return onCall(_stub, x);
+					if (_stub?.Calculate.Callback is { } onCall) return onCall(_stub, x);
 					return base.Calculate(x);
 				}
 
@@ -230,7 +245,7 @@ partial class ClassStubTestClass
 				public override string Format(string input, int count)
 				{
 					_stub?.Format.RecordCall(input, count);
-					if (_stub?.Format.OnCall is { } onCall) return onCall(_stub, input, count);
+					if (_stub?.Format.Callback is { } onCall) return onCall(_stub, input, count);
 					return base.Format(input, count);
 				}
 

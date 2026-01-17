@@ -8,44 +8,318 @@ partial class InlineMixedReturnTypesStub
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for Fetch1.</summary>
+		/// <summary>Tracks and configures behavior for Fetch1.</summary>
 		public sealed class IFactoryWithMixedReturnTypes_Fetch1Interceptor
 		{
-			/// <summary>Number of times this method was called.</summary>
-			public int CallCount { get; private set; }
+			/// <summary>Delegate for Fetch1.</summary>
+			public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleArea?> Fetch1Delegate(Stubs.IFactoryWithMixedReturnTypes ko, long id);
+
+			private readonly global::System.Collections.Generic.List<(Fetch1Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+			private int _sequenceIndex;
+			private int _unconfiguredCallCount;
+			private long? _unconfiguredLastArg;
+
+			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+			public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>The argument from the last call.</summary>
-			public long? LastCallArg { get; private set; }
+			/// <summary>The argument from the last call (from most recently called registration).</summary>
+			public long? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
-			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Func<Stubs.IFactoryWithMixedReturnTypes, long, global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleArea?>>? OnCall { get; set; }
 
-			public void RecordCall(long id) { CallCount++; LastCallArg = id; }
+			/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<long> OnCall(Fetch1Delegate callback)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequenceIndex = 0;
+				return tracking;
+			}
 
-			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+			/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+			public global::KnockOff.IMethodSequence<Fetch1Delegate> OnCall(Fetch1Delegate callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, times, tracking));
+				_sequenceIndex = 0;
+				return new MethodSequenceImpl(this);
+			}
+
+			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+			internal global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleArea?> Invoke(Stubs.IFactoryWithMixedReturnTypes ko, long id)
+			{
+				if (_sequence.Count == 0)
+				{
+					_unconfiguredCallCount++;
+					_unconfiguredLastArg = id;
+					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Fetch1");
+					return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.ISampleArea?>(default!);
+				}
+
+				var (callback, times, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall(id);
+
+				if (!times.IsForever && tracking.CallCount >= times.Count)
+				{
+					if (_sequenceIndex < _sequence.Count - 1)
+						_sequenceIndex++;
+					else if (tracking.CallCount > times.Count)
+						throw global::KnockOff.StubException.SequenceExhausted("Fetch1");
+				}
+
+				return callback(ko, id);
+			}
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset()
+			{
+				_unconfiguredCallCount = 0;
+				_unconfiguredLastArg = default;
+				foreach (var (_, _, tracking) in _sequence)
+					tracking.Reset();
+				_sequenceIndex = 0;
+			}
+
+			/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _sequence)
+				{
+					if (times.IsForever)
+					{
+						if (!tracking.WasCalled)
+							return false;
+					}
+					else if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Tracks invocations for this callback registration.</summary>
+			private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking<long>
+			{
+				private long _lastArg = default!;
+
+				/// <summary>Number of times this callback was invoked.</summary>
+				public int CallCount { get; private set; }
+
+				/// <summary>True if CallCount > 0.</summary>
+				public bool WasCalled => CallCount > 0;
+
+				/// <summary>Last argument passed to this callback. Default if never called.</summary>
+				public long LastArg => _lastArg;
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall(long id) { CallCount++; _lastArg = id; }
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() { CallCount = 0; _lastArg = default!; }
+			}
+
+			/// <summary>Sequence implementation for ThenCall chaining.</summary>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<Fetch1Delegate>
+			{
+				private readonly IFactoryWithMixedReturnTypes_Fetch1Interceptor _interceptor;
+
+				public MethodSequenceImpl(IFactoryWithMixedReturnTypes_Fetch1Interceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Total calls across all callbacks in sequence.</summary>
+				public int TotalCallCount
+				{
+					get
+					{
+						var total = 0;
+						foreach (var (_, _, tracking) in _interceptor._sequence)
+							total += tracking.CallCount;
+						return total;
+					}
+				}
+
+				/// <summary>Add another callback to the sequence.</summary>
+				public global::KnockOff.IMethodSequence<Fetch1Delegate> ThenCall(Fetch1Delegate callback, global::KnockOff.Times times)
+				{
+					var tracking = new MethodTrackingImpl();
+					_interceptor._sequence.Add((callback, times, tracking));
+					return this;
+				}
+
+				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+				public bool Verify()
+				{
+					foreach (var (_, times, tracking) in _interceptor._sequence)
+					{
+						if (!times.Verify(tracking.CallCount))
+							return false;
+					}
+					return true;
+				}
+
+				/// <summary>Reset all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+			}
+
 		}
 
-		/// <summary>Interceptor for Fetch2.</summary>
+		/// <summary>Tracks and configures behavior for Fetch2.</summary>
 		public sealed class IFactoryWithMixedReturnTypes_Fetch2Interceptor
 		{
-			/// <summary>Number of times this method was called.</summary>
-			public int CallCount { get; private set; }
+			/// <summary>Delegate for Fetch2.</summary>
+			public delegate global::KnockOff.Tests.ISampleArea Fetch2Delegate(Stubs.IFactoryWithMixedReturnTypes ko, global::KnockOff.Tests.SampleEntity entity);
+
+			private readonly global::System.Collections.Generic.List<(Fetch2Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+			private int _sequenceIndex;
+			private int _unconfiguredCallCount;
+			private global::KnockOff.Tests.SampleEntity? _unconfiguredLastArg;
+
+			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+			public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>The argument from the last call.</summary>
-			public global::KnockOff.Tests.SampleEntity? LastCallArg { get; private set; }
+			/// <summary>The argument from the last call (from most recently called registration).</summary>
+			public global::KnockOff.Tests.SampleEntity? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
-			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Func<Stubs.IFactoryWithMixedReturnTypes, global::KnockOff.Tests.SampleEntity, global::KnockOff.Tests.ISampleArea>? OnCall { get; set; }
 
-			public void RecordCall(global::KnockOff.Tests.SampleEntity entity) { CallCount++; LastCallArg = entity; }
+			/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<global::KnockOff.Tests.SampleEntity> OnCall(Fetch2Delegate callback)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequenceIndex = 0;
+				return tracking;
+			}
 
-			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+			/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+			public global::KnockOff.IMethodSequence<Fetch2Delegate> OnCall(Fetch2Delegate callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, times, tracking));
+				_sequenceIndex = 0;
+				return new MethodSequenceImpl(this);
+			}
+
+			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+			internal global::KnockOff.Tests.ISampleArea Invoke(Stubs.IFactoryWithMixedReturnTypes ko, global::KnockOff.Tests.SampleEntity entity)
+			{
+				if (_sequence.Count == 0)
+				{
+					_unconfiguredCallCount++;
+					_unconfiguredLastArg = entity;
+					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Fetch2");
+					return default!;
+				}
+
+				var (callback, times, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall(entity);
+
+				if (!times.IsForever && tracking.CallCount >= times.Count)
+				{
+					if (_sequenceIndex < _sequence.Count - 1)
+						_sequenceIndex++;
+					else if (tracking.CallCount > times.Count)
+						throw global::KnockOff.StubException.SequenceExhausted("Fetch2");
+				}
+
+				return callback(ko, entity);
+			}
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset()
+			{
+				_unconfiguredCallCount = 0;
+				_unconfiguredLastArg = default;
+				foreach (var (_, _, tracking) in _sequence)
+					tracking.Reset();
+				_sequenceIndex = 0;
+			}
+
+			/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _sequence)
+				{
+					if (times.IsForever)
+					{
+						if (!tracking.WasCalled)
+							return false;
+					}
+					else if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Tracks invocations for this callback registration.</summary>
+			private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking<global::KnockOff.Tests.SampleEntity>
+			{
+				private global::KnockOff.Tests.SampleEntity _lastArg = default!;
+
+				/// <summary>Number of times this callback was invoked.</summary>
+				public int CallCount { get; private set; }
+
+				/// <summary>True if CallCount > 0.</summary>
+				public bool WasCalled => CallCount > 0;
+
+				/// <summary>Last argument passed to this callback. Default if never called.</summary>
+				public global::KnockOff.Tests.SampleEntity LastArg => _lastArg;
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall(global::KnockOff.Tests.SampleEntity entity) { CallCount++; _lastArg = entity; }
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() { CallCount = 0; _lastArg = default!; }
+			}
+
+			/// <summary>Sequence implementation for ThenCall chaining.</summary>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<Fetch2Delegate>
+			{
+				private readonly IFactoryWithMixedReturnTypes_Fetch2Interceptor _interceptor;
+
+				public MethodSequenceImpl(IFactoryWithMixedReturnTypes_Fetch2Interceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Total calls across all callbacks in sequence.</summary>
+				public int TotalCallCount
+				{
+					get
+					{
+						var total = 0;
+						foreach (var (_, _, tracking) in _interceptor._sequence)
+							total += tracking.CallCount;
+						return total;
+					}
+				}
+
+				/// <summary>Add another callback to the sequence.</summary>
+				public global::KnockOff.IMethodSequence<Fetch2Delegate> ThenCall(Fetch2Delegate callback, global::KnockOff.Times times)
+				{
+					var tracking = new MethodTrackingImpl();
+					_interceptor._sequence.Add((callback, times, tracking));
+					return this;
+				}
+
+				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+				public bool Verify()
+				{
+					foreach (var (_, times, tracking) in _interceptor._sequence)
+					{
+						if (!times.Verify(tracking.CallCount))
+							return false;
+					}
+					return true;
+				}
+
+				/// <summary>Reset all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+			}
+
 		}
 
 		/// <summary>Stub implementation of global::KnockOff.Tests.IFactoryWithMixedReturnTypes.</summary>
@@ -59,18 +333,12 @@ partial class InlineMixedReturnTypesStub
 
 			global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleArea?> global::KnockOff.Tests.IFactoryWithMixedReturnTypes.Fetch(long id)
 			{
-				Fetch1.RecordCall(id);
-				if (Fetch1.OnCall is { } onCall) return onCall(this, id);
-				if (Strict) throw global::KnockOff.StubException.NotConfigured("IFactoryWithMixedReturnTypes", "Fetch");
-				return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.ISampleArea?>(default!);
+				return Fetch1.Invoke(this, id);
 			}
 
 			global::KnockOff.Tests.ISampleArea global::KnockOff.Tests.IFactoryWithMixedReturnTypes.Fetch(global::KnockOff.Tests.SampleEntity entity)
 			{
-				Fetch2.RecordCall(entity);
-				if (Fetch2.OnCall is { } onCall) return onCall(this, entity);
-				if (Strict) throw global::KnockOff.StubException.NotConfigured("IFactoryWithMixedReturnTypes", "Fetch");
-				throw new global::System.InvalidOperationException("No implementation provided for Fetch. Set Fetch2.OnCall.");
+				return Fetch2.Invoke(this, entity);
 			}
 
 			/// <summary>The global::KnockOff.Tests.IFactoryWithMixedReturnTypes instance. Use for passing to code expecting the interface.</summary>

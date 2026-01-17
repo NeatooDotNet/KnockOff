@@ -13,6 +13,14 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 
 		private readonly global::System.Collections.Generic.List<(DoWorkAsyncDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(DoWorkAsyncDelegate callback)
@@ -39,6 +47,7 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "DoWorkAsync");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -60,6 +69,7 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -70,7 +80,6 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -140,6 +149,7 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for GetOptionalAsync.</summary>
@@ -150,6 +160,14 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 
 		private readonly global::System.Collections.Generic.List<(GetOptionalAsyncDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetOptionalAsyncDelegate callback)
@@ -176,6 +194,7 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetOptionalAsync");
 				return global::System.Threading.Tasks.Task.FromResult<string?>(default!);
 			}
@@ -197,6 +216,7 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -207,7 +227,6 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -277,6 +296,7 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for GetRequiredAsync.</summary>
@@ -287,6 +307,14 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 
 		private readonly global::System.Collections.Generic.List<(GetRequiredAsyncDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetRequiredAsyncDelegate callback)
@@ -313,8 +341,9 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetRequiredAsync");
-				throw new global::System.InvalidOperationException("No implementation provided for GetRequiredAsync. Configure via GetRequiredAsync.OnCall.");
+				throw new global::System.InvalidOperationException("No implementation provided for GetRequiredAsync. Configure via OnCall.");
 			}
 
 			var (callback, times, tracking) = _sequence[_sequenceIndex];
@@ -334,6 +363,7 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -344,7 +374,6 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -414,6 +443,7 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for DoWorkValueTaskAsync.</summary>
@@ -424,6 +454,14 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 
 		private readonly global::System.Collections.Generic.List<(DoWorkValueTaskAsyncDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(DoWorkValueTaskAsyncDelegate callback)
@@ -450,6 +488,7 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "DoWorkValueTaskAsync");
 				return default;
 			}
@@ -471,6 +510,7 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -481,7 +521,6 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -551,6 +590,7 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks calls to GetValueAsync (user-defined implementation).</summary>

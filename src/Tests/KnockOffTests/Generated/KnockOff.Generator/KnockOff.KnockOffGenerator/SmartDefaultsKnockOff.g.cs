@@ -51,6 +51,14 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private readonly global::System.Collections.Generic.List<(GetIntDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetIntDelegate callback)
@@ -77,6 +85,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetInt");
 				return default!;
 			}
@@ -98,6 +107,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -108,7 +118,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -178,6 +187,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for GetBool.</summary>
@@ -188,6 +198,14 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private readonly global::System.Collections.Generic.List<(GetBoolDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetBoolDelegate callback)
@@ -214,6 +232,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetBool");
 				return default!;
 			}
@@ -235,6 +254,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -245,7 +265,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -315,6 +334,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for GetDateTime.</summary>
@@ -325,6 +345,14 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private readonly global::System.Collections.Generic.List<(GetDateTimeDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetDateTimeDelegate callback)
@@ -351,6 +379,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetDateTime");
 				return default!;
 			}
@@ -372,6 +401,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -382,7 +412,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -452,6 +481,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for GetNullableString.</summary>
@@ -462,6 +492,14 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private readonly global::System.Collections.Generic.List<(GetNullableStringDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetNullableStringDelegate callback)
@@ -488,6 +526,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetNullableString");
 				return default!;
 			}
@@ -509,6 +548,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -519,7 +559,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -589,6 +628,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for GetNullableEntity.</summary>
@@ -599,6 +639,14 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private readonly global::System.Collections.Generic.List<(GetNullableEntityDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetNullableEntityDelegate callback)
@@ -625,6 +673,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetNullableEntity");
 				return default!;
 			}
@@ -646,6 +695,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -656,7 +706,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -726,6 +775,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for GetList.</summary>
@@ -736,6 +786,14 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private readonly global::System.Collections.Generic.List<(GetListDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetListDelegate callback)
@@ -762,6 +820,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetList");
 				return new global::System.Collections.Generic.List<string>();
 			}
@@ -783,6 +842,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -793,7 +853,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -863,6 +922,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for GetDictionary.</summary>
@@ -873,6 +933,14 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private readonly global::System.Collections.Generic.List<(GetDictionaryDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetDictionaryDelegate callback)
@@ -899,6 +967,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetDictionary");
 				return new global::System.Collections.Generic.Dictionary<string, int>();
 			}
@@ -920,6 +989,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -930,7 +1000,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1000,6 +1069,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for GetEntity.</summary>
@@ -1010,6 +1080,14 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private readonly global::System.Collections.Generic.List<(GetEntityDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetEntityDelegate callback)
@@ -1036,6 +1114,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetEntity");
 				return new global::KnockOff.Tests.TestEntity();
 			}
@@ -1057,6 +1136,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1067,7 +1147,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1137,6 +1216,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for GetIList.</summary>
@@ -1147,6 +1227,14 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private readonly global::System.Collections.Generic.List<(GetIListDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetIListDelegate callback)
@@ -1173,6 +1261,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetIList");
 				return new global::System.Collections.Generic.List<string>();
 			}
@@ -1194,6 +1283,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1204,7 +1294,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1274,6 +1363,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for GetString.</summary>
@@ -1284,6 +1374,14 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private readonly global::System.Collections.Generic.List<(GetStringDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetStringDelegate callback)
@@ -1310,8 +1408,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetString");
-				throw new global::System.InvalidOperationException("No implementation provided for GetString. Configure via GetString.OnCall.");
+				throw new global::System.InvalidOperationException("No implementation provided for GetString. Configure via OnCall.");
 			}
 
 			var (callback, times, tracking) = _sequence[_sequenceIndex];
@@ -1331,6 +1430,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1341,7 +1441,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1411,6 +1510,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for GetDisposable.</summary>
@@ -1421,6 +1521,14 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private readonly global::System.Collections.Generic.List<(GetDisposableDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetDisposableDelegate callback)
@@ -1447,8 +1555,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetDisposable");
-				throw new global::System.InvalidOperationException("No implementation provided for GetDisposable. Configure via GetDisposable.OnCall.");
+				throw new global::System.InvalidOperationException("No implementation provided for GetDisposable. Configure via OnCall.");
 			}
 
 			var (callback, times, tracking) = _sequence[_sequenceIndex];
@@ -1468,6 +1577,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1478,7 +1588,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1548,6 +1657,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for GetIntAsync.</summary>
@@ -1558,6 +1668,14 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private readonly global::System.Collections.Generic.List<(GetIntAsyncDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetIntAsyncDelegate callback)
@@ -1584,6 +1702,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetIntAsync");
 				return global::System.Threading.Tasks.Task.FromResult<int>(default!);
 			}
@@ -1605,6 +1724,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1615,7 +1735,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1685,6 +1804,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for GetListAsync.</summary>
@@ -1695,6 +1815,14 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private readonly global::System.Collections.Generic.List<(GetListAsyncDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetListAsyncDelegate callback)
@@ -1721,6 +1849,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetListAsync");
 				return global::System.Threading.Tasks.Task.FromResult<global::System.Collections.Generic.List<string>>(new global::System.Collections.Generic.List<string>());
 			}
@@ -1742,6 +1871,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1752,7 +1882,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1822,6 +1951,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for GetStringAsync.</summary>
@@ -1832,6 +1962,14 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private readonly global::System.Collections.Generic.List<(GetStringAsyncDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetStringAsyncDelegate callback)
@@ -1858,8 +1996,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetStringAsync");
-				throw new global::System.InvalidOperationException("No implementation provided for GetStringAsync. Configure via GetStringAsync.OnCall.");
+				throw new global::System.InvalidOperationException("No implementation provided for GetStringAsync. Configure via OnCall.");
 			}
 
 			var (callback, times, tracking) = _sequence[_sequenceIndex];
@@ -1879,6 +2018,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1889,7 +2029,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1959,6 +2098,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Interceptor for Count. Configure via .Value, track via .GetCount.</summary>

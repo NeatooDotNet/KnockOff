@@ -120,7 +120,7 @@ public partial class SpUserServiceTests
         var repoStub = new Stubs.ISpUserRepository();
         var emailStub = new Stubs.ISpEmailService();
 
-        repoStub.GetById.OnCall = (ko, id) => new SpUser { Id = id };
+        repoStub.GetById.OnCall((ko, id) => new SpUser { Id = id });
 
         // var service = new UserService(repoStub.Object, emailStub.Object);
         _ = (repoStub, emailStub);
@@ -151,7 +151,7 @@ public partial class SpNotificationTests
         var stub = new Stubs.SpEmailServiceClass();
 
         // Configure virtual methods (OnCall is a property for inline stubs)
-        stub.Send.OnCall = (ko, to, body) => { };
+        stub.Send.OnCall((ko, to, body) => { });
 
         // Use .Object to get the class instance
         SpEmailServiceClass service = stub.Object;

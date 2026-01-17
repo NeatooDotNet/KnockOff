@@ -108,21 +108,151 @@ partial class IPropertyInfoTests
 			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for GetCustomAttributes.</summary>
+		/// <summary>Tracks and configures behavior for GetCustomAttributes.</summary>
 		public sealed class IPropertyInfo_GetCustomAttributesInterceptor
 		{
-			/// <summary>Number of times this method was called.</summary>
-			public int CallCount { get; private set; }
+			/// <summary>Delegate for GetCustomAttributes.</summary>
+			public delegate global::System.Collections.Generic.IEnumerable<global::System.Attribute> GetCustomAttributesDelegate(Stubs.IPropertyInfo ko);
+
+			private readonly global::System.Collections.Generic.List<(GetCustomAttributesDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+			private int _sequenceIndex;
+			private int _unconfiguredCallCount;
+
+			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+			public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Func<Stubs.IPropertyInfo, global::System.Collections.Generic.IEnumerable<global::System.Attribute>>? OnCall { get; set; }
 
-			public void RecordCall() { CallCount++; }
+			/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking OnCall(GetCustomAttributesDelegate callback)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequenceIndex = 0;
+				return tracking;
+			}
 
-			public void Reset() { CallCount = 0; OnCall = null; }
+			/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+			public global::KnockOff.IMethodSequence<GetCustomAttributesDelegate> OnCall(GetCustomAttributesDelegate callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, times, tracking));
+				_sequenceIndex = 0;
+				return new MethodSequenceImpl(this);
+			}
+
+			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+			internal global::System.Collections.Generic.IEnumerable<global::System.Attribute> Invoke(Stubs.IPropertyInfo ko)
+			{
+				if (_sequence.Count == 0)
+				{
+					_unconfiguredCallCount++;
+					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetCustomAttributes");
+					throw new global::System.InvalidOperationException("No implementation provided for GetCustomAttributes. Configure via OnCall.");
+				}
+
+				var (callback, times, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall();
+
+				if (!times.IsForever && tracking.CallCount >= times.Count)
+				{
+					if (_sequenceIndex < _sequence.Count - 1)
+						_sequenceIndex++;
+					else if (tracking.CallCount > times.Count)
+						throw global::KnockOff.StubException.SequenceExhausted("GetCustomAttributes");
+				}
+
+				return callback(ko);
+			}
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset()
+			{
+				_unconfiguredCallCount = 0;
+				foreach (var (_, _, tracking) in _sequence)
+					tracking.Reset();
+				_sequenceIndex = 0;
+			}
+
+			/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _sequence)
+				{
+					if (times.IsForever)
+					{
+						if (!tracking.WasCalled)
+							return false;
+					}
+					else if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Tracks invocations for this callback registration.</summary>
+			private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking
+			{
+
+				/// <summary>Number of times this callback was invoked.</summary>
+				public int CallCount { get; private set; }
+
+				/// <summary>True if CallCount > 0.</summary>
+				public bool WasCalled => CallCount > 0;
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall() => CallCount++;
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() => CallCount = 0;
+			}
+
+			/// <summary>Sequence implementation for ThenCall chaining.</summary>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<GetCustomAttributesDelegate>
+			{
+				private readonly IPropertyInfo_GetCustomAttributesInterceptor _interceptor;
+
+				public MethodSequenceImpl(IPropertyInfo_GetCustomAttributesInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Total calls across all callbacks in sequence.</summary>
+				public int TotalCallCount
+				{
+					get
+					{
+						var total = 0;
+						foreach (var (_, _, tracking) in _interceptor._sequence)
+							total += tracking.CallCount;
+						return total;
+					}
+				}
+
+				/// <summary>Add another callback to the sequence.</summary>
+				public global::KnockOff.IMethodSequence<GetCustomAttributesDelegate> ThenCall(GetCustomAttributesDelegate callback, global::KnockOff.Times times)
+				{
+					var tracking = new MethodTrackingImpl();
+					_interceptor._sequence.Add((callback, times, tracking));
+					return this;
+				}
+
+				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+				public bool Verify()
+				{
+					foreach (var (_, times, tracking) in _interceptor._sequence)
+					{
+						if (!times.Verify(tracking.CallCount))
+							return false;
+					}
+					return true;
+				}
+
+				/// <summary>Reset all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+			}
+
 		}
 
 		/// <summary>Interceptor for GetCustomAttribute.</summary>
@@ -160,10 +290,12 @@ partial class IPropertyInfoTests
 			}
 
 			/// <summary>Typed handler for GetCustomAttribute with specific type arguments.</summary>
-			public sealed class GetCustomAttributeTypedHandler<T> : IGenericMethodCallTracker, IResettable where T : global::System.Attribute
+			public sealed class GetCustomAttributeTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : global::System.Attribute
 			{
 				/// <summary>Delegate for GetCustomAttribute.</summary>
 				public delegate T? GetCustomAttributeDelegate(Stubs.IPropertyInfo ko);
+
+				private GetCustomAttributeDelegate? _onCall;
 
 				/// <summary>Number of times this method was called with these type arguments.</summary>
 				public int CallCount { get; private set; }
@@ -171,14 +303,17 @@ partial class IPropertyInfoTests
 				/// <summary>True if this method was called at least once with these type arguments.</summary>
 				public bool WasCalled => CallCount > 0;
 
-				/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-				public GetCustomAttributeDelegate? OnCall { get; set; }
+				/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
+				public global::KnockOff.IMethodTracking OnCall(GetCustomAttributeDelegate callback) { _onCall = callback; return this; }
+
+				/// <summary>Gets the configured callback (internal use).</summary>
+				internal GetCustomAttributeDelegate? Callback => _onCall;
 
 				/// <summary>Records a method call.</summary>
 				public void RecordCall() => CallCount++;
 
 				/// <summary>Resets all tracking state.</summary>
-				public void Reset() { CallCount = 0; OnCall = null; }
+				public void Reset() { CallCount = 0; _onCall = null; }
 			}
 		}
 
@@ -210,7 +345,7 @@ partial class IPropertyInfoTests
 			{
 				var typedHandler = GetCustomAttribute.Of<T>();
 				typedHandler.RecordCall();
-				if (typedHandler.OnCall is { } onCallCallback)
+				if (typedHandler.Callback is { } onCallCallback)
 					return onCallCallback(this);
 				if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "GetCustomAttribute");
 				return default!;
@@ -218,10 +353,7 @@ partial class IPropertyInfoTests
 
 			global::System.Collections.Generic.IEnumerable<global::System.Attribute> global::Neatoo.IPropertyInfo.GetCustomAttributes()
 			{
-				GetCustomAttributes.RecordCall();
-				if (GetCustomAttributes.OnCall is { } onCall) return onCall(this);
-				if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "GetCustomAttributes");
-				return new global::System.Collections.Generic.List<global::System.Attribute>();
+				return GetCustomAttributes.Invoke(this);
 			}
 
 			global::System.Reflection.PropertyInfo global::Neatoo.IPropertyInfo.PropertyInfo

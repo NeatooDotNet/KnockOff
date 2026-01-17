@@ -71,11 +71,11 @@ public partial class IRuleMessagesTests
         string? capturedProp = null;
         string? capturedMsg = null;
 
-        stub.Add.OnCall = (ko, prop, msg, item) =>
+        stub.Add.OnCall((ko, prop, msg) =>
         {
             capturedProp = prop;
             capturedMsg = msg;
-        };
+        });
 
         messages.Add("Name", "Required");
 
@@ -143,7 +143,7 @@ public partial class IRuleMessagesTests
         IList<IRuleMessage> list = stub;
 
         var messageStub = new RuleMessageStubForList();
-        stub.Contains.OnCall = (ko, item) => true;
+        stub.Contains.OnCall((ko, item) => true);
 
         var result = list.Contains(messageStub);
 
@@ -158,7 +158,7 @@ public partial class IRuleMessagesTests
         IList<IRuleMessage> list = stub;
 
         var messageStub = new RuleMessageStubForList();
-        stub.IndexOf.OnCall = (ko, item) => 3;
+        stub.IndexOf.OnCall((ko, item) => 3);
 
         var result = list.IndexOf(messageStub);
 
@@ -239,7 +239,7 @@ public partial class IRuleMessagesTests
         IEnumerable<IRuleMessage> enumerable = stub;
 
         var emptyEnumerator = new List<IRuleMessage>().GetEnumerator();
-        stub.GetEnumerator.OnCall = (ko) => emptyEnumerator;
+        stub.GetEnumerator.OnCall((ko) => emptyEnumerator);
 
         var enumerator = enumerable.GetEnumerator();
 

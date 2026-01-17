@@ -26,9 +26,9 @@ public class GenericMethodInvocationBenchmarks
         _moq = mock.Object;
 
         var stub = new ConverterStub();
-        stub.Convert.Of<int>().OnCall = (ko, v) => 42;
-        stub.Convert.Of<string>().OnCall = (ko, v) => "test";
-        stub.Transform.Of<int, string>().OnCall = (ko, v) => "converted";
+        stub.Convert.Of<int>().OnCall((ko, v) => 42);
+        stub.Convert.Of<string>().OnCall((ko, v) => "test");
+        stub.Transform.Of<int, string>().OnCall((ko, v) => "converted");
         _knockOff = stub;
     }
 
@@ -71,8 +71,8 @@ public class GenericMethodSetupBenchmarks
     public ConverterStub KnockOff_SetupGenericMethods()
     {
         var stub = new ConverterStub();
-        stub.Convert.Of<int>().OnCall = (ko, v) => 42;
-        stub.Convert.Of<string>().OnCall = (ko, v) => "test";
+        stub.Convert.Of<int>().OnCall((ko, v) => 42);
+        stub.Convert.Of<string>().OnCall((ko, v) => "test");
         return stub;
     }
 }

@@ -10,6 +10,14 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(global::System.Action<LargeServiceStub> callback)
@@ -36,6 +44,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethod01");
 				return;
 			}
@@ -57,6 +66,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -67,7 +77,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -137,6 +146,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for VoidMethod02.</summary>
@@ -144,6 +154,14 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(global::System.Action<LargeServiceStub> callback)
@@ -170,6 +188,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethod02");
 				return;
 			}
@@ -191,6 +210,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -201,7 +221,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -271,6 +290,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for VoidMethod03.</summary>
@@ -278,6 +298,14 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(global::System.Action<LargeServiceStub> callback)
@@ -304,6 +332,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethod03");
 				return;
 			}
@@ -325,6 +354,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -335,7 +365,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -405,6 +434,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for VoidMethod04.</summary>
@@ -412,6 +442,14 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(global::System.Action<LargeServiceStub> callback)
@@ -438,6 +476,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethod04");
 				return;
 			}
@@ -459,6 +498,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -469,7 +509,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -539,6 +578,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for VoidMethod05.</summary>
@@ -546,6 +586,14 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(global::System.Action<LargeServiceStub> callback)
@@ -572,6 +620,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethod05");
 				return;
 			}
@@ -593,6 +642,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -603,7 +653,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -673,6 +722,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for VoidMethod06.</summary>
@@ -680,6 +730,14 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(global::System.Action<LargeServiceStub> callback)
@@ -706,6 +764,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethod06");
 				return;
 			}
@@ -727,6 +786,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -737,7 +797,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -807,6 +866,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for VoidMethod07.</summary>
@@ -814,6 +874,14 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(global::System.Action<LargeServiceStub> callback)
@@ -840,6 +908,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethod07");
 				return;
 			}
@@ -861,6 +930,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -871,7 +941,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -941,6 +1010,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for VoidMethod08.</summary>
@@ -948,6 +1018,14 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(global::System.Action<LargeServiceStub> callback)
@@ -974,6 +1052,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethod08");
 				return;
 			}
@@ -995,6 +1074,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1005,7 +1085,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1075,6 +1154,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for VoidMethod09.</summary>
@@ -1082,6 +1162,14 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(global::System.Action<LargeServiceStub> callback)
@@ -1108,6 +1196,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethod09");
 				return;
 			}
@@ -1129,6 +1218,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1139,7 +1229,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1209,6 +1298,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for VoidMethod10.</summary>
@@ -1216,6 +1306,14 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(global::System.Action<LargeServiceStub> callback)
@@ -1242,6 +1340,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethod10");
 				return;
 			}
@@ -1263,6 +1362,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1273,7 +1373,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1343,6 +1442,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for VoidMethodWithParam01.</summary>
@@ -1350,6 +1450,18 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<LargeServiceStub, int> callback)
@@ -1376,6 +1488,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = p;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethodWithParam01");
 				return;
 			}
@@ -1397,6 +1511,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1407,7 +1523,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1481,6 +1596,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for VoidMethodWithParam02.</summary>
@@ -1488,6 +1604,18 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<LargeServiceStub, int> callback)
@@ -1514,6 +1642,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = p;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethodWithParam02");
 				return;
 			}
@@ -1535,6 +1665,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1545,7 +1677,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1619,6 +1750,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for VoidMethodWithParam03.</summary>
@@ -1626,6 +1758,18 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<LargeServiceStub, int> callback)
@@ -1652,6 +1796,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = p;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethodWithParam03");
 				return;
 			}
@@ -1673,6 +1819,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1683,7 +1831,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1757,6 +1904,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for VoidMethodWithParam04.</summary>
@@ -1764,6 +1912,18 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<LargeServiceStub, int> callback)
@@ -1790,6 +1950,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = p;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethodWithParam04");
 				return;
 			}
@@ -1811,6 +1973,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1821,7 +1985,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1895,6 +2058,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for VoidMethodWithParam05.</summary>
@@ -1902,6 +2066,18 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<LargeServiceStub, int> callback)
@@ -1928,6 +2104,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = p;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethodWithParam05");
 				return;
 			}
@@ -1949,6 +2127,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1959,7 +2139,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -2033,6 +2212,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for VoidMethodWithParam06.</summary>
@@ -2040,6 +2220,18 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<LargeServiceStub, int> callback)
@@ -2066,6 +2258,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = p;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethodWithParam06");
 				return;
 			}
@@ -2087,6 +2281,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -2097,7 +2293,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -2171,6 +2366,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for VoidMethodWithParam07.</summary>
@@ -2178,6 +2374,18 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<LargeServiceStub, int> callback)
@@ -2204,6 +2412,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = p;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethodWithParam07");
 				return;
 			}
@@ -2225,6 +2435,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -2235,7 +2447,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -2309,6 +2520,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for VoidMethodWithParam08.</summary>
@@ -2316,6 +2528,18 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<LargeServiceStub, int> callback)
@@ -2342,6 +2566,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = p;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethodWithParam08");
 				return;
 			}
@@ -2363,6 +2589,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -2373,7 +2601,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -2447,6 +2674,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for VoidMethodWithParam09.</summary>
@@ -2454,6 +2682,18 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<LargeServiceStub, int> callback)
@@ -2480,6 +2720,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = p;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethodWithParam09");
 				return;
 			}
@@ -2501,6 +2743,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -2511,7 +2755,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -2585,6 +2828,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for VoidMethodWithParam10.</summary>
@@ -2592,6 +2836,18 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<LargeServiceStub, int> callback)
@@ -2618,6 +2874,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = p;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethodWithParam10");
 				return;
 			}
@@ -2639,6 +2897,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -2649,7 +2909,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -2723,6 +2982,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for IntMethod01.</summary>
@@ -2733,6 +2993,14 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 		private readonly global::System.Collections.Generic.List<(IntMethod01Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(IntMethod01Delegate callback)
@@ -2759,6 +3027,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethod01");
 				return default!;
 			}
@@ -2780,6 +3049,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -2790,7 +3060,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -2860,6 +3129,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for IntMethod02.</summary>
@@ -2870,6 +3140,14 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 		private readonly global::System.Collections.Generic.List<(IntMethod02Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(IntMethod02Delegate callback)
@@ -2896,6 +3174,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethod02");
 				return default!;
 			}
@@ -2917,6 +3196,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -2927,7 +3207,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -2997,6 +3276,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for IntMethod03.</summary>
@@ -3007,6 +3287,14 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 		private readonly global::System.Collections.Generic.List<(IntMethod03Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(IntMethod03Delegate callback)
@@ -3033,6 +3321,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethod03");
 				return default!;
 			}
@@ -3054,6 +3343,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -3064,7 +3354,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -3134,6 +3423,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for IntMethod04.</summary>
@@ -3144,6 +3434,14 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 		private readonly global::System.Collections.Generic.List<(IntMethod04Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(IntMethod04Delegate callback)
@@ -3170,6 +3468,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethod04");
 				return default!;
 			}
@@ -3191,6 +3490,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -3201,7 +3501,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -3271,6 +3570,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for IntMethod05.</summary>
@@ -3281,6 +3581,14 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 		private readonly global::System.Collections.Generic.List<(IntMethod05Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(IntMethod05Delegate callback)
@@ -3307,6 +3615,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethod05");
 				return default!;
 			}
@@ -3328,6 +3637,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -3338,7 +3648,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -3408,6 +3717,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for IntMethod06.</summary>
@@ -3418,6 +3728,14 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 		private readonly global::System.Collections.Generic.List<(IntMethod06Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(IntMethod06Delegate callback)
@@ -3444,6 +3762,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethod06");
 				return default!;
 			}
@@ -3465,6 +3784,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -3475,7 +3795,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -3545,6 +3864,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for IntMethod07.</summary>
@@ -3555,6 +3875,14 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 		private readonly global::System.Collections.Generic.List<(IntMethod07Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(IntMethod07Delegate callback)
@@ -3581,6 +3909,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethod07");
 				return default!;
 			}
@@ -3602,6 +3931,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -3612,7 +3942,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -3682,6 +4011,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for IntMethod08.</summary>
@@ -3692,6 +4022,14 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 		private readonly global::System.Collections.Generic.List<(IntMethod08Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(IntMethod08Delegate callback)
@@ -3718,6 +4056,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethod08");
 				return default!;
 			}
@@ -3739,6 +4078,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -3749,7 +4089,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -3819,6 +4158,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for IntMethod09.</summary>
@@ -3829,6 +4169,14 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 		private readonly global::System.Collections.Generic.List<(IntMethod09Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(IntMethod09Delegate callback)
@@ -3855,6 +4203,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethod09");
 				return default!;
 			}
@@ -3876,6 +4225,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -3886,7 +4236,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -3956,6 +4305,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for IntMethod10.</summary>
@@ -3966,6 +4316,14 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 		private readonly global::System.Collections.Generic.List<(IntMethod10Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(IntMethod10Delegate callback)
@@ -3992,6 +4350,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethod10");
 				return default!;
 			}
@@ -4013,6 +4372,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -4023,7 +4383,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -4093,6 +4452,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for StringMethod01.</summary>
@@ -4103,6 +4463,14 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 		private readonly global::System.Collections.Generic.List<(StringMethod01Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(StringMethod01Delegate callback)
@@ -4129,8 +4497,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "StringMethod01");
-				throw new global::System.InvalidOperationException("No implementation provided for StringMethod01. Configure via StringMethod01.OnCall.");
+				throw new global::System.InvalidOperationException("No implementation provided for StringMethod01. Configure via OnCall.");
 			}
 
 			var (callback, times, tracking) = _sequence[_sequenceIndex];
@@ -4150,6 +4519,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -4160,7 +4530,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -4230,6 +4599,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for StringMethod02.</summary>
@@ -4240,6 +4610,14 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 		private readonly global::System.Collections.Generic.List<(StringMethod02Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(StringMethod02Delegate callback)
@@ -4266,8 +4644,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "StringMethod02");
-				throw new global::System.InvalidOperationException("No implementation provided for StringMethod02. Configure via StringMethod02.OnCall.");
+				throw new global::System.InvalidOperationException("No implementation provided for StringMethod02. Configure via OnCall.");
 			}
 
 			var (callback, times, tracking) = _sequence[_sequenceIndex];
@@ -4287,6 +4666,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -4297,7 +4677,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -4367,6 +4746,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for StringMethod03.</summary>
@@ -4377,6 +4757,14 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 		private readonly global::System.Collections.Generic.List<(StringMethod03Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(StringMethod03Delegate callback)
@@ -4403,8 +4791,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "StringMethod03");
-				throw new global::System.InvalidOperationException("No implementation provided for StringMethod03. Configure via StringMethod03.OnCall.");
+				throw new global::System.InvalidOperationException("No implementation provided for StringMethod03. Configure via OnCall.");
 			}
 
 			var (callback, times, tracking) = _sequence[_sequenceIndex];
@@ -4424,6 +4813,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -4434,7 +4824,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -4504,6 +4893,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for StringMethod04.</summary>
@@ -4514,6 +4904,14 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 		private readonly global::System.Collections.Generic.List<(StringMethod04Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(StringMethod04Delegate callback)
@@ -4540,8 +4938,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "StringMethod04");
-				throw new global::System.InvalidOperationException("No implementation provided for StringMethod04. Configure via StringMethod04.OnCall.");
+				throw new global::System.InvalidOperationException("No implementation provided for StringMethod04. Configure via OnCall.");
 			}
 
 			var (callback, times, tracking) = _sequence[_sequenceIndex];
@@ -4561,6 +4960,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -4571,7 +4971,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -4641,6 +5040,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for StringMethod05.</summary>
@@ -4651,6 +5051,14 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 		private readonly global::System.Collections.Generic.List<(StringMethod05Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(StringMethod05Delegate callback)
@@ -4677,8 +5085,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "StringMethod05");
-				throw new global::System.InvalidOperationException("No implementation provided for StringMethod05. Configure via StringMethod05.OnCall.");
+				throw new global::System.InvalidOperationException("No implementation provided for StringMethod05. Configure via OnCall.");
 			}
 
 			var (callback, times, tracking) = _sequence[_sequenceIndex];
@@ -4698,6 +5107,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -4708,7 +5118,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -4778,6 +5187,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for StringMethod06.</summary>
@@ -4788,6 +5198,14 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 		private readonly global::System.Collections.Generic.List<(StringMethod06Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(StringMethod06Delegate callback)
@@ -4814,8 +5232,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "StringMethod06");
-				throw new global::System.InvalidOperationException("No implementation provided for StringMethod06. Configure via StringMethod06.OnCall.");
+				throw new global::System.InvalidOperationException("No implementation provided for StringMethod06. Configure via OnCall.");
 			}
 
 			var (callback, times, tracking) = _sequence[_sequenceIndex];
@@ -4835,6 +5254,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -4845,7 +5265,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -4915,6 +5334,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for StringMethod07.</summary>
@@ -4925,6 +5345,14 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 		private readonly global::System.Collections.Generic.List<(StringMethod07Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(StringMethod07Delegate callback)
@@ -4951,8 +5379,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "StringMethod07");
-				throw new global::System.InvalidOperationException("No implementation provided for StringMethod07. Configure via StringMethod07.OnCall.");
+				throw new global::System.InvalidOperationException("No implementation provided for StringMethod07. Configure via OnCall.");
 			}
 
 			var (callback, times, tracking) = _sequence[_sequenceIndex];
@@ -4972,6 +5401,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -4982,7 +5412,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -5052,6 +5481,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for StringMethod08.</summary>
@@ -5062,6 +5492,14 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 		private readonly global::System.Collections.Generic.List<(StringMethod08Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(StringMethod08Delegate callback)
@@ -5088,8 +5526,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "StringMethod08");
-				throw new global::System.InvalidOperationException("No implementation provided for StringMethod08. Configure via StringMethod08.OnCall.");
+				throw new global::System.InvalidOperationException("No implementation provided for StringMethod08. Configure via OnCall.");
 			}
 
 			var (callback, times, tracking) = _sequence[_sequenceIndex];
@@ -5109,6 +5548,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -5119,7 +5559,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -5189,6 +5628,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for StringMethod09.</summary>
@@ -5199,6 +5639,14 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 		private readonly global::System.Collections.Generic.List<(StringMethod09Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(StringMethod09Delegate callback)
@@ -5225,8 +5673,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "StringMethod09");
-				throw new global::System.InvalidOperationException("No implementation provided for StringMethod09. Configure via StringMethod09.OnCall.");
+				throw new global::System.InvalidOperationException("No implementation provided for StringMethod09. Configure via OnCall.");
 			}
 
 			var (callback, times, tracking) = _sequence[_sequenceIndex];
@@ -5246,6 +5695,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -5256,7 +5706,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -5326,6 +5775,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for StringMethod10.</summary>
@@ -5336,6 +5786,14 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 		private readonly global::System.Collections.Generic.List<(StringMethod10Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(StringMethod10Delegate callback)
@@ -5362,8 +5820,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "StringMethod10");
-				throw new global::System.InvalidOperationException("No implementation provided for StringMethod10. Configure via StringMethod10.OnCall.");
+				throw new global::System.InvalidOperationException("No implementation provided for StringMethod10. Configure via OnCall.");
 			}
 
 			var (callback, times, tracking) = _sequence[_sequenceIndex];
@@ -5383,6 +5842,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -5393,7 +5853,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -5463,6 +5922,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for IntMethodWithParam01.</summary>
@@ -5473,6 +5933,18 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 		private readonly global::System.Collections.Generic.List<(IntMethodWithParam01Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(IntMethodWithParam01Delegate callback)
@@ -5499,6 +5971,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = p;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethodWithParam01");
 				return default!;
 			}
@@ -5520,6 +5994,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -5530,7 +6006,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -5604,6 +6079,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for IntMethodWithParam02.</summary>
@@ -5614,6 +6090,18 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 		private readonly global::System.Collections.Generic.List<(IntMethodWithParam02Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(IntMethodWithParam02Delegate callback)
@@ -5640,6 +6128,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = p;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethodWithParam02");
 				return default!;
 			}
@@ -5661,6 +6151,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -5671,7 +6163,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -5745,6 +6236,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for IntMethodWithParam03.</summary>
@@ -5755,6 +6247,18 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 		private readonly global::System.Collections.Generic.List<(IntMethodWithParam03Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(IntMethodWithParam03Delegate callback)
@@ -5781,6 +6285,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = p;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethodWithParam03");
 				return default!;
 			}
@@ -5802,6 +6308,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -5812,7 +6320,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -5886,6 +6393,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for IntMethodWithParam04.</summary>
@@ -5896,6 +6404,18 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 		private readonly global::System.Collections.Generic.List<(IntMethodWithParam04Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(IntMethodWithParam04Delegate callback)
@@ -5922,6 +6442,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = p;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethodWithParam04");
 				return default!;
 			}
@@ -5943,6 +6465,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -5953,7 +6477,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -6027,6 +6550,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for IntMethodWithParam05.</summary>
@@ -6037,6 +6561,18 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 		private readonly global::System.Collections.Generic.List<(IntMethodWithParam05Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(IntMethodWithParam05Delegate callback)
@@ -6063,6 +6599,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = p;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethodWithParam05");
 				return default!;
 			}
@@ -6084,6 +6622,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -6094,7 +6634,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -6168,6 +6707,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for IntMethodWithParam06.</summary>
@@ -6178,6 +6718,18 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 		private readonly global::System.Collections.Generic.List<(IntMethodWithParam06Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(IntMethodWithParam06Delegate callback)
@@ -6204,6 +6756,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = p;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethodWithParam06");
 				return default!;
 			}
@@ -6225,6 +6779,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -6235,7 +6791,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -6309,6 +6864,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for IntMethodWithParam07.</summary>
@@ -6319,6 +6875,18 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 		private readonly global::System.Collections.Generic.List<(IntMethodWithParam07Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(IntMethodWithParam07Delegate callback)
@@ -6345,6 +6913,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = p;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethodWithParam07");
 				return default!;
 			}
@@ -6366,6 +6936,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -6376,7 +6948,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -6450,6 +7021,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for IntMethodWithParam08.</summary>
@@ -6460,6 +7032,18 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 		private readonly global::System.Collections.Generic.List<(IntMethodWithParam08Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(IntMethodWithParam08Delegate callback)
@@ -6486,6 +7070,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = p;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethodWithParam08");
 				return default!;
 			}
@@ -6507,6 +7093,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -6517,7 +7105,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -6591,6 +7178,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for IntMethodWithParam09.</summary>
@@ -6601,6 +7189,18 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 		private readonly global::System.Collections.Generic.List<(IntMethodWithParam09Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(IntMethodWithParam09Delegate callback)
@@ -6627,6 +7227,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = p;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethodWithParam09");
 				return default!;
 			}
@@ -6648,6 +7250,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -6658,7 +7262,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -6732,6 +7335,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for IntMethodWithParam10.</summary>
@@ -6742,6 +7346,18 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 		private readonly global::System.Collections.Generic.List<(IntMethodWithParam10Delegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(IntMethodWithParam10Delegate callback)
@@ -6768,6 +7384,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = p;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethodWithParam10");
 				return default!;
 			}
@@ -6789,6 +7407,8 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -6799,7 +7419,6 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -6873,6 +7492,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Interceptor for VoidMethod01.</summary>

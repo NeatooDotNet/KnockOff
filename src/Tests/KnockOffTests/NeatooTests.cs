@@ -483,7 +483,7 @@ public partial class InlineValidateBaseTests
         var stub = new Stubs.IValidateBase();
         IValidateBase validate = stub;
 
-        stub.GetProperty.OnCall = (s, name) => null!;
+        stub.GetProperty.OnCall((s, name) => null!);
 
         _ = validate.GetProperty("TestProp");
 
@@ -497,7 +497,7 @@ public partial class InlineValidateBaseTests
         var stub = new Stubs.IValidateBase();
         IValidateBase validate = stub;
 
-        stub.TryGetProperty.OnCall = (s, name) => true;
+        stub.TryGetProperty.OnCall((InlineValidateBaseTests.Stubs.IValidateBase_TryGetPropertyInterceptor.TryGetPropertyDelegate)((Stubs.IValidateBase ko, string name, out IValidateProperty prop) => { prop = default!; return true; }));
 
         var result = validate.TryGetProperty("TestProp", out _);
 
@@ -535,11 +535,11 @@ public partial class InlineValidateBaseTests
         IValidateBase validate = stub;
         var callbackExecuted = false;
 
-        stub.RunRules.OnCall = (s, prop, token, flag) =>
+        stub.RunRules.OnCall((InlineValidateBaseTests.Stubs.IValidateBase_RunRulesInterceptor.RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task)((ko, prop, token) =>
         {
             callbackExecuted = true;
             return Task.CompletedTask;
-        };
+        }));
 
         await validate.RunRules("Property", null);
 

@@ -44,6 +44,18 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 
 		private readonly global::System.Collections.Generic.List<(SaveDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private global::KnockOff.Documentation.Samples.Comparison.VsUser? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public global::KnockOff.Documentation.Samples.Comparison.VsUser? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<global::KnockOff.Documentation.Samples.Comparison.VsUser> OnCall(SaveDelegate callback)
@@ -70,6 +82,8 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = user;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 				return default!;
 			}
@@ -91,6 +105,8 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -101,7 +117,6 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -175,6 +190,7 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for Delete.</summary>
@@ -182,6 +198,18 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<VsUserServiceKnockOff, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<VsUserServiceKnockOff, int> callback)
@@ -208,6 +236,8 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = id;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Delete");
 				return;
 			}
@@ -229,6 +259,8 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -239,7 +271,6 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -313,6 +344,7 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for GetAll.</summary>
@@ -323,6 +355,14 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 
 		private readonly global::System.Collections.Generic.List<(GetAllDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetAllDelegate callback)
@@ -349,6 +389,7 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetAll");
 				return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Comparison.VsUser>();
 			}
@@ -370,6 +411,7 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -380,7 +422,6 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -450,6 +491,7 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for Update.</summary>
@@ -457,6 +499,18 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<VsUserServiceKnockOff, global::KnockOff.Documentation.Samples.Comparison.VsUser> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private global::KnockOff.Documentation.Samples.Comparison.VsUser? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public global::KnockOff.Documentation.Samples.Comparison.VsUser? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<global::KnockOff.Documentation.Samples.Comparison.VsUser> OnCall(global::System.Action<VsUserServiceKnockOff, global::KnockOff.Documentation.Samples.Comparison.VsUser> callback)
@@ -483,6 +537,8 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = user;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Update");
 				return;
 			}
@@ -504,6 +560,8 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -514,7 +572,6 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -588,6 +645,7 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks calls to GetUser (user-defined implementation).</summary>

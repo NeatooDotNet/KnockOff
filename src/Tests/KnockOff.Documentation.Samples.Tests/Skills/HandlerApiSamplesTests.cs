@@ -505,8 +505,8 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaSerializerKnockOff();
         IHaSerializer service = knockOff;
 
-        knockOff.Deserialize.Of<HaUser>().OnCall = (ko, json) =>
-            new HaUser { Name = "FromJson" };
+        knockOff.Deserialize.Of<HaUser>().OnCall((ko, json) =>
+            new HaUser { Name = "FromJson" });
 
         var user = service.Deserialize<HaUser>("{}");
 
@@ -519,8 +519,8 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaSerializerKnockOff();
         IHaSerializer service = knockOff;
 
-        knockOff.Deserialize.Of<HaUser>().OnCall = (ko, json) => new HaUser();
-        knockOff.Deserialize.Of<HaEntity>().OnCall = (ko, json) => new HaEntity();
+        knockOff.Deserialize.Of<HaUser>().OnCall((ko, json) => new HaUser());
+        knockOff.Deserialize.Of<HaEntity>().OnCall((ko, json) => new HaEntity());
 
         service.Deserialize<HaUser>("{}");
         service.Deserialize<HaUser>("{}");
@@ -536,8 +536,8 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaSerializerKnockOff();
         IHaSerializer service = knockOff;
 
-        knockOff.Deserialize.Of<HaUser>().OnCall = (ko, json) => new HaUser();
-        knockOff.Deserialize.Of<HaEntity>().OnCall = (ko, json) => new HaEntity();
+        knockOff.Deserialize.Of<HaUser>().OnCall((ko, json) => new HaUser());
+        knockOff.Deserialize.Of<HaEntity>().OnCall((ko, json) => new HaEntity());
 
         service.Deserialize<HaUser>("{}");
         service.Deserialize<HaUser>("{}");
@@ -556,7 +556,7 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaSerializerKnockOff();
         IHaSerializer service = knockOff;
 
-        knockOff.Convert.Of<string, int>().OnCall = (ko, s) => s.Length;
+        knockOff.Convert.Of<string, int>().OnCall((ko, s) => s.Length);
 
         var result = service.Convert<string, int>("hello");
 
@@ -569,8 +569,8 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaSerializerKnockOff();
         IHaSerializer service = knockOff;
 
-        knockOff.Deserialize.Of<HaUser>().OnCall = (ko, json) => new HaUser();
-        knockOff.Deserialize.Of<HaEntity>().OnCall = (ko, json) => new HaEntity();
+        knockOff.Deserialize.Of<HaUser>().OnCall((ko, json) => new HaUser());
+        knockOff.Deserialize.Of<HaEntity>().OnCall((ko, json) => new HaEntity());
 
         service.Deserialize<HaUser>("{}");
         service.Deserialize<HaEntity>("{}");
@@ -587,8 +587,8 @@ public class HandlerApiSamplesTests : SamplesTestBase
         var knockOff = new HaSerializerKnockOff();
         IHaSerializer service = knockOff;
 
-        knockOff.Deserialize.Of<HaUser>().OnCall = (ko, json) => new HaUser();
-        knockOff.Deserialize.Of<HaEntity>().OnCall = (ko, json) => new HaEntity();
+        knockOff.Deserialize.Of<HaUser>().OnCall((ko, json) => new HaUser());
+        knockOff.Deserialize.Of<HaEntity>().OnCall((ko, json) => new HaEntity());
 
         service.Deserialize<HaUser>("{}");
         service.Deserialize<HaEntity>("{}");

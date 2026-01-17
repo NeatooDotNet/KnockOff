@@ -300,6 +300,14 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<EntityPropertyStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(global::System.Action<EntityPropertyStub> callback)
@@ -326,6 +334,7 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "MarkSelfUnmodified");
 				return;
 			}
@@ -347,6 +356,7 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -357,7 +367,6 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -427,6 +436,7 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for ApplyPropertyInfo.</summary>
@@ -434,6 +444,18 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<EntityPropertyStub, global::Neatoo.IPropertyInfo> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private global::Neatoo.IPropertyInfo? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public global::Neatoo.IPropertyInfo? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<global::Neatoo.IPropertyInfo> OnCall(global::System.Action<EntityPropertyStub, global::Neatoo.IPropertyInfo> callback)
@@ -460,6 +482,8 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = propertyInfo;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ApplyPropertyInfo");
 				return;
 			}
@@ -481,6 +505,8 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -491,7 +517,6 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -565,6 +590,7 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for SetValue.</summary>
@@ -575,6 +601,18 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 
 		private readonly global::System.Collections.Generic.List<(SetValueDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private object? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public object? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<object?> OnCall(SetValueDelegate callback)
@@ -601,6 +639,8 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = newValue;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SetValue");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -622,6 +662,8 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -632,7 +674,6 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -706,6 +747,7 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for AddMarkedBusy.</summary>
@@ -713,6 +755,18 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<EntityPropertyStub, long> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private long? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public long? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<long> OnCall(global::System.Action<EntityPropertyStub, long> callback)
@@ -739,6 +793,8 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = id;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "AddMarkedBusy");
 				return;
 			}
@@ -760,6 +816,8 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -770,7 +828,6 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -844,6 +901,7 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for RemoveMarkedBusy.</summary>
@@ -851,6 +909,18 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<EntityPropertyStub, long> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private long? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public long? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<long> OnCall(global::System.Action<EntityPropertyStub, long> callback)
@@ -877,6 +947,8 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = id;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RemoveMarkedBusy");
 				return;
 			}
@@ -898,6 +970,8 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -908,7 +982,6 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -982,6 +1055,7 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for LoadValue.</summary>
@@ -989,6 +1063,18 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<EntityPropertyStub, object?> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private object? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public object? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<object?> OnCall(global::System.Action<EntityPropertyStub, object?> callback)
@@ -1015,6 +1101,8 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = @value;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "LoadValue");
 				return;
 			}
@@ -1036,6 +1124,8 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1046,7 +1136,6 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1120,6 +1209,7 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for WaitForTasks.</summary>
@@ -1130,6 +1220,14 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 
 		private readonly global::System.Collections.Generic.List<(WaitForTasksDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(WaitForTasksDelegate callback)
@@ -1156,6 +1254,7 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -1177,6 +1276,7 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1187,7 +1287,6 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1257,6 +1356,7 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for GetAwaiter.</summary>
@@ -1267,6 +1367,14 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 
 		private readonly global::System.Collections.Generic.List<(GetAwaiterDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetAwaiterDelegate callback)
@@ -1293,6 +1401,7 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetAwaiter");
 				return default!;
 			}
@@ -1314,6 +1423,7 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1324,7 +1434,6 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1394,6 +1503,7 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for RunRules.</summary>
@@ -1404,6 +1514,18 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 
 		private readonly global::System.Collections.Generic.List<(RunRulesDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private (global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token)? _unconfiguredLastArgs;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The arguments from the last call (from most recently called registration).</summary>
+		public (global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token)? LastCallArgs { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTrackingArgs<(global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token)> OnCall(RunRulesDelegate callback)
@@ -1430,6 +1552,8 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArgs = ((runRules, token));
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -1451,6 +1575,8 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArgs = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1461,7 +1587,6 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1535,6 +1660,7 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Interceptor for PropertyChanged event.</summary>

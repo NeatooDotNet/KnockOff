@@ -10,6 +10,18 @@ partial class ProgressIntKnockOff : global::System.IProgress<int>, global::Knock
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<ProgressIntKnockOff, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<ProgressIntKnockOff, int> callback)
@@ -36,6 +48,8 @@ partial class ProgressIntKnockOff : global::System.IProgress<int>, global::Knock
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = @value;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Report");
 				return;
 			}
@@ -57,6 +71,8 @@ partial class ProgressIntKnockOff : global::System.IProgress<int>, global::Knock
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -67,7 +83,6 @@ partial class ProgressIntKnockOff : global::System.IProgress<int>, global::Knock
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -141,6 +156,7 @@ partial class ProgressIntKnockOff : global::System.IProgress<int>, global::Knock
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Interceptor for Report.</summary>

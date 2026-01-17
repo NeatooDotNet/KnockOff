@@ -9,8 +9,10 @@ partial class SpEmailServiceConstructorTests
 	public static class Stubs
 	{
 		/// <summary>Interceptor for SpEmailServiceClass.Send.</summary>
-		public sealed class SpEmailServiceClass_SendInterceptor
+		public sealed class SpEmailServiceClass_SendInterceptor : global::KnockOff.IMethodTracking
 		{
+			private global::System.Action<Stubs.SpEmailServiceClass, string, string>? _onCall;
+
 			/// <summary>Number of times this method was called.</summary>
 			public int CallCount { get; private set; }
 
@@ -20,12 +22,15 @@ partial class SpEmailServiceConstructorTests
 			/// <summary>The arguments from the last call.</summary>
 			public (string? to, string? body)? LastCallArgs { get; private set; }
 
-			/// <summary>Callback invoked when method is called. If set, called instead of base.</summary>
-			public global::System.Action<Stubs.SpEmailServiceClass, string, string>? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.SpEmailServiceClass, string, string> callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal global::System.Action<Stubs.SpEmailServiceClass, string, string>? Callback => _onCall;
 
 			public void RecordCall(string to, string body) { CallCount++; LastCallArgs = (to, body); }
 
-			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+			public void Reset() { CallCount = 0; LastCallArgs = default; _onCall = null; }
 		}
 
 		/// <summary>Stub for global::KnockOff.Documentation.Samples.Guides.SpEmailServiceClass via composition.</summary>
@@ -75,7 +80,7 @@ partial class SpEmailServiceConstructorTests
 				public override void Send(string to, string body)
 				{
 					_stub?.Send.RecordCall(to, body);
-					if (_stub?.Send.OnCall is { } onCall) { onCall(_stub, to, body); return; }
+					if (_stub?.Send.Callback is { } onCall) { onCall(_stub, to, body); return; }
 					base.Send(to, body);
 				}
 

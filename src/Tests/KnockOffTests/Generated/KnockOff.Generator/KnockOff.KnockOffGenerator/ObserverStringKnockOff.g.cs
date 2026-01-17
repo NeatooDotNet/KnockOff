@@ -10,6 +10,14 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<ObserverStringKnockOff> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(global::System.Action<ObserverStringKnockOff> callback)
@@ -36,6 +44,7 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "OnCompleted");
 				return;
 			}
@@ -57,6 +66,7 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -67,7 +77,6 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -137,6 +146,7 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for OnError.</summary>
@@ -144,6 +154,18 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<ObserverStringKnockOff, global::System.Exception> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private global::System.Exception? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public global::System.Exception? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<global::System.Exception> OnCall(global::System.Action<ObserverStringKnockOff, global::System.Exception> callback)
@@ -170,6 +192,8 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = error;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "OnError");
 				return;
 			}
@@ -191,6 +215,8 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -201,7 +227,6 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -275,6 +300,7 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for OnNext.</summary>
@@ -282,6 +308,18 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<ObserverStringKnockOff, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private string? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public string? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<string> OnCall(global::System.Action<ObserverStringKnockOff, string> callback)
@@ -308,6 +346,8 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = @value;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "OnNext");
 				return;
 			}
@@ -329,6 +369,8 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -339,7 +381,6 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -413,6 +454,7 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Interceptor for OnCompleted.</summary>

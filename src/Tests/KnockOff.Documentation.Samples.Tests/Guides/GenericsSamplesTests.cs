@@ -19,8 +19,8 @@ public class GenericsSamplesTests
         var knockOff = new GenSerializerKnockOff();
         IGenSerializer service = knockOff;
 
-        knockOff.Deserialize.Of<GenUser>().OnCall = (ko, json) =>
-            new GenUser { Id = 1, Name = "FromJson" };
+        knockOff.Deserialize.Of<GenUser>().OnCall((ko, json) =>
+            new GenUser { Id = 1, Name = "FromJson" });
 
         var user = service.Deserialize<GenUser>("{}");
 
@@ -34,8 +34,8 @@ public class GenericsSamplesTests
         var knockOff = new GenSerializerKnockOff();
         IGenSerializer service = knockOff;
 
-        knockOff.Deserialize.Of<GenUser>().OnCall = (ko, json) => new GenUser();
-        knockOff.Deserialize.Of<GenOrder>().OnCall = (ko, json) => new GenOrder();
+        knockOff.Deserialize.Of<GenUser>().OnCall((ko, json) => new GenUser());
+        knockOff.Deserialize.Of<GenOrder>().OnCall((ko, json) => new GenOrder());
 
         service.Deserialize<GenUser>("{}");
         service.Deserialize<GenUser>("{}");
@@ -51,8 +51,8 @@ public class GenericsSamplesTests
         var knockOff = new GenSerializerKnockOff();
         IGenSerializer service = knockOff;
 
-        knockOff.Deserialize.Of<GenUser>().OnCall = (ko, json) => new GenUser();
-        knockOff.Deserialize.Of<GenOrder>().OnCall = (ko, json) => new GenOrder();
+        knockOff.Deserialize.Of<GenUser>().OnCall((ko, json) => new GenUser());
+        knockOff.Deserialize.Of<GenOrder>().OnCall((ko, json) => new GenOrder());
 
         service.Deserialize<GenUser>("{}");
         service.Deserialize<GenUser>("{}");
@@ -69,7 +69,7 @@ public class GenericsSamplesTests
         var knockOff = new GenConverterKnockOff();
         IGenConverter service = knockOff;
 
-        knockOff.Convert.Of<string, int>().OnCall = (ko, s) => s.Length;
+        knockOff.Convert.Of<string, int>().OnCall((ko, s) => s.Length);
 
         var result = service.Convert<string, int>("hello");
 
@@ -82,8 +82,8 @@ public class GenericsSamplesTests
         var knockOff = new GenEntityFactoryKnockOff();
         IGenEntityFactory service = knockOff;
 
-        knockOff.Create.Of<GenEmployee>().OnCall = (ko) =>
-            new GenEmployee { Id = 42, Name = "Test" };
+        knockOff.Create.Of<GenEmployee>().OnCall((ko) =>
+            new GenEmployee { Id = 42, Name = "Test" });
 
         var employee = service.Create<GenEmployee>();
 

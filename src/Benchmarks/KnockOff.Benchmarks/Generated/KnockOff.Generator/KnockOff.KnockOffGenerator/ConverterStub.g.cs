@@ -55,10 +55,12 @@ partial class ConverterStub : global::KnockOff.Benchmarks.Interfaces.IConverter,
 		}
 
 		/// <summary>Typed handler for Convert with specific type arguments.</summary>
-		public sealed class ConvertTypedHandler<T> : IGenericMethodCallTracker, IResettable
+		public sealed class ConvertTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 		{
 			/// <summary>Delegate for Convert.</summary>
 			public delegate T ConvertDelegate(ConverterStub ko, object @value);
+
+			private ConvertDelegate? _onCall;
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -69,14 +71,17 @@ partial class ConverterStub : global::KnockOff.Benchmarks.Interfaces.IConverter,
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public ConvertDelegate? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(ConvertDelegate callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal ConvertDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
 			public void RecordCall(object? @value) { CallCount++; LastCallArg = @value; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+			public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }
 		}
 	}
 
@@ -115,10 +120,12 @@ partial class ConverterStub : global::KnockOff.Benchmarks.Interfaces.IConverter,
 		}
 
 		/// <summary>Typed handler for Transform with specific type arguments.</summary>
-		public sealed class TransformTypedHandler<TIn, TOut> : IGenericMethodCallTracker, IResettable
+		public sealed class TransformTypedHandler<TIn, TOut> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 		{
 			/// <summary>Delegate for Transform.</summary>
 			public delegate TOut TransformDelegate(ConverterStub ko, TIn input);
+
+			private TransformDelegate? _onCall;
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -126,14 +133,17 @@ partial class ConverterStub : global::KnockOff.Benchmarks.Interfaces.IConverter,
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public TransformDelegate? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(TransformDelegate callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal TransformDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
 			public void RecordCall() => CallCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; OnCall = null; }
+			public void Reset() { CallCount = 0; _onCall = null; }
 		}
 	}
 
@@ -174,7 +184,7 @@ partial class ConverterStub : global::KnockOff.Benchmarks.Interfaces.IConverter,
 	T global::KnockOff.Benchmarks.Interfaces.IConverter.Convert<T>(object @value)
 	{
 		Convert.Of<T>().RecordCall(@value);
-		if (Convert.Of<T>().OnCall is { } callback)
+		if (Convert.Of<T>().Callback is { } callback)
 			return callback(this, @value);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IConverter", "Convert");
 		return SmartDefault<T>("Convert");
@@ -183,7 +193,7 @@ partial class ConverterStub : global::KnockOff.Benchmarks.Interfaces.IConverter,
 	TOut global::KnockOff.Benchmarks.Interfaces.IConverter.Transform<TIn, TOut>(TIn input)
 	{
 		Transform.Of<TIn, TOut>().RecordCall();
-		if (Transform.Of<TIn, TOut>().OnCall is { } callback)
+		if (Transform.Of<TIn, TOut>().Callback is { } callback)
 			return callback(this, input);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IConverter", "Transform");
 		return SmartDefault<TOut>("Transform");

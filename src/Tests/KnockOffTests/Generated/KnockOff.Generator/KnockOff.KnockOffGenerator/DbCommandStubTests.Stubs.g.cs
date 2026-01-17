@@ -213,126 +213,1150 @@ partial class DbCommandStubTests
 			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
 		}
 
-		/// <summary>Interceptor for Cancel.</summary>
+		/// <summary>Tracks and configures behavior for Cancel.</summary>
 		public sealed class IDbCommand_CancelInterceptor
 		{
-			/// <summary>Number of times this method was called.</summary>
-			public int CallCount { get; private set; }
+			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IDbCommand> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+			private int _sequenceIndex;
+			private int _unconfiguredCallCount;
+
+			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+			public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Action<Stubs.IDbCommand>? OnCall { get; set; }
 
-			public void RecordCall() { CallCount++; }
+			/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.IDbCommand> callback)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequenceIndex = 0;
+				return tracking;
+			}
 
-			public void Reset() { CallCount = 0; OnCall = null; }
+			/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDbCommand>> OnCall(global::System.Action<Stubs.IDbCommand> callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, times, tracking));
+				_sequenceIndex = 0;
+				return new MethodSequenceImpl(this);
+			}
+
+			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+			internal void Invoke(Stubs.IDbCommand ko)
+			{
+				if (_sequence.Count == 0)
+				{
+					_unconfiguredCallCount++;
+					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Cancel");
+					return;
+				}
+
+				var (callback, times, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall();
+
+				if (!times.IsForever && tracking.CallCount >= times.Count)
+				{
+					if (_sequenceIndex < _sequence.Count - 1)
+						_sequenceIndex++;
+					else if (tracking.CallCount > times.Count)
+						throw global::KnockOff.StubException.SequenceExhausted("Cancel");
+				}
+
+				callback(ko);
+			}
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset()
+			{
+				_unconfiguredCallCount = 0;
+				foreach (var (_, _, tracking) in _sequence)
+					tracking.Reset();
+				_sequenceIndex = 0;
+			}
+
+			/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _sequence)
+				{
+					if (times.IsForever)
+					{
+						if (!tracking.WasCalled)
+							return false;
+					}
+					else if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Tracks invocations for this callback registration.</summary>
+			private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking
+			{
+
+				/// <summary>Number of times this callback was invoked.</summary>
+				public int CallCount { get; private set; }
+
+				/// <summary>True if CallCount > 0.</summary>
+				public bool WasCalled => CallCount > 0;
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall() => CallCount++;
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() => CallCount = 0;
+			}
+
+			/// <summary>Sequence implementation for ThenCall chaining.</summary>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDbCommand>>
+			{
+				private readonly IDbCommand_CancelInterceptor _interceptor;
+
+				public MethodSequenceImpl(IDbCommand_CancelInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Total calls across all callbacks in sequence.</summary>
+				public int TotalCallCount
+				{
+					get
+					{
+						var total = 0;
+						foreach (var (_, _, tracking) in _interceptor._sequence)
+							total += tracking.CallCount;
+						return total;
+					}
+				}
+
+				/// <summary>Add another callback to the sequence.</summary>
+				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDbCommand>> ThenCall(global::System.Action<Stubs.IDbCommand> callback, global::KnockOff.Times times)
+				{
+					var tracking = new MethodTrackingImpl();
+					_interceptor._sequence.Add((callback, times, tracking));
+					return this;
+				}
+
+				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+				public bool Verify()
+				{
+					foreach (var (_, times, tracking) in _interceptor._sequence)
+					{
+						if (!times.Verify(tracking.CallCount))
+							return false;
+					}
+					return true;
+				}
+
+				/// <summary>Reset all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+			}
+
 		}
 
-		/// <summary>Interceptor for CreateParameter.</summary>
+		/// <summary>Tracks and configures behavior for CreateParameter.</summary>
 		public sealed class IDbCommand_CreateParameterInterceptor
 		{
-			/// <summary>Number of times this method was called.</summary>
-			public int CallCount { get; private set; }
+			/// <summary>Delegate for CreateParameter.</summary>
+			public delegate global::System.Data.IDbDataParameter CreateParameterDelegate(Stubs.IDbCommand ko);
+
+			private readonly global::System.Collections.Generic.List<(CreateParameterDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+			private int _sequenceIndex;
+			private int _unconfiguredCallCount;
+
+			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+			public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Func<Stubs.IDbCommand, global::System.Data.IDbDataParameter>? OnCall { get; set; }
 
-			public void RecordCall() { CallCount++; }
+			/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking OnCall(CreateParameterDelegate callback)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequenceIndex = 0;
+				return tracking;
+			}
 
-			public void Reset() { CallCount = 0; OnCall = null; }
+			/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+			public global::KnockOff.IMethodSequence<CreateParameterDelegate> OnCall(CreateParameterDelegate callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, times, tracking));
+				_sequenceIndex = 0;
+				return new MethodSequenceImpl(this);
+			}
+
+			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+			internal global::System.Data.IDbDataParameter Invoke(Stubs.IDbCommand ko)
+			{
+				if (_sequence.Count == 0)
+				{
+					_unconfiguredCallCount++;
+					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "CreateParameter");
+					return default!;
+				}
+
+				var (callback, times, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall();
+
+				if (!times.IsForever && tracking.CallCount >= times.Count)
+				{
+					if (_sequenceIndex < _sequence.Count - 1)
+						_sequenceIndex++;
+					else if (tracking.CallCount > times.Count)
+						throw global::KnockOff.StubException.SequenceExhausted("CreateParameter");
+				}
+
+				return callback(ko);
+			}
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset()
+			{
+				_unconfiguredCallCount = 0;
+				foreach (var (_, _, tracking) in _sequence)
+					tracking.Reset();
+				_sequenceIndex = 0;
+			}
+
+			/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _sequence)
+				{
+					if (times.IsForever)
+					{
+						if (!tracking.WasCalled)
+							return false;
+					}
+					else if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Tracks invocations for this callback registration.</summary>
+			private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking
+			{
+
+				/// <summary>Number of times this callback was invoked.</summary>
+				public int CallCount { get; private set; }
+
+				/// <summary>True if CallCount > 0.</summary>
+				public bool WasCalled => CallCount > 0;
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall() => CallCount++;
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() => CallCount = 0;
+			}
+
+			/// <summary>Sequence implementation for ThenCall chaining.</summary>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<CreateParameterDelegate>
+			{
+				private readonly IDbCommand_CreateParameterInterceptor _interceptor;
+
+				public MethodSequenceImpl(IDbCommand_CreateParameterInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Total calls across all callbacks in sequence.</summary>
+				public int TotalCallCount
+				{
+					get
+					{
+						var total = 0;
+						foreach (var (_, _, tracking) in _interceptor._sequence)
+							total += tracking.CallCount;
+						return total;
+					}
+				}
+
+				/// <summary>Add another callback to the sequence.</summary>
+				public global::KnockOff.IMethodSequence<CreateParameterDelegate> ThenCall(CreateParameterDelegate callback, global::KnockOff.Times times)
+				{
+					var tracking = new MethodTrackingImpl();
+					_interceptor._sequence.Add((callback, times, tracking));
+					return this;
+				}
+
+				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+				public bool Verify()
+				{
+					foreach (var (_, times, tracking) in _interceptor._sequence)
+					{
+						if (!times.Verify(tracking.CallCount))
+							return false;
+					}
+					return true;
+				}
+
+				/// <summary>Reset all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+			}
+
 		}
 
-		/// <summary>Interceptor for ExecuteNonQuery.</summary>
+		/// <summary>Tracks and configures behavior for ExecuteNonQuery.</summary>
 		public sealed class IDbCommand_ExecuteNonQueryInterceptor
 		{
-			/// <summary>Number of times this method was called.</summary>
-			public int CallCount { get; private set; }
+			/// <summary>Delegate for ExecuteNonQuery.</summary>
+			public delegate int ExecuteNonQueryDelegate(Stubs.IDbCommand ko);
+
+			private readonly global::System.Collections.Generic.List<(ExecuteNonQueryDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+			private int _sequenceIndex;
+			private int _unconfiguredCallCount;
+
+			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+			public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Func<Stubs.IDbCommand, int>? OnCall { get; set; }
 
-			public void RecordCall() { CallCount++; }
+			/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking OnCall(ExecuteNonQueryDelegate callback)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequenceIndex = 0;
+				return tracking;
+			}
 
-			public void Reset() { CallCount = 0; OnCall = null; }
+			/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+			public global::KnockOff.IMethodSequence<ExecuteNonQueryDelegate> OnCall(ExecuteNonQueryDelegate callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, times, tracking));
+				_sequenceIndex = 0;
+				return new MethodSequenceImpl(this);
+			}
+
+			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+			internal int Invoke(Stubs.IDbCommand ko)
+			{
+				if (_sequence.Count == 0)
+				{
+					_unconfiguredCallCount++;
+					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ExecuteNonQuery");
+					return default!;
+				}
+
+				var (callback, times, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall();
+
+				if (!times.IsForever && tracking.CallCount >= times.Count)
+				{
+					if (_sequenceIndex < _sequence.Count - 1)
+						_sequenceIndex++;
+					else if (tracking.CallCount > times.Count)
+						throw global::KnockOff.StubException.SequenceExhausted("ExecuteNonQuery");
+				}
+
+				return callback(ko);
+			}
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset()
+			{
+				_unconfiguredCallCount = 0;
+				foreach (var (_, _, tracking) in _sequence)
+					tracking.Reset();
+				_sequenceIndex = 0;
+			}
+
+			/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _sequence)
+				{
+					if (times.IsForever)
+					{
+						if (!tracking.WasCalled)
+							return false;
+					}
+					else if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Tracks invocations for this callback registration.</summary>
+			private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking
+			{
+
+				/// <summary>Number of times this callback was invoked.</summary>
+				public int CallCount { get; private set; }
+
+				/// <summary>True if CallCount > 0.</summary>
+				public bool WasCalled => CallCount > 0;
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall() => CallCount++;
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() => CallCount = 0;
+			}
+
+			/// <summary>Sequence implementation for ThenCall chaining.</summary>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<ExecuteNonQueryDelegate>
+			{
+				private readonly IDbCommand_ExecuteNonQueryInterceptor _interceptor;
+
+				public MethodSequenceImpl(IDbCommand_ExecuteNonQueryInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Total calls across all callbacks in sequence.</summary>
+				public int TotalCallCount
+				{
+					get
+					{
+						var total = 0;
+						foreach (var (_, _, tracking) in _interceptor._sequence)
+							total += tracking.CallCount;
+						return total;
+					}
+				}
+
+				/// <summary>Add another callback to the sequence.</summary>
+				public global::KnockOff.IMethodSequence<ExecuteNonQueryDelegate> ThenCall(ExecuteNonQueryDelegate callback, global::KnockOff.Times times)
+				{
+					var tracking = new MethodTrackingImpl();
+					_interceptor._sequence.Add((callback, times, tracking));
+					return this;
+				}
+
+				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+				public bool Verify()
+				{
+					foreach (var (_, times, tracking) in _interceptor._sequence)
+					{
+						if (!times.Verify(tracking.CallCount))
+							return false;
+					}
+					return true;
+				}
+
+				/// <summary>Reset all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+			}
+
 		}
 
-		/// <summary>Interceptor for ExecuteReader.</summary>
+		/// <summary>Tracks and configures behavior for ExecuteReader.</summary>
 		public sealed class IDbCommand_ExecuteReaderInterceptor
 		{
-			/// <summary>Number of times this method was called.</summary>
-			public int CallCount { get; private set; }
+			private int _unconfiguredCallCount;
 
-			/// <summary>Whether this method was called at least once.</summary>
+			/// <summary>Delegate for ExecuteReader().</summary>
+			public delegate global::System.Data.IDataReader ExecuteReaderDelegate_NoParams_Data_IDataReader(Stubs.IDbCommand ko);
+
+			private readonly global::System.Collections.Generic.List<(ExecuteReaderDelegate_NoParams_Data_IDataReader Callback, global::KnockOff.Times Times, MethodTrackingImpl_NoParams_Data_IDataReader Tracking)> _sequence_NoParams_Data_IDataReader = new();
+			private int _sequenceIndex_NoParams_Data_IDataReader;
+
+			/// <summary>Delegate for ExecuteReader(global::System.Data.CommandBehavior).</summary>
+			public delegate global::System.Data.IDataReader ExecuteReaderDelegate_Data_CommandBehavior_Data_IDataReader(Stubs.IDbCommand ko, global::System.Data.CommandBehavior behavior);
+
+			private readonly global::System.Collections.Generic.List<(ExecuteReaderDelegate_Data_CommandBehavior_Data_IDataReader Callback, global::KnockOff.Times Times, MethodTrackingImpl_Data_CommandBehavior_Data_IDataReader Tracking)> _sequence_Data_CommandBehavior_Data_IDataReader = new();
+			private int _sequenceIndex_Data_CommandBehavior_Data_IDataReader;
+
+			/// <summary>Total number of times this method was called (across all overloads and registrations).</summary>
+			public int CallCount => _unconfiguredCallCount + _sequence_NoParams_Data_IDataReader.Sum(s => s.Tracking.CallCount) + _sequence_Data_CommandBehavior_Data_IDataReader.Sum(s => s.Tracking.CallCount);
+
+			/// <summary>Whether this method was called at least once (any overload).</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>The argument from the last call.</summary>
-			public global::System.Data.CommandBehavior? LastCallArg { get; private set; }
+			/// <summary>Configures callback for ExecuteReader(). Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking OnCall(ExecuteReaderDelegate_NoParams_Data_IDataReader callback)
+			{
+				var tracking = new MethodTrackingImpl_NoParams_Data_IDataReader();
+				_sequence_NoParams_Data_IDataReader.Clear();
+				_sequence_NoParams_Data_IDataReader.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequenceIndex_NoParams_Data_IDataReader = 0;
+				return tracking;
+			}
 
-			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Func<Stubs.IDbCommand, global::System.Data.CommandBehavior?, global::System.Data.IDataReader>? OnCall { get; set; }
+			/// <summary>Configures callback for ExecuteReader() with Times constraint.</summary>
+			public global::KnockOff.IMethodSequence<ExecuteReaderDelegate_NoParams_Data_IDataReader> OnCall(ExecuteReaderDelegate_NoParams_Data_IDataReader callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl_NoParams_Data_IDataReader();
+				_sequence_NoParams_Data_IDataReader.Clear();
+				_sequence_NoParams_Data_IDataReader.Add((callback, times, tracking));
+				_sequenceIndex_NoParams_Data_IDataReader = 0;
+				return new MethodSequenceImpl_NoParams_Data_IDataReader(this);
+			}
 
-			public void RecordCall(global::System.Data.CommandBehavior? behavior) { CallCount++; LastCallArg = behavior; }
+			/// <summary>Configures callback for ExecuteReader(global::System.Data.CommandBehavior). Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<global::System.Data.CommandBehavior> OnCall(ExecuteReaderDelegate_Data_CommandBehavior_Data_IDataReader callback)
+			{
+				var tracking = new MethodTrackingImpl_Data_CommandBehavior_Data_IDataReader();
+				_sequence_Data_CommandBehavior_Data_IDataReader.Clear();
+				_sequence_Data_CommandBehavior_Data_IDataReader.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequenceIndex_Data_CommandBehavior_Data_IDataReader = 0;
+				return tracking;
+			}
 
-			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+			/// <summary>Configures callback for ExecuteReader(global::System.Data.CommandBehavior) with Times constraint.</summary>
+			public global::KnockOff.IMethodSequence<ExecuteReaderDelegate_Data_CommandBehavior_Data_IDataReader> OnCall(ExecuteReaderDelegate_Data_CommandBehavior_Data_IDataReader callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl_Data_CommandBehavior_Data_IDataReader();
+				_sequence_Data_CommandBehavior_Data_IDataReader.Clear();
+				_sequence_Data_CommandBehavior_Data_IDataReader.Add((callback, times, tracking));
+				_sequenceIndex_Data_CommandBehavior_Data_IDataReader = 0;
+				return new MethodSequenceImpl_Data_CommandBehavior_Data_IDataReader(this);
+			}
+
+			/// <summary>Invokes configured callback for ExecuteReader().</summary>
+			internal global::System.Data.IDataReader Invoke_NoParams_Data_IDataReader(Stubs.IDbCommand ko)
+			{
+				if (_sequence_NoParams_Data_IDataReader.Count == 0)
+				{
+					_unconfiguredCallCount++;
+					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ExecuteReader");
+					throw new global::System.InvalidOperationException("No implementation provided for ExecuteReader. Configure via OnCall.");
+				}
+
+				var (callback, times, tracking) = _sequence_NoParams_Data_IDataReader[_sequenceIndex_NoParams_Data_IDataReader];
+				tracking.RecordCall();
+
+				if (!times.IsForever && tracking.CallCount >= times.Count)
+				{
+					if (_sequenceIndex_NoParams_Data_IDataReader < _sequence_NoParams_Data_IDataReader.Count - 1)
+						_sequenceIndex_NoParams_Data_IDataReader++;
+					else if (tracking.CallCount > times.Count)
+						throw global::KnockOff.StubException.SequenceExhausted("ExecuteReader");
+				}
+
+				return callback(ko);
+			}
+
+			/// <summary>Invokes configured callback for ExecuteReader(global::System.Data.CommandBehavior).</summary>
+			internal global::System.Data.IDataReader Invoke_Data_CommandBehavior_Data_IDataReader(Stubs.IDbCommand ko, global::System.Data.CommandBehavior behavior)
+			{
+				if (_sequence_Data_CommandBehavior_Data_IDataReader.Count == 0)
+				{
+					_unconfiguredCallCount++;
+					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ExecuteReader");
+					throw new global::System.InvalidOperationException("No implementation provided for ExecuteReader. Configure via OnCall.");
+				}
+
+				var (callback, times, tracking) = _sequence_Data_CommandBehavior_Data_IDataReader[_sequenceIndex_Data_CommandBehavior_Data_IDataReader];
+				tracking.RecordCall(behavior);
+
+				if (!times.IsForever && tracking.CallCount >= times.Count)
+				{
+					if (_sequenceIndex_Data_CommandBehavior_Data_IDataReader < _sequence_Data_CommandBehavior_Data_IDataReader.Count - 1)
+						_sequenceIndex_Data_CommandBehavior_Data_IDataReader++;
+					else if (tracking.CallCount > times.Count)
+						throw global::KnockOff.StubException.SequenceExhausted("ExecuteReader");
+				}
+
+				return callback(ko, behavior);
+			}
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset()
+			{
+				_unconfiguredCallCount = 0;
+				foreach (var (_, _, tracking) in _sequence_NoParams_Data_IDataReader)
+					tracking.Reset();
+				_sequenceIndex_NoParams_Data_IDataReader = 0;
+				foreach (var (_, _, tracking) in _sequence_Data_CommandBehavior_Data_IDataReader)
+					tracking.Reset();
+				_sequenceIndex_Data_CommandBehavior_Data_IDataReader = 0;
+			}
+
+			/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _sequence_NoParams_Data_IDataReader)
+				{
+					if (times.IsForever)
+					{
+						if (!tracking.WasCalled)
+							return false;
+					}
+					else if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				foreach (var (_, times, tracking) in _sequence_Data_CommandBehavior_Data_IDataReader)
+				{
+					if (times.IsForever)
+					{
+						if (!tracking.WasCalled)
+							return false;
+					}
+					else if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Tracks invocations for this callback registration.</summary>
+			private sealed class MethodTrackingImpl_NoParams_Data_IDataReader : global::KnockOff.IMethodTracking
+			{
+
+				/// <summary>Number of times this callback was invoked.</summary>
+				public int CallCount { get; private set; }
+
+				/// <summary>True if CallCount > 0.</summary>
+				public bool WasCalled => CallCount > 0;
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall() => CallCount++;
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() => CallCount = 0;
+			}
+
+			/// <summary>Tracks invocations for this callback registration.</summary>
+			private sealed class MethodTrackingImpl_Data_CommandBehavior_Data_IDataReader : global::KnockOff.IMethodTracking<global::System.Data.CommandBehavior>
+			{
+				private global::System.Data.CommandBehavior _lastArg = default!;
+
+				/// <summary>Number of times this callback was invoked.</summary>
+				public int CallCount { get; private set; }
+
+				/// <summary>True if CallCount > 0.</summary>
+				public bool WasCalled => CallCount > 0;
+
+				/// <summary>Last argument passed to this callback. Default if never called.</summary>
+				public global::System.Data.CommandBehavior LastArg => _lastArg;
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall(global::System.Data.CommandBehavior behavior) { CallCount++; _lastArg = behavior; }
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() { CallCount = 0; _lastArg = default!; }
+			}
+
+			/// <summary>Sequence implementation for ThenCall chaining.</summary>
+			private sealed class MethodSequenceImpl_NoParams_Data_IDataReader : global::KnockOff.IMethodSequence<ExecuteReaderDelegate_NoParams_Data_IDataReader>
+			{
+				private readonly IDbCommand_ExecuteReaderInterceptor _interceptor;
+
+				public MethodSequenceImpl_NoParams_Data_IDataReader(IDbCommand_ExecuteReaderInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Total calls across all callbacks in sequence.</summary>
+				public int TotalCallCount
+				{
+					get
+					{
+						var total = 0;
+						foreach (var (_, _, tracking) in _interceptor._sequence_NoParams_Data_IDataReader)
+							total += tracking.CallCount;
+						return total;
+					}
+				}
+
+				/// <summary>Add another callback to the sequence.</summary>
+				public global::KnockOff.IMethodSequence<ExecuteReaderDelegate_NoParams_Data_IDataReader> ThenCall(ExecuteReaderDelegate_NoParams_Data_IDataReader callback, global::KnockOff.Times times)
+				{
+					var tracking = new MethodTrackingImpl_NoParams_Data_IDataReader();
+					_interceptor._sequence_NoParams_Data_IDataReader.Add((callback, times, tracking));
+					return this;
+				}
+
+				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+				public bool Verify()
+				{
+					foreach (var (_, times, tracking) in _interceptor._sequence_NoParams_Data_IDataReader)
+					{
+						if (!times.Verify(tracking.CallCount))
+							return false;
+					}
+					return true;
+				}
+
+				/// <summary>Reset all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+			}
+
+			/// <summary>Sequence implementation for ThenCall chaining.</summary>
+			private sealed class MethodSequenceImpl_Data_CommandBehavior_Data_IDataReader : global::KnockOff.IMethodSequence<ExecuteReaderDelegate_Data_CommandBehavior_Data_IDataReader>
+			{
+				private readonly IDbCommand_ExecuteReaderInterceptor _interceptor;
+
+				public MethodSequenceImpl_Data_CommandBehavior_Data_IDataReader(IDbCommand_ExecuteReaderInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Total calls across all callbacks in sequence.</summary>
+				public int TotalCallCount
+				{
+					get
+					{
+						var total = 0;
+						foreach (var (_, _, tracking) in _interceptor._sequence_Data_CommandBehavior_Data_IDataReader)
+							total += tracking.CallCount;
+						return total;
+					}
+				}
+
+				/// <summary>Add another callback to the sequence.</summary>
+				public global::KnockOff.IMethodSequence<ExecuteReaderDelegate_Data_CommandBehavior_Data_IDataReader> ThenCall(ExecuteReaderDelegate_Data_CommandBehavior_Data_IDataReader callback, global::KnockOff.Times times)
+				{
+					var tracking = new MethodTrackingImpl_Data_CommandBehavior_Data_IDataReader();
+					_interceptor._sequence_Data_CommandBehavior_Data_IDataReader.Add((callback, times, tracking));
+					return this;
+				}
+
+				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+				public bool Verify()
+				{
+					foreach (var (_, times, tracking) in _interceptor._sequence_Data_CommandBehavior_Data_IDataReader)
+					{
+						if (!times.Verify(tracking.CallCount))
+							return false;
+					}
+					return true;
+				}
+
+				/// <summary>Reset all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+			}
+
 		}
 
-		/// <summary>Interceptor for ExecuteScalar.</summary>
+		/// <summary>Tracks and configures behavior for ExecuteScalar.</summary>
 		public sealed class IDbCommand_ExecuteScalarInterceptor
 		{
-			/// <summary>Number of times this method was called.</summary>
-			public int CallCount { get; private set; }
+			/// <summary>Delegate for ExecuteScalar.</summary>
+			public delegate object? ExecuteScalarDelegate(Stubs.IDbCommand ko);
+
+			private readonly global::System.Collections.Generic.List<(ExecuteScalarDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+			private int _sequenceIndex;
+			private int _unconfiguredCallCount;
+
+			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+			public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Func<Stubs.IDbCommand, object?>? OnCall { get; set; }
 
-			public void RecordCall() { CallCount++; }
+			/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking OnCall(ExecuteScalarDelegate callback)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequenceIndex = 0;
+				return tracking;
+			}
 
-			public void Reset() { CallCount = 0; OnCall = null; }
+			/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+			public global::KnockOff.IMethodSequence<ExecuteScalarDelegate> OnCall(ExecuteScalarDelegate callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, times, tracking));
+				_sequenceIndex = 0;
+				return new MethodSequenceImpl(this);
+			}
+
+			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+			internal object? Invoke(Stubs.IDbCommand ko)
+			{
+				if (_sequence.Count == 0)
+				{
+					_unconfiguredCallCount++;
+					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ExecuteScalar");
+					return default!;
+				}
+
+				var (callback, times, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall();
+
+				if (!times.IsForever && tracking.CallCount >= times.Count)
+				{
+					if (_sequenceIndex < _sequence.Count - 1)
+						_sequenceIndex++;
+					else if (tracking.CallCount > times.Count)
+						throw global::KnockOff.StubException.SequenceExhausted("ExecuteScalar");
+				}
+
+				return callback(ko);
+			}
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset()
+			{
+				_unconfiguredCallCount = 0;
+				foreach (var (_, _, tracking) in _sequence)
+					tracking.Reset();
+				_sequenceIndex = 0;
+			}
+
+			/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _sequence)
+				{
+					if (times.IsForever)
+					{
+						if (!tracking.WasCalled)
+							return false;
+					}
+					else if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Tracks invocations for this callback registration.</summary>
+			private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking
+			{
+
+				/// <summary>Number of times this callback was invoked.</summary>
+				public int CallCount { get; private set; }
+
+				/// <summary>True if CallCount > 0.</summary>
+				public bool WasCalled => CallCount > 0;
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall() => CallCount++;
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() => CallCount = 0;
+			}
+
+			/// <summary>Sequence implementation for ThenCall chaining.</summary>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<ExecuteScalarDelegate>
+			{
+				private readonly IDbCommand_ExecuteScalarInterceptor _interceptor;
+
+				public MethodSequenceImpl(IDbCommand_ExecuteScalarInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Total calls across all callbacks in sequence.</summary>
+				public int TotalCallCount
+				{
+					get
+					{
+						var total = 0;
+						foreach (var (_, _, tracking) in _interceptor._sequence)
+							total += tracking.CallCount;
+						return total;
+					}
+				}
+
+				/// <summary>Add another callback to the sequence.</summary>
+				public global::KnockOff.IMethodSequence<ExecuteScalarDelegate> ThenCall(ExecuteScalarDelegate callback, global::KnockOff.Times times)
+				{
+					var tracking = new MethodTrackingImpl();
+					_interceptor._sequence.Add((callback, times, tracking));
+					return this;
+				}
+
+				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+				public bool Verify()
+				{
+					foreach (var (_, times, tracking) in _interceptor._sequence)
+					{
+						if (!times.Verify(tracking.CallCount))
+							return false;
+					}
+					return true;
+				}
+
+				/// <summary>Reset all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+			}
+
 		}
 
-		/// <summary>Interceptor for Prepare.</summary>
+		/// <summary>Tracks and configures behavior for Prepare.</summary>
 		public sealed class IDbCommand_PrepareInterceptor
 		{
-			/// <summary>Number of times this method was called.</summary>
-			public int CallCount { get; private set; }
+			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IDbCommand> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+			private int _sequenceIndex;
+			private int _unconfiguredCallCount;
+
+			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+			public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Action<Stubs.IDbCommand>? OnCall { get; set; }
 
-			public void RecordCall() { CallCount++; }
+			/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.IDbCommand> callback)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequenceIndex = 0;
+				return tracking;
+			}
 
-			public void Reset() { CallCount = 0; OnCall = null; }
+			/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDbCommand>> OnCall(global::System.Action<Stubs.IDbCommand> callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, times, tracking));
+				_sequenceIndex = 0;
+				return new MethodSequenceImpl(this);
+			}
+
+			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+			internal void Invoke(Stubs.IDbCommand ko)
+			{
+				if (_sequence.Count == 0)
+				{
+					_unconfiguredCallCount++;
+					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Prepare");
+					return;
+				}
+
+				var (callback, times, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall();
+
+				if (!times.IsForever && tracking.CallCount >= times.Count)
+				{
+					if (_sequenceIndex < _sequence.Count - 1)
+						_sequenceIndex++;
+					else if (tracking.CallCount > times.Count)
+						throw global::KnockOff.StubException.SequenceExhausted("Prepare");
+				}
+
+				callback(ko);
+			}
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset()
+			{
+				_unconfiguredCallCount = 0;
+				foreach (var (_, _, tracking) in _sequence)
+					tracking.Reset();
+				_sequenceIndex = 0;
+			}
+
+			/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _sequence)
+				{
+					if (times.IsForever)
+					{
+						if (!tracking.WasCalled)
+							return false;
+					}
+					else if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Tracks invocations for this callback registration.</summary>
+			private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking
+			{
+
+				/// <summary>Number of times this callback was invoked.</summary>
+				public int CallCount { get; private set; }
+
+				/// <summary>True if CallCount > 0.</summary>
+				public bool WasCalled => CallCount > 0;
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall() => CallCount++;
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() => CallCount = 0;
+			}
+
+			/// <summary>Sequence implementation for ThenCall chaining.</summary>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDbCommand>>
+			{
+				private readonly IDbCommand_PrepareInterceptor _interceptor;
+
+				public MethodSequenceImpl(IDbCommand_PrepareInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Total calls across all callbacks in sequence.</summary>
+				public int TotalCallCount
+				{
+					get
+					{
+						var total = 0;
+						foreach (var (_, _, tracking) in _interceptor._sequence)
+							total += tracking.CallCount;
+						return total;
+					}
+				}
+
+				/// <summary>Add another callback to the sequence.</summary>
+				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDbCommand>> ThenCall(global::System.Action<Stubs.IDbCommand> callback, global::KnockOff.Times times)
+				{
+					var tracking = new MethodTrackingImpl();
+					_interceptor._sequence.Add((callback, times, tracking));
+					return this;
+				}
+
+				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+				public bool Verify()
+				{
+					foreach (var (_, times, tracking) in _interceptor._sequence)
+					{
+						if (!times.Verify(tracking.CallCount))
+							return false;
+					}
+					return true;
+				}
+
+				/// <summary>Reset all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+			}
+
 		}
 
-		/// <summary>Interceptor for Dispose.</summary>
+		/// <summary>Tracks and configures behavior for Dispose.</summary>
 		public sealed class IDbCommand_DisposeInterceptor
 		{
-			/// <summary>Number of times this method was called.</summary>
-			public int CallCount { get; private set; }
+			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IDbCommand> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+			private int _sequenceIndex;
+			private int _unconfiguredCallCount;
+
+			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+			public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when method is called.</summary>
-			public global::System.Action<Stubs.IDbCommand>? OnCall { get; set; }
 
-			public void RecordCall() { CallCount++; }
+			/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.IDbCommand> callback)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequenceIndex = 0;
+				return tracking;
+			}
 
-			public void Reset() { CallCount = 0; OnCall = null; }
+			/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
+			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDbCommand>> OnCall(global::System.Action<Stubs.IDbCommand> callback, global::KnockOff.Times times)
+			{
+				var tracking = new MethodTrackingImpl();
+				_sequence.Clear();
+				_sequence.Add((callback, times, tracking));
+				_sequenceIndex = 0;
+				return new MethodSequenceImpl(this);
+			}
+
+			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+			internal void Invoke(Stubs.IDbCommand ko)
+			{
+				if (_sequence.Count == 0)
+				{
+					_unconfiguredCallCount++;
+					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Dispose");
+					return;
+				}
+
+				var (callback, times, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall();
+
+				if (!times.IsForever && tracking.CallCount >= times.Count)
+				{
+					if (_sequenceIndex < _sequence.Count - 1)
+						_sequenceIndex++;
+					else if (tracking.CallCount > times.Count)
+						throw global::KnockOff.StubException.SequenceExhausted("Dispose");
+				}
+
+				callback(ko);
+			}
+
+			/// <summary>Resets all tracking state.</summary>
+			public void Reset()
+			{
+				_unconfiguredCallCount = 0;
+				foreach (var (_, _, tracking) in _sequence)
+					tracking.Reset();
+				_sequenceIndex = 0;
+			}
+
+			/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
+			public bool Verify()
+			{
+				foreach (var (_, times, tracking) in _sequence)
+				{
+					if (times.IsForever)
+					{
+						if (!tracking.WasCalled)
+							return false;
+					}
+					else if (!times.Verify(tracking.CallCount))
+						return false;
+				}
+				return true;
+			}
+
+			/// <summary>Tracks invocations for this callback registration.</summary>
+			private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking
+			{
+
+				/// <summary>Number of times this callback was invoked.</summary>
+				public int CallCount { get; private set; }
+
+				/// <summary>True if CallCount > 0.</summary>
+				public bool WasCalled => CallCount > 0;
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall() => CallCount++;
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() => CallCount = 0;
+			}
+
+			/// <summary>Sequence implementation for ThenCall chaining.</summary>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDbCommand>>
+			{
+				private readonly IDbCommand_DisposeInterceptor _interceptor;
+
+				public MethodSequenceImpl(IDbCommand_DisposeInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Total calls across all callbacks in sequence.</summary>
+				public int TotalCallCount
+				{
+					get
+					{
+						var total = 0;
+						foreach (var (_, _, tracking) in _interceptor._sequence)
+							total += tracking.CallCount;
+						return total;
+					}
+				}
+
+				/// <summary>Add another callback to the sequence.</summary>
+				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDbCommand>> ThenCall(global::System.Action<Stubs.IDbCommand> callback, global::KnockOff.Times times)
+				{
+					var tracking = new MethodTrackingImpl();
+					_interceptor._sequence.Add((callback, times, tracking));
+					return this;
+				}
+
+				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
+				public bool Verify()
+				{
+					foreach (var (_, times, tracking) in _interceptor._sequence)
+					{
+						if (!times.Verify(tracking.CallCount))
+							return false;
+					}
+					return true;
+				}
+
+				/// <summary>Reset all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+			}
+
 		}
 
 		/// <summary>Stub implementation of global::System.Data.IDbCommand.</summary>
@@ -382,56 +1406,37 @@ partial class DbCommandStubTests
 
 			void global::System.Data.IDbCommand.Cancel()
 			{
-				Cancel.RecordCall();
-				if (Cancel.OnCall is { } onCall) { onCall(this); return; }
-				if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "Cancel");
+				Cancel.Invoke(this);
 			}
 
 			global::System.Data.IDbDataParameter global::System.Data.IDbCommand.CreateParameter()
 			{
-				CreateParameter.RecordCall();
-				if (CreateParameter.OnCall is { } onCall) return onCall(this);
-				if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "CreateParameter");
-				throw new global::System.InvalidOperationException("No implementation provided for CreateParameter. Set CreateParameter.OnCall.");
+				return CreateParameter.Invoke(this);
 			}
 
 			int global::System.Data.IDbCommand.ExecuteNonQuery()
 			{
-				ExecuteNonQuery.RecordCall();
-				if (ExecuteNonQuery.OnCall is { } onCall) return onCall(this);
-				if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "ExecuteNonQuery");
-				return default!;
+				return ExecuteNonQuery.Invoke(this);
 			}
 
 			global::System.Data.IDataReader global::System.Data.IDbCommand.ExecuteReader()
 			{
-				ExecuteReader.RecordCall(null);
-				if (ExecuteReader.OnCall is { } onCall) return onCall(this, null);
-				if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "ExecuteReader");
-				throw new global::System.InvalidOperationException("No implementation provided for ExecuteReader. Set ExecuteReader.OnCall.");
+				return ExecuteReader.Invoke_NoParams_Data_IDataReader(this);
 			}
 
 			global::System.Data.IDataReader global::System.Data.IDbCommand.ExecuteReader(global::System.Data.CommandBehavior behavior)
 			{
-				ExecuteReader.RecordCall(behavior);
-				if (ExecuteReader.OnCall is { } onCall) return onCall(this, behavior);
-				if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "ExecuteReader");
-				throw new global::System.InvalidOperationException("No implementation provided for ExecuteReader. Set ExecuteReader.OnCall.");
+				return ExecuteReader.Invoke_Data_CommandBehavior_Data_IDataReader(this, behavior);
 			}
 
 			object? global::System.Data.IDbCommand.ExecuteScalar()
 			{
-				ExecuteScalar.RecordCall();
-				if (ExecuteScalar.OnCall is { } onCall) return onCall(this);
-				if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "ExecuteScalar");
-				return default!;
+				return ExecuteScalar.Invoke(this);
 			}
 
 			void global::System.Data.IDbCommand.Prepare()
 			{
-				Prepare.RecordCall();
-				if (Prepare.OnCall is { } onCall) { onCall(this); return; }
-				if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "Prepare");
+				Prepare.Invoke(this);
 			}
 
 			string global::System.Data.IDbCommand.CommandText
@@ -558,9 +1563,7 @@ partial class DbCommandStubTests
 
 			void global::System.IDisposable.Dispose()
 			{
-				Dispose.RecordCall();
-				if (Dispose.OnCall is { } onCall) { onCall(this); return; }
-				if (Strict) throw global::KnockOff.StubException.NotConfigured("IDisposable", "Dispose");
+				Dispose.Invoke(this);
 			}
 
 			/// <summary>The global::System.Data.IDbCommand instance. Use for passing to code expecting the interface.</summary>

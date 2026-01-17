@@ -55,10 +55,12 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 		}
 
 		/// <summary>Typed handler for GetAttribute with specific type arguments.</summary>
-		public sealed class GetAttributeTypedHandler<T> : IGenericMethodCallTracker, IResettable where T : global::System.Attribute
+		public sealed class GetAttributeTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : global::System.Attribute
 		{
 			/// <summary>Delegate for GetAttribute.</summary>
 			public delegate T? GetAttributeDelegate(ConstrainedGenericMethodKnockOff ko);
+
+			private GetAttributeDelegate? _onCall;
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -66,14 +68,17 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public GetAttributeDelegate? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(GetAttributeDelegate callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal GetAttributeDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
 			public void RecordCall() => CallCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; OnCall = null; }
+			public void Reset() { CallCount = 0; _onCall = null; }
 		}
 	}
 
@@ -112,10 +117,12 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 		}
 
 		/// <summary>Typed handler for GetOrDefault with specific type arguments.</summary>
-		public sealed class GetOrDefaultTypedHandler<T> : IGenericMethodCallTracker, IResettable where T : class
+		public sealed class GetOrDefaultTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : class
 		{
 			/// <summary>Delegate for GetOrDefault.</summary>
 			public delegate T? GetOrDefaultDelegate(ConstrainedGenericMethodKnockOff ko);
+
+			private GetOrDefaultDelegate? _onCall;
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -123,14 +130,17 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public GetOrDefaultDelegate? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(GetOrDefaultDelegate callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal GetOrDefaultDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
 			public void RecordCall() => CallCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; OnCall = null; }
+			public void Reset() { CallCount = 0; _onCall = null; }
 		}
 	}
 
@@ -169,10 +179,12 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 		}
 
 		/// <summary>Typed handler for Transform with specific type arguments.</summary>
-		public sealed class TransformTypedHandler<TInput, TResult> : IGenericMethodCallTracker, IResettable where TInput : struct where TResult : class
+		public sealed class TransformTypedHandler<TInput, TResult> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where TInput : struct where TResult : class
 		{
 			/// <summary>Delegate for Transform.</summary>
 			public delegate TResult? TransformDelegate(ConstrainedGenericMethodKnockOff ko, TInput input);
+
+			private TransformDelegate? _onCall;
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -180,14 +192,17 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public TransformDelegate? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(TransformDelegate callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal TransformDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
 			public void RecordCall() => CallCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; OnCall = null; }
+			public void Reset() { CallCount = 0; _onCall = null; }
 		}
 	}
 
@@ -226,10 +241,12 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 		}
 
 		/// <summary>Typed handler for GetValue with specific type arguments.</summary>
-		public sealed class GetValueTypedHandler<T> : IGenericMethodCallTracker, IResettable
+		public sealed class GetValueTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 		{
 			/// <summary>Delegate for GetValue.</summary>
 			public delegate T GetValueDelegate(ConstrainedGenericMethodKnockOff ko, int index);
+
+			private GetValueDelegate? _onCall;
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -240,14 +257,17 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public GetValueDelegate? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(GetValueDelegate callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal GetValueDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
 			public void RecordCall(int? index) { CallCount++; LastCallArg = index; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+			public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }
 		}
 	}
 
@@ -286,10 +306,12 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 		}
 
 		/// <summary>Typed handler for FindService with specific type arguments.</summary>
-		public sealed class FindServiceTypedHandler<T> : IGenericMethodCallTracker, IResettable where T : class, global::System.IDisposable
+		public sealed class FindServiceTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : class, global::System.IDisposable
 		{
 			/// <summary>Delegate for FindService.</summary>
 			public delegate T? FindServiceDelegate(ConstrainedGenericMethodKnockOff ko);
+
+			private FindServiceDelegate? _onCall;
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -297,14 +319,17 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public FindServiceDelegate? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(FindServiceDelegate callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal FindServiceDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
 			public void RecordCall() => CallCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; OnCall = null; }
+			public void Reset() { CallCount = 0; _onCall = null; }
 		}
 	}
 
@@ -354,7 +379,7 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 	T? global::KnockOff.Tests.IConstrainedGenericMethod.GetAttribute<T>() where T : class
 	{
 		GetAttribute.Of<T>().RecordCall();
-		if (GetAttribute.Of<T>().OnCall is { } callback)
+		if (GetAttribute.Of<T>().Callback is { } callback)
 			return callback(this);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IConstrainedGenericMethod", "GetAttribute");
 		return default!;
@@ -363,7 +388,7 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 	T? global::KnockOff.Tests.IConstrainedGenericMethod.GetOrDefault<T>() where T : class
 	{
 		GetOrDefault.Of<T>().RecordCall();
-		if (GetOrDefault.Of<T>().OnCall is { } callback)
+		if (GetOrDefault.Of<T>().Callback is { } callback)
 			return callback(this);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IConstrainedGenericMethod", "GetOrDefault");
 		return default!;
@@ -372,7 +397,7 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 	TResult? global::KnockOff.Tests.IConstrainedGenericMethod.Transform<TInput, TResult>(TInput input) where TInput : struct where TResult : class
 	{
 		Transform.Of<TInput, TResult>().RecordCall();
-		if (Transform.Of<TInput, TResult>().OnCall is { } callback)
+		if (Transform.Of<TInput, TResult>().Callback is { } callback)
 			return callback(this, input);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IConstrainedGenericMethod", "Transform");
 		return default!;
@@ -381,7 +406,7 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 	T global::KnockOff.Tests.IConstrainedGenericMethod.GetValue<T>(int index)
 	{
 		GetValue.Of<T>().RecordCall(index);
-		if (GetValue.Of<T>().OnCall is { } callback)
+		if (GetValue.Of<T>().Callback is { } callback)
 			return callback(this, index);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IConstrainedGenericMethod", "GetValue");
 		return SmartDefault<T>("GetValue");
@@ -390,7 +415,7 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 	T? global::KnockOff.Tests.IConstrainedGenericMethod.FindService<T>() where T : class
 	{
 		FindService.Of<T>().RecordCall();
-		if (FindService.Of<T>().OnCall is { } callback)
+		if (FindService.Of<T>().Callback is { } callback)
 			return callback(this);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IConstrainedGenericMethod", "FindService");
 		return default!;

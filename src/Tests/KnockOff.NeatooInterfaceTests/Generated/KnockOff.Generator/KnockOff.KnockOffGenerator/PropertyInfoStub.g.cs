@@ -123,6 +123,14 @@ partial class PropertyInfoStub : global::Neatoo.IPropertyInfo, global::KnockOff.
 
 		private readonly global::System.Collections.Generic.List<(GetCustomAttributesDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetCustomAttributesDelegate callback)
@@ -149,6 +157,7 @@ partial class PropertyInfoStub : global::Neatoo.IPropertyInfo, global::KnockOff.
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetCustomAttributes");
 				return new global::System.Collections.Generic.List<global::System.Attribute>();
 			}
@@ -170,6 +179,7 @@ partial class PropertyInfoStub : global::Neatoo.IPropertyInfo, global::KnockOff.
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -180,7 +190,6 @@ partial class PropertyInfoStub : global::Neatoo.IPropertyInfo, global::KnockOff.
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -250,6 +259,7 @@ partial class PropertyInfoStub : global::Neatoo.IPropertyInfo, global::KnockOff.
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Interceptor for GetCustomAttribute (generic method with Of&lt;T&gt;() access).</summary>
@@ -287,10 +297,12 @@ partial class PropertyInfoStub : global::Neatoo.IPropertyInfo, global::KnockOff.
 		}
 
 		/// <summary>Typed handler for GetCustomAttribute with specific type arguments.</summary>
-		public sealed class GetCustomAttributeTypedHandler<T> : IGenericMethodCallTracker, IResettable where T : global::System.Attribute
+		public sealed class GetCustomAttributeTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : global::System.Attribute
 		{
 			/// <summary>Delegate for GetCustomAttribute.</summary>
 			public delegate T? GetCustomAttributeDelegate(PropertyInfoStub ko);
+
+			private GetCustomAttributeDelegate? _onCall;
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -298,14 +310,17 @@ partial class PropertyInfoStub : global::Neatoo.IPropertyInfo, global::KnockOff.
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public GetCustomAttributeDelegate? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(GetCustomAttributeDelegate callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal GetCustomAttributeDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
 			public void RecordCall() => CallCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; OnCall = null; }
+			public void Reset() { CallCount = 0; _onCall = null; }
 		}
 	}
 
@@ -401,7 +416,7 @@ partial class PropertyInfoStub : global::Neatoo.IPropertyInfo, global::KnockOff.
 	T? global::Neatoo.IPropertyInfo.GetCustomAttribute<T>() where T : class
 	{
 		GetCustomAttribute.Of<T>().RecordCall();
-		if (GetCustomAttribute.Of<T>().OnCall is { } callback)
+		if (GetCustomAttribute.Of<T>().Callback is { } callback)
 			return callback(this);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "GetCustomAttribute");
 		return default!;

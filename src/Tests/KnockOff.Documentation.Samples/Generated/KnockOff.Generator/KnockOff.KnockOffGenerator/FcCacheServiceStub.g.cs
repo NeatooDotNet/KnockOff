@@ -25,6 +25,18 @@ partial class FcCacheServiceStub : global::KnockOff.Documentation.Samples.Compar
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<FcCacheServiceStub, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private string? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public string? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<string> OnCall(global::System.Action<FcCacheServiceStub, string> callback)
@@ -51,6 +63,8 @@ partial class FcCacheServiceStub : global::KnockOff.Documentation.Samples.Compar
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = key;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Remove");
 				return;
 			}
@@ -72,6 +86,8 @@ partial class FcCacheServiceStub : global::KnockOff.Documentation.Samples.Compar
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -82,7 +98,6 @@ partial class FcCacheServiceStub : global::KnockOff.Documentation.Samples.Compar
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -156,6 +171,7 @@ partial class FcCacheServiceStub : global::KnockOff.Documentation.Samples.Compar
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Interceptor for Get (generic method with Of&lt;T&gt;() access).</summary>
@@ -193,10 +209,12 @@ partial class FcCacheServiceStub : global::KnockOff.Documentation.Samples.Compar
 		}
 
 		/// <summary>Typed handler for Get with specific type arguments.</summary>
-		public sealed class GetTypedHandler<T> : IGenericMethodCallTracker, IResettable where T : class
+		public sealed class GetTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : class
 		{
 			/// <summary>Delegate for Get.</summary>
 			public delegate T? GetDelegate(FcCacheServiceStub ko, string key);
+
+			private GetDelegate? _onCall;
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -207,14 +225,17 @@ partial class FcCacheServiceStub : global::KnockOff.Documentation.Samples.Compar
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public GetDelegate? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(GetDelegate callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal GetDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
 			public void RecordCall(string? key) { CallCount++; LastCallArg = key; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+			public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }
 		}
 	}
 
@@ -253,10 +274,12 @@ partial class FcCacheServiceStub : global::KnockOff.Documentation.Samples.Compar
 		}
 
 		/// <summary>Typed handler for Set with specific type arguments.</summary>
-		public sealed class SetTypedHandler<T> : IGenericMethodCallTracker, IResettable where T : class
+		public sealed class SetTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : class
 		{
 			/// <summary>Delegate for Set.</summary>
 			public delegate void SetDelegate(FcCacheServiceStub ko, string key, T @value, global::System.TimeSpan expiration);
+
+			private SetDelegate? _onCall;
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -267,14 +290,17 @@ partial class FcCacheServiceStub : global::KnockOff.Documentation.Samples.Compar
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public SetDelegate? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(SetDelegate callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal SetDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
 			public void RecordCall(string? key) { CallCount++; LastCallArg = key; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+			public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }
 		}
 	}
 
@@ -333,7 +359,7 @@ partial class FcCacheServiceStub : global::KnockOff.Documentation.Samples.Compar
 	T? global::KnockOff.Documentation.Samples.Comparison.IFcCacheService.Get<T>(string key) where T : class
 	{
 		Get.Of<T>().RecordCall(key);
-		if (Get.Of<T>().OnCall is { } callback)
+		if (Get.Of<T>().Callback is { } callback)
 			return callback(this, key);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFcCacheService", "Get");
 		return default!;
@@ -342,7 +368,7 @@ partial class FcCacheServiceStub : global::KnockOff.Documentation.Samples.Compar
 	void global::KnockOff.Documentation.Samples.Comparison.IFcCacheService.Set<T>(string key, T @value, global::System.TimeSpan expiration) where T : class
 	{
 		Set.Of<T>().RecordCall(key);
-		if (Set.Of<T>().OnCall is { } onCallCallback)
+		if (Set.Of<T>().Callback is { } onCallCallback)
 		{ onCallCallback(this, key, @value, expiration); return; }
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFcCacheService", "Set");
 	}

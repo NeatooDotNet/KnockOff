@@ -82,7 +82,7 @@ public partial class ITriggerPropertyTests
         var stub = new Stubs.ITriggerProperty();
         ITriggerProperty trigger = stub;
 
-        stub.IsMatch.OnCall = (ko, propName) => propName == "ExpectedProperty";
+        stub.IsMatch.OnCall((ko, propName) => propName == "ExpectedProperty");
 
         Assert.True(trigger.IsMatch("ExpectedProperty"));
         Assert.False(trigger.IsMatch("OtherProperty"));
@@ -240,11 +240,11 @@ public partial class ITriggerPropertyOfTTests
         ITriggerProperty<IValidateBase> trigger = stub;
         IValidateBase? capturedTarget = null;
 
-        stub.GetValue.OnCall = (ko, target) =>
+        stub.GetValue.OnCall((ko, target) =>
         {
             capturedTarget = target;
             return "Value";
-        };
+        });
 
         var targetStub = new ValidateBaseStubForTrigger();
         trigger.GetValue(targetStub);
@@ -258,7 +258,7 @@ public partial class ITriggerPropertyOfTTests
         var stub = new Stubs.ITriggerProperty();
         ITriggerProperty<IValidateBase> trigger = stub;
 
-        stub.GetValue.OnCall = (ko, target) => "ConfiguredValue";
+        stub.GetValue.OnCall((ko, target) => "ConfiguredValue");
 
         var targetStub = new ValidateBaseStubForTrigger();
         var result = trigger.GetValue(targetStub);

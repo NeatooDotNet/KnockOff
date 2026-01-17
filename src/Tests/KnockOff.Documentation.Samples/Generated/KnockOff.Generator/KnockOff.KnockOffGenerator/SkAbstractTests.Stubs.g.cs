@@ -25,8 +25,10 @@ partial class SkAbstractTests
 		}
 
 		/// <summary>Interceptor for SkBaseRepository.Save.</summary>
-		public sealed class SkBaseRepository_SaveInterceptor
+		public sealed class SkBaseRepository_SaveInterceptor : global::KnockOff.IMethodTracking
 		{
+			private global::System.Action<Stubs.SkBaseRepository, object>? _onCall;
+
 			/// <summary>Number of times this method was called.</summary>
 			public int CallCount { get; private set; }
 
@@ -36,12 +38,15 @@ partial class SkAbstractTests
 			/// <summary>The argument from the last call.</summary>
 			public object? LastCallArg { get; private set; }
 
-			/// <summary>Callback invoked when method is called. If set, called instead of base.</summary>
-			public global::System.Action<Stubs.SkBaseRepository, object>? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.SkBaseRepository, object> callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal global::System.Action<Stubs.SkBaseRepository, object>? Callback => _onCall;
 
 			public void RecordCall(object entity) { CallCount++; LastCallArg = entity; }
 
-			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+			public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }
 		}
 
 		/// <summary>Stub for global::KnockOff.Documentation.Samples.Skills.SkBaseRepository via composition.</summary>
@@ -95,7 +100,7 @@ partial class SkAbstractTests
 				public override void Save(object entity)
 				{
 					_stub?.Save.RecordCall(entity);
-					if (_stub?.Save.OnCall is { } onCall) { onCall(_stub, entity); return; }
+					if (_stub?.Save.Callback is { } onCall) { onCall(_stub, entity); return; }
 				}
 
 			}

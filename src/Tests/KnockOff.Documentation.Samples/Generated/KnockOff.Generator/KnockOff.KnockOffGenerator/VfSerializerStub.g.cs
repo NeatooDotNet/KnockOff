@@ -55,10 +55,12 @@ partial class VfSerializerStub : global::KnockOff.Documentation.Samples.Guides.I
 		}
 
 		/// <summary>Typed handler for Deserialize with specific type arguments.</summary>
-		public sealed class DeserializeTypedHandler<T> : IGenericMethodCallTracker, IResettable where T : class
+		public sealed class DeserializeTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : class
 		{
 			/// <summary>Delegate for Deserialize.</summary>
 			public delegate T? DeserializeDelegate(VfSerializerStub ko, string json);
+
+			private DeserializeDelegate? _onCall;
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -69,14 +71,17 @@ partial class VfSerializerStub : global::KnockOff.Documentation.Samples.Guides.I
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public DeserializeDelegate? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(DeserializeDelegate callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal DeserializeDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
 			public void RecordCall(string? json) { CallCount++; LastCallArg = json; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+			public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }
 		}
 	}
 
@@ -114,7 +119,7 @@ partial class VfSerializerStub : global::KnockOff.Documentation.Samples.Guides.I
 	T? global::KnockOff.Documentation.Samples.Guides.IVfSerializer.Deserialize<T>(string json) where T : class
 	{
 		Deserialize.Of<T>().RecordCall(json);
-		if (Deserialize.Of<T>().OnCall is { } callback)
+		if (Deserialize.Of<T>().Callback is { } callback)
 			return callback(this, json);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IVfSerializer", "Deserialize");
 		return default!;

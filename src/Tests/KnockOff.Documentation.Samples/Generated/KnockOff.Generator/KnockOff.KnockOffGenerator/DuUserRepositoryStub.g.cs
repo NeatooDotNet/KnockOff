@@ -10,6 +10,18 @@ partial class DuUserRepositoryStub : global::KnockOff.Documentation.Samples.WhyK
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<DuUserRepositoryStub, global::KnockOff.Documentation.Samples.WhyKnockOff.DuUser> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private global::KnockOff.Documentation.Samples.WhyKnockOff.DuUser? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public global::KnockOff.Documentation.Samples.WhyKnockOff.DuUser? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<global::KnockOff.Documentation.Samples.WhyKnockOff.DuUser> OnCall(global::System.Action<DuUserRepositoryStub, global::KnockOff.Documentation.Samples.WhyKnockOff.DuUser> callback)
@@ -36,6 +48,8 @@ partial class DuUserRepositoryStub : global::KnockOff.Documentation.Samples.WhyK
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = user;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 				return;
 			}
@@ -57,6 +71,8 @@ partial class DuUserRepositoryStub : global::KnockOff.Documentation.Samples.WhyK
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -67,7 +83,6 @@ partial class DuUserRepositoryStub : global::KnockOff.Documentation.Samples.WhyK
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -141,6 +156,7 @@ partial class DuUserRepositoryStub : global::KnockOff.Documentation.Samples.WhyK
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks calls to GetById (user-defined implementation).</summary>

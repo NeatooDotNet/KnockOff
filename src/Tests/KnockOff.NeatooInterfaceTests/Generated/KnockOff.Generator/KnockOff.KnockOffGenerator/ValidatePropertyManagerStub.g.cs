@@ -130,6 +130,14 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 
 		private readonly global::System.Collections.Generic.List<(WaitForTasksDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(WaitForTasksDelegate callback)
@@ -156,6 +164,7 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -177,6 +186,7 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -187,7 +197,6 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -257,6 +266,7 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for HasProperty.</summary>
@@ -267,6 +277,18 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 
 		private readonly global::System.Collections.Generic.List<(HasPropertyDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private string? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public string? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<string> OnCall(HasPropertyDelegate callback)
@@ -293,6 +315,8 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = propertyName;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "HasProperty");
 				return default!;
 			}
@@ -314,6 +338,8 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -324,7 +350,6 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -398,6 +423,7 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for GetProperty.</summary>
@@ -408,6 +434,18 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 
 		private readonly global::System.Collections.Generic.List<(GetPropertyDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private string? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public string? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<string> OnCall(GetPropertyDelegate callback)
@@ -434,8 +472,10 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = propertyName;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetProperty");
-				throw new global::System.InvalidOperationException("No implementation provided for GetProperty. Configure via GetProperty.OnCall.");
+				throw new global::System.InvalidOperationException("No implementation provided for GetProperty. Configure via OnCall.");
 			}
 
 			var (callback, times, tracking) = _sequence[_sequenceIndex];
@@ -455,6 +495,8 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -465,7 +507,6 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -539,6 +580,7 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for SetProperties.</summary>
@@ -546,6 +588,18 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<ValidatePropertyManagerStub, global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty>> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty>? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty>? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty>> OnCall(global::System.Action<ValidatePropertyManagerStub, global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty>> callback)
@@ -572,6 +626,8 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = properties;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SetProperties");
 				return;
 			}
@@ -593,6 +649,8 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -603,7 +661,6 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -677,6 +734,7 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for RunRules.</summary>
@@ -687,6 +745,18 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 
 		private readonly global::System.Collections.Generic.List<(RunRulesDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+		private (global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token)? _unconfiguredLastArgs;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The arguments from the last call (from most recently called registration).</summary>
+		public (global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token)? LastCallArgs { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTrackingArgs<(global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token)> OnCall(RunRulesDelegate callback)
@@ -713,6 +783,8 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
+				_unconfiguredLastArgs = ((runRules, token));
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -734,6 +806,8 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArgs = default;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -744,7 +818,6 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -818,6 +891,7 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for PauseAllActions.</summary>
@@ -825,6 +899,14 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<ValidatePropertyManagerStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(global::System.Action<ValidatePropertyManagerStub> callback)
@@ -851,6 +933,7 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "PauseAllActions");
 				return;
 			}
@@ -872,6 +955,7 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -882,7 +966,6 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -952,6 +1035,7 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for ResumeAllActions.</summary>
@@ -959,6 +1043,14 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<ValidatePropertyManagerStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(global::System.Action<ValidatePropertyManagerStub> callback)
@@ -985,6 +1077,7 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ResumeAllActions");
 				return;
 			}
@@ -1006,6 +1099,7 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1016,7 +1110,6 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1086,6 +1179,7 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for ClearAllMessages.</summary>
@@ -1093,6 +1187,14 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<ValidatePropertyManagerStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(global::System.Action<ValidatePropertyManagerStub> callback)
@@ -1119,6 +1221,7 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ClearAllMessages");
 				return;
 			}
@@ -1140,6 +1243,7 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1150,7 +1254,6 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1220,6 +1323,7 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for ClearSelfMessages.</summary>
@@ -1227,6 +1331,14 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 	{
 		private readonly global::System.Collections.Generic.List<(global::System.Action<ValidatePropertyManagerStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
+		private int _unconfiguredCallCount;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
 
 		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(global::System.Action<ValidatePropertyManagerStub> callback)
@@ -1253,6 +1365,7 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 		{
 			if (_sequence.Count == 0)
 			{
+				_unconfiguredCallCount++;
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ClearSelfMessages");
 				return;
 			}
@@ -1274,6 +1387,7 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 		/// <summary>Resets all tracking state.</summary>
 		public void Reset()
 		{
+			_unconfiguredCallCount = 0;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1284,7 +1398,6 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 		{
 			foreach (var (_, times, tracking) in _sequence)
 			{
-				// For Forever, infer "at least once"
 				if (times.IsForever)
 				{
 					if (!tracking.WasCalled)
@@ -1354,6 +1467,7 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 			/// <summary>Reset all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
 		}
+
 	}
 
 	/// <summary>Interceptor for NeatooPropertyChanged event.</summary>

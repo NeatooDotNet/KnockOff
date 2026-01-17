@@ -55,10 +55,12 @@ partial class AttributeToRuleStub : global::Neatoo.Rules.Rules.IAttributeToRule,
 		}
 
 		/// <summary>Typed handler for GetRule with specific type arguments.</summary>
-		public sealed class GetRuleTypedHandler<T> : IGenericMethodCallTracker, IResettable where T : class, global::Neatoo.IValidateBase
+		public sealed class GetRuleTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : class, global::Neatoo.IValidateBase
 		{
 			/// <summary>Delegate for GetRule.</summary>
 			public delegate global::Neatoo.Rules.IRule? GetRuleDelegate(AttributeToRuleStub ko, global::Neatoo.IPropertyInfo r, object? attribute);
+
+			private GetRuleDelegate? _onCall;
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -69,14 +71,17 @@ partial class AttributeToRuleStub : global::Neatoo.Rules.Rules.IAttributeToRule,
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public GetRuleDelegate? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(GetRuleDelegate callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal GetRuleDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
 			public void RecordCall(global::Neatoo.IPropertyInfo? r, object? attribute) { CallCount++; LastCallArgs = (r, attribute); }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+			public void Reset() { CallCount = 0; LastCallArgs = default; _onCall = null; }
 		}
 	}
 
@@ -114,7 +119,7 @@ partial class AttributeToRuleStub : global::Neatoo.Rules.Rules.IAttributeToRule,
 	global::Neatoo.Rules.IRule? global::Neatoo.Rules.Rules.IAttributeToRule.GetRule<T>(global::Neatoo.IPropertyInfo r, object? attribute) where T : class
 	{
 		GetRule.Of<T>().RecordCall(r, attribute);
-		if (GetRule.Of<T>().OnCall is { } callback)
+		if (GetRule.Of<T>().Callback is { } callback)
 			return callback(this, r, attribute);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IAttributeToRule", "GetRule");
 		return default!;

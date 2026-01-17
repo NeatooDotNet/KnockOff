@@ -33,10 +33,10 @@ public class MultipleInterfacesSamplesTests
 
         // Track calls on repo
         var addCount = 0;
-        repoStub.Add.OnCall = (ko, user) => { addCount++; };
+        repoStub.Add.OnCall((ko, user) => { addCount++; });
 
         // Return add count from SaveChanges
-        uowStub.SaveChangesAsync.OnCall = (ko, ct) => Task.FromResult(addCount);
+        uowStub.SaveChangesAsync.OnCall((ko, ct) => Task.FromResult(addCount));
 
         IMultiRepository repo = repoStub;
         IMultiUnitOfWork uow = uowStub;

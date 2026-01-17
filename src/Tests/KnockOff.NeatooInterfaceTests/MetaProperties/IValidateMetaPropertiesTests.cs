@@ -146,11 +146,11 @@ public partial class IValidateMetaPropertiesTests
         IValidateMetaProperties meta = stub;
         var callbackExecuted = false;
 
-        stub.RunRules.OnCall = (ko, propOrFlag, token, extra) =>
+        stub.RunRules.OnCall((Stubs.IValidateMetaProperties_RunRulesInterceptor.RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task)((ko, propOrFlag, token) =>
         {
             callbackExecuted = true;
             return Task.CompletedTask;
-        };
+        }));
 
         await meta.RunRules("Property", null);
 

@@ -169,7 +169,7 @@ public partial class IEntityPropertyManagerTests
         var stub = new Stubs.IEntityPropertyManager();
         IEntityPropertyManager manager = stub;
 
-        stub.HasProperty.OnCall = (ko, name) => name == "ExistingProperty";
+        stub.HasProperty.OnCall((ko, name) => name == "ExistingProperty");
 
         Assert.True(manager.HasProperty("ExistingProperty"));
         Assert.False(manager.HasProperty("NonExistent"));
@@ -182,7 +182,7 @@ public partial class IEntityPropertyManagerTests
         IEntityPropertyManager manager = stub;
 
         var propertyStub = new EntityPropertyStubForManager();
-        stub.GetProperty.OnCall = (ko, name) => propertyStub;
+        stub.GetProperty.OnCall((ko, name) => propertyStub);
 
         manager.GetProperty("Name");
 

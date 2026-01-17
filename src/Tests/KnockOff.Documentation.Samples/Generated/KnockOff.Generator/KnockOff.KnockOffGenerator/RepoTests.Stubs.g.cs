@@ -9,8 +9,10 @@ partial class RepoTests
 	public static class Stubs
 	{
 		/// <summary>Interceptor for Repository.GetUser.</summary>
-		public sealed class Repository_GetUserInterceptor
+		public sealed class Repository_GetUserInterceptor : global::KnockOff.IMethodTracking
 		{
+			private global::System.Func<Stubs.Repository, int, global::KnockOff.Documentation.Samples.Guides.InlineStubs.InUser?>? _onCall;
+
 			/// <summary>Number of times this method was called.</summary>
 			public int CallCount { get; private set; }
 
@@ -20,12 +22,15 @@ partial class RepoTests
 			/// <summary>The argument from the last call.</summary>
 			public int? LastCallArg { get; private set; }
 
-			/// <summary>Callback invoked when method is called. If set, called instead of base.</summary>
-			public global::System.Func<Stubs.Repository, int, global::KnockOff.Documentation.Samples.Guides.InlineStubs.InUser?>? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(global::System.Func<Stubs.Repository, int, global::KnockOff.Documentation.Samples.Guides.InlineStubs.InUser?> callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal global::System.Func<Stubs.Repository, int, global::KnockOff.Documentation.Samples.Guides.InlineStubs.InUser?>? Callback => _onCall;
 
 			public void RecordCall(int id) { CallCount++; LastCallArg = id; }
 
-			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+			public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }
 		}
 
 		/// <summary>Stub for global::KnockOff.Documentation.Samples.Guides.InlineStubs.Repository via composition.</summary>
@@ -65,7 +70,7 @@ partial class RepoTests
 				public override global::KnockOff.Documentation.Samples.Guides.InlineStubs.InUser? GetUser(int id)
 				{
 					_stub?.GetUser.RecordCall(id);
-					if (_stub?.GetUser.OnCall is { } onCall) return onCall(_stub, id);
+					if (_stub?.GetUser.Callback is { } onCall) return onCall(_stub, id);
 					return base.GetUser(id);
 				}
 

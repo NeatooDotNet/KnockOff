@@ -55,10 +55,12 @@ partial class GenericMethodWithUserMethodKnockOff : global::KnockOff.Tests.IGene
 		}
 
 		/// <summary>Typed handler for Create with specific type arguments.</summary>
-		public sealed class CreateTypedHandler<T> : IGenericMethodCallTracker, IResettable where T : new()
+		public sealed class CreateTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : new()
 		{
 			/// <summary>Delegate for Create.</summary>
 			public delegate T CreateDelegate(GenericMethodWithUserMethodKnockOff ko);
+
+			private CreateDelegate? _onCall;
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -66,14 +68,17 @@ partial class GenericMethodWithUserMethodKnockOff : global::KnockOff.Tests.IGene
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public CreateDelegate? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(CreateDelegate callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal CreateDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
 			public void RecordCall() => CallCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; OnCall = null; }
+			public void Reset() { CallCount = 0; _onCall = null; }
 		}
 	}
 
@@ -112,10 +117,12 @@ partial class GenericMethodWithUserMethodKnockOff : global::KnockOff.Tests.IGene
 		}
 
 		/// <summary>Typed handler for Transform with specific type arguments.</summary>
-		public sealed class TransformTypedHandler<T> : IGenericMethodCallTracker, IResettable
+		public sealed class TransformTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 		{
 			/// <summary>Delegate for Transform.</summary>
 			public delegate T TransformDelegate(GenericMethodWithUserMethodKnockOff ko, T @value);
+
+			private TransformDelegate? _onCall;
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -123,14 +130,17 @@ partial class GenericMethodWithUserMethodKnockOff : global::KnockOff.Tests.IGene
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public TransformDelegate? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(TransformDelegate callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal TransformDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
 			public void RecordCall() => CallCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; OnCall = null; }
+			public void Reset() { CallCount = 0; _onCall = null; }
 		}
 	}
 
@@ -169,10 +179,12 @@ partial class GenericMethodWithUserMethodKnockOff : global::KnockOff.Tests.IGene
 		}
 
 		/// <summary>Typed handler for Convert with specific type arguments.</summary>
-		public sealed class ConvertTypedHandler<TIn, TOut> : IGenericMethodCallTracker, IResettable where TOut : new()
+		public sealed class ConvertTypedHandler<TIn, TOut> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where TOut : new()
 		{
 			/// <summary>Delegate for Convert.</summary>
 			public delegate TOut ConvertDelegate(GenericMethodWithUserMethodKnockOff ko, TIn input);
+
+			private ConvertDelegate? _onCall;
 
 			/// <summary>Number of times this method was called with these type arguments.</summary>
 			public int CallCount { get; private set; }
@@ -180,14 +192,17 @@ partial class GenericMethodWithUserMethodKnockOff : global::KnockOff.Tests.IGene
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
 
-			/// <summary>Callback invoked when this method is called. If set, its return value is used.</summary>
-			public ConvertDelegate? OnCall { get; set; }
+			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
+			public global::KnockOff.IMethodTracking OnCall(ConvertDelegate callback) { _onCall = callback; return this; }
+
+			/// <summary>Gets the configured callback (internal use).</summary>
+			internal ConvertDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
 			public void RecordCall() => CallCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; OnCall = null; }
+			public void Reset() { CallCount = 0; _onCall = null; }
 		}
 	}
 
@@ -231,7 +246,7 @@ partial class GenericMethodWithUserMethodKnockOff : global::KnockOff.Tests.IGene
 	T global::KnockOff.Tests.IGenericMethodWithUserMethod.Create<T>()
 	{
 		Create2.Of<T>().RecordCall();
-		if (Create2.Of<T>().OnCall is { } callback)
+		if (Create2.Of<T>().Callback is { } callback)
 			return callback(this);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodWithUserMethod", "Create");
 		return Create<T>();
@@ -240,7 +255,7 @@ partial class GenericMethodWithUserMethodKnockOff : global::KnockOff.Tests.IGene
 	T global::KnockOff.Tests.IGenericMethodWithUserMethod.Transform<T>(T @value)
 	{
 		Transform2.Of<T>().RecordCall();
-		if (Transform2.Of<T>().OnCall is { } callback)
+		if (Transform2.Of<T>().Callback is { } callback)
 			return callback(this, @value);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodWithUserMethod", "Transform");
 		return Transform<T>(@value);
@@ -249,7 +264,7 @@ partial class GenericMethodWithUserMethodKnockOff : global::KnockOff.Tests.IGene
 	TOut global::KnockOff.Tests.IGenericMethodWithUserMethod.Convert<TIn, TOut>(TIn input)
 	{
 		Convert2.Of<TIn, TOut>().RecordCall();
-		if (Convert2.Of<TIn, TOut>().OnCall is { } callback)
+		if (Convert2.Of<TIn, TOut>().Callback is { } callback)
 			return callback(this, input);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodWithUserMethod", "Convert");
 		return Convert<TIn, TOut>(input);
