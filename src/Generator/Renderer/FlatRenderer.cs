@@ -271,12 +271,24 @@ internal static class FlatRenderer
 		w.Line("public int GetCount { get; private set; }");
 		w.Line();
 
+		w.Line("/// <summary>Number of times the setter was accessed.</summary>");
+		w.Line("public int SetCount { get; private set; }");
+		w.Line();
+
+		w.Line("/// <summary>The value from the most recent setter call.</summary>");
+		w.Line($"public {prop.NullableReturnType} LastSetValue {{ get; private set; }}");
+		w.Line();
+
 		w.Line("/// <summary>Records a getter access.</summary>");
 		w.Line("public void RecordGet() => GetCount++;");
 		w.Line();
 
+		w.Line("/// <summary>Records a setter access.</summary>");
+		w.Line($"public void RecordSet({prop.NullableReturnType} value) {{ SetCount++; LastSetValue = value; }}");
+		w.Line();
+
 		w.Line("/// <summary>Resets all tracking state.</summary>");
-		w.Line("public void Reset() { GetCount = 0; Value = default!; }");
+		w.Line("public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; Value = default!; }");
 	}
 
 	private static void RenderRegularPropertyInterceptorContent(CodeWriter w, FlatPropertyModel prop, string className)
@@ -1709,7 +1721,7 @@ internal static class FlatRenderer
 			{
 				// Init-only: read from interceptor's Value, record access
 				w.Line($"get {{ {prop.InterceptorName}.RecordGet(); return {prop.InterceptorName}.Value; }}");
-				w.Line($"init {{ {prop.InterceptorName}.Value = value; }}");
+				w.Line($"init {{ {prop.InterceptorName}.RecordSet(value); {prop.InterceptorName}.Value = value; }}");
 			}
 			else
 			{

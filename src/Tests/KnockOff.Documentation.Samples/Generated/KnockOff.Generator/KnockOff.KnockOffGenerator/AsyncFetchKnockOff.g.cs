@@ -56,7 +56,9 @@ partial class AsyncFetchKnockOff : global::KnockOff.Documentation.Samples.Guides
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((id, ct));
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.FetchAsync(id, ct);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "FetchAsync");
 				return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Guides.AsyncData>(new global::KnockOff.Documentation.Samples.Guides.AsyncData());
 			}

@@ -53,7 +53,9 @@ partial class DuOrderRepositoryStub : global::KnockOff.Documentation.Samples.Why
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = order;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Save(order); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 				return;
 			}

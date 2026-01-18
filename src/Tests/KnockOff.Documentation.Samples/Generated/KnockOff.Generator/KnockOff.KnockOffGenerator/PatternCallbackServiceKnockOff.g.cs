@@ -48,7 +48,9 @@ partial class PatternCallbackServiceKnockOff : global::KnockOff.Documentation.Sa
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.DoSomething(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "DoSomething");
 				return;
 			}
@@ -205,7 +207,9 @@ partial class PatternCallbackServiceKnockOff : global::KnockOff.Documentation.Sa
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetUser(id);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetUser");
 				return new global::KnockOff.Documentation.Samples.Concepts.PatternUser();
 			}
@@ -367,7 +371,9 @@ partial class PatternCallbackServiceKnockOff : global::KnockOff.Documentation.Sa
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((name, @value, flag));
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Calculate(name, @value, flag);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Calculate");
 				return default!;
 			}

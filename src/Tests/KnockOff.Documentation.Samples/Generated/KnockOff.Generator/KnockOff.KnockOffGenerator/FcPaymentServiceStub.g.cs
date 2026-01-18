@@ -56,7 +56,9 @@ partial class FcPaymentServiceStub : global::KnockOff.Documentation.Samples.Comp
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((customerId, amount));
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.ProcessPayment(customerId, amount);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ProcessPayment");
 				return new global::KnockOff.Documentation.Samples.Comparison.FcPaymentResult();
 			}

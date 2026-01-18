@@ -8,6 +8,9 @@ partial class ParserStub : global::KnockOff.Benchmarks.Interfaces.IParser, globa
 	/// <summary>Tracks and configures behavior for TryParse.</summary>
 	public sealed class TryParseInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.IParser? _source;
+
 		/// <summary>Delegate for TryParse.</summary>
 		public delegate bool TryParseDelegate(ParserStub ko, string input, out int result);
 
@@ -54,6 +57,9 @@ partial class ParserStub : global::KnockOff.Benchmarks.Interfaces.IParser, globa
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = input;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.TryParse(input, out result);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "TryParse");
 				return default!;
 			}
@@ -77,6 +83,7 @@ partial class ParserStub : global::KnockOff.Benchmarks.Interfaces.IParser, globa
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -166,6 +173,9 @@ partial class ParserStub : global::KnockOff.Benchmarks.Interfaces.IParser, globa
 	/// <summary>Tracks and configures behavior for Increment.</summary>
 	public sealed class IncrementInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.IParser? _source;
+
 		/// <summary>Delegate for Increment.</summary>
 		public delegate void IncrementDelegate(ParserStub ko, ref int @value);
 
@@ -211,6 +221,9 @@ partial class ParserStub : global::KnockOff.Benchmarks.Interfaces.IParser, globa
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = @value;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.Increment(ref @value); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Increment");
 				return;
 			}
@@ -234,6 +247,7 @@ partial class ParserStub : global::KnockOff.Benchmarks.Interfaces.IParser, globa
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -346,6 +360,16 @@ partial class ParserStub : global::KnockOff.Benchmarks.Interfaces.IParser, globa
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Benchmarks.Interfaces.IParser).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Benchmarks.Interfaces.IParser? source)
+	{
+		TryParse._source = source;
+		Increment._source = source;
 	}
 
 	bool global::KnockOff.Benchmarks.Interfaces.IParser.TryParse(string input, out int result)

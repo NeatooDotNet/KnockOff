@@ -56,7 +56,9 @@ partial class AsyncSaveKnockOff : global::KnockOff.Documentation.Samples.Guides.
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = entity;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.SaveAsync(entity);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SaveAsync");
 				return global::System.Threading.Tasks.Task.FromResult<int>(default!);
 			}

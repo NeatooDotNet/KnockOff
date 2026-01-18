@@ -48,7 +48,9 @@ partial class ApiMethodServiceKnockOff : global::KnockOff.Documentation.Samples.
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Initialize(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Initialize");
 				return;
 			}
@@ -205,7 +207,9 @@ partial class ApiMethodServiceKnockOff : global::KnockOff.Documentation.Samples.
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetById(id);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
 				return new global::KnockOff.Documentation.Samples.Reference.ApiUser();
 			}
@@ -364,7 +368,9 @@ partial class ApiMethodServiceKnockOff : global::KnockOff.Documentation.Samples.
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((level, message));
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Log(level, message); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Log");
 				return;
 			}

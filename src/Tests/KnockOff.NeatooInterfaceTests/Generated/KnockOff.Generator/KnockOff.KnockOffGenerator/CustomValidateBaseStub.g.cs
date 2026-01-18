@@ -235,7 +235,9 @@ partial class CustomValidateBaseStub : global::KnockOff.NeatooInterfaceTests.Val
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = propertyName;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetProperty(propertyName);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetProperty");
 				throw new global::System.InvalidOperationException("No implementation provided for GetProperty. Configure via OnCall.");
 			}
@@ -398,9 +400,9 @@ partial class CustomValidateBaseStub : global::KnockOff.NeatooInterfaceTests.Val
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = propertyName;
-				#pragma warning disable CS8601
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.TryGetProperty(propertyName, out validateProperty);
-				#pragma warning restore CS8601
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "TryGetProperty");
 				return default!;
 			}
@@ -583,7 +585,9 @@ partial class CustomValidateBaseStub : global::KnockOff.NeatooInterfaceTests.Val
 			if (_sequence_NoParams_Threading_Tasks_Task.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.WaitForTasks();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -608,7 +612,9 @@ partial class CustomValidateBaseStub : global::KnockOff.NeatooInterfaceTests.Val
 			if (_sequence_Threading_CancellationToken_Threading_Tasks_Task.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.WaitForTasks(token);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -862,7 +868,9 @@ partial class CustomValidateBaseStub : global::KnockOff.NeatooInterfaceTests.Val
 			if (_sequence_String_Threading_CancellationToken_Threading_Tasks_Task.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.RunRules(propertyName, token);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -887,7 +895,9 @@ partial class CustomValidateBaseStub : global::KnockOff.NeatooInterfaceTests.Val
 			if (_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.RunRules(runRules, token);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -1116,7 +1126,9 @@ partial class CustomValidateBaseStub : global::KnockOff.NeatooInterfaceTests.Val
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.ClearAllMessages(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ClearAllMessages");
 				return;
 			}
@@ -1265,7 +1277,9 @@ partial class CustomValidateBaseStub : global::KnockOff.NeatooInterfaceTests.Val
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.ClearSelfMessages(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ClearSelfMessages");
 				return;
 			}

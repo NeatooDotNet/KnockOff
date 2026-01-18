@@ -57,9 +57,9 @@ partial class BpParserKnockOff : global::KnockOff.Documentation.Samples.Guides.I
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = input;
-				#pragma warning disable CS8601
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.TryParse(input, out result);
-				#pragma warning restore CS8601
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "TryParse");
 				return default!;
 			}

@@ -8,6 +8,9 @@ partial class DataProviderStub : global::KnockOff.Benchmarks.Interfaces.IDataPro
 	/// <summary>Tracks and configures behavior for Count.</summary>
 	public sealed class CountInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.IDataProvider? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -21,12 +24,15 @@ partial class DataProviderStub : global::KnockOff.Benchmarks.Interfaces.IDataPro
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for GetEnumerator.</summary>
 	public sealed class GetEnumeratorInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::System.Collections.Generic.IEnumerable<string>? _source;
+
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for GetEnumerator().</summary>
@@ -93,6 +99,9 @@ partial class DataProviderStub : global::KnockOff.Benchmarks.Interfaces.IDataPro
 			if (_sequence_NoParams_Collections_Generic_IEnumerator_string.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetEnumerator();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
 			}
@@ -117,6 +126,9 @@ partial class DataProviderStub : global::KnockOff.Benchmarks.Interfaces.IDataPro
 			if (_sequence_NoParams_Collections_IEnumerator.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetEnumerator();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
 			}
@@ -139,6 +151,7 @@ partial class DataProviderStub : global::KnockOff.Benchmarks.Interfaces.IDataPro
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence_NoParams_Collections_Generic_IEnumerator_string)
 				tracking.Reset();
 			_sequenceIndex_NoParams_Collections_Generic_IEnumerator_string = 0;
@@ -296,6 +309,9 @@ partial class DataProviderStub : global::KnockOff.Benchmarks.Interfaces.IDataPro
 	/// <summary>Tracks and configures behavior for Dispose.</summary>
 	public sealed class DisposeInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::System.IDisposable? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<DataProviderStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -333,6 +349,9 @@ partial class DataProviderStub : global::KnockOff.Benchmarks.Interfaces.IDataPro
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.Dispose(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Dispose");
 				return;
 			}
@@ -355,6 +374,7 @@ partial class DataProviderStub : global::KnockOff.Benchmarks.Interfaces.IDataPro
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -468,9 +488,47 @@ partial class DataProviderStub : global::KnockOff.Benchmarks.Interfaces.IDataPro
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
 	}
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Benchmarks.Interfaces.IDataProvider).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Benchmarks.Interfaces.IDataProvider? source)
+	{
+		Count._source = source;
+		GetEnumerator._source = source;
+		Dispose._source = source;
+	}
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::System.Collections.Generic.IEnumerable<string>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::System.Collections.Generic.IEnumerable<string>? source)
+	{
+		Count._source = null;
+		GetEnumerator._source = source;
+		Dispose._source = null;
+	}
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::System.Collections.IEnumerable).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::System.Collections.IEnumerable? source)
+	{
+		Count._source = null;
+		GetEnumerator._source = null;
+		Dispose._source = null;
+	}
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::System.IDisposable).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::System.IDisposable? source)
+	{
+		Count._source = null;
+		GetEnumerator._source = null;
+		Dispose._source = source;
+	}
+
 	int global::KnockOff.Benchmarks.Interfaces.IDataProvider.Count
 	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IDataProvider", "Count"); return Count.Value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("IDataProvider", "Count"); return Count.Value; }
 	}
 
 	global::System.Collections.Generic.IEnumerator<string> global::System.Collections.Generic.IEnumerable<string>.GetEnumerator()

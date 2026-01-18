@@ -44,6 +44,7 @@ description: |
   </example>
 model: opus
 color: blue
+skills: project-todos
 ---
 
 # KnockOff Architect

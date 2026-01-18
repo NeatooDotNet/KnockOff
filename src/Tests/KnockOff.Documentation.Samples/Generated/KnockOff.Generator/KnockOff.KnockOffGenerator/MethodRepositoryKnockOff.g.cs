@@ -56,7 +56,9 @@ partial class MethodRepositoryKnockOff : global::KnockOff.Documentation.Samples.
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetById(id);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
 				return default!;
 			}
@@ -213,7 +215,9 @@ partial class MethodRepositoryKnockOff : global::KnockOff.Documentation.Samples.
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Count();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Count");
 				return default!;
 			}

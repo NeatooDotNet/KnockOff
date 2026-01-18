@@ -53,7 +53,9 @@ partial class GenAuditorKnockOff : global::KnockOff.Documentation.Samples.Refere
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = action;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Audit(action); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Audit");
 				return;
 			}

@@ -75,7 +75,9 @@ partial class EmailServiceWithValidation : global::KnockOff.Documentation.Sample
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((to, subject, body));
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.SendEmail(to, subject, body); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SendEmail");
 				return;
 			}

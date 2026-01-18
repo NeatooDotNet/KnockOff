@@ -8,6 +8,9 @@ partial class OrderServiceStub : global::KnockOff.Benchmarks.Interfaces.IOrderSe
 	/// <summary>Tracks and configures behavior for GetOrder.</summary>
 	public sealed class GetOrderInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.IOrderService? _source;
+
 		/// <summary>Delegate for GetOrder.</summary>
 		public delegate global::KnockOff.Benchmarks.Interfaces.Order GetOrderDelegate(OrderServiceStub ko, int id);
 
@@ -53,6 +56,9 @@ partial class OrderServiceStub : global::KnockOff.Benchmarks.Interfaces.IOrderSe
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetOrder(id);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetOrder");
 				return new global::KnockOff.Benchmarks.Interfaces.Order();
 			}
@@ -76,6 +82,7 @@ partial class OrderServiceStub : global::KnockOff.Benchmarks.Interfaces.IOrderSe
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -165,6 +172,9 @@ partial class OrderServiceStub : global::KnockOff.Benchmarks.Interfaces.IOrderSe
 	/// <summary>Tracks and configures behavior for ValidateOrder.</summary>
 	public sealed class ValidateOrderInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.IOrderService? _source;
+
 		/// <summary>Delegate for ValidateOrder.</summary>
 		public delegate bool ValidateOrderDelegate(OrderServiceStub ko, global::KnockOff.Benchmarks.Interfaces.Order order);
 
@@ -210,6 +220,9 @@ partial class OrderServiceStub : global::KnockOff.Benchmarks.Interfaces.IOrderSe
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = order;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.ValidateOrder(order);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ValidateOrder");
 				return default!;
 			}
@@ -233,6 +246,7 @@ partial class OrderServiceStub : global::KnockOff.Benchmarks.Interfaces.IOrderSe
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -322,6 +336,9 @@ partial class OrderServiceStub : global::KnockOff.Benchmarks.Interfaces.IOrderSe
 	/// <summary>Tracks and configures behavior for CalculateTotal.</summary>
 	public sealed class CalculateTotalInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.IOrderService? _source;
+
 		/// <summary>Delegate for CalculateTotal.</summary>
 		public delegate decimal CalculateTotalDelegate(OrderServiceStub ko, global::KnockOff.Benchmarks.Interfaces.Order order);
 
@@ -367,6 +384,9 @@ partial class OrderServiceStub : global::KnockOff.Benchmarks.Interfaces.IOrderSe
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = order;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.CalculateTotal(order);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "CalculateTotal");
 				return default!;
 			}
@@ -390,6 +410,7 @@ partial class OrderServiceStub : global::KnockOff.Benchmarks.Interfaces.IOrderSe
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -479,6 +500,9 @@ partial class OrderServiceStub : global::KnockOff.Benchmarks.Interfaces.IOrderSe
 	/// <summary>Tracks and configures behavior for SaveOrder.</summary>
 	public sealed class SaveOrderInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.IOrderService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<OrderServiceStub, global::KnockOff.Benchmarks.Interfaces.Order> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -521,6 +545,9 @@ partial class OrderServiceStub : global::KnockOff.Benchmarks.Interfaces.IOrderSe
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = order;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.SaveOrder(order); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SaveOrder");
 				return;
 			}
@@ -544,6 +571,7 @@ partial class OrderServiceStub : global::KnockOff.Benchmarks.Interfaces.IOrderSe
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -664,6 +692,18 @@ partial class OrderServiceStub : global::KnockOff.Benchmarks.Interfaces.IOrderSe
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Benchmarks.Interfaces.IOrderService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Benchmarks.Interfaces.IOrderService? source)
+	{
+		GetOrder._source = source;
+		ValidateOrder._source = source;
+		CalculateTotal._source = source;
+		SaveOrder._source = source;
 	}
 
 	global::KnockOff.Benchmarks.Interfaces.Order global::KnockOff.Benchmarks.Interfaces.IOrderService.GetOrder(int id)

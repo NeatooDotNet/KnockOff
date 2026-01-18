@@ -215,6 +215,35 @@ public class InitPropertyStandaloneTests
 		Assert.Equal(0, stub.Id.GetCount);
 		Assert.Equal(default, stub.Id.Value);
 	}
+
+	/// <summary>
+	/// Tests that verify init-only property interceptors have the SetCount and LastSetValue fields.
+	/// The init setter should call RecordSet() to track sets, just like regular setters.
+	///
+	/// BUG: FlatRenderer does NOT call RecordSet for init-only properties, but InlineRenderer does.
+	/// This test should FAIL until FlatRenderer is fixed.
+	///
+	/// Compare to InlineStub_InitProperty_InterceptorHasSetTracking which passes because
+	/// InlineRenderer correctly generates RecordSet calls for init properties.
+	/// </summary>
+	[Fact]
+	public void StandaloneStub_InitProperty_InterceptorHasSetTracking()
+	{
+		// Arrange
+		var stub = new EntityWithInitPropertyKnockOff();
+
+		// Assert - interceptor should have SetCount and LastSetValue fields
+		// These compile-time checks verify the interceptor structure
+		// BUG: The following lines will fail to compile because the standalone
+		// interceptor is missing SetCount, LastSetValue, and RecordSet
+		Assert.Equal(0, stub.Id.SetCount);
+		Assert.Null(stub.Id.LastSetValue);
+
+		// Verify RecordSet method exists and works
+		stub.Id.RecordSet("test-value");
+		Assert.Equal(1, stub.Id.SetCount);
+		Assert.Equal("test-value", stub.Id.LastSetValue);
+	}
 }
 
 /// <summary>

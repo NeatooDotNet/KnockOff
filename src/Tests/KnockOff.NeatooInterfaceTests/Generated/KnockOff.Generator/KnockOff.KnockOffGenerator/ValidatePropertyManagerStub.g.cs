@@ -186,7 +186,9 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.WaitForTasks();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -343,7 +345,9 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = propertyName;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.HasProperty(propertyName);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "HasProperty");
 				return default!;
 			}
@@ -505,7 +509,9 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = propertyName;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetProperty(propertyName);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetProperty");
 				throw new global::System.InvalidOperationException("No implementation provided for GetProperty. Configure via OnCall.");
 			}
@@ -664,7 +670,9 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = properties;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.SetProperties(properties); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SetProperties");
 				return;
 			}
@@ -826,7 +834,9 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((runRules, token));
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.RunRules(runRules, token);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -980,7 +990,9 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.PauseAllActions(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "PauseAllActions");
 				return;
 			}
@@ -1129,7 +1141,9 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.ResumeAllActions(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ResumeAllActions");
 				return;
 			}
@@ -1278,7 +1292,9 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.ClearAllMessages(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ClearAllMessages");
 				return;
 			}
@@ -1427,7 +1443,9 @@ partial class ValidatePropertyManagerStub : global::Neatoo.IValidatePropertyMana
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.ClearSelfMessages(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ClearSelfMessages");
 				return;
 			}

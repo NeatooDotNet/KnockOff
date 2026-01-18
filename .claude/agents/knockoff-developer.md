@@ -44,6 +44,7 @@ description: |
   </example>
 model: opus
 color: cyan
+skills: project-todos
 ---
 
 # KnockOff Senior Developer

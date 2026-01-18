@@ -14,11 +14,20 @@ partial class MultipleInitPropertiesKnockOff : global::KnockOffTests.IMultipleIn
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
+		/// <summary>Number of times the setter was accessed.</summary>
+		public int SetCount { get; private set; }
+
+		/// <summary>The value from the most recent setter call.</summary>
+		public string? LastSetValue { get; private set; }
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
+		/// <summary>Records a setter access.</summary>
+		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
+
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; Value = default!; }
+		public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for Name.</summary>
@@ -30,11 +39,20 @@ partial class MultipleInitPropertiesKnockOff : global::KnockOffTests.IMultipleIn
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
+		/// <summary>Number of times the setter was accessed.</summary>
+		public int SetCount { get; private set; }
+
+		/// <summary>The value from the most recent setter call.</summary>
+		public string? LastSetValue { get; private set; }
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
+		/// <summary>Records a setter access.</summary>
+		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
+
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; Value = default!; }
+		public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; Value = default!; }
 	}
 
 	/// <summary>Tracks and configures behavior for Version.</summary>
@@ -46,11 +64,20 @@ partial class MultipleInitPropertiesKnockOff : global::KnockOffTests.IMultipleIn
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
+		/// <summary>Number of times the setter was accessed.</summary>
+		public int SetCount { get; private set; }
+
+		/// <summary>The value from the most recent setter call.</summary>
+		public int? LastSetValue { get; private set; }
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
+		/// <summary>Records a setter access.</summary>
+		public void RecordSet(int? value) { SetCount++; LastSetValue = value; }
+
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; Value = default!; }
+		public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; Value = default!; }
 	}
 
 	/// <summary>Interceptor for Id. Configure via .Value, track via .GetCount.</summary>
@@ -79,19 +106,19 @@ partial class MultipleInitPropertiesKnockOff : global::KnockOffTests.IMultipleIn
 	string global::KnockOffTests.IMultipleInitProperties.Id
 	{
 		get { Id.RecordGet(); return Id.Value; }
-		init { Id.Value = value; }
+		init { Id.RecordSet(value); Id.Value = value; }
 	}
 
 	string global::KnockOffTests.IMultipleInitProperties.Name
 	{
 		get { Name.RecordGet(); return Name.Value; }
-		init { Name.Value = value; }
+		init { Name.RecordSet(value); Name.Value = value; }
 	}
 
 	int global::KnockOffTests.IMultipleInitProperties.Version
 	{
 		get { Version.RecordGet(); return Version.Value; }
-		init { Version.Value = value; }
+		init { Version.RecordSet(value); Version.Value = value; }
 	}
 
 }

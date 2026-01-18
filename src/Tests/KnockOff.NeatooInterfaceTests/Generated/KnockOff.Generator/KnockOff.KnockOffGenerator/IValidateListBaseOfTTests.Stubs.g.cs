@@ -250,7 +250,9 @@ partial class IValidateListBaseOfTTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = item;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) return src.IndexOf(item);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "IndexOf");
 					return default!;
 				}
@@ -409,7 +411,9 @@ partial class IValidateListBaseOfTTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((index, item));
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) { src.Insert(index, item); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Insert");
 					return;
 				}
@@ -568,7 +572,9 @@ partial class IValidateListBaseOfTTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = index;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) { src.RemoveAt(index); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "RemoveAt");
 					return;
 				}
@@ -727,7 +733,9 @@ partial class IValidateListBaseOfTTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = item;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) { src.Add(item); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 					return;
 				}
@@ -881,7 +889,9 @@ partial class IValidateListBaseOfTTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) { src.Clear(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Clear");
 					return;
 				}
@@ -1038,7 +1048,9 @@ partial class IValidateListBaseOfTTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = item;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) return src.Contains(item);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Contains");
 					return default!;
 				}
@@ -1197,7 +1209,9 @@ partial class IValidateListBaseOfTTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((array, arrayIndex));
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) { src.CopyTo(array, arrayIndex); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "CopyTo");
 					return;
 				}
@@ -1359,7 +1373,9 @@ partial class IValidateListBaseOfTTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = item;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) return src.Remove(item);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Remove");
 					return default!;
 				}
@@ -1516,7 +1532,9 @@ partial class IValidateListBaseOfTTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) return src.GetEnumerator();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
 					throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
 				}
@@ -1694,7 +1712,9 @@ partial class IValidateListBaseOfTTests
 				if (_sequence_NoParams_Threading_Tasks_Task.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) return src.WaitForTasks();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "WaitForTasks");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
@@ -1719,7 +1739,9 @@ partial class IValidateListBaseOfTTests
 				if (_sequence_Threading_CancellationToken_Threading_Tasks_Task.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) return src.WaitForTasks(token);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "WaitForTasks");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
@@ -1973,7 +1995,9 @@ partial class IValidateListBaseOfTTests
 				if (_sequence_String_Threading_CancellationToken_Threading_Tasks_Task.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) return src.RunRules(propertyName, token);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
@@ -1998,7 +2022,9 @@ partial class IValidateListBaseOfTTests
 				if (_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) return src.RunRules(runRules, token);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
@@ -2227,7 +2253,9 @@ partial class IValidateListBaseOfTTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) { src.ClearAllMessages(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ClearAllMessages");
 					return;
 				}
@@ -2376,7 +2404,9 @@ partial class IValidateListBaseOfTTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) { src.ClearSelfMessages(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ClearSelfMessages");
 					return;
 				}

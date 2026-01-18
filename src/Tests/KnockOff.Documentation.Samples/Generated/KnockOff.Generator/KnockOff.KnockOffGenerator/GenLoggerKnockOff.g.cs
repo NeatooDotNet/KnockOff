@@ -53,7 +53,9 @@ partial class GenLoggerKnockOff : global::KnockOff.Documentation.Samples.Referen
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((level, message, code));
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Log(level, message, code); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Log");
 				return;
 			}

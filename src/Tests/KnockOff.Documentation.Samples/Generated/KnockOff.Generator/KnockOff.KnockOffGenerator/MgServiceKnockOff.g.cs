@@ -56,7 +56,9 @@ partial class MgServiceKnockOff : global::KnockOff.Documentation.Samples.Skills.
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetUser(id);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetUser");
 				return default!;
 			}

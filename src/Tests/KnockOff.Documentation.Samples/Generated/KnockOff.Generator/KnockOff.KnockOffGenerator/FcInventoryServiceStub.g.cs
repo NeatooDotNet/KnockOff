@@ -56,7 +56,9 @@ partial class FcInventoryServiceStub : global::KnockOff.Documentation.Samples.Co
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = items;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.ReserveItems(items);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ReserveItems");
 				return default!;
 			}
@@ -215,7 +217,9 @@ partial class FcInventoryServiceStub : global::KnockOff.Documentation.Samples.Co
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = items;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.ReleaseItems(items); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ReleaseItems");
 				return;
 			}

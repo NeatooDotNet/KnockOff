@@ -188,7 +188,9 @@ partial class RequiredRuleStub : global::Neatoo.Rules.Rules.IRequiredRule, globa
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((target, token));
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.RunRule(target, token);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RunRule");
 				throw new global::System.InvalidOperationException("No implementation provided for RunRule. Configure via OnCall.");
 			}
@@ -347,7 +349,9 @@ partial class RequiredRuleStub : global::Neatoo.Rules.Rules.IRequiredRule, globa
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((ruleManager, uniqueIndex));
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.OnRuleAdded(ruleManager, uniqueIndex); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "OnRuleAdded");
 				return;
 			}

@@ -8,6 +8,9 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 	/// <summary>Tracks and configures behavior for Method1.</summary>
 	public sealed class Method1Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.IMediumService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<MediumServiceStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -45,6 +48,9 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.Method1(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Method1");
 				return;
 			}
@@ -67,6 +73,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -152,6 +159,9 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 	/// <summary>Tracks and configures behavior for Method2.</summary>
 	public sealed class Method2Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.IMediumService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<MediumServiceStub, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -194,6 +204,9 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = param;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.Method2(param); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Method2");
 				return;
 			}
@@ -217,6 +230,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -306,6 +320,9 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 	/// <summary>Tracks and configures behavior for Method3.</summary>
 	public sealed class Method3Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.IMediumService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<MediumServiceStub, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -348,6 +365,9 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = param;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.Method3(param); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Method3");
 				return;
 			}
@@ -371,6 +391,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -460,6 +481,9 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 	/// <summary>Tracks and configures behavior for Method4.</summary>
 	public sealed class Method4Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.IMediumService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<MediumServiceStub, int, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -502,6 +526,9 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((a, b));
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.Method4(a, b); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Method4");
 				return;
 			}
@@ -525,6 +552,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -614,6 +642,9 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 	/// <summary>Tracks and configures behavior for Method5.</summary>
 	public sealed class Method5Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.IMediumService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<MediumServiceStub, int, int, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -656,6 +687,9 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((a, b, c));
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.Method5(a, b, c); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Method5");
 				return;
 			}
@@ -679,6 +713,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -768,6 +803,9 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 	/// <summary>Tracks and configures behavior for Method6.</summary>
 	public sealed class Method6Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.IMediumService? _source;
+
 		/// <summary>Delegate for Method6.</summary>
 		public delegate int Method6Delegate(MediumServiceStub ko);
 
@@ -808,6 +846,9 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Method6();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Method6");
 				return default!;
 			}
@@ -830,6 +871,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -915,6 +957,9 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 	/// <summary>Tracks and configures behavior for Method7.</summary>
 	public sealed class Method7Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.IMediumService? _source;
+
 		/// <summary>Delegate for Method7.</summary>
 		public delegate string Method7Delegate(MediumServiceStub ko);
 
@@ -955,6 +1000,9 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Method7();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Method7");
 				throw new global::System.InvalidOperationException("No implementation provided for Method7. Configure via OnCall.");
 			}
@@ -977,6 +1025,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1062,6 +1111,9 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 	/// <summary>Tracks and configures behavior for Method8.</summary>
 	public sealed class Method8Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.IMediumService? _source;
+
 		/// <summary>Delegate for Method8.</summary>
 		public delegate int Method8Delegate(MediumServiceStub ko, int param);
 
@@ -1107,6 +1159,9 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = param;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Method8(param);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Method8");
 				return default!;
 			}
@@ -1130,6 +1185,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1219,6 +1275,9 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 	/// <summary>Tracks and configures behavior for Method9.</summary>
 	public sealed class Method9Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.IMediumService? _source;
+
 		/// <summary>Delegate for Method9.</summary>
 		public delegate string Method9Delegate(MediumServiceStub ko, string param);
 
@@ -1264,6 +1323,9 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = param;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Method9(param);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Method9");
 				throw new global::System.InvalidOperationException("No implementation provided for Method9. Configure via OnCall.");
 			}
@@ -1287,6 +1349,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1376,6 +1439,9 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 	/// <summary>Tracks and configures behavior for Method10.</summary>
 	public sealed class Method10Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.IMediumService? _source;
+
 		/// <summary>Delegate for Method10.</summary>
 		public delegate bool Method10Delegate(MediumServiceStub ko, int a, string b);
 
@@ -1421,6 +1487,9 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((a, b));
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Method10(a, b);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Method10");
 				return default!;
 			}
@@ -1444,6 +1513,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1588,6 +1658,24 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Benchmarks.Interfaces.IMediumService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Benchmarks.Interfaces.IMediumService? source)
+	{
+		Method1._source = source;
+		Method2._source = source;
+		Method3._source = source;
+		Method4._source = source;
+		Method5._source = source;
+		Method6._source = source;
+		Method7._source = source;
+		Method8._source = source;
+		Method9._source = source;
+		Method10._source = source;
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.IMediumService.Method1()

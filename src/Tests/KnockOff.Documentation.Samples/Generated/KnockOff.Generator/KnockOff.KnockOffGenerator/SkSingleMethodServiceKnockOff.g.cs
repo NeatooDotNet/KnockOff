@@ -53,7 +53,9 @@ partial class SkSingleMethodServiceKnockOff : global::KnockOff.Documentation.Sam
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((to, subject));
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.SendEmail(to, subject); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SendEmail");
 				return;
 			}

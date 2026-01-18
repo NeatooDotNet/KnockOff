@@ -51,7 +51,9 @@ partial class HaDefaultsServiceKnockOff : global::KnockOff.Documentation.Samples
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetCount();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetCount");
 				return default!;
 			}
@@ -203,7 +205,9 @@ partial class HaDefaultsServiceKnockOff : global::KnockOff.Documentation.Samples
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetItems();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetItems");
 				return new global::System.Collections.Generic.List<string>();
 			}
@@ -355,7 +359,9 @@ partial class HaDefaultsServiceKnockOff : global::KnockOff.Documentation.Samples
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetIList();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetIList");
 				return new global::System.Collections.Generic.List<string>();
 			}
@@ -507,7 +513,9 @@ partial class HaDefaultsServiceKnockOff : global::KnockOff.Documentation.Samples
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetOptional();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetOptional");
 				return default!;
 			}
@@ -659,7 +667,9 @@ partial class HaDefaultsServiceKnockOff : global::KnockOff.Documentation.Samples
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetDisposable();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetDisposable");
 				throw new global::System.InvalidOperationException("No implementation provided for GetDisposable. Configure via OnCall.");
 			}

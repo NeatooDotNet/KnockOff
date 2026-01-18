@@ -14,11 +14,20 @@ partial class NullableInitPropertyKnockOff : global::KnockOffTests.INullableInit
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
+		/// <summary>Number of times the setter was accessed.</summary>
+		public int SetCount { get; private set; }
+
+		/// <summary>The value from the most recent setter call.</summary>
+		public string? LastSetValue { get; private set; }
+
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
+		/// <summary>Records a setter access.</summary>
+		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
+
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; Value = default!; }
+		public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; Value = default!; }
 	}
 
 	/// <summary>Interceptor for Name. Configure via .Value, track via .GetCount.</summary>
@@ -41,7 +50,7 @@ partial class NullableInitPropertyKnockOff : global::KnockOffTests.INullableInit
 	string? global::KnockOffTests.INullableInitProperty.Name
 	{
 		get { Name.RecordGet(); return Name.Value; }
-		init { Name.Value = value; }
+		init { Name.RecordSet(value); Name.Value = value; }
 	}
 
 }

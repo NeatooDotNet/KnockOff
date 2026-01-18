@@ -56,7 +56,9 @@ partial class CalculatorKnockOff : global::KnockOff.Documentation.Samples.ReadMe
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((a, b));
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Multiply(a, b);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Multiply");
 				return default!;
 			}

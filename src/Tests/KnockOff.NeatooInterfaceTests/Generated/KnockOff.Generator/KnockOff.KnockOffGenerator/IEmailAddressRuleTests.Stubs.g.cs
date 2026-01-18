@@ -191,7 +191,9 @@ partial class IEmailAddressRuleTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((target, token));
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) return src.RunRule(target, token);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "RunRule");
 					return global::System.Threading.Tasks.Task.FromResult<global::Neatoo.Rules.IRuleMessages>(default!);
 				}
@@ -350,7 +352,9 @@ partial class IEmailAddressRuleTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((ruleManager, uniqueIndex));
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) { src.OnRuleAdded(ruleManager, uniqueIndex); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "OnRuleAdded");
 					return;
 				}

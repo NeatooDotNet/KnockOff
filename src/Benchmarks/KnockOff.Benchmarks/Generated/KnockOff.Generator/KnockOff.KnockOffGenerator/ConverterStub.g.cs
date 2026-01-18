@@ -181,6 +181,14 @@ partial class ConverterStub : global::KnockOff.Benchmarks.Interfaces.IConverter,
 			$"Set the handler's OnCall.");
 	}
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Benchmarks.Interfaces.IConverter).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Benchmarks.Interfaces.IConverter? source)
+	{
+	}
+
 	T global::KnockOff.Benchmarks.Interfaces.IConverter.Convert<T>(object @value)
 	{
 		Convert.Of<T>().RecordCall(@value);

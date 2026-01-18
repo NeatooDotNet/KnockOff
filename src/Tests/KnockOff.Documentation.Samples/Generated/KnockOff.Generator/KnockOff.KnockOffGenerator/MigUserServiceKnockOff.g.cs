@@ -90,7 +90,9 @@ partial class MigUserServiceKnockOff : global::KnockOff.Documentation.Samples.Co
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetUser(id);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetUser");
 				return new global::KnockOff.Documentation.Samples.Comparison.MigUser();
 			}
@@ -252,7 +254,9 @@ partial class MigUserServiceKnockOff : global::KnockOff.Documentation.Samples.Co
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetUserAsync(id);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetUserAsync");
 				return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Comparison.MigUser?>(default!);
 			}
@@ -411,7 +415,9 @@ partial class MigUserServiceKnockOff : global::KnockOff.Documentation.Samples.Co
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = user;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Save(user); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 				return;
 			}
@@ -570,7 +576,9 @@ partial class MigUserServiceKnockOff : global::KnockOff.Documentation.Samples.Co
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Delete(id); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Delete");
 				return;
 			}
@@ -727,7 +735,9 @@ partial class MigUserServiceKnockOff : global::KnockOff.Documentation.Samples.Co
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetAll();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetAll");
 				return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Comparison.MigUser>();
 			}
@@ -881,7 +891,9 @@ partial class MigUserServiceKnockOff : global::KnockOff.Documentation.Samples.Co
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = user;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Update(user); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Update");
 				return;
 			}

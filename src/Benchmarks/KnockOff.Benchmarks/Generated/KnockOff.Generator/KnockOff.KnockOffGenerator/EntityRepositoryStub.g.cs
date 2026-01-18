@@ -8,6 +8,9 @@ partial class EntityRepositoryStub : global::KnockOff.Benchmarks.Interfaces.IRep
 	/// <summary>Tracks and configures behavior for GetById.</summary>
 	public sealed class GetByIdInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.IRepository<global::KnockOff.Benchmarks.Interfaces.Entity>? _source;
+
 		/// <summary>Delegate for GetById.</summary>
 		public delegate global::KnockOff.Benchmarks.Interfaces.Entity? GetByIdDelegate(EntityRepositoryStub ko, int id);
 
@@ -53,6 +56,9 @@ partial class EntityRepositoryStub : global::KnockOff.Benchmarks.Interfaces.IRep
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetById(id);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
 				return default!;
 			}
@@ -76,6 +82,7 @@ partial class EntityRepositoryStub : global::KnockOff.Benchmarks.Interfaces.IRep
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -165,6 +172,9 @@ partial class EntityRepositoryStub : global::KnockOff.Benchmarks.Interfaces.IRep
 	/// <summary>Tracks and configures behavior for Save.</summary>
 	public sealed class SaveInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.IRepository<global::KnockOff.Benchmarks.Interfaces.Entity>? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<EntityRepositoryStub, global::KnockOff.Benchmarks.Interfaces.Entity> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -207,6 +217,9 @@ partial class EntityRepositoryStub : global::KnockOff.Benchmarks.Interfaces.IRep
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = entity;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.Save(entity); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 				return;
 			}
@@ -230,6 +243,7 @@ partial class EntityRepositoryStub : global::KnockOff.Benchmarks.Interfaces.IRep
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -319,6 +333,9 @@ partial class EntityRepositoryStub : global::KnockOff.Benchmarks.Interfaces.IRep
 	/// <summary>Tracks and configures behavior for GetAll.</summary>
 	public sealed class GetAllInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.IRepository<global::KnockOff.Benchmarks.Interfaces.Entity>? _source;
+
 		/// <summary>Delegate for GetAll.</summary>
 		public delegate global::System.Collections.Generic.IEnumerable<global::KnockOff.Benchmarks.Interfaces.Entity> GetAllDelegate(EntityRepositoryStub ko);
 
@@ -359,6 +376,9 @@ partial class EntityRepositoryStub : global::KnockOff.Benchmarks.Interfaces.IRep
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetAll();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetAll");
 				return new global::System.Collections.Generic.List<global::KnockOff.Benchmarks.Interfaces.Entity>();
 			}
@@ -381,6 +401,7 @@ partial class EntityRepositoryStub : global::KnockOff.Benchmarks.Interfaces.IRep
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -493,6 +514,17 @@ partial class EntityRepositoryStub : global::KnockOff.Benchmarks.Interfaces.IRep
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Benchmarks.Interfaces.IRepository<global::KnockOff.Benchmarks.Interfaces.Entity>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Benchmarks.Interfaces.IRepository<global::KnockOff.Benchmarks.Interfaces.Entity>? source)
+	{
+		GetById._source = source;
+		Save._source = source;
+		GetAll._source = source;
 	}
 
 	global::KnockOff.Benchmarks.Interfaces.Entity? global::KnockOff.Benchmarks.Interfaces.IRepository<global::KnockOff.Benchmarks.Interfaces.Entity>.GetById(int id)

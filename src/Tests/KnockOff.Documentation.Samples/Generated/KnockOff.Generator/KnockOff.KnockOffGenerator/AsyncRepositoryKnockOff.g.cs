@@ -51,7 +51,9 @@ partial class AsyncRepositoryKnockOff : global::KnockOff.Documentation.Samples.G
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.InitializeAsync();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "InitializeAsync");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -208,7 +210,9 @@ partial class AsyncRepositoryKnockOff : global::KnockOff.Documentation.Samples.G
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetByIdAsync(id);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetByIdAsync");
 				return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Guides.AsyncUser?>(default!);
 			}
@@ -365,7 +369,9 @@ partial class AsyncRepositoryKnockOff : global::KnockOff.Documentation.Samples.G
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.CountAsync();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "CountAsync");
 				return default;
 			}

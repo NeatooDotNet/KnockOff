@@ -48,7 +48,9 @@ partial class SkOnCallKnockOff : global::KnockOff.Documentation.Samples.Skills.I
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Clear(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Clear");
 				return;
 			}
@@ -205,7 +207,9 @@ partial class SkOnCallKnockOff : global::KnockOff.Documentation.Samples.Skills.I
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetById(id);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
 				return new global::KnockOff.Documentation.Samples.Skills.SkUser();
 			}
@@ -367,7 +371,9 @@ partial class SkOnCallKnockOff : global::KnockOff.Documentation.Samples.Skills.I
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((name, active));
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Find(name, active);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Find");
 				return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser>();
 			}
@@ -526,7 +532,9 @@ partial class SkOnCallKnockOff : global::KnockOff.Documentation.Samples.Skills.I
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = entity;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Save(entity); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 				return;
 			}

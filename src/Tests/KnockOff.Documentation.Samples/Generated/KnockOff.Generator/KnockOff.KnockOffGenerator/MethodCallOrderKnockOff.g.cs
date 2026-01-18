@@ -48,7 +48,9 @@ partial class MethodCallOrderKnockOff : global::KnockOff.Documentation.Samples.G
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Initialize(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Initialize");
 				return;
 			}
@@ -197,7 +199,9 @@ partial class MethodCallOrderKnockOff : global::KnockOff.Documentation.Samples.G
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Process(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return;
 			}
@@ -346,7 +350,9 @@ partial class MethodCallOrderKnockOff : global::KnockOff.Documentation.Samples.G
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Cleanup(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Cleanup");
 				return;
 			}

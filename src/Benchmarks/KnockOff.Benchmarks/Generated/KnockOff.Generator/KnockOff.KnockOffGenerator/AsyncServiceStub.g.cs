@@ -8,6 +8,9 @@ partial class AsyncServiceStub : global::KnockOff.Benchmarks.Interfaces.IAsyncSe
 	/// <summary>Tracks and configures behavior for DoWorkAsync.</summary>
 	public sealed class DoWorkAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.IAsyncService? _source;
+
 		/// <summary>Delegate for DoWorkAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task DoWorkAsyncDelegate(AsyncServiceStub ko);
 
@@ -48,6 +51,9 @@ partial class AsyncServiceStub : global::KnockOff.Benchmarks.Interfaces.IAsyncSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.DoWorkAsync();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "DoWorkAsync");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -70,6 +76,7 @@ partial class AsyncServiceStub : global::KnockOff.Benchmarks.Interfaces.IAsyncSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -155,6 +162,9 @@ partial class AsyncServiceStub : global::KnockOff.Benchmarks.Interfaces.IAsyncSe
 	/// <summary>Tracks and configures behavior for GetValueAsync.</summary>
 	public sealed class GetValueAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.IAsyncService? _source;
+
 		/// <summary>Delegate for GetValueAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<int> GetValueAsyncDelegate(AsyncServiceStub ko);
 
@@ -195,6 +205,9 @@ partial class AsyncServiceStub : global::KnockOff.Benchmarks.Interfaces.IAsyncSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetValueAsync();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetValueAsync");
 				return global::System.Threading.Tasks.Task.FromResult<int>(default!);
 			}
@@ -217,6 +230,7 @@ partial class AsyncServiceStub : global::KnockOff.Benchmarks.Interfaces.IAsyncSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -302,6 +316,9 @@ partial class AsyncServiceStub : global::KnockOff.Benchmarks.Interfaces.IAsyncSe
 	/// <summary>Tracks and configures behavior for GetStringValueAsync.</summary>
 	public sealed class GetStringValueAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.IAsyncService? _source;
+
 		/// <summary>Delegate for GetStringValueAsync.</summary>
 		public delegate global::System.Threading.Tasks.ValueTask<string> GetStringValueAsyncDelegate(AsyncServiceStub ko);
 
@@ -342,6 +359,9 @@ partial class AsyncServiceStub : global::KnockOff.Benchmarks.Interfaces.IAsyncSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetStringValueAsync();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetStringValueAsync");
 				throw new global::System.InvalidOperationException("No implementation provided for GetStringValueAsync. Configure via OnCall.");
 			}
@@ -364,6 +384,7 @@ partial class AsyncServiceStub : global::KnockOff.Benchmarks.Interfaces.IAsyncSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -476,6 +497,17 @@ partial class AsyncServiceStub : global::KnockOff.Benchmarks.Interfaces.IAsyncSe
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Benchmarks.Interfaces.IAsyncService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Benchmarks.Interfaces.IAsyncService? source)
+	{
+		DoWorkAsync._source = source;
+		GetValueAsync._source = source;
+		GetStringValueAsync._source = source;
 	}
 
 	global::System.Threading.Tasks.Task global::KnockOff.Benchmarks.Interfaces.IAsyncService.DoWorkAsync()

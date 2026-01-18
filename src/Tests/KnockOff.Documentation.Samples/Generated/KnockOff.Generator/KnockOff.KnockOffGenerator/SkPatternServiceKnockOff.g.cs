@@ -56,7 +56,9 @@ partial class SkPatternServiceKnockOff : global::KnockOff.Documentation.Samples.
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetUser(id);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetUser");
 				return default!;
 			}
@@ -210,7 +212,9 @@ partial class SkPatternServiceKnockOff : global::KnockOff.Documentation.Samples.
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Connect(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Connect");
 				return;
 			}
@@ -367,7 +371,9 @@ partial class SkPatternServiceKnockOff : global::KnockOff.Documentation.Samples.
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = entity;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.SaveAsync(entity);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SaveAsync");
 				return global::System.Threading.Tasks.Task.FromResult<int>(default!);
 			}
@@ -524,7 +530,9 @@ partial class SkPatternServiceKnockOff : global::KnockOff.Documentation.Samples.
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetNext();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetNext");
 				return default!;
 			}
