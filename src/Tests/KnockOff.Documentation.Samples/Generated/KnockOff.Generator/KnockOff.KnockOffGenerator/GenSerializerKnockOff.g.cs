@@ -181,6 +181,14 @@ partial class GenSerializerKnockOff : global::KnockOff.Documentation.Samples.Gui
 			$"Set the handler's OnCall.");
 	}
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.IGenSerializer).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.IGenSerializer? source)
+	{
+	}
+
 	T global::KnockOff.Documentation.Samples.Guides.IGenSerializer.Deserialize<T>(string json)
 	{
 		Deserialize.Of<T>().RecordCall(json);

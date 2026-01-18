@@ -20,11 +20,14 @@ partial class ListStringStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public int Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Collections.Generic.ICollection<string>? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IList.IsReadOnly.</summary>
@@ -39,11 +42,14 @@ partial class ListStringStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Collections.Generic.ICollection<string>? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IList.Indexer.</summary>
@@ -76,13 +82,19 @@ partial class ListStringStubTests
 			/// <summary>Backing storage for this indexer.</summary>
 			public global::System.Collections.Generic.Dictionary<int, string> Backing { get; } = new();
 
+			/// <summary>Source object for delegation when OnGet/OnSet is not set.</summary>
+			internal global::System.Collections.Generic.IList<string>? _source;
+
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
+			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; _source = null; }
 		}
 
 		/// <summary>Tracks and configures behavior for IndexOf.</summary>
 		public sealed class IList_IndexOfInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IList<string>? _source;
+
 			/// <summary>Delegate for IndexOf.</summary>
 			public delegate int IndexOfDelegate(Stubs.IList ko, string item);
 
@@ -128,6 +140,9 @@ partial class ListStringStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = item;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.IndexOf(item);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "IndexOf");
 					return default!;
 				}
@@ -151,6 +166,7 @@ partial class ListStringStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -240,6 +256,9 @@ partial class ListStringStubTests
 		/// <summary>Tracks and configures behavior for Insert.</summary>
 		public sealed class IList_InsertInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IList<string>? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IList, int, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -282,6 +301,9 @@ partial class ListStringStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((index, item));
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.Insert(index, item); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Insert");
 					return;
 				}
@@ -305,6 +327,7 @@ partial class ListStringStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -394,6 +417,9 @@ partial class ListStringStubTests
 		/// <summary>Tracks and configures behavior for RemoveAt.</summary>
 		public sealed class IList_RemoveAtInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IList<string>? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IList, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -436,6 +462,9 @@ partial class ListStringStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = index;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.RemoveAt(index); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "RemoveAt");
 					return;
 				}
@@ -459,6 +488,7 @@ partial class ListStringStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -548,6 +578,9 @@ partial class ListStringStubTests
 		/// <summary>Tracks and configures behavior for Add.</summary>
 		public sealed class IList_AddInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.ICollection<string>? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IList, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -590,6 +623,9 @@ partial class ListStringStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = item;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.Add(item); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 					return;
 				}
@@ -613,6 +649,7 @@ partial class ListStringStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -702,6 +739,9 @@ partial class ListStringStubTests
 		/// <summary>Tracks and configures behavior for Clear.</summary>
 		public sealed class IList_ClearInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.ICollection<string>? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IList> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -739,6 +779,9 @@ partial class ListStringStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.Clear(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Clear");
 					return;
 				}
@@ -761,6 +804,7 @@ partial class ListStringStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -846,6 +890,9 @@ partial class ListStringStubTests
 		/// <summary>Tracks and configures behavior for Contains.</summary>
 		public sealed class IList_ContainsInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.ICollection<string>? _source;
+
 			/// <summary>Delegate for Contains.</summary>
 			public delegate bool ContainsDelegate(Stubs.IList ko, string item);
 
@@ -891,6 +938,9 @@ partial class ListStringStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = item;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.Contains(item);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Contains");
 					return default!;
 				}
@@ -914,6 +964,7 @@ partial class ListStringStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1003,6 +1054,9 @@ partial class ListStringStubTests
 		/// <summary>Tracks and configures behavior for CopyTo.</summary>
 		public sealed class IList_CopyToInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.ICollection<string>? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IList, string[], int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -1045,6 +1099,9 @@ partial class ListStringStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((array, arrayIndex));
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.CopyTo(array, arrayIndex); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "CopyTo");
 					return;
 				}
@@ -1068,6 +1125,7 @@ partial class ListStringStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1157,6 +1215,9 @@ partial class ListStringStubTests
 		/// <summary>Tracks and configures behavior for Remove.</summary>
 		public sealed class IList_RemoveInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.ICollection<string>? _source;
+
 			/// <summary>Delegate for Remove.</summary>
 			public delegate bool RemoveDelegate(Stubs.IList ko, string item);
 
@@ -1202,6 +1263,9 @@ partial class ListStringStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = item;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.Remove(item);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Remove");
 					return default!;
 				}
@@ -1225,6 +1289,7 @@ partial class ListStringStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1314,6 +1379,9 @@ partial class ListStringStubTests
 		/// <summary>Tracks and configures behavior for GetEnumerator.</summary>
 		public sealed class IList_GetEnumeratorInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IEnumerable<string>? _source;
+
 			/// <summary>Delegate for GetEnumerator.</summary>
 			public delegate global::System.Collections.Generic.IEnumerator<string> GetEnumeratorDelegate(Stubs.IList ko);
 
@@ -1354,6 +1422,9 @@ partial class ListStringStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetEnumerator();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
 					throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
 				}
@@ -1376,6 +1447,7 @@ partial class ListStringStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1518,6 +1590,7 @@ partial class ListStringStubTests
 				{
 					Indexer.RecordGet(index);
 					if (Indexer.OnGet is { } onGet) return onGet(this, index);
+					if (Indexer._source is { } src) return src[index];
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IList<string>", "this[]");
 					return Indexer.Backing.TryGetValue(index, out var v) ? v : default!;
 				}
@@ -1525,6 +1598,7 @@ partial class ListStringStubTests
 				{
 					Indexer.RecordSet(index, value);
 					if (Indexer.OnSet is { } onSet) { onSet(this, index, value); return; }
+					if (Indexer._source is { } src) { src[index] = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IList<string>", "this[]");
 					Indexer.Backing[index] = value;
 				}
@@ -1561,6 +1635,7 @@ partial class ListStringStubTests
 				{
 					Count.RecordGet();
 					if (Count.OnGet is { } onGet) return onGet(this);
+					if (Count._source is { } src) return src.Count;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "Count");
 					return Count.Value;
 				}
@@ -1572,6 +1647,7 @@ partial class ListStringStubTests
 				{
 					IsReadOnly.RecordGet();
 					if (IsReadOnly.OnGet is { } onGet) return onGet(this);
+					if (IsReadOnly._source is { } src) return src.IsReadOnly;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "IsReadOnly");
 					return IsReadOnly.Value;
 				}
@@ -1598,6 +1674,74 @@ partial class ListStringStubTests
 			public IList(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.Generic.IList<string> delegation.</summary>
+			public void Source(global::System.Collections.Generic.IList<string>? source)
+			{
+				Count._source = source;
+				IsReadOnly._source = source;
+				Indexer._source = source;
+				IndexOf._source = source;
+				Insert._source = source;
+				RemoveAt._source = source;
+				Add._source = source;
+				Clear._source = source;
+				Contains._source = source;
+				CopyTo._source = source;
+				Remove._source = source;
+				GetEnumerator._source = source;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.Generic.ICollection<string> delegation.</summary>
+			public void Source(global::System.Collections.Generic.ICollection<string>? source)
+			{
+				Count._source = source;
+				IsReadOnly._source = source;
+				Indexer._source = null;
+				IndexOf._source = null;
+				Insert._source = null;
+				RemoveAt._source = null;
+				Add._source = source;
+				Clear._source = source;
+				Contains._source = source;
+				CopyTo._source = source;
+				Remove._source = source;
+				GetEnumerator._source = null;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.Generic.IEnumerable<string> delegation.</summary>
+			public void Source(global::System.Collections.Generic.IEnumerable<string>? source)
+			{
+				Count._source = null;
+				IsReadOnly._source = null;
+				Indexer._source = null;
+				IndexOf._source = null;
+				Insert._source = null;
+				RemoveAt._source = null;
+				Add._source = null;
+				Clear._source = null;
+				Contains._source = null;
+				CopyTo._source = null;
+				Remove._source = null;
+				GetEnumerator._source = source;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.IEnumerable delegation.</summary>
+			public void Source(global::System.Collections.IEnumerable? source)
+			{
+				Count._source = null;
+				IsReadOnly._source = null;
+				Indexer._source = null;
+				IndexOf._source = null;
+				Insert._source = null;
+				RemoveAt._source = null;
+				Add._source = null;
+				Clear._source = null;
+				Contains._source = null;
+				CopyTo._source = null;
+				Remove._source = null;
+				GetEnumerator._source = null;
 			}
 
 		}

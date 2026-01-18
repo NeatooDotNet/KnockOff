@@ -11,6 +11,9 @@ partial class AttrUserServiceTests
 		/// <summary>Tracks and configures behavior for GetById.</summary>
 		public sealed class IAttrUserRepository_GetByIdInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Reference.IAttrUserRepository? _source;
+
 			/// <summary>Delegate for GetById.</summary>
 			public delegate global::KnockOff.Documentation.Samples.Reference.AttrUser? GetByIdDelegate(Stubs.IAttrUserRepository ko, int id);
 
@@ -56,6 +59,7 @@ partial class AttrUserServiceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = id;
+					if (_source is { } src) return src.GetById(id);
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
 					return default!;
 				}
@@ -79,6 +83,7 @@ partial class AttrUserServiceTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -189,11 +194,20 @@ partial class AttrUserServiceTests
 				Strict = strict;
 			}
 
+			/// <summary>Sets the source object for global::KnockOff.Documentation.Samples.Reference.IAttrUserRepository delegation.</summary>
+			public void Source(global::KnockOff.Documentation.Samples.Reference.IAttrUserRepository? source)
+			{
+				GetById._source = source;
+			}
+
 		}
 
 		/// <summary>Tracks and configures behavior for Send.</summary>
 		public sealed class IAttrEmailService_SendInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Reference.IAttrEmailService? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IAttrEmailService, string, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -236,6 +250,7 @@ partial class AttrUserServiceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((to, body));
+					if (_source is { } src) { src.Send(to, body); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Send");
 					return;
 				}
@@ -259,6 +274,7 @@ partial class AttrUserServiceTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -367,6 +383,12 @@ partial class AttrUserServiceTests
 			public IAttrEmailService(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::KnockOff.Documentation.Samples.Reference.IAttrEmailService delegation.</summary>
+			public void Source(global::KnockOff.Documentation.Samples.Reference.IAttrEmailService? source)
+			{
+				Send._source = source;
 			}
 
 		}

@@ -365,6 +365,11 @@ public partial class KnockOffGenerator
 
 		var simpleName = GetSimpleInterfaceName(iface.Name);
 
+		// Collect base interfaces for Source(T) hierarchy
+		var baseInterfaceNames = iface.AllInterfaces
+			.Select(bi => bi.ToDisplayString(FullyQualifiedWithNullability))
+			.ToArray();
+
 		return new InterfaceInfo(
 			iface.ToDisplayString(FullyQualifiedWithNullability),
 			iface.Name,
@@ -374,7 +379,8 @@ public partial class KnockOffGenerator
 			TypeSuffix: typeSuffix,
 			Strict: strict,
 			IsOpenGeneric: isOpenGeneric,
-			TypeParameters: typeParameters);
+			TypeParameters: typeParameters,
+			BaseInterfaces: new EquatableArray<string>(baseInterfaceNames));
 	}
 
 	/// <summary>
@@ -768,12 +774,18 @@ public partial class KnockOffGenerator
 				// Extract simple interface name for AsXYZ() generation
 				var simpleName = GetSimpleInterfaceName(iface.Name);
 
+				// Collect base interfaces for Source(T) hierarchy
+				var baseInterfaceNames = iface.AllInterfaces
+					.Select(bi => bi.ToDisplayString(FullyQualifiedWithNullability))
+					.ToArray();
+
 				interfaceInfos.Add(new InterfaceInfo(
 					iface.ToDisplayString(FullyQualifiedWithNullability),
 					iface.Name,
 					simpleName,
 					new EquatableArray<InterfaceMemberInfo>(members.ToArray()),
-					new EquatableArray<EventMemberInfo>(events.ToArray())));
+					new EquatableArray<EventMemberInfo>(events.ToArray()),
+					BaseInterfaces: new EquatableArray<string>(baseInterfaceNames)));
 			}
 		}
 

@@ -8,6 +8,9 @@ partial class NestedDictStub<TKey, TValue> : global::KnockOff.Tests.INestedDictS
 	/// <summary>Tracks and configures behavior for GetMapping.</summary>
 	public sealed class GetMappingInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.INestedDictService<TKey, TValue>? _source;
+
 		/// <summary>Delegate for GetMapping.</summary>
 		public delegate global::System.Collections.Generic.Dictionary<TKey, TValue> GetMappingDelegate(NestedDictStub<TKey, TValue> ko);
 
@@ -48,6 +51,9 @@ partial class NestedDictStub<TKey, TValue> : global::KnockOff.Tests.INestedDictS
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetMapping();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetMapping");
 				return new global::System.Collections.Generic.Dictionary<TKey, TValue>();
 			}
@@ -70,6 +76,7 @@ partial class NestedDictStub<TKey, TValue> : global::KnockOff.Tests.INestedDictS
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -174,6 +181,15 @@ partial class NestedDictStub<TKey, TValue> : global::KnockOff.Tests.INestedDictS
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Tests.INestedDictService<TKey, TValue>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Tests.INestedDictService<TKey, TValue>? source)
+	{
+		GetMapping._source = source;
 	}
 
 	global::System.Collections.Generic.Dictionary<TKey, TValue> global::KnockOff.Tests.INestedDictService<TKey, TValue>.GetMapping()

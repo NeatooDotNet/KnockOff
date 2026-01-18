@@ -8,6 +8,9 @@ partial class CollisionKnockOff : global::KnockOff.Tests.ICollision, global::Kno
 	/// <summary>Tracks and configures behavior for ICollision.</summary>
 	public sealed class ICollisionInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Tests.ICollision? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -33,12 +36,15 @@ partial class CollisionKnockOff : global::KnockOff.Tests.ICollision, global::Kno
 		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for DoWork.</summary>
 	public sealed class DoWorkInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.ICollision? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<CollisionKnockOff> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -76,6 +82,9 @@ partial class CollisionKnockOff : global::KnockOff.Tests.ICollision, global::Kno
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.DoWork(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "DoWork");
 				return;
 			}
@@ -98,6 +107,7 @@ partial class CollisionKnockOff : global::KnockOff.Tests.ICollision, global::Kno
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -207,10 +217,20 @@ partial class CollisionKnockOff : global::KnockOff.Tests.ICollision, global::Kno
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
 	}
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Tests.ICollision).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Tests.ICollision? source)
+	{
+		ICollision._source = source;
+		DoWork._source = source;
+	}
+
 	string global::KnockOff.Tests.ICollision.ICollision
 	{
-		get { ICollision.RecordGet(); if (ICollision.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollision", "ICollision"); return ICollision.Value; }
-		set { ICollision.RecordSet(value); if (ICollision.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollision", "ICollision"); ICollision.Value = value; }
+		get { ICollision.RecordGet(); if (ICollision.OnGet is { } onGet) return onGet(this); if (ICollision._source is { } src) return src.ICollision; if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollision", "ICollision"); return ICollision.Value; }
+		set { ICollision.RecordSet(value); if (ICollision.OnSet is { } onSet) { onSet(this, value); return; } if (ICollision._source is { } src) { src.ICollision = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollision", "ICollision"); ICollision.Value = value; }
 	}
 
 	void global::KnockOff.Tests.ICollision.DoWork()

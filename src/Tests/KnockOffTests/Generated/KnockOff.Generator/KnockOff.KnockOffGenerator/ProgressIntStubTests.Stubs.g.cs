@@ -11,6 +11,9 @@ partial class ProgressIntStubTests
 		/// <summary>Tracks and configures behavior for Report.</summary>
 		public sealed class IProgress_ReportInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IProgress<int>? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IProgress, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -53,6 +56,9 @@ partial class ProgressIntStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = @value;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.Report(@value); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Report");
 					return;
 				}
@@ -76,6 +82,7 @@ partial class ProgressIntStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -184,6 +191,12 @@ partial class ProgressIntStubTests
 			public IProgress(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.IProgress<int> delegation.</summary>
+			public void Source(global::System.IProgress<int>? source)
+			{
+				Report._source = source;
 			}
 
 		}

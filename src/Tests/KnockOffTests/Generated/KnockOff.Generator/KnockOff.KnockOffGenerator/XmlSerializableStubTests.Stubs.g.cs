@@ -11,6 +11,9 @@ partial class XmlSerializableStubTests
 		/// <summary>Tracks and configures behavior for GetSchema.</summary>
 		public sealed class IXmlSerializable_GetSchemaInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Xml.Serialization.IXmlSerializable? _source;
+
 			/// <summary>Delegate for GetSchema.</summary>
 			public delegate global::System.Xml.Schema.XmlSchema? GetSchemaDelegate(Stubs.IXmlSerializable ko);
 
@@ -51,6 +54,9 @@ partial class XmlSerializableStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetSchema();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetSchema");
 					return default!;
 				}
@@ -73,6 +79,7 @@ partial class XmlSerializableStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -158,6 +165,9 @@ partial class XmlSerializableStubTests
 		/// <summary>Tracks and configures behavior for ReadXml.</summary>
 		public sealed class IXmlSerializable_ReadXmlInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Xml.Serialization.IXmlSerializable? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlReader> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -200,6 +210,9 @@ partial class XmlSerializableStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = reader;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.ReadXml(reader); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ReadXml");
 					return;
 				}
@@ -223,6 +236,7 @@ partial class XmlSerializableStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -312,6 +326,9 @@ partial class XmlSerializableStubTests
 		/// <summary>Tracks and configures behavior for WriteXml.</summary>
 		public sealed class IXmlSerializable_WriteXmlInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Xml.Serialization.IXmlSerializable? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlWriter> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -354,6 +371,9 @@ partial class XmlSerializableStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = writer;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.WriteXml(writer); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "WriteXml");
 					return;
 				}
@@ -377,6 +397,7 @@ partial class XmlSerializableStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -501,6 +522,14 @@ partial class XmlSerializableStubTests
 			public IXmlSerializable(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.Xml.Serialization.IXmlSerializable delegation.</summary>
+			public void Source(global::System.Xml.Serialization.IXmlSerializable? source)
+			{
+				GetSchema._source = source;
+				ReadXml._source = source;
+				WriteXml._source = source;
 			}
 
 		}

@@ -11,6 +11,9 @@ partial class ObservableStringStubTests
 		/// <summary>Tracks and configures behavior for Subscribe.</summary>
 		public sealed class IObservable_SubscribeInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IObservable<string>? _source;
+
 			/// <summary>Delegate for Subscribe.</summary>
 			public delegate global::System.IDisposable SubscribeDelegate(Stubs.IObservable ko, global::System.IObserver<string> observer);
 
@@ -56,6 +59,9 @@ partial class ObservableStringStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = observer;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.Subscribe(observer);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Subscribe");
 					throw new global::System.InvalidOperationException("No implementation provided for Subscribe. Configure via OnCall.");
 				}
@@ -79,6 +85,7 @@ partial class ObservableStringStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -187,6 +194,12 @@ partial class ObservableStringStubTests
 			public IObservable(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.IObservable<string> delegation.</summary>
+			public void Source(global::System.IObservable<string>? source)
+			{
+				Subscribe._source = source;
 			}
 
 		}

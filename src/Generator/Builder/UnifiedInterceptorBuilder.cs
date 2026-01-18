@@ -23,6 +23,7 @@ internal static class UnifiedInterceptorBuilder
 	public static UnifiedMethodInterceptorModel BuildMethodInterceptor(
 		string interceptorClassName,
 		string methodName,
+		string declaringInterface,
 		string ownerClassName,
 		string ownerTypeParameters,
 		IReadOnlyList<MethodSignatureInfo> overloads)
@@ -40,6 +41,7 @@ internal static class UnifiedInterceptorBuilder
 			return new UnifiedMethodInterceptorModel(
 				InterceptorClassName: interceptorClassName,
 				MethodName: methodName,
+				DeclaringInterface: declaringInterface,
 				OwnerClassName: ownerClassName,
 				OwnerTypeParameters: ownerTypeParameters,
 				Parameters: sig.Parameters,
@@ -64,6 +66,7 @@ internal static class UnifiedInterceptorBuilder
 			return new UnifiedMethodInterceptorModel(
 				InterceptorClassName: interceptorClassName,
 				MethodName: methodName,
+				DeclaringInterface: declaringInterface,
 				OwnerClassName: ownerClassName,
 				OwnerTypeParameters: ownerTypeParameters,
 				// Single-signature fields (not used for multi-overload, but need values)

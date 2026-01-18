@@ -20,11 +20,14 @@ partial class PropertyStoreKnockOff
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public string Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IInPropertyInfo.Value.</summary>
@@ -48,6 +51,9 @@ partial class PropertyStoreKnockOff
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public object? Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
@@ -55,7 +61,7 @@ partial class PropertyStoreKnockOff
 			public void RecordSet(object? value) { SetCount++; LastSetValue = value; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Stub implementation of global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo.</summary>
@@ -73,6 +79,7 @@ partial class PropertyStoreKnockOff
 				{
 					Name.RecordGet();
 					if (Name.OnGet is { } onGet) return onGet(this);
+					if (Name._source is { } src) return src.Name;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IInPropertyInfo", "Name");
 					return Name.Value;
 				}
@@ -84,6 +91,7 @@ partial class PropertyStoreKnockOff
 				{
 					Value.RecordGet();
 					if (Value.OnGet is { } onGet) return onGet(this);
+					if (Value._source is { } src) return src.Value;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IInPropertyInfo", "Value");
 					return Value.Value;
 				}
@@ -91,6 +99,7 @@ partial class PropertyStoreKnockOff
 				{
 					Value.RecordSet(value);
 					if (Value.OnSet is { } onSet) { onSet(this, value); return; }
+					if (Value._source is { } src) { src.Value = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IInPropertyInfo", "Value");
 					Value.Value = value;
 				}
@@ -107,6 +116,13 @@ partial class PropertyStoreKnockOff
 			public IInPropertyInfo(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo delegation.</summary>
+			public void Source(global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo? source)
+			{
+				Name._source = source;
+				Value._source = source;
 			}
 
 		}

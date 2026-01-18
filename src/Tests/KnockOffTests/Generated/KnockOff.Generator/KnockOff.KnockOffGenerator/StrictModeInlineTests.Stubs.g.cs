@@ -29,6 +29,9 @@ partial class StrictModeInlineTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public string Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::KnockOff.Tests.IStrictModeTest? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
@@ -36,12 +39,15 @@ partial class StrictModeInlineTests
 			public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Tracks and configures behavior for GetValue.</summary>
 		public sealed class IStrictModeTest_GetValueInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Tests.IStrictModeTest? _source;
+
 			/// <summary>Delegate for GetValue.</summary>
 			public delegate int GetValueDelegate(Stubs.IStrictModeTest ko, int x);
 
@@ -87,6 +93,9 @@ partial class StrictModeInlineTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = x;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetValue(x);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetValue");
 					return default!;
 				}
@@ -110,6 +119,7 @@ partial class StrictModeInlineTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -199,6 +209,9 @@ partial class StrictModeInlineTests
 		/// <summary>Tracks and configures behavior for DoSomething.</summary>
 		public sealed class IStrictModeTest_DoSomethingInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Tests.IStrictModeTest? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IStrictModeTest> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -236,6 +249,9 @@ partial class StrictModeInlineTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.DoSomething(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "DoSomething");
 					return;
 				}
@@ -258,6 +274,7 @@ partial class StrictModeInlineTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -358,6 +375,7 @@ partial class StrictModeInlineTests
 				{
 					Name.RecordGet();
 					if (Name.OnGet is { } onGet) return onGet(this);
+					if (Name._source is { } src) return src.Name;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IStrictModeTest", "Name");
 					return Name.Value;
 				}
@@ -365,6 +383,7 @@ partial class StrictModeInlineTests
 				{
 					Name.RecordSet(value);
 					if (Name.OnSet is { } onSet) { onSet(this, value); return; }
+					if (Name._source is { } src) { src.Name = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IStrictModeTest", "Name");
 					Name.Value = value;
 				}
@@ -393,11 +412,22 @@ partial class StrictModeInlineTests
 				Strict = strict;
 			}
 
+			/// <summary>Sets the source object for global::KnockOff.Tests.IStrictModeTest delegation.</summary>
+			public void Source(global::KnockOff.Tests.IStrictModeTest? source)
+			{
+				Name._source = source;
+				GetValue._source = source;
+				DoSomething._source = source;
+			}
+
 		}
 
 		/// <summary>Tracks and configures behavior for GetData.</summary>
 		public sealed class IStrictByDefault_GetDataInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Tests.IStrictByDefault? _source;
+
 			/// <summary>Delegate for GetData.</summary>
 			public delegate int GetDataDelegate(Stubs.IStrictByDefault ko);
 
@@ -438,6 +468,9 @@ partial class StrictModeInlineTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetData();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetData");
 					return default!;
 				}
@@ -460,6 +493,7 @@ partial class StrictModeInlineTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -564,6 +598,12 @@ partial class StrictModeInlineTests
 			public IStrictByDefault(bool strict = true)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::KnockOff.Tests.IStrictByDefault delegation.</summary>
+			public void Source(global::KnockOff.Tests.IStrictByDefault? source)
+			{
+				GetData._source = source;
 			}
 
 		}

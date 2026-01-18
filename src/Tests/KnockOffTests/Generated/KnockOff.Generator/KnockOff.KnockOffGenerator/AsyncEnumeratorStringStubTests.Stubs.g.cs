@@ -20,16 +20,22 @@ partial class AsyncEnumeratorStringStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public string Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Collections.Generic.IAsyncEnumerator<string>? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Tracks and configures behavior for MoveNextAsync.</summary>
 		public sealed class IAsyncEnumerator_MoveNextAsyncInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IAsyncEnumerator<string>? _source;
+
 			/// <summary>Delegate for MoveNextAsync.</summary>
 			public delegate global::System.Threading.Tasks.ValueTask<bool> MoveNextAsyncDelegate(Stubs.IAsyncEnumerator ko);
 
@@ -70,6 +76,9 @@ partial class AsyncEnumeratorStringStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.MoveNextAsync();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "MoveNextAsync");
 					return new global::System.Threading.Tasks.ValueTask<bool>((bool)default!);
 				}
@@ -92,6 +101,7 @@ partial class AsyncEnumeratorStringStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -177,6 +187,9 @@ partial class AsyncEnumeratorStringStubTests
 		/// <summary>Tracks and configures behavior for DisposeAsync.</summary>
 		public sealed class IAsyncEnumerator_DisposeAsyncInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IAsyncDisposable? _source;
+
 			/// <summary>Delegate for DisposeAsync.</summary>
 			public delegate global::System.Threading.Tasks.ValueTask DisposeAsyncDelegate(Stubs.IAsyncEnumerator ko);
 
@@ -217,6 +230,9 @@ partial class AsyncEnumeratorStringStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.DisposeAsync();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "DisposeAsync");
 					return default;
 				}
@@ -239,6 +255,7 @@ partial class AsyncEnumeratorStringStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -344,6 +361,7 @@ partial class AsyncEnumeratorStringStubTests
 				{
 					Current.RecordGet();
 					if (Current.OnGet is { } onGet) return onGet(this);
+					if (Current._source is { } src) return src.Current;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncEnumerator<string>", "Current");
 					return Current.Value;
 				}
@@ -365,6 +383,22 @@ partial class AsyncEnumeratorStringStubTests
 			public IAsyncEnumerator(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.Generic.IAsyncEnumerator<string> delegation.</summary>
+			public void Source(global::System.Collections.Generic.IAsyncEnumerator<string>? source)
+			{
+				Current._source = source;
+				MoveNextAsync._source = source;
+				DisposeAsync._source = source;
+			}
+
+			/// <summary>Sets the source object for global::System.IAsyncDisposable delegation.</summary>
+			public void Source(global::System.IAsyncDisposable? source)
+			{
+				Current._source = null;
+				MoveNextAsync._source = null;
+				DisposeAsync._source = source;
 			}
 
 		}

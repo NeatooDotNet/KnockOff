@@ -8,6 +8,9 @@ partial class PatternPropertyServiceKnockOff : global::KnockOff.Documentation.Sa
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Concepts.IPatternPropertyService? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -33,7 +36,7 @@ partial class PatternPropertyServiceKnockOff : global::KnockOff.Documentation.Sa
 		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Interceptor for Name. Configure via .Value, track via .GetCount.</summary>
@@ -45,10 +48,19 @@ partial class PatternPropertyServiceKnockOff : global::KnockOff.Documentation.Sa
 	/// <summary>The global::KnockOff.Documentation.Samples.Concepts.IPatternPropertyService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Concepts.IPatternPropertyService Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Concepts.IPatternPropertyService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Concepts.IPatternPropertyService? source)
+	{
+		Name._source = source;
+	}
+
 	string global::KnockOff.Documentation.Samples.Concepts.IPatternPropertyService.Name
 	{
-		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IPatternPropertyService", "Name"); return Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IPatternPropertyService", "Name"); Name.Value = value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Name._source is { } src) return src.Name; if (Strict) throw global::KnockOff.StubException.NotConfigured("IPatternPropertyService", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Name._source is { } src) { src.Name = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IPatternPropertyService", "Name"); Name.Value = value; }
 	}
 
 }

@@ -8,6 +8,9 @@ partial class MmUserServiceKnockOff : global::KnockOff.Documentation.Samples.Ski
 	/// <summary>Tracks and configures behavior for GetUser.</summary>
 	public sealed class GetUserInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.IMmUserService? _source;
+
 		/// <summary>Delegate for GetUser.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.MmUser? GetUserDelegate(MmUserServiceKnockOff ko, int id);
 
@@ -53,6 +56,7 @@ partial class MmUserServiceKnockOff : global::KnockOff.Documentation.Samples.Ski
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				if (_source is { } src) return src.GetUser(id);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetUser");
 				return default!;
 			}
@@ -76,6 +80,7 @@ partial class MmUserServiceKnockOff : global::KnockOff.Documentation.Samples.Ski
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -165,6 +170,9 @@ partial class MmUserServiceKnockOff : global::KnockOff.Documentation.Samples.Ski
 	/// <summary>Tracks and configures behavior for GetUserAsync.</summary>
 	public sealed class GetUserAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.IMmUserService? _source;
+
 		/// <summary>Delegate for GetUserAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.MmUser?> GetUserAsyncDelegate(MmUserServiceKnockOff ko, int id);
 
@@ -210,6 +218,7 @@ partial class MmUserServiceKnockOff : global::KnockOff.Documentation.Samples.Ski
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				if (_source is { } src) return src.GetUserAsync(id);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetUserAsync");
 				return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Skills.MmUser?>(default!);
 			}
@@ -233,6 +242,7 @@ partial class MmUserServiceKnockOff : global::KnockOff.Documentation.Samples.Ski
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -322,6 +332,9 @@ partial class MmUserServiceKnockOff : global::KnockOff.Documentation.Samples.Ski
 	/// <summary>Tracks and configures behavior for Save.</summary>
 	public sealed class SaveInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.IMmUserService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<MmUserServiceKnockOff, global::KnockOff.Documentation.Samples.Skills.MmUser> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -364,6 +377,7 @@ partial class MmUserServiceKnockOff : global::KnockOff.Documentation.Samples.Ski
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = user;
+				if (_source is { } src) { src.Save(user); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 				return;
 			}
@@ -387,6 +401,7 @@ partial class MmUserServiceKnockOff : global::KnockOff.Documentation.Samples.Ski
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -476,6 +491,9 @@ partial class MmUserServiceKnockOff : global::KnockOff.Documentation.Samples.Ski
 	/// <summary>Tracks and configures behavior for Delete.</summary>
 	public sealed class DeleteInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.IMmUserService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<MmUserServiceKnockOff, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -518,6 +536,7 @@ partial class MmUserServiceKnockOff : global::KnockOff.Documentation.Samples.Ski
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				if (_source is { } src) { src.Delete(id); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Delete");
 				return;
 			}
@@ -541,6 +560,7 @@ partial class MmUserServiceKnockOff : global::KnockOff.Documentation.Samples.Ski
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -630,6 +650,9 @@ partial class MmUserServiceKnockOff : global::KnockOff.Documentation.Samples.Ski
 	/// <summary>Tracks and configures behavior for GetAll.</summary>
 	public sealed class GetAllInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.IMmUserService? _source;
+
 		/// <summary>Delegate for GetAll.</summary>
 		public delegate global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Skills.MmUser> GetAllDelegate(MmUserServiceKnockOff ko);
 
@@ -670,6 +693,7 @@ partial class MmUserServiceKnockOff : global::KnockOff.Documentation.Samples.Ski
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.GetAll();
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetAll");
 				return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.MmUser>();
 			}
@@ -692,6 +716,7 @@ partial class MmUserServiceKnockOff : global::KnockOff.Documentation.Samples.Ski
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -777,6 +802,9 @@ partial class MmUserServiceKnockOff : global::KnockOff.Documentation.Samples.Ski
 	/// <summary>Tracks and configures behavior for Update.</summary>
 	public sealed class UpdateInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.IMmUserService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<MmUserServiceKnockOff, global::KnockOff.Documentation.Samples.Skills.MmUser> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -819,6 +847,7 @@ partial class MmUserServiceKnockOff : global::KnockOff.Documentation.Samples.Ski
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = user;
+				if (_source is { } src) { src.Update(user); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Update");
 				return;
 			}
@@ -842,6 +871,7 @@ partial class MmUserServiceKnockOff : global::KnockOff.Documentation.Samples.Ski
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -970,6 +1000,20 @@ partial class MmUserServiceKnockOff : global::KnockOff.Documentation.Samples.Ski
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Skills.IMmUserService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Skills.IMmUserService? source)
+	{
+		GetUser._source = source;
+		GetUserAsync._source = source;
+		Save._source = source;
+		Delete._source = source;
+		GetAll._source = source;
+		Update._source = source;
 	}
 
 	global::KnockOff.Documentation.Samples.Skills.MmUser? global::KnockOff.Documentation.Samples.Skills.IMmUserService.GetUser(int id)

@@ -8,6 +8,9 @@ partial class HaParserKnockOff : global::KnockOff.Documentation.Samples.Skills.I
 	/// <summary>Tracks and configures behavior for TryParse.</summary>
 	public sealed class TryParseInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.IHaParser? _source;
+
 		/// <summary>Delegate for TryParse.</summary>
 		public delegate bool TryParseDelegate(HaParserKnockOff ko, string input, out int result);
 
@@ -54,6 +57,9 @@ partial class HaParserKnockOff : global::KnockOff.Documentation.Samples.Skills.I
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = input;
+				#pragma warning disable CS8601
+				if (_source is { } src) return src.TryParse(input, out result);
+				#pragma warning restore CS8601
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "TryParse");
 				return default!;
 			}
@@ -77,6 +83,7 @@ partial class HaParserKnockOff : global::KnockOff.Documentation.Samples.Skills.I
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -166,6 +173,9 @@ partial class HaParserKnockOff : global::KnockOff.Documentation.Samples.Skills.I
 	/// <summary>Tracks and configures behavior for GetData.</summary>
 	public sealed class GetDataInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.IHaParser? _source;
+
 		/// <summary>Delegate for GetData.</summary>
 		public delegate void GetDataDelegate(HaParserKnockOff ko, out string name, out int count);
 
@@ -208,6 +218,9 @@ partial class HaParserKnockOff : global::KnockOff.Documentation.Samples.Skills.I
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601
+				if (_source is { } src) { src.GetData(out name, out count); return; }
+				#pragma warning restore CS8601
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetData");
 				return;
 			}
@@ -230,6 +243,7 @@ partial class HaParserKnockOff : global::KnockOff.Documentation.Samples.Skills.I
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -338,6 +352,16 @@ partial class HaParserKnockOff : global::KnockOff.Documentation.Samples.Skills.I
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Skills.IHaParser).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Skills.IHaParser? source)
+	{
+		TryParse._source = source;
+		GetData._source = source;
 	}
 
 	bool global::KnockOff.Documentation.Samples.Skills.IHaParser.TryParse(string input, out int result)

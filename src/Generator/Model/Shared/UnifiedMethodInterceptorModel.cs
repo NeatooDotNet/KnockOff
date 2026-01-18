@@ -15,6 +15,8 @@ internal sealed record UnifiedMethodInterceptorModel(
     string InterceptorClassName,
     /// <summary>Method name (e.g., "Process").</summary>
     string MethodName,
+    /// <summary>The declaring interface type for Source(T) feature (e.g., "global::MyNamespace.IMyInterface").</summary>
+    string DeclaringInterface,
 
     // Owner context
     /// <summary>The class name that owns this interceptor (for delegate signatures).</summary>

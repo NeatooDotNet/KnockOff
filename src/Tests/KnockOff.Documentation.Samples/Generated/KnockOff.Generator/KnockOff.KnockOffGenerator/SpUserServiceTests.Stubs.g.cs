@@ -11,6 +11,9 @@ partial class SpUserServiceTests
 		/// <summary>Tracks and configures behavior for GetById.</summary>
 		public sealed class ISpUserRepository_GetByIdInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.ISpUserRepository? _source;
+
 			/// <summary>Delegate for GetById.</summary>
 			public delegate global::KnockOff.Documentation.Samples.Guides.SpUser? GetByIdDelegate(Stubs.ISpUserRepository ko, int id);
 
@@ -56,6 +59,7 @@ partial class SpUserServiceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = id;
+					if (_source is { } src) return src.GetById(id);
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
 					return default!;
 				}
@@ -79,6 +83,7 @@ partial class SpUserServiceTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -168,6 +173,9 @@ partial class SpUserServiceTests
 		/// <summary>Tracks and configures behavior for GetAll.</summary>
 		public sealed class ISpUserRepository_GetAllInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.ISpUserRepository? _source;
+
 			/// <summary>Delegate for GetAll.</summary>
 			public delegate global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Guides.SpUser> GetAllDelegate(Stubs.ISpUserRepository ko);
 
@@ -208,6 +216,7 @@ partial class SpUserServiceTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					if (_source is { } src) return src.GetAll();
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetAll");
 					throw new global::System.InvalidOperationException("No implementation provided for GetAll. Configure via OnCall.");
 				}
@@ -230,6 +239,7 @@ partial class SpUserServiceTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -315,6 +325,9 @@ partial class SpUserServiceTests
 		/// <summary>Tracks and configures behavior for Save.</summary>
 		public sealed class ISpUserRepository_SaveInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.ISpUserRepository? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.ISpUserRepository, global::KnockOff.Documentation.Samples.Guides.SpUser> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -357,6 +370,7 @@ partial class SpUserServiceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = user;
+					if (_source is { } src) { src.Save(user); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 					return;
 				}
@@ -380,6 +394,7 @@ partial class SpUserServiceTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -506,11 +521,22 @@ partial class SpUserServiceTests
 				Strict = strict;
 			}
 
+			/// <summary>Sets the source object for global::KnockOff.Documentation.Samples.Guides.ISpUserRepository delegation.</summary>
+			public void Source(global::KnockOff.Documentation.Samples.Guides.ISpUserRepository? source)
+			{
+				GetById._source = source;
+				GetAll._source = source;
+				Save._source = source;
+			}
+
 		}
 
 		/// <summary>Tracks and configures behavior for Send.</summary>
 		public sealed class ISpEmailService_SendInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.ISpEmailService? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.ISpEmailService, string, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -553,6 +579,7 @@ partial class SpUserServiceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((to, body));
+					if (_source is { } src) { src.Send(to, body); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Send");
 					return;
 				}
@@ -576,6 +603,7 @@ partial class SpUserServiceTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -684,6 +712,12 @@ partial class SpUserServiceTests
 			public ISpEmailService(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::KnockOff.Documentation.Samples.Guides.ISpEmailService delegation.</summary>
+			public void Source(global::KnockOff.Documentation.Samples.Guides.ISpEmailService? source)
+			{
+				Send._source = source;
 			}
 
 		}

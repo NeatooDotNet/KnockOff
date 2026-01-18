@@ -11,6 +11,9 @@ partial class NamespaceCollisionInlineTests
 		/// <summary>Tracks and configures behavior for SavePerson.</summary>
 		public sealed class IPersonDbContext_SavePersonInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::Person.Ef.IPersonDbContext? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IPersonDbContext, global::DomainModel.Person> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -53,6 +56,9 @@ partial class NamespaceCollisionInlineTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = person;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.SavePerson(person); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "SavePerson");
 					return;
 				}
@@ -76,6 +82,7 @@ partial class NamespaceCollisionInlineTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -165,6 +172,9 @@ partial class NamespaceCollisionInlineTests
 		/// <summary>Tracks and configures behavior for GetPerson.</summary>
 		public sealed class IPersonDbContext_GetPersonInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::Person.Ef.IPersonDbContext? _source;
+
 			/// <summary>Delegate for GetPerson.</summary>
 			public delegate global::DomainModel.Person? GetPersonDelegate(Stubs.IPersonDbContext ko, int id);
 
@@ -210,6 +220,9 @@ partial class NamespaceCollisionInlineTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = id;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetPerson(id);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetPerson");
 					return default!;
 				}
@@ -233,6 +246,7 @@ partial class NamespaceCollisionInlineTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -349,6 +363,13 @@ partial class NamespaceCollisionInlineTests
 			public IPersonDbContext(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::Person.Ef.IPersonDbContext delegation.</summary>
+			public void Source(global::Person.Ef.IPersonDbContext? source)
+			{
+				SavePerson._source = source;
+				GetPerson._source = source;
 			}
 
 		}

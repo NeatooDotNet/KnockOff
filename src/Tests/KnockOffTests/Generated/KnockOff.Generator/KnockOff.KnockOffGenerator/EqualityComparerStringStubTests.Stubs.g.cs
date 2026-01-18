@@ -11,6 +11,9 @@ partial class EqualityComparerStringStubTests
 		/// <summary>Tracks and configures behavior for Equals.</summary>
 		public sealed class IEqualityComparer_EqualsInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IEqualityComparer<string>? _source;
+
 			/// <summary>Delegate for Equals.</summary>
 			public delegate bool EqualsDelegate(Stubs.IEqualityComparer ko, string? x, string? y);
 
@@ -56,6 +59,9 @@ partial class EqualityComparerStringStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((x, y));
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.Equals(x, y);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Equals");
 					return default!;
 				}
@@ -79,6 +85,7 @@ partial class EqualityComparerStringStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -168,6 +175,9 @@ partial class EqualityComparerStringStubTests
 		/// <summary>Tracks and configures behavior for GetHashCode.</summary>
 		public sealed class IEqualityComparer_GetHashCodeInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IEqualityComparer<string>? _source;
+
 			/// <summary>Delegate for GetHashCode.</summary>
 			public delegate int GetHashCodeDelegate(Stubs.IEqualityComparer ko, string obj);
 
@@ -213,6 +223,9 @@ partial class EqualityComparerStringStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = obj;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetHashCode(obj);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetHashCode");
 					return default!;
 				}
@@ -236,6 +249,7 @@ partial class EqualityComparerStringStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -352,6 +366,13 @@ partial class EqualityComparerStringStubTests
 			public IEqualityComparer(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.Generic.IEqualityComparer<string> delegation.</summary>
+			public void Source(global::System.Collections.Generic.IEqualityComparer<string>? source)
+			{
+				Equals._source = source;
+				GetHashCode._source = source;
 			}
 
 		}

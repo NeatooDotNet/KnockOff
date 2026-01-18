@@ -8,6 +8,9 @@ partial class AsyncCallOrderKnockOff : global::KnockOff.Documentation.Samples.Gu
 	/// <summary>Tracks and configures behavior for StartAsync.</summary>
 	public sealed class StartAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IAsyncCallOrder? _source;
+
 		/// <summary>Delegate for StartAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task StartAsyncDelegate(AsyncCallOrderKnockOff ko);
 
@@ -48,6 +51,7 @@ partial class AsyncCallOrderKnockOff : global::KnockOff.Documentation.Samples.Gu
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.StartAsync();
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "StartAsync");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -70,6 +74,7 @@ partial class AsyncCallOrderKnockOff : global::KnockOff.Documentation.Samples.Gu
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -155,6 +160,9 @@ partial class AsyncCallOrderKnockOff : global::KnockOff.Documentation.Samples.Gu
 	/// <summary>Tracks and configures behavior for ProcessAsync.</summary>
 	public sealed class ProcessAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IAsyncCallOrder? _source;
+
 		/// <summary>Delegate for ProcessAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task ProcessAsyncDelegate(AsyncCallOrderKnockOff ko);
 
@@ -195,6 +203,7 @@ partial class AsyncCallOrderKnockOff : global::KnockOff.Documentation.Samples.Gu
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.ProcessAsync();
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ProcessAsync");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -217,6 +226,7 @@ partial class AsyncCallOrderKnockOff : global::KnockOff.Documentation.Samples.Gu
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -325,6 +335,16 @@ partial class AsyncCallOrderKnockOff : global::KnockOff.Documentation.Samples.Gu
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.IAsyncCallOrder).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.IAsyncCallOrder? source)
+	{
+		StartAsync._source = source;
+		ProcessAsync._source = source;
 	}
 
 	global::System.Threading.Tasks.Task global::KnockOff.Documentation.Samples.Guides.IAsyncCallOrder.StartAsync()

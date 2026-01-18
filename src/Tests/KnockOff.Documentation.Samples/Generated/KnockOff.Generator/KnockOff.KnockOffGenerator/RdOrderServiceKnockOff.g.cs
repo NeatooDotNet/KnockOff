@@ -8,6 +8,9 @@ partial class RdOrderServiceKnockOff : global::KnockOff.Documentation.Samples.Wh
 	/// <summary>Tracks and configures behavior for Save.</summary>
 	public sealed class SaveInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.WhyKnockOff.IRdOrderService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<RdOrderServiceKnockOff, global::KnockOff.Documentation.Samples.WhyKnockOff.RdOrder> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -50,6 +53,7 @@ partial class RdOrderServiceKnockOff : global::KnockOff.Documentation.Samples.Wh
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = order;
+				if (_source is { } src) { src.Save(order); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 				return;
 			}
@@ -73,6 +77,7 @@ partial class RdOrderServiceKnockOff : global::KnockOff.Documentation.Samples.Wh
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -162,6 +167,9 @@ partial class RdOrderServiceKnockOff : global::KnockOff.Documentation.Samples.Wh
 	/// <summary>Tracks and configures behavior for Delete.</summary>
 	public sealed class DeleteInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.WhyKnockOff.IRdOrderService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<RdOrderServiceKnockOff, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -204,6 +212,7 @@ partial class RdOrderServiceKnockOff : global::KnockOff.Documentation.Samples.Wh
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				if (_source is { } src) { src.Delete(id); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Delete");
 				return;
 			}
@@ -227,6 +236,7 @@ partial class RdOrderServiceKnockOff : global::KnockOff.Documentation.Samples.Wh
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -316,6 +326,9 @@ partial class RdOrderServiceKnockOff : global::KnockOff.Documentation.Samples.Wh
 	/// <summary>Tracks and configures behavior for GetAll.</summary>
 	public sealed class GetAllInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.WhyKnockOff.IRdOrderService? _source;
+
 		/// <summary>Delegate for GetAll.</summary>
 		public delegate global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.WhyKnockOff.RdOrder> GetAllDelegate(RdOrderServiceKnockOff ko);
 
@@ -356,6 +369,7 @@ partial class RdOrderServiceKnockOff : global::KnockOff.Documentation.Samples.Wh
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.GetAll();
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetAll");
 				return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.WhyKnockOff.RdOrder>();
 			}
@@ -378,6 +392,7 @@ partial class RdOrderServiceKnockOff : global::KnockOff.Documentation.Samples.Wh
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -463,6 +478,9 @@ partial class RdOrderServiceKnockOff : global::KnockOff.Documentation.Samples.Wh
 	/// <summary>Tracks and configures behavior for Process.</summary>
 	public sealed class ProcessInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.WhyKnockOff.IRdOrderService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<RdOrderServiceKnockOff, global::KnockOff.Documentation.Samples.WhyKnockOff.RdOrder> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -505,6 +523,7 @@ partial class RdOrderServiceKnockOff : global::KnockOff.Documentation.Samples.Wh
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = order;
+				if (_source is { } src) { src.Process(order); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return;
 			}
@@ -528,6 +547,7 @@ partial class RdOrderServiceKnockOff : global::KnockOff.Documentation.Samples.Wh
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -648,6 +668,18 @@ partial class RdOrderServiceKnockOff : global::KnockOff.Documentation.Samples.Wh
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.WhyKnockOff.IRdOrderService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.WhyKnockOff.IRdOrderService? source)
+	{
+		Save._source = source;
+		Delete._source = source;
+		GetAll._source = source;
+		Process._source = source;
 	}
 
 	void global::KnockOff.Documentation.Samples.WhyKnockOff.IRdOrderService.Save(global::KnockOff.Documentation.Samples.WhyKnockOff.RdOrder order)

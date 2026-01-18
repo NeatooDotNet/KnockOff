@@ -8,6 +8,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 	/// <summary>Tracks and configures behavior for Count.</summary>
 	public sealed class CountInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Tests.ISmartDefaultsService? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -21,12 +24,15 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for Items.</summary>
 	public sealed class ItemsInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Tests.ISmartDefaultsService? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -40,12 +46,15 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for GetInt.</summary>
 	public sealed class GetIntInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.ISmartDefaultsService? _source;
+
 		/// <summary>Delegate for GetInt.</summary>
 		public delegate int GetIntDelegate(SmartDefaultsKnockOff ko);
 
@@ -86,6 +95,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetInt();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetInt");
 				return default!;
 			}
@@ -108,6 +120,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -193,6 +206,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 	/// <summary>Tracks and configures behavior for GetBool.</summary>
 	public sealed class GetBoolInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.ISmartDefaultsService? _source;
+
 		/// <summary>Delegate for GetBool.</summary>
 		public delegate bool GetBoolDelegate(SmartDefaultsKnockOff ko);
 
@@ -233,6 +249,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetBool();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetBool");
 				return default!;
 			}
@@ -255,6 +274,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -340,6 +360,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 	/// <summary>Tracks and configures behavior for GetDateTime.</summary>
 	public sealed class GetDateTimeInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.ISmartDefaultsService? _source;
+
 		/// <summary>Delegate for GetDateTime.</summary>
 		public delegate global::System.DateTime GetDateTimeDelegate(SmartDefaultsKnockOff ko);
 
@@ -380,6 +403,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetDateTime();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetDateTime");
 				return default!;
 			}
@@ -402,6 +428,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -487,6 +514,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 	/// <summary>Tracks and configures behavior for GetNullableString.</summary>
 	public sealed class GetNullableStringInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.ISmartDefaultsService? _source;
+
 		/// <summary>Delegate for GetNullableString.</summary>
 		public delegate string? GetNullableStringDelegate(SmartDefaultsKnockOff ko);
 
@@ -527,6 +557,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetNullableString();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetNullableString");
 				return default!;
 			}
@@ -549,6 +582,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -634,6 +668,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 	/// <summary>Tracks and configures behavior for GetNullableEntity.</summary>
 	public sealed class GetNullableEntityInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.ISmartDefaultsService? _source;
+
 		/// <summary>Delegate for GetNullableEntity.</summary>
 		public delegate global::KnockOff.Tests.TestEntity? GetNullableEntityDelegate(SmartDefaultsKnockOff ko);
 
@@ -674,6 +711,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetNullableEntity();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetNullableEntity");
 				return default!;
 			}
@@ -696,6 +736,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -781,6 +822,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 	/// <summary>Tracks and configures behavior for GetList.</summary>
 	public sealed class GetListInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.ISmartDefaultsService? _source;
+
 		/// <summary>Delegate for GetList.</summary>
 		public delegate global::System.Collections.Generic.List<string> GetListDelegate(SmartDefaultsKnockOff ko);
 
@@ -821,6 +865,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetList();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetList");
 				return new global::System.Collections.Generic.List<string>();
 			}
@@ -843,6 +890,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -928,6 +976,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 	/// <summary>Tracks and configures behavior for GetDictionary.</summary>
 	public sealed class GetDictionaryInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.ISmartDefaultsService? _source;
+
 		/// <summary>Delegate for GetDictionary.</summary>
 		public delegate global::System.Collections.Generic.Dictionary<string, int> GetDictionaryDelegate(SmartDefaultsKnockOff ko);
 
@@ -968,6 +1019,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetDictionary();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetDictionary");
 				return new global::System.Collections.Generic.Dictionary<string, int>();
 			}
@@ -990,6 +1044,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1075,6 +1130,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 	/// <summary>Tracks and configures behavior for GetEntity.</summary>
 	public sealed class GetEntityInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.ISmartDefaultsService? _source;
+
 		/// <summary>Delegate for GetEntity.</summary>
 		public delegate global::KnockOff.Tests.TestEntity GetEntityDelegate(SmartDefaultsKnockOff ko);
 
@@ -1115,6 +1173,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetEntity();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetEntity");
 				return new global::KnockOff.Tests.TestEntity();
 			}
@@ -1137,6 +1198,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1222,6 +1284,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 	/// <summary>Tracks and configures behavior for GetIList.</summary>
 	public sealed class GetIListInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.ISmartDefaultsService? _source;
+
 		/// <summary>Delegate for GetIList.</summary>
 		public delegate global::System.Collections.Generic.IList<string> GetIListDelegate(SmartDefaultsKnockOff ko);
 
@@ -1262,6 +1327,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetIList();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetIList");
 				return new global::System.Collections.Generic.List<string>();
 			}
@@ -1284,6 +1352,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1369,6 +1438,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 	/// <summary>Tracks and configures behavior for GetString.</summary>
 	public sealed class GetStringInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.ISmartDefaultsService? _source;
+
 		/// <summary>Delegate for GetString.</summary>
 		public delegate string GetStringDelegate(SmartDefaultsKnockOff ko);
 
@@ -1409,6 +1481,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetString();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetString");
 				throw new global::System.InvalidOperationException("No implementation provided for GetString. Configure via OnCall.");
 			}
@@ -1431,6 +1506,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1516,6 +1592,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 	/// <summary>Tracks and configures behavior for GetDisposable.</summary>
 	public sealed class GetDisposableInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.ISmartDefaultsService? _source;
+
 		/// <summary>Delegate for GetDisposable.</summary>
 		public delegate global::System.IDisposable GetDisposableDelegate(SmartDefaultsKnockOff ko);
 
@@ -1556,6 +1635,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetDisposable();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetDisposable");
 				throw new global::System.InvalidOperationException("No implementation provided for GetDisposable. Configure via OnCall.");
 			}
@@ -1578,6 +1660,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1663,6 +1746,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 	/// <summary>Tracks and configures behavior for GetIntAsync.</summary>
 	public sealed class GetIntAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.ISmartDefaultsService? _source;
+
 		/// <summary>Delegate for GetIntAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<int> GetIntAsyncDelegate(SmartDefaultsKnockOff ko);
 
@@ -1703,6 +1789,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetIntAsync();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetIntAsync");
 				return global::System.Threading.Tasks.Task.FromResult<int>(default!);
 			}
@@ -1725,6 +1814,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1810,6 +1900,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 	/// <summary>Tracks and configures behavior for GetListAsync.</summary>
 	public sealed class GetListAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.ISmartDefaultsService? _source;
+
 		/// <summary>Delegate for GetListAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<global::System.Collections.Generic.List<string>> GetListAsyncDelegate(SmartDefaultsKnockOff ko);
 
@@ -1850,6 +1943,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetListAsync();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetListAsync");
 				return global::System.Threading.Tasks.Task.FromResult<global::System.Collections.Generic.List<string>>(new global::System.Collections.Generic.List<string>());
 			}
@@ -1872,6 +1968,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1957,6 +2054,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 	/// <summary>Tracks and configures behavior for GetStringAsync.</summary>
 	public sealed class GetStringAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.ISmartDefaultsService? _source;
+
 		/// <summary>Delegate for GetStringAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<string> GetStringAsyncDelegate(SmartDefaultsKnockOff ko);
 
@@ -1997,6 +2097,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetStringAsync();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetStringAsync");
 				throw new global::System.InvalidOperationException("No implementation provided for GetStringAsync. Configure via OnCall.");
 			}
@@ -2019,6 +2122,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -2183,14 +2287,38 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
 	}
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Tests.ISmartDefaultsService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Tests.ISmartDefaultsService? source)
+	{
+		Count._source = source;
+		Items._source = source;
+		GetInt._source = source;
+		GetBool._source = source;
+		GetDateTime._source = source;
+		GetNullableString._source = source;
+		GetNullableEntity._source = source;
+		GetList._source = source;
+		GetDictionary._source = source;
+		GetEntity._source = source;
+		GetIList._source = source;
+		GetString._source = source;
+		GetDisposable._source = source;
+		GetIntAsync._source = source;
+		GetListAsync._source = source;
+		GetStringAsync._source = source;
+	}
+
 	int global::KnockOff.Tests.ISmartDefaultsService.Count
 	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ISmartDefaultsService", "Count"); return Count.Value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("ISmartDefaultsService", "Count"); return Count.Value; }
 	}
 
 	global::System.Collections.Generic.List<string> global::KnockOff.Tests.ISmartDefaultsService.Items
 	{
-		get { Items.RecordGet(); if (Items.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ISmartDefaultsService", "Items"); return Items.Value; }
+		get { Items.RecordGet(); if (Items.OnGet is { } onGet) return onGet(this); if (Items._source is { } src) return src.Items; if (Strict) throw global::KnockOff.StubException.NotConfigured("ISmartDefaultsService", "Items"); return Items.Value; }
 	}
 
 	int global::KnockOff.Tests.ISmartDefaultsService.GetInt()

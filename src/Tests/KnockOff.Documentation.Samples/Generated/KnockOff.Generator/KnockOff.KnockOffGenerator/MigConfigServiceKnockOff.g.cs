@@ -31,6 +31,14 @@ partial class MigConfigServiceKnockOff : global::KnockOff.Documentation.Samples.
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IMigConfigService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IMigConfigService Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Comparison.IMigConfigService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Comparison.IMigConfigService? source)
+	{
+	}
+
 	global::KnockOff.Documentation.Samples.Comparison.MigConfig global::KnockOff.Documentation.Samples.Comparison.IMigConfigService.GetConfig()
 	{
 		GetConfig2.RecordCall();

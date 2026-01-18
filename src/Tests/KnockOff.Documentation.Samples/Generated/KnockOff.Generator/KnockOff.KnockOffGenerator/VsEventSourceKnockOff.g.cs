@@ -41,6 +41,14 @@ partial class VsEventSourceKnockOff : global::KnockOff.Documentation.Samples.Com
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IVsEventSource instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IVsEventSource Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Comparison.IVsEventSource).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Comparison.IVsEventSource? source)
+	{
+	}
+
 	event global::System.EventHandler<string>? global::KnockOff.Documentation.Samples.Comparison.IVsEventSource.DataReceived
 	{
 		add => DataReceived.RecordAdd(value);

@@ -8,6 +8,9 @@ partial class SkRefProcessorKnockOff : global::KnockOff.Documentation.Samples.Sk
 	/// <summary>Tracks and configures behavior for Increment.</summary>
 	public sealed class IncrementInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.ISkRefProcessor? _source;
+
 		/// <summary>Delegate for Increment.</summary>
 		public delegate void IncrementDelegate(SkRefProcessorKnockOff ko, ref int @value);
 
@@ -53,6 +56,7 @@ partial class SkRefProcessorKnockOff : global::KnockOff.Documentation.Samples.Sk
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = @value;
+				if (_source is { } src) { src.Increment(ref @value); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Increment");
 				return;
 			}
@@ -76,6 +80,7 @@ partial class SkRefProcessorKnockOff : global::KnockOff.Documentation.Samples.Sk
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -165,6 +170,9 @@ partial class SkRefProcessorKnockOff : global::KnockOff.Documentation.Samples.Sk
 	/// <summary>Tracks and configures behavior for TryUpdate.</summary>
 	public sealed class TryUpdateInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.ISkRefProcessor? _source;
+
 		/// <summary>Delegate for TryUpdate.</summary>
 		public delegate bool TryUpdateDelegate(SkRefProcessorKnockOff ko, string key, ref string @value);
 
@@ -210,6 +218,7 @@ partial class SkRefProcessorKnockOff : global::KnockOff.Documentation.Samples.Sk
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((key, @value));
+				if (_source is { } src) return src.TryUpdate(key, ref @value);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "TryUpdate");
 				return default!;
 			}
@@ -233,6 +242,7 @@ partial class SkRefProcessorKnockOff : global::KnockOff.Documentation.Samples.Sk
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -345,6 +355,16 @@ partial class SkRefProcessorKnockOff : global::KnockOff.Documentation.Samples.Sk
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Skills.ISkRefProcessor).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Skills.ISkRefProcessor? source)
+	{
+		Increment._source = source;
+		TryUpdate._source = source;
 	}
 
 	void global::KnockOff.Documentation.Samples.Skills.ISkRefProcessor.Increment(ref int @value)

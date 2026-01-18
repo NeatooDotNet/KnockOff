@@ -8,6 +8,9 @@ partial class NestedTypeParamStub<T> : global::KnockOff.Tests.INestedTypeParamSe
 	/// <summary>Tracks and configures behavior for GetItems.</summary>
 	public sealed class GetItemsInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.INestedTypeParamService<T>? _source;
+
 		/// <summary>Delegate for GetItems.</summary>
 		public delegate global::System.Collections.Generic.List<T> GetItemsDelegate(NestedTypeParamStub<T> ko);
 
@@ -48,6 +51,9 @@ partial class NestedTypeParamStub<T> : global::KnockOff.Tests.INestedTypeParamSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetItems();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetItems");
 				return new global::System.Collections.Generic.List<T>();
 			}
@@ -70,6 +76,7 @@ partial class NestedTypeParamStub<T> : global::KnockOff.Tests.INestedTypeParamSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -155,6 +162,9 @@ partial class NestedTypeParamStub<T> : global::KnockOff.Tests.INestedTypeParamSe
 	/// <summary>Tracks and configures behavior for AddItems.</summary>
 	public sealed class AddItemsInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.INestedTypeParamService<T>? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<NestedTypeParamStub<T>, global::System.Collections.Generic.IEnumerable<T>> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -197,6 +207,9 @@ partial class NestedTypeParamStub<T> : global::KnockOff.Tests.INestedTypeParamSe
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = items;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.AddItems(items); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "AddItems");
 				return;
 			}
@@ -220,6 +233,7 @@ partial class NestedTypeParamStub<T> : global::KnockOff.Tests.INestedTypeParamSe
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -332,6 +346,16 @@ partial class NestedTypeParamStub<T> : global::KnockOff.Tests.INestedTypeParamSe
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Tests.INestedTypeParamService<T>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Tests.INestedTypeParamService<T>? source)
+	{
+		GetItems._source = source;
+		AddItems._source = source;
 	}
 
 	global::System.Collections.Generic.List<T> global::KnockOff.Tests.INestedTypeParamService<T>.GetItems()

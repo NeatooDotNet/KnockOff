@@ -8,6 +8,9 @@ partial class PropPersonKnockOff : global::KnockOff.Documentation.Samples.Guides
 	/// <summary>Tracks and configures behavior for FirstName.</summary>
 	public sealed class FirstNameInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IPropPerson? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -33,12 +36,15 @@ partial class PropPersonKnockOff : global::KnockOff.Documentation.Samples.Guides
 		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for LastName.</summary>
 	public sealed class LastNameInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IPropPerson? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -64,12 +70,15 @@ partial class PropPersonKnockOff : global::KnockOff.Documentation.Samples.Guides
 		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for FullName.</summary>
 	public sealed class FullNameInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IPropPerson? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -83,7 +92,7 @@ partial class PropPersonKnockOff : global::KnockOff.Documentation.Samples.Guides
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Interceptor for FirstName. Configure via .Value, track via .GetCount.</summary>
@@ -101,21 +110,32 @@ partial class PropPersonKnockOff : global::KnockOff.Documentation.Samples.Guides
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IPropPerson instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IPropPerson Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.IPropPerson).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.IPropPerson? source)
+	{
+		FirstName._source = source;
+		LastName._source = source;
+		FullName._source = source;
+	}
+
 	string global::KnockOff.Documentation.Samples.Guides.IPropPerson.FirstName
 	{
-		get { FirstName.RecordGet(); if (FirstName.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropPerson", "FirstName"); return FirstName.Value; }
-		set { FirstName.RecordSet(value); if (FirstName.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropPerson", "FirstName"); FirstName.Value = value; }
+		get { FirstName.RecordGet(); if (FirstName.OnGet is { } onGet) return onGet(this); if (FirstName._source is { } src) return src.FirstName; if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropPerson", "FirstName"); return FirstName.Value; }
+		set { FirstName.RecordSet(value); if (FirstName.OnSet is { } onSet) { onSet(this, value); return; } if (FirstName._source is { } src) { src.FirstName = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropPerson", "FirstName"); FirstName.Value = value; }
 	}
 
 	string global::KnockOff.Documentation.Samples.Guides.IPropPerson.LastName
 	{
-		get { LastName.RecordGet(); if (LastName.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropPerson", "LastName"); return LastName.Value; }
-		set { LastName.RecordSet(value); if (LastName.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropPerson", "LastName"); LastName.Value = value; }
+		get { LastName.RecordGet(); if (LastName.OnGet is { } onGet) return onGet(this); if (LastName._source is { } src) return src.LastName; if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropPerson", "LastName"); return LastName.Value; }
+		set { LastName.RecordSet(value); if (LastName.OnSet is { } onSet) { onSet(this, value); return; } if (LastName._source is { } src) { src.LastName = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropPerson", "LastName"); LastName.Value = value; }
 	}
 
 	string global::KnockOff.Documentation.Samples.Guides.IPropPerson.FullName
 	{
-		get { FullName.RecordGet(); if (FullName.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropPerson", "FullName"); return FullName.Value; }
+		get { FullName.RecordGet(); if (FullName.OnGet is { } onGet) return onGet(this); if (FullName._source is { } src) return src.FullName; if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropPerson", "FullName"); return FullName.Value; }
 	}
 
 }

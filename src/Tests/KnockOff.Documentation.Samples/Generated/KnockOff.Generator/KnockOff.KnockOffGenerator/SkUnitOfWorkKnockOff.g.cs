@@ -8,6 +8,9 @@ partial class SkUnitOfWorkKnockOff : global::KnockOff.Documentation.Samples.Skil
 	/// <summary>Tracks and configures behavior for Commit.</summary>
 	public sealed class CommitInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.ISkUnitOfWork? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<SkUnitOfWorkKnockOff> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -45,6 +48,7 @@ partial class SkUnitOfWorkKnockOff : global::KnockOff.Documentation.Samples.Skil
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) { src.Commit(); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Commit");
 				return;
 			}
@@ -67,6 +71,7 @@ partial class SkUnitOfWorkKnockOff : global::KnockOff.Documentation.Samples.Skil
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -171,6 +176,15 @@ partial class SkUnitOfWorkKnockOff : global::KnockOff.Documentation.Samples.Skil
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Skills.ISkUnitOfWork).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Skills.ISkUnitOfWork? source)
+	{
+		Commit._source = source;
 	}
 
 	void global::KnockOff.Documentation.Samples.Skills.ISkUnitOfWork.Commit()

@@ -8,6 +8,9 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 	/// <summary>Tracks and configures behavior for IsModified.</summary>
 	public sealed class IsModifiedInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.IEntityPropertyManager? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -21,12 +24,15 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsSelfModified.</summary>
 	public sealed class IsSelfModifiedInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.IEntityPropertyManager? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -40,12 +46,15 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for ModifiedProperties.</summary>
 	public sealed class ModifiedPropertiesInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.IEntityPropertyManager? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -59,12 +68,15 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsBusy.</summary>
 	public sealed class IsBusyInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -78,12 +90,15 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsSelfValid.</summary>
 	public sealed class IsSelfValidInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -97,12 +112,15 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsValid.</summary>
 	public sealed class IsValidInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -116,12 +134,15 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for PropertyMessages.</summary>
 	public sealed class PropertyMessagesInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -135,12 +156,15 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsPaused.</summary>
 	public sealed class IsPausedInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -154,12 +178,15 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for indexer.</summary>
 	public sealed class IndexerInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -176,12 +203,15 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		public global::System.Collections.Generic.Dictionary<string, global::Neatoo.IEntityProperty> Backing { get; } = new();
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
+		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for MarkSelfUnmodified.</summary>
 	public sealed class MarkSelfUnmodifiedInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::Neatoo.IEntityPropertyManager? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<EntityPropertyManagerStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -219,6 +249,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) { src.MarkSelfUnmodified(); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "MarkSelfUnmodified");
 				return;
 			}
@@ -241,6 +272,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -326,6 +358,9 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 	/// <summary>Tracks and configures behavior for WaitForTasks.</summary>
 	public sealed class WaitForTasksInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>? _source;
+
 		/// <summary>Delegate for WaitForTasks.</summary>
 		public delegate global::System.Threading.Tasks.Task WaitForTasksDelegate(EntityPropertyManagerStub ko);
 
@@ -366,6 +401,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.WaitForTasks();
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -388,6 +424,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -473,6 +510,9 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 	/// <summary>Tracks and configures behavior for HasProperty.</summary>
 	public sealed class HasPropertyInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>? _source;
+
 		/// <summary>Delegate for HasProperty.</summary>
 		public delegate bool HasPropertyDelegate(EntityPropertyManagerStub ko, string propertyName);
 
@@ -518,6 +558,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = propertyName;
+				if (_source is { } src) return src.HasProperty(propertyName);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "HasProperty");
 				return default!;
 			}
@@ -541,6 +582,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -630,6 +672,9 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 	/// <summary>Tracks and configures behavior for GetProperty.</summary>
 	public sealed class GetPropertyInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>? _source;
+
 		/// <summary>Delegate for GetProperty.</summary>
 		public delegate global::Neatoo.IEntityProperty GetPropertyDelegate(EntityPropertyManagerStub ko, string propertyName);
 
@@ -675,6 +720,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = propertyName;
+				if (_source is { } src) return src.GetProperty(propertyName);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetProperty");
 				throw new global::System.InvalidOperationException("No implementation provided for GetProperty. Configure via OnCall.");
 			}
@@ -698,6 +744,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -787,6 +834,9 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 	/// <summary>Tracks and configures behavior for SetProperties.</summary>
 	public sealed class SetPropertiesInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<EntityPropertyManagerStub, global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty>> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -829,6 +879,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = properties;
+				if (_source is { } src) { src.SetProperties(properties); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SetProperties");
 				return;
 			}
@@ -852,6 +903,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -941,6 +993,9 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 	/// <summary>Tracks and configures behavior for RunRules.</summary>
 	public sealed class RunRulesInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>? _source;
+
 		/// <summary>Delegate for RunRules.</summary>
 		public delegate global::System.Threading.Tasks.Task RunRulesDelegate(EntityPropertyManagerStub ko, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token);
 
@@ -986,6 +1041,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((runRules, token));
+				if (_source is { } src) return src.RunRules(runRules, token);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -1009,6 +1065,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1098,6 +1155,9 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 	/// <summary>Tracks and configures behavior for PauseAllActions.</summary>
 	public sealed class PauseAllActionsInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<EntityPropertyManagerStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -1135,6 +1195,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) { src.PauseAllActions(); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "PauseAllActions");
 				return;
 			}
@@ -1157,6 +1218,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1242,6 +1304,9 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 	/// <summary>Tracks and configures behavior for ResumeAllActions.</summary>
 	public sealed class ResumeAllActionsInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<EntityPropertyManagerStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -1279,6 +1344,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) { src.ResumeAllActions(); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ResumeAllActions");
 				return;
 			}
@@ -1301,6 +1367,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1386,6 +1453,9 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 	/// <summary>Tracks and configures behavior for ClearAllMessages.</summary>
 	public sealed class ClearAllMessagesInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<EntityPropertyManagerStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -1423,6 +1493,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) { src.ClearAllMessages(); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ClearAllMessages");
 				return;
 			}
@@ -1445,6 +1516,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1530,6 +1602,9 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 	/// <summary>Tracks and configures behavior for ClearSelfMessages.</summary>
 	public sealed class ClearSelfMessagesInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<EntityPropertyManagerStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -1567,6 +1642,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) { src.ClearSelfMessages(); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ClearSelfMessages");
 				return;
 			}
@@ -1589,6 +1665,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1818,49 +1895,151 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
 	}
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::Neatoo.IEntityPropertyManager).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::Neatoo.IEntityPropertyManager? source)
+	{
+		IsModified._source = source;
+		IsSelfModified._source = source;
+		ModifiedProperties._source = source;
+		IsBusy._source = source;
+		IsSelfValid._source = source;
+		IsValid._source = source;
+		PropertyMessages._source = source;
+		IsPaused._source = source;
+		Indexer._source = source;
+		MarkSelfUnmodified._source = source;
+		WaitForTasks._source = source;
+		HasProperty._source = source;
+		GetProperty._source = source;
+		SetProperties._source = source;
+		RunRules._source = source;
+		PauseAllActions._source = source;
+		ResumeAllActions._source = source;
+		ClearAllMessages._source = source;
+		ClearSelfMessages._source = source;
+	}
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>? source)
+	{
+		IsModified._source = null;
+		IsSelfModified._source = null;
+		ModifiedProperties._source = null;
+		IsBusy._source = source;
+		IsSelfValid._source = source;
+		IsValid._source = source;
+		PropertyMessages._source = source;
+		IsPaused._source = source;
+		Indexer._source = source;
+		MarkSelfUnmodified._source = null;
+		WaitForTasks._source = source;
+		HasProperty._source = source;
+		GetProperty._source = source;
+		SetProperties._source = source;
+		RunRules._source = source;
+		PauseAllActions._source = source;
+		ResumeAllActions._source = source;
+		ClearAllMessages._source = source;
+		ClearSelfMessages._source = source;
+	}
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::Neatoo.INotifyNeatooPropertyChanged).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::Neatoo.INotifyNeatooPropertyChanged? source)
+	{
+		IsModified._source = null;
+		IsSelfModified._source = null;
+		ModifiedProperties._source = null;
+		IsBusy._source = null;
+		IsSelfValid._source = null;
+		IsValid._source = null;
+		PropertyMessages._source = null;
+		IsPaused._source = null;
+		Indexer._source = null;
+		MarkSelfUnmodified._source = null;
+		WaitForTasks._source = null;
+		HasProperty._source = null;
+		GetProperty._source = null;
+		SetProperties._source = null;
+		RunRules._source = null;
+		PauseAllActions._source = null;
+		ResumeAllActions._source = null;
+		ClearAllMessages._source = null;
+		ClearSelfMessages._source = null;
+	}
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::System.ComponentModel.INotifyPropertyChanged).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::System.ComponentModel.INotifyPropertyChanged? source)
+	{
+		IsModified._source = null;
+		IsSelfModified._source = null;
+		ModifiedProperties._source = null;
+		IsBusy._source = null;
+		IsSelfValid._source = null;
+		IsValid._source = null;
+		PropertyMessages._source = null;
+		IsPaused._source = null;
+		Indexer._source = null;
+		MarkSelfUnmodified._source = null;
+		WaitForTasks._source = null;
+		HasProperty._source = null;
+		GetProperty._source = null;
+		SetProperties._source = null;
+		RunRules._source = null;
+		PauseAllActions._source = null;
+		ResumeAllActions._source = null;
+		ClearAllMessages._source = null;
+		ClearSelfMessages._source = null;
+	}
+
 	bool global::Neatoo.IEntityPropertyManager.IsModified
 	{
-		get { IsModified.RecordGet(); if (IsModified.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityPropertyManager", "IsModified"); return IsModified.Value; }
+		get { IsModified.RecordGet(); if (IsModified.OnGet is { } onGet) return onGet(this); if (IsModified._source is { } src) return src.IsModified; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityPropertyManager", "IsModified"); return IsModified.Value; }
 	}
 
 	bool global::Neatoo.IEntityPropertyManager.IsSelfModified
 	{
-		get { IsSelfModified.RecordGet(); if (IsSelfModified.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityPropertyManager", "IsSelfModified"); return IsSelfModified.Value; }
+		get { IsSelfModified.RecordGet(); if (IsSelfModified.OnGet is { } onGet) return onGet(this); if (IsSelfModified._source is { } src) return src.IsSelfModified; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityPropertyManager", "IsSelfModified"); return IsSelfModified.Value; }
 	}
 
 	global::System.Collections.Generic.IEnumerable<string> global::Neatoo.IEntityPropertyManager.ModifiedProperties
 	{
-		get { ModifiedProperties.RecordGet(); if (ModifiedProperties.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityPropertyManager", "ModifiedProperties"); return ModifiedProperties.Value; }
+		get { ModifiedProperties.RecordGet(); if (ModifiedProperties.OnGet is { } onGet) return onGet(this); if (ModifiedProperties._source is { } src) return src.ModifiedProperties; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityPropertyManager", "ModifiedProperties"); return ModifiedProperties.Value; }
 	}
 
 	bool global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>.IsBusy
 	{
-		get { IsBusy.RecordGet(); if (IsBusy.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty>", "IsBusy"); return IsBusy.Value; }
+		get { IsBusy.RecordGet(); if (IsBusy.OnGet is { } onGet) return onGet(this); if (IsBusy._source is { } src) return src.IsBusy; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty>", "IsBusy"); return IsBusy.Value; }
 	}
 
 	bool global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>.IsSelfValid
 	{
-		get { IsSelfValid.RecordGet(); if (IsSelfValid.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty>", "IsSelfValid"); return IsSelfValid.Value; }
+		get { IsSelfValid.RecordGet(); if (IsSelfValid.OnGet is { } onGet) return onGet(this); if (IsSelfValid._source is { } src) return src.IsSelfValid; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty>", "IsSelfValid"); return IsSelfValid.Value; }
 	}
 
 	bool global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>.IsValid
 	{
-		get { IsValid.RecordGet(); if (IsValid.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty>", "IsValid"); return IsValid.Value; }
+		get { IsValid.RecordGet(); if (IsValid.OnGet is { } onGet) return onGet(this); if (IsValid._source is { } src) return src.IsValid; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty>", "IsValid"); return IsValid.Value; }
 	}
 
 	global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>.PropertyMessages
 	{
-		get { PropertyMessages.RecordGet(); if (PropertyMessages.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty>", "PropertyMessages"); return PropertyMessages.Value; }
+		get { PropertyMessages.RecordGet(); if (PropertyMessages.OnGet is { } onGet) return onGet(this); if (PropertyMessages._source is { } src) return src.PropertyMessages; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty>", "PropertyMessages"); return PropertyMessages.Value; }
 	}
 
 	bool global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>.IsPaused
 	{
-		get { IsPaused.RecordGet(); if (IsPaused.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty>", "IsPaused"); return IsPaused.Value; }
+		get { IsPaused.RecordGet(); if (IsPaused.OnGet is { } onGet) return onGet(this); if (IsPaused._source is { } src) return src.IsPaused; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty>", "IsPaused"); return IsPaused.Value; }
 	}
 
 	global::Neatoo.IEntityProperty global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>.this[string propertyName]
 	{
-		get { Indexer.RecordGet(propertyName); if (Indexer.OnGet is { } onGet) return onGet(this, propertyName); if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty>", "this[]"); return Indexer.Backing.TryGetValue(propertyName, out var v) ? v : default!; }
+		get { Indexer.RecordGet(propertyName); if (Indexer.OnGet is { } onGet) return onGet(this, propertyName); if (Indexer._source is { } src) return src[propertyName]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty>", "this[]"); return Indexer.Backing.TryGetValue(propertyName, out var v) ? v : default!; }
 	}
 
 	void global::Neatoo.IEntityPropertyManager.MarkSelfUnmodified()

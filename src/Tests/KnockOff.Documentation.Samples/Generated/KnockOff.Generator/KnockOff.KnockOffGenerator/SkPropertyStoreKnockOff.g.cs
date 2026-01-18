@@ -8,6 +8,9 @@ partial class SkPropertyStoreKnockOff : global::KnockOff.Documentation.Samples.S
 	/// <summary>Tracks and configures behavior for indexer.</summary>
 	public sealed class IndexerInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.ISkPropertyStore? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -36,7 +39,7 @@ partial class SkPropertyStoreKnockOff : global::KnockOff.Documentation.Samples.S
 		public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Documentation.Samples.Skills.SkUser?> Backing { get; } = new();
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; }
+		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; _source = null; }
 	}
 
 	/// <summary>Interceptor for indexer. Configure callbacks and track access.</summary>
@@ -48,10 +51,19 @@ partial class SkPropertyStoreKnockOff : global::KnockOff.Documentation.Samples.S
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkPropertyStore instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ISkPropertyStore Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Skills.ISkPropertyStore).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Skills.ISkPropertyStore? source)
+	{
+		Indexer._source = source;
+	}
+
 	global::KnockOff.Documentation.Samples.Skills.SkUser? global::KnockOff.Documentation.Samples.Skills.ISkPropertyStore.this[string key]
 	{
-		get { Indexer.RecordGet(key); if (Indexer.OnGet is { } onGet) return onGet(this, key); if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkPropertyStore", "this[]"); return Indexer.Backing.TryGetValue(key, out var v) ? v : default; }
-		set { Indexer.RecordSet(key, value); if (Indexer.OnSet is { } onSet) { onSet(this, key, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkPropertyStore", "this[]"); Indexer.Backing[key] = value; }
+		get { Indexer.RecordGet(key); if (Indexer.OnGet is { } onGet) return onGet(this, key); if (Indexer._source is { } src) return src[key]; if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkPropertyStore", "this[]"); return Indexer.Backing.TryGetValue(key, out var v) ? v : default; }
+		set { Indexer.RecordSet(key, value); if (Indexer.OnSet is { } onSet) { onSet(this, key, value); return; } if (Indexer._source is { } src) { src[key] = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkPropertyStore", "this[]"); Indexer.Backing[key] = value; }
 	}
 
 }

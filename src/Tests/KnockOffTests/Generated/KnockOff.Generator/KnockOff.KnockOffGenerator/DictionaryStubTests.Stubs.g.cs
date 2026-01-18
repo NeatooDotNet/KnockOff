@@ -20,11 +20,14 @@ partial class DictionaryStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Collections.IDictionary? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDictionary.IsReadOnly.</summary>
@@ -39,11 +42,14 @@ partial class DictionaryStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Collections.IDictionary? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDictionary.Keys.</summary>
@@ -58,11 +64,14 @@ partial class DictionaryStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Collections.ICollection Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Collections.IDictionary? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDictionary.Values.</summary>
@@ -77,11 +86,14 @@ partial class DictionaryStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Collections.ICollection Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Collections.IDictionary? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDictionary.Count.</summary>
@@ -96,11 +108,14 @@ partial class DictionaryStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public int Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Collections.ICollection? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDictionary.IsSynchronized.</summary>
@@ -115,11 +130,14 @@ partial class DictionaryStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Collections.ICollection? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDictionary.SyncRoot.</summary>
@@ -134,11 +152,14 @@ partial class DictionaryStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public object Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Collections.ICollection? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDictionary.Indexer.</summary>
@@ -171,13 +192,19 @@ partial class DictionaryStubTests
 			/// <summary>Backing storage for this indexer.</summary>
 			public global::System.Collections.Generic.Dictionary<object, object?> Backing { get; } = new();
 
+			/// <summary>Source object for delegation when OnGet/OnSet is not set.</summary>
+			internal global::System.Collections.IDictionary? _source;
+
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
+			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; _source = null; }
 		}
 
 		/// <summary>Tracks and configures behavior for Add.</summary>
 		public sealed class IDictionary_AddInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.IDictionary? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IDictionary, object, object?> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -220,6 +247,9 @@ partial class DictionaryStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((key, @value));
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.Add(key, @value); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 					return;
 				}
@@ -243,6 +273,7 @@ partial class DictionaryStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -332,6 +363,9 @@ partial class DictionaryStubTests
 		/// <summary>Tracks and configures behavior for Clear.</summary>
 		public sealed class IDictionary_ClearInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.IDictionary? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IDictionary> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -369,6 +403,9 @@ partial class DictionaryStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.Clear(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Clear");
 					return;
 				}
@@ -391,6 +428,7 @@ partial class DictionaryStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -476,6 +514,9 @@ partial class DictionaryStubTests
 		/// <summary>Tracks and configures behavior for Contains.</summary>
 		public sealed class IDictionary_ContainsInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.IDictionary? _source;
+
 			/// <summary>Delegate for Contains.</summary>
 			public delegate bool ContainsDelegate(Stubs.IDictionary ko, object key);
 
@@ -521,6 +562,9 @@ partial class DictionaryStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = key;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.Contains(key);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Contains");
 					return default!;
 				}
@@ -544,6 +588,7 @@ partial class DictionaryStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -633,6 +678,9 @@ partial class DictionaryStubTests
 		/// <summary>Tracks and configures behavior for GetEnumerator.</summary>
 		public sealed class IDictionary_GetEnumeratorInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.IDictionary? _source;
+
 			/// <summary>Delegate for GetEnumerator.</summary>
 			public delegate global::System.Collections.IDictionaryEnumerator GetEnumeratorDelegate(Stubs.IDictionary ko);
 
@@ -673,6 +721,9 @@ partial class DictionaryStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetEnumerator();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
 					return default!;
 				}
@@ -695,6 +746,7 @@ partial class DictionaryStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -780,6 +832,9 @@ partial class DictionaryStubTests
 		/// <summary>Tracks and configures behavior for Remove.</summary>
 		public sealed class IDictionary_RemoveInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.IDictionary? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IDictionary, object> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -822,6 +877,9 @@ partial class DictionaryStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = key;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.Remove(key); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Remove");
 					return;
 				}
@@ -845,6 +903,7 @@ partial class DictionaryStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -934,6 +993,9 @@ partial class DictionaryStubTests
 		/// <summary>Tracks and configures behavior for CopyTo.</summary>
 		public sealed class IDictionary_CopyToInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.ICollection? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IDictionary, global::System.Array, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -976,6 +1038,9 @@ partial class DictionaryStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((array, index));
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.CopyTo(array, index); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "CopyTo");
 					return;
 				}
@@ -999,6 +1064,7 @@ partial class DictionaryStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1161,6 +1227,7 @@ partial class DictionaryStubTests
 				{
 					IsFixedSize.RecordGet();
 					if (IsFixedSize.OnGet is { } onGet) return onGet(this);
+					if (IsFixedSize._source is { } src) return src.IsFixedSize;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary", "IsFixedSize");
 					return IsFixedSize.Value;
 				}
@@ -1172,6 +1239,7 @@ partial class DictionaryStubTests
 				{
 					IsReadOnly.RecordGet();
 					if (IsReadOnly.OnGet is { } onGet) return onGet(this);
+					if (IsReadOnly._source is { } src) return src.IsReadOnly;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary", "IsReadOnly");
 					return IsReadOnly.Value;
 				}
@@ -1183,6 +1251,7 @@ partial class DictionaryStubTests
 				{
 					Indexer.RecordGet(key);
 					if (Indexer.OnGet is { } onGet) return onGet(this, key);
+					if (Indexer._source is { } src) return src[key];
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary", "this[]");
 					return Indexer.Backing.TryGetValue(key, out var v) ? v : default;
 				}
@@ -1190,6 +1259,7 @@ partial class DictionaryStubTests
 				{
 					Indexer.RecordSet(key, value);
 					if (Indexer.OnSet is { } onSet) { onSet(this, key, value); return; }
+					if (Indexer._source is { } src) { src[key] = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary", "this[]");
 					Indexer.Backing[key] = value;
 				}
@@ -1201,6 +1271,7 @@ partial class DictionaryStubTests
 				{
 					Keys.RecordGet();
 					if (Keys.OnGet is { } onGet) return onGet(this);
+					if (Keys._source is { } src) return src.Keys;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary", "Keys");
 					return Keys.Value;
 				}
@@ -1212,6 +1283,7 @@ partial class DictionaryStubTests
 				{
 					Values.RecordGet();
 					if (Values.OnGet is { } onGet) return onGet(this);
+					if (Values._source is { } src) return src.Values;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary", "Values");
 					return Values.Value;
 				}
@@ -1228,6 +1300,7 @@ partial class DictionaryStubTests
 				{
 					Count.RecordGet();
 					if (Count.OnGet is { } onGet) return onGet(this);
+					if (Count._source is { } src) return src.Count;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection", "Count");
 					return Count.Value;
 				}
@@ -1239,6 +1312,7 @@ partial class DictionaryStubTests
 				{
 					IsSynchronized.RecordGet();
 					if (IsSynchronized.OnGet is { } onGet) return onGet(this);
+					if (IsSynchronized._source is { } src) return src.IsSynchronized;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection", "IsSynchronized");
 					return IsSynchronized.Value;
 				}
@@ -1250,6 +1324,7 @@ partial class DictionaryStubTests
 				{
 					SyncRoot.RecordGet();
 					if (SyncRoot.OnGet is { } onGet) return onGet(this);
+					if (SyncRoot._source is { } src) return src.SyncRoot;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection", "SyncRoot");
 					return SyncRoot.Value;
 				}
@@ -1271,6 +1346,63 @@ partial class DictionaryStubTests
 			public IDictionary(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.IDictionary delegation.</summary>
+			public void Source(global::System.Collections.IDictionary? source)
+			{
+				IsFixedSize._source = source;
+				IsReadOnly._source = source;
+				Keys._source = source;
+				Values._source = source;
+				Count._source = source;
+				IsSynchronized._source = source;
+				SyncRoot._source = source;
+				Indexer._source = source;
+				Add._source = source;
+				Clear._source = source;
+				Contains._source = source;
+				GetEnumerator._source = source;
+				Remove._source = source;
+				CopyTo._source = source;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.ICollection delegation.</summary>
+			public void Source(global::System.Collections.ICollection? source)
+			{
+				IsFixedSize._source = null;
+				IsReadOnly._source = null;
+				Keys._source = null;
+				Values._source = null;
+				Count._source = source;
+				IsSynchronized._source = source;
+				SyncRoot._source = source;
+				Indexer._source = null;
+				Add._source = null;
+				Clear._source = null;
+				Contains._source = null;
+				GetEnumerator._source = null;
+				Remove._source = null;
+				CopyTo._source = source;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.IEnumerable delegation.</summary>
+			public void Source(global::System.Collections.IEnumerable? source)
+			{
+				IsFixedSize._source = null;
+				IsReadOnly._source = null;
+				Keys._source = null;
+				Values._source = null;
+				Count._source = null;
+				IsSynchronized._source = null;
+				SyncRoot._source = null;
+				Indexer._source = null;
+				Add._source = null;
+				Clear._source = null;
+				Contains._source = null;
+				GetEnumerator._source = null;
+				Remove._source = null;
+				CopyTo._source = null;
 			}
 
 		}

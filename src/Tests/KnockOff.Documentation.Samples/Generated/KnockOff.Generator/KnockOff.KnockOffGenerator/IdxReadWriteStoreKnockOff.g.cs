@@ -8,6 +8,9 @@ partial class IdxReadWriteStoreKnockOff : global::KnockOff.Documentation.Samples
 	/// <summary>Tracks and configures behavior for indexer.</summary>
 	public sealed class IndexerInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IIdxReadWriteStore? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -36,7 +39,7 @@ partial class IdxReadWriteStoreKnockOff : global::KnockOff.Documentation.Samples
 		public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Documentation.Samples.Guides.IdxPropertyInfo?> Backing { get; } = new();
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; }
+		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; _source = null; }
 	}
 
 	/// <summary>Interceptor for indexer. Configure callbacks and track access.</summary>
@@ -48,10 +51,19 @@ partial class IdxReadWriteStoreKnockOff : global::KnockOff.Documentation.Samples
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IIdxReadWriteStore instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IIdxReadWriteStore Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.IIdxReadWriteStore).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.IIdxReadWriteStore? source)
+	{
+		Indexer._source = source;
+	}
+
 	global::KnockOff.Documentation.Samples.Guides.IdxPropertyInfo? global::KnockOff.Documentation.Samples.Guides.IIdxReadWriteStore.this[string key]
 	{
-		get { Indexer.RecordGet(key); if (Indexer.OnGet is { } onGet) return onGet(this, key); if (Strict) throw global::KnockOff.StubException.NotConfigured("IIdxReadWriteStore", "this[]"); return Indexer.Backing.TryGetValue(key, out var v) ? v : default; }
-		set { Indexer.RecordSet(key, value); if (Indexer.OnSet is { } onSet) { onSet(this, key, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IIdxReadWriteStore", "this[]"); Indexer.Backing[key] = value; }
+		get { Indexer.RecordGet(key); if (Indexer.OnGet is { } onGet) return onGet(this, key); if (Indexer._source is { } src) return src[key]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IIdxReadWriteStore", "this[]"); return Indexer.Backing.TryGetValue(key, out var v) ? v : default; }
+		set { Indexer.RecordSet(key, value); if (Indexer.OnSet is { } onSet) { onSet(this, key, value); return; } if (Indexer._source is { } src) { src[key] = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IIdxReadWriteStore", "this[]"); Indexer.Backing[key] = value; }
 	}
 
 }

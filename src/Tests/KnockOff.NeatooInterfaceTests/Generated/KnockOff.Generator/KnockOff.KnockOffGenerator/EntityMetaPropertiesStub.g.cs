@@ -8,6 +8,9 @@ partial class EntityMetaPropertiesStub : global::Neatoo.IEntityMetaProperties, g
 	/// <summary>Tracks and configures behavior for IsChild.</summary>
 	public sealed class IsChildInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.IEntityMetaProperties? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -21,12 +24,15 @@ partial class EntityMetaPropertiesStub : global::Neatoo.IEntityMetaProperties, g
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsModified.</summary>
 	public sealed class IsModifiedInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.IEntityMetaProperties? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -40,12 +46,15 @@ partial class EntityMetaPropertiesStub : global::Neatoo.IEntityMetaProperties, g
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsSelfModified.</summary>
 	public sealed class IsSelfModifiedInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.IEntityMetaProperties? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -59,12 +68,15 @@ partial class EntityMetaPropertiesStub : global::Neatoo.IEntityMetaProperties, g
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsMarkedModified.</summary>
 	public sealed class IsMarkedModifiedInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.IEntityMetaProperties? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -78,12 +90,15 @@ partial class EntityMetaPropertiesStub : global::Neatoo.IEntityMetaProperties, g
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsSavable.</summary>
 	public sealed class IsSavableInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.IEntityMetaProperties? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -97,12 +112,15 @@ partial class EntityMetaPropertiesStub : global::Neatoo.IEntityMetaProperties, g
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsDeleted.</summary>
 	public sealed class IsDeletedInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.RemoteFactory.IFactorySaveMeta? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -116,12 +134,15 @@ partial class EntityMetaPropertiesStub : global::Neatoo.IEntityMetaProperties, g
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsNew.</summary>
 	public sealed class IsNewInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.RemoteFactory.IFactorySaveMeta? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -135,7 +156,7 @@ partial class EntityMetaPropertiesStub : global::Neatoo.IEntityMetaProperties, g
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Interceptor for IsChild. Configure via .Value, track via .GetCount.</summary>
@@ -165,39 +186,67 @@ partial class EntityMetaPropertiesStub : global::Neatoo.IEntityMetaProperties, g
 	/// <summary>The global::Neatoo.IEntityMetaProperties instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.IEntityMetaProperties Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::Neatoo.IEntityMetaProperties).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::Neatoo.IEntityMetaProperties? source)
+	{
+		IsChild._source = source;
+		IsModified._source = source;
+		IsSelfModified._source = source;
+		IsMarkedModified._source = source;
+		IsSavable._source = source;
+		IsDeleted._source = source;
+		IsNew._source = source;
+	}
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::Neatoo.RemoteFactory.IFactorySaveMeta).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::Neatoo.RemoteFactory.IFactorySaveMeta? source)
+	{
+		IsChild._source = null;
+		IsModified._source = null;
+		IsSelfModified._source = null;
+		IsMarkedModified._source = null;
+		IsSavable._source = null;
+		IsDeleted._source = source;
+		IsNew._source = source;
+	}
+
 	bool global::Neatoo.IEntityMetaProperties.IsChild
 	{
-		get { IsChild.RecordGet(); if (IsChild.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsChild"); return IsChild.Value; }
+		get { IsChild.RecordGet(); if (IsChild.OnGet is { } onGet) return onGet(this); if (IsChild._source is { } src) return src.IsChild; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsChild"); return IsChild.Value; }
 	}
 
 	bool global::Neatoo.IEntityMetaProperties.IsModified
 	{
-		get { IsModified.RecordGet(); if (IsModified.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsModified"); return IsModified.Value; }
+		get { IsModified.RecordGet(); if (IsModified.OnGet is { } onGet) return onGet(this); if (IsModified._source is { } src) return src.IsModified; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsModified"); return IsModified.Value; }
 	}
 
 	bool global::Neatoo.IEntityMetaProperties.IsSelfModified
 	{
-		get { IsSelfModified.RecordGet(); if (IsSelfModified.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsSelfModified"); return IsSelfModified.Value; }
+		get { IsSelfModified.RecordGet(); if (IsSelfModified.OnGet is { } onGet) return onGet(this); if (IsSelfModified._source is { } src) return src.IsSelfModified; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsSelfModified"); return IsSelfModified.Value; }
 	}
 
 	bool global::Neatoo.IEntityMetaProperties.IsMarkedModified
 	{
-		get { IsMarkedModified.RecordGet(); if (IsMarkedModified.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsMarkedModified"); return IsMarkedModified.Value; }
+		get { IsMarkedModified.RecordGet(); if (IsMarkedModified.OnGet is { } onGet) return onGet(this); if (IsMarkedModified._source is { } src) return src.IsMarkedModified; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsMarkedModified"); return IsMarkedModified.Value; }
 	}
 
 	bool global::Neatoo.IEntityMetaProperties.IsSavable
 	{
-		get { IsSavable.RecordGet(); if (IsSavable.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsSavable"); return IsSavable.Value; }
+		get { IsSavable.RecordGet(); if (IsSavable.OnGet is { } onGet) return onGet(this); if (IsSavable._source is { } src) return src.IsSavable; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsSavable"); return IsSavable.Value; }
 	}
 
 	bool global::Neatoo.RemoteFactory.IFactorySaveMeta.IsDeleted
 	{
-		get { IsDeleted.RecordGet(); if (IsDeleted.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IFactorySaveMeta", "IsDeleted"); return IsDeleted.Value; }
+		get { IsDeleted.RecordGet(); if (IsDeleted.OnGet is { } onGet) return onGet(this); if (IsDeleted._source is { } src) return src.IsDeleted; if (Strict) throw global::KnockOff.StubException.NotConfigured("IFactorySaveMeta", "IsDeleted"); return IsDeleted.Value; }
 	}
 
 	bool global::Neatoo.RemoteFactory.IFactorySaveMeta.IsNew
 	{
-		get { IsNew.RecordGet(); if (IsNew.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IFactorySaveMeta", "IsNew"); return IsNew.Value; }
+		get { IsNew.RecordGet(); if (IsNew.OnGet is { } onGet) return onGet(this); if (IsNew._source is { } src) return src.IsNew; if (Strict) throw global::KnockOff.StubException.NotConfigured("IFactorySaveMeta", "IsNew"); return IsNew.Value; }
 	}
 
 }

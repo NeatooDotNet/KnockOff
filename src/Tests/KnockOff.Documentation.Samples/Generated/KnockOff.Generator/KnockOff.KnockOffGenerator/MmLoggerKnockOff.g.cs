@@ -8,6 +8,9 @@ partial class MmLoggerKnockOff : global::KnockOff.Documentation.Samples.Skills.I
 	/// <summary>Tracks and configures behavior for Log.</summary>
 	public sealed class LogInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.IMmLogger? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<MmLoggerKnockOff, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -50,6 +53,7 @@ partial class MmLoggerKnockOff : global::KnockOff.Documentation.Samples.Skills.I
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = message;
+				if (_source is { } src) { src.Log(message); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Log");
 				return;
 			}
@@ -73,6 +77,7 @@ partial class MmLoggerKnockOff : global::KnockOff.Documentation.Samples.Skills.I
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -181,6 +186,15 @@ partial class MmLoggerKnockOff : global::KnockOff.Documentation.Samples.Skills.I
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Skills.IMmLogger).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Skills.IMmLogger? source)
+	{
+		Log._source = source;
 	}
 
 	void global::KnockOff.Documentation.Samples.Skills.IMmLogger.Log(string message)

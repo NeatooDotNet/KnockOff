@@ -376,6 +376,14 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 			$"Set the handler's OnCall.");
 	}
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Tests.IConstrainedGenericMethod).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Tests.IConstrainedGenericMethod? source)
+	{
+	}
+
 	T? global::KnockOff.Tests.IConstrainedGenericMethod.GetAttribute<T>() where T : class
 	{
 		GetAttribute.Of<T>().RecordCall();

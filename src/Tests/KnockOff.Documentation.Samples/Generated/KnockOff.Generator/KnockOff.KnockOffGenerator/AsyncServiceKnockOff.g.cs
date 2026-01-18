@@ -8,6 +8,9 @@ partial class AsyncServiceKnockOff : global::KnockOff.Documentation.Samples.Gett
 	/// <summary>Tracks and configures behavior for SaveAsync.</summary>
 	public sealed class SaveAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.GettingStarted.IAsyncSaveService? _source;
+
 		/// <summary>Delegate for SaveAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<int> SaveAsyncDelegate(AsyncServiceKnockOff ko, object entity);
 
@@ -53,6 +56,7 @@ partial class AsyncServiceKnockOff : global::KnockOff.Documentation.Samples.Gett
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = entity;
+				if (_source is { } src) return src.SaveAsync(entity);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SaveAsync");
 				return global::System.Threading.Tasks.Task.FromResult<int>(default!);
 			}
@@ -76,6 +80,7 @@ partial class AsyncServiceKnockOff : global::KnockOff.Documentation.Samples.Gett
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -184,6 +189,15 @@ partial class AsyncServiceKnockOff : global::KnockOff.Documentation.Samples.Gett
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.GettingStarted.IAsyncSaveService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.GettingStarted.IAsyncSaveService? source)
+	{
+		SaveAsync._source = source;
 	}
 
 	global::System.Threading.Tasks.Task<int> global::KnockOff.Documentation.Samples.GettingStarted.IAsyncSaveService.SaveAsync(object entity)

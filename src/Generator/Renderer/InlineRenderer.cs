@@ -184,6 +184,9 @@ internal static class InlineRenderer
         w.Line("\t\t\t}");
         w.Line();
 
+        // Source(T) methods for Source feature
+        RenderSourceMethods(w, iface);
+
         // SmartDefault helper if interface has generic methods
         if (iface.HasGenericMethods)
         {
@@ -231,6 +234,14 @@ internal static class InlineRenderer
         w.Line($"\t\t\tpublic {prop.ReturnType} Value {{ get; set; }} = default!;");
         w.Line();
 
+        // Source field for Source(T) feature - skip for init-only properties
+        if (!string.IsNullOrEmpty(prop.DeclaringInterface) && !prop.IsInitOnly)
+        {
+            w.Line($"\t\t\t/// <summary>Source object for delegation when OnGet is not set.</summary>");
+            w.Line($"\t\t\tinternal {prop.DeclaringInterface}? _source;");
+            w.Line();
+        }
+
         // RecordGet/RecordSet
         if (prop.HasGetter)
         {
@@ -251,6 +262,7 @@ internal static class InlineRenderer
         if (prop.HasGetter) resetParts.Add("GetCount = 0; OnGet = null;");
         if (prop.HasSetter) resetParts.Add("SetCount = 0; LastSetValue = default; OnSet = null;");
         resetParts.Add("Value = default!;");
+        if (!string.IsNullOrEmpty(prop.DeclaringInterface) && !prop.IsInitOnly) resetParts.Add("_source = null;");
         w.Line($"\t\t\tpublic void Reset() {{ {string.Join(" ", resetParts)} }}");
 
         w.Line("\t\t}");
@@ -311,11 +323,20 @@ internal static class InlineRenderer
         w.Line($"\t\t\tpublic global::System.Collections.Generic.Dictionary<{indexer.SingleKeyType}, {indexer.ReturnType}> Backing {{ get; }} = new();");
         w.Line();
 
+        // Source field for Source(T) feature
+        if (!string.IsNullOrEmpty(indexer.DeclaringInterface))
+        {
+            w.Line($"\t\t\t/// <summary>Source object for delegation when OnGet/OnSet is not set.</summary>");
+            w.Line($"\t\t\tinternal {indexer.DeclaringInterface}? _source;");
+            w.Line();
+        }
+
         // Reset method
         w.Line("\t\t\t/// <summary>Resets all tracking state.</summary>");
         var resetParts = new List<string>();
         if (indexer.HasGetter) resetParts.Add("GetCount = 0; LastGetKey = default; OnGet = null;");
         if (indexer.HasSetter) resetParts.Add("SetCount = 0; LastSetEntry = default; OnSet = null;");
+        if (!string.IsNullOrEmpty(indexer.DeclaringInterface)) resetParts.Add("_source = null;");
         w.Line($"\t\t\tpublic void Reset() {{ {string.Join(" ", resetParts)} }}");
 
         w.Line("\t\t}");
@@ -574,8 +595,13 @@ internal static class InlineRenderer
             w.Line("\t\t\t\tget");
             w.Line("\t\t\t\t{");
             w.Line($"\t\t\t\t\t{impl.InterceptorName}.RecordGet();");
-            w.Line($"\t\t\t\t\tif ({impl.InterceptorName}.OnGet is {{ }} onGet) return onGet(this);");
-            w.Line($"\t\t\t\t\tif (Strict) throw global::KnockOff.StubException.NotConfigured(\"{impl.SimpleInterfaceName}\", \"{impl.MemberName}\");");
+            // Init-only properties don't support OnGet/OnSet or _source
+            if (!impl.IsInitOnly)
+            {
+                w.Line($"\t\t\t\t\tif ({impl.InterceptorName}.OnGet is {{ }} onGet) return onGet(this);");
+                w.Line($"\t\t\t\t\tif ({impl.InterceptorName}._source is {{ }} src) return src.{impl.MemberName};");
+                w.Line($"\t\t\t\t\tif (Strict) throw global::KnockOff.StubException.NotConfigured(\"{impl.SimpleInterfaceName}\", \"{impl.MemberName}\");");
+            }
             w.Line($"\t\t\t\t\treturn {impl.InterceptorName}.Value;");
             w.Line("\t\t\t\t}");
         }
@@ -587,10 +613,20 @@ internal static class InlineRenderer
                 w.Append(impl.SetterPragmaDisable);
             w.Line($"\t\t\t\t{setterKeyword}");
             w.Line("\t\t\t\t{");
-            w.Line($"\t\t\t\t\t{impl.InterceptorName}.RecordSet(value);");
-            w.Line($"\t\t\t\t\tif ({impl.InterceptorName}.OnSet is {{ }} onSet) {{ onSet(this, value); return; }}");
-            w.Line($"\t\t\t\t\tif (Strict) throw global::KnockOff.StubException.NotConfigured(\"{impl.SimpleInterfaceName}\", \"{impl.MemberName}\");");
-            w.Line($"\t\t\t\t\t{impl.InterceptorName}.Value = value;");
+            // Init-only properties record the set and store value - no OnSet, _source or Strict checks
+            if (impl.IsInitOnly)
+            {
+                w.Line($"\t\t\t\t\t{impl.InterceptorName}.RecordSet(value);");
+                w.Line($"\t\t\t\t\t{impl.InterceptorName}.Value = value;");
+            }
+            else
+            {
+                w.Line($"\t\t\t\t\t{impl.InterceptorName}.RecordSet(value);");
+                w.Line($"\t\t\t\t\tif ({impl.InterceptorName}.OnSet is {{ }} onSet) {{ onSet(this, value); return; }}");
+                w.Line($"\t\t\t\t\tif ({impl.InterceptorName}._source is {{ }} src) {{ src.{impl.MemberName} = value; return; }}");
+                w.Line($"\t\t\t\t\tif (Strict) throw global::KnockOff.StubException.NotConfigured(\"{impl.SimpleInterfaceName}\", \"{impl.MemberName}\");");
+                w.Line($"\t\t\t\t\t{impl.InterceptorName}.Value = value;");
+            }
             w.Line("\t\t\t\t}");
             if (impl.SetterPragmaRestore != null)
                 w.Line(impl.SetterPragmaRestore);
@@ -611,6 +647,7 @@ internal static class InlineRenderer
             w.Line("\t\t\t\t{");
             w.Line($"\t\t\t\t\t{impl.InterceptorName}.RecordGet({impl.ArgumentList});");
             w.Line($"\t\t\t\t\tif ({impl.InterceptorName}.OnGet is {{ }} onGet) return onGet({impl.OnCallArgs});");
+            w.Line($"\t\t\t\t\tif ({impl.InterceptorName}._source is {{ }} src) return src[{impl.ArgumentList}];");
             w.Line($"\t\t\t\t\tif (Strict) throw global::KnockOff.StubException.NotConfigured(\"{impl.SimpleInterfaceName}\", \"this[]\");");
             w.Line($"\t\t\t\t\treturn {impl.InterceptorName}.Backing.TryGetValue({impl.KeyArg}, out var v) ? v : {impl.DefaultExpression};");
             w.Line("\t\t\t\t}");
@@ -622,6 +659,7 @@ internal static class InlineRenderer
             w.Line("\t\t\t\t{");
             w.Line($"\t\t\t\t\t{impl.InterceptorName}.RecordSet({impl.ArgumentList}, value);");
             w.Line($"\t\t\t\t\tif ({impl.InterceptorName}.OnSet is {{ }} onSet) {{ onSet({impl.OnCallArgs}, value); return; }}");
+            w.Line($"\t\t\t\t\tif ({impl.InterceptorName}._source is {{ }} src) {{ src[{impl.ArgumentList}] = value; return; }}");
             w.Line($"\t\t\t\t\tif (Strict) throw global::KnockOff.StubException.NotConfigured(\"{impl.SimpleInterfaceName}\", \"this[]\");");
             w.Line($"\t\t\t\t\t{impl.InterceptorName}.Backing[{impl.KeyArg}] = value;");
             w.Line("\t\t\t\t}");
@@ -886,6 +924,39 @@ internal static class InlineRenderer
         w.Line($"\tprivate readonly Stubs.{prop.StubTypeName} {prop.BackingFieldName} = new();");
         w.Line($"\t/// <summary>Auto-instantiated stub for {prop.StubTypeName}.</summary>");
         w.Line($"\t{accessMod}partial Stubs.{prop.StubTypeName} {prop.PropertyName} {{ get => {prop.BackingFieldName}; }}");
+    }
+
+    #endregion
+
+    #region Source Methods Rendering
+
+    private static void RenderSourceMethods(CodeWriter w, InlineInterfaceStubModel iface)
+    {
+        // Skip if no source providers
+        if (iface.SourceProviders.Count == 0)
+            return;
+
+        foreach (var provider in iface.SourceProviders)
+        {
+            w.Line($"\t\t\t/// <summary>Sets the source object for {provider.InterfaceType} delegation.</summary>");
+            w.Line($"\t\t\tpublic void {provider.MethodName}({provider.InterfaceType}? source)");
+            w.Line("\t\t\t{");
+
+            foreach (var mapping in provider.MemberMappings)
+            {
+                if (mapping.SetSource)
+                {
+                    w.Line($"\t\t\t\t{mapping.InterceptorName}._source = source;");
+                }
+                else
+                {
+                    w.Line($"\t\t\t\t{mapping.InterceptorName}._source = null;");
+                }
+            }
+
+            w.Line("\t\t\t}");
+            w.Line();
+        }
     }
 
     #endregion

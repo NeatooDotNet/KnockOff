@@ -30,6 +30,14 @@ partial class NullableValueTypeInitPropertyKnockOff : global::KnockOffTests.INul
 	/// <summary>The global::KnockOffTests.INullableValueTypeInitProperty instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOffTests.INullableValueTypeInitProperty Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOffTests.INullableValueTypeInitProperty).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOffTests.INullableValueTypeInitProperty? source)
+	{
+	}
+
 	int? global::KnockOffTests.INullableValueTypeInitProperty.Revision
 	{
 		get { Revision.RecordGet(); return Revision.Value; }

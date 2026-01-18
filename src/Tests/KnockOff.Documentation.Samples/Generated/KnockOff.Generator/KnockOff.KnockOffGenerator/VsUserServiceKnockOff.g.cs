@@ -8,6 +8,9 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 	/// <summary>Tracks and configures behavior for CurrentUser.</summary>
 	public sealed class CurrentUserInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Comparison.IVsUserService? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -33,12 +36,15 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 		public void RecordSet(global::KnockOff.Documentation.Samples.Comparison.VsUser? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for Save.</summary>
 	public sealed class SaveInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Comparison.IVsUserService? _source;
+
 		/// <summary>Delegate for Save.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Comparison.VsUser? SaveDelegate(VsUserServiceKnockOff ko, global::KnockOff.Documentation.Samples.Comparison.VsUser user);
 
@@ -84,6 +90,7 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = user;
+				if (_source is { } src) return src.Save(user);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 				return default!;
 			}
@@ -107,6 +114,7 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -196,6 +204,9 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 	/// <summary>Tracks and configures behavior for Delete.</summary>
 	public sealed class DeleteInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Comparison.IVsUserService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<VsUserServiceKnockOff, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -238,6 +249,7 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				if (_source is { } src) { src.Delete(id); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Delete");
 				return;
 			}
@@ -261,6 +273,7 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -350,6 +363,9 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 	/// <summary>Tracks and configures behavior for GetAll.</summary>
 	public sealed class GetAllInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Comparison.IVsUserService? _source;
+
 		/// <summary>Delegate for GetAll.</summary>
 		public delegate global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Comparison.VsUser> GetAllDelegate(VsUserServiceKnockOff ko);
 
@@ -390,6 +406,7 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.GetAll();
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetAll");
 				return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Comparison.VsUser>();
 			}
@@ -412,6 +429,7 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -497,6 +515,9 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 	/// <summary>Tracks and configures behavior for Update.</summary>
 	public sealed class UpdateInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Comparison.IVsUserService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<VsUserServiceKnockOff, global::KnockOff.Documentation.Samples.Comparison.VsUser> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -539,6 +560,7 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = user;
+				if (_source is { } src) { src.Update(user); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Update");
 				return;
 			}
@@ -562,6 +584,7 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -711,10 +734,23 @@ partial class VsUserServiceKnockOff : global::KnockOff.Documentation.Samples.Com
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
 	}
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Comparison.IVsUserService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Comparison.IVsUserService? source)
+	{
+		CurrentUser._source = source;
+		Save._source = source;
+		Delete._source = source;
+		GetAll._source = source;
+		Update._source = source;
+	}
+
 	global::KnockOff.Documentation.Samples.Comparison.VsUser? global::KnockOff.Documentation.Samples.Comparison.IVsUserService.CurrentUser
 	{
-		get { CurrentUser.RecordGet(); if (CurrentUser.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IVsUserService", "CurrentUser"); return CurrentUser.Value; }
-		set { CurrentUser.RecordSet(value); if (CurrentUser.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IVsUserService", "CurrentUser"); CurrentUser.Value = value; }
+		get { CurrentUser.RecordGet(); if (CurrentUser.OnGet is { } onGet) return onGet(this); if (CurrentUser._source is { } src) return src.CurrentUser; if (Strict) throw global::KnockOff.StubException.NotConfigured("IVsUserService", "CurrentUser"); return CurrentUser.Value; }
+		set { CurrentUser.RecordSet(value); if (CurrentUser.OnSet is { } onSet) { onSet(this, value); return; } if (CurrentUser._source is { } src) { src.CurrentUser = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IVsUserService", "CurrentUser"); CurrentUser.Value = value; }
 	}
 
 	global::KnockOff.Documentation.Samples.Comparison.VsUser global::KnockOff.Documentation.Samples.Comparison.IVsUserService.GetUser(int id)

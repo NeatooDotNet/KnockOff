@@ -29,6 +29,9 @@ partial class DbCommandStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public string Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Data.IDbCommand? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
@@ -36,7 +39,7 @@ partial class DbCommandStubTests
 			public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDbCommand.CommandTimeout.</summary>
@@ -60,6 +63,9 @@ partial class DbCommandStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public int Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Data.IDbCommand? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
@@ -67,7 +73,7 @@ partial class DbCommandStubTests
 			public void RecordSet(int? value) { SetCount++; LastSetValue = value; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDbCommand.CommandType.</summary>
@@ -91,6 +97,9 @@ partial class DbCommandStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Data.CommandType Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Data.IDbCommand? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
@@ -98,7 +107,7 @@ partial class DbCommandStubTests
 			public void RecordSet(global::System.Data.CommandType? value) { SetCount++; LastSetValue = value; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDbCommand.Connection.</summary>
@@ -122,6 +131,9 @@ partial class DbCommandStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Data.IDbConnection? Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Data.IDbCommand? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
@@ -129,7 +141,7 @@ partial class DbCommandStubTests
 			public void RecordSet(global::System.Data.IDbConnection? value) { SetCount++; LastSetValue = value; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDbCommand.Parameters.</summary>
@@ -144,11 +156,14 @@ partial class DbCommandStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Data.IDataParameterCollection Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Data.IDbCommand? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDbCommand.Transaction.</summary>
@@ -172,6 +187,9 @@ partial class DbCommandStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Data.IDbTransaction? Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Data.IDbCommand? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
@@ -179,7 +197,7 @@ partial class DbCommandStubTests
 			public void RecordSet(global::System.Data.IDbTransaction? value) { SetCount++; LastSetValue = value; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDbCommand.UpdatedRowSource.</summary>
@@ -203,6 +221,9 @@ partial class DbCommandStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Data.UpdateRowSource Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Data.IDbCommand? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
@@ -210,12 +231,15 @@ partial class DbCommandStubTests
 			public void RecordSet(global::System.Data.UpdateRowSource? value) { SetCount++; LastSetValue = value; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Tracks and configures behavior for Cancel.</summary>
 		public sealed class IDbCommand_CancelInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDbCommand? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IDbCommand> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -253,6 +277,9 @@ partial class DbCommandStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.Cancel(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Cancel");
 					return;
 				}
@@ -275,6 +302,7 @@ partial class DbCommandStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -360,6 +388,9 @@ partial class DbCommandStubTests
 		/// <summary>Tracks and configures behavior for CreateParameter.</summary>
 		public sealed class IDbCommand_CreateParameterInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDbCommand? _source;
+
 			/// <summary>Delegate for CreateParameter.</summary>
 			public delegate global::System.Data.IDbDataParameter CreateParameterDelegate(Stubs.IDbCommand ko);
 
@@ -400,6 +431,9 @@ partial class DbCommandStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.CreateParameter();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "CreateParameter");
 					return default!;
 				}
@@ -422,6 +456,7 @@ partial class DbCommandStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -507,6 +542,9 @@ partial class DbCommandStubTests
 		/// <summary>Tracks and configures behavior for ExecuteNonQuery.</summary>
 		public sealed class IDbCommand_ExecuteNonQueryInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDbCommand? _source;
+
 			/// <summary>Delegate for ExecuteNonQuery.</summary>
 			public delegate int ExecuteNonQueryDelegate(Stubs.IDbCommand ko);
 
@@ -547,6 +585,9 @@ partial class DbCommandStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.ExecuteNonQuery();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ExecuteNonQuery");
 					return default!;
 				}
@@ -569,6 +610,7 @@ partial class DbCommandStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -654,6 +696,9 @@ partial class DbCommandStubTests
 		/// <summary>Tracks and configures behavior for ExecuteReader.</summary>
 		public sealed class IDbCommand_ExecuteReaderInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDbCommand? _source;
+
 			private int _unconfiguredCallCount;
 
 			/// <summary>Delegate for ExecuteReader().</summary>
@@ -720,6 +765,9 @@ partial class DbCommandStubTests
 				if (_sequence_NoParams_Data_IDataReader.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.ExecuteReader();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ExecuteReader");
 					throw new global::System.InvalidOperationException("No implementation provided for ExecuteReader. Configure via OnCall.");
 				}
@@ -744,6 +792,9 @@ partial class DbCommandStubTests
 				if (_sequence_Data_CommandBehavior_Data_IDataReader.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.ExecuteReader(behavior);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ExecuteReader");
 					throw new global::System.InvalidOperationException("No implementation provided for ExecuteReader. Configure via OnCall.");
 				}
@@ -766,6 +817,7 @@ partial class DbCommandStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence_NoParams_Data_IDataReader)
 					tracking.Reset();
 				_sequenceIndex_NoParams_Data_IDataReader = 0;
@@ -927,6 +979,9 @@ partial class DbCommandStubTests
 		/// <summary>Tracks and configures behavior for ExecuteScalar.</summary>
 		public sealed class IDbCommand_ExecuteScalarInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDbCommand? _source;
+
 			/// <summary>Delegate for ExecuteScalar.</summary>
 			public delegate object? ExecuteScalarDelegate(Stubs.IDbCommand ko);
 
@@ -967,6 +1022,9 @@ partial class DbCommandStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.ExecuteScalar();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ExecuteScalar");
 					return default!;
 				}
@@ -989,6 +1047,7 @@ partial class DbCommandStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1074,6 +1133,9 @@ partial class DbCommandStubTests
 		/// <summary>Tracks and configures behavior for Prepare.</summary>
 		public sealed class IDbCommand_PrepareInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDbCommand? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IDbCommand> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -1111,6 +1173,9 @@ partial class DbCommandStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.Prepare(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Prepare");
 					return;
 				}
@@ -1133,6 +1198,7 @@ partial class DbCommandStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1218,6 +1284,9 @@ partial class DbCommandStubTests
 		/// <summary>Tracks and configures behavior for Dispose.</summary>
 		public sealed class IDbCommand_DisposeInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IDisposable? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IDbCommand> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -1255,6 +1324,9 @@ partial class DbCommandStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.Dispose(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Dispose");
 					return;
 				}
@@ -1277,6 +1349,7 @@ partial class DbCommandStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1445,6 +1518,7 @@ partial class DbCommandStubTests
 				{
 					CommandText.RecordGet();
 					if (CommandText.OnGet is { } onGet) return onGet(this);
+					if (CommandText._source is { } src) return src.CommandText;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "CommandText");
 					return CommandText.Value;
 				}
@@ -1453,6 +1527,7 @@ partial class DbCommandStubTests
 				{
 					CommandText.RecordSet(value);
 					if (CommandText.OnSet is { } onSet) { onSet(this, value); return; }
+					if (CommandText._source is { } src) { src.CommandText = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "CommandText");
 					CommandText.Value = value;
 				}
@@ -1466,6 +1541,7 @@ partial class DbCommandStubTests
 				{
 					CommandTimeout.RecordGet();
 					if (CommandTimeout.OnGet is { } onGet) return onGet(this);
+					if (CommandTimeout._source is { } src) return src.CommandTimeout;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "CommandTimeout");
 					return CommandTimeout.Value;
 				}
@@ -1473,6 +1549,7 @@ partial class DbCommandStubTests
 				{
 					CommandTimeout.RecordSet(value);
 					if (CommandTimeout.OnSet is { } onSet) { onSet(this, value); return; }
+					if (CommandTimeout._source is { } src) { src.CommandTimeout = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "CommandTimeout");
 					CommandTimeout.Value = value;
 				}
@@ -1484,6 +1561,7 @@ partial class DbCommandStubTests
 				{
 					CommandType.RecordGet();
 					if (CommandType.OnGet is { } onGet) return onGet(this);
+					if (CommandType._source is { } src) return src.CommandType;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "CommandType");
 					return CommandType.Value;
 				}
@@ -1491,6 +1569,7 @@ partial class DbCommandStubTests
 				{
 					CommandType.RecordSet(value);
 					if (CommandType.OnSet is { } onSet) { onSet(this, value); return; }
+					if (CommandType._source is { } src) { src.CommandType = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "CommandType");
 					CommandType.Value = value;
 				}
@@ -1502,6 +1581,7 @@ partial class DbCommandStubTests
 				{
 					Connection.RecordGet();
 					if (Connection.OnGet is { } onGet) return onGet(this);
+					if (Connection._source is { } src) return src.Connection;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "Connection");
 					return Connection.Value;
 				}
@@ -1509,6 +1589,7 @@ partial class DbCommandStubTests
 				{
 					Connection.RecordSet(value);
 					if (Connection.OnSet is { } onSet) { onSet(this, value); return; }
+					if (Connection._source is { } src) { src.Connection = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "Connection");
 					Connection.Value = value;
 				}
@@ -1520,6 +1601,7 @@ partial class DbCommandStubTests
 				{
 					Parameters.RecordGet();
 					if (Parameters.OnGet is { } onGet) return onGet(this);
+					if (Parameters._source is { } src) return src.Parameters;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "Parameters");
 					return Parameters.Value;
 				}
@@ -1531,6 +1613,7 @@ partial class DbCommandStubTests
 				{
 					Transaction.RecordGet();
 					if (Transaction.OnGet is { } onGet) return onGet(this);
+					if (Transaction._source is { } src) return src.Transaction;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "Transaction");
 					return Transaction.Value;
 				}
@@ -1538,6 +1621,7 @@ partial class DbCommandStubTests
 				{
 					Transaction.RecordSet(value);
 					if (Transaction.OnSet is { } onSet) { onSet(this, value); return; }
+					if (Transaction._source is { } src) { src.Transaction = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "Transaction");
 					Transaction.Value = value;
 				}
@@ -1549,6 +1633,7 @@ partial class DbCommandStubTests
 				{
 					UpdatedRowSource.RecordGet();
 					if (UpdatedRowSource.OnGet is { } onGet) return onGet(this);
+					if (UpdatedRowSource._source is { } src) return src.UpdatedRowSource;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "UpdatedRowSource");
 					return UpdatedRowSource.Value;
 				}
@@ -1556,6 +1641,7 @@ partial class DbCommandStubTests
 				{
 					UpdatedRowSource.RecordSet(value);
 					if (UpdatedRowSource.OnSet is { } onSet) { onSet(this, value); return; }
+					if (UpdatedRowSource._source is { } src) { src.UpdatedRowSource = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "UpdatedRowSource");
 					UpdatedRowSource.Value = value;
 				}
@@ -1577,6 +1663,44 @@ partial class DbCommandStubTests
 			public IDbCommand(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.Data.IDbCommand delegation.</summary>
+			public void Source(global::System.Data.IDbCommand? source)
+			{
+				CommandText._source = source;
+				CommandTimeout._source = source;
+				CommandType._source = source;
+				Connection._source = source;
+				Parameters._source = source;
+				Transaction._source = source;
+				UpdatedRowSource._source = source;
+				Cancel._source = source;
+				CreateParameter._source = source;
+				ExecuteNonQuery._source = source;
+				ExecuteReader._source = source;
+				ExecuteScalar._source = source;
+				Prepare._source = source;
+				Dispose._source = source;
+			}
+
+			/// <summary>Sets the source object for global::System.IDisposable delegation.</summary>
+			public void Source(global::System.IDisposable? source)
+			{
+				CommandText._source = null;
+				CommandTimeout._source = null;
+				CommandType._source = null;
+				Connection._source = null;
+				Parameters._source = null;
+				Transaction._source = null;
+				UpdatedRowSource._source = null;
+				Cancel._source = null;
+				CreateParameter._source = null;
+				ExecuteNonQuery._source = null;
+				ExecuteReader._source = null;
+				ExecuteScalar._source = null;
+				Prepare._source = null;
+				Dispose._source = source;
 			}
 
 		}

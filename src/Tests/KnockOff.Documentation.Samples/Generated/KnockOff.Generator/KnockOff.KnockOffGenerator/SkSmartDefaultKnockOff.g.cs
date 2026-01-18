@@ -8,6 +8,9 @@ partial class SkSmartDefaultKnockOff : global::KnockOff.Documentation.Samples.Sk
 	/// <summary>Tracks and configures behavior for GetCount.</summary>
 	public sealed class GetCountInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService? _source;
+
 		/// <summary>Delegate for GetCount.</summary>
 		public delegate int GetCountDelegate(SkSmartDefaultKnockOff ko);
 
@@ -48,6 +51,7 @@ partial class SkSmartDefaultKnockOff : global::KnockOff.Documentation.Samples.Sk
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.GetCount();
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetCount");
 				return default!;
 			}
@@ -70,6 +74,7 @@ partial class SkSmartDefaultKnockOff : global::KnockOff.Documentation.Samples.Sk
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -155,6 +160,9 @@ partial class SkSmartDefaultKnockOff : global::KnockOff.Documentation.Samples.Sk
 	/// <summary>Tracks and configures behavior for GetItems.</summary>
 	public sealed class GetItemsInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService? _source;
+
 		/// <summary>Delegate for GetItems.</summary>
 		public delegate global::System.Collections.Generic.List<string> GetItemsDelegate(SkSmartDefaultKnockOff ko);
 
@@ -195,6 +203,7 @@ partial class SkSmartDefaultKnockOff : global::KnockOff.Documentation.Samples.Sk
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.GetItems();
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetItems");
 				return new global::System.Collections.Generic.List<string>();
 			}
@@ -217,6 +226,7 @@ partial class SkSmartDefaultKnockOff : global::KnockOff.Documentation.Samples.Sk
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -302,6 +312,9 @@ partial class SkSmartDefaultKnockOff : global::KnockOff.Documentation.Samples.Sk
 	/// <summary>Tracks and configures behavior for GetIList.</summary>
 	public sealed class GetIListInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService? _source;
+
 		/// <summary>Delegate for GetIList.</summary>
 		public delegate global::System.Collections.Generic.IList<string> GetIListDelegate(SkSmartDefaultKnockOff ko);
 
@@ -342,6 +355,7 @@ partial class SkSmartDefaultKnockOff : global::KnockOff.Documentation.Samples.Sk
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.GetIList();
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetIList");
 				return new global::System.Collections.Generic.List<string>();
 			}
@@ -364,6 +378,7 @@ partial class SkSmartDefaultKnockOff : global::KnockOff.Documentation.Samples.Sk
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -449,6 +464,9 @@ partial class SkSmartDefaultKnockOff : global::KnockOff.Documentation.Samples.Sk
 	/// <summary>Tracks and configures behavior for GetOptional.</summary>
 	public sealed class GetOptionalInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService? _source;
+
 		/// <summary>Delegate for GetOptional.</summary>
 		public delegate string? GetOptionalDelegate(SkSmartDefaultKnockOff ko);
 
@@ -489,6 +507,7 @@ partial class SkSmartDefaultKnockOff : global::KnockOff.Documentation.Samples.Sk
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.GetOptional();
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetOptional");
 				return default!;
 			}
@@ -511,6 +530,7 @@ partial class SkSmartDefaultKnockOff : global::KnockOff.Documentation.Samples.Sk
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -596,6 +616,9 @@ partial class SkSmartDefaultKnockOff : global::KnockOff.Documentation.Samples.Sk
 	/// <summary>Tracks and configures behavior for GetDisposable.</summary>
 	public sealed class GetDisposableInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService? _source;
+
 		/// <summary>Delegate for GetDisposable.</summary>
 		public delegate global::System.IDisposable GetDisposableDelegate(SkSmartDefaultKnockOff ko);
 
@@ -636,6 +659,7 @@ partial class SkSmartDefaultKnockOff : global::KnockOff.Documentation.Samples.Sk
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.GetDisposable();
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetDisposable");
 				throw new global::System.InvalidOperationException("No implementation provided for GetDisposable. Configure via OnCall.");
 			}
@@ -658,6 +682,7 @@ partial class SkSmartDefaultKnockOff : global::KnockOff.Documentation.Samples.Sk
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -778,6 +803,19 @@ partial class SkSmartDefaultKnockOff : global::KnockOff.Documentation.Samples.Sk
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService? source)
+	{
+		GetCount._source = source;
+		GetItems._source = source;
+		GetIList._source = source;
+		GetOptional._source = source;
+		GetDisposable._source = source;
 	}
 
 	int global::KnockOff.Documentation.Samples.Skills.ISkSmartDefaultService.GetCount()

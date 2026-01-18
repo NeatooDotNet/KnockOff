@@ -8,6 +8,9 @@ partial class SampleValidationRuleKnockOff : global::KnockOff.Tests.ISampleValid
 	/// <summary>Tracks and configures behavior for Execute.</summary>
 	public sealed class ExecuteInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.ISampleRule<global::KnockOff.Tests.ISampleTarget>? _source;
+
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for Execute(global::KnockOff.Tests.ISampleTarget, global::System.Threading.CancellationToken?).</summary>
@@ -74,6 +77,9 @@ partial class SampleValidationRuleKnockOff : global::KnockOff.Tests.ISampleValid
 			if (_sequence_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Execute(target, token);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Execute");
 				throw new global::System.InvalidOperationException("No implementation provided for Execute. Configure via OnCall.");
 			}
@@ -98,6 +104,9 @@ partial class SampleValidationRuleKnockOff : global::KnockOff.Tests.ISampleValid
 			if (_sequence_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Execute(target, token);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Execute");
 				throw new global::System.InvalidOperationException("No implementation provided for Execute. Configure via OnCall.");
 			}
@@ -120,6 +129,7 @@ partial class SampleValidationRuleKnockOff : global::KnockOff.Tests.ISampleValid
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult)
 				tracking.Reset();
 			_sequenceIndex_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult = 0;
@@ -304,6 +314,29 @@ partial class SampleValidationRuleKnockOff : global::KnockOff.Tests.ISampleValid
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Tests.ISampleValidationRule).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Tests.ISampleValidationRule? source)
+	{
+		Execute._source = source;
+	}
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Tests.ISampleRule<global::KnockOff.Tests.ISampleTarget>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Tests.ISampleRule<global::KnockOff.Tests.ISampleTarget>? source)
+	{
+		Execute._source = source;
+	}
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Tests.ISampleRule).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Tests.ISampleRule? source)
+	{
+		Execute._source = null;
 	}
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> global::KnockOff.Tests.ISampleRule<global::KnockOff.Tests.ISampleTarget>.Execute(global::KnockOff.Tests.ISampleTarget target, global::System.Threading.CancellationToken? token)

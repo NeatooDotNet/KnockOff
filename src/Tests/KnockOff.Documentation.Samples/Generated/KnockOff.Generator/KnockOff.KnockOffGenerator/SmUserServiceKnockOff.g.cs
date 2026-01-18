@@ -8,6 +8,9 @@ partial class SmUserServiceKnockOff : global::KnockOff.Documentation.Samples.Ski
 	/// <summary>Tracks and configures behavior for GetUser.</summary>
 	public sealed class GetUserInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.ISmUserService? _source;
+
 		/// <summary>Delegate for GetUser.</summary>
 		public delegate global::KnockOff.Documentation.Samples.SampleDomain.User GetUserDelegate(SmUserServiceKnockOff ko, int id);
 
@@ -53,6 +56,7 @@ partial class SmUserServiceKnockOff : global::KnockOff.Documentation.Samples.Ski
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				if (_source is { } src) return src.GetUser(id);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetUser");
 				return new global::KnockOff.Documentation.Samples.SampleDomain.User();
 			}
@@ -76,6 +80,7 @@ partial class SmUserServiceKnockOff : global::KnockOff.Documentation.Samples.Ski
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -165,6 +170,9 @@ partial class SmUserServiceKnockOff : global::KnockOff.Documentation.Samples.Ski
 	/// <summary>Tracks and configures behavior for DeleteUser.</summary>
 	public sealed class DeleteUserInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.ISmUserService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<SmUserServiceKnockOff, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -207,6 +215,7 @@ partial class SmUserServiceKnockOff : global::KnockOff.Documentation.Samples.Ski
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				if (_source is { } src) { src.DeleteUser(id); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "DeleteUser");
 				return;
 			}
@@ -230,6 +239,7 @@ partial class SmUserServiceKnockOff : global::KnockOff.Documentation.Samples.Ski
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -342,6 +352,16 @@ partial class SmUserServiceKnockOff : global::KnockOff.Documentation.Samples.Ski
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Skills.ISmUserService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Skills.ISmUserService? source)
+	{
+		GetUser._source = source;
+		DeleteUser._source = source;
 	}
 
 	global::KnockOff.Documentation.Samples.SampleDomain.User global::KnockOff.Documentation.Samples.Skills.ISmUserService.GetUser(int id)

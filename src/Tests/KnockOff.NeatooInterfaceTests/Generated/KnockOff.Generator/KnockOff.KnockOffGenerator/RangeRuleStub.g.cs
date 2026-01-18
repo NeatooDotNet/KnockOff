@@ -8,6 +8,9 @@ partial class RangeRuleStub : global::Neatoo.Rules.Rules.IRangeRule, global::Nea
 	/// <summary>Tracks and configures behavior for ErrorMessage.</summary>
 	public sealed class ErrorMessageInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.Rules.Rules.IRangeRule? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -21,12 +24,15 @@ partial class RangeRuleStub : global::Neatoo.Rules.Rules.IRangeRule, global::Nea
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for Minimum.</summary>
 	public sealed class MinimumInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.Rules.Rules.IRangeRule? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -40,12 +46,15 @@ partial class RangeRuleStub : global::Neatoo.Rules.Rules.IRangeRule, global::Nea
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for Maximum.</summary>
 	public sealed class MaximumInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.Rules.Rules.IRangeRule? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -59,12 +68,15 @@ partial class RangeRuleStub : global::Neatoo.Rules.Rules.IRangeRule, global::Nea
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for Executed.</summary>
 	public sealed class ExecutedInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.Rules.IRule? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -78,12 +90,15 @@ partial class RangeRuleStub : global::Neatoo.Rules.Rules.IRangeRule, global::Nea
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for RuleOrder.</summary>
 	public sealed class RuleOrderInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.Rules.IRule? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -97,12 +112,15 @@ partial class RangeRuleStub : global::Neatoo.Rules.Rules.IRangeRule, global::Nea
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for UniqueIndex.</summary>
 	public sealed class UniqueIndexInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.Rules.IRule? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -116,12 +134,15 @@ partial class RangeRuleStub : global::Neatoo.Rules.Rules.IRangeRule, global::Nea
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for Messages.</summary>
 	public sealed class MessagesInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.Rules.IRule? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -135,12 +156,15 @@ partial class RangeRuleStub : global::Neatoo.Rules.Rules.IRangeRule, global::Nea
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for TriggerProperties.</summary>
 	public sealed class TriggerPropertiesInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.Rules.IRule? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -154,12 +178,15 @@ partial class RangeRuleStub : global::Neatoo.Rules.Rules.IRangeRule, global::Nea
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for RunRule.</summary>
 	public sealed class RunRuleInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::Neatoo.Rules.IRule? _source;
+
 		/// <summary>Delegate for RunRule.</summary>
 		public delegate global::System.Threading.Tasks.Task<global::Neatoo.Rules.IRuleMessages> RunRuleDelegate(RangeRuleStub ko, global::Neatoo.IValidateBase target, global::System.Threading.CancellationToken? token);
 
@@ -205,6 +232,7 @@ partial class RangeRuleStub : global::Neatoo.Rules.Rules.IRangeRule, global::Nea
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((target, token));
+				if (_source is { } src) return src.RunRule(target, token);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RunRule");
 				throw new global::System.InvalidOperationException("No implementation provided for RunRule. Configure via OnCall.");
 			}
@@ -228,6 +256,7 @@ partial class RangeRuleStub : global::Neatoo.Rules.Rules.IRangeRule, global::Nea
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -317,6 +346,9 @@ partial class RangeRuleStub : global::Neatoo.Rules.Rules.IRangeRule, global::Nea
 	/// <summary>Tracks and configures behavior for OnRuleAdded.</summary>
 	public sealed class OnRuleAddedInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::Neatoo.Rules.IRule? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<RangeRuleStub, global::Neatoo.Rules.IRuleManager, uint> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -359,6 +391,7 @@ partial class RangeRuleStub : global::Neatoo.Rules.Rules.IRangeRule, global::Nea
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((ruleManager, uniqueIndex));
+				if (_source is { } src) { src.OnRuleAdded(ruleManager, uniqueIndex); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "OnRuleAdded");
 				return;
 			}
@@ -382,6 +415,7 @@ partial class RangeRuleStub : global::Neatoo.Rules.Rules.IRangeRule, global::Nea
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -520,44 +554,78 @@ partial class RangeRuleStub : global::Neatoo.Rules.Rules.IRangeRule, global::Nea
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
 	}
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::Neatoo.Rules.Rules.IRangeRule).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::Neatoo.Rules.Rules.IRangeRule? source)
+	{
+		ErrorMessage._source = source;
+		Minimum._source = source;
+		Maximum._source = source;
+		Executed._source = source;
+		RuleOrder._source = source;
+		UniqueIndex._source = source;
+		Messages._source = source;
+		TriggerProperties._source = source;
+		RunRule._source = source;
+		OnRuleAdded._source = source;
+	}
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::Neatoo.Rules.IRule).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::Neatoo.Rules.IRule? source)
+	{
+		ErrorMessage._source = null;
+		Minimum._source = null;
+		Maximum._source = null;
+		Executed._source = source;
+		RuleOrder._source = source;
+		UniqueIndex._source = source;
+		Messages._source = source;
+		TriggerProperties._source = source;
+		RunRule._source = source;
+		OnRuleAdded._source = source;
+	}
+
 	string global::Neatoo.Rules.Rules.IRangeRule.ErrorMessage
 	{
-		get { ErrorMessage.RecordGet(); if (ErrorMessage.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRangeRule", "ErrorMessage"); return ErrorMessage.Value; }
+		get { ErrorMessage.RecordGet(); if (ErrorMessage.OnGet is { } onGet) return onGet(this); if (ErrorMessage._source is { } src) return src.ErrorMessage; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRangeRule", "ErrorMessage"); return ErrorMessage.Value; }
 	}
 
 	object global::Neatoo.Rules.Rules.IRangeRule.Minimum
 	{
-		get { Minimum.RecordGet(); if (Minimum.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRangeRule", "Minimum"); return Minimum.Value; }
+		get { Minimum.RecordGet(); if (Minimum.OnGet is { } onGet) return onGet(this); if (Minimum._source is { } src) return src.Minimum; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRangeRule", "Minimum"); return Minimum.Value; }
 	}
 
 	object global::Neatoo.Rules.Rules.IRangeRule.Maximum
 	{
-		get { Maximum.RecordGet(); if (Maximum.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRangeRule", "Maximum"); return Maximum.Value; }
+		get { Maximum.RecordGet(); if (Maximum.OnGet is { } onGet) return onGet(this); if (Maximum._source is { } src) return src.Maximum; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRangeRule", "Maximum"); return Maximum.Value; }
 	}
 
 	bool global::Neatoo.Rules.IRule.Executed
 	{
-		get { Executed.RecordGet(); if (Executed.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "Executed"); return Executed.Value; }
+		get { Executed.RecordGet(); if (Executed.OnGet is { } onGet) return onGet(this); if (Executed._source is { } src) return src.Executed; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "Executed"); return Executed.Value; }
 	}
 
 	int global::Neatoo.Rules.IRule.RuleOrder
 	{
-		get { RuleOrder.RecordGet(); if (RuleOrder.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "RuleOrder"); return RuleOrder.Value; }
+		get { RuleOrder.RecordGet(); if (RuleOrder.OnGet is { } onGet) return onGet(this); if (RuleOrder._source is { } src) return src.RuleOrder; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "RuleOrder"); return RuleOrder.Value; }
 	}
 
 	uint global::Neatoo.Rules.IRule.UniqueIndex
 	{
-		get { UniqueIndex.RecordGet(); if (UniqueIndex.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "UniqueIndex"); return UniqueIndex.Value; }
+		get { UniqueIndex.RecordGet(); if (UniqueIndex.OnGet is { } onGet) return onGet(this); if (UniqueIndex._source is { } src) return src.UniqueIndex; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "UniqueIndex"); return UniqueIndex.Value; }
 	}
 
 	global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.IRuleMessage> global::Neatoo.Rules.IRule.Messages
 	{
-		get { Messages.RecordGet(); if (Messages.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "Messages"); return Messages.Value; }
+		get { Messages.RecordGet(); if (Messages.OnGet is { } onGet) return onGet(this); if (Messages._source is { } src) return src.Messages; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "Messages"); return Messages.Value; }
 	}
 
 	global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.ITriggerProperty> global::Neatoo.Rules.IRule.TriggerProperties
 	{
-		get { TriggerProperties.RecordGet(); if (TriggerProperties.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "TriggerProperties"); return TriggerProperties.Value; }
+		get { TriggerProperties.RecordGet(); if (TriggerProperties.OnGet is { } onGet) return onGet(this); if (TriggerProperties._source is { } src) return src.TriggerProperties; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "TriggerProperties"); return TriggerProperties.Value; }
 	}
 
 	global::System.Threading.Tasks.Task<global::Neatoo.Rules.IRuleMessages> global::Neatoo.Rules.IRule.RunRule(global::Neatoo.IValidateBase target, global::System.Threading.CancellationToken? token)

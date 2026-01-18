@@ -23,6 +23,9 @@ partial class RuleManagerStubForRule : global::Neatoo.Rules.IRuleManager, global
 	/// <summary>Tracks and configures behavior for Rules.</summary>
 	public sealed class RulesInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.Rules.IRuleManager? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -36,12 +39,15 @@ partial class RuleManagerStubForRule : global::Neatoo.Rules.IRuleManager, global
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for RunRules.</summary>
 	public sealed class RunRulesInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::Neatoo.Rules.IRuleManager? _source;
+
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for RunRules(string, global::System.Threading.CancellationToken?).</summary>
@@ -108,6 +114,7 @@ partial class RuleManagerStubForRule : global::Neatoo.Rules.IRuleManager, global
 			if (_sequence_String_Threading_CancellationToken_Threading_Tasks_Task.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.RunRules(propertyName, token);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -132,6 +139,7 @@ partial class RuleManagerStubForRule : global::Neatoo.Rules.IRuleManager, global
 			if (_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.RunRules(runRules, token);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -154,6 +162,7 @@ partial class RuleManagerStubForRule : global::Neatoo.Rules.IRuleManager, global
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence_String_Threading_CancellationToken_Threading_Tasks_Task)
 				tracking.Reset();
 			_sequenceIndex_String_Threading_CancellationToken_Threading_Tasks_Task = 0;
@@ -319,6 +328,9 @@ partial class RuleManagerStubForRule : global::Neatoo.Rules.IRuleManager, global
 	/// <summary>Tracks and configures behavior for RunRule.</summary>
 	public sealed class RunRuleInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::Neatoo.Rules.IRuleManager? _source;
+
 		/// <summary>Delegate for RunRule.</summary>
 		public delegate global::System.Threading.Tasks.Task RunRuleDelegate(RuleManagerStubForRule ko, global::Neatoo.Rules.IRule r, global::System.Threading.CancellationToken? token);
 
@@ -364,6 +376,7 @@ partial class RuleManagerStubForRule : global::Neatoo.Rules.IRuleManager, global
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((r, token));
+				if (_source is { } src) return src.RunRule(r, token);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RunRule");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -387,6 +400,7 @@ partial class RuleManagerStubForRule : global::Neatoo.Rules.IRuleManager, global
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -721,9 +735,20 @@ partial class RuleManagerStubForRule : global::Neatoo.Rules.IRuleManager, global
 			$"Set the handler's OnCall.");
 	}
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::Neatoo.Rules.IRuleManager).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::Neatoo.Rules.IRuleManager? source)
+	{
+		Rules._source = source;
+		RunRules._source = source;
+		RunRule._source = source;
+	}
+
 	global::System.Collections.Generic.IEnumerable<global::Neatoo.Rules.IRule> global::Neatoo.Rules.IRuleManager.Rules
 	{
-		get { Rules.RecordGet(); if (Rules.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleManager", "Rules"); return Rules.Value; }
+		get { Rules.RecordGet(); if (Rules.OnGet is { } onGet) return onGet(this); if (Rules._source is { } src) return src.Rules; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleManager", "Rules"); return Rules.Value; }
 	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.Rules.IRuleManager.RunRules(string propertyName, global::System.Threading.CancellationToken? token)

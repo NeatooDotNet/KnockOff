@@ -8,6 +8,9 @@ partial class TriggerPropertyOfTStub : global::Neatoo.Rules.ITriggerProperty<glo
 	/// <summary>Tracks and configures behavior for PropertyName.</summary>
 	public sealed class PropertyNameInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.Rules.ITriggerProperty? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -21,12 +24,15 @@ partial class TriggerPropertyOfTStub : global::Neatoo.Rules.ITriggerProperty<glo
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for GetValue.</summary>
 	public sealed class GetValueInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::Neatoo.Rules.ITriggerProperty<global::Neatoo.IValidateBase>? _source;
+
 		/// <summary>Delegate for GetValue.</summary>
 		public delegate object? GetValueDelegate(TriggerPropertyOfTStub ko, global::Neatoo.IValidateBase target);
 
@@ -72,6 +78,7 @@ partial class TriggerPropertyOfTStub : global::Neatoo.Rules.ITriggerProperty<glo
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = target;
+				if (_source is { } src) return src.GetValue(target);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetValue");
 				return default!;
 			}
@@ -95,6 +102,7 @@ partial class TriggerPropertyOfTStub : global::Neatoo.Rules.ITriggerProperty<glo
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -184,6 +192,9 @@ partial class TriggerPropertyOfTStub : global::Neatoo.Rules.ITriggerProperty<glo
 	/// <summary>Tracks and configures behavior for IsMatch.</summary>
 	public sealed class IsMatchInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::Neatoo.Rules.ITriggerProperty? _source;
+
 		/// <summary>Delegate for IsMatch.</summary>
 		public delegate bool IsMatchDelegate(TriggerPropertyOfTStub ko, string propertyName);
 
@@ -229,6 +240,7 @@ partial class TriggerPropertyOfTStub : global::Neatoo.Rules.ITriggerProperty<glo
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = propertyName;
+				if (_source is { } src) return src.IsMatch(propertyName);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsMatch");
 				return default!;
 			}
@@ -252,6 +264,7 @@ partial class TriggerPropertyOfTStub : global::Neatoo.Rules.ITriggerProperty<glo
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -369,9 +382,29 @@ partial class TriggerPropertyOfTStub : global::Neatoo.Rules.ITriggerProperty<glo
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
 	}
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::Neatoo.Rules.ITriggerProperty<global::Neatoo.IValidateBase>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::Neatoo.Rules.ITriggerProperty<global::Neatoo.IValidateBase>? source)
+	{
+		PropertyName._source = source;
+		GetValue._source = source;
+		IsMatch._source = source;
+	}
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::Neatoo.Rules.ITriggerProperty).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::Neatoo.Rules.ITriggerProperty? source)
+	{
+		PropertyName._source = source;
+		GetValue._source = null;
+		IsMatch._source = source;
+	}
+
 	string global::Neatoo.Rules.ITriggerProperty.PropertyName
 	{
-		get { PropertyName.RecordGet(); if (PropertyName.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ITriggerProperty", "PropertyName"); return PropertyName.Value; }
+		get { PropertyName.RecordGet(); if (PropertyName.OnGet is { } onGet) return onGet(this); if (PropertyName._source is { } src) return src.PropertyName; if (Strict) throw global::KnockOff.StubException.NotConfigured("ITriggerProperty", "PropertyName"); return PropertyName.Value; }
 	}
 
 	object? global::Neatoo.Rules.ITriggerProperty<global::Neatoo.IValidateBase>.GetValue(global::Neatoo.IValidateBase target)

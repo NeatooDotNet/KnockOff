@@ -27,4 +27,6 @@ internal sealed record InlinePropertyModel(
     /// <summary>Type parameter list for open generic interfaces.</summary>
     string TypeParameterList,
     /// <summary>Constraint clauses for type parameters.</summary>
-    string ConstraintClauses);
+    string ConstraintClauses,
+    /// <summary>The declaring interface type for Source(T) feature.</summary>
+    string DeclaringInterface);

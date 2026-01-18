@@ -11,6 +11,9 @@ partial class SkPartialPropertyTests
 		/// <summary>Tracks and configures behavior for GetUser.</summary>
 		public sealed class ISkInlineUserService_GetUserInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Skills.ISkInlineUserService? _source;
+
 			/// <summary>Delegate for GetUser.</summary>
 			public delegate global::KnockOff.Documentation.Samples.Skills.SkUser? GetUserDelegate(Stubs.ISkInlineUserService ko, int id);
 
@@ -56,6 +59,7 @@ partial class SkPartialPropertyTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = id;
+					if (_source is { } src) return src.GetUser(id);
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetUser");
 					return default!;
 				}
@@ -79,6 +83,7 @@ partial class SkPartialPropertyTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -187,6 +192,12 @@ partial class SkPartialPropertyTests
 			public ISkInlineUserService(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::KnockOff.Documentation.Samples.Skills.ISkInlineUserService delegation.</summary>
+			public void Source(global::KnockOff.Documentation.Samples.Skills.ISkInlineUserService? source)
+			{
+				GetUser._source = source;
 			}
 
 		}

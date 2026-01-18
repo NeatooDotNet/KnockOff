@@ -8,6 +8,9 @@ partial class ConfigServiceStub : global::KnockOff.Documentation.Samples.ReadMe.
 	/// <summary>Tracks and configures behavior for ConnectionString.</summary>
 	public sealed class ConnectionStringInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.ReadMe.IConfigService? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -21,12 +24,15 @@ partial class ConfigServiceStub : global::KnockOff.Documentation.Samples.ReadMe.
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for LogLevel.</summary>
 	public sealed class LogLevelInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.ReadMe.IConfigService? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -52,7 +58,7 @@ partial class ConfigServiceStub : global::KnockOff.Documentation.Samples.ReadMe.
 		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Interceptor for ConnectionString. Configure via .Value, track via .GetCount.</summary>
@@ -67,15 +73,25 @@ partial class ConfigServiceStub : global::KnockOff.Documentation.Samples.ReadMe.
 	/// <summary>The global::KnockOff.Documentation.Samples.ReadMe.IConfigService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.ReadMe.IConfigService Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.ReadMe.IConfigService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.ReadMe.IConfigService? source)
+	{
+		ConnectionString._source = source;
+		LogLevel._source = source;
+	}
+
 	string global::KnockOff.Documentation.Samples.ReadMe.IConfigService.ConnectionString
 	{
-		get { ConnectionString.RecordGet(); if (ConnectionString.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IConfigService", "ConnectionString"); return ConnectionString.Value; }
+		get { ConnectionString.RecordGet(); if (ConnectionString.OnGet is { } onGet) return onGet(this); if (ConnectionString._source is { } src) return src.ConnectionString; if (Strict) throw global::KnockOff.StubException.NotConfigured("IConfigService", "ConnectionString"); return ConnectionString.Value; }
 	}
 
 	string global::KnockOff.Documentation.Samples.ReadMe.IConfigService.LogLevel
 	{
-		get { LogLevel.RecordGet(); if (LogLevel.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IConfigService", "LogLevel"); return LogLevel.Value; }
-		set { LogLevel.RecordSet(value); if (LogLevel.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IConfigService", "LogLevel"); LogLevel.Value = value; }
+		get { LogLevel.RecordGet(); if (LogLevel.OnGet is { } onGet) return onGet(this); if (LogLevel._source is { } src) return src.LogLevel; if (Strict) throw global::KnockOff.StubException.NotConfigured("IConfigService", "LogLevel"); return LogLevel.Value; }
+		set { LogLevel.RecordSet(value); if (LogLevel.OnSet is { } onSet) { onSet(this, value); return; } if (LogLevel._source is { } src) { src.LogLevel = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IConfigService", "LogLevel"); LogLevel.Value = value; }
 	}
 
 }

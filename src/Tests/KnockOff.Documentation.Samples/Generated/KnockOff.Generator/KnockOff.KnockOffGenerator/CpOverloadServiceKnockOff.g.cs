@@ -8,6 +8,9 @@ partial class CpOverloadServiceKnockOff : global::KnockOff.Documentation.Samples
 	/// <summary>Tracks and configures behavior for Process.</summary>
 	public sealed class ProcessInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.ICpOverloadService? _source;
+
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for Process(string).</summary>
@@ -74,6 +77,7 @@ partial class CpOverloadServiceKnockOff : global::KnockOff.Documentation.Samples
 			if (_sequence_String_void.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) { src.Process(data); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return;
 			}
@@ -98,6 +102,7 @@ partial class CpOverloadServiceKnockOff : global::KnockOff.Documentation.Samples
 			if (_sequence_String_Int32_void.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) { src.Process(data, priority); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return;
 			}
@@ -120,6 +125,7 @@ partial class CpOverloadServiceKnockOff : global::KnockOff.Documentation.Samples
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence_String_void)
 				tracking.Reset();
 			_sequenceIndex_String_void = 0;
@@ -285,6 +291,9 @@ partial class CpOverloadServiceKnockOff : global::KnockOff.Documentation.Samples
 	/// <summary>Tracks and configures behavior for Calculate.</summary>
 	public sealed class CalculateInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.ICpOverloadService? _source;
+
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for Calculate(int).</summary>
@@ -351,6 +360,7 @@ partial class CpOverloadServiceKnockOff : global::KnockOff.Documentation.Samples
 			if (_sequence_Int32_Int32.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.Calculate(@value);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Calculate");
 				return default!;
 			}
@@ -375,6 +385,7 @@ partial class CpOverloadServiceKnockOff : global::KnockOff.Documentation.Samples
 			if (_sequence_Int32_Int32_Int32.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.Calculate(a, b);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Calculate");
 				return default!;
 			}
@@ -397,6 +408,7 @@ partial class CpOverloadServiceKnockOff : global::KnockOff.Documentation.Samples
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence_Int32_Int32)
 				tracking.Reset();
 			_sequenceIndex_Int32_Int32 = 0;
@@ -585,6 +597,16 @@ partial class CpOverloadServiceKnockOff : global::KnockOff.Documentation.Samples
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Skills.ICpOverloadService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Skills.ICpOverloadService? source)
+	{
+		Process._source = source;
+		Calculate._source = source;
 	}
 
 	void global::KnockOff.Documentation.Samples.Skills.ICpOverloadService.Process(string data)

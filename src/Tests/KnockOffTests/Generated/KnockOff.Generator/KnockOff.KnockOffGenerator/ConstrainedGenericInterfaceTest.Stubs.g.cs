@@ -11,6 +11,9 @@ partial class ConstrainedGenericInterfaceTest
 		/// <summary>Tracks and configures behavior for Add.</summary>
 		public sealed class IClassRepository_AddInterceptor<T> where T : class
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Tests.IClassRepository<T>? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IClassRepository<T>, T> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -53,6 +56,9 @@ partial class ConstrainedGenericInterfaceTest
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = item;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.Add(item); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 					return;
 				}
@@ -76,6 +82,7 @@ partial class ConstrainedGenericInterfaceTest
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -165,6 +172,9 @@ partial class ConstrainedGenericInterfaceTest
 		/// <summary>Tracks and configures behavior for Find.</summary>
 		public sealed class IClassRepository_FindInterceptor<T> where T : class
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Tests.IClassRepository<T>? _source;
+
 			/// <summary>Delegate for Find.</summary>
 			public delegate T? FindDelegate(Stubs.IClassRepository<T> ko, int id);
 
@@ -210,6 +220,9 @@ partial class ConstrainedGenericInterfaceTest
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = id;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.Find(id);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Find");
 					return default!;
 				}
@@ -233,6 +246,7 @@ partial class ConstrainedGenericInterfaceTest
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -349,6 +363,13 @@ partial class ConstrainedGenericInterfaceTest
 			public IClassRepository(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::KnockOff.Tests.IClassRepository<T> delegation.</summary>
+			public void Source(global::KnockOff.Tests.IClassRepository<T>? source)
+			{
+				Add._source = source;
+				Find._source = source;
 			}
 
 		}

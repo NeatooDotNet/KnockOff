@@ -10,6 +10,9 @@ partial class BpServiceKnockOff : global::KnockOff.Documentation.Samples.Guides.
 	/// <summary>Tracks and configures behavior for DoWork.</summary>
 	public sealed class DoWorkInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IBpService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<BpServiceKnockOff> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -47,6 +50,7 @@ partial class BpServiceKnockOff : global::KnockOff.Documentation.Samples.Guides.
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) { src.DoWork(); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "DoWork");
 				return;
 			}
@@ -69,6 +73,7 @@ partial class BpServiceKnockOff : global::KnockOff.Documentation.Samples.Guides.
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -173,6 +178,15 @@ partial class BpServiceKnockOff : global::KnockOff.Documentation.Samples.Guides.
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.IBpService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.IBpService? source)
+	{
+		DoWork._source = source;
 	}
 
 	void global::KnockOff.Documentation.Samples.Guides.IBpService.DoWork()

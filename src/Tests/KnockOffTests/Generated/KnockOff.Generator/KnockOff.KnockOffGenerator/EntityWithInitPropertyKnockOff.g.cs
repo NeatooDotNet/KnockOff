@@ -30,6 +30,14 @@ partial class EntityWithInitPropertyKnockOff : global::KnockOffTests.IEntityWith
 	/// <summary>The global::KnockOffTests.IEntityWithInitProperty instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOffTests.IEntityWithInitProperty Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOffTests.IEntityWithInitProperty).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOffTests.IEntityWithInitProperty? source)
+	{
+	}
+
 	string global::KnockOffTests.IEntityWithInitProperty.Id
 	{
 		get { Id.RecordGet(); return Id.Value; }

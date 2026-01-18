@@ -8,6 +8,9 @@ partial class BpCallbackRepoKnockOff : global::KnockOff.Documentation.Samples.Gu
 	/// <summary>Tracks and configures behavior for GetById.</summary>
 	public sealed class GetByIdInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IBpCallbackRepo? _source;
+
 		/// <summary>Delegate for GetById.</summary>
 		public delegate global::KnockOff.Documentation.Samples.SampleDomain.User? GetByIdDelegate(BpCallbackRepoKnockOff ko, int id);
 
@@ -53,6 +56,7 @@ partial class BpCallbackRepoKnockOff : global::KnockOff.Documentation.Samples.Gu
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				if (_source is { } src) return src.GetById(id);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
 				return default!;
 			}
@@ -76,6 +80,7 @@ partial class BpCallbackRepoKnockOff : global::KnockOff.Documentation.Samples.Gu
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -184,6 +189,15 @@ partial class BpCallbackRepoKnockOff : global::KnockOff.Documentation.Samples.Gu
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.IBpCallbackRepo).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.IBpCallbackRepo? source)
+	{
+		GetById._source = source;
 	}
 
 	global::KnockOff.Documentation.Samples.SampleDomain.User? global::KnockOff.Documentation.Samples.Guides.IBpCallbackRepo.GetById(int id)

@@ -29,6 +29,9 @@ partial class DbConnectionStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public string Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Data.IDbConnection? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
@@ -36,7 +39,7 @@ partial class DbConnectionStubTests
 			public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDbConnection.ConnectionTimeout.</summary>
@@ -51,11 +54,14 @@ partial class DbConnectionStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public int Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Data.IDbConnection? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDbConnection.Database.</summary>
@@ -70,11 +76,14 @@ partial class DbConnectionStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public string Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Data.IDbConnection? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDbConnection.State.</summary>
@@ -89,16 +98,22 @@ partial class DbConnectionStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Data.ConnectionState Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Data.IDbConnection? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Tracks and configures behavior for BeginTransaction.</summary>
 		public sealed class IDbConnection_BeginTransactionInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDbConnection? _source;
+
 			private int _unconfiguredCallCount;
 
 			/// <summary>Delegate for BeginTransaction().</summary>
@@ -165,6 +180,9 @@ partial class DbConnectionStubTests
 				if (_sequence_NoParams_Data_IDbTransaction.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.BeginTransaction();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "BeginTransaction");
 					return default!;
 				}
@@ -189,6 +207,9 @@ partial class DbConnectionStubTests
 				if (_sequence_Data_IsolationLevel_Data_IDbTransaction.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.BeginTransaction(il);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "BeginTransaction");
 					return default!;
 				}
@@ -211,6 +232,7 @@ partial class DbConnectionStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence_NoParams_Data_IDbTransaction)
 					tracking.Reset();
 				_sequenceIndex_NoParams_Data_IDbTransaction = 0;
@@ -372,6 +394,9 @@ partial class DbConnectionStubTests
 		/// <summary>Tracks and configures behavior for ChangeDatabase.</summary>
 		public sealed class IDbConnection_ChangeDatabaseInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDbConnection? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IDbConnection, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -414,6 +439,9 @@ partial class DbConnectionStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = databaseName;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.ChangeDatabase(databaseName); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ChangeDatabase");
 					return;
 				}
@@ -437,6 +465,7 @@ partial class DbConnectionStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -526,6 +555,9 @@ partial class DbConnectionStubTests
 		/// <summary>Tracks and configures behavior for Close.</summary>
 		public sealed class IDbConnection_CloseInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDbConnection? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IDbConnection> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -563,6 +595,9 @@ partial class DbConnectionStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.Close(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Close");
 					return;
 				}
@@ -585,6 +620,7 @@ partial class DbConnectionStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -670,6 +706,9 @@ partial class DbConnectionStubTests
 		/// <summary>Tracks and configures behavior for CreateCommand.</summary>
 		public sealed class IDbConnection_CreateCommandInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDbConnection? _source;
+
 			/// <summary>Delegate for CreateCommand.</summary>
 			public delegate global::System.Data.IDbCommand CreateCommandDelegate(Stubs.IDbConnection ko);
 
@@ -710,6 +749,9 @@ partial class DbConnectionStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.CreateCommand();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "CreateCommand");
 					return default!;
 				}
@@ -732,6 +774,7 @@ partial class DbConnectionStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -817,6 +860,9 @@ partial class DbConnectionStubTests
 		/// <summary>Tracks and configures behavior for Open.</summary>
 		public sealed class IDbConnection_OpenInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDbConnection? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IDbConnection> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -854,6 +900,9 @@ partial class DbConnectionStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.Open(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Open");
 					return;
 				}
@@ -876,6 +925,7 @@ partial class DbConnectionStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -961,6 +1011,9 @@ partial class DbConnectionStubTests
 		/// <summary>Tracks and configures behavior for Dispose.</summary>
 		public sealed class IDbConnection_DisposeInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IDisposable? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IDbConnection> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -998,6 +1051,9 @@ partial class DbConnectionStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.Dispose(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Dispose");
 					return;
 				}
@@ -1020,6 +1076,7 @@ partial class DbConnectionStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1171,6 +1228,7 @@ partial class DbConnectionStubTests
 				{
 					ConnectionString.RecordGet();
 					if (ConnectionString.OnGet is { } onGet) return onGet(this);
+					if (ConnectionString._source is { } src) return src.ConnectionString;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbConnection", "ConnectionString");
 					return ConnectionString.Value;
 				}
@@ -1179,6 +1237,7 @@ partial class DbConnectionStubTests
 				{
 					ConnectionString.RecordSet(value);
 					if (ConnectionString.OnSet is { } onSet) { onSet(this, value); return; }
+					if (ConnectionString._source is { } src) { src.ConnectionString = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbConnection", "ConnectionString");
 					ConnectionString.Value = value;
 				}
@@ -1192,6 +1251,7 @@ partial class DbConnectionStubTests
 				{
 					ConnectionTimeout.RecordGet();
 					if (ConnectionTimeout.OnGet is { } onGet) return onGet(this);
+					if (ConnectionTimeout._source is { } src) return src.ConnectionTimeout;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbConnection", "ConnectionTimeout");
 					return ConnectionTimeout.Value;
 				}
@@ -1203,6 +1263,7 @@ partial class DbConnectionStubTests
 				{
 					Database.RecordGet();
 					if (Database.OnGet is { } onGet) return onGet(this);
+					if (Database._source is { } src) return src.Database;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbConnection", "Database");
 					return Database.Value;
 				}
@@ -1214,6 +1275,7 @@ partial class DbConnectionStubTests
 				{
 					State.RecordGet();
 					if (State.OnGet is { } onGet) return onGet(this);
+					if (State._source is { } src) return src.State;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbConnection", "State");
 					return State.Value;
 				}
@@ -1235,6 +1297,36 @@ partial class DbConnectionStubTests
 			public IDbConnection(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.Data.IDbConnection delegation.</summary>
+			public void Source(global::System.Data.IDbConnection? source)
+			{
+				ConnectionString._source = source;
+				ConnectionTimeout._source = source;
+				Database._source = source;
+				State._source = source;
+				BeginTransaction._source = source;
+				ChangeDatabase._source = source;
+				Close._source = source;
+				CreateCommand._source = source;
+				Open._source = source;
+				Dispose._source = source;
+			}
+
+			/// <summary>Sets the source object for global::System.IDisposable delegation.</summary>
+			public void Source(global::System.IDisposable? source)
+			{
+				ConnectionString._source = null;
+				ConnectionTimeout._source = null;
+				Database._source = null;
+				State._source = null;
+				BeginTransaction._source = null;
+				ChangeDatabase._source = null;
+				Close._source = null;
+				CreateCommand._source = null;
+				Open._source = null;
+				Dispose._source = source;
 			}
 
 		}

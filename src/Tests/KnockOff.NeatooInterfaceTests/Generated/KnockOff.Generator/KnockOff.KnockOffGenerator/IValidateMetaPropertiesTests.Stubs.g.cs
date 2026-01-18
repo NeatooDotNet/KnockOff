@@ -20,11 +20,14 @@ partial class IValidateMetaPropertiesTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.IValidateMetaProperties? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IValidateMetaProperties.IsValid.</summary>
@@ -39,11 +42,14 @@ partial class IValidateMetaPropertiesTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.IValidateMetaProperties? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IValidateMetaProperties.IsSelfValid.</summary>
@@ -58,11 +64,14 @@ partial class IValidateMetaPropertiesTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.IValidateMetaProperties? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IValidateMetaProperties.PropertyMessages.</summary>
@@ -77,16 +86,22 @@ partial class IValidateMetaPropertiesTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.IValidateMetaProperties? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Tracks and configures behavior for WaitForTasks.</summary>
 		public sealed class IValidateMetaProperties_WaitForTasksInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::Neatoo.IValidateMetaProperties? _source;
+
 			private int _unconfiguredCallCount;
 
 			/// <summary>Delegate for WaitForTasks().</summary>
@@ -153,6 +168,7 @@ partial class IValidateMetaPropertiesTests
 				if (_sequence_NoParams_Threading_Tasks_Task.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					if (_source is { } src) return src.WaitForTasks();
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "WaitForTasks");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
@@ -177,6 +193,7 @@ partial class IValidateMetaPropertiesTests
 				if (_sequence_Threading_CancellationToken_Threading_Tasks_Task.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					if (_source is { } src) return src.WaitForTasks(token);
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "WaitForTasks");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
@@ -199,6 +216,7 @@ partial class IValidateMetaPropertiesTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence_NoParams_Threading_Tasks_Task)
 					tracking.Reset();
 				_sequenceIndex_NoParams_Threading_Tasks_Task = 0;
@@ -360,6 +378,9 @@ partial class IValidateMetaPropertiesTests
 		/// <summary>Tracks and configures behavior for RunRules.</summary>
 		public sealed class IValidateMetaProperties_RunRulesInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::Neatoo.IValidateMetaProperties? _source;
+
 			private int _unconfiguredCallCount;
 
 			/// <summary>Delegate for RunRules(string, global::System.Threading.CancellationToken?).</summary>
@@ -426,6 +447,7 @@ partial class IValidateMetaPropertiesTests
 				if (_sequence_String_Threading_CancellationToken_Threading_Tasks_Task.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					if (_source is { } src) return src.RunRules(propertyName, token);
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
@@ -450,6 +472,7 @@ partial class IValidateMetaPropertiesTests
 				if (_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					if (_source is { } src) return src.RunRules(runRules, token);
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
@@ -472,6 +495,7 @@ partial class IValidateMetaPropertiesTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence_String_Threading_CancellationToken_Threading_Tasks_Task)
 					tracking.Reset();
 				_sequenceIndex_String_Threading_CancellationToken_Threading_Tasks_Task = 0;
@@ -637,6 +661,9 @@ partial class IValidateMetaPropertiesTests
 		/// <summary>Tracks and configures behavior for ClearAllMessages.</summary>
 		public sealed class IValidateMetaProperties_ClearAllMessagesInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::Neatoo.IValidateMetaProperties? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IValidateMetaProperties> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -674,6 +701,7 @@ partial class IValidateMetaPropertiesTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					if (_source is { } src) { src.ClearAllMessages(); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ClearAllMessages");
 					return;
 				}
@@ -696,6 +724,7 @@ partial class IValidateMetaPropertiesTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -781,6 +810,9 @@ partial class IValidateMetaPropertiesTests
 		/// <summary>Tracks and configures behavior for ClearSelfMessages.</summary>
 		public sealed class IValidateMetaProperties_ClearSelfMessagesInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::Neatoo.IValidateMetaProperties? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IValidateMetaProperties> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -818,6 +850,7 @@ partial class IValidateMetaPropertiesTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					if (_source is { } src) { src.ClearSelfMessages(); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ClearSelfMessages");
 					return;
 				}
@@ -840,6 +873,7 @@ partial class IValidateMetaPropertiesTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -985,6 +1019,7 @@ partial class IValidateMetaPropertiesTests
 				{
 					IsBusy.RecordGet();
 					if (IsBusy.OnGet is { } onGet) return onGet(this);
+					if (IsBusy._source is { } src) return src.IsBusy;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsBusy");
 					return IsBusy.Value;
 				}
@@ -996,6 +1031,7 @@ partial class IValidateMetaPropertiesTests
 				{
 					IsValid.RecordGet();
 					if (IsValid.OnGet is { } onGet) return onGet(this);
+					if (IsValid._source is { } src) return src.IsValid;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsValid");
 					return IsValid.Value;
 				}
@@ -1007,6 +1043,7 @@ partial class IValidateMetaPropertiesTests
 				{
 					IsSelfValid.RecordGet();
 					if (IsSelfValid.OnGet is { } onGet) return onGet(this);
+					if (IsSelfValid._source is { } src) return src.IsSelfValid;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsSelfValid");
 					return IsSelfValid.Value;
 				}
@@ -1018,6 +1055,7 @@ partial class IValidateMetaPropertiesTests
 				{
 					PropertyMessages.RecordGet();
 					if (PropertyMessages.OnGet is { } onGet) return onGet(this);
+					if (PropertyMessages._source is { } src) return src.PropertyMessages;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "PropertyMessages");
 					return PropertyMessages.Value;
 				}
@@ -1034,6 +1072,19 @@ partial class IValidateMetaPropertiesTests
 			public IValidateMetaProperties(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::Neatoo.IValidateMetaProperties delegation.</summary>
+			public void Source(global::Neatoo.IValidateMetaProperties? source)
+			{
+				IsBusy._source = source;
+				IsValid._source = source;
+				IsSelfValid._source = source;
+				PropertyMessages._source = source;
+				WaitForTasks._source = source;
+				RunRules._source = source;
+				ClearAllMessages._source = source;
+				ClearSelfMessages._source = source;
 			}
 
 		}
@@ -1059,6 +1110,9 @@ partial class IValidateMetaPropertiesTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::Neatoo.IValidateProperty Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.IPropertyMessage? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
@@ -1066,7 +1120,7 @@ partial class IValidateMetaPropertiesTests
 			public void RecordSet(global::Neatoo.IValidateProperty? value) { SetCount++; LastSetValue = value; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IPropertyMessage.Message.</summary>
@@ -1090,6 +1144,9 @@ partial class IValidateMetaPropertiesTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public string Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.IPropertyMessage? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
@@ -1097,7 +1154,7 @@ partial class IValidateMetaPropertiesTests
 			public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Stub implementation of global::Neatoo.IPropertyMessage.</summary>
@@ -1115,6 +1172,7 @@ partial class IValidateMetaPropertiesTests
 				{
 					Property.RecordGet();
 					if (Property.OnGet is { } onGet) return onGet(this);
+					if (Property._source is { } src) return src.Property;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyMessage", "Property");
 					return Property.Value;
 				}
@@ -1122,6 +1180,7 @@ partial class IValidateMetaPropertiesTests
 				{
 					Property.RecordSet(value);
 					if (Property.OnSet is { } onSet) { onSet(this, value); return; }
+					if (Property._source is { } src) { src.Property = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyMessage", "Property");
 					Property.Value = value;
 				}
@@ -1133,6 +1192,7 @@ partial class IValidateMetaPropertiesTests
 				{
 					Message.RecordGet();
 					if (Message.OnGet is { } onGet) return onGet(this);
+					if (Message._source is { } src) return src.Message;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyMessage", "Message");
 					return Message.Value;
 				}
@@ -1140,6 +1200,7 @@ partial class IValidateMetaPropertiesTests
 				{
 					Message.RecordSet(value);
 					if (Message.OnSet is { } onSet) { onSet(this, value); return; }
+					if (Message._source is { } src) { src.Message = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyMessage", "Message");
 					Message.Value = value;
 				}
@@ -1156,6 +1217,13 @@ partial class IValidateMetaPropertiesTests
 			public IPropertyMessage(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::Neatoo.IPropertyMessage delegation.</summary>
+			public void Source(global::Neatoo.IPropertyMessage? source)
+			{
+				Property._source = source;
+				Message._source = source;
 			}
 
 		}

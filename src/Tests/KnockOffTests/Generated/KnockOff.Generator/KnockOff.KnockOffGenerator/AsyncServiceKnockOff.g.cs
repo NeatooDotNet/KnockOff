@@ -8,6 +8,9 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 	/// <summary>Tracks and configures behavior for DoWorkAsync.</summary>
 	public sealed class DoWorkAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.IAsyncService? _source;
+
 		/// <summary>Delegate for DoWorkAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task DoWorkAsyncDelegate(AsyncServiceKnockOff ko);
 
@@ -48,6 +51,9 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.DoWorkAsync();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "DoWorkAsync");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -70,6 +76,7 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -155,6 +162,9 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 	/// <summary>Tracks and configures behavior for GetOptionalAsync.</summary>
 	public sealed class GetOptionalAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.IAsyncService? _source;
+
 		/// <summary>Delegate for GetOptionalAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<string?> GetOptionalAsyncDelegate(AsyncServiceKnockOff ko);
 
@@ -195,6 +205,9 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetOptionalAsync();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetOptionalAsync");
 				return global::System.Threading.Tasks.Task.FromResult<string?>(default!);
 			}
@@ -217,6 +230,7 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -302,6 +316,9 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 	/// <summary>Tracks and configures behavior for GetRequiredAsync.</summary>
 	public sealed class GetRequiredAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.IAsyncService? _source;
+
 		/// <summary>Delegate for GetRequiredAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<string> GetRequiredAsyncDelegate(AsyncServiceKnockOff ko);
 
@@ -342,6 +359,9 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetRequiredAsync();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetRequiredAsync");
 				throw new global::System.InvalidOperationException("No implementation provided for GetRequiredAsync. Configure via OnCall.");
 			}
@@ -364,6 +384,7 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -449,6 +470,9 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 	/// <summary>Tracks and configures behavior for DoWorkValueTaskAsync.</summary>
 	public sealed class DoWorkValueTaskAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.IAsyncService? _source;
+
 		/// <summary>Delegate for DoWorkValueTaskAsync.</summary>
 		public delegate global::System.Threading.Tasks.ValueTask DoWorkValueTaskAsyncDelegate(AsyncServiceKnockOff ko);
 
@@ -489,6 +513,9 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.DoWorkValueTaskAsync();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "DoWorkValueTaskAsync");
 				return default;
 			}
@@ -511,6 +538,7 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -675,6 +703,18 @@ partial class AsyncServiceKnockOff : global::KnockOff.Tests.IAsyncService, globa
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Tests.IAsyncService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Tests.IAsyncService? source)
+	{
+		DoWorkAsync._source = source;
+		GetOptionalAsync._source = source;
+		GetRequiredAsync._source = source;
+		DoWorkValueTaskAsync._source = source;
 	}
 
 	global::System.Threading.Tasks.Task global::KnockOff.Tests.IAsyncService.DoWorkAsync()

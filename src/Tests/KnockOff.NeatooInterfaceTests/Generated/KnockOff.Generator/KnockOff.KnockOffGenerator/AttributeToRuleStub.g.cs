@@ -116,6 +116,14 @@ partial class AttributeToRuleStub : global::Neatoo.Rules.Rules.IAttributeToRule,
 			$"Set the handler's OnCall.");
 	}
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::Neatoo.Rules.Rules.IAttributeToRule).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::Neatoo.Rules.Rules.IAttributeToRule? source)
+	{
+	}
+
 	global::Neatoo.Rules.IRule? global::Neatoo.Rules.Rules.IAttributeToRule.GetRule<T>(global::Neatoo.IPropertyInfo r, object? attribute) where T : class
 	{
 		GetRule.Of<T>().RecordCall(r, attribute);

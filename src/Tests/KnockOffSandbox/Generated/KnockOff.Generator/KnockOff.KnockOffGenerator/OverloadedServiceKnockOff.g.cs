@@ -8,6 +8,9 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Sandbox.IOverloadedSe
 	/// <summary>Tracks and configures behavior for Format.</summary>
 	public sealed class FormatInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Sandbox.IOverloadedService? _source;
+
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for Format(string).</summary>
@@ -100,6 +103,7 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Sandbox.IOverloadedSe
 			if (_sequence_String_String.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.Format(input);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Format");
 				throw new global::System.InvalidOperationException("No implementation provided for Format. Configure via OnCall.");
 			}
@@ -124,6 +128,7 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Sandbox.IOverloadedSe
 			if (_sequence_String_Boolean_String.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.Format(input, uppercase);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Format");
 				throw new global::System.InvalidOperationException("No implementation provided for Format. Configure via OnCall.");
 			}
@@ -148,6 +153,7 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Sandbox.IOverloadedSe
 			if (_sequence_String_Int32_String.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.Format(input, maxLength);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Format");
 				throw new global::System.InvalidOperationException("No implementation provided for Format. Configure via OnCall.");
 			}
@@ -170,6 +176,7 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Sandbox.IOverloadedSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence_String_String)
 				tracking.Reset();
 			_sequenceIndex_String_String = 0;
@@ -430,6 +437,15 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Sandbox.IOverloadedSe
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Sandbox.IOverloadedService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Sandbox.IOverloadedService? source)
+	{
+		Format._source = source;
 	}
 
 	string global::KnockOff.Sandbox.IOverloadedService.Format(string input)

@@ -11,6 +11,9 @@ partial class EnumerableStubTests
 		/// <summary>Tracks and configures behavior for GetEnumerator.</summary>
 		public sealed class IEnumerable_GetEnumeratorInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.IEnumerable? _source;
+
 			/// <summary>Delegate for GetEnumerator.</summary>
 			public delegate global::System.Collections.IEnumerator GetEnumeratorDelegate(Stubs.IEnumerable ko);
 
@@ -51,6 +54,9 @@ partial class EnumerableStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetEnumerator();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
 					throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
 				}
@@ -73,6 +79,7 @@ partial class EnumerableStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -177,6 +184,12 @@ partial class EnumerableStubTests
 			public IEnumerable(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.IEnumerable delegation.</summary>
+			public void Source(global::System.Collections.IEnumerable? source)
+			{
+				GetEnumerator._source = source;
 			}
 
 		}

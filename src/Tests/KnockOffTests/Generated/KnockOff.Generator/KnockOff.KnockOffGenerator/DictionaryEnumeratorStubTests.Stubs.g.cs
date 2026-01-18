@@ -20,11 +20,14 @@ partial class DictionaryEnumeratorStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Collections.DictionaryEntry Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Collections.IDictionaryEnumerator? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDictionaryEnumerator.Key.</summary>
@@ -39,11 +42,14 @@ partial class DictionaryEnumeratorStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public object Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Collections.IDictionaryEnumerator? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDictionaryEnumerator.Value.</summary>
@@ -58,11 +64,14 @@ partial class DictionaryEnumeratorStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public object? Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Collections.IDictionaryEnumerator? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDictionaryEnumerator.Current.</summary>
@@ -77,16 +86,22 @@ partial class DictionaryEnumeratorStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public object Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Collections.IEnumerator? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Tracks and configures behavior for MoveNext.</summary>
 		public sealed class IDictionaryEnumerator_MoveNextInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.IEnumerator? _source;
+
 			/// <summary>Delegate for MoveNext.</summary>
 			public delegate bool MoveNextDelegate(Stubs.IDictionaryEnumerator ko);
 
@@ -127,6 +142,9 @@ partial class DictionaryEnumeratorStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.MoveNext();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "MoveNext");
 					return default!;
 				}
@@ -149,6 +167,7 @@ partial class DictionaryEnumeratorStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -234,6 +253,9 @@ partial class DictionaryEnumeratorStubTests
 		/// <summary>Tracks and configures behavior for Reset.</summary>
 		public sealed class IDictionaryEnumerator_ResetInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.IEnumerator? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IDictionaryEnumerator> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -271,6 +293,9 @@ partial class DictionaryEnumeratorStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.Reset(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Reset");
 					return;
 				}
@@ -293,6 +318,7 @@ partial class DictionaryEnumeratorStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -402,6 +428,7 @@ partial class DictionaryEnumeratorStubTests
 				{
 					Entry.RecordGet();
 					if (Entry.OnGet is { } onGet) return onGet(this);
+					if (Entry._source is { } src) return src.Entry;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionaryEnumerator", "Entry");
 					return Entry.Value;
 				}
@@ -413,6 +440,7 @@ partial class DictionaryEnumeratorStubTests
 				{
 					Key.RecordGet();
 					if (Key.OnGet is { } onGet) return onGet(this);
+					if (Key._source is { } src) return src.Key;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionaryEnumerator", "Key");
 					return Key.Value;
 				}
@@ -424,6 +452,7 @@ partial class DictionaryEnumeratorStubTests
 				{
 					Value.RecordGet();
 					if (Value.OnGet is { } onGet) return onGet(this);
+					if (Value._source is { } src) return src.Value;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionaryEnumerator", "Value");
 					return Value.Value;
 				}
@@ -445,6 +474,7 @@ partial class DictionaryEnumeratorStubTests
 				{
 					Current.RecordGet();
 					if (Current.OnGet is { } onGet) return onGet(this);
+					if (Current._source is { } src) return src.Current;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerator", "Current");
 					return Current.Value;
 				}
@@ -461,6 +491,28 @@ partial class DictionaryEnumeratorStubTests
 			public IDictionaryEnumerator(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.IDictionaryEnumerator delegation.</summary>
+			public void Source(global::System.Collections.IDictionaryEnumerator? source)
+			{
+				Entry._source = source;
+				Key._source = source;
+				Value._source = source;
+				Current._source = source;
+				MoveNext._source = source;
+				Reset._source = source;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.IEnumerator delegation.</summary>
+			public void Source(global::System.Collections.IEnumerator? source)
+			{
+				Entry._source = null;
+				Key._source = null;
+				Value._source = null;
+				Current._source = source;
+				MoveNext._source = source;
+				Reset._source = source;
 			}
 
 		}

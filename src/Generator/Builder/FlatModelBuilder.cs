@@ -65,6 +65,9 @@ internal static class FlatModelBuilder
 			Name: ct.Name,
 			AccessModifier: ct.AccessibilityModifier)).ToEquatableArray();
 
+		// Build source providers for Source(T) methods
+		var sourceProviders = BuildSourceProviders(typeInfo.Interfaces, properties, indexers, flatIndexerGroups, methods, genericHandlers, nameMap);
+
 		return new FlatGenerationUnit(
 			ClassName: typeInfo.ClassName,
 			Namespace: typeInfo.Namespace,
@@ -78,6 +81,7 @@ internal static class FlatModelBuilder
 			MethodGroups: new EquatableArray<FlatMethodGroup>(flatMethodGroups.ToArray()),
 			GenericMethodHandlers: genericHandlers,
 			Events: events,
+			SourceProviders: sourceProviders,
 			HasGenericMethods: genericHandlers.Count > 0 || methods.Any(m => m.IsGenericMethod),
 			ImplementsIKnockOffStub: true,
 			Strict: typeInfo.Strict);
@@ -1681,6 +1685,168 @@ internal static class FlatModelBuilder
 	/// </summary>
 	private static bool NeedsNewKeyword(string interceptorName) =>
 		ObjectMemberNames.Contains(interceptorName);
+
+	#endregion
+
+	#region Source Provider Building
+
+	/// <summary>
+	/// Builds SourceProviderInfo for each interface in the hierarchy.
+	/// Each Source(T) overload sets _source for members declared on T or its bases,
+	/// and clears _source for members declared on derived interfaces.
+	/// </summary>
+	private static EquatableArray<SourceProviderInfo> BuildSourceProviders(
+		EquatableArray<InterfaceInfo> interfaces,
+		EquatableArray<FlatPropertyModel> properties,
+		EquatableArray<FlatIndexerModel> indexers,
+		List<FlatIndexerGroup> indexerGroups,
+		EquatableArray<FlatMethodModel> methods,
+		EquatableArray<FlatGenericMethodHandlerModel> genericHandlers,
+		Dictionary<string, string> nameMap)
+	{
+		// Build a map of interface full name -> set of interfaces it inherits from (including itself)
+		var interfaceHierarchy = BuildInterfaceHierarchy(interfaces);
+
+		// Build indexer access map (same logic as FlatRenderer.BuildIndexerAccessMap)
+		var indexerAccessMap = new Dictionary<string, string>();
+		foreach (var group in indexerGroups)
+		{
+			var indexerArray = group.Indexers.GetArray();
+			if (indexerArray == null) continue;
+
+			if (group.Indexers.Count == 1)
+			{
+				// Single indexer - direct access
+				indexerAccessMap[indexerArray[0].InterceptorName] = group.BaseName;
+			}
+			else
+			{
+				// Multiple indexers - container with OfXxx pattern
+				foreach (var indexer in indexerArray)
+				{
+					indexerAccessMap[indexer.InterceptorName] = $"{group.BaseName}.Of{indexer.KeyTypeFriendlyName}";
+				}
+			}
+		}
+
+		// Collect all unique interceptor names with their declaring interfaces
+		var interceptorToDeclaringInterface = new Dictionary<string, string>();
+
+		foreach (var prop in properties)
+		{
+			// Skip delegation targets - they don't have their own interceptor
+			if (prop.DelegationTarget != null)
+				continue;
+			// Skip init-only properties - they can't be delegated to source
+			if (prop.IsInitOnly)
+				continue;
+			if (!interceptorToDeclaringInterface.ContainsKey(prop.InterceptorName))
+				interceptorToDeclaringInterface[prop.InterceptorName] = prop.DeclaringInterface;
+		}
+
+		// For indexers, use the access path from indexerAccessMap
+		foreach (var indexer in indexers)
+		{
+			var accessPath = indexerAccessMap.TryGetValue(indexer.InterceptorName, out var path)
+				? path
+				: indexer.InterceptorName;
+			if (!interceptorToDeclaringInterface.ContainsKey(accessPath))
+				interceptorToDeclaringInterface[accessPath] = indexer.DeclaringInterface;
+		}
+
+		foreach (var method in methods)
+		{
+			// Skip user method implementations and delegation targets
+			if (method.UserMethodCall != null || method.DelegationTarget != null)
+				continue;
+			// Skip generic methods - they use handlers, not direct interceptors
+			if (method.IsGenericMethod)
+				continue;
+			if (!interceptorToDeclaringInterface.ContainsKey(method.InterceptorName))
+				interceptorToDeclaringInterface[method.InterceptorName] = method.DeclaringInterface;
+		}
+
+		// Note: Generic method handlers are not included in Source() - they have complex type handling
+
+		// Build source providers for each interface
+		var sourceProviders = new List<SourceProviderInfo>();
+		var allInterceptorNames = interceptorToDeclaringInterface.Keys.ToList();
+
+		foreach (var iface in interfaces)
+		{
+			var ifaceFullName = iface.FullName;
+			var inheritedInterfaces = interfaceHierarchy.TryGetValue(ifaceFullName, out var inherited)
+				? inherited
+				: new HashSet<string> { ifaceFullName };
+
+			var memberMappings = new List<SourceMemberMapping>();
+
+			foreach (var interceptorName in allInterceptorNames)
+			{
+				var declaringInterface = interceptorToDeclaringInterface[interceptorName];
+
+				// If the declaring interface is in the inherited set, set source; otherwise clear it
+				var setSource = inheritedInterfaces.Contains(declaringInterface);
+
+				// Find the source interface type for this member
+				// This is the interface where we'll call the member from
+				var sourceInterfaceType = setSource ? declaringInterface : "";
+
+				memberMappings.Add(new SourceMemberMapping(
+					InterceptorName: interceptorName,
+					SourceInterfaceType: sourceInterfaceType,
+					SetSource: setSource));
+			}
+
+			sourceProviders.Add(new SourceProviderInfo(
+				InterfaceType: ifaceFullName,
+				MethodName: "Source",
+				MemberMappings: memberMappings.ToEquatableArray()));
+		}
+
+		return sourceProviders.ToEquatableArray();
+	}
+
+	/// <summary>
+	/// Builds a map from each interface to the set of interfaces it inherits from (including itself).
+	/// This is used to determine which members are "covered" by a Source(T) call.
+	/// </summary>
+	private static Dictionary<string, HashSet<string>> BuildInterfaceHierarchy(EquatableArray<InterfaceInfo> interfaces)
+	{
+		var hierarchy = new Dictionary<string, HashSet<string>>();
+
+		foreach (var iface in interfaces)
+		{
+			var inherited = new HashSet<string> { iface.FullName };
+
+			// Recursively collect all base interfaces
+			CollectBaseInterfaces(iface.FullName, interfaces, inherited);
+
+			hierarchy[iface.FullName] = inherited;
+		}
+
+		return hierarchy;
+	}
+
+	/// <summary>
+	/// Recursively collects all base interfaces for a given interface.
+	/// </summary>
+	private static void CollectBaseInterfaces(string ifaceFullName, EquatableArray<InterfaceInfo> allInterfaces, HashSet<string> collected)
+	{
+		// Find the interface info
+		var iface = allInterfaces.FirstOrDefault(i => i.FullName == ifaceFullName);
+		if (iface == null)
+			return;
+
+		// Add all base interfaces
+		foreach (var baseIfaceName in iface.BaseInterfaces)
+		{
+			if (collected.Add(baseIfaceName))
+			{
+				CollectBaseInterfaces(baseIfaceName, allInterfaces, collected);
+			}
+		}
+	}
 
 	#endregion
 }

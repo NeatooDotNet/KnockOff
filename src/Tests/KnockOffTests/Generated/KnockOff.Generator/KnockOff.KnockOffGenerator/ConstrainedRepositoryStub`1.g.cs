@@ -8,6 +8,9 @@ partial class ConstrainedRepositoryStub<T> : global::KnockOff.Tests.IConstrained
 	/// <summary>Tracks and configures behavior for GetById.</summary>
 	public sealed class GetByIdInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.IConstrainedRepository<T>? _source;
+
 		/// <summary>Delegate for GetById.</summary>
 		public delegate T? GetByIdDelegate(ConstrainedRepositoryStub<T> ko, int id);
 
@@ -53,6 +56,9 @@ partial class ConstrainedRepositoryStub<T> : global::KnockOff.Tests.IConstrained
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetById(id);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
 				return default!;
 			}
@@ -76,6 +82,7 @@ partial class ConstrainedRepositoryStub<T> : global::KnockOff.Tests.IConstrained
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -165,6 +172,9 @@ partial class ConstrainedRepositoryStub<T> : global::KnockOff.Tests.IConstrained
 	/// <summary>Tracks and configures behavior for Save.</summary>
 	public sealed class SaveInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.IConstrainedRepository<T>? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<ConstrainedRepositoryStub<T>, T> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -207,6 +217,9 @@ partial class ConstrainedRepositoryStub<T> : global::KnockOff.Tests.IConstrained
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = entity;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.Save(entity); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 				return;
 			}
@@ -230,6 +243,7 @@ partial class ConstrainedRepositoryStub<T> : global::KnockOff.Tests.IConstrained
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -342,6 +356,16 @@ partial class ConstrainedRepositoryStub<T> : global::KnockOff.Tests.IConstrained
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Tests.IConstrainedRepository<T>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Tests.IConstrainedRepository<T>? source)
+	{
+		GetById._source = source;
+		Save._source = source;
 	}
 
 	T? global::KnockOff.Tests.IConstrainedRepository<T>.GetById(int id)

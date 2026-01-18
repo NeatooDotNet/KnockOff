@@ -8,6 +8,9 @@ partial class MigSaveServiceKnockOff : global::KnockOff.Documentation.Samples.Co
 	/// <summary>Tracks and configures behavior for Save.</summary>
 	public sealed class SaveInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Comparison.IMigSaveService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<MigSaveServiceKnockOff, global::KnockOff.Documentation.Samples.Comparison.MigEntity> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -50,6 +53,7 @@ partial class MigSaveServiceKnockOff : global::KnockOff.Documentation.Samples.Co
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = entity;
+				if (_source is { } src) { src.Save(entity); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 				return;
 			}
@@ -73,6 +77,7 @@ partial class MigSaveServiceKnockOff : global::KnockOff.Documentation.Samples.Co
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -181,6 +186,15 @@ partial class MigSaveServiceKnockOff : global::KnockOff.Documentation.Samples.Co
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Comparison.IMigSaveService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Comparison.IMigSaveService? source)
+	{
+		Save._source = source;
 	}
 
 	void global::KnockOff.Documentation.Samples.Comparison.IMigSaveService.Save(global::KnockOff.Documentation.Samples.Comparison.MigEntity entity)

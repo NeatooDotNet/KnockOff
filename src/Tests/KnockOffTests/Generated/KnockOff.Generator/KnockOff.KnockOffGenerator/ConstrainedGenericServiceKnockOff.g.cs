@@ -178,6 +178,14 @@ partial class ConstrainedGenericServiceKnockOff : global::KnockOff.Tests.IConstr
 			$"Set the handler's OnCall.");
 	}
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Tests.IConstrainedGenericService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Tests.IConstrainedGenericService? source)
+	{
+	}
+
 	T global::KnockOff.Tests.IConstrainedGenericService.CreateEntity<T>() where T : class
 	{
 		CreateEntity.Of<T>().RecordCall();

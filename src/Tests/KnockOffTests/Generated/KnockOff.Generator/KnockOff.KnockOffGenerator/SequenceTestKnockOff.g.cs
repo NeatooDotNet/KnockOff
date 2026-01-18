@@ -8,6 +8,9 @@ partial class SequenceTestKnockOff : global::KnockOff.Tests.ISequenceTestService
 	/// <summary>Tracks and configures behavior for Add.</summary>
 	public sealed class AddInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.ISequenceTestService? _source;
+
 		/// <summary>Delegate for Add.</summary>
 		public delegate int AddDelegate(SequenceTestKnockOff ko, int a, int b);
 
@@ -53,6 +56,9 @@ partial class SequenceTestKnockOff : global::KnockOff.Tests.ISequenceTestService
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((a, b));
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Add(a, b);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 				return default!;
 			}
@@ -76,6 +82,7 @@ partial class SequenceTestKnockOff : global::KnockOff.Tests.ISequenceTestService
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -165,6 +172,9 @@ partial class SequenceTestKnockOff : global::KnockOff.Tests.ISequenceTestService
 	/// <summary>Tracks and configures behavior for DoWork.</summary>
 	public sealed class DoWorkInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.ISequenceTestService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<SequenceTestKnockOff> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -202,6 +212,9 @@ partial class SequenceTestKnockOff : global::KnockOff.Tests.ISequenceTestService
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.DoWork(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "DoWork");
 				return;
 			}
@@ -224,6 +237,7 @@ partial class SequenceTestKnockOff : global::KnockOff.Tests.ISequenceTestService
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -309,6 +323,9 @@ partial class SequenceTestKnockOff : global::KnockOff.Tests.ISequenceTestService
 	/// <summary>Tracks and configures behavior for GetMessage.</summary>
 	public sealed class GetMessageInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.ISequenceTestService? _source;
+
 		/// <summary>Delegate for GetMessage.</summary>
 		public delegate string GetMessageDelegate(SequenceTestKnockOff ko, string name);
 
@@ -354,6 +371,9 @@ partial class SequenceTestKnockOff : global::KnockOff.Tests.ISequenceTestService
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = name;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetMessage(name);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetMessage");
 				throw new global::System.InvalidOperationException("No implementation provided for GetMessage. Configure via OnCall.");
 			}
@@ -377,6 +397,7 @@ partial class SequenceTestKnockOff : global::KnockOff.Tests.ISequenceTestService
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -493,6 +514,17 @@ partial class SequenceTestKnockOff : global::KnockOff.Tests.ISequenceTestService
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Tests.ISequenceTestService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Tests.ISequenceTestService? source)
+	{
+		Add._source = source;
+		DoWork._source = source;
+		GetMessage._source = source;
 	}
 
 	int global::KnockOff.Tests.ISequenceTestService.Add(int a, int b)

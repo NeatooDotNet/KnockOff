@@ -8,6 +8,9 @@ partial class GenUserRepositoryKnockOff : global::KnockOff.Documentation.Samples
 	/// <summary>Tracks and configures behavior for GetById.</summary>
 	public sealed class GetByIdInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IGenRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>? _source;
+
 		/// <summary>Delegate for GetById.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Guides.GenUser? GetByIdDelegate(GenUserRepositoryKnockOff ko, int id);
 
@@ -53,6 +56,7 @@ partial class GenUserRepositoryKnockOff : global::KnockOff.Documentation.Samples
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				if (_source is { } src) return src.GetById(id);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
 				return default!;
 			}
@@ -76,6 +80,7 @@ partial class GenUserRepositoryKnockOff : global::KnockOff.Documentation.Samples
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -165,6 +170,9 @@ partial class GenUserRepositoryKnockOff : global::KnockOff.Documentation.Samples
 	/// <summary>Tracks and configures behavior for Save.</summary>
 	public sealed class SaveInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IGenRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<GenUserRepositoryKnockOff, global::KnockOff.Documentation.Samples.Guides.GenUser> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -207,6 +215,7 @@ partial class GenUserRepositoryKnockOff : global::KnockOff.Documentation.Samples
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = entity;
+				if (_source is { } src) { src.Save(entity); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 				return;
 			}
@@ -230,6 +239,7 @@ partial class GenUserRepositoryKnockOff : global::KnockOff.Documentation.Samples
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -319,6 +329,9 @@ partial class GenUserRepositoryKnockOff : global::KnockOff.Documentation.Samples
 	/// <summary>Tracks and configures behavior for GetByIdAsync.</summary>
 	public sealed class GetByIdAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IGenRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>? _source;
+
 		/// <summary>Delegate for GetByIdAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.GenUser?> GetByIdAsyncDelegate(GenUserRepositoryKnockOff ko, int id);
 
@@ -364,6 +377,7 @@ partial class GenUserRepositoryKnockOff : global::KnockOff.Documentation.Samples
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				if (_source is { } src) return src.GetByIdAsync(id);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetByIdAsync");
 				return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Guides.GenUser?>(default!);
 			}
@@ -387,6 +401,7 @@ partial class GenUserRepositoryKnockOff : global::KnockOff.Documentation.Samples
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -503,6 +518,17 @@ partial class GenUserRepositoryKnockOff : global::KnockOff.Documentation.Samples
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.IGenRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.IGenRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>? source)
+	{
+		GetById._source = source;
+		Save._source = source;
+		GetByIdAsync._source = source;
 	}
 
 	global::KnockOff.Documentation.Samples.Guides.GenUser? global::KnockOff.Documentation.Samples.Guides.IGenRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>.GetById(int id)

@@ -20,16 +20,22 @@ partial class GroupingIntUserStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public int Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Linq.IGrouping<int, global::KnockOff.Tests.User>? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Tracks and configures behavior for GetEnumerator.</summary>
 		public sealed class IGrouping_GetEnumeratorInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IEnumerable<global::KnockOff.Tests.User>? _source;
+
 			/// <summary>Delegate for GetEnumerator.</summary>
 			public delegate global::System.Collections.Generic.IEnumerator<global::KnockOff.Tests.User> GetEnumeratorDelegate(Stubs.IGrouping ko);
 
@@ -70,6 +76,9 @@ partial class GroupingIntUserStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetEnumerator();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
 					throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
 				}
@@ -92,6 +101,7 @@ partial class GroupingIntUserStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -189,6 +199,7 @@ partial class GroupingIntUserStubTests
 				{
 					Key.RecordGet();
 					if (Key.OnGet is { } onGet) return onGet(this);
+					if (Key._source is { } src) return src.Key;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("User>", "Key");
 					return Key.Value;
 				}
@@ -215,6 +226,27 @@ partial class GroupingIntUserStubTests
 			public IGrouping(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.Linq.IGrouping<int, global::KnockOff.Tests.User> delegation.</summary>
+			public void Source(global::System.Linq.IGrouping<int, global::KnockOff.Tests.User>? source)
+			{
+				Key._source = source;
+				GetEnumerator._source = source;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.Generic.IEnumerable<global::KnockOff.Tests.User> delegation.</summary>
+			public void Source(global::System.Collections.Generic.IEnumerable<global::KnockOff.Tests.User>? source)
+			{
+				Key._source = null;
+				GetEnumerator._source = source;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.IEnumerable delegation.</summary>
+			public void Source(global::System.Collections.IEnumerable? source)
+			{
+				Key._source = null;
+				GetEnumerator._source = null;
 			}
 
 		}

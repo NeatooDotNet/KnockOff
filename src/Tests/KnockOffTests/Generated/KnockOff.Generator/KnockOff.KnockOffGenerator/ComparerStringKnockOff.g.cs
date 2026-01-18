@@ -8,6 +8,9 @@ partial class ComparerStringKnockOff : global::System.Collections.Generic.ICompa
 	/// <summary>Tracks and configures behavior for Compare.</summary>
 	public sealed class CompareInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::System.Collections.Generic.IComparer<string>? _source;
+
 		/// <summary>Delegate for Compare.</summary>
 		public delegate int CompareDelegate(ComparerStringKnockOff ko, string? x, string? y);
 
@@ -53,6 +56,9 @@ partial class ComparerStringKnockOff : global::System.Collections.Generic.ICompa
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((x, y));
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Compare(x, y);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Compare");
 				return default!;
 			}
@@ -76,6 +82,7 @@ partial class ComparerStringKnockOff : global::System.Collections.Generic.ICompa
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -184,6 +191,15 @@ partial class ComparerStringKnockOff : global::System.Collections.Generic.ICompa
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::System.Collections.Generic.IComparer<string>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::System.Collections.Generic.IComparer<string>? source)
+	{
+		Compare._source = source;
 	}
 
 	int global::System.Collections.Generic.IComparer<string>.Compare(string? x, string? y)

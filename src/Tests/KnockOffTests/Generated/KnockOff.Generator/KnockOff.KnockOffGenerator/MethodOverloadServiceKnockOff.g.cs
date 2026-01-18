@@ -8,6 +8,9 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 	/// <summary>Tracks and configures behavior for Format.</summary>
 	public sealed class FormatInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOffTests.IMethodOverloadService? _source;
+
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for Format(string).</summary>
@@ -100,6 +103,9 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 			if (_sequence_String_String.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Format(input);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Format");
 				throw new global::System.InvalidOperationException("No implementation provided for Format. Configure via OnCall.");
 			}
@@ -124,6 +130,9 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 			if (_sequence_String_Boolean_String.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Format(input, uppercase);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Format");
 				throw new global::System.InvalidOperationException("No implementation provided for Format. Configure via OnCall.");
 			}
@@ -148,6 +157,9 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 			if (_sequence_String_Int32_String.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Format(input, maxLength);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Format");
 				throw new global::System.InvalidOperationException("No implementation provided for Format. Configure via OnCall.");
 			}
@@ -170,6 +182,7 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence_String_String)
 				tracking.Reset();
 			_sequenceIndex_String_String = 0;
@@ -430,6 +443,15 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOffTests.IMethodOverloadService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOffTests.IMethodOverloadService? source)
+	{
+		Format._source = source;
 	}
 
 	string global::KnockOffTests.IMethodOverloadService.Format(string input)

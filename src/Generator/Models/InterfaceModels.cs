@@ -35,7 +35,12 @@ internal sealed record InterfaceInfo(
 	/// Type parameters for open generic interfaces (e.g., T, TKey, TValue).
 	/// Empty for closed generic or non-generic interfaces.
 	/// </summary>
-	EquatableArray<TypeParameterInfo> TypeParameters = default) : IEquatable<InterfaceInfo>
+	EquatableArray<TypeParameterInfo> TypeParameters = default,
+	/// <summary>
+	/// Fully qualified names of interfaces that this interface directly inherits from.
+	/// Used for building the interface hierarchy for Source(T) methods.
+	/// </summary>
+	EquatableArray<string> BaseInterfaces = default) : IEquatable<InterfaceInfo>
 {
 	/// <summary>
 	/// Gets the stub class name, including type suffix when needed for collision avoidance.

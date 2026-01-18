@@ -8,6 +8,9 @@ partial class PropSecureKnockOff : global::KnockOff.Documentation.Samples.Guides
 	/// <summary>Tracks and configures behavior for SecretKey.</summary>
 	public sealed class SecretKeyInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IPropSecure? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -21,7 +24,7 @@ partial class PropSecureKnockOff : global::KnockOff.Documentation.Samples.Guides
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Interceptor for SecretKey. Configure via .Value, track via .GetCount.</summary>
@@ -33,9 +36,18 @@ partial class PropSecureKnockOff : global::KnockOff.Documentation.Samples.Guides
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IPropSecure instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IPropSecure Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.IPropSecure).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.IPropSecure? source)
+	{
+		SecretKey._source = source;
+	}
+
 	string global::KnockOff.Documentation.Samples.Guides.IPropSecure.SecretKey
 	{
-		get { SecretKey.RecordGet(); if (SecretKey.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropSecure", "SecretKey"); return SecretKey.Value; }
+		get { SecretKey.RecordGet(); if (SecretKey.OnGet is { } onGet) return onGet(this); if (SecretKey._source is { } src) return src.SecretKey; if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropSecure", "SecretKey"); return SecretKey.Value; }
 	}
 
 }

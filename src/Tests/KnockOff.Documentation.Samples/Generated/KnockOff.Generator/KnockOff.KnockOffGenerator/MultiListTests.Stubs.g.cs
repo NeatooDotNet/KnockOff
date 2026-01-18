@@ -20,11 +20,14 @@ partial class MultiListTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public int Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Collections.Generic.ICollection<string>? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IListString.IsReadOnly.</summary>
@@ -39,11 +42,14 @@ partial class MultiListTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Collections.Generic.ICollection<string>? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IListString.Indexer.</summary>
@@ -76,13 +82,19 @@ partial class MultiListTests
 			/// <summary>Backing storage for this indexer.</summary>
 			public global::System.Collections.Generic.Dictionary<int, string> Backing { get; } = new();
 
+			/// <summary>Source object for delegation when OnGet/OnSet is not set.</summary>
+			internal global::System.Collections.Generic.IList<string>? _source;
+
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
+			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; _source = null; }
 		}
 
 		/// <summary>Tracks and configures behavior for IndexOf.</summary>
 		public sealed class IListString_IndexOfInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IList<string>? _source;
+
 			/// <summary>Delegate for IndexOf.</summary>
 			public delegate int IndexOfDelegate(Stubs.IListString ko, string item);
 
@@ -128,6 +140,7 @@ partial class MultiListTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = item;
+					if (_source is { } src) return src.IndexOf(item);
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "IndexOf");
 					return default!;
 				}
@@ -151,6 +164,7 @@ partial class MultiListTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -240,6 +254,9 @@ partial class MultiListTests
 		/// <summary>Tracks and configures behavior for Insert.</summary>
 		public sealed class IListString_InsertInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IList<string>? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IListString, int, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -282,6 +299,7 @@ partial class MultiListTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((index, item));
+					if (_source is { } src) { src.Insert(index, item); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Insert");
 					return;
 				}
@@ -305,6 +323,7 @@ partial class MultiListTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -394,6 +413,9 @@ partial class MultiListTests
 		/// <summary>Tracks and configures behavior for RemoveAt.</summary>
 		public sealed class IListString_RemoveAtInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IList<string>? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IListString, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -436,6 +458,7 @@ partial class MultiListTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = index;
+					if (_source is { } src) { src.RemoveAt(index); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "RemoveAt");
 					return;
 				}
@@ -459,6 +482,7 @@ partial class MultiListTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -548,6 +572,9 @@ partial class MultiListTests
 		/// <summary>Tracks and configures behavior for Add.</summary>
 		public sealed class IListString_AddInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.ICollection<string>? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IListString, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -590,6 +617,7 @@ partial class MultiListTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = item;
+					if (_source is { } src) { src.Add(item); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 					return;
 				}
@@ -613,6 +641,7 @@ partial class MultiListTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -702,6 +731,9 @@ partial class MultiListTests
 		/// <summary>Tracks and configures behavior for Clear.</summary>
 		public sealed class IListString_ClearInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.ICollection<string>? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IListString> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -739,6 +771,7 @@ partial class MultiListTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					if (_source is { } src) { src.Clear(); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Clear");
 					return;
 				}
@@ -761,6 +794,7 @@ partial class MultiListTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -846,6 +880,9 @@ partial class MultiListTests
 		/// <summary>Tracks and configures behavior for Contains.</summary>
 		public sealed class IListString_ContainsInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.ICollection<string>? _source;
+
 			/// <summary>Delegate for Contains.</summary>
 			public delegate bool ContainsDelegate(Stubs.IListString ko, string item);
 
@@ -891,6 +928,7 @@ partial class MultiListTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = item;
+					if (_source is { } src) return src.Contains(item);
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Contains");
 					return default!;
 				}
@@ -914,6 +952,7 @@ partial class MultiListTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1003,6 +1042,9 @@ partial class MultiListTests
 		/// <summary>Tracks and configures behavior for CopyTo.</summary>
 		public sealed class IListString_CopyToInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.ICollection<string>? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IListString, string[], int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -1045,6 +1087,7 @@ partial class MultiListTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((array, arrayIndex));
+					if (_source is { } src) { src.CopyTo(array, arrayIndex); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "CopyTo");
 					return;
 				}
@@ -1068,6 +1111,7 @@ partial class MultiListTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1157,6 +1201,9 @@ partial class MultiListTests
 		/// <summary>Tracks and configures behavior for Remove.</summary>
 		public sealed class IListString_RemoveInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.ICollection<string>? _source;
+
 			/// <summary>Delegate for Remove.</summary>
 			public delegate bool RemoveDelegate(Stubs.IListString ko, string item);
 
@@ -1202,6 +1249,7 @@ partial class MultiListTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = item;
+					if (_source is { } src) return src.Remove(item);
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Remove");
 					return default!;
 				}
@@ -1225,6 +1273,7 @@ partial class MultiListTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1314,6 +1363,9 @@ partial class MultiListTests
 		/// <summary>Tracks and configures behavior for GetEnumerator.</summary>
 		public sealed class IListString_GetEnumeratorInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IEnumerable<string>? _source;
+
 			/// <summary>Delegate for GetEnumerator.</summary>
 			public delegate global::System.Collections.Generic.IEnumerator<string> GetEnumeratorDelegate(Stubs.IListString ko);
 
@@ -1354,6 +1406,7 @@ partial class MultiListTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					if (_source is { } src) return src.GetEnumerator();
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
 					throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
 				}
@@ -1376,6 +1429,7 @@ partial class MultiListTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1518,6 +1572,7 @@ partial class MultiListTests
 				{
 					Indexer.RecordGet(index);
 					if (Indexer.OnGet is { } onGet) return onGet(this, index);
+					if (Indexer._source is { } src) return src[index];
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IList<string>", "this[]");
 					return Indexer.Backing.TryGetValue(index, out var v) ? v : default!;
 				}
@@ -1525,6 +1580,7 @@ partial class MultiListTests
 				{
 					Indexer.RecordSet(index, value);
 					if (Indexer.OnSet is { } onSet) { onSet(this, index, value); return; }
+					if (Indexer._source is { } src) { src[index] = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IList<string>", "this[]");
 					Indexer.Backing[index] = value;
 				}
@@ -1561,6 +1617,7 @@ partial class MultiListTests
 				{
 					Count.RecordGet();
 					if (Count.OnGet is { } onGet) return onGet(this);
+					if (Count._source is { } src) return src.Count;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "Count");
 					return Count.Value;
 				}
@@ -1572,6 +1629,7 @@ partial class MultiListTests
 				{
 					IsReadOnly.RecordGet();
 					if (IsReadOnly.OnGet is { } onGet) return onGet(this);
+					if (IsReadOnly._source is { } src) return src.IsReadOnly;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "IsReadOnly");
 					return IsReadOnly.Value;
 				}
@@ -1600,6 +1658,74 @@ partial class MultiListTests
 				Strict = strict;
 			}
 
+			/// <summary>Sets the source object for global::System.Collections.Generic.IList<string> delegation.</summary>
+			public void Source(global::System.Collections.Generic.IList<string>? source)
+			{
+				Count._source = source;
+				IsReadOnly._source = source;
+				Indexer._source = source;
+				IndexOf._source = source;
+				Insert._source = source;
+				RemoveAt._source = source;
+				Add._source = source;
+				Clear._source = source;
+				Contains._source = source;
+				CopyTo._source = source;
+				Remove._source = source;
+				GetEnumerator._source = source;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.Generic.ICollection<string> delegation.</summary>
+			public void Source(global::System.Collections.Generic.ICollection<string>? source)
+			{
+				Count._source = source;
+				IsReadOnly._source = source;
+				Indexer._source = null;
+				IndexOf._source = null;
+				Insert._source = null;
+				RemoveAt._source = null;
+				Add._source = source;
+				Clear._source = source;
+				Contains._source = source;
+				CopyTo._source = source;
+				Remove._source = source;
+				GetEnumerator._source = source;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.Generic.IEnumerable<string> delegation.</summary>
+			public void Source(global::System.Collections.Generic.IEnumerable<string>? source)
+			{
+				Count._source = null;
+				IsReadOnly._source = null;
+				Indexer._source = null;
+				IndexOf._source = null;
+				Insert._source = null;
+				RemoveAt._source = null;
+				Add._source = null;
+				Clear._source = null;
+				Contains._source = null;
+				CopyTo._source = null;
+				Remove._source = null;
+				GetEnumerator._source = source;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.IEnumerable delegation.</summary>
+			public void Source(global::System.Collections.IEnumerable? source)
+			{
+				Count._source = null;
+				IsReadOnly._source = null;
+				Indexer._source = null;
+				IndexOf._source = null;
+				Insert._source = null;
+				RemoveAt._source = null;
+				Add._source = null;
+				Clear._source = null;
+				Contains._source = null;
+				CopyTo._source = null;
+				Remove._source = null;
+				GetEnumerator._source = null;
+			}
+
 		}
 
 		/// <summary>Interceptor for IListInt32.Count.</summary>
@@ -1614,11 +1740,14 @@ partial class MultiListTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public int Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Collections.Generic.ICollection<int>? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IListInt32.IsReadOnly.</summary>
@@ -1633,11 +1762,14 @@ partial class MultiListTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Collections.Generic.ICollection<int>? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IListInt32.Indexer.</summary>
@@ -1670,13 +1802,19 @@ partial class MultiListTests
 			/// <summary>Backing storage for this indexer.</summary>
 			public global::System.Collections.Generic.Dictionary<int, int> Backing { get; } = new();
 
+			/// <summary>Source object for delegation when OnGet/OnSet is not set.</summary>
+			internal global::System.Collections.Generic.IList<int>? _source;
+
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
+			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; _source = null; }
 		}
 
 		/// <summary>Tracks and configures behavior for IndexOf.</summary>
 		public sealed class IListInt32_IndexOfInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IList<int>? _source;
+
 			/// <summary>Delegate for IndexOf.</summary>
 			public delegate int IndexOfDelegate(Stubs.IListInt32 ko, int item);
 
@@ -1722,6 +1860,7 @@ partial class MultiListTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = item;
+					if (_source is { } src) return src.IndexOf(item);
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "IndexOf");
 					return default!;
 				}
@@ -1745,6 +1884,7 @@ partial class MultiListTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1834,6 +1974,9 @@ partial class MultiListTests
 		/// <summary>Tracks and configures behavior for Insert.</summary>
 		public sealed class IListInt32_InsertInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IList<int>? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IListInt32, int, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -1876,6 +2019,7 @@ partial class MultiListTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((index, item));
+					if (_source is { } src) { src.Insert(index, item); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Insert");
 					return;
 				}
@@ -1899,6 +2043,7 @@ partial class MultiListTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1988,6 +2133,9 @@ partial class MultiListTests
 		/// <summary>Tracks and configures behavior for RemoveAt.</summary>
 		public sealed class IListInt32_RemoveAtInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IList<int>? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IListInt32, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -2030,6 +2178,7 @@ partial class MultiListTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = index;
+					if (_source is { } src) { src.RemoveAt(index); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "RemoveAt");
 					return;
 				}
@@ -2053,6 +2202,7 @@ partial class MultiListTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -2142,6 +2292,9 @@ partial class MultiListTests
 		/// <summary>Tracks and configures behavior for Add.</summary>
 		public sealed class IListInt32_AddInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.ICollection<int>? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IListInt32, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -2184,6 +2337,7 @@ partial class MultiListTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = item;
+					if (_source is { } src) { src.Add(item); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 					return;
 				}
@@ -2207,6 +2361,7 @@ partial class MultiListTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -2296,6 +2451,9 @@ partial class MultiListTests
 		/// <summary>Tracks and configures behavior for Clear.</summary>
 		public sealed class IListInt32_ClearInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.ICollection<int>? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IListInt32> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -2333,6 +2491,7 @@ partial class MultiListTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					if (_source is { } src) { src.Clear(); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Clear");
 					return;
 				}
@@ -2355,6 +2514,7 @@ partial class MultiListTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -2440,6 +2600,9 @@ partial class MultiListTests
 		/// <summary>Tracks and configures behavior for Contains.</summary>
 		public sealed class IListInt32_ContainsInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.ICollection<int>? _source;
+
 			/// <summary>Delegate for Contains.</summary>
 			public delegate bool ContainsDelegate(Stubs.IListInt32 ko, int item);
 
@@ -2485,6 +2648,7 @@ partial class MultiListTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = item;
+					if (_source is { } src) return src.Contains(item);
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Contains");
 					return default!;
 				}
@@ -2508,6 +2672,7 @@ partial class MultiListTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -2597,6 +2762,9 @@ partial class MultiListTests
 		/// <summary>Tracks and configures behavior for CopyTo.</summary>
 		public sealed class IListInt32_CopyToInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.ICollection<int>? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IListInt32, int[], int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -2639,6 +2807,7 @@ partial class MultiListTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((array, arrayIndex));
+					if (_source is { } src) { src.CopyTo(array, arrayIndex); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "CopyTo");
 					return;
 				}
@@ -2662,6 +2831,7 @@ partial class MultiListTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -2751,6 +2921,9 @@ partial class MultiListTests
 		/// <summary>Tracks and configures behavior for Remove.</summary>
 		public sealed class IListInt32_RemoveInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.ICollection<int>? _source;
+
 			/// <summary>Delegate for Remove.</summary>
 			public delegate bool RemoveDelegate(Stubs.IListInt32 ko, int item);
 
@@ -2796,6 +2969,7 @@ partial class MultiListTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = item;
+					if (_source is { } src) return src.Remove(item);
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Remove");
 					return default!;
 				}
@@ -2819,6 +2993,7 @@ partial class MultiListTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -2908,6 +3083,9 @@ partial class MultiListTests
 		/// <summary>Tracks and configures behavior for GetEnumerator.</summary>
 		public sealed class IListInt32_GetEnumeratorInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IEnumerable<int>? _source;
+
 			/// <summary>Delegate for GetEnumerator.</summary>
 			public delegate global::System.Collections.Generic.IEnumerator<int> GetEnumeratorDelegate(Stubs.IListInt32 ko);
 
@@ -2948,6 +3126,7 @@ partial class MultiListTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					if (_source is { } src) return src.GetEnumerator();
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
 					throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
 				}
@@ -2970,6 +3149,7 @@ partial class MultiListTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -3112,6 +3292,7 @@ partial class MultiListTests
 				{
 					Indexer.RecordGet(index);
 					if (Indexer.OnGet is { } onGet) return onGet(this, index);
+					if (Indexer._source is { } src) return src[index];
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IList<int>", "this[]");
 					return Indexer.Backing.TryGetValue(index, out var v) ? v : default!;
 				}
@@ -3119,6 +3300,7 @@ partial class MultiListTests
 				{
 					Indexer.RecordSet(index, value);
 					if (Indexer.OnSet is { } onSet) { onSet(this, index, value); return; }
+					if (Indexer._source is { } src) { src[index] = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IList<int>", "this[]");
 					Indexer.Backing[index] = value;
 				}
@@ -3155,6 +3337,7 @@ partial class MultiListTests
 				{
 					Count.RecordGet();
 					if (Count.OnGet is { } onGet) return onGet(this);
+					if (Count._source is { } src) return src.Count;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<int>", "Count");
 					return Count.Value;
 				}
@@ -3166,6 +3349,7 @@ partial class MultiListTests
 				{
 					IsReadOnly.RecordGet();
 					if (IsReadOnly.OnGet is { } onGet) return onGet(this);
+					if (IsReadOnly._source is { } src) return src.IsReadOnly;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<int>", "IsReadOnly");
 					return IsReadOnly.Value;
 				}
@@ -3192,6 +3376,74 @@ partial class MultiListTests
 			public IListInt32(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.Generic.IList<int> delegation.</summary>
+			public void Source(global::System.Collections.Generic.IList<int>? source)
+			{
+				Count._source = source;
+				IsReadOnly._source = source;
+				Indexer._source = source;
+				IndexOf._source = source;
+				Insert._source = source;
+				RemoveAt._source = source;
+				Add._source = source;
+				Clear._source = source;
+				Contains._source = source;
+				CopyTo._source = source;
+				Remove._source = source;
+				GetEnumerator._source = source;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.Generic.ICollection<int> delegation.</summary>
+			public void Source(global::System.Collections.Generic.ICollection<int>? source)
+			{
+				Count._source = source;
+				IsReadOnly._source = source;
+				Indexer._source = null;
+				IndexOf._source = null;
+				Insert._source = null;
+				RemoveAt._source = null;
+				Add._source = source;
+				Clear._source = source;
+				Contains._source = source;
+				CopyTo._source = source;
+				Remove._source = source;
+				GetEnumerator._source = source;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.Generic.IEnumerable<int> delegation.</summary>
+			public void Source(global::System.Collections.Generic.IEnumerable<int>? source)
+			{
+				Count._source = null;
+				IsReadOnly._source = null;
+				Indexer._source = null;
+				IndexOf._source = null;
+				Insert._source = null;
+				RemoveAt._source = null;
+				Add._source = null;
+				Clear._source = null;
+				Contains._source = null;
+				CopyTo._source = null;
+				Remove._source = null;
+				GetEnumerator._source = source;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.IEnumerable delegation.</summary>
+			public void Source(global::System.Collections.IEnumerable? source)
+			{
+				Count._source = null;
+				IsReadOnly._source = null;
+				Indexer._source = null;
+				IndexOf._source = null;
+				Insert._source = null;
+				RemoveAt._source = null;
+				Add._source = null;
+				Clear._source = null;
+				Contains._source = null;
+				CopyTo._source = null;
+				Remove._source = null;
+				GetEnumerator._source = null;
 			}
 
 		}

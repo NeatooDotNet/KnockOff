@@ -8,6 +8,9 @@ partial class MmSequenceKnockOff : global::KnockOff.Documentation.Samples.Skills
 	/// <summary>Tracks and configures behavior for GetNext.</summary>
 	public sealed class GetNextInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.IMmSequenceService? _source;
+
 		/// <summary>Delegate for GetNext.</summary>
 		public delegate int GetNextDelegate(MmSequenceKnockOff ko);
 
@@ -48,6 +51,7 @@ partial class MmSequenceKnockOff : global::KnockOff.Documentation.Samples.Skills
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.GetNext();
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetNext");
 				return default!;
 			}
@@ -70,6 +74,7 @@ partial class MmSequenceKnockOff : global::KnockOff.Documentation.Samples.Skills
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -174,6 +179,15 @@ partial class MmSequenceKnockOff : global::KnockOff.Documentation.Samples.Skills
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Skills.IMmSequenceService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Skills.IMmSequenceService? source)
+	{
+		GetNext._source = source;
 	}
 
 	int global::KnockOff.Documentation.Samples.Skills.IMmSequenceService.GetNext()

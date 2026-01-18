@@ -20,11 +20,14 @@ partial class DictionaryCollisionTest
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Collections.Generic.ICollection<string> Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Collections.Generic.IDictionary<string, int>? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDictionaryStringInt32.Values.</summary>
@@ -39,11 +42,14 @@ partial class DictionaryCollisionTest
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Collections.Generic.ICollection<int> Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Collections.Generic.IDictionary<string, int>? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDictionaryStringInt32.Count.</summary>
@@ -58,11 +64,14 @@ partial class DictionaryCollisionTest
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public int Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, int>>? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDictionaryStringInt32.IsReadOnly.</summary>
@@ -77,11 +86,14 @@ partial class DictionaryCollisionTest
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, int>>? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDictionaryStringInt32.Indexer.</summary>
@@ -114,13 +126,19 @@ partial class DictionaryCollisionTest
 			/// <summary>Backing storage for this indexer.</summary>
 			public global::System.Collections.Generic.Dictionary<string, int> Backing { get; } = new();
 
+			/// <summary>Source object for delegation when OnGet/OnSet is not set.</summary>
+			internal global::System.Collections.Generic.IDictionary<string, int>? _source;
+
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
+			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; _source = null; }
 		}
 
 		/// <summary>Tracks and configures behavior for Add.</summary>
 		public sealed class IDictionaryStringInt32_AddInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IDictionary<string, int>? _source;
+
 			private int _unconfiguredCallCount;
 
 			/// <summary>Delegate for Add(string, int).</summary>
@@ -187,6 +205,9 @@ partial class DictionaryCollisionTest
 				if (_sequence_String_Int32_void.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.Add(key, @value); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 					return;
 				}
@@ -211,6 +232,9 @@ partial class DictionaryCollisionTest
 				if (_sequence_Collections_Generic_KeyValuePair_string_int_void.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.Add(item); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 					return;
 				}
@@ -233,6 +257,7 @@ partial class DictionaryCollisionTest
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence_String_Int32_void)
 					tracking.Reset();
 				_sequenceIndex_String_Int32_void = 0;
@@ -398,6 +423,9 @@ partial class DictionaryCollisionTest
 		/// <summary>Tracks and configures behavior for ContainsKey.</summary>
 		public sealed class IDictionaryStringInt32_ContainsKeyInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IDictionary<string, int>? _source;
+
 			/// <summary>Delegate for ContainsKey.</summary>
 			public delegate bool ContainsKeyDelegate(Stubs.IDictionaryStringInt32 ko, string key);
 
@@ -443,6 +471,9 @@ partial class DictionaryCollisionTest
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = key;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.ContainsKey(key);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ContainsKey");
 					return default!;
 				}
@@ -466,6 +497,7 @@ partial class DictionaryCollisionTest
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -555,6 +587,9 @@ partial class DictionaryCollisionTest
 		/// <summary>Tracks and configures behavior for Remove.</summary>
 		public sealed class IDictionaryStringInt32_RemoveInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IDictionary<string, int>? _source;
+
 			private int _unconfiguredCallCount;
 
 			/// <summary>Delegate for Remove(string).</summary>
@@ -621,6 +656,9 @@ partial class DictionaryCollisionTest
 				if (_sequence_String_Boolean.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.Remove(key);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Remove");
 					return default!;
 				}
@@ -645,6 +683,9 @@ partial class DictionaryCollisionTest
 				if (_sequence_Collections_Generic_KeyValuePair_string_int_Boolean.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.Remove(item);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Remove");
 					return default!;
 				}
@@ -667,6 +708,7 @@ partial class DictionaryCollisionTest
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence_String_Boolean)
 					tracking.Reset();
 				_sequenceIndex_String_Boolean = 0;
@@ -832,6 +874,9 @@ partial class DictionaryCollisionTest
 		/// <summary>Tracks and configures behavior for TryGetValue.</summary>
 		public sealed class IDictionaryStringInt32_TryGetValueInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IDictionary<string, int>? _source;
+
 			/// <summary>Delegate for TryGetValue.</summary>
 			public delegate bool TryGetValueDelegate(Stubs.IDictionaryStringInt32 ko, string key, out int @value);
 
@@ -878,6 +923,9 @@ partial class DictionaryCollisionTest
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = key;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.TryGetValue(key, out @value);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "TryGetValue");
 					return default!;
 				}
@@ -901,6 +949,7 @@ partial class DictionaryCollisionTest
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -990,6 +1039,9 @@ partial class DictionaryCollisionTest
 		/// <summary>Tracks and configures behavior for Clear.</summary>
 		public sealed class IDictionaryStringInt32_ClearInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, int>>? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IDictionaryStringInt32> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -1027,6 +1079,9 @@ partial class DictionaryCollisionTest
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.Clear(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Clear");
 					return;
 				}
@@ -1049,6 +1104,7 @@ partial class DictionaryCollisionTest
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1134,6 +1190,9 @@ partial class DictionaryCollisionTest
 		/// <summary>Tracks and configures behavior for Contains.</summary>
 		public sealed class IDictionaryStringInt32_ContainsInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, int>>? _source;
+
 			/// <summary>Delegate for Contains.</summary>
 			public delegate bool ContainsDelegate(Stubs.IDictionaryStringInt32 ko, global::System.Collections.Generic.KeyValuePair<string, int> item);
 
@@ -1179,6 +1238,9 @@ partial class DictionaryCollisionTest
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = item;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.Contains(item);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Contains");
 					return default!;
 				}
@@ -1202,6 +1264,7 @@ partial class DictionaryCollisionTest
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1291,6 +1354,9 @@ partial class DictionaryCollisionTest
 		/// <summary>Tracks and configures behavior for CopyTo.</summary>
 		public sealed class IDictionaryStringInt32_CopyToInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, int>>? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IDictionaryStringInt32, global::System.Collections.Generic.KeyValuePair<string, int>[], int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -1333,6 +1399,9 @@ partial class DictionaryCollisionTest
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((array, arrayIndex));
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.CopyTo(array, arrayIndex); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "CopyTo");
 					return;
 				}
@@ -1356,6 +1425,7 @@ partial class DictionaryCollisionTest
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1445,6 +1515,9 @@ partial class DictionaryCollisionTest
 		/// <summary>Tracks and configures behavior for GetEnumerator.</summary>
 		public sealed class IDictionaryStringInt32_GetEnumeratorInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.KeyValuePair<string, int>>? _source;
+
 			/// <summary>Delegate for GetEnumerator.</summary>
 			public delegate global::System.Collections.Generic.IEnumerator<global::System.Collections.Generic.KeyValuePair<string, int>> GetEnumeratorDelegate(Stubs.IDictionaryStringInt32 ko);
 
@@ -1485,6 +1558,9 @@ partial class DictionaryCollisionTest
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetEnumerator();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
 					throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
 				}
@@ -1507,6 +1583,7 @@ partial class DictionaryCollisionTest
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1657,6 +1734,7 @@ partial class DictionaryCollisionTest
 				{
 					Indexer.RecordGet(key);
 					if (Indexer.OnGet is { } onGet) return onGet(this, key);
+					if (Indexer._source is { } src) return src[key];
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, int>", "this[]");
 					return Indexer.Backing.TryGetValue(key, out var v) ? v : default!;
 				}
@@ -1664,6 +1742,7 @@ partial class DictionaryCollisionTest
 				{
 					Indexer.RecordSet(key, value);
 					if (Indexer.OnSet is { } onSet) { onSet(this, key, value); return; }
+					if (Indexer._source is { } src) { src[key] = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, int>", "this[]");
 					Indexer.Backing[key] = value;
 				}
@@ -1675,6 +1754,7 @@ partial class DictionaryCollisionTest
 				{
 					Keys.RecordGet();
 					if (Keys.OnGet is { } onGet) return onGet(this);
+					if (Keys._source is { } src) return src.Keys;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, int>", "Keys");
 					return Keys.Value;
 				}
@@ -1686,6 +1766,7 @@ partial class DictionaryCollisionTest
 				{
 					Values.RecordGet();
 					if (Values.OnGet is { } onGet) return onGet(this);
+					if (Values._source is { } src) return src.Values;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, int>", "Values");
 					return Values.Value;
 				}
@@ -1722,6 +1803,7 @@ partial class DictionaryCollisionTest
 				{
 					Count.RecordGet();
 					if (Count.OnGet is { } onGet) return onGet(this);
+					if (Count._source is { } src) return src.Count;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, int>>", "Count");
 					return Count.Value;
 				}
@@ -1733,6 +1815,7 @@ partial class DictionaryCollisionTest
 				{
 					IsReadOnly.RecordGet();
 					if (IsReadOnly.OnGet is { } onGet) return onGet(this);
+					if (IsReadOnly._source is { } src) return src.IsReadOnly;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, int>>", "IsReadOnly");
 					return IsReadOnly.Value;
 				}
@@ -1761,6 +1844,78 @@ partial class DictionaryCollisionTest
 				Strict = strict;
 			}
 
+			/// <summary>Sets the source object for global::System.Collections.Generic.IDictionary<string, int> delegation.</summary>
+			public void Source(global::System.Collections.Generic.IDictionary<string, int>? source)
+			{
+				Keys._source = source;
+				Values._source = source;
+				Count._source = source;
+				IsReadOnly._source = source;
+				Indexer._source = source;
+				Add._source = source;
+				ContainsKey._source = source;
+				Remove._source = source;
+				TryGetValue._source = source;
+				Clear._source = source;
+				Contains._source = source;
+				CopyTo._source = source;
+				GetEnumerator._source = source;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, int>> delegation.</summary>
+			public void Source(global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, int>>? source)
+			{
+				Keys._source = null;
+				Values._source = null;
+				Count._source = source;
+				IsReadOnly._source = source;
+				Indexer._source = null;
+				Add._source = null;
+				ContainsKey._source = null;
+				Remove._source = null;
+				TryGetValue._source = null;
+				Clear._source = source;
+				Contains._source = source;
+				CopyTo._source = source;
+				GetEnumerator._source = null;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.KeyValuePair<string, int>> delegation.</summary>
+			public void Source(global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.KeyValuePair<string, int>>? source)
+			{
+				Keys._source = null;
+				Values._source = null;
+				Count._source = null;
+				IsReadOnly._source = null;
+				Indexer._source = null;
+				Add._source = null;
+				ContainsKey._source = null;
+				Remove._source = null;
+				TryGetValue._source = null;
+				Clear._source = null;
+				Contains._source = null;
+				CopyTo._source = null;
+				GetEnumerator._source = source;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.IEnumerable delegation.</summary>
+			public void Source(global::System.Collections.IEnumerable? source)
+			{
+				Keys._source = null;
+				Values._source = null;
+				Count._source = null;
+				IsReadOnly._source = null;
+				Indexer._source = null;
+				Add._source = null;
+				ContainsKey._source = null;
+				Remove._source = null;
+				TryGetValue._source = null;
+				Clear._source = null;
+				Contains._source = null;
+				CopyTo._source = null;
+				GetEnumerator._source = null;
+			}
+
 		}
 
 		/// <summary>Interceptor for IDictionaryInt32String.Keys.</summary>
@@ -1775,11 +1930,14 @@ partial class DictionaryCollisionTest
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Collections.Generic.ICollection<int> Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Collections.Generic.IDictionary<int, string>? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDictionaryInt32String.Values.</summary>
@@ -1794,11 +1952,14 @@ partial class DictionaryCollisionTest
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Collections.Generic.ICollection<string> Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Collections.Generic.IDictionary<int, string>? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDictionaryInt32String.Count.</summary>
@@ -1813,11 +1974,14 @@ partial class DictionaryCollisionTest
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public int Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<int, string>>? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDictionaryInt32String.IsReadOnly.</summary>
@@ -1832,11 +1996,14 @@ partial class DictionaryCollisionTest
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<int, string>>? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDictionaryInt32String.Indexer.</summary>
@@ -1869,13 +2036,19 @@ partial class DictionaryCollisionTest
 			/// <summary>Backing storage for this indexer.</summary>
 			public global::System.Collections.Generic.Dictionary<int, string> Backing { get; } = new();
 
+			/// <summary>Source object for delegation when OnGet/OnSet is not set.</summary>
+			internal global::System.Collections.Generic.IDictionary<int, string>? _source;
+
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
+			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; _source = null; }
 		}
 
 		/// <summary>Tracks and configures behavior for Add.</summary>
 		public sealed class IDictionaryInt32String_AddInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IDictionary<int, string>? _source;
+
 			private int _unconfiguredCallCount;
 
 			/// <summary>Delegate for Add(int, string).</summary>
@@ -1942,6 +2115,9 @@ partial class DictionaryCollisionTest
 				if (_sequence_Int32_String_void.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.Add(key, @value); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 					return;
 				}
@@ -1966,6 +2142,9 @@ partial class DictionaryCollisionTest
 				if (_sequence_Collections_Generic_KeyValuePair_int_string_void.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.Add(item); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 					return;
 				}
@@ -1988,6 +2167,7 @@ partial class DictionaryCollisionTest
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence_Int32_String_void)
 					tracking.Reset();
 				_sequenceIndex_Int32_String_void = 0;
@@ -2153,6 +2333,9 @@ partial class DictionaryCollisionTest
 		/// <summary>Tracks and configures behavior for ContainsKey.</summary>
 		public sealed class IDictionaryInt32String_ContainsKeyInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IDictionary<int, string>? _source;
+
 			/// <summary>Delegate for ContainsKey.</summary>
 			public delegate bool ContainsKeyDelegate(Stubs.IDictionaryInt32String ko, int key);
 
@@ -2198,6 +2381,9 @@ partial class DictionaryCollisionTest
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = key;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.ContainsKey(key);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ContainsKey");
 					return default!;
 				}
@@ -2221,6 +2407,7 @@ partial class DictionaryCollisionTest
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -2310,6 +2497,9 @@ partial class DictionaryCollisionTest
 		/// <summary>Tracks and configures behavior for Remove.</summary>
 		public sealed class IDictionaryInt32String_RemoveInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IDictionary<int, string>? _source;
+
 			private int _unconfiguredCallCount;
 
 			/// <summary>Delegate for Remove(int).</summary>
@@ -2376,6 +2566,9 @@ partial class DictionaryCollisionTest
 				if (_sequence_Int32_Boolean.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.Remove(key);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Remove");
 					return default!;
 				}
@@ -2400,6 +2593,9 @@ partial class DictionaryCollisionTest
 				if (_sequence_Collections_Generic_KeyValuePair_int_string_Boolean.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.Remove(item);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Remove");
 					return default!;
 				}
@@ -2422,6 +2618,7 @@ partial class DictionaryCollisionTest
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence_Int32_Boolean)
 					tracking.Reset();
 				_sequenceIndex_Int32_Boolean = 0;
@@ -2587,6 +2784,9 @@ partial class DictionaryCollisionTest
 		/// <summary>Tracks and configures behavior for TryGetValue.</summary>
 		public sealed class IDictionaryInt32String_TryGetValueInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IDictionary<int, string>? _source;
+
 			/// <summary>Delegate for TryGetValue.</summary>
 			public delegate bool TryGetValueDelegate(Stubs.IDictionaryInt32String ko, int key, out string @value);
 
@@ -2633,6 +2833,9 @@ partial class DictionaryCollisionTest
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = key;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.TryGetValue(key, out @value);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "TryGetValue");
 					return default!;
 				}
@@ -2656,6 +2859,7 @@ partial class DictionaryCollisionTest
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -2745,6 +2949,9 @@ partial class DictionaryCollisionTest
 		/// <summary>Tracks and configures behavior for Clear.</summary>
 		public sealed class IDictionaryInt32String_ClearInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<int, string>>? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IDictionaryInt32String> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -2782,6 +2989,9 @@ partial class DictionaryCollisionTest
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.Clear(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Clear");
 					return;
 				}
@@ -2804,6 +3014,7 @@ partial class DictionaryCollisionTest
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -2889,6 +3100,9 @@ partial class DictionaryCollisionTest
 		/// <summary>Tracks and configures behavior for Contains.</summary>
 		public sealed class IDictionaryInt32String_ContainsInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<int, string>>? _source;
+
 			/// <summary>Delegate for Contains.</summary>
 			public delegate bool ContainsDelegate(Stubs.IDictionaryInt32String ko, global::System.Collections.Generic.KeyValuePair<int, string> item);
 
@@ -2934,6 +3148,9 @@ partial class DictionaryCollisionTest
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = item;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.Contains(item);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Contains");
 					return default!;
 				}
@@ -2957,6 +3174,7 @@ partial class DictionaryCollisionTest
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -3046,6 +3264,9 @@ partial class DictionaryCollisionTest
 		/// <summary>Tracks and configures behavior for CopyTo.</summary>
 		public sealed class IDictionaryInt32String_CopyToInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<int, string>>? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IDictionaryInt32String, global::System.Collections.Generic.KeyValuePair<int, string>[], int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -3088,6 +3309,9 @@ partial class DictionaryCollisionTest
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((array, arrayIndex));
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.CopyTo(array, arrayIndex); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "CopyTo");
 					return;
 				}
@@ -3111,6 +3335,7 @@ partial class DictionaryCollisionTest
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -3200,6 +3425,9 @@ partial class DictionaryCollisionTest
 		/// <summary>Tracks and configures behavior for GetEnumerator.</summary>
 		public sealed class IDictionaryInt32String_GetEnumeratorInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.KeyValuePair<int, string>>? _source;
+
 			/// <summary>Delegate for GetEnumerator.</summary>
 			public delegate global::System.Collections.Generic.IEnumerator<global::System.Collections.Generic.KeyValuePair<int, string>> GetEnumeratorDelegate(Stubs.IDictionaryInt32String ko);
 
@@ -3240,6 +3468,9 @@ partial class DictionaryCollisionTest
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetEnumerator();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
 					throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
 				}
@@ -3262,6 +3493,7 @@ partial class DictionaryCollisionTest
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -3412,6 +3644,7 @@ partial class DictionaryCollisionTest
 				{
 					Indexer.RecordGet(key);
 					if (Indexer.OnGet is { } onGet) return onGet(this, key);
+					if (Indexer._source is { } src) return src[key];
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<int, string>", "this[]");
 					return Indexer.Backing.TryGetValue(key, out var v) ? v : default!;
 				}
@@ -3419,6 +3652,7 @@ partial class DictionaryCollisionTest
 				{
 					Indexer.RecordSet(key, value);
 					if (Indexer.OnSet is { } onSet) { onSet(this, key, value); return; }
+					if (Indexer._source is { } src) { src[key] = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<int, string>", "this[]");
 					Indexer.Backing[key] = value;
 				}
@@ -3430,6 +3664,7 @@ partial class DictionaryCollisionTest
 				{
 					Keys.RecordGet();
 					if (Keys.OnGet is { } onGet) return onGet(this);
+					if (Keys._source is { } src) return src.Keys;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<int, string>", "Keys");
 					return Keys.Value;
 				}
@@ -3441,6 +3676,7 @@ partial class DictionaryCollisionTest
 				{
 					Values.RecordGet();
 					if (Values.OnGet is { } onGet) return onGet(this);
+					if (Values._source is { } src) return src.Values;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<int, string>", "Values");
 					return Values.Value;
 				}
@@ -3477,6 +3713,7 @@ partial class DictionaryCollisionTest
 				{
 					Count.RecordGet();
 					if (Count.OnGet is { } onGet) return onGet(this);
+					if (Count._source is { } src) return src.Count;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<int, string>>", "Count");
 					return Count.Value;
 				}
@@ -3488,6 +3725,7 @@ partial class DictionaryCollisionTest
 				{
 					IsReadOnly.RecordGet();
 					if (IsReadOnly.OnGet is { } onGet) return onGet(this);
+					if (IsReadOnly._source is { } src) return src.IsReadOnly;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<int, string>>", "IsReadOnly");
 					return IsReadOnly.Value;
 				}
@@ -3514,6 +3752,78 @@ partial class DictionaryCollisionTest
 			public IDictionaryInt32String(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.Generic.IDictionary<int, string> delegation.</summary>
+			public void Source(global::System.Collections.Generic.IDictionary<int, string>? source)
+			{
+				Keys._source = source;
+				Values._source = source;
+				Count._source = source;
+				IsReadOnly._source = source;
+				Indexer._source = source;
+				Add._source = source;
+				ContainsKey._source = source;
+				Remove._source = source;
+				TryGetValue._source = source;
+				Clear._source = source;
+				Contains._source = source;
+				CopyTo._source = source;
+				GetEnumerator._source = source;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<int, string>> delegation.</summary>
+			public void Source(global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<int, string>>? source)
+			{
+				Keys._source = null;
+				Values._source = null;
+				Count._source = source;
+				IsReadOnly._source = source;
+				Indexer._source = null;
+				Add._source = null;
+				ContainsKey._source = null;
+				Remove._source = null;
+				TryGetValue._source = null;
+				Clear._source = source;
+				Contains._source = source;
+				CopyTo._source = source;
+				GetEnumerator._source = null;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.KeyValuePair<int, string>> delegation.</summary>
+			public void Source(global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.KeyValuePair<int, string>>? source)
+			{
+				Keys._source = null;
+				Values._source = null;
+				Count._source = null;
+				IsReadOnly._source = null;
+				Indexer._source = null;
+				Add._source = null;
+				ContainsKey._source = null;
+				Remove._source = null;
+				TryGetValue._source = null;
+				Clear._source = null;
+				Contains._source = null;
+				CopyTo._source = null;
+				GetEnumerator._source = source;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.IEnumerable delegation.</summary>
+			public void Source(global::System.Collections.IEnumerable? source)
+			{
+				Keys._source = null;
+				Values._source = null;
+				Count._source = null;
+				IsReadOnly._source = null;
+				Indexer._source = null;
+				Add._source = null;
+				ContainsKey._source = null;
+				Remove._source = null;
+				TryGetValue._source = null;
+				Clear._source = null;
+				Contains._source = null;
+				CopyTo._source = null;
+				GetEnumerator._source = null;
 			}
 
 		}

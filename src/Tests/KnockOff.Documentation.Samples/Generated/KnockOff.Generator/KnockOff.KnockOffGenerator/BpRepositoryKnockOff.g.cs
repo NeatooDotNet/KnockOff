@@ -35,6 +35,14 @@ partial class BpRepositoryKnockOff : global::KnockOff.Documentation.Samples.Guid
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IBpRepository instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IBpRepository Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.IBpRepository).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.IBpRepository? source)
+	{
+	}
+
 	global::KnockOff.Documentation.Samples.SampleDomain.User? global::KnockOff.Documentation.Samples.Guides.IBpRepository.GetById(int id)
 	{
 		GetById2.RecordCall(id);

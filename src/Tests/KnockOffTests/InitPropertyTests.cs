@@ -279,6 +279,82 @@ public class InitPropertyInlineStubTests
 		// Assert
 		Assert.Equal(2, stub.Id.GetCount);
 	}
+
+	/// <summary>
+	/// Tests that verify init-only property interceptors have the SetCount and LastSetValue fields.
+	/// The init setter should call RecordSet() to track sets, just like regular setters.
+	///
+	/// Note: Testing the actual init setter behavior at runtime is difficult because init-only
+	/// properties in explicit interface implementations can only be set during object construction,
+	/// and the stub's Object property returns 'this' which doesn't allow nested initializers.
+	///
+	/// These tests verify:
+	/// 1. The interceptor has SetCount/LastSetValue fields (compile-time verification)
+	/// 2. The interceptor has RecordSet method (compile-time verification)
+	/// 3. RecordSet properly increments SetCount and captures LastSetValue
+	/// </summary>
+	[Fact]
+	public void InlineStub_InitProperty_InterceptorHasSetTracking()
+	{
+		// Arrange
+		var stub = new InitPropertyInlineTests.Stubs.IEntityWithInitProperty();
+
+		// Assert - interceptor should have SetCount and LastSetValue fields
+		// These compile-time checks verify the interceptor structure
+		Assert.Equal(0, stub.Id.SetCount);
+		Assert.Null(stub.Id.LastSetValue);
+
+		// Verify RecordSet method exists and works
+		stub.Id.RecordSet("test-value");
+		Assert.Equal(1, stub.Id.SetCount);
+		Assert.Equal("test-value", stub.Id.LastSetValue);
+	}
+
+	[Fact]
+	public void InlineStub_InitProperty_RecordSetIncrements()
+	{
+		// Arrange
+		var stub = new InitPropertyInlineTests.Stubs.IEntityWithInitProperty();
+
+		// Act - simulate multiple set operations
+		stub.Id.RecordSet("first");
+		stub.Id.RecordSet("second");
+		stub.Id.RecordSet("third");
+
+		// Assert
+		Assert.Equal(3, stub.Id.SetCount);
+		Assert.Equal("third", stub.Id.LastSetValue);
+	}
+
+	[Fact]
+	public void InlineStub_InitProperty_ResetClearsSetTracking()
+	{
+		// Arrange
+		var stub = new InitPropertyInlineTests.Stubs.IEntityWithInitProperty();
+		stub.Id.RecordSet("some-value");
+		Assert.Equal(1, stub.Id.SetCount);
+
+		// Act
+		stub.Id.Reset();
+
+		// Assert
+		Assert.Equal(0, stub.Id.SetCount);
+		Assert.Null(stub.Id.LastSetValue);
+	}
+
+	[Fact]
+	public void InlineStub_MixedProperties_RegularSetterTracksCorrectly()
+	{
+		// Arrange
+		var stub = new InitPropertyInlineTests.Stubs.IDocumentWithMixedProperties();
+
+		// Act - set regular (non-init) property through interface
+		stub.Object.Title = "test-title";
+
+		// Assert - regular setter should track SetCount
+		Assert.Equal(1, stub.Title.SetCount);
+		Assert.Equal("test-title", stub.Title.LastSetValue);
+	}
 }
 
 /// <summary>

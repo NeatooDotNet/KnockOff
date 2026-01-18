@@ -11,12 +11,16 @@ Key concept: A class marked with `[KnockOff]` that implements an interface will 
 2. Interface-named properties for test verification (call counts, args, callbacks)
 3. User-defined methods detected and called from generated interceptors
 
-## API Design
+## Design Principles
 
-| Access | What You Get |
-|--------|--------------|
-| `stub.Member` | Interceptor (tracking, callbacks) |
-| `stub.Object.Member` | Actual value (interface/class instance) |
+**CRITICAL: All designs, features, and changes MUST work for all three patterns:**
+1. **Stand-Alone/Flat** - `[KnockOff]` on a class implementing an interface
+2. **Inline Interface** - `[KnockOff<IFoo>]` generating a stub class
+3. **Inline Class** - `[KnockOff<SomeClass>]` generating a stub class
+
+When designing features, architecture, or APIs, you must explicitly consider how each pattern will be supported. Do not design for just one scenario. If a design cannot support all three patterns, stop and ask for guidance.
+
+## API Design
 
 Three patterns: Inline Interface (`[KnockOff<IFoo>]`), Inline Class (`[KnockOff<SomeClass>]`), and Stand-Alone (`[KnockOff]` on a class implementing an interface). See `docs/getting-started.md` or `Documentation.Samples` for examples.
 

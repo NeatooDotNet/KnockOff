@@ -8,6 +8,9 @@ partial class MethodLoggerKnockOff : global::KnockOff.Documentation.Samples.Guid
 	/// <summary>Tracks and configures behavior for Log.</summary>
 	public sealed class LogInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IMethodLogger? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<MethodLoggerKnockOff, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -50,6 +53,7 @@ partial class MethodLoggerKnockOff : global::KnockOff.Documentation.Samples.Guid
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = message;
+				if (_source is { } src) { src.Log(message); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Log");
 				return;
 			}
@@ -73,6 +77,7 @@ partial class MethodLoggerKnockOff : global::KnockOff.Documentation.Samples.Guid
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -162,6 +167,9 @@ partial class MethodLoggerKnockOff : global::KnockOff.Documentation.Samples.Guid
 	/// <summary>Tracks and configures behavior for LogError.</summary>
 	public sealed class LogErrorInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IMethodLogger? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<MethodLoggerKnockOff, string, global::System.Exception> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -204,6 +212,7 @@ partial class MethodLoggerKnockOff : global::KnockOff.Documentation.Samples.Guid
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((message, ex));
+				if (_source is { } src) { src.LogError(message, ex); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "LogError");
 				return;
 			}
@@ -227,6 +236,7 @@ partial class MethodLoggerKnockOff : global::KnockOff.Documentation.Samples.Guid
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -339,6 +349,16 @@ partial class MethodLoggerKnockOff : global::KnockOff.Documentation.Samples.Guid
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.IMethodLogger).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.IMethodLogger? source)
+	{
+		Log._source = source;
+		LogError._source = source;
 	}
 
 	void global::KnockOff.Documentation.Samples.Guides.IMethodLogger.Log(string message)

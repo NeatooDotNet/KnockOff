@@ -8,6 +8,9 @@ partial class AiOrderServiceStub : global::KnockOff.Documentation.Samples.IAiOrd
 	/// <summary>Tracks and configures behavior for TotalAmount.</summary>
 	public sealed class TotalAmountInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.IAiOrderService? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -21,12 +24,15 @@ partial class AiOrderServiceStub : global::KnockOff.Documentation.Samples.IAiOrd
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for SaveOrder.</summary>
 	public sealed class SaveOrderInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.IAiOrderService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<AiOrderServiceStub, global::KnockOff.Documentation.Samples.AiOrder> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -69,6 +75,7 @@ partial class AiOrderServiceStub : global::KnockOff.Documentation.Samples.IAiOrd
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = order;
+				if (_source is { } src) { src.SaveOrder(order); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SaveOrder");
 				return;
 			}
@@ -92,6 +99,7 @@ partial class AiOrderServiceStub : global::KnockOff.Documentation.Samples.IAiOrd
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -253,9 +261,19 @@ partial class AiOrderServiceStub : global::KnockOff.Documentation.Samples.IAiOrd
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
 	}
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.IAiOrderService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.IAiOrderService? source)
+	{
+		TotalAmount._source = source;
+		SaveOrder._source = source;
+	}
+
 	decimal global::KnockOff.Documentation.Samples.IAiOrderService.TotalAmount
 	{
-		get { TotalAmount.RecordGet(); if (TotalAmount.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IAiOrderService", "TotalAmount"); return TotalAmount.Value; }
+		get { TotalAmount.RecordGet(); if (TotalAmount.OnGet is { } onGet) return onGet(this); if (TotalAmount._source is { } src) return src.TotalAmount; if (Strict) throw global::KnockOff.StubException.NotConfigured("IAiOrderService", "TotalAmount"); return TotalAmount.Value; }
 	}
 
 	global::KnockOff.Documentation.Samples.AiOrder? global::KnockOff.Documentation.Samples.IAiOrderService.GetOrder(int id)

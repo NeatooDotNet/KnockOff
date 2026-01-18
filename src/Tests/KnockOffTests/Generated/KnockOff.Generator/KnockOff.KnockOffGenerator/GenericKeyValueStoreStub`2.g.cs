@@ -8,6 +8,9 @@ partial class GenericKeyValueStoreStub<TKey, TValue> : global::KnockOff.Tests.IG
 	/// <summary>Tracks and configures behavior for Get.</summary>
 	public sealed class GetInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.IGenericKeyValueStore<TKey, TValue>? _source;
+
 		/// <summary>Delegate for Get.</summary>
 		public delegate TValue GetDelegate(GenericKeyValueStoreStub<TKey, TValue> ko, TKey key);
 
@@ -53,6 +56,9 @@ partial class GenericKeyValueStoreStub<TKey, TValue> : global::KnockOff.Tests.IG
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = key;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Get(key);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Get");
 				throw new global::System.InvalidOperationException("No implementation provided for Get. Configure via OnCall.");
 			}
@@ -76,6 +82,7 @@ partial class GenericKeyValueStoreStub<TKey, TValue> : global::KnockOff.Tests.IG
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -165,6 +172,9 @@ partial class GenericKeyValueStoreStub<TKey, TValue> : global::KnockOff.Tests.IG
 	/// <summary>Tracks and configures behavior for Set.</summary>
 	public sealed class SetInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.IGenericKeyValueStore<TKey, TValue>? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<GenericKeyValueStoreStub<TKey, TValue>, TKey, TValue> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -207,6 +217,9 @@ partial class GenericKeyValueStoreStub<TKey, TValue> : global::KnockOff.Tests.IG
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((key, @value));
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.Set(key, @value); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Set");
 				return;
 			}
@@ -230,6 +243,7 @@ partial class GenericKeyValueStoreStub<TKey, TValue> : global::KnockOff.Tests.IG
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -342,6 +356,16 @@ partial class GenericKeyValueStoreStub<TKey, TValue> : global::KnockOff.Tests.IG
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Tests.IGenericKeyValueStore<TKey, TValue>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Tests.IGenericKeyValueStore<TKey, TValue>? source)
+	{
+		Get._source = source;
+		Set._source = source;
 	}
 
 	TValue global::KnockOff.Tests.IGenericKeyValueStore<TKey, TValue>.Get(TKey key)

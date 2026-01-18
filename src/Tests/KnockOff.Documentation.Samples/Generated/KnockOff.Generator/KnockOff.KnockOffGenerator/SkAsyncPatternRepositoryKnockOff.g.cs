@@ -8,6 +8,9 @@ partial class SkAsyncPatternRepositoryKnockOff : global::KnockOff.Documentation.
 	/// <summary>Tracks and configures behavior for GetUserAsync.</summary>
 	public sealed class GetUserAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.ISkAsyncPatternRepository? _source;
+
 		/// <summary>Delegate for GetUserAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.SkUser?> GetUserAsyncDelegate(SkAsyncPatternRepositoryKnockOff ko, int id);
 
@@ -53,6 +56,7 @@ partial class SkAsyncPatternRepositoryKnockOff : global::KnockOff.Documentation.
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				if (_source is { } src) return src.GetUserAsync(id);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetUserAsync");
 				return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Skills.SkUser?>(default!);
 			}
@@ -76,6 +80,7 @@ partial class SkAsyncPatternRepositoryKnockOff : global::KnockOff.Documentation.
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -165,6 +170,9 @@ partial class SkAsyncPatternRepositoryKnockOff : global::KnockOff.Documentation.
 	/// <summary>Tracks and configures behavior for SaveAsync.</summary>
 	public sealed class SaveAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.ISkAsyncPatternRepository? _source;
+
 		/// <summary>Delegate for SaveAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<int> SaveAsyncDelegate(SkAsyncPatternRepositoryKnockOff ko, object entity);
 
@@ -210,6 +218,7 @@ partial class SkAsyncPatternRepositoryKnockOff : global::KnockOff.Documentation.
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = entity;
+				if (_source is { } src) return src.SaveAsync(entity);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SaveAsync");
 				return global::System.Threading.Tasks.Task.FromResult<int>(default!);
 			}
@@ -233,6 +242,7 @@ partial class SkAsyncPatternRepositoryKnockOff : global::KnockOff.Documentation.
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -345,6 +355,16 @@ partial class SkAsyncPatternRepositoryKnockOff : global::KnockOff.Documentation.
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Skills.ISkAsyncPatternRepository).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Skills.ISkAsyncPatternRepository? source)
+	{
+		GetUserAsync._source = source;
+		SaveAsync._source = source;
 	}
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.SkUser?> global::KnockOff.Documentation.Samples.Skills.ISkAsyncPatternRepository.GetUserAsync(int id)

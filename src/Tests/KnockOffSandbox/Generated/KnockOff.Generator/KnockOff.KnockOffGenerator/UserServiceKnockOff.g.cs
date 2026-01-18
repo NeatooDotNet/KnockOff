@@ -8,6 +8,9 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Sandbox.IUserService? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -33,12 +36,15 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for Count.</summary>
 	public sealed class CountInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Sandbox.IUserService? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -52,12 +58,15 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for DoWork.</summary>
 	public sealed class DoWorkInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Sandbox.IUserService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<UserServiceKnockOff> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -95,6 +104,7 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) { src.DoWork(); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "DoWork");
 				return;
 			}
@@ -117,6 +127,7 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -202,6 +213,9 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 	/// <summary>Tracks and configures behavior for Process.</summary>
 	public sealed class ProcessInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Sandbox.IUserService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<UserServiceKnockOff, string, int, bool> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -244,6 +258,7 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((id, count, urgent));
+				if (_source is { } src) { src.Process(id, count, urgent); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return;
 			}
@@ -267,6 +282,7 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -411,15 +427,27 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
 	}
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Sandbox.IUserService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Sandbox.IUserService? source)
+	{
+		Name._source = source;
+		Count._source = source;
+		DoWork._source = source;
+		Process._source = source;
+	}
+
 	string global::KnockOff.Sandbox.IUserService.Name
 	{
-		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserService", "Name"); return Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserService", "Name"); Name.Value = value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Name._source is { } src) return src.Name; if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserService", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Name._source is { } src) { src.Name = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserService", "Name"); Name.Value = value; }
 	}
 
 	int global::KnockOff.Sandbox.IUserService.Count
 	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserService", "Count"); return Count.Value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserService", "Count"); return Count.Value; }
 	}
 
 	void global::KnockOff.Sandbox.IUserService.DoWork()

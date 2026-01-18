@@ -11,6 +11,9 @@ partial class AsyncEnumerableIntStubTests
 		/// <summary>Tracks and configures behavior for GetAsyncEnumerator.</summary>
 		public sealed class IAsyncEnumerable_GetAsyncEnumeratorInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IAsyncEnumerable<int>? _source;
+
 			/// <summary>Delegate for GetAsyncEnumerator.</summary>
 			public delegate global::System.Collections.Generic.IAsyncEnumerator<int> GetAsyncEnumeratorDelegate(Stubs.IAsyncEnumerable ko, global::System.Threading.CancellationToken cancellationToken);
 
@@ -56,6 +59,9 @@ partial class AsyncEnumerableIntStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = cancellationToken;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetAsyncEnumerator(cancellationToken);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetAsyncEnumerator");
 					throw new global::System.InvalidOperationException("No implementation provided for GetAsyncEnumerator. Configure via OnCall.");
 				}
@@ -79,6 +85,7 @@ partial class AsyncEnumerableIntStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -187,6 +194,12 @@ partial class AsyncEnumerableIntStubTests
 			public IAsyncEnumerable(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.Generic.IAsyncEnumerable<int> delegation.</summary>
+			public void Source(global::System.Collections.Generic.IAsyncEnumerable<int>? source)
+			{
+				GetAsyncEnumerator._source = source;
 			}
 
 		}

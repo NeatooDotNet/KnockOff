@@ -11,6 +11,9 @@ partial class AttrInterfaceTests
 		/// <summary>Tracks and configures behavior for GetById.</summary>
 		public sealed class IAttrUserRepository_GetByIdInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Reference.IAttrUserRepository? _source;
+
 			/// <summary>Delegate for GetById.</summary>
 			public delegate global::KnockOff.Documentation.Samples.Reference.AttrUser? GetByIdDelegate(Stubs.IAttrUserRepository ko, int id);
 
@@ -56,6 +59,7 @@ partial class AttrInterfaceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = id;
+					if (_source is { } src) return src.GetById(id);
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
 					return default!;
 				}
@@ -79,6 +83,7 @@ partial class AttrInterfaceTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -187,6 +192,12 @@ partial class AttrInterfaceTests
 			public IAttrUserRepository(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::KnockOff.Documentation.Samples.Reference.IAttrUserRepository delegation.</summary>
+			public void Source(global::KnockOff.Documentation.Samples.Reference.IAttrUserRepository? source)
+			{
+				GetById._source = source;
 			}
 
 		}

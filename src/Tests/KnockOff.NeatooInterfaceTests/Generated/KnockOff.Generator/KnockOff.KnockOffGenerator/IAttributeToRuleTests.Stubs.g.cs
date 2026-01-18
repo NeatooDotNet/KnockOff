@@ -107,6 +107,11 @@ partial class IAttributeToRuleTests
 				Strict = strict;
 			}
 
+			/// <summary>Sets the source object for global::Neatoo.Rules.Rules.IAttributeToRule delegation.</summary>
+			public void Source(global::Neatoo.Rules.Rules.IAttributeToRule? source)
+			{
+			}
+
 			/// <summary>Gets a smart default value for a generic type at runtime.</summary>
 			private static T SmartDefault<T>(string methodName)
 			{

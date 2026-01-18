@@ -8,6 +8,9 @@ partial class GenericRepositoryStub<T> : global::KnockOff.Tests.IGenericReposito
 	/// <summary>Tracks and configures behavior for Count.</summary>
 	public sealed class CountInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Tests.IGenericRepository<T>? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -33,12 +36,15 @@ partial class GenericRepositoryStub<T> : global::KnockOff.Tests.IGenericReposito
 		public void RecordSet(int? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for GetById.</summary>
 	public sealed class GetByIdInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.IGenericRepository<T>? _source;
+
 		/// <summary>Delegate for GetById.</summary>
 		public delegate T? GetByIdDelegate(GenericRepositoryStub<T> ko, int id);
 
@@ -84,6 +90,9 @@ partial class GenericRepositoryStub<T> : global::KnockOff.Tests.IGenericReposito
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetById(id);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
 				return default!;
 			}
@@ -107,6 +116,7 @@ partial class GenericRepositoryStub<T> : global::KnockOff.Tests.IGenericReposito
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -196,6 +206,9 @@ partial class GenericRepositoryStub<T> : global::KnockOff.Tests.IGenericReposito
 	/// <summary>Tracks and configures behavior for Save.</summary>
 	public sealed class SaveInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.IGenericRepository<T>? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<GenericRepositoryStub<T>, T> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -238,6 +251,9 @@ partial class GenericRepositoryStub<T> : global::KnockOff.Tests.IGenericReposito
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = entity;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.Save(entity); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 				return;
 			}
@@ -261,6 +277,7 @@ partial class GenericRepositoryStub<T> : global::KnockOff.Tests.IGenericReposito
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -350,6 +367,9 @@ partial class GenericRepositoryStub<T> : global::KnockOff.Tests.IGenericReposito
 	/// <summary>Tracks and configures behavior for GetAll.</summary>
 	public sealed class GetAllInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.IGenericRepository<T>? _source;
+
 		/// <summary>Delegate for GetAll.</summary>
 		public delegate global::System.Collections.Generic.IEnumerable<T> GetAllDelegate(GenericRepositoryStub<T> ko);
 
@@ -390,6 +410,9 @@ partial class GenericRepositoryStub<T> : global::KnockOff.Tests.IGenericReposito
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetAll();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetAll");
 				return new global::System.Collections.Generic.List<T>();
 			}
@@ -412,6 +435,7 @@ partial class GenericRepositoryStub<T> : global::KnockOff.Tests.IGenericReposito
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -529,10 +553,22 @@ partial class GenericRepositoryStub<T> : global::KnockOff.Tests.IGenericReposito
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
 	}
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Tests.IGenericRepository<T>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Tests.IGenericRepository<T>? source)
+	{
+		Count._source = source;
+		GetById._source = source;
+		Save._source = source;
+		GetAll._source = source;
+	}
+
 	int global::KnockOff.Tests.IGenericRepository<T>.Count
 	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericRepository<T>", "Count"); return Count.Value; }
-		set { Count.RecordSet(value); if (Count.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericRepository<T>", "Count"); Count.Value = value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericRepository<T>", "Count"); return Count.Value; }
+		set { Count.RecordSet(value); if (Count.OnSet is { } onSet) { onSet(this, value); return; } if (Count._source is { } src) { src.Count = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericRepository<T>", "Count"); Count.Value = value; }
 	}
 
 	T? global::KnockOff.Tests.IGenericRepository<T>.GetById(int id)

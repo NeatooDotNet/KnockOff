@@ -125,6 +125,9 @@ internal static class FlatRenderer
 			// Standard members (Strict mode, Object accessor)
 			RenderStandardMembers(w, unit);
 
+			// Source(T) methods for each interface in the hierarchy
+			RenderSourceMethods(w, unit);
+
 			// Build set of interceptor names that have multiple UNIQUE overloads (need suffixed Invoke)
 			// Must match the deduplication logic in RenderMethodGroupInterceptorClass
 			var multiOverloadInterceptors = new HashSet<string>(
@@ -278,6 +281,11 @@ internal static class FlatRenderer
 
 	private static void RenderRegularPropertyInterceptorContent(CodeWriter w, FlatPropertyModel prop, string className)
 	{
+		// Source field for Source(T) feature - uses declaring interface type
+		w.Line($"/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>");
+		w.Line($"internal {prop.DeclaringInterface}? _source;");
+		w.Line();
+
 		if (prop.HasGetter)
 		{
 			w.Line("/// <summary>Number of times the getter was accessed.</summary>");
@@ -327,7 +335,7 @@ internal static class FlatRenderer
 		var resetParts = new System.Collections.Generic.List<string>();
 		if (prop.HasGetter) resetParts.Add("GetCount = 0; OnGet = null;");
 		if (prop.HasSetter) resetParts.Add("SetCount = 0; LastSetValue = default; OnSet = null;");
-		resetParts.Add("Value = default!;");
+		resetParts.Add("Value = default!; _source = null;");
 		w.Line($"public void Reset() {{ {string.Join(" ", resetParts)} }}");
 	}
 
@@ -387,6 +395,11 @@ internal static class FlatRenderer
 		w.Line($"/// <summary>Tracks and configures behavior for indexer.</summary>");
 		using (w.Block($"public sealed class {indexer.InterceptorClassName}"))
 		{
+			// Source field for Source(T) feature - uses declaring interface type
+			w.Line($"/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>");
+			w.Line($"internal {indexer.DeclaringInterface}? _source;");
+			w.Line();
+
 			if (indexer.HasGetter)
 			{
 				w.Line("/// <summary>Number of times the getter was accessed.</summary>");
@@ -441,6 +454,7 @@ internal static class FlatRenderer
 			var resetParts = new System.Collections.Generic.List<string>();
 			if (indexer.HasGetter) resetParts.Add("GetCount = 0; LastGetKey = default; OnGet = null;");
 			if (indexer.HasSetter) resetParts.Add("SetCount = 0; LastSetEntry = null; OnSet = null;");
+			resetParts.Add("_source = null;");
 			// Note: Backing dictionary is intentionally NOT cleared - pre-populated data is preserved
 			w.Line($"public void Reset() {{ {string.Join(" ", resetParts)} }}");
 		}
@@ -1638,6 +1652,45 @@ internal static class FlatRenderer
 
 	#endregion
 
+	#region Source Methods
+
+	/// <summary>
+	/// Renders Source(T) methods for each interface in the inheritance hierarchy.
+	/// Each Source(T) overload sets _source for members declared on T or its bases,
+	/// and clears _source for members declared on more derived interfaces.
+	/// </summary>
+	private static void RenderSourceMethods(CodeWriter w, FlatGenerationUnit unit)
+	{
+		if (unit.SourceProviders.Count == 0)
+			return;
+
+		w.Line("// Source(T) methods for interface delegation");
+		w.Line();
+
+		foreach (var provider in unit.SourceProviders)
+		{
+			w.Line($"/// <summary>Delegates unconfigured member access to the provided source object ({provider.InterfaceType}).</summary>");
+			w.Line($"/// <param name=\"source\">The source to delegate to, or null to clear.</param>");
+			using (w.Block($"public void {provider.MethodName}({provider.InterfaceType}? source)"))
+			{
+				foreach (var mapping in provider.MemberMappings)
+				{
+					if (mapping.SetSource)
+					{
+						w.Line($"{mapping.InterceptorName}._source = source;");
+					}
+					else
+					{
+						w.Line($"{mapping.InterceptorName}._source = null;");
+					}
+				}
+			}
+			w.Line();
+		}
+	}
+
+	#endregion
+
 	#region Property Implementation
 
 	private static void RenderPropertyImplementation(CodeWriter w, FlatPropertyModel prop)
@@ -1660,16 +1713,17 @@ internal static class FlatRenderer
 			}
 			else
 			{
+				// Priority chain: OnGet/OnSet > Source > Strict > Value
 				if (prop.HasGetter)
 				{
-					w.Line($"get {{ {prop.InterceptorName}.RecordGet(); if ({prop.InterceptorName}.OnGet is {{ }} onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{prop.SimpleInterfaceName}\", \"{prop.MemberName}\"); return {prop.InterceptorName}.Value; }}");
+					w.Line($"get {{ {prop.InterceptorName}.RecordGet(); if ({prop.InterceptorName}.OnGet is {{ }} onGet) return onGet(this); if ({prop.InterceptorName}._source is {{ }} src) return src.{prop.MemberName}; if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{prop.SimpleInterfaceName}\", \"{prop.MemberName}\"); return {prop.InterceptorName}.Value; }}");
 				}
 
 				if (prop.HasSetter)
 				{
 					if (prop.SetterPragmaDisable != null)
 						w.Append(prop.SetterPragmaDisable);
-					w.Line($"set {{ {prop.InterceptorName}.RecordSet(value); if ({prop.InterceptorName}.OnSet is {{ }} onSet) {{ onSet(this, value); return; }} if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{prop.SimpleInterfaceName}\", \"{prop.MemberName}\"); {prop.InterceptorName}.Value = value; }}");
+					w.Line($"set {{ {prop.InterceptorName}.RecordSet(value); if ({prop.InterceptorName}.OnSet is {{ }} onSet) {{ onSet(this, value); return; }} if ({prop.InterceptorName}._source is {{ }} src) {{ src.{prop.MemberName} = value; return; }} if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{prop.SimpleInterfaceName}\", \"{prop.MemberName}\"); {prop.InterceptorName}.Value = value; }}");
 					if (prop.SetterPragmaRestore != null)
 						w.Line(prop.SetterPragmaRestore);
 				}
@@ -1715,14 +1769,15 @@ internal static class FlatRenderer
 		w.Line($"{indexer.ReturnType} {indexer.DeclaringInterface}.this[{indexer.KeyType} {indexer.KeyParamName}]");
 		using (w.Braces())
 		{
+			// Priority chain: OnGet/OnSet > Source > Strict > Backing
 			if (indexer.HasGetter)
 			{
-				w.Line($"get {{ {accessExpr}.RecordGet({indexer.KeyParamName}); if ({accessExpr}.OnGet is {{ }} onGet) return onGet(this, {indexer.KeyParamName}); if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{indexer.SimpleInterfaceName}\", \"this[]\"); return {accessExpr}.Backing.TryGetValue({indexer.KeyParamName}, out var v) ? v : {indexer.DefaultExpression}; }}");
+				w.Line($"get {{ {accessExpr}.RecordGet({indexer.KeyParamName}); if ({accessExpr}.OnGet is {{ }} onGet) return onGet(this, {indexer.KeyParamName}); if ({accessExpr}._source is {{ }} src) return src[{indexer.KeyParamName}]; if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{indexer.SimpleInterfaceName}\", \"this[]\"); return {accessExpr}.Backing.TryGetValue({indexer.KeyParamName}, out var v) ? v : {indexer.DefaultExpression}; }}");
 			}
 
 			if (indexer.HasSetter)
 			{
-				w.Line($"set {{ {accessExpr}.RecordSet({indexer.KeyParamName}, value); if ({accessExpr}.OnSet is {{ }} onSet) {{ onSet(this, {indexer.KeyParamName}, value); return; }} if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{indexer.SimpleInterfaceName}\", \"this[]\"); {accessExpr}.Backing[{indexer.KeyParamName}] = value; }}");
+				w.Line($"set {{ {accessExpr}.RecordSet({indexer.KeyParamName}, value); if ({accessExpr}.OnSet is {{ }} onSet) {{ onSet(this, {indexer.KeyParamName}, value); return; }} if ({accessExpr}._source is {{ }} src) {{ src[{indexer.KeyParamName}] = value; return; }} if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{indexer.SimpleInterfaceName}\", \"this[]\"); {accessExpr}.Backing[{indexer.KeyParamName}] = value; }}");
 			}
 		}
 		w.Line();

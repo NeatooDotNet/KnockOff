@@ -11,6 +11,9 @@ partial class AttrFullyQualifiedTests
 		/// <summary>Tracks and configures behavior for DoWork.</summary>
 		public sealed class IAttrService_DoWorkInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Reference.IAttrService? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IAttrService> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -48,6 +51,7 @@ partial class AttrFullyQualifiedTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					if (_source is { } src) { src.DoWork(); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "DoWork");
 					return;
 				}
@@ -70,6 +74,7 @@ partial class AttrFullyQualifiedTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -174,6 +179,12 @@ partial class AttrFullyQualifiedTests
 			public IAttrService(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::KnockOff.Documentation.Samples.Reference.IAttrService delegation.</summary>
+			public void Source(global::KnockOff.Documentation.Samples.Reference.IAttrService? source)
+			{
+				DoWork._source = source;
 			}
 
 		}

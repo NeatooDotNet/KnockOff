@@ -20,16 +20,22 @@ partial class EnumeratorStringStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public string Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Collections.Generic.IEnumerator<string>? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Tracks and configures behavior for MoveNext.</summary>
 		public sealed class IEnumerator_MoveNextInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.IEnumerator? _source;
+
 			/// <summary>Delegate for MoveNext.</summary>
 			public delegate bool MoveNextDelegate(Stubs.IEnumerator ko);
 
@@ -70,6 +76,9 @@ partial class EnumeratorStringStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.MoveNext();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "MoveNext");
 					return default!;
 				}
@@ -92,6 +101,7 @@ partial class EnumeratorStringStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -177,6 +187,9 @@ partial class EnumeratorStringStubTests
 		/// <summary>Tracks and configures behavior for Reset.</summary>
 		public sealed class IEnumerator_ResetInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.IEnumerator? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IEnumerator> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -214,6 +227,9 @@ partial class EnumeratorStringStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.Reset(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Reset");
 					return;
 				}
@@ -236,6 +252,7 @@ partial class EnumeratorStringStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -321,6 +338,9 @@ partial class EnumeratorStringStubTests
 		/// <summary>Tracks and configures behavior for Dispose.</summary>
 		public sealed class IEnumerator_DisposeInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IDisposable? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IEnumerator> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -358,6 +378,9 @@ partial class EnumeratorStringStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.Dispose(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Dispose");
 					return;
 				}
@@ -380,6 +403,7 @@ partial class EnumeratorStringStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -483,6 +507,7 @@ partial class EnumeratorStringStubTests
 				{
 					Current.RecordGet();
 					if (Current.OnGet is { } onGet) return onGet(this);
+					if (Current._source is { } src) return src.Current;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEnumerator<string>", "Current");
 					return Current.Value;
 				}
@@ -519,6 +544,33 @@ partial class EnumeratorStringStubTests
 			public IEnumerator(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.Generic.IEnumerator<string> delegation.</summary>
+			public void Source(global::System.Collections.Generic.IEnumerator<string>? source)
+			{
+				Current._source = source;
+				MoveNext._source = source;
+				Reset._source = source;
+				Dispose._source = source;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.IEnumerator delegation.</summary>
+			public void Source(global::System.Collections.IEnumerator? source)
+			{
+				Current._source = null;
+				MoveNext._source = source;
+				Reset._source = source;
+				Dispose._source = null;
+			}
+
+			/// <summary>Sets the source object for global::System.IDisposable delegation.</summary>
+			public void Source(global::System.IDisposable? source)
+			{
+				Current._source = null;
+				MoveNext._source = null;
+				Reset._source = null;
+				Dispose._source = source;
 			}
 
 		}

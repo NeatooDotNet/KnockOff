@@ -29,6 +29,9 @@ partial class IEntityPropertyOfTTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.IEntityProperty? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
@@ -36,7 +39,7 @@ partial class IEntityPropertyOfTTests
 			public void RecordSet(bool? value) { SetCount++; LastSetValue = value; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IEntityProperty.IsModified.</summary>
@@ -51,11 +54,14 @@ partial class IEntityPropertyOfTTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.IEntityProperty? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IEntityProperty.IsSelfModified.</summary>
@@ -70,11 +76,14 @@ partial class IEntityPropertyOfTTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.IEntityProperty? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IEntityProperty.DisplayName.</summary>
@@ -89,11 +98,14 @@ partial class IEntityPropertyOfTTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public string Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.IEntityProperty? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IEntityProperty.Value.</summary>
@@ -117,6 +129,9 @@ partial class IEntityPropertyOfTTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public string? Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.IValidateProperty<string>? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
@@ -124,7 +139,7 @@ partial class IEntityPropertyOfTTests
 			public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IEntityProperty.Name.</summary>
@@ -139,11 +154,14 @@ partial class IEntityPropertyOfTTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public string Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.IValidateProperty? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IEntityProperty.Task.</summary>
@@ -158,11 +176,14 @@ partial class IEntityPropertyOfTTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Threading.Tasks.Task Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.IValidateProperty? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IEntityProperty.IsBusy.</summary>
@@ -177,11 +198,14 @@ partial class IEntityPropertyOfTTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.IValidateProperty? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IEntityProperty.IsReadOnly.</summary>
@@ -196,11 +220,14 @@ partial class IEntityPropertyOfTTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.IValidateProperty? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IEntityProperty.Type.</summary>
@@ -215,11 +242,14 @@ partial class IEntityPropertyOfTTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Type Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.IValidateProperty? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IEntityProperty.StringValue.</summary>
@@ -234,11 +264,14 @@ partial class IEntityPropertyOfTTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public string? Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.IValidateProperty? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IEntityProperty.IsSelfValid.</summary>
@@ -253,11 +286,14 @@ partial class IEntityPropertyOfTTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.IValidateProperty? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IEntityProperty.IsValid.</summary>
@@ -272,11 +308,14 @@ partial class IEntityPropertyOfTTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.IValidateProperty? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IEntityProperty.PropertyMessages.</summary>
@@ -291,16 +330,22 @@ partial class IEntityPropertyOfTTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.IValidateProperty? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Tracks and configures behavior for MarkSelfUnmodified.</summary>
 		public sealed class IEntityProperty_MarkSelfUnmodifiedInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::Neatoo.IEntityProperty? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IEntityProperty> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -338,6 +383,7 @@ partial class IEntityPropertyOfTTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					if (_source is { } src) { src.MarkSelfUnmodified(); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "MarkSelfUnmodified");
 					return;
 				}
@@ -360,6 +406,7 @@ partial class IEntityPropertyOfTTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -445,6 +492,9 @@ partial class IEntityPropertyOfTTests
 		/// <summary>Tracks and configures behavior for ApplyPropertyInfo.</summary>
 		public sealed class IEntityProperty_ApplyPropertyInfoInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::Neatoo.IEntityProperty? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IEntityProperty, global::Neatoo.IPropertyInfo> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -487,6 +537,7 @@ partial class IEntityPropertyOfTTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = propertyInfo;
+					if (_source is { } src) { src.ApplyPropertyInfo(propertyInfo); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ApplyPropertyInfo");
 					return;
 				}
@@ -510,6 +561,7 @@ partial class IEntityPropertyOfTTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -599,6 +651,9 @@ partial class IEntityPropertyOfTTests
 		/// <summary>Tracks and configures behavior for SetValue.</summary>
 		public sealed class IEntityProperty_SetValueInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::Neatoo.IValidateProperty? _source;
+
 			/// <summary>Delegate for SetValue.</summary>
 			public delegate global::System.Threading.Tasks.Task SetValueDelegate(Stubs.IEntityProperty ko, object? newValue);
 
@@ -644,6 +699,7 @@ partial class IEntityPropertyOfTTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = newValue;
+					if (_source is { } src) return src.SetValue(newValue);
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "SetValue");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
@@ -667,6 +723,7 @@ partial class IEntityPropertyOfTTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -756,6 +813,9 @@ partial class IEntityPropertyOfTTests
 		/// <summary>Tracks and configures behavior for AddMarkedBusy.</summary>
 		public sealed class IEntityProperty_AddMarkedBusyInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::Neatoo.IValidateProperty? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IEntityProperty, long> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -798,6 +858,7 @@ partial class IEntityPropertyOfTTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = id;
+					if (_source is { } src) { src.AddMarkedBusy(id); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "AddMarkedBusy");
 					return;
 				}
@@ -821,6 +882,7 @@ partial class IEntityPropertyOfTTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -910,6 +972,9 @@ partial class IEntityPropertyOfTTests
 		/// <summary>Tracks and configures behavior for RemoveMarkedBusy.</summary>
 		public sealed class IEntityProperty_RemoveMarkedBusyInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::Neatoo.IValidateProperty? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IEntityProperty, long> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -952,6 +1017,7 @@ partial class IEntityPropertyOfTTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = id;
+					if (_source is { } src) { src.RemoveMarkedBusy(id); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "RemoveMarkedBusy");
 					return;
 				}
@@ -975,6 +1041,7 @@ partial class IEntityPropertyOfTTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1064,6 +1131,9 @@ partial class IEntityPropertyOfTTests
 		/// <summary>Tracks and configures behavior for LoadValue.</summary>
 		public sealed class IEntityProperty_LoadValueInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::Neatoo.IValidateProperty? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IEntityProperty, object?> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -1106,6 +1176,7 @@ partial class IEntityPropertyOfTTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = @value;
+					if (_source is { } src) { src.LoadValue(@value); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "LoadValue");
 					return;
 				}
@@ -1129,6 +1200,7 @@ partial class IEntityPropertyOfTTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1218,6 +1290,9 @@ partial class IEntityPropertyOfTTests
 		/// <summary>Tracks and configures behavior for WaitForTasks.</summary>
 		public sealed class IEntityProperty_WaitForTasksInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::Neatoo.IValidateProperty? _source;
+
 			/// <summary>Delegate for WaitForTasks.</summary>
 			public delegate global::System.Threading.Tasks.Task WaitForTasksDelegate(Stubs.IEntityProperty ko);
 
@@ -1258,6 +1333,7 @@ partial class IEntityPropertyOfTTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					if (_source is { } src) return src.WaitForTasks();
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "WaitForTasks");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
@@ -1280,6 +1356,7 @@ partial class IEntityPropertyOfTTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1365,6 +1442,9 @@ partial class IEntityPropertyOfTTests
 		/// <summary>Tracks and configures behavior for GetAwaiter.</summary>
 		public sealed class IEntityProperty_GetAwaiterInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::Neatoo.IValidateProperty? _source;
+
 			/// <summary>Delegate for GetAwaiter.</summary>
 			public delegate global::System.Runtime.CompilerServices.TaskAwaiter GetAwaiterDelegate(Stubs.IEntityProperty ko);
 
@@ -1405,6 +1485,7 @@ partial class IEntityPropertyOfTTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					if (_source is { } src) return src.GetAwaiter();
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetAwaiter");
 					return default!;
 				}
@@ -1427,6 +1508,7 @@ partial class IEntityPropertyOfTTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1512,6 +1594,9 @@ partial class IEntityPropertyOfTTests
 		/// <summary>Tracks and configures behavior for RunRules.</summary>
 		public sealed class IEntityProperty_RunRulesInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::Neatoo.IValidateProperty? _source;
+
 			/// <summary>Delegate for RunRules.</summary>
 			public delegate global::System.Threading.Tasks.Task RunRulesDelegate(Stubs.IEntityProperty ko, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token);
 
@@ -1557,6 +1642,7 @@ partial class IEntityPropertyOfTTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((runRules, token));
+					if (_source is { } src) return src.RunRules(runRules, token);
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
@@ -1580,6 +1666,7 @@ partial class IEntityPropertyOfTTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1804,6 +1891,7 @@ partial class IEntityPropertyOfTTests
 				{
 					IsPaused.RecordGet();
 					if (IsPaused.OnGet is { } onGet) return onGet(this);
+					if (IsPaused._source is { } src) return src.IsPaused;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty", "IsPaused");
 					return IsPaused.Value;
 				}
@@ -1811,6 +1899,7 @@ partial class IEntityPropertyOfTTests
 				{
 					IsPaused.RecordSet(value);
 					if (IsPaused.OnSet is { } onSet) { onSet(this, value); return; }
+					if (IsPaused._source is { } src) { src.IsPaused = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty", "IsPaused");
 					IsPaused.Value = value;
 				}
@@ -1822,6 +1911,7 @@ partial class IEntityPropertyOfTTests
 				{
 					IsModified.RecordGet();
 					if (IsModified.OnGet is { } onGet) return onGet(this);
+					if (IsModified._source is { } src) return src.IsModified;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty", "IsModified");
 					return IsModified.Value;
 				}
@@ -1833,6 +1923,7 @@ partial class IEntityPropertyOfTTests
 				{
 					IsSelfModified.RecordGet();
 					if (IsSelfModified.OnGet is { } onGet) return onGet(this);
+					if (IsSelfModified._source is { } src) return src.IsSelfModified;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty", "IsSelfModified");
 					return IsSelfModified.Value;
 				}
@@ -1844,6 +1935,7 @@ partial class IEntityPropertyOfTTests
 				{
 					DisplayName.RecordGet();
 					if (DisplayName.OnGet is { } onGet) return onGet(this);
+					if (DisplayName._source is { } src) return src.DisplayName;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty", "DisplayName");
 					return DisplayName.Value;
 				}
@@ -1855,6 +1947,7 @@ partial class IEntityPropertyOfTTests
 				{
 					Value.RecordGet();
 					if (Value.OnGet is { } onGet) return onGet(this);
+					if (Value._source is { } src) return src.Value;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty<string>", "Value");
 					return Value.Value;
 				}
@@ -1862,6 +1955,7 @@ partial class IEntityPropertyOfTTests
 				{
 					Value.RecordSet(value);
 					if (Value.OnSet is { } onSet) { onSet(this, value); return; }
+					if (Value._source is { } src) { src.Value = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty<string>", "Value");
 					Value.Value = value;
 				}
@@ -1908,6 +2002,7 @@ partial class IEntityPropertyOfTTests
 				{
 					Name.RecordGet();
 					if (Name.OnGet is { } onGet) return onGet(this);
+					if (Name._source is { } src) return src.Name;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "Name");
 					return Name.Value;
 				}
@@ -1925,6 +2020,7 @@ partial class IEntityPropertyOfTTests
 				{
 					Task.RecordGet();
 					if (Task.OnGet is { } onGet) return onGet(this);
+					if (Task._source is { } src) return src.Task;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "Task");
 					return Task.Value;
 				}
@@ -1936,6 +2032,7 @@ partial class IEntityPropertyOfTTests
 				{
 					IsBusy.RecordGet();
 					if (IsBusy.OnGet is { } onGet) return onGet(this);
+					if (IsBusy._source is { } src) return src.IsBusy;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "IsBusy");
 					return IsBusy.Value;
 				}
@@ -1947,6 +2044,7 @@ partial class IEntityPropertyOfTTests
 				{
 					IsReadOnly.RecordGet();
 					if (IsReadOnly.OnGet is { } onGet) return onGet(this);
+					if (IsReadOnly._source is { } src) return src.IsReadOnly;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "IsReadOnly");
 					return IsReadOnly.Value;
 				}
@@ -1958,6 +2056,7 @@ partial class IEntityPropertyOfTTests
 				{
 					Type.RecordGet();
 					if (Type.OnGet is { } onGet) return onGet(this);
+					if (Type._source is { } src) return src.Type;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "Type");
 					return Type.Value;
 				}
@@ -1969,6 +2068,7 @@ partial class IEntityPropertyOfTTests
 				{
 					StringValue.RecordGet();
 					if (StringValue.OnGet is { } onGet) return onGet(this);
+					if (StringValue._source is { } src) return src.StringValue;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "StringValue");
 					return StringValue.Value;
 				}
@@ -1980,6 +2080,7 @@ partial class IEntityPropertyOfTTests
 				{
 					IsSelfValid.RecordGet();
 					if (IsSelfValid.OnGet is { } onGet) return onGet(this);
+					if (IsSelfValid._source is { } src) return src.IsSelfValid;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "IsSelfValid");
 					return IsSelfValid.Value;
 				}
@@ -1991,6 +2092,7 @@ partial class IEntityPropertyOfTTests
 				{
 					IsValid.RecordGet();
 					if (IsValid.OnGet is { } onGet) return onGet(this);
+					if (IsValid._source is { } src) return src.IsValid;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "IsValid");
 					return IsValid.Value;
 				}
@@ -2002,6 +2104,7 @@ partial class IEntityPropertyOfTTests
 				{
 					PropertyMessages.RecordGet();
 					if (PropertyMessages.OnGet is { } onGet) return onGet(this);
+					if (PropertyMessages._source is { } src) return src.PropertyMessages;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "PropertyMessages");
 					return PropertyMessages.Value;
 				}
@@ -2030,6 +2133,174 @@ partial class IEntityPropertyOfTTests
 			public IEntityProperty(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::Neatoo.IEntityProperty<string> delegation.</summary>
+			public void Source(global::Neatoo.IEntityProperty<string>? source)
+			{
+				IsPaused._source = source;
+				IsModified._source = source;
+				IsSelfModified._source = source;
+				DisplayName._source = source;
+				Value._source = source;
+				Name._source = source;
+				Task._source = source;
+				IsBusy._source = source;
+				IsReadOnly._source = source;
+				Type._source = source;
+				StringValue._source = source;
+				IsSelfValid._source = source;
+				IsValid._source = source;
+				PropertyMessages._source = source;
+				MarkSelfUnmodified._source = source;
+				ApplyPropertyInfo._source = source;
+				SetValue._source = source;
+				AddMarkedBusy._source = source;
+				RemoveMarkedBusy._source = source;
+				LoadValue._source = source;
+				WaitForTasks._source = source;
+				GetAwaiter._source = source;
+				RunRules._source = source;
+			}
+
+			/// <summary>Sets the source object for global::Neatoo.IEntityProperty delegation.</summary>
+			public void Source(global::Neatoo.IEntityProperty? source)
+			{
+				IsPaused._source = source;
+				IsModified._source = source;
+				IsSelfModified._source = source;
+				DisplayName._source = source;
+				Value._source = null;
+				Name._source = null;
+				Task._source = null;
+				IsBusy._source = null;
+				IsReadOnly._source = null;
+				Type._source = null;
+				StringValue._source = null;
+				IsSelfValid._source = null;
+				IsValid._source = null;
+				PropertyMessages._source = null;
+				MarkSelfUnmodified._source = source;
+				ApplyPropertyInfo._source = source;
+				SetValue._source = null;
+				AddMarkedBusy._source = null;
+				RemoveMarkedBusy._source = null;
+				LoadValue._source = null;
+				WaitForTasks._source = null;
+				GetAwaiter._source = null;
+				RunRules._source = null;
+			}
+
+			/// <summary>Sets the source object for global::Neatoo.IValidateProperty<string> delegation.</summary>
+			public void Source(global::Neatoo.IValidateProperty<string>? source)
+			{
+				IsPaused._source = null;
+				IsModified._source = null;
+				IsSelfModified._source = null;
+				DisplayName._source = null;
+				Value._source = source;
+				Name._source = null;
+				Task._source = null;
+				IsBusy._source = null;
+				IsReadOnly._source = null;
+				Type._source = null;
+				StringValue._source = null;
+				IsSelfValid._source = null;
+				IsValid._source = null;
+				PropertyMessages._source = null;
+				MarkSelfUnmodified._source = null;
+				ApplyPropertyInfo._source = null;
+				SetValue._source = null;
+				AddMarkedBusy._source = null;
+				RemoveMarkedBusy._source = null;
+				LoadValue._source = null;
+				WaitForTasks._source = null;
+				GetAwaiter._source = null;
+				RunRules._source = null;
+			}
+
+			/// <summary>Sets the source object for global::Neatoo.IValidateProperty delegation.</summary>
+			public void Source(global::Neatoo.IValidateProperty? source)
+			{
+				IsPaused._source = null;
+				IsModified._source = null;
+				IsSelfModified._source = null;
+				DisplayName._source = null;
+				Value._source = null;
+				Name._source = source;
+				Task._source = source;
+				IsBusy._source = source;
+				IsReadOnly._source = source;
+				Type._source = source;
+				StringValue._source = source;
+				IsSelfValid._source = source;
+				IsValid._source = source;
+				PropertyMessages._source = source;
+				MarkSelfUnmodified._source = null;
+				ApplyPropertyInfo._source = null;
+				SetValue._source = source;
+				AddMarkedBusy._source = source;
+				RemoveMarkedBusy._source = source;
+				LoadValue._source = source;
+				WaitForTasks._source = source;
+				GetAwaiter._source = source;
+				RunRules._source = source;
+			}
+
+			/// <summary>Sets the source object for global::System.ComponentModel.INotifyPropertyChanged delegation.</summary>
+			public void Source(global::System.ComponentModel.INotifyPropertyChanged? source)
+			{
+				IsPaused._source = null;
+				IsModified._source = null;
+				IsSelfModified._source = null;
+				DisplayName._source = null;
+				Value._source = null;
+				Name._source = null;
+				Task._source = null;
+				IsBusy._source = null;
+				IsReadOnly._source = null;
+				Type._source = null;
+				StringValue._source = null;
+				IsSelfValid._source = null;
+				IsValid._source = null;
+				PropertyMessages._source = null;
+				MarkSelfUnmodified._source = null;
+				ApplyPropertyInfo._source = null;
+				SetValue._source = null;
+				AddMarkedBusy._source = null;
+				RemoveMarkedBusy._source = null;
+				LoadValue._source = null;
+				WaitForTasks._source = null;
+				GetAwaiter._source = null;
+				RunRules._source = null;
+			}
+
+			/// <summary>Sets the source object for global::Neatoo.INotifyNeatooPropertyChanged delegation.</summary>
+			public void Source(global::Neatoo.INotifyNeatooPropertyChanged? source)
+			{
+				IsPaused._source = null;
+				IsModified._source = null;
+				IsSelfModified._source = null;
+				DisplayName._source = null;
+				Value._source = null;
+				Name._source = null;
+				Task._source = null;
+				IsBusy._source = null;
+				IsReadOnly._source = null;
+				Type._source = null;
+				StringValue._source = null;
+				IsSelfValid._source = null;
+				IsValid._source = null;
+				PropertyMessages._source = null;
+				MarkSelfUnmodified._source = null;
+				ApplyPropertyInfo._source = null;
+				SetValue._source = null;
+				AddMarkedBusy._source = null;
+				RemoveMarkedBusy._source = null;
+				LoadValue._source = null;
+				WaitForTasks._source = null;
+				GetAwaiter._source = null;
+				RunRules._source = null;
 			}
 
 		}

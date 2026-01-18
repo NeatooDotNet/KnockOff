@@ -53,6 +53,14 @@ internal static class MethodInterceptorRenderer
 		var ownerWithParams = GetOwnerWithParams(model);
 		var delegateType = model.OnCallDelegateType.TrimEnd('?');
 
+		// Source field for Source(T) feature - uses declaring interface type
+		if (!string.IsNullOrEmpty(model.DeclaringInterface))
+		{
+			w.Line($"/// <summary>Source object to delegate to when no OnCall is configured.</summary>");
+			w.Line($"internal {model.DeclaringInterface}? _source;");
+			w.Line();
+		}
+
 		// Custom delegate if needed
 		if (model.NeedsCustomDelegate && model.CustomDelegateSignature != null)
 		{
@@ -112,7 +120,7 @@ internal static class MethodInterceptorRenderer
 		RenderInvokeMethod(w, model, options, null);
 
 		// Reset method
-		RenderResetMethod(w, model.Overloads, model.LastArgType, model.LastArgsType);
+		RenderResetMethod(w, model.Overloads, model.LastArgType, model.LastArgsType, hasSourceField: !string.IsNullOrEmpty(model.DeclaringInterface));
 
 		// Verify method
 		RenderVerifyMethod(w, model.Overloads);
@@ -135,6 +143,14 @@ internal static class MethodInterceptorRenderer
 		InterceptorRenderOptions options)
 	{
 		var ownerWithParams = GetOwnerWithParams(model);
+
+		// Source field for Source(T) feature - uses declaring interface type
+		if (!string.IsNullOrEmpty(model.DeclaringInterface))
+		{
+			w.Line($"/// <summary>Source object to delegate to when no OnCall is configured.</summary>");
+			w.Line($"internal {model.DeclaringInterface}? _source;");
+			w.Line();
+		}
 
 		// Track unconfigured calls (shared across all overloads)
 		w.Line("private int _unconfiguredCallCount;");
@@ -195,7 +211,7 @@ internal static class MethodInterceptorRenderer
 		}
 
 		// Reset method (resets all sequences)
-		RenderResetMethod(w, model.Overloads);
+		RenderResetMethod(w, model.Overloads, hasSourceField: !string.IsNullOrEmpty(model.DeclaringInterface));
 
 		// Verify method (verifies all sequences)
 		RenderVerifyMethod(w, model.Overloads);
@@ -240,7 +256,7 @@ internal static class MethodInterceptorRenderer
 
 			var trackingArgs = UnifiedInterceptorBuilder.BuildTrackingArgs(model.TrackableParameters);
 
-			// No sequence configured - track call and return default
+			// No sequence configured - track call, check source, then strict/default
 			w.Line("if (_sequence.Count == 0)");
 			using (w.Braces())
 			{
@@ -255,6 +271,25 @@ internal static class MethodInterceptorRenderer
 				{
 					w.Line($"_unconfiguredLastArgs = ({trackingArgs});");
 				}
+
+				// Priority chain: OnCall (checked above) > Source > Strict > Value
+				if (!string.IsNullOrEmpty(model.DeclaringInterface))
+				{
+					// Build the method call to delegate to source
+					// Suppress warnings for source delegation: CS8601 for out params, SYSLIB0050 for obsolete members
+					w.Line("#pragma warning disable CS8601, SYSLIB0050");
+					var sourceCallArgs = string.Join(", ", model.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
+					if (model.IsVoid)
+					{
+						w.Line($"if (_source is {{ }} src) {{ src.{model.MethodName}({sourceCallArgs}); return; }}");
+					}
+					else
+					{
+						w.Line($"if (_source is {{ }} src) return src.{model.MethodName}({sourceCallArgs});");
+					}
+					w.Line("#pragma warning restore CS8601, SYSLIB0050");
+				}
+
 				w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.MethodName}\");");
 				if (model.IsVoid)
 					w.Line("return;");
@@ -320,6 +355,25 @@ internal static class MethodInterceptorRenderer
 			using (w.Braces())
 			{
 				w.Line("_unconfiguredCallCount++;");
+
+				// Priority chain: OnCall (checked above) > Source > Strict > Value
+				if (!string.IsNullOrEmpty(model.DeclaringInterface))
+				{
+					// Build the method call to delegate to source
+					// Suppress warnings for source delegation: CS8601 for out params, SYSLIB0050 for obsolete members
+					w.Line("#pragma warning disable CS8601, SYSLIB0050");
+					var sourceCallArgs = string.Join(", ", overload.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
+					if (overload.IsVoid)
+					{
+						w.Line($"if (_source is {{ }} src) {{ src.{model.MethodName}({sourceCallArgs}); return; }}");
+					}
+					else
+					{
+						w.Line($"if (_source is {{ }} src) return src.{model.MethodName}({sourceCallArgs});");
+					}
+					w.Line("#pragma warning restore CS8601, SYSLIB0050");
+				}
+
 				w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.MethodName}\");");
 				if (overload.IsVoid)
 					w.Line("return;");
@@ -360,7 +414,7 @@ internal static class MethodInterceptorRenderer
 
 	#region Reset and Verify Methods
 
-	private static void RenderResetMethod(CodeWriter w, EquatableArray<MethodOverloadSignature> overloads, string? lastArgType = null, string? lastArgsType = null)
+	private static void RenderResetMethod(CodeWriter w, EquatableArray<MethodOverloadSignature> overloads, string? lastArgType = null, string? lastArgsType = null, bool hasSourceField = false)
 	{
 		w.Line("/// <summary>Resets all tracking state.</summary>");
 		using (w.Block("public void Reset()"))
@@ -370,6 +424,8 @@ internal static class MethodInterceptorRenderer
 				w.Line("_unconfiguredLastArg = default;");
 			if (lastArgsType != null)
 				w.Line("_unconfiguredLastArgs = default;");
+			if (hasSourceField)
+				w.Line("_source = null;");
 			if (overloads.Count == 0)
 			{
 				// Single-signature

@@ -483,6 +483,11 @@ partial class InlineGenericMethodTest
 				Strict = strict;
 			}
 
+			/// <summary>Sets the source object for global::KnockOff.Tests.IGenericMethodService delegation.</summary>
+			public void Source(global::KnockOff.Tests.IGenericMethodService? source)
+			{
+			}
+
 			/// <summary>Gets a smart default value for a generic type at runtime.</summary>
 			private static T SmartDefault<T>(string methodName)
 			{

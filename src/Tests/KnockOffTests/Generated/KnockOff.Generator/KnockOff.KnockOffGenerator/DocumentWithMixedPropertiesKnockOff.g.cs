@@ -24,6 +24,9 @@ partial class DocumentWithMixedPropertiesKnockOff : global::KnockOffTests.IDocum
 	/// <summary>Tracks and configures behavior for Title.</summary>
 	public sealed class TitleInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOffTests.IDocumentWithMixedProperties? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -49,12 +52,15 @@ partial class DocumentWithMixedPropertiesKnockOff : global::KnockOffTests.IDocum
 		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for Version.</summary>
 	public sealed class VersionInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOffTests.IDocumentWithMixedProperties? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -68,7 +74,7 @@ partial class DocumentWithMixedPropertiesKnockOff : global::KnockOffTests.IDocum
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Interceptor for Id. Configure via .Value, track via .GetCount.</summary>
@@ -86,6 +92,16 @@ partial class DocumentWithMixedPropertiesKnockOff : global::KnockOffTests.IDocum
 	/// <summary>The global::KnockOffTests.IDocumentWithMixedProperties instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOffTests.IDocumentWithMixedProperties Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOffTests.IDocumentWithMixedProperties).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOffTests.IDocumentWithMixedProperties? source)
+	{
+		Title._source = source;
+		Version._source = source;
+	}
+
 	string global::KnockOffTests.IDocumentWithMixedProperties.Id
 	{
 		get { Id.RecordGet(); return Id.Value; }
@@ -94,13 +110,13 @@ partial class DocumentWithMixedPropertiesKnockOff : global::KnockOffTests.IDocum
 
 	string global::KnockOffTests.IDocumentWithMixedProperties.Title
 	{
-		get { Title.RecordGet(); if (Title.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IDocumentWithMixedProperties", "Title"); return Title.Value; }
-		set { Title.RecordSet(value); if (Title.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IDocumentWithMixedProperties", "Title"); Title.Value = value; }
+		get { Title.RecordGet(); if (Title.OnGet is { } onGet) return onGet(this); if (Title._source is { } src) return src.Title; if (Strict) throw global::KnockOff.StubException.NotConfigured("IDocumentWithMixedProperties", "Title"); return Title.Value; }
+		set { Title.RecordSet(value); if (Title.OnSet is { } onSet) { onSet(this, value); return; } if (Title._source is { } src) { src.Title = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IDocumentWithMixedProperties", "Title"); Title.Value = value; }
 	}
 
 	int global::KnockOffTests.IDocumentWithMixedProperties.Version
 	{
-		get { Version.RecordGet(); if (Version.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IDocumentWithMixedProperties", "Version"); return Version.Value; }
+		get { Version.RecordGet(); if (Version.OnGet is { } onGet) return onGet(this); if (Version._source is { } src) return src.Version; if (Strict) throw global::KnockOff.StubException.NotConfigured("IDocumentWithMixedProperties", "Version"); return Version.Value; }
 	}
 
 }

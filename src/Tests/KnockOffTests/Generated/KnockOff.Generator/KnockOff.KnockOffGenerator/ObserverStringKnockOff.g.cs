@@ -8,6 +8,9 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 	/// <summary>Tracks and configures behavior for OnCompleted.</summary>
 	public sealed class OnCompletedInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::System.IObserver<string>? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<ObserverStringKnockOff> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -45,6 +48,9 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.OnCompleted(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "OnCompleted");
 				return;
 			}
@@ -67,6 +73,7 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -152,6 +159,9 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 	/// <summary>Tracks and configures behavior for OnError.</summary>
 	public sealed class OnErrorInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::System.IObserver<string>? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<ObserverStringKnockOff, global::System.Exception> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -194,6 +204,9 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = error;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.OnError(error); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "OnError");
 				return;
 			}
@@ -217,6 +230,7 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -306,6 +320,9 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 	/// <summary>Tracks and configures behavior for OnNext.</summary>
 	public sealed class OnNextInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::System.IObserver<string>? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<ObserverStringKnockOff, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -348,6 +365,9 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = @value;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.OnNext(@value); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "OnNext");
 				return;
 			}
@@ -371,6 +391,7 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -487,6 +508,17 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::System.IObserver<string>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::System.IObserver<string>? source)
+	{
+		OnCompleted._source = source;
+		OnError._source = source;
+		OnNext._source = source;
 	}
 
 	void global::System.IObserver<string>.OnCompleted()

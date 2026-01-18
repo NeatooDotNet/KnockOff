@@ -25,16 +25,22 @@ partial class IRuleManagerTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Collections.Generic.IEnumerable<global::Neatoo.Rules.IRule> Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.Rules.IRuleManager? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Tracks and configures behavior for RunRules.</summary>
 		public sealed class IRuleManager_RunRulesInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::Neatoo.Rules.IRuleManager? _source;
+
 			private int _unconfiguredCallCount;
 
 			/// <summary>Delegate for RunRules(string, global::System.Threading.CancellationToken?).</summary>
@@ -101,6 +107,7 @@ partial class IRuleManagerTests
 				if (_sequence_String_Threading_CancellationToken_Threading_Tasks_Task.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					if (_source is { } src) return src.RunRules(propertyName, token);
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
@@ -125,6 +132,7 @@ partial class IRuleManagerTests
 				if (_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					if (_source is { } src) return src.RunRules(runRules, token);
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
@@ -147,6 +155,7 @@ partial class IRuleManagerTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence_String_Threading_CancellationToken_Threading_Tasks_Task)
 					tracking.Reset();
 				_sequenceIndex_String_Threading_CancellationToken_Threading_Tasks_Task = 0;
@@ -312,6 +321,9 @@ partial class IRuleManagerTests
 		/// <summary>Tracks and configures behavior for RunRule.</summary>
 		public sealed class IRuleManager_RunRuleInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::Neatoo.Rules.IRuleManager? _source;
+
 			/// <summary>Delegate for RunRule.</summary>
 			public delegate global::System.Threading.Tasks.Task RunRuleDelegate(Stubs.IRuleManager ko, global::Neatoo.Rules.IRule r, global::System.Threading.CancellationToken? token);
 
@@ -357,6 +369,7 @@ partial class IRuleManagerTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((r, token));
+					if (_source is { } src) return src.RunRule(r, token);
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "RunRule");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
@@ -380,6 +393,7 @@ partial class IRuleManagerTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -725,6 +739,7 @@ partial class IRuleManagerTests
 				{
 					Rules.RecordGet();
 					if (Rules.OnGet is { } onGet) return onGet(this);
+					if (Rules._source is { } src) return src.Rules;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleManager", "Rules");
 					return Rules.Value;
 				}
@@ -741,6 +756,14 @@ partial class IRuleManagerTests
 			public IRuleManager(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::Neatoo.Rules.IRuleManager delegation.</summary>
+			public void Source(global::Neatoo.Rules.IRuleManager? source)
+			{
+				Rules._source = source;
+				RunRules._source = source;
+				RunRule._source = source;
 			}
 
 			/// <summary>Gets a smart default value for a generic type at runtime.</summary>

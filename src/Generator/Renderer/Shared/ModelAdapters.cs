@@ -65,6 +65,7 @@ internal static class ModelAdapters
 		return new UnifiedMethodInterceptorModel(
 			InterceptorClassName: group.InterceptorClassName,
 			MethodName: first.MethodName,
+			DeclaringInterface: first.DeclaringInterface,
 			OwnerClassName: className,
 			OwnerTypeParameters: typeParameters,
 			Parameters: first.Parameters,
@@ -130,6 +131,7 @@ internal static class ModelAdapters
 		return new UnifiedMethodInterceptorModel(
 			InterceptorClassName: group.InterceptorClassName,
 			MethodName: first.MethodName,
+			DeclaringInterface: first.DeclaringInterface,
 			OwnerClassName: className,
 			OwnerTypeParameters: typeParameters,
 			Parameters: first.Parameters,

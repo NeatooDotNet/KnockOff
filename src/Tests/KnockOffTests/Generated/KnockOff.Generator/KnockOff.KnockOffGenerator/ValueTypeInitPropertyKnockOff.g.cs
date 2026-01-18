@@ -30,6 +30,14 @@ partial class ValueTypeInitPropertyKnockOff : global::KnockOffTests.IValueTypeIn
 	/// <summary>The global::KnockOffTests.IValueTypeInitProperty instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOffTests.IValueTypeInitProperty Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOffTests.IValueTypeInitProperty).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOffTests.IValueTypeInitProperty? source)
+	{
+	}
+
 	int global::KnockOffTests.IValueTypeInitProperty.Count
 	{
 		get { Count.RecordGet(); return Count.Value; }

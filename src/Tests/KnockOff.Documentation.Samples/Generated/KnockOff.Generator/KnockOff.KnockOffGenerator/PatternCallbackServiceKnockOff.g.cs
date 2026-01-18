@@ -8,6 +8,9 @@ partial class PatternCallbackServiceKnockOff : global::KnockOff.Documentation.Sa
 	/// <summary>Tracks and configures behavior for DoSomething.</summary>
 	public sealed class DoSomethingInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Concepts.IPatternCallbackService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<PatternCallbackServiceKnockOff> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -45,6 +48,7 @@ partial class PatternCallbackServiceKnockOff : global::KnockOff.Documentation.Sa
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) { src.DoSomething(); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "DoSomething");
 				return;
 			}
@@ -67,6 +71,7 @@ partial class PatternCallbackServiceKnockOff : global::KnockOff.Documentation.Sa
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -152,6 +157,9 @@ partial class PatternCallbackServiceKnockOff : global::KnockOff.Documentation.Sa
 	/// <summary>Tracks and configures behavior for GetUser.</summary>
 	public sealed class GetUserInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Concepts.IPatternCallbackService? _source;
+
 		/// <summary>Delegate for GetUser.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Concepts.PatternUser GetUserDelegate(PatternCallbackServiceKnockOff ko, int id);
 
@@ -197,6 +205,7 @@ partial class PatternCallbackServiceKnockOff : global::KnockOff.Documentation.Sa
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				if (_source is { } src) return src.GetUser(id);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetUser");
 				return new global::KnockOff.Documentation.Samples.Concepts.PatternUser();
 			}
@@ -220,6 +229,7 @@ partial class PatternCallbackServiceKnockOff : global::KnockOff.Documentation.Sa
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -309,6 +319,9 @@ partial class PatternCallbackServiceKnockOff : global::KnockOff.Documentation.Sa
 	/// <summary>Tracks and configures behavior for Calculate.</summary>
 	public sealed class CalculateInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Concepts.IPatternCallbackService? _source;
+
 		/// <summary>Delegate for Calculate.</summary>
 		public delegate int CalculateDelegate(PatternCallbackServiceKnockOff ko, string name, int @value, bool flag);
 
@@ -354,6 +367,7 @@ partial class PatternCallbackServiceKnockOff : global::KnockOff.Documentation.Sa
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((name, @value, flag));
+				if (_source is { } src) return src.Calculate(name, @value, flag);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Calculate");
 				return default!;
 			}
@@ -377,6 +391,7 @@ partial class PatternCallbackServiceKnockOff : global::KnockOff.Documentation.Sa
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -493,6 +508,17 @@ partial class PatternCallbackServiceKnockOff : global::KnockOff.Documentation.Sa
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Concepts.IPatternCallbackService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Concepts.IPatternCallbackService? source)
+	{
+		DoSomething._source = source;
+		GetUser._source = source;
+		Calculate._source = source;
 	}
 
 	void global::KnockOff.Documentation.Samples.Concepts.IPatternCallbackService.DoSomething()

@@ -11,6 +11,9 @@ partial class CloneableStubTests
 		/// <summary>Tracks and configures behavior for Clone.</summary>
 		public sealed class ICloneable_CloneInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.ICloneable? _source;
+
 			/// <summary>Delegate for Clone.</summary>
 			public delegate object CloneDelegate(Stubs.ICloneable ko);
 
@@ -51,6 +54,9 @@ partial class CloneableStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.Clone();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Clone");
 					return default!;
 				}
@@ -73,6 +79,7 @@ partial class CloneableStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -177,6 +184,12 @@ partial class CloneableStubTests
 			public ICloneable(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.ICloneable delegation.</summary>
+			public void Source(global::System.ICloneable? source)
+			{
+				Clone._source = source;
 			}
 
 		}

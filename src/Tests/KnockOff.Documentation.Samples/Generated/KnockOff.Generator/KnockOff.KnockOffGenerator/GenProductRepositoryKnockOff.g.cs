@@ -8,6 +8,9 @@ partial class GenProductRepositoryKnockOff : global::KnockOff.Documentation.Samp
 	/// <summary>Tracks and configures behavior for GetAll.</summary>
 	public sealed class GetAllInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<global::KnockOff.Documentation.Samples.Guides.GenProduct>? _source;
+
 		/// <summary>Delegate for GetAll.</summary>
 		public delegate global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Guides.GenProduct> GetAllDelegate(GenProductRepositoryKnockOff ko);
 
@@ -48,6 +51,7 @@ partial class GenProductRepositoryKnockOff : global::KnockOff.Documentation.Samp
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.GetAll();
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetAll");
 				return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Guides.GenProduct>();
 			}
@@ -70,6 +74,7 @@ partial class GenProductRepositoryKnockOff : global::KnockOff.Documentation.Samp
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -155,6 +160,9 @@ partial class GenProductRepositoryKnockOff : global::KnockOff.Documentation.Samp
 	/// <summary>Tracks and configures behavior for FindFirst.</summary>
 	public sealed class FindFirstInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<global::KnockOff.Documentation.Samples.Guides.GenProduct>? _source;
+
 		/// <summary>Delegate for FindFirst.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Guides.GenProduct? FindFirstDelegate(GenProductRepositoryKnockOff ko, global::System.Func<global::KnockOff.Documentation.Samples.Guides.GenProduct, bool> predicate);
 
@@ -200,6 +208,7 @@ partial class GenProductRepositoryKnockOff : global::KnockOff.Documentation.Samp
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = predicate;
+				if (_source is { } src) return src.FindFirst(predicate);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "FindFirst");
 				return default!;
 			}
@@ -223,6 +232,7 @@ partial class GenProductRepositoryKnockOff : global::KnockOff.Documentation.Samp
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -335,6 +345,16 @@ partial class GenProductRepositoryKnockOff : global::KnockOff.Documentation.Samp
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<global::KnockOff.Documentation.Samples.Guides.GenProduct>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<global::KnockOff.Documentation.Samples.Guides.GenProduct>? source)
+	{
+		GetAll._source = source;
+		FindFirst._source = source;
 	}
 
 	global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Guides.GenProduct> global::KnockOff.Documentation.Samples.Guides.IGenReadOnlyRepository<global::KnockOff.Documentation.Samples.Guides.GenProduct>.GetAll()

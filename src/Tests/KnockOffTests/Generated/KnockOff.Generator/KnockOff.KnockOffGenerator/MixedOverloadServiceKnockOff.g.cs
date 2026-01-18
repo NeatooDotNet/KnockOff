@@ -23,6 +23,9 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 	/// <summary>Tracks and configures behavior for Process.</summary>
 	public sealed class ProcessInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.IMixedOverloadService? _source;
+
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for Process(string).</summary>
@@ -89,6 +92,9 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 			if (_sequence_String_void.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.Process(@value); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return;
 			}
@@ -113,6 +119,9 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 			if (_sequence_Int32_void.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.Process(@value); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return;
 			}
@@ -135,6 +144,7 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence_String_void)
 				tracking.Reset();
 			_sequenceIndex_String_void = 0;
@@ -300,6 +310,9 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 	/// <summary>Tracks and configures behavior for Format.</summary>
 	public sealed class FormatInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.IMixedOverloadService? _source;
+
 		/// <summary>Delegate for Format.</summary>
 		public delegate string FormatDelegate(MixedOverloadServiceKnockOff ko, int @value);
 
@@ -345,6 +358,9 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = @value;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Format(@value);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Format");
 				throw new global::System.InvalidOperationException("No implementation provided for Format. Configure via OnCall.");
 			}
@@ -368,6 +384,7 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -632,6 +649,16 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 		throw new global::System.InvalidOperationException(
 			$"No implementation provided for {methodName}<{type.Name}>. " +
 			$"Set the handler's OnCall.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Tests.IMixedOverloadService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Tests.IMixedOverloadService? source)
+	{
+		Process._source = source;
+		Format._source = source;
 	}
 
 	void global::KnockOff.Tests.IMixedOverloadService.Process(string @value)

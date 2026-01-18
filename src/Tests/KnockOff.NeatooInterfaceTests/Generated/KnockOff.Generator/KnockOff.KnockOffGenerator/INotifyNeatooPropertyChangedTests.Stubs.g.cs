@@ -55,6 +55,11 @@ partial class INotifyNeatooPropertyChangedTests
 				Strict = strict;
 			}
 
+			/// <summary>Sets the source object for global::Neatoo.INotifyNeatooPropertyChanged delegation.</summary>
+			public void Source(global::Neatoo.INotifyNeatooPropertyChanged? source)
+			{
+			}
+
 		}
 
 	}

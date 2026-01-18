@@ -116,6 +116,14 @@ partial class VfSerializerStub : global::KnockOff.Documentation.Samples.Guides.I
 			$"Set the handler's OnCall.");
 	}
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.IVfSerializer).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.IVfSerializer? source)
+	{
+	}
+
 	T? global::KnockOff.Documentation.Samples.Guides.IVfSerializer.Deserialize<T>(string json) where T : class
 	{
 		Deserialize.Of<T>().RecordCall(json);

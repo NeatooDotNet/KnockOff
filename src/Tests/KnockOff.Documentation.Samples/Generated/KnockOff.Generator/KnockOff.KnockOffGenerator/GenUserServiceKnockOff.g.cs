@@ -8,6 +8,9 @@ partial class GenUserServiceKnockOff : global::KnockOff.Documentation.Samples.Re
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Reference.IGenUserService? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -33,7 +36,7 @@ partial class GenUserServiceKnockOff : global::KnockOff.Documentation.Samples.Re
 		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks calls to GetUser (user-defined implementation).</summary>
@@ -69,10 +72,19 @@ partial class GenUserServiceKnockOff : global::KnockOff.Documentation.Samples.Re
 	/// <summary>The global::KnockOff.Documentation.Samples.Reference.IGenUserService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Reference.IGenUserService Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Reference.IGenUserService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Reference.IGenUserService? source)
+	{
+		Name._source = source;
+	}
+
 	string global::KnockOff.Documentation.Samples.Reference.IGenUserService.Name
 	{
-		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenUserService", "Name"); return Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenUserService", "Name"); Name.Value = value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Name._source is { } src) return src.Name; if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenUserService", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Name._source is { } src) { src.Name = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenUserService", "Name"); Name.Value = value; }
 	}
 
 	global::KnockOff.Documentation.Samples.Reference.GenUser? global::KnockOff.Documentation.Samples.Reference.IGenUserService.GetUser(int id)

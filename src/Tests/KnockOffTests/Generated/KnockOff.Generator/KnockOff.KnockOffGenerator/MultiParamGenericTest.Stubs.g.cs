@@ -11,6 +11,9 @@ partial class MultiParamGenericTest
 		/// <summary>Tracks and configures behavior for Set.</summary>
 		public sealed class IKeyValueStore_SetInterceptor<TKey, TValue>
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Tests.IKeyValueStore<TKey, TValue>? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IKeyValueStore<TKey, TValue>, TKey, TValue> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -53,6 +56,9 @@ partial class MultiParamGenericTest
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((key, @value));
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.Set(key, @value); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Set");
 					return;
 				}
@@ -76,6 +82,7 @@ partial class MultiParamGenericTest
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -165,6 +172,9 @@ partial class MultiParamGenericTest
 		/// <summary>Tracks and configures behavior for Get.</summary>
 		public sealed class IKeyValueStore_GetInterceptor<TKey, TValue>
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Tests.IKeyValueStore<TKey, TValue>? _source;
+
 			/// <summary>Delegate for Get.</summary>
 			public delegate TValue? GetDelegate(Stubs.IKeyValueStore<TKey, TValue> ko, TKey key);
 
@@ -210,6 +220,9 @@ partial class MultiParamGenericTest
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = key;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.Get(key);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Get");
 					return default!;
 				}
@@ -233,6 +246,7 @@ partial class MultiParamGenericTest
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -349,6 +363,13 @@ partial class MultiParamGenericTest
 			public IKeyValueStore(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::KnockOff.Tests.IKeyValueStore<TKey, TValue> delegation.</summary>
+			public void Source(global::KnockOff.Tests.IKeyValueStore<TKey, TValue>? source)
+			{
+				Set._source = source;
+				Get._source = source;
 			}
 
 		}

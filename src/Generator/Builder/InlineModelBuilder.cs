@@ -158,7 +158,7 @@ internal static class InlineModelBuilder
                 var (nonGenericGroup, genericGroup) = SplitMixedGroup(group);
                 if (nonGenericGroup is not null)
                 {
-                    methods.Add(BuildMethodModel(nonGenericGroup, stubClassName, typeParamList, constraintClause));
+                    methods.Add(BuildMethodModel(nonGenericGroup, stubClassName, typeParamList, constraintClause, iface));
                 }
                 if (genericGroup is not null)
                 {
@@ -171,7 +171,7 @@ internal static class InlineModelBuilder
             }
             else
             {
-                methods.Add(BuildMethodModel(group, stubClassName, typeParamList, constraintClause));
+                methods.Add(BuildMethodModel(group, stubClassName, typeParamList, constraintClause, iface));
             }
         }
 
@@ -191,6 +191,9 @@ internal static class InlineModelBuilder
 
         var hasGenericMethods = genericHandlers.Count > 0 || iface.Members.Any(m => m.IsGenericMethod);
 
+        // Build source providers for Source(T) methods
+        var sourceProviders = BuildSourceProviders(iface, properties, indexers, methods, methodGroups, stubClassName, typeParamList);
+
         return new InlineInterfaceStubModel(
             StubClassName: stubClassName,
             InterfaceFullName: iface.FullName,
@@ -205,7 +208,8 @@ internal static class InlineModelBuilder
             GenericMethodHandlers: genericHandlers.ToEquatableArray(),
             Events: events.ToEquatableArray(),
             InterceptorProperties: interceptorProperties,
-            Implementations: implementations);
+            Implementations: implementations,
+            SourceProviders: sourceProviders);
     }
 
     private static InlinePropertyModel BuildPropertyModel(
@@ -215,6 +219,11 @@ internal static class InlineModelBuilder
         string constraintClause)
     {
         var interceptClassName = $"{stubClassName}_{member.Name}Interceptor";
+
+        // For open generics, replace <> with actual type parameters
+        var declaringInterface = typeParamList.Length > 0
+            ? SymbolHelpers.ReplaceUnboundGeneric(member.DeclaringInterfaceFullName, typeParamList)
+            : member.DeclaringInterfaceFullName;
 
         return new InlinePropertyModel(
             InterceptorClassName: interceptClassName,
@@ -226,7 +235,8 @@ internal static class InlineModelBuilder
             IsInitOnly: member.IsInitOnly,
             StubClassName: $"Stubs.{stubClassName}{typeParamList}",
             TypeParameterList: typeParamList,
-            ConstraintClauses: constraintClause);
+            ConstraintClauses: constraintClause,
+            DeclaringInterface: declaringInterface);
     }
 
     private static InlineIndexerModel BuildIndexerModel(
@@ -253,6 +263,11 @@ internal static class InlineModelBuilder
             ? member.IndexerParameters.GetArray()![0].Name
             : $"({string.Join(", ", member.IndexerParameters.Select(p => p.Name))})";
 
+        // For open generics, replace <> with actual type parameters
+        var declaringInterface = typeParamList.Length > 0
+            ? SymbolHelpers.ReplaceUnboundGeneric(member.DeclaringInterfaceFullName, typeParamList)
+            : member.DeclaringInterfaceFullName;
+
         return new InlineIndexerModel(
             InterceptorClassName: interceptClassName,
             IndexerName: indexerName,
@@ -267,17 +282,31 @@ internal static class InlineModelBuilder
             KeyExpression: keyExpr,
             StubClassName: $"Stubs.{stubClassName}{typeParamList}",
             TypeParameterList: typeParamList,
-            ConstraintClauses: constraintClause);
+            ConstraintClauses: constraintClause,
+            DeclaringInterface: declaringInterface);
     }
 
     private static UnifiedMethodInterceptorModel BuildMethodModel(
         MethodGroupInfo group,
         string stubClassName,
         string typeParamList,
-        string constraintClause)
+        string constraintClause,
+        InterfaceInfo iface)
     {
         var interceptClassName = $"{stubClassName}_{group.Name}Interceptor";
         var stubClassRef = $"Stubs.{stubClassName}{typeParamList}";
+
+        // Find the declaring interface for this method group (from the first non-generic member)
+        var declaringInterface = "";
+        var member = iface.Members.FirstOrDefault(m =>
+            !m.IsProperty && !m.IsIndexer && m.Name == group.Name && !m.IsGenericMethod);
+        if (member != null)
+        {
+            // For open generics, replace <> with actual type parameters
+            declaringInterface = typeParamList.Length > 0
+                ? SymbolHelpers.ReplaceUnboundGeneric(member.DeclaringInterfaceFullName, typeParamList)
+                : member.DeclaringInterfaceFullName;
+        }
 
         // Build MethodSignatureInfo for each overload
         var signatures = new List<MethodSignatureInfo>();
@@ -321,6 +350,7 @@ internal static class InlineModelBuilder
             return UnifiedInterceptorBuilder.BuildMethodInterceptor(
                 interceptorClassName: interceptClassName,
                 methodName: group.Name,
+                declaringInterface: declaringInterface,
                 ownerClassName: stubClassRef,
                 ownerTypeParameters: "",
                 overloads: new List<MethodSignatureInfo>
@@ -340,6 +370,7 @@ internal static class InlineModelBuilder
         return UnifiedInterceptorBuilder.BuildMethodInterceptor(
             interceptorClassName: interceptClassName,
             methodName: group.Name,
+            declaringInterface: declaringInterface,
             ownerClassName: stubClassRef,
             ownerTypeParameters: "",
             overloads: signatures);
@@ -1640,6 +1671,119 @@ internal static class InlineModelBuilder
             return typeName.Substring(start + 1, end - start - 1);
         }
         return "";
+    }
+
+    #endregion
+
+    #region Source Provider Building
+
+    /// <summary>
+    /// Builds SourceProviderInfo for inline interface stubs.
+    /// For inline stubs, we build source providers for the primary interface and all its base interfaces.
+    /// </summary>
+    private static EquatableArray<SourceProviderInfo> BuildSourceProviders(
+        InterfaceInfo iface,
+        List<InlinePropertyModel> properties,
+        List<InlineIndexerModel> indexers,
+        List<UnifiedMethodInterceptorModel> methods,
+        Dictionary<string, MethodGroupInfo> methodGroups,
+        string stubClassName,
+        string typeParamList)
+    {
+        // Helper to convert unbound generic form to bound form
+        string ToBindGeneric(string interfaceName) =>
+            typeParamList.Length > 0
+                ? SymbolHelpers.ReplaceUnboundGeneric(interfaceName, typeParamList)
+                : interfaceName;
+
+        // Collect all unique interceptor names with their declaring interfaces
+        var interceptorToDeclaringInterface = new Dictionary<string, string>();
+
+        foreach (var prop in properties)
+        {
+            // Skip init-only properties - they can't be delegated to source
+            if (prop.IsInitOnly)
+                continue;
+            var interceptorName = prop.PropertyName;
+            // Find the declaring interface from the original member
+            var member = iface.Members.FirstOrDefault(m => m.IsProperty && !m.IsIndexer && m.Name == prop.PropertyName);
+            if (member != null && !interceptorToDeclaringInterface.ContainsKey(interceptorName))
+            {
+                interceptorToDeclaringInterface[interceptorName] = ToBindGeneric(member.DeclaringInterfaceFullName);
+            }
+        }
+
+        foreach (var indexer in indexers)
+        {
+            var interceptorName = indexer.IndexerName;
+            var member = iface.Members.FirstOrDefault(m => m.IsIndexer);
+            if (member != null && !interceptorToDeclaringInterface.ContainsKey(interceptorName))
+            {
+                interceptorToDeclaringInterface[interceptorName] = ToBindGeneric(member.DeclaringInterfaceFullName);
+            }
+        }
+
+        foreach (var method in methods)
+        {
+            var interceptorName = method.MethodName;
+            // Find the declaring interface from method groups
+            if (methodGroups.TryGetValue(interceptorName, out var group))
+            {
+                var firstOverload = group.Overloads.FirstOrDefault();
+                if (firstOverload != null)
+                {
+                    // Get declaring interface from the first parameter in the group
+                    var member = iface.Members.FirstOrDefault(m =>
+                        !m.IsProperty && !m.IsIndexer && m.Name == interceptorName && !m.IsGenericMethod);
+                    if (member != null && !interceptorToDeclaringInterface.ContainsKey(interceptorName))
+                    {
+                        interceptorToDeclaringInterface[interceptorName] = ToBindGeneric(member.DeclaringInterfaceFullName);
+                    }
+                }
+            }
+        }
+
+        // Build the interface hierarchy - the primary interface plus all its base interfaces
+        // Convert to bound generic form for proper matching
+        var primaryInterface = ToBindGeneric(iface.FullName);
+        var allInterfaces = new List<string> { primaryInterface };
+        allInterfaces.AddRange(iface.BaseInterfaces.Select(bi => ToBindGeneric(bi)));
+
+        // Build source providers for each interface in the hierarchy
+        // For the primary interface: all members get source (since primary contains all members)
+        // For base interfaces: only members declared on that exact interface get source
+        // This is conservative but type-safe - we can't determine transitive base relationships
+        // without the full inheritance graph
+        var sourceProviders = new List<SourceProviderInfo>();
+        var allInterceptorNames = interceptorToDeclaringInterface.Keys.ToList();
+
+        foreach (var sourceIfaceFullName in allInterfaces)
+        {
+            var memberMappings = new List<SourceMemberMapping>();
+            var isPrimaryInterface = sourceIfaceFullName == primaryInterface;
+
+            foreach (var interceptorName in allInterceptorNames)
+            {
+                var declaringInterface = interceptorToDeclaringInterface[interceptorName];
+
+                // For primary interface: set source on ALL members (safe because primary extends all)
+                // For base interfaces: only set source when declaring interface matches exactly
+                // This avoids type errors - the source type must be assignable to _source field type
+                var setSource = isPrimaryInterface || declaringInterface == sourceIfaceFullName;
+
+                memberMappings.Add(new SourceMemberMapping(
+                    InterceptorName: interceptorName,
+                    SourceInterfaceType: setSource ? declaringInterface : "",
+                    SetSource: setSource));
+            }
+
+            sourceProviders.Add(new SourceProviderInfo(
+                InterfaceType: sourceIfaceFullName,
+                MethodName: "Source",
+                MemberMappings: memberMappings.ToEquatableArray()));
+        }
+
+        return sourceProviders.ToEquatableArray();
     }
 
     #endregion

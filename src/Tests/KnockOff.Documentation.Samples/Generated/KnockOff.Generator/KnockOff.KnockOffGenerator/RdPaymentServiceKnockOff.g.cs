@@ -8,6 +8,9 @@ partial class RdPaymentServiceKnockOff : global::KnockOff.Documentation.Samples.
 	/// <summary>Tracks and configures behavior for Process.</summary>
 	public sealed class ProcessInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.WhyKnockOff.IRdPaymentService? _source;
+
 		/// <summary>Delegate for Process.</summary>
 		public delegate global::KnockOff.Documentation.Samples.WhyKnockOff.RdPaymentResult ProcessDelegate(RdPaymentServiceKnockOff ko, int orderId, decimal amount);
 
@@ -53,6 +56,7 @@ partial class RdPaymentServiceKnockOff : global::KnockOff.Documentation.Samples.
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((orderId, amount));
+				if (_source is { } src) return src.Process(orderId, amount);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return new global::KnockOff.Documentation.Samples.WhyKnockOff.RdPaymentResult();
 			}
@@ -76,6 +80,7 @@ partial class RdPaymentServiceKnockOff : global::KnockOff.Documentation.Samples.
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -184,6 +189,15 @@ partial class RdPaymentServiceKnockOff : global::KnockOff.Documentation.Samples.
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.WhyKnockOff.IRdPaymentService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.WhyKnockOff.IRdPaymentService? source)
+	{
+		Process._source = source;
 	}
 
 	global::KnockOff.Documentation.Samples.WhyKnockOff.RdPaymentResult global::KnockOff.Documentation.Samples.WhyKnockOff.IRdPaymentService.Process(int orderId, decimal amount)

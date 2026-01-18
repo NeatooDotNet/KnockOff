@@ -11,6 +11,9 @@ partial class MultiDataContextTests
 		/// <summary>Tracks and configures behavior for GetById.</summary>
 		public sealed class IMultiRepository_GetByIdInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.IMultiRepository? _source;
+
 			/// <summary>Delegate for GetById.</summary>
 			public delegate global::KnockOff.Documentation.Samples.Guides.MultiUser? GetByIdDelegate(Stubs.IMultiRepository ko, int id);
 
@@ -56,6 +59,7 @@ partial class MultiDataContextTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = id;
+					if (_source is { } src) return src.GetById(id);
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
 					return default!;
 				}
@@ -79,6 +83,7 @@ partial class MultiDataContextTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -168,6 +173,9 @@ partial class MultiDataContextTests
 		/// <summary>Tracks and configures behavior for Add.</summary>
 		public sealed class IMultiRepository_AddInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.IMultiRepository? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IMultiRepository, global::KnockOff.Documentation.Samples.Guides.MultiUser> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -210,6 +218,7 @@ partial class MultiDataContextTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = user;
+					if (_source is { } src) { src.Add(user); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 					return;
 				}
@@ -233,6 +242,7 @@ partial class MultiDataContextTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -351,11 +361,21 @@ partial class MultiDataContextTests
 				Strict = strict;
 			}
 
+			/// <summary>Sets the source object for global::KnockOff.Documentation.Samples.Guides.IMultiRepository delegation.</summary>
+			public void Source(global::KnockOff.Documentation.Samples.Guides.IMultiRepository? source)
+			{
+				GetById._source = source;
+				Add._source = source;
+			}
+
 		}
 
 		/// <summary>Tracks and configures behavior for SaveChangesAsync.</summary>
 		public sealed class IMultiUnitOfWork_SaveChangesAsyncInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.IMultiUnitOfWork? _source;
+
 			/// <summary>Delegate for SaveChangesAsync.</summary>
 			public delegate global::System.Threading.Tasks.Task<int> SaveChangesAsyncDelegate(Stubs.IMultiUnitOfWork ko, global::System.Threading.CancellationToken ct);
 
@@ -401,6 +421,7 @@ partial class MultiDataContextTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = ct;
+					if (_source is { } src) return src.SaveChangesAsync(ct);
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "SaveChangesAsync");
 					return global::System.Threading.Tasks.Task.FromResult<int>(default!);
 				}
@@ -424,6 +445,7 @@ partial class MultiDataContextTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -532,6 +554,12 @@ partial class MultiDataContextTests
 			public IMultiUnitOfWork(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::KnockOff.Documentation.Samples.Guides.IMultiUnitOfWork delegation.</summary>
+			public void Source(global::KnockOff.Documentation.Samples.Guides.IMultiUnitOfWork? source)
+			{
+				SaveChangesAsync._source = source;
 			}
 
 		}

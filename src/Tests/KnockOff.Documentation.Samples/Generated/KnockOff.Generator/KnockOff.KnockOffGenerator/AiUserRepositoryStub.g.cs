@@ -8,6 +8,9 @@ partial class AiUserRepositoryStub : global::KnockOff.Documentation.Samples.IAiU
 	/// <summary>Tracks and configures behavior for GetById.</summary>
 	public sealed class GetByIdInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.IAiUserRepository? _source;
+
 		/// <summary>Delegate for GetById.</summary>
 		public delegate global::KnockOff.Documentation.Samples.AiUser? GetByIdDelegate(AiUserRepositoryStub ko, int id);
 
@@ -53,6 +56,7 @@ partial class AiUserRepositoryStub : global::KnockOff.Documentation.Samples.IAiU
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				if (_source is { } src) return src.GetById(id);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
 				return default!;
 			}
@@ -76,6 +80,7 @@ partial class AiUserRepositoryStub : global::KnockOff.Documentation.Samples.IAiU
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -165,6 +170,9 @@ partial class AiUserRepositoryStub : global::KnockOff.Documentation.Samples.IAiU
 	/// <summary>Tracks and configures behavior for Save.</summary>
 	public sealed class SaveInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.IAiUserRepository? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<AiUserRepositoryStub, global::KnockOff.Documentation.Samples.AiUser> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -207,6 +215,7 @@ partial class AiUserRepositoryStub : global::KnockOff.Documentation.Samples.IAiU
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = user;
+				if (_source is { } src) { src.Save(user); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 				return;
 			}
@@ -230,6 +239,7 @@ partial class AiUserRepositoryStub : global::KnockOff.Documentation.Samples.IAiU
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -342,6 +352,16 @@ partial class AiUserRepositoryStub : global::KnockOff.Documentation.Samples.IAiU
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.IAiUserRepository).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.IAiUserRepository? source)
+	{
+		GetById._source = source;
+		Save._source = source;
 	}
 
 	global::KnockOff.Documentation.Samples.AiUser? global::KnockOff.Documentation.Samples.IAiUserRepository.GetById(int id)

@@ -8,6 +8,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 	/// <summary>Tracks and configures behavior for Count.</summary>
 	public sealed class CountInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::System.Collections.Generic.ICollection<string>? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -21,12 +24,15 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsReadOnly.</summary>
 	public sealed class IsReadOnlyInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::System.Collections.Generic.ICollection<string>? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -40,12 +46,15 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for Add.</summary>
 	public sealed class AddInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::System.Collections.Generic.ISet<string>? _source;
+
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for Add(string).</summary>
@@ -112,6 +121,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			if (_sequence_String_Boolean.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Add(item);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 				return default!;
 			}
@@ -136,6 +148,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			if (_sequence_String_void.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.Add(item); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 				return;
 			}
@@ -158,6 +173,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence_String_Boolean)
 				tracking.Reset();
 			_sequenceIndex_String_Boolean = 0;
@@ -323,6 +339,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 	/// <summary>Tracks and configures behavior for ExceptWith.</summary>
 	public sealed class ExceptWithInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::System.Collections.Generic.ISet<string>? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -365,6 +384,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = other;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.ExceptWith(other); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ExceptWith");
 				return;
 			}
@@ -388,6 +410,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -477,6 +500,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 	/// <summary>Tracks and configures behavior for IntersectWith.</summary>
 	public sealed class IntersectWithInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::System.Collections.Generic.ISet<string>? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -519,6 +545,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = other;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.IntersectWith(other); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntersectWith");
 				return;
 			}
@@ -542,6 +571,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -631,6 +661,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 	/// <summary>Tracks and configures behavior for IsProperSubsetOf.</summary>
 	public sealed class IsProperSubsetOfInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::System.Collections.Generic.ISet<string>? _source;
+
 		/// <summary>Delegate for IsProperSubsetOf.</summary>
 		public delegate bool IsProperSubsetOfDelegate(SetStringKnockOff ko, global::System.Collections.Generic.IEnumerable<string> other);
 
@@ -676,6 +709,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = other;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.IsProperSubsetOf(other);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsProperSubsetOf");
 				return default!;
 			}
@@ -699,6 +735,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -788,6 +825,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 	/// <summary>Tracks and configures behavior for IsProperSupersetOf.</summary>
 	public sealed class IsProperSupersetOfInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::System.Collections.Generic.ISet<string>? _source;
+
 		/// <summary>Delegate for IsProperSupersetOf.</summary>
 		public delegate bool IsProperSupersetOfDelegate(SetStringKnockOff ko, global::System.Collections.Generic.IEnumerable<string> other);
 
@@ -833,6 +873,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = other;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.IsProperSupersetOf(other);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsProperSupersetOf");
 				return default!;
 			}
@@ -856,6 +899,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -945,6 +989,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 	/// <summary>Tracks and configures behavior for IsSubsetOf.</summary>
 	public sealed class IsSubsetOfInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::System.Collections.Generic.ISet<string>? _source;
+
 		/// <summary>Delegate for IsSubsetOf.</summary>
 		public delegate bool IsSubsetOfDelegate(SetStringKnockOff ko, global::System.Collections.Generic.IEnumerable<string> other);
 
@@ -990,6 +1037,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = other;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.IsSubsetOf(other);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsSubsetOf");
 				return default!;
 			}
@@ -1013,6 +1063,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1102,6 +1153,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 	/// <summary>Tracks and configures behavior for IsSupersetOf.</summary>
 	public sealed class IsSupersetOfInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::System.Collections.Generic.ISet<string>? _source;
+
 		/// <summary>Delegate for IsSupersetOf.</summary>
 		public delegate bool IsSupersetOfDelegate(SetStringKnockOff ko, global::System.Collections.Generic.IEnumerable<string> other);
 
@@ -1147,6 +1201,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = other;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.IsSupersetOf(other);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsSupersetOf");
 				return default!;
 			}
@@ -1170,6 +1227,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1259,6 +1317,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 	/// <summary>Tracks and configures behavior for Overlaps.</summary>
 	public sealed class OverlapsInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::System.Collections.Generic.ISet<string>? _source;
+
 		/// <summary>Delegate for Overlaps.</summary>
 		public delegate bool OverlapsDelegate(SetStringKnockOff ko, global::System.Collections.Generic.IEnumerable<string> other);
 
@@ -1304,6 +1365,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = other;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Overlaps(other);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Overlaps");
 				return default!;
 			}
@@ -1327,6 +1391,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1416,6 +1481,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 	/// <summary>Tracks and configures behavior for SetEquals.</summary>
 	public sealed class SetEqualsInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::System.Collections.Generic.ISet<string>? _source;
+
 		/// <summary>Delegate for SetEquals.</summary>
 		public delegate bool SetEqualsDelegate(SetStringKnockOff ko, global::System.Collections.Generic.IEnumerable<string> other);
 
@@ -1461,6 +1529,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = other;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.SetEquals(other);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SetEquals");
 				return default!;
 			}
@@ -1484,6 +1555,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1573,6 +1645,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 	/// <summary>Tracks and configures behavior for SymmetricExceptWith.</summary>
 	public sealed class SymmetricExceptWithInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::System.Collections.Generic.ISet<string>? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -1615,6 +1690,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = other;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.SymmetricExceptWith(other); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SymmetricExceptWith");
 				return;
 			}
@@ -1638,6 +1716,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1727,6 +1806,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 	/// <summary>Tracks and configures behavior for UnionWith.</summary>
 	public sealed class UnionWithInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::System.Collections.Generic.ISet<string>? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -1769,6 +1851,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = other;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.UnionWith(other); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "UnionWith");
 				return;
 			}
@@ -1792,6 +1877,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1881,6 +1967,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 	/// <summary>Tracks and configures behavior for Clear.</summary>
 	public sealed class ClearInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::System.Collections.Generic.ICollection<string>? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<SetStringKnockOff> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -1918,6 +2007,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.Clear(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Clear");
 				return;
 			}
@@ -1940,6 +2032,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -2025,6 +2118,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 	/// <summary>Tracks and configures behavior for Contains.</summary>
 	public sealed class ContainsInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::System.Collections.Generic.ICollection<string>? _source;
+
 		/// <summary>Delegate for Contains.</summary>
 		public delegate bool ContainsDelegate(SetStringKnockOff ko, string item);
 
@@ -2070,6 +2166,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = item;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Contains(item);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Contains");
 				return default!;
 			}
@@ -2093,6 +2192,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -2182,6 +2282,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 	/// <summary>Tracks and configures behavior for CopyTo.</summary>
 	public sealed class CopyToInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::System.Collections.Generic.ICollection<string>? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<SetStringKnockOff, string[], int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -2224,6 +2327,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((array, arrayIndex));
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.CopyTo(array, arrayIndex); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "CopyTo");
 				return;
 			}
@@ -2247,6 +2353,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -2336,6 +2443,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 	/// <summary>Tracks and configures behavior for Remove.</summary>
 	public sealed class RemoveInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::System.Collections.Generic.ICollection<string>? _source;
+
 		/// <summary>Delegate for Remove.</summary>
 		public delegate bool RemoveDelegate(SetStringKnockOff ko, string item);
 
@@ -2381,6 +2491,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = item;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Remove(item);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Remove");
 				return default!;
 			}
@@ -2404,6 +2517,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -2493,6 +2607,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 	/// <summary>Tracks and configures behavior for GetEnumerator.</summary>
 	public sealed class GetEnumeratorInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::System.Collections.Generic.IEnumerable<string>? _source;
+
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for GetEnumerator().</summary>
@@ -2559,6 +2676,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			if (_sequence_NoParams_Collections_Generic_IEnumerator_string.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetEnumerator();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
 			}
@@ -2583,6 +2703,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			if (_sequence_NoParams_Collections_IEnumerator.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetEnumerator();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
 			}
@@ -2605,6 +2728,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence_NoParams_Collections_Generic_IEnumerator_string)
 				tracking.Reset();
 			_sequenceIndex_NoParams_Collections_Generic_IEnumerator_string = 0;
@@ -2849,14 +2973,112 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
 	}
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::System.Collections.Generic.ISet<string>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::System.Collections.Generic.ISet<string>? source)
+	{
+		Count._source = source;
+		IsReadOnly._source = source;
+		Add._source = source;
+		ExceptWith._source = source;
+		IntersectWith._source = source;
+		IsProperSubsetOf._source = source;
+		IsProperSupersetOf._source = source;
+		IsSubsetOf._source = source;
+		IsSupersetOf._source = source;
+		Overlaps._source = source;
+		SetEquals._source = source;
+		SymmetricExceptWith._source = source;
+		UnionWith._source = source;
+		Clear._source = source;
+		Contains._source = source;
+		CopyTo._source = source;
+		Remove._source = source;
+		GetEnumerator._source = source;
+	}
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::System.Collections.Generic.ICollection<string>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::System.Collections.Generic.ICollection<string>? source)
+	{
+		Count._source = source;
+		IsReadOnly._source = source;
+		Add._source = null;
+		ExceptWith._source = null;
+		IntersectWith._source = null;
+		IsProperSubsetOf._source = null;
+		IsProperSupersetOf._source = null;
+		IsSubsetOf._source = null;
+		IsSupersetOf._source = null;
+		Overlaps._source = null;
+		SetEquals._source = null;
+		SymmetricExceptWith._source = null;
+		UnionWith._source = null;
+		Clear._source = source;
+		Contains._source = source;
+		CopyTo._source = source;
+		Remove._source = source;
+		GetEnumerator._source = source;
+	}
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::System.Collections.Generic.IEnumerable<string>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::System.Collections.Generic.IEnumerable<string>? source)
+	{
+		Count._source = null;
+		IsReadOnly._source = null;
+		Add._source = null;
+		ExceptWith._source = null;
+		IntersectWith._source = null;
+		IsProperSubsetOf._source = null;
+		IsProperSupersetOf._source = null;
+		IsSubsetOf._source = null;
+		IsSupersetOf._source = null;
+		Overlaps._source = null;
+		SetEquals._source = null;
+		SymmetricExceptWith._source = null;
+		UnionWith._source = null;
+		Clear._source = null;
+		Contains._source = null;
+		CopyTo._source = null;
+		Remove._source = null;
+		GetEnumerator._source = source;
+	}
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::System.Collections.IEnumerable).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::System.Collections.IEnumerable? source)
+	{
+		Count._source = null;
+		IsReadOnly._source = null;
+		Add._source = null;
+		ExceptWith._source = null;
+		IntersectWith._source = null;
+		IsProperSubsetOf._source = null;
+		IsProperSupersetOf._source = null;
+		IsSubsetOf._source = null;
+		IsSupersetOf._source = null;
+		Overlaps._source = null;
+		SetEquals._source = null;
+		SymmetricExceptWith._source = null;
+		UnionWith._source = null;
+		Clear._source = null;
+		Contains._source = null;
+		CopyTo._source = null;
+		Remove._source = null;
+		GetEnumerator._source = null;
+	}
+
 	int global::System.Collections.Generic.ICollection<string>.Count
 	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "Count"); return Count.Value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "Count"); return Count.Value; }
 	}
 
 	bool global::System.Collections.Generic.ICollection<string>.IsReadOnly
 	{
-		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "IsReadOnly"); return IsReadOnly.Value; }
+		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(this); if (IsReadOnly._source is { } src) return src.IsReadOnly; if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "IsReadOnly"); return IsReadOnly.Value; }
 	}
 
 	bool global::System.Collections.Generic.ISet<string>.Add(string item)

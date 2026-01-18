@@ -8,6 +8,9 @@ partial class PropertyStoreKnockOff : global::KnockOff.Documentation.Samples.Gui
 	/// <summary>Tracks and configures behavior for Count.</summary>
 	public sealed class CountInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -21,12 +24,15 @@ partial class PropertyStoreKnockOff : global::KnockOff.Documentation.Samples.Gui
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for indexer.</summary>
 	public sealed class IndexerInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -43,7 +49,7 @@ partial class PropertyStoreKnockOff : global::KnockOff.Documentation.Samples.Gui
 		public global::System.Collections.Generic.Dictionary<int, global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo> Backing { get; } = new();
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
+		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; _source = null; }
 	}
 
 	/// <summary>Interceptor for Count. Configure via .Value, track via .GetCount.</summary>
@@ -58,14 +64,24 @@ partial class PropertyStoreKnockOff : global::KnockOff.Documentation.Samples.Gui
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore? source)
+	{
+		Count._source = source;
+		Indexer._source = source;
+	}
+
 	int global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore.Count
 	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IInPropertyStore", "Count"); return Count.Value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("IInPropertyStore", "Count"); return Count.Value; }
 	}
 
 	global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyInfo global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInPropertyStore.this[int index]
 	{
-		get { Indexer.RecordGet(index); if (Indexer.OnGet is { } onGet) return onGet(this, index); if (Strict) throw global::KnockOff.StubException.NotConfigured("IInPropertyStore", "this[]"); return Indexer.Backing.TryGetValue(index, out var v) ? v : default!; }
+		get { Indexer.RecordGet(index); if (Indexer.OnGet is { } onGet) return onGet(this, index); if (Indexer._source is { } src) return src[index]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IInPropertyStore", "this[]"); return Indexer.Backing.TryGetValue(index, out var v) ? v : default!; }
 	}
 
 }
