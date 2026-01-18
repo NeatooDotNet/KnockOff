@@ -92,7 +92,9 @@ partial class IhOrderKnockOff : global::KnockOff.Documentation.Samples.Guides.II
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Submit(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Submit");
 				return;
 			}
@@ -244,7 +246,9 @@ partial class IhOrderKnockOff : global::KnockOff.Documentation.Samples.Guides.II
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetErrors();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetErrors");
 				return new global::System.Collections.Generic.List<string>();
 			}

@@ -59,7 +59,9 @@ partial class SpUserServiceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = id;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) return src.GetById(id);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
 					return default!;
 				}
@@ -216,7 +218,9 @@ partial class SpUserServiceTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) return src.GetAll();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetAll");
 					throw new global::System.InvalidOperationException("No implementation provided for GetAll. Configure via OnCall.");
 				}
@@ -370,7 +374,9 @@ partial class SpUserServiceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = user;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) { src.Save(user); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 					return;
 				}
@@ -579,7 +585,9 @@ partial class SpUserServiceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((to, body));
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) { src.Send(to, body); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Send");
 					return;
 				}

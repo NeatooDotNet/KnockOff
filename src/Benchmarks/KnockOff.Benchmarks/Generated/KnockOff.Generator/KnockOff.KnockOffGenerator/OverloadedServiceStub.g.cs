@@ -8,6 +8,9 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 	/// <summary>Tracks and configures behavior for Process.</summary>
 	public sealed class ProcessInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.IOverloadedService? _source;
+
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for Process(int).</summary>
@@ -100,6 +103,9 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 			if (_sequence_Int32_void.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.Process(@value); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return;
 			}
@@ -124,6 +130,9 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 			if (_sequence_String_void.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.Process(@value); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return;
 			}
@@ -148,6 +157,9 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 			if (_sequence_Int32_Int32_void.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.Process(a, b); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return;
 			}
@@ -170,6 +182,7 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence_Int32_void)
 				tracking.Reset();
 			_sequenceIndex_Int32_void = 0;
@@ -411,6 +424,9 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 	/// <summary>Tracks and configures behavior for Calculate.</summary>
 	public sealed class CalculateInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.IOverloadedService? _source;
+
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for Calculate(int).</summary>
@@ -477,6 +493,9 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 			if (_sequence_Int32_Int32.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Calculate(@value);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Calculate");
 				return default!;
 			}
@@ -501,6 +520,9 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 			if (_sequence_Int32_Int32_Int32.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Calculate(a, b);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Calculate");
 				return default!;
 			}
@@ -523,6 +545,7 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence_Int32_Int32)
 				tracking.Reset();
 			_sequenceIndex_Int32_Int32 = 0;
@@ -711,6 +734,16 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Benchmarks.Interfaces.IOverloadedService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Benchmarks.Interfaces.IOverloadedService? source)
+	{
+		Process._source = source;
+		Calculate._source = source;
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.IOverloadedService.Process(int @value)

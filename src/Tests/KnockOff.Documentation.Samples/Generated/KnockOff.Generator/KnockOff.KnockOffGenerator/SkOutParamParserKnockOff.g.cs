@@ -57,9 +57,9 @@ partial class SkOutParamParserKnockOff : global::KnockOff.Documentation.Samples.
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = input;
-				#pragma warning disable CS8601
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.TryParse(input, out result);
-				#pragma warning restore CS8601
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "TryParse");
 				return default!;
 			}
@@ -218,9 +218,9 @@ partial class SkOutParamParserKnockOff : global::KnockOff.Documentation.Samples.
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
-				#pragma warning disable CS8601
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.GetData(out name, out count); return; }
-				#pragma warning restore CS8601
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetData");
 				return;
 			}

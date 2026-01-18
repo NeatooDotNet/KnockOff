@@ -104,7 +104,9 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.DoWork(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "DoWork");
 				return;
 			}
@@ -258,7 +260,9 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((id, count, urgent));
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Process(id, count, urgent); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return;
 			}

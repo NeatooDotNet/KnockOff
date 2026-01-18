@@ -68,7 +68,9 @@ partial class FcCacheServiceStub : global::KnockOff.Documentation.Samples.Compar
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = key;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Remove(key); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Remove");
 				return;
 			}

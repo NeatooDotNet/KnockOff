@@ -53,7 +53,9 @@ partial class MethodLoggerKnockOff : global::KnockOff.Documentation.Samples.Guid
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = message;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Log(message); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Log");
 				return;
 			}
@@ -212,7 +214,9 @@ partial class MethodLoggerKnockOff : global::KnockOff.Documentation.Samples.Guid
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((message, ex));
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.LogError(message, ex); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "LogError");
 				return;
 			}

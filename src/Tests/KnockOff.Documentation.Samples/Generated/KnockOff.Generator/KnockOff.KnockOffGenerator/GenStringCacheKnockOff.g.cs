@@ -56,7 +56,9 @@ partial class GenStringCacheKnockOff : global::KnockOff.Documentation.Samples.Gu
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = key;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Get(key);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Get");
 				return default!;
 			}
@@ -215,7 +217,9 @@ partial class GenStringCacheKnockOff : global::KnockOff.Documentation.Samples.Gu
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((key, @value));
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Set(key, @value); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Set");
 				return;
 			}

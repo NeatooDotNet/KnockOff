@@ -116,7 +116,9 @@ partial class SkCallbackMethodKnockOff : global::KnockOff.Documentation.Samples.
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.DoWork(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "DoWork");
 				return;
 			}
@@ -273,7 +275,9 @@ partial class SkCallbackMethodKnockOff : global::KnockOff.Documentation.Samples.
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetById(id);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
 				return new global::KnockOff.Documentation.Samples.Skills.SkUser();
 			}
@@ -435,7 +439,9 @@ partial class SkCallbackMethodKnockOff : global::KnockOff.Documentation.Samples.
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((query, limit, offset));
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Search(query, limit, offset);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Search");
 				return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser>();
 			}

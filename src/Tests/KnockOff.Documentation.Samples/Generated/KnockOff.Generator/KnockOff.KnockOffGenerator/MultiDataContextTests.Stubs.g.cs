@@ -59,7 +59,9 @@ partial class MultiDataContextTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = id;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) return src.GetById(id);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
 					return default!;
 				}
@@ -218,7 +220,9 @@ partial class MultiDataContextTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = user;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) { src.Add(user); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 					return;
 				}
@@ -421,7 +425,9 @@ partial class MultiDataContextTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = ct;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) return src.SaveChangesAsync(ct);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "SaveChangesAsync");
 					return global::System.Threading.Tasks.Task.FromResult<int>(default!);
 				}

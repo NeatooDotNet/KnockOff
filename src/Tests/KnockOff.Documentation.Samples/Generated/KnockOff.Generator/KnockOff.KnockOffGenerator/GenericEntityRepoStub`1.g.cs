@@ -56,7 +56,9 @@ partial class GenericEntityRepoStub<T> : global::KnockOff.Documentation.Samples.
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.FindById(id);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "FindById");
 				return default!;
 			}
@@ -215,7 +217,9 @@ partial class GenericEntityRepoStub<T> : global::KnockOff.Documentation.Samples.
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = entity;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Save(entity); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 				return;
 			}

@@ -88,6 +88,7 @@ partial class DsInitPropertyTests
 				}
 				init
 				{
+					Id.RecordSet(value);
 					Id.Value = value;
 				}
 			}
@@ -101,6 +102,7 @@ partial class DsInitPropertyTests
 				}
 				init
 				{
+					Name.RecordSet(value);
 					Name.Value = value;
 				}
 			}
@@ -233,6 +235,7 @@ partial class DsInitPropertyTests
 				}
 				init
 				{
+					Id.RecordSet(value);
 					Id.Value = value;
 				}
 			}

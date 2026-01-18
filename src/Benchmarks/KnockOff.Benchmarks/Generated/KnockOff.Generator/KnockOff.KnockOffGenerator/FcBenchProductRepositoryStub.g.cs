@@ -8,6 +8,9 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 	/// <summary>Tracks and configures behavior for GetByIdAsync.</summary>
 	public sealed class GetByIdAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Benchmarks.IFcBenchProductRepository? _source;
+
 		/// <summary>Delegate for GetByIdAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct?> GetByIdAsyncDelegate(FcBenchProductRepositoryStub ko, int id);
 
@@ -53,6 +56,9 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetByIdAsync(id);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetByIdAsync");
 				return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct?>(default!);
 			}
@@ -76,6 +82,7 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -165,6 +172,9 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 	/// <summary>Tracks and configures behavior for GetAllAsync.</summary>
 	public sealed class GetAllAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Benchmarks.IFcBenchProductRepository? _source;
+
 		/// <summary>Delegate for GetAllAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<global::System.Collections.Generic.IEnumerable<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct>> GetAllAsyncDelegate(FcBenchProductRepositoryStub ko);
 
@@ -205,6 +215,9 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetAllAsync();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetAllAsync");
 				return global::System.Threading.Tasks.Task.FromResult<global::System.Collections.Generic.IEnumerable<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct>>(new global::System.Collections.Generic.List<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct>());
 			}
@@ -227,6 +240,7 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -312,6 +326,9 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 	/// <summary>Tracks and configures behavior for SaveAsync.</summary>
 	public sealed class SaveAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Benchmarks.IFcBenchProductRepository? _source;
+
 		/// <summary>Delegate for SaveAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task SaveAsyncDelegate(FcBenchProductRepositoryStub ko, global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct product);
 
@@ -357,6 +374,9 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = product;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.SaveAsync(product);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SaveAsync");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -380,6 +400,7 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -469,6 +490,9 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 	/// <summary>Tracks and configures behavior for DeleteAsync.</summary>
 	public sealed class DeleteAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Benchmarks.IFcBenchProductRepository? _source;
+
 		/// <summary>Delegate for DeleteAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task DeleteAsyncDelegate(FcBenchProductRepositoryStub ko, int id);
 
@@ -514,6 +538,9 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.DeleteAsync(id);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "DeleteAsync");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -537,6 +564,7 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -657,6 +685,18 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Benchmarks.Benchmarks.IFcBenchProductRepository).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Benchmarks.Benchmarks.IFcBenchProductRepository? source)
+	{
+		GetByIdAsync._source = source;
+		GetAllAsync._source = source;
+		SaveAsync._source = source;
+		DeleteAsync._source = source;
 	}
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct?> global::KnockOff.Benchmarks.Benchmarks.IFcBenchProductRepository.GetByIdAsync(int id)

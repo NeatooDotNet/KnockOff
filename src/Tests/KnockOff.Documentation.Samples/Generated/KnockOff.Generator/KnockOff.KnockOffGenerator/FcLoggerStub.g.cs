@@ -53,7 +53,9 @@ partial class FcLoggerStub : global::KnockOff.Documentation.Samples.Comparison.I
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = message;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.LogInfo(message); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "LogInfo");
 				return;
 			}
@@ -212,7 +214,9 @@ partial class FcLoggerStub : global::KnockOff.Documentation.Samples.Comparison.I
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = message;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.LogWarning(message); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "LogWarning");
 				return;
 			}
@@ -371,7 +375,9 @@ partial class FcLoggerStub : global::KnockOff.Documentation.Samples.Comparison.I
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((message, exception));
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.LogError(message, exception); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "LogError");
 				return;
 			}

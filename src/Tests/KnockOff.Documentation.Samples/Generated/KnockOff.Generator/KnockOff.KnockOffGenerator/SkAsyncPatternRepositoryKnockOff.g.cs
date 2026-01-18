@@ -56,7 +56,9 @@ partial class SkAsyncPatternRepositoryKnockOff : global::KnockOff.Documentation.
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetUserAsync(id);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetUserAsync");
 				return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Skills.SkUser?>(default!);
 			}
@@ -218,7 +220,9 @@ partial class SkAsyncPatternRepositoryKnockOff : global::KnockOff.Documentation.
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = entity;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.SaveAsync(entity);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SaveAsync");
 				return global::System.Threading.Tasks.Task.FromResult<int>(default!);
 			}

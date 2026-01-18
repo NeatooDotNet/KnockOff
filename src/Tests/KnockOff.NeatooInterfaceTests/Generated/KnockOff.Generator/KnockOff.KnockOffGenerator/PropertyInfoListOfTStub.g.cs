@@ -56,7 +56,9 @@ partial class PropertyInfoListOfTStub : global::Neatoo.IPropertyInfoList<global:
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = name;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetPropertyInfo(name);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetPropertyInfo");
 				return default!;
 			}
@@ -213,7 +215,9 @@ partial class PropertyInfoListOfTStub : global::Neatoo.IPropertyInfoList<global:
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Properties();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Properties");
 				return new global::System.Collections.Generic.List<global::Neatoo.IPropertyInfo>();
 			}
@@ -370,7 +374,9 @@ partial class PropertyInfoListOfTStub : global::Neatoo.IPropertyInfoList<global:
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = propertyName;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.HasProperty(propertyName);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "HasProperty");
 				return default!;
 			}

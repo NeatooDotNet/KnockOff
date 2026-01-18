@@ -93,7 +93,9 @@ partial class MultiServiceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = id;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) return src.GetUser(id);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetUser");
 					return default!;
 				}
@@ -252,7 +254,9 @@ partial class MultiServiceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = user;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) { src.SaveUser(user); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "SaveUser");
 					return;
 				}
@@ -476,7 +480,9 @@ partial class MultiServiceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = message;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) { src.Log(message); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Log");
 					return;
 				}
@@ -635,7 +641,9 @@ partial class MultiServiceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((message, ex));
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) { src.LogError(message, ex); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "LogError");
 					return;
 				}
@@ -835,7 +843,9 @@ partial class MultiServiceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = entity;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) { src.Save(entity); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 					return;
 				}
@@ -997,7 +1007,9 @@ partial class MultiServiceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = id;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) return src.FindById(id);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "FindById");
 					return default!;
 				}

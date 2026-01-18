@@ -273,7 +273,9 @@ partial class BpComplexInterfaceTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) { src.BeginEdit(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "BeginEdit");
 					return;
 				}
@@ -422,7 +424,9 @@ partial class BpComplexInterfaceTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) { src.CancelEdit(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "CancelEdit");
 					return;
 				}
@@ -571,7 +575,9 @@ partial class BpComplexInterfaceTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) { src.ApplyEdit(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ApplyEdit");
 					return;
 				}
@@ -720,7 +726,9 @@ partial class BpComplexInterfaceTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) { src.MarkDeleted(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "MarkDeleted");
 					return;
 				}
@@ -869,7 +877,9 @@ partial class BpComplexInterfaceTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) { src.MarkNew(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "MarkNew");
 					return;
 				}
@@ -1018,7 +1028,9 @@ partial class BpComplexInterfaceTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) { src.MarkOld(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "MarkOld");
 					return;
 				}
@@ -1172,7 +1184,9 @@ partial class BpComplexInterfaceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((property, rule));
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) { src.AddRule(property, rule); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "AddRule");
 					return;
 				}
@@ -1331,7 +1345,9 @@ partial class BpComplexInterfaceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = property;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) { src.RemoveRule(property); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "RemoveRule");
 					return;
 				}
@@ -1488,7 +1504,9 @@ partial class BpComplexInterfaceTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) return src.GetBrokenRules();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetBrokenRules");
 					throw new global::System.InvalidOperationException("No implementation provided for GetBrokenRules. Configure via OnCall.");
 				}
@@ -1642,7 +1660,9 @@ partial class BpComplexInterfaceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = child;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) { src.AddChild(child); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "AddChild");
 					return;
 				}
@@ -1801,7 +1821,9 @@ partial class BpComplexInterfaceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = child;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) { src.RemoveChild(child); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "RemoveChild");
 					return;
 				}
@@ -1958,7 +1980,9 @@ partial class BpComplexInterfaceTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) return src.GetChildren();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetChildren");
 					throw new global::System.InvalidOperationException("No implementation provided for GetChildren. Configure via OnCall.");
 				}

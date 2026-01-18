@@ -8,6 +8,9 @@ partial class TimestampedEntityStub : global::KnockOff.Benchmarks.Interfaces.ITi
 	/// <summary>Tracks and configures behavior for CreatedAt.</summary>
 	public sealed class CreatedAtInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ITimestampedEntity? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -21,12 +24,15 @@ partial class TimestampedEntityStub : global::KnockOff.Benchmarks.Interfaces.ITi
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for UpdatedAt.</summary>
 	public sealed class UpdatedAtInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ITimestampedEntity? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -40,12 +46,15 @@ partial class TimestampedEntityStub : global::KnockOff.Benchmarks.Interfaces.ITi
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for Id.</summary>
 	public sealed class IdInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.IBaseEntity? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -59,7 +68,7 @@ partial class TimestampedEntityStub : global::KnockOff.Benchmarks.Interfaces.ITi
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Interceptor for CreatedAt. Configure via .Value, track via .GetCount.</summary>
@@ -77,19 +86,39 @@ partial class TimestampedEntityStub : global::KnockOff.Benchmarks.Interfaces.ITi
 	/// <summary>The global::KnockOff.Benchmarks.Interfaces.ITimestampedEntity instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Interfaces.ITimestampedEntity Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Benchmarks.Interfaces.ITimestampedEntity).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Benchmarks.Interfaces.ITimestampedEntity? source)
+	{
+		CreatedAt._source = source;
+		UpdatedAt._source = source;
+		Id._source = source;
+	}
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Benchmarks.Interfaces.IBaseEntity).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Benchmarks.Interfaces.IBaseEntity? source)
+	{
+		CreatedAt._source = null;
+		UpdatedAt._source = null;
+		Id._source = source;
+	}
+
 	global::System.DateTime global::KnockOff.Benchmarks.Interfaces.ITimestampedEntity.CreatedAt
 	{
-		get { CreatedAt.RecordGet(); if (CreatedAt.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ITimestampedEntity", "CreatedAt"); return CreatedAt.Value; }
+		get { CreatedAt.RecordGet(); if (CreatedAt.OnGet is { } onGet) return onGet(this); if (CreatedAt._source is { } src) return src.CreatedAt; if (Strict) throw global::KnockOff.StubException.NotConfigured("ITimestampedEntity", "CreatedAt"); return CreatedAt.Value; }
 	}
 
 	global::System.DateTime? global::KnockOff.Benchmarks.Interfaces.ITimestampedEntity.UpdatedAt
 	{
-		get { UpdatedAt.RecordGet(); if (UpdatedAt.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ITimestampedEntity", "UpdatedAt"); return UpdatedAt.Value; }
+		get { UpdatedAt.RecordGet(); if (UpdatedAt.OnGet is { } onGet) return onGet(this); if (UpdatedAt._source is { } src) return src.UpdatedAt; if (Strict) throw global::KnockOff.StubException.NotConfigured("ITimestampedEntity", "UpdatedAt"); return UpdatedAt.Value; }
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.IBaseEntity.Id
 	{
-		get { Id.RecordGet(); if (Id.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IBaseEntity", "Id"); return Id.Value; }
+		get { Id.RecordGet(); if (Id.OnGet is { } onGet) return onGet(this); if (Id._source is { } src) return src.Id; if (Strict) throw global::KnockOff.StubException.NotConfigured("IBaseEntity", "Id"); return Id.Value; }
 	}
 
 }

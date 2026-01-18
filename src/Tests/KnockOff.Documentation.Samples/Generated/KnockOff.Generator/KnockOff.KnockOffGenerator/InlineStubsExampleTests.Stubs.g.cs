@@ -56,7 +56,9 @@ partial class InlineStubsExampleTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = entity;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) { src.Save(entity); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 					return;
 				}
@@ -242,7 +244,9 @@ partial class InlineStubsExampleTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) { src.Commit(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Commit");
 					return;
 				}

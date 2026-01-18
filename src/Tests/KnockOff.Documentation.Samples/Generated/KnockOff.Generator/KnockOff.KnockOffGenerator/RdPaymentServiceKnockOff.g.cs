@@ -56,7 +56,9 @@ partial class RdPaymentServiceKnockOff : global::KnockOff.Documentation.Samples.
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((orderId, amount));
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Process(orderId, amount);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return new global::KnockOff.Documentation.Samples.WhyKnockOff.RdPaymentResult();
 			}

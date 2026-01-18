@@ -53,7 +53,9 @@ partial class DuUserRepositoryStub : global::KnockOff.Documentation.Samples.WhyK
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = user;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Save(user); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 				return;
 			}

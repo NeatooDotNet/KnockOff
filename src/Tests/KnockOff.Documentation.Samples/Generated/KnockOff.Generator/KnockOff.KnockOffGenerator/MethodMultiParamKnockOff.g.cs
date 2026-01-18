@@ -53,7 +53,9 @@ partial class MethodMultiParamKnockOff : global::KnockOff.Documentation.Samples.
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((name, @value, flag));
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Process(name, @value, flag); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return;
 			}

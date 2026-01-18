@@ -103,7 +103,9 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Sandbox.IOverloadedSe
 			if (_sequence_String_String.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Format(input);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Format");
 				throw new global::System.InvalidOperationException("No implementation provided for Format. Configure via OnCall.");
 			}
@@ -128,7 +130,9 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Sandbox.IOverloadedSe
 			if (_sequence_String_Boolean_String.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Format(input, uppercase);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Format");
 				throw new global::System.InvalidOperationException("No implementation provided for Format. Configure via OnCall.");
 			}
@@ -153,7 +157,9 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Sandbox.IOverloadedSe
 			if (_sequence_String_Int32_String.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Format(input, maxLength);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Format");
 				throw new global::System.InvalidOperationException("No implementation provided for Format. Configure via OnCall.");
 			}

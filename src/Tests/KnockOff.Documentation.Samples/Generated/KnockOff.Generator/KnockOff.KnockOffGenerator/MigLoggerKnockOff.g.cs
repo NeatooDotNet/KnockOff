@@ -53,7 +53,9 @@ partial class MigLoggerKnockOff : global::KnockOff.Documentation.Samples.Compari
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = message;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Log(message); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Log");
 				return;
 			}

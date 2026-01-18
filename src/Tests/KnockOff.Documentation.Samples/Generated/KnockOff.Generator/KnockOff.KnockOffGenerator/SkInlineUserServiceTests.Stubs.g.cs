@@ -59,7 +59,9 @@ partial class SkInlineUserServiceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = id;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) return src.GetUser(id);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetUser");
 					return default!;
 				}
@@ -250,7 +252,9 @@ partial class SkInlineUserServiceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = message;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) { src.Log(message); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Log");
 					return;
 				}

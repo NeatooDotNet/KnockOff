@@ -77,7 +77,9 @@ partial class BpProcessorKnockOff : global::KnockOff.Documentation.Samples.Guide
 			if (_sequence_String_void.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Process(data); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return;
 			}
@@ -102,7 +104,9 @@ partial class BpProcessorKnockOff : global::KnockOff.Documentation.Samples.Guide
 			if (_sequence_String_Int32_void.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Process(data, priority); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return;
 			}

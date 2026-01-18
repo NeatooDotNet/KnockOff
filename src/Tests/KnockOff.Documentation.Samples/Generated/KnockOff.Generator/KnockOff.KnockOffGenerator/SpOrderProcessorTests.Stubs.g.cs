@@ -59,7 +59,9 @@ partial class SpOrderProcessorTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = id;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) return src.GetById(id);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
 					return default!;
 				}
@@ -218,7 +220,9 @@ partial class SpOrderProcessorTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = order;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) { src.Save(order); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 					return;
 				}
@@ -421,7 +425,9 @@ partial class SpOrderProcessorTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = amount;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) return src.Process(amount);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 					return default!;
 				}
@@ -612,7 +618,9 @@ partial class SpOrderProcessorTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = message;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) { src.Notify(message); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Notify");
 					return;
 				}

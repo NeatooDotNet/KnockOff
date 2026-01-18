@@ -11,6 +11,9 @@ partial class InlineStubs
 		/// <summary>Tracks and configures behavior for DoWork.</summary>
 		public sealed class ISimpleService_DoWorkInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Benchmarks.Interfaces.ISimpleService? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.ISimpleService> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -48,6 +51,9 @@ partial class InlineStubs
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.DoWork(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "DoWork");
 					return;
 				}
@@ -70,6 +76,7 @@ partial class InlineStubs
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -176,11 +183,20 @@ partial class InlineStubs
 				Strict = strict;
 			}
 
+			/// <summary>Sets the source object for global::KnockOff.Benchmarks.Interfaces.ISimpleService delegation.</summary>
+			public void Source(global::KnockOff.Benchmarks.Interfaces.ISimpleService? source)
+			{
+				DoWork._source = source;
+			}
+
 		}
 
 		/// <summary>Tracks and configures behavior for Add.</summary>
 		public sealed class ICalculator_AddInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Benchmarks.Interfaces.ICalculator? _source;
+
 			/// <summary>Delegate for Add.</summary>
 			public delegate int AddDelegate(Stubs.ICalculator ko, int a, int b);
 
@@ -226,6 +242,9 @@ partial class InlineStubs
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((a, b));
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.Add(a, b);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 					return default!;
 				}
@@ -249,6 +268,7 @@ partial class InlineStubs
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -338,6 +358,9 @@ partial class InlineStubs
 		/// <summary>Tracks and configures behavior for Subtract.</summary>
 		public sealed class ICalculator_SubtractInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Benchmarks.Interfaces.ICalculator? _source;
+
 			/// <summary>Delegate for Subtract.</summary>
 			public delegate int SubtractDelegate(Stubs.ICalculator ko, int a, int b);
 
@@ -383,6 +406,9 @@ partial class InlineStubs
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((a, b));
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.Subtract(a, b);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Subtract");
 					return default!;
 				}
@@ -406,6 +432,7 @@ partial class InlineStubs
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -495,6 +522,9 @@ partial class InlineStubs
 		/// <summary>Tracks and configures behavior for Multiply.</summary>
 		public sealed class ICalculator_MultiplyInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Benchmarks.Interfaces.ICalculator? _source;
+
 			/// <summary>Delegate for Multiply.</summary>
 			public delegate int MultiplyDelegate(Stubs.ICalculator ko, int a, int b);
 
@@ -540,6 +570,9 @@ partial class InlineStubs
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((a, b));
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.Multiply(a, b);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Multiply");
 					return default!;
 				}
@@ -563,6 +596,7 @@ partial class InlineStubs
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -652,6 +686,9 @@ partial class InlineStubs
 		/// <summary>Tracks and configures behavior for Divide.</summary>
 		public sealed class ICalculator_DivideInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Benchmarks.Interfaces.ICalculator? _source;
+
 			/// <summary>Delegate for Divide.</summary>
 			public delegate double DivideDelegate(Stubs.ICalculator ko, double a, double b);
 
@@ -697,6 +734,9 @@ partial class InlineStubs
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((a, b));
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.Divide(a, b);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Divide");
 					return default!;
 				}
@@ -720,6 +760,7 @@ partial class InlineStubs
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -809,6 +850,9 @@ partial class InlineStubs
 		/// <summary>Tracks and configures behavior for Square.</summary>
 		public sealed class ICalculator_SquareInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Benchmarks.Interfaces.ICalculator? _source;
+
 			/// <summary>Delegate for Square.</summary>
 			public delegate int SquareDelegate(Stubs.ICalculator ko, int x);
 
@@ -854,6 +898,9 @@ partial class InlineStubs
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = x;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.Square(x);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Square");
 					return default!;
 				}
@@ -877,6 +924,7 @@ partial class InlineStubs
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1019,6 +1067,16 @@ partial class InlineStubs
 				Strict = strict;
 			}
 
+			/// <summary>Sets the source object for global::KnockOff.Benchmarks.Interfaces.ICalculator delegation.</summary>
+			public void Source(global::KnockOff.Benchmarks.Interfaces.ICalculator? source)
+			{
+				Add._source = source;
+				Subtract._source = source;
+				Multiply._source = source;
+				Divide._source = source;
+				Square._source = source;
+			}
+
 		}
 
 		/// <summary>Interceptor for IPropertyService.Name.</summary>
@@ -1042,6 +1100,9 @@ partial class InlineStubs
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public string Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::KnockOff.Benchmarks.Interfaces.IPropertyService? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
@@ -1049,7 +1110,7 @@ partial class InlineStubs
 			public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IPropertyService.ReadOnlyValue.</summary>
@@ -1064,11 +1125,14 @@ partial class InlineStubs
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public int Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::KnockOff.Benchmarks.Interfaces.IPropertyService? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IPropertyService.WriteOnlyValue.</summary>
@@ -1086,11 +1150,14 @@ partial class InlineStubs
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public int Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::KnockOff.Benchmarks.Interfaces.IPropertyService? _source;
+
 			/// <summary>Records a setter access.</summary>
 			public void RecordSet(int? value) { SetCount++; LastSetValue = value; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+			public void Reset() { SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Stub implementation of global::KnockOff.Benchmarks.Interfaces.IPropertyService.</summary>
@@ -1111,6 +1178,7 @@ partial class InlineStubs
 				{
 					Name.RecordGet();
 					if (Name.OnGet is { } onGet) return onGet(this);
+					if (Name._source is { } src) return src.Name;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyService", "Name");
 					return Name.Value;
 				}
@@ -1118,6 +1186,7 @@ partial class InlineStubs
 				{
 					Name.RecordSet(value);
 					if (Name.OnSet is { } onSet) { onSet(this, value); return; }
+					if (Name._source is { } src) { src.Name = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyService", "Name");
 					Name.Value = value;
 				}
@@ -1129,6 +1198,7 @@ partial class InlineStubs
 				{
 					ReadOnlyValue.RecordGet();
 					if (ReadOnlyValue.OnGet is { } onGet) return onGet(this);
+					if (ReadOnlyValue._source is { } src) return src.ReadOnlyValue;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyService", "ReadOnlyValue");
 					return ReadOnlyValue.Value;
 				}
@@ -1140,6 +1210,7 @@ partial class InlineStubs
 				{
 					WriteOnlyValue.RecordSet(value);
 					if (WriteOnlyValue.OnSet is { } onSet) { onSet(this, value); return; }
+					if (WriteOnlyValue._source is { } src) { src.WriteOnlyValue = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyService", "WriteOnlyValue");
 					WriteOnlyValue.Value = value;
 				}
@@ -1156,6 +1227,14 @@ partial class InlineStubs
 			public IPropertyService(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::KnockOff.Benchmarks.Interfaces.IPropertyService delegation.</summary>
+			public void Source(global::KnockOff.Benchmarks.Interfaces.IPropertyService? source)
+			{
+				Name._source = source;
+				ReadOnlyValue._source = source;
+				WriteOnlyValue._source = source;
 			}
 
 		}

@@ -53,7 +53,9 @@ partial class FcNotificationServiceStub : global::KnockOff.Documentation.Samples
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((customerId, orderId));
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.SendOrderConfirmation(customerId, orderId); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SendOrderConfirmation");
 				return;
 			}
@@ -212,7 +214,9 @@ partial class FcNotificationServiceStub : global::KnockOff.Documentation.Samples
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((customerId, reason));
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.SendPaymentFailure(customerId, reason); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SendPaymentFailure");
 				return;
 			}

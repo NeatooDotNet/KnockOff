@@ -8,6 +8,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for VoidMethod01.</summary>
 	public sealed class VoidMethod01Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -45,6 +48,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.VoidMethod01(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethod01");
 				return;
 			}
@@ -67,6 +73,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -152,6 +159,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for VoidMethod02.</summary>
 	public sealed class VoidMethod02Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -189,6 +199,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.VoidMethod02(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethod02");
 				return;
 			}
@@ -211,6 +224,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -296,6 +310,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for VoidMethod03.</summary>
 	public sealed class VoidMethod03Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -333,6 +350,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.VoidMethod03(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethod03");
 				return;
 			}
@@ -355,6 +375,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -440,6 +461,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for VoidMethod04.</summary>
 	public sealed class VoidMethod04Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -477,6 +501,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.VoidMethod04(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethod04");
 				return;
 			}
@@ -499,6 +526,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -584,6 +612,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for VoidMethod05.</summary>
 	public sealed class VoidMethod05Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -621,6 +652,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.VoidMethod05(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethod05");
 				return;
 			}
@@ -643,6 +677,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -728,6 +763,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for VoidMethod06.</summary>
 	public sealed class VoidMethod06Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -765,6 +803,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.VoidMethod06(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethod06");
 				return;
 			}
@@ -787,6 +828,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -872,6 +914,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for VoidMethod07.</summary>
 	public sealed class VoidMethod07Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -909,6 +954,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.VoidMethod07(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethod07");
 				return;
 			}
@@ -931,6 +979,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1016,6 +1065,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for VoidMethod08.</summary>
 	public sealed class VoidMethod08Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -1053,6 +1105,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.VoidMethod08(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethod08");
 				return;
 			}
@@ -1075,6 +1130,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1160,6 +1216,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for VoidMethod09.</summary>
 	public sealed class VoidMethod09Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -1197,6 +1256,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.VoidMethod09(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethod09");
 				return;
 			}
@@ -1219,6 +1281,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1304,6 +1367,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for VoidMethod10.</summary>
 	public sealed class VoidMethod10Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -1341,6 +1407,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.VoidMethod10(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethod10");
 				return;
 			}
@@ -1363,6 +1432,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1448,6 +1518,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for VoidMethodWithParam01.</summary>
 	public sealed class VoidMethodWithParam01Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -1490,6 +1563,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = p;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.VoidMethodWithParam01(p); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethodWithParam01");
 				return;
 			}
@@ -1513,6 +1589,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1602,6 +1679,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for VoidMethodWithParam02.</summary>
 	public sealed class VoidMethodWithParam02Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -1644,6 +1724,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = p;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.VoidMethodWithParam02(p); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethodWithParam02");
 				return;
 			}
@@ -1667,6 +1750,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1756,6 +1840,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for VoidMethodWithParam03.</summary>
 	public sealed class VoidMethodWithParam03Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -1798,6 +1885,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = p;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.VoidMethodWithParam03(p); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethodWithParam03");
 				return;
 			}
@@ -1821,6 +1911,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1910,6 +2001,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for VoidMethodWithParam04.</summary>
 	public sealed class VoidMethodWithParam04Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -1952,6 +2046,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = p;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.VoidMethodWithParam04(p); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethodWithParam04");
 				return;
 			}
@@ -1975,6 +2072,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -2064,6 +2162,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for VoidMethodWithParam05.</summary>
 	public sealed class VoidMethodWithParam05Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -2106,6 +2207,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = p;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.VoidMethodWithParam05(p); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethodWithParam05");
 				return;
 			}
@@ -2129,6 +2233,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -2218,6 +2323,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for VoidMethodWithParam06.</summary>
 	public sealed class VoidMethodWithParam06Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -2260,6 +2368,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = p;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.VoidMethodWithParam06(p); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethodWithParam06");
 				return;
 			}
@@ -2283,6 +2394,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -2372,6 +2484,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for VoidMethodWithParam07.</summary>
 	public sealed class VoidMethodWithParam07Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -2414,6 +2529,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = p;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.VoidMethodWithParam07(p); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethodWithParam07");
 				return;
 			}
@@ -2437,6 +2555,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -2526,6 +2645,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for VoidMethodWithParam08.</summary>
 	public sealed class VoidMethodWithParam08Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -2568,6 +2690,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = p;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.VoidMethodWithParam08(p); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethodWithParam08");
 				return;
 			}
@@ -2591,6 +2716,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -2680,6 +2806,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for VoidMethodWithParam09.</summary>
 	public sealed class VoidMethodWithParam09Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -2722,6 +2851,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = p;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.VoidMethodWithParam09(p); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethodWithParam09");
 				return;
 			}
@@ -2745,6 +2877,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -2834,6 +2967,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for VoidMethodWithParam10.</summary>
 	public sealed class VoidMethodWithParam10Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -2876,6 +3012,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = p;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.VoidMethodWithParam10(p); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VoidMethodWithParam10");
 				return;
 			}
@@ -2899,6 +3038,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -2988,6 +3128,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for IntMethod01.</summary>
 	public sealed class IntMethod01Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		/// <summary>Delegate for IntMethod01.</summary>
 		public delegate int IntMethod01Delegate(LargeServiceStub ko);
 
@@ -3028,6 +3171,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.IntMethod01();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethod01");
 				return default!;
 			}
@@ -3050,6 +3196,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -3135,6 +3282,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for IntMethod02.</summary>
 	public sealed class IntMethod02Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		/// <summary>Delegate for IntMethod02.</summary>
 		public delegate int IntMethod02Delegate(LargeServiceStub ko);
 
@@ -3175,6 +3325,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.IntMethod02();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethod02");
 				return default!;
 			}
@@ -3197,6 +3350,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -3282,6 +3436,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for IntMethod03.</summary>
 	public sealed class IntMethod03Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		/// <summary>Delegate for IntMethod03.</summary>
 		public delegate int IntMethod03Delegate(LargeServiceStub ko);
 
@@ -3322,6 +3479,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.IntMethod03();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethod03");
 				return default!;
 			}
@@ -3344,6 +3504,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -3429,6 +3590,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for IntMethod04.</summary>
 	public sealed class IntMethod04Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		/// <summary>Delegate for IntMethod04.</summary>
 		public delegate int IntMethod04Delegate(LargeServiceStub ko);
 
@@ -3469,6 +3633,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.IntMethod04();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethod04");
 				return default!;
 			}
@@ -3491,6 +3658,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -3576,6 +3744,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for IntMethod05.</summary>
 	public sealed class IntMethod05Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		/// <summary>Delegate for IntMethod05.</summary>
 		public delegate int IntMethod05Delegate(LargeServiceStub ko);
 
@@ -3616,6 +3787,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.IntMethod05();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethod05");
 				return default!;
 			}
@@ -3638,6 +3812,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -3723,6 +3898,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for IntMethod06.</summary>
 	public sealed class IntMethod06Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		/// <summary>Delegate for IntMethod06.</summary>
 		public delegate int IntMethod06Delegate(LargeServiceStub ko);
 
@@ -3763,6 +3941,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.IntMethod06();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethod06");
 				return default!;
 			}
@@ -3785,6 +3966,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -3870,6 +4052,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for IntMethod07.</summary>
 	public sealed class IntMethod07Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		/// <summary>Delegate for IntMethod07.</summary>
 		public delegate int IntMethod07Delegate(LargeServiceStub ko);
 
@@ -3910,6 +4095,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.IntMethod07();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethod07");
 				return default!;
 			}
@@ -3932,6 +4120,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -4017,6 +4206,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for IntMethod08.</summary>
 	public sealed class IntMethod08Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		/// <summary>Delegate for IntMethod08.</summary>
 		public delegate int IntMethod08Delegate(LargeServiceStub ko);
 
@@ -4057,6 +4249,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.IntMethod08();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethod08");
 				return default!;
 			}
@@ -4079,6 +4274,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -4164,6 +4360,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for IntMethod09.</summary>
 	public sealed class IntMethod09Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		/// <summary>Delegate for IntMethod09.</summary>
 		public delegate int IntMethod09Delegate(LargeServiceStub ko);
 
@@ -4204,6 +4403,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.IntMethod09();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethod09");
 				return default!;
 			}
@@ -4226,6 +4428,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -4311,6 +4514,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for IntMethod10.</summary>
 	public sealed class IntMethod10Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		/// <summary>Delegate for IntMethod10.</summary>
 		public delegate int IntMethod10Delegate(LargeServiceStub ko);
 
@@ -4351,6 +4557,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.IntMethod10();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethod10");
 				return default!;
 			}
@@ -4373,6 +4582,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -4458,6 +4668,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for StringMethod01.</summary>
 	public sealed class StringMethod01Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		/// <summary>Delegate for StringMethod01.</summary>
 		public delegate string StringMethod01Delegate(LargeServiceStub ko);
 
@@ -4498,6 +4711,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.StringMethod01();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "StringMethod01");
 				throw new global::System.InvalidOperationException("No implementation provided for StringMethod01. Configure via OnCall.");
 			}
@@ -4520,6 +4736,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -4605,6 +4822,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for StringMethod02.</summary>
 	public sealed class StringMethod02Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		/// <summary>Delegate for StringMethod02.</summary>
 		public delegate string StringMethod02Delegate(LargeServiceStub ko);
 
@@ -4645,6 +4865,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.StringMethod02();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "StringMethod02");
 				throw new global::System.InvalidOperationException("No implementation provided for StringMethod02. Configure via OnCall.");
 			}
@@ -4667,6 +4890,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -4752,6 +4976,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for StringMethod03.</summary>
 	public sealed class StringMethod03Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		/// <summary>Delegate for StringMethod03.</summary>
 		public delegate string StringMethod03Delegate(LargeServiceStub ko);
 
@@ -4792,6 +5019,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.StringMethod03();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "StringMethod03");
 				throw new global::System.InvalidOperationException("No implementation provided for StringMethod03. Configure via OnCall.");
 			}
@@ -4814,6 +5044,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -4899,6 +5130,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for StringMethod04.</summary>
 	public sealed class StringMethod04Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		/// <summary>Delegate for StringMethod04.</summary>
 		public delegate string StringMethod04Delegate(LargeServiceStub ko);
 
@@ -4939,6 +5173,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.StringMethod04();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "StringMethod04");
 				throw new global::System.InvalidOperationException("No implementation provided for StringMethod04. Configure via OnCall.");
 			}
@@ -4961,6 +5198,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -5046,6 +5284,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for StringMethod05.</summary>
 	public sealed class StringMethod05Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		/// <summary>Delegate for StringMethod05.</summary>
 		public delegate string StringMethod05Delegate(LargeServiceStub ko);
 
@@ -5086,6 +5327,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.StringMethod05();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "StringMethod05");
 				throw new global::System.InvalidOperationException("No implementation provided for StringMethod05. Configure via OnCall.");
 			}
@@ -5108,6 +5352,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -5193,6 +5438,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for StringMethod06.</summary>
 	public sealed class StringMethod06Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		/// <summary>Delegate for StringMethod06.</summary>
 		public delegate string StringMethod06Delegate(LargeServiceStub ko);
 
@@ -5233,6 +5481,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.StringMethod06();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "StringMethod06");
 				throw new global::System.InvalidOperationException("No implementation provided for StringMethod06. Configure via OnCall.");
 			}
@@ -5255,6 +5506,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -5340,6 +5592,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for StringMethod07.</summary>
 	public sealed class StringMethod07Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		/// <summary>Delegate for StringMethod07.</summary>
 		public delegate string StringMethod07Delegate(LargeServiceStub ko);
 
@@ -5380,6 +5635,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.StringMethod07();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "StringMethod07");
 				throw new global::System.InvalidOperationException("No implementation provided for StringMethod07. Configure via OnCall.");
 			}
@@ -5402,6 +5660,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -5487,6 +5746,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for StringMethod08.</summary>
 	public sealed class StringMethod08Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		/// <summary>Delegate for StringMethod08.</summary>
 		public delegate string StringMethod08Delegate(LargeServiceStub ko);
 
@@ -5527,6 +5789,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.StringMethod08();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "StringMethod08");
 				throw new global::System.InvalidOperationException("No implementation provided for StringMethod08. Configure via OnCall.");
 			}
@@ -5549,6 +5814,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -5634,6 +5900,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for StringMethod09.</summary>
 	public sealed class StringMethod09Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		/// <summary>Delegate for StringMethod09.</summary>
 		public delegate string StringMethod09Delegate(LargeServiceStub ko);
 
@@ -5674,6 +5943,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.StringMethod09();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "StringMethod09");
 				throw new global::System.InvalidOperationException("No implementation provided for StringMethod09. Configure via OnCall.");
 			}
@@ -5696,6 +5968,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -5781,6 +6054,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for StringMethod10.</summary>
 	public sealed class StringMethod10Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		/// <summary>Delegate for StringMethod10.</summary>
 		public delegate string StringMethod10Delegate(LargeServiceStub ko);
 
@@ -5821,6 +6097,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.StringMethod10();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "StringMethod10");
 				throw new global::System.InvalidOperationException("No implementation provided for StringMethod10. Configure via OnCall.");
 			}
@@ -5843,6 +6122,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -5928,6 +6208,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for IntMethodWithParam01.</summary>
 	public sealed class IntMethodWithParam01Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		/// <summary>Delegate for IntMethodWithParam01.</summary>
 		public delegate int IntMethodWithParam01Delegate(LargeServiceStub ko, int p);
 
@@ -5973,6 +6256,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = p;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.IntMethodWithParam01(p);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethodWithParam01");
 				return default!;
 			}
@@ -5996,6 +6282,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -6085,6 +6372,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for IntMethodWithParam02.</summary>
 	public sealed class IntMethodWithParam02Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		/// <summary>Delegate for IntMethodWithParam02.</summary>
 		public delegate int IntMethodWithParam02Delegate(LargeServiceStub ko, int p);
 
@@ -6130,6 +6420,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = p;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.IntMethodWithParam02(p);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethodWithParam02");
 				return default!;
 			}
@@ -6153,6 +6446,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -6242,6 +6536,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for IntMethodWithParam03.</summary>
 	public sealed class IntMethodWithParam03Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		/// <summary>Delegate for IntMethodWithParam03.</summary>
 		public delegate int IntMethodWithParam03Delegate(LargeServiceStub ko, int p);
 
@@ -6287,6 +6584,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = p;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.IntMethodWithParam03(p);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethodWithParam03");
 				return default!;
 			}
@@ -6310,6 +6610,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -6399,6 +6700,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for IntMethodWithParam04.</summary>
 	public sealed class IntMethodWithParam04Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		/// <summary>Delegate for IntMethodWithParam04.</summary>
 		public delegate int IntMethodWithParam04Delegate(LargeServiceStub ko, int p);
 
@@ -6444,6 +6748,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = p;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.IntMethodWithParam04(p);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethodWithParam04");
 				return default!;
 			}
@@ -6467,6 +6774,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -6556,6 +6864,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for IntMethodWithParam05.</summary>
 	public sealed class IntMethodWithParam05Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		/// <summary>Delegate for IntMethodWithParam05.</summary>
 		public delegate int IntMethodWithParam05Delegate(LargeServiceStub ko, int p);
 
@@ -6601,6 +6912,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = p;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.IntMethodWithParam05(p);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethodWithParam05");
 				return default!;
 			}
@@ -6624,6 +6938,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -6713,6 +7028,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for IntMethodWithParam06.</summary>
 	public sealed class IntMethodWithParam06Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		/// <summary>Delegate for IntMethodWithParam06.</summary>
 		public delegate int IntMethodWithParam06Delegate(LargeServiceStub ko, int p);
 
@@ -6758,6 +7076,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = p;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.IntMethodWithParam06(p);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethodWithParam06");
 				return default!;
 			}
@@ -6781,6 +7102,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -6870,6 +7192,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for IntMethodWithParam07.</summary>
 	public sealed class IntMethodWithParam07Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		/// <summary>Delegate for IntMethodWithParam07.</summary>
 		public delegate int IntMethodWithParam07Delegate(LargeServiceStub ko, int p);
 
@@ -6915,6 +7240,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = p;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.IntMethodWithParam07(p);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethodWithParam07");
 				return default!;
 			}
@@ -6938,6 +7266,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -7027,6 +7356,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for IntMethodWithParam08.</summary>
 	public sealed class IntMethodWithParam08Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		/// <summary>Delegate for IntMethodWithParam08.</summary>
 		public delegate int IntMethodWithParam08Delegate(LargeServiceStub ko, int p);
 
@@ -7072,6 +7404,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = p;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.IntMethodWithParam08(p);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethodWithParam08");
 				return default!;
 			}
@@ -7095,6 +7430,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -7184,6 +7520,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for IntMethodWithParam09.</summary>
 	public sealed class IntMethodWithParam09Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		/// <summary>Delegate for IntMethodWithParam09.</summary>
 		public delegate int IntMethodWithParam09Delegate(LargeServiceStub ko, int p);
 
@@ -7229,6 +7568,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = p;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.IntMethodWithParam09(p);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethodWithParam09");
 				return default!;
 			}
@@ -7252,6 +7594,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -7341,6 +7684,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	/// <summary>Tracks and configures behavior for IntMethodWithParam10.</summary>
 	public sealed class IntMethodWithParam10Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
+
 		/// <summary>Delegate for IntMethodWithParam10.</summary>
 		public delegate int IntMethodWithParam10Delegate(LargeServiceStub ko, int p);
 
@@ -7386,6 +7732,9 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = p;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.IntMethodWithParam10(p);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IntMethodWithParam10");
 				return default!;
 			}
@@ -7409,6 +7758,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -7713,6 +8063,64 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Benchmarks.Interfaces.ILargeService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Benchmarks.Interfaces.ILargeService? source)
+	{
+		VoidMethod01._source = source;
+		VoidMethod02._source = source;
+		VoidMethod03._source = source;
+		VoidMethod04._source = source;
+		VoidMethod05._source = source;
+		VoidMethod06._source = source;
+		VoidMethod07._source = source;
+		VoidMethod08._source = source;
+		VoidMethod09._source = source;
+		VoidMethod10._source = source;
+		VoidMethodWithParam01._source = source;
+		VoidMethodWithParam02._source = source;
+		VoidMethodWithParam03._source = source;
+		VoidMethodWithParam04._source = source;
+		VoidMethodWithParam05._source = source;
+		VoidMethodWithParam06._source = source;
+		VoidMethodWithParam07._source = source;
+		VoidMethodWithParam08._source = source;
+		VoidMethodWithParam09._source = source;
+		VoidMethodWithParam10._source = source;
+		IntMethod01._source = source;
+		IntMethod02._source = source;
+		IntMethod03._source = source;
+		IntMethod04._source = source;
+		IntMethod05._source = source;
+		IntMethod06._source = source;
+		IntMethod07._source = source;
+		IntMethod08._source = source;
+		IntMethod09._source = source;
+		IntMethod10._source = source;
+		StringMethod01._source = source;
+		StringMethod02._source = source;
+		StringMethod03._source = source;
+		StringMethod04._source = source;
+		StringMethod05._source = source;
+		StringMethod06._source = source;
+		StringMethod07._source = source;
+		StringMethod08._source = source;
+		StringMethod09._source = source;
+		StringMethod10._source = source;
+		IntMethodWithParam01._source = source;
+		IntMethodWithParam02._source = source;
+		IntMethodWithParam03._source = source;
+		IntMethodWithParam04._source = source;
+		IntMethodWithParam05._source = source;
+		IntMethodWithParam06._source = source;
+		IntMethodWithParam07._source = source;
+		IntMethodWithParam08._source = source;
+		IntMethodWithParam09._source = source;
+		IntMethodWithParam10._source = source;
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod01()

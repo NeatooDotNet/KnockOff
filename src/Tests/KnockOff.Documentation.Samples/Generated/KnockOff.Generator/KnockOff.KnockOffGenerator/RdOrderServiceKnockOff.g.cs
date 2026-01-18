@@ -53,7 +53,9 @@ partial class RdOrderServiceKnockOff : global::KnockOff.Documentation.Samples.Wh
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = order;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Save(order); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 				return;
 			}
@@ -212,7 +214,9 @@ partial class RdOrderServiceKnockOff : global::KnockOff.Documentation.Samples.Wh
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Delete(id); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Delete");
 				return;
 			}
@@ -369,7 +373,9 @@ partial class RdOrderServiceKnockOff : global::KnockOff.Documentation.Samples.Wh
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetAll();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetAll");
 				return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.WhyKnockOff.RdOrder>();
 			}
@@ -523,7 +529,9 @@ partial class RdOrderServiceKnockOff : global::KnockOff.Documentation.Samples.Wh
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = order;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Process(order); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return;
 			}

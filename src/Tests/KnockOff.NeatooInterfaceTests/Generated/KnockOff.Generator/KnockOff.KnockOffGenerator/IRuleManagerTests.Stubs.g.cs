@@ -107,7 +107,9 @@ partial class IRuleManagerTests
 				if (_sequence_String_Threading_CancellationToken_Threading_Tasks_Task.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) return src.RunRules(propertyName, token);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
@@ -132,7 +134,9 @@ partial class IRuleManagerTests
 				if (_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) return src.RunRules(runRules, token);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
@@ -369,7 +373,9 @@ partial class IRuleManagerTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((r, token));
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) return src.RunRule(r, token);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "RunRule");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}

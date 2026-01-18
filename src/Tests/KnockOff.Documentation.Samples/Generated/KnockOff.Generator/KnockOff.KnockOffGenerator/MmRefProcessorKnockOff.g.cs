@@ -56,7 +56,9 @@ partial class MmRefProcessorKnockOff : global::KnockOff.Documentation.Samples.Sk
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = @value;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Increment(ref @value); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Increment");
 				return;
 			}

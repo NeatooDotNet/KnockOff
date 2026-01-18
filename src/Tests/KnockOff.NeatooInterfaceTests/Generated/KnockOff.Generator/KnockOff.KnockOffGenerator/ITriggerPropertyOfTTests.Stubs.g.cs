@@ -81,7 +81,9 @@ partial class ITriggerPropertyOfTTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = target;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) return src.GetValue(target);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetValue");
 					return default!;
 				}
@@ -243,7 +245,9 @@ partial class ITriggerPropertyOfTTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = propertyName;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) return src.IsMatch(propertyName);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "IsMatch");
 					return default!;
 				}

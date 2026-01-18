@@ -56,7 +56,9 @@ partial class OrderServiceStub : global::KnockOff.Documentation.Samples.Comparis
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetOrder(id);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetOrder");
 				return new global::KnockOff.Documentation.Samples.Comparison.Order();
 			}
@@ -218,7 +220,9 @@ partial class OrderServiceStub : global::KnockOff.Documentation.Samples.Comparis
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = order;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.ValidateOrder(order);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ValidateOrder");
 				return default!;
 			}
@@ -380,7 +384,9 @@ partial class OrderServiceStub : global::KnockOff.Documentation.Samples.Comparis
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = order;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.CalculateTotal(order);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "CalculateTotal");
 				return default!;
 			}
@@ -539,7 +545,9 @@ partial class OrderServiceStub : global::KnockOff.Documentation.Samples.Comparis
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = order;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.SaveOrder(order); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SaveOrder");
 				return;
 			}

@@ -56,7 +56,9 @@ partial class FcProductRepositoryStub : global::KnockOff.Documentation.Samples.C
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetByIdAsync(id);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetByIdAsync");
 				return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Comparison.FcProduct?>(default!);
 			}
@@ -213,7 +215,9 @@ partial class FcProductRepositoryStub : global::KnockOff.Documentation.Samples.C
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetAllAsync();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetAllAsync");
 				return global::System.Threading.Tasks.Task.FromResult<global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Comparison.FcProduct>>(new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Comparison.FcProduct>());
 			}
@@ -370,7 +374,9 @@ partial class FcProductRepositoryStub : global::KnockOff.Documentation.Samples.C
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = product;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.SaveAsync(product);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SaveAsync");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -532,7 +538,9 @@ partial class FcProductRepositoryStub : global::KnockOff.Documentation.Samples.C
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.DeleteAsync(id);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "DeleteAsync");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}

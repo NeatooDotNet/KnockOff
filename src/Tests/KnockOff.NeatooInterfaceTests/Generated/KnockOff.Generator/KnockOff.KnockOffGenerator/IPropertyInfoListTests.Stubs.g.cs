@@ -59,7 +59,9 @@ partial class IPropertyInfoListTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = name;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) return src.GetPropertyInfo(name);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetPropertyInfo");
 					return default!;
 				}
@@ -216,7 +218,9 @@ partial class IPropertyInfoListTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) return src.Properties();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Properties");
 					throw new global::System.InvalidOperationException("No implementation provided for Properties. Configure via OnCall.");
 				}
@@ -373,7 +377,9 @@ partial class IPropertyInfoListTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = propertyName;
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) return src.HasProperty(propertyName);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "HasProperty");
 					return default!;
 				}

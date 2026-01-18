@@ -56,7 +56,9 @@ partial class UserRepositoryStub : global::KnockOff.Documentation.Samples.ReadMe
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetById(id);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
 				return default!;
 			}
@@ -215,7 +217,9 @@ partial class UserRepositoryStub : global::KnockOff.Documentation.Samples.ReadMe
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = user;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Save(user); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 				return;
 			}

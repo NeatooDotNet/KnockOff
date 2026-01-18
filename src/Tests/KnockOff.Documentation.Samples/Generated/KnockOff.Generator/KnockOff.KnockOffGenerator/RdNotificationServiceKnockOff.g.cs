@@ -53,7 +53,9 @@ partial class RdNotificationServiceKnockOff : global::KnockOff.Documentation.Sam
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = orderId;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.SendConfirmation(orderId); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SendConfirmation");
 				return;
 			}

@@ -23,6 +23,9 @@ partial class FcBenchCacheServiceStub : global::KnockOff.Benchmarks.Benchmarks.I
 	/// <summary>Tracks and configures behavior for Remove.</summary>
 	public sealed class RemoveInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Benchmarks.IFcBenchCacheService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<FcBenchCacheServiceStub, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -65,6 +68,9 @@ partial class FcBenchCacheServiceStub : global::KnockOff.Benchmarks.Benchmarks.I
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = key;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.Remove(key); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Remove");
 				return;
 			}
@@ -88,6 +94,7 @@ partial class FcBenchCacheServiceStub : global::KnockOff.Benchmarks.Benchmarks.I
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -354,6 +361,15 @@ partial class FcBenchCacheServiceStub : global::KnockOff.Benchmarks.Benchmarks.I
 		throw new global::System.InvalidOperationException(
 			$"No implementation provided for {methodName}<{type.Name}>. " +
 			$"Set the handler's OnCall.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Benchmarks.Benchmarks.IFcBenchCacheService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Benchmarks.Benchmarks.IFcBenchCacheService? source)
+	{
+		Remove._source = source;
 	}
 
 	T? global::KnockOff.Benchmarks.Benchmarks.IFcBenchCacheService.Get<T>(string key) where T : class

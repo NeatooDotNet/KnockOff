@@ -77,7 +77,9 @@ partial class AiProcessorStub : global::KnockOff.Documentation.Samples.IAiProces
 			if (_sequence_String_void.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Process(data); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return;
 			}
@@ -102,7 +104,9 @@ partial class AiProcessorStub : global::KnockOff.Documentation.Samples.IAiProces
 			if (_sequence_String_Int32_void.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Process(data, n); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return;
 			}

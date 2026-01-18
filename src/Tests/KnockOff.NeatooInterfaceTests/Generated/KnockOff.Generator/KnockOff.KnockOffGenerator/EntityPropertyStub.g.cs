@@ -380,7 +380,9 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.MarkSelfUnmodified(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "MarkSelfUnmodified");
 				return;
 			}
@@ -534,7 +536,9 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = propertyInfo;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.ApplyPropertyInfo(propertyInfo); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ApplyPropertyInfo");
 				return;
 			}
@@ -696,7 +700,9 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = newValue;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.SetValue(newValue);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SetValue");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -855,7 +861,9 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.AddMarkedBusy(id); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "AddMarkedBusy");
 				return;
 			}
@@ -1014,7 +1022,9 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.RemoveMarkedBusy(id); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RemoveMarkedBusy");
 				return;
 			}
@@ -1173,7 +1183,9 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = @value;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.LoadValue(@value); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "LoadValue");
 				return;
 			}
@@ -1330,7 +1342,9 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.WaitForTasks();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -1482,7 +1496,9 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetAwaiter();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetAwaiter");
 				return default!;
 			}
@@ -1639,7 +1655,9 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((runRules, token));
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.RunRules(runRules, token);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}

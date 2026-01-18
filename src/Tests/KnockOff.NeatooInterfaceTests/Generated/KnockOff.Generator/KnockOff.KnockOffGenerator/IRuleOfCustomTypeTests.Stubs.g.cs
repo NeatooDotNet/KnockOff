@@ -480,7 +480,9 @@ partial class IRuleOfCustomTypeTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((ruleManager, uniqueIndex));
+					#pragma warning disable CS8601, SYSLIB0050
 					if (_source is { } src) { src.OnRuleAdded(ruleManager, uniqueIndex); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "OnRuleAdded");
 					return;
 				}

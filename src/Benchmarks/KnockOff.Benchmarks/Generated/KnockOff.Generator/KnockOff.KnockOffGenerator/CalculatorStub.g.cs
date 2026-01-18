@@ -8,6 +8,9 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 	/// <summary>Tracks and configures behavior for Add.</summary>
 	public sealed class AddInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ICalculator? _source;
+
 		/// <summary>Delegate for Add.</summary>
 		public delegate int AddDelegate(CalculatorStub ko, int a, int b);
 
@@ -53,6 +56,9 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((a, b));
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Add(a, b);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 				return default!;
 			}
@@ -76,6 +82,7 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -165,6 +172,9 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 	/// <summary>Tracks and configures behavior for Subtract.</summary>
 	public sealed class SubtractInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ICalculator? _source;
+
 		/// <summary>Delegate for Subtract.</summary>
 		public delegate int SubtractDelegate(CalculatorStub ko, int a, int b);
 
@@ -210,6 +220,9 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((a, b));
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Subtract(a, b);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Subtract");
 				return default!;
 			}
@@ -233,6 +246,7 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -322,6 +336,9 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 	/// <summary>Tracks and configures behavior for Multiply.</summary>
 	public sealed class MultiplyInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ICalculator? _source;
+
 		/// <summary>Delegate for Multiply.</summary>
 		public delegate int MultiplyDelegate(CalculatorStub ko, int a, int b);
 
@@ -367,6 +384,9 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((a, b));
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Multiply(a, b);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Multiply");
 				return default!;
 			}
@@ -390,6 +410,7 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -479,6 +500,9 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 	/// <summary>Tracks and configures behavior for Divide.</summary>
 	public sealed class DivideInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ICalculator? _source;
+
 		/// <summary>Delegate for Divide.</summary>
 		public delegate double DivideDelegate(CalculatorStub ko, double a, double b);
 
@@ -524,6 +548,9 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((a, b));
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Divide(a, b);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Divide");
 				return default!;
 			}
@@ -547,6 +574,7 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -636,6 +664,9 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 	/// <summary>Tracks and configures behavior for Square.</summary>
 	public sealed class SquareInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Benchmarks.Interfaces.ICalculator? _source;
+
 		/// <summary>Delegate for Square.</summary>
 		public delegate int SquareDelegate(CalculatorStub ko, int x);
 
@@ -681,6 +712,9 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = x;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Square(x);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Square");
 				return default!;
 			}
@@ -704,6 +738,7 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -828,6 +863,19 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Benchmarks.Interfaces.ICalculator).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Benchmarks.Interfaces.ICalculator? source)
+	{
+		Add._source = source;
+		Subtract._source = source;
+		Multiply._source = source;
+		Divide._source = source;
+		Square._source = source;
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ICalculator.Add(int a, int b)

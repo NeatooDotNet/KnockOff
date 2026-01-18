@@ -78,7 +78,9 @@ partial class TriggerPropertyStub : global::Neatoo.Rules.ITriggerProperty, globa
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = propertyName;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.IsMatch(propertyName);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsMatch");
 				return default!;
 			}

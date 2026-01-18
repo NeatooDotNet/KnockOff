@@ -53,7 +53,9 @@ partial class MigProcessorKnockOff : global::KnockOff.Documentation.Samples.Comp
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = data;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Process(data); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return;
 			}

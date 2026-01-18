@@ -48,7 +48,9 @@ partial class VfProcessorStub : global::KnockOff.Documentation.Samples.Guides.IV
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Initialize(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Initialize");
 				return;
 			}
@@ -202,7 +204,9 @@ partial class VfProcessorStub : global::KnockOff.Documentation.Samples.Guides.IV
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = @value;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Process(@value); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return;
 			}
@@ -356,7 +360,9 @@ partial class VfProcessorStub : global::KnockOff.Documentation.Samples.Guides.IV
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Cleanup(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Cleanup");
 				return;
 			}
@@ -505,7 +511,9 @@ partial class VfProcessorStub : global::KnockOff.Documentation.Samples.Guides.IV
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Delete(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Delete");
 				return;
 			}

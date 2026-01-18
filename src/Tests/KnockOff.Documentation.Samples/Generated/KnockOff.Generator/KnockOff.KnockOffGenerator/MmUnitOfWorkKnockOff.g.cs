@@ -56,7 +56,9 @@ partial class MmUnitOfWorkKnockOff : global::KnockOff.Documentation.Samples.Skil
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = ct;
+				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.SaveChangesAsync(ct);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SaveChangesAsync");
 				return global::System.Threading.Tasks.Task.FromResult<int>(default!);
 			}

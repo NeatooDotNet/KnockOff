@@ -28,6 +28,7 @@ Releases with notable changes.
 
 ## All Releases
 
+- [v10.23.0](v10.23.0.md) - 2026-01-18 - Fix init-only property set tracking in standalone stubs
 - [v10.22.0](v10.22.0.md) - 2026-01-17 - Fix LastCallArg/LastCallArgs with sequences
 - [v10.21.0](v10.21.0.md) - 2026-01-16 - **Breaking:** Interceptor API redesign, method overloading support
 - [v10.20.0](v10.20.0.md) - 2026-01-15 - Open generic delegate and class stubs
