@@ -358,10 +358,6 @@ public class IndexerOfXxxTests
     }
 }
 
-// Note: Stub-level Verify() and VerifyAll() were removed from the API.
-// Verification is done via the sequence.Verify() method returned by OnCall(..., Times).
-// See SequencingTests for sequence verification examples.
-
 /// <summary>
 /// Tests for method overload support via compiler resolution on OnCall() delegates.
 /// For overloads with same number of parameters, explicit delegate types are required.
