@@ -8,6 +8,9 @@ partial class FcLoggerStub : global::KnockOff.Documentation.Samples.Comparison.I
 	/// <summary>Tracks and configures behavior for LogInfo.</summary>
 	public sealed class LogInfoInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Comparison.IFcLogger? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<FcLoggerStub, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -50,6 +53,7 @@ partial class FcLoggerStub : global::KnockOff.Documentation.Samples.Comparison.I
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = message;
+				if (_source is { } src) { src.LogInfo(message); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "LogInfo");
 				return;
 			}
@@ -73,6 +77,7 @@ partial class FcLoggerStub : global::KnockOff.Documentation.Samples.Comparison.I
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -162,6 +167,9 @@ partial class FcLoggerStub : global::KnockOff.Documentation.Samples.Comparison.I
 	/// <summary>Tracks and configures behavior for LogWarning.</summary>
 	public sealed class LogWarningInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Comparison.IFcLogger? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<FcLoggerStub, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -204,6 +212,7 @@ partial class FcLoggerStub : global::KnockOff.Documentation.Samples.Comparison.I
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = message;
+				if (_source is { } src) { src.LogWarning(message); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "LogWarning");
 				return;
 			}
@@ -227,6 +236,7 @@ partial class FcLoggerStub : global::KnockOff.Documentation.Samples.Comparison.I
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -316,6 +326,9 @@ partial class FcLoggerStub : global::KnockOff.Documentation.Samples.Comparison.I
 	/// <summary>Tracks and configures behavior for LogError.</summary>
 	public sealed class LogErrorInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Comparison.IFcLogger? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<FcLoggerStub, string, global::System.Exception?> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -358,6 +371,7 @@ partial class FcLoggerStub : global::KnockOff.Documentation.Samples.Comparison.I
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((message, exception));
+				if (_source is { } src) { src.LogError(message, exception); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "LogError");
 				return;
 			}
@@ -381,6 +395,7 @@ partial class FcLoggerStub : global::KnockOff.Documentation.Samples.Comparison.I
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -497,6 +512,17 @@ partial class FcLoggerStub : global::KnockOff.Documentation.Samples.Comparison.I
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Comparison.IFcLogger).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Comparison.IFcLogger? source)
+	{
+		LogInfo._source = source;
+		LogWarning._source = source;
+		LogError._source = source;
 	}
 
 	void global::KnockOff.Documentation.Samples.Comparison.IFcLogger.LogInfo(string message)

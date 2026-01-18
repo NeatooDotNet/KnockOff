@@ -8,6 +8,9 @@ partial class PropertyInfoListOfTStub : global::Neatoo.IPropertyInfoList<global:
 	/// <summary>Tracks and configures behavior for GetPropertyInfo.</summary>
 	public sealed class GetPropertyInfoInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::Neatoo.IPropertyInfoList? _source;
+
 		/// <summary>Delegate for GetPropertyInfo.</summary>
 		public delegate global::Neatoo.IPropertyInfo? GetPropertyInfoDelegate(PropertyInfoListOfTStub ko, string name);
 
@@ -53,6 +56,7 @@ partial class PropertyInfoListOfTStub : global::Neatoo.IPropertyInfoList<global:
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = name;
+				if (_source is { } src) return src.GetPropertyInfo(name);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetPropertyInfo");
 				return default!;
 			}
@@ -76,6 +80,7 @@ partial class PropertyInfoListOfTStub : global::Neatoo.IPropertyInfoList<global:
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -165,6 +170,9 @@ partial class PropertyInfoListOfTStub : global::Neatoo.IPropertyInfoList<global:
 	/// <summary>Tracks and configures behavior for Properties.</summary>
 	public sealed class PropertiesInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::Neatoo.IPropertyInfoList? _source;
+
 		/// <summary>Delegate for Properties.</summary>
 		public delegate global::System.Collections.Generic.IEnumerable<global::Neatoo.IPropertyInfo> PropertiesDelegate(PropertyInfoListOfTStub ko);
 
@@ -205,6 +213,7 @@ partial class PropertyInfoListOfTStub : global::Neatoo.IPropertyInfoList<global:
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.Properties();
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Properties");
 				return new global::System.Collections.Generic.List<global::Neatoo.IPropertyInfo>();
 			}
@@ -227,6 +236,7 @@ partial class PropertyInfoListOfTStub : global::Neatoo.IPropertyInfoList<global:
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -312,6 +322,9 @@ partial class PropertyInfoListOfTStub : global::Neatoo.IPropertyInfoList<global:
 	/// <summary>Tracks and configures behavior for HasProperty.</summary>
 	public sealed class HasPropertyInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::Neatoo.IPropertyInfoList? _source;
+
 		/// <summary>Delegate for HasProperty.</summary>
 		public delegate bool HasPropertyDelegate(PropertyInfoListOfTStub ko, string propertyName);
 
@@ -357,6 +370,7 @@ partial class PropertyInfoListOfTStub : global::Neatoo.IPropertyInfoList<global:
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = propertyName;
+				if (_source is { } src) return src.HasProperty(propertyName);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "HasProperty");
 				return default!;
 			}
@@ -380,6 +394,7 @@ partial class PropertyInfoListOfTStub : global::Neatoo.IPropertyInfoList<global:
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -496,6 +511,26 @@ partial class PropertyInfoListOfTStub : global::Neatoo.IPropertyInfoList<global:
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::Neatoo.IPropertyInfoList<global::Neatoo.IValidateBase>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::Neatoo.IPropertyInfoList<global::Neatoo.IValidateBase>? source)
+	{
+		GetPropertyInfo._source = source;
+		Properties._source = source;
+		HasProperty._source = source;
+	}
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::Neatoo.IPropertyInfoList).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::Neatoo.IPropertyInfoList? source)
+	{
+		GetPropertyInfo._source = source;
+		Properties._source = source;
+		HasProperty._source = source;
 	}
 
 	global::Neatoo.IPropertyInfo? global::Neatoo.IPropertyInfoList.GetPropertyInfo(string name)

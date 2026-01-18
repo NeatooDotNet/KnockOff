@@ -113,6 +113,14 @@ partial class GenConverterKnockOff : global::KnockOff.Documentation.Samples.Guid
 			$"Set the handler's OnCall.");
 	}
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.IGenConverter).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.IGenConverter? source)
+	{
+	}
+
 	TOut global::KnockOff.Documentation.Samples.Guides.IGenConverter.Convert<TIn, TOut>(TIn input)
 	{
 		Convert.Of<TIn, TOut>().RecordCall();

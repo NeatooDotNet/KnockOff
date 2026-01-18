@@ -29,6 +29,9 @@ partial class MultiServiceTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public string Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
@@ -36,12 +39,15 @@ partial class MultiServiceTests
 			public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Tracks and configures behavior for GetUser.</summary>
 		public sealed class IInUserService_GetUserInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService? _source;
+
 			/// <summary>Delegate for GetUser.</summary>
 			public delegate global::KnockOff.Documentation.Samples.Guides.InlineStubs.InUser? GetUserDelegate(Stubs.IInUserService ko, int id);
 
@@ -87,6 +93,7 @@ partial class MultiServiceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = id;
+					if (_source is { } src) return src.GetUser(id);
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetUser");
 					return default!;
 				}
@@ -110,6 +117,7 @@ partial class MultiServiceTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -199,6 +207,9 @@ partial class MultiServiceTests
 		/// <summary>Tracks and configures behavior for SaveUser.</summary>
 		public sealed class IInUserService_SaveUserInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IInUserService, global::KnockOff.Documentation.Samples.Guides.InlineStubs.InUser> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -241,6 +252,7 @@ partial class MultiServiceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = user;
+					if (_source is { } src) { src.SaveUser(user); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "SaveUser");
 					return;
 				}
@@ -264,6 +276,7 @@ partial class MultiServiceTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -378,6 +391,7 @@ partial class MultiServiceTests
 				{
 					ConnectionString.RecordGet();
 					if (ConnectionString.OnGet is { } onGet) return onGet(this);
+					if (ConnectionString._source is { } src) return src.ConnectionString;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IInUserService", "ConnectionString");
 					return ConnectionString.Value;
 				}
@@ -385,6 +399,7 @@ partial class MultiServiceTests
 				{
 					ConnectionString.RecordSet(value);
 					if (ConnectionString.OnSet is { } onSet) { onSet(this, value); return; }
+					if (ConnectionString._source is { } src) { src.ConnectionString = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IInUserService", "ConnectionString");
 					ConnectionString.Value = value;
 				}
@@ -403,11 +418,22 @@ partial class MultiServiceTests
 				Strict = strict;
 			}
 
+			/// <summary>Sets the source object for global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService delegation.</summary>
+			public void Source(global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInUserService? source)
+			{
+				ConnectionString._source = source;
+				GetUser._source = source;
+				SaveUser._source = source;
+			}
+
 		}
 
 		/// <summary>Tracks and configures behavior for Log.</summary>
 		public sealed class IInLogger_LogInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInLogger? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IInLogger, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -450,6 +476,7 @@ partial class MultiServiceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = message;
+					if (_source is { } src) { src.Log(message); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Log");
 					return;
 				}
@@ -473,6 +500,7 @@ partial class MultiServiceTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -562,6 +590,9 @@ partial class MultiServiceTests
 		/// <summary>Tracks and configures behavior for LogError.</summary>
 		public sealed class IInLogger_LogErrorInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInLogger? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IInLogger, string, global::System.Exception?> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -604,6 +635,7 @@ partial class MultiServiceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((message, ex));
+					if (_source is { } src) { src.LogError(message, ex); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "LogError");
 					return;
 				}
@@ -627,6 +659,7 @@ partial class MultiServiceTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -745,11 +778,21 @@ partial class MultiServiceTests
 				Strict = strict;
 			}
 
+			/// <summary>Sets the source object for global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInLogger delegation.</summary>
+			public void Source(global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInLogger? source)
+			{
+				Log._source = source;
+				LogError._source = source;
+			}
+
 		}
 
 		/// <summary>Tracks and configures behavior for Save.</summary>
 		public sealed class IInRepository_SaveInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInRepository? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IInRepository, object> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -792,6 +835,7 @@ partial class MultiServiceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = entity;
+					if (_source is { } src) { src.Save(entity); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 					return;
 				}
@@ -815,6 +859,7 @@ partial class MultiServiceTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -904,6 +949,9 @@ partial class MultiServiceTests
 		/// <summary>Tracks and configures behavior for FindById.</summary>
 		public sealed class IInRepository_FindByIdInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInRepository? _source;
+
 			/// <summary>Delegate for FindById.</summary>
 			public delegate global::KnockOff.Documentation.Samples.Guides.InlineStubs.InUser? FindByIdDelegate(Stubs.IInRepository ko, int id);
 
@@ -949,6 +997,7 @@ partial class MultiServiceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = id;
+					if (_source is { } src) return src.FindById(id);
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "FindById");
 					return default!;
 				}
@@ -972,6 +1021,7 @@ partial class MultiServiceTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1088,6 +1138,13 @@ partial class MultiServiceTests
 			public IInRepository(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInRepository delegation.</summary>
+			public void Source(global::KnockOff.Documentation.Samples.Guides.InlineStubs.IInRepository? source)
+			{
+				Save._source = source;
+				FindById._source = source;
 			}
 
 		}

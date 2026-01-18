@@ -20,11 +20,14 @@ partial class IRuleMessageTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public uint Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.Rules.IRuleMessage? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IRuleMessage.PropertyName.</summary>
@@ -39,11 +42,14 @@ partial class IRuleMessageTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public string Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.Rules.IRuleMessage? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IRuleMessage.Message.</summary>
@@ -58,11 +64,14 @@ partial class IRuleMessageTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public string? Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.Rules.IRuleMessage? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Stub implementation of global::Neatoo.Rules.IRuleMessage.</summary>
@@ -83,6 +92,7 @@ partial class IRuleMessageTests
 				{
 					RuleIndex.RecordGet();
 					if (RuleIndex.OnGet is { } onGet) return onGet(this);
+					if (RuleIndex._source is { } src) return src.RuleIndex;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage", "RuleIndex");
 					return RuleIndex.Value;
 				}
@@ -94,6 +104,7 @@ partial class IRuleMessageTests
 				{
 					PropertyName.RecordGet();
 					if (PropertyName.OnGet is { } onGet) return onGet(this);
+					if (PropertyName._source is { } src) return src.PropertyName;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage", "PropertyName");
 					return PropertyName.Value;
 				}
@@ -105,6 +116,7 @@ partial class IRuleMessageTests
 				{
 					Message.RecordGet();
 					if (Message.OnGet is { } onGet) return onGet(this);
+					if (Message._source is { } src) return src.Message;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage", "Message");
 					return Message.Value;
 				}
@@ -121,6 +133,14 @@ partial class IRuleMessageTests
 			public IRuleMessage(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::Neatoo.Rules.IRuleMessage delegation.</summary>
+			public void Source(global::Neatoo.Rules.IRuleMessage? source)
+			{
+				RuleIndex._source = source;
+				PropertyName._source = source;
+				Message._source = source;
 			}
 
 		}

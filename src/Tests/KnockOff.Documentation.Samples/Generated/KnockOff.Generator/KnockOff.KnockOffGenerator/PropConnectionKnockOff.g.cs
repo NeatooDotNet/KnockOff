@@ -8,6 +8,9 @@ partial class PropConnectionKnockOff : global::KnockOff.Documentation.Samples.Gu
 	/// <summary>Tracks and configures behavior for IsConnected.</summary>
 	public sealed class IsConnectedInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IPropConnection? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -21,12 +24,15 @@ partial class PropConnectionKnockOff : global::KnockOff.Documentation.Samples.Gu
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for Connect.</summary>
 	public sealed class ConnectInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IPropConnection? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<PropConnectionKnockOff> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -64,6 +70,7 @@ partial class PropConnectionKnockOff : global::KnockOff.Documentation.Samples.Gu
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) { src.Connect(); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Connect");
 				return;
 			}
@@ -86,6 +93,7 @@ partial class PropConnectionKnockOff : global::KnockOff.Documentation.Samples.Gu
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -195,9 +203,19 @@ partial class PropConnectionKnockOff : global::KnockOff.Documentation.Samples.Gu
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
 	}
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.IPropConnection).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.IPropConnection? source)
+	{
+		IsConnected._source = source;
+		Connect._source = source;
+	}
+
 	bool global::KnockOff.Documentation.Samples.Guides.IPropConnection.IsConnected
 	{
-		get { IsConnected.RecordGet(); if (IsConnected.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropConnection", "IsConnected"); return IsConnected.Value; }
+		get { IsConnected.RecordGet(); if (IsConnected.OnGet is { } onGet) return onGet(this); if (IsConnected._source is { } src) return src.IsConnected; if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropConnection", "IsConnected"); return IsConnected.Value; }
 	}
 
 	void global::KnockOff.Documentation.Samples.Guides.IPropConnection.Connect()

@@ -59,6 +59,14 @@ partial class CpCalculatorKnockOff : global::KnockOff.Documentation.Samples.Skil
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ICpCalculator instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ICpCalculator Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Skills.ICpCalculator).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Skills.ICpCalculator? source)
+	{
+	}
+
 	int global::KnockOff.Documentation.Samples.Skills.ICpCalculator.Add(int a, int b)
 	{
 		Add2.RecordCall((a, b));

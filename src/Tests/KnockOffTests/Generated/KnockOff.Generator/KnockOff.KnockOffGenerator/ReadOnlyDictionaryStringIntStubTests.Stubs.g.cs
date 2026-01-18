@@ -20,11 +20,14 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Collections.Generic.IEnumerable<string> Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Collections.Generic.IReadOnlyDictionary<string, int>? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IReadOnlyDictionary.Values.</summary>
@@ -39,11 +42,14 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Collections.Generic.IEnumerable<int> Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Collections.Generic.IReadOnlyDictionary<string, int>? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IReadOnlyDictionary.Count.</summary>
@@ -58,11 +64,14 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public int Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Collections.Generic.IReadOnlyCollection<global::System.Collections.Generic.KeyValuePair<string, int>>? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IReadOnlyDictionary.Indexer.</summary>
@@ -83,13 +92,19 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			/// <summary>Backing storage for this indexer.</summary>
 			public global::System.Collections.Generic.Dictionary<string, int> Backing { get; } = new();
 
+			/// <summary>Source object for delegation when OnGet/OnSet is not set.</summary>
+			internal global::System.Collections.Generic.IReadOnlyDictionary<string, int>? _source;
+
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
+			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; _source = null; }
 		}
 
 		/// <summary>Tracks and configures behavior for ContainsKey.</summary>
 		public sealed class IReadOnlyDictionary_ContainsKeyInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IReadOnlyDictionary<string, int>? _source;
+
 			/// <summary>Delegate for ContainsKey.</summary>
 			public delegate bool ContainsKeyDelegate(Stubs.IReadOnlyDictionary ko, string key);
 
@@ -135,6 +150,9 @@ partial class ReadOnlyDictionaryStringIntStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = key;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.ContainsKey(key);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ContainsKey");
 					return default!;
 				}
@@ -158,6 +176,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -247,6 +266,9 @@ partial class ReadOnlyDictionaryStringIntStubTests
 		/// <summary>Tracks and configures behavior for TryGetValue.</summary>
 		public sealed class IReadOnlyDictionary_TryGetValueInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IReadOnlyDictionary<string, int>? _source;
+
 			/// <summary>Delegate for TryGetValue.</summary>
 			public delegate bool TryGetValueDelegate(Stubs.IReadOnlyDictionary ko, string key, out int @value);
 
@@ -293,6 +315,9 @@ partial class ReadOnlyDictionaryStringIntStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = key;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.TryGetValue(key, out @value);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "TryGetValue");
 					return default!;
 				}
@@ -316,6 +341,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -405,6 +431,9 @@ partial class ReadOnlyDictionaryStringIntStubTests
 		/// <summary>Tracks and configures behavior for GetEnumerator.</summary>
 		public sealed class IReadOnlyDictionary_GetEnumeratorInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.KeyValuePair<string, int>>? _source;
+
 			/// <summary>Delegate for GetEnumerator.</summary>
 			public delegate global::System.Collections.Generic.IEnumerator<global::System.Collections.Generic.KeyValuePair<string, int>> GetEnumeratorDelegate(Stubs.IReadOnlyDictionary ko);
 
@@ -445,6 +474,9 @@ partial class ReadOnlyDictionaryStringIntStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetEnumerator();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
 					throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
 				}
@@ -467,6 +499,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -589,6 +622,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 				{
 					Indexer.RecordGet(key);
 					if (Indexer.OnGet is { } onGet) return onGet(this, key);
+					if (Indexer._source is { } src) return src[key];
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IReadOnlyDictionary<string, int>", "this[]");
 					return Indexer.Backing.TryGetValue(key, out var v) ? v : default!;
 				}
@@ -600,6 +634,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 				{
 					Keys.RecordGet();
 					if (Keys.OnGet is { } onGet) return onGet(this);
+					if (Keys._source is { } src) return src.Keys;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IReadOnlyDictionary<string, int>", "Keys");
 					return Keys.Value;
 				}
@@ -611,6 +646,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 				{
 					Values.RecordGet();
 					if (Values.OnGet is { } onGet) return onGet(this);
+					if (Values._source is { } src) return src.Values;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IReadOnlyDictionary<string, int>", "Values");
 					return Values.Value;
 				}
@@ -622,6 +658,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 				{
 					Count.RecordGet();
 					if (Count.OnGet is { } onGet) return onGet(this);
+					if (Count._source is { } src) return src.Count;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, int>>", "Count");
 					return Count.Value;
 				}
@@ -648,6 +685,54 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			public IReadOnlyDictionary(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.Generic.IReadOnlyDictionary<string, int> delegation.</summary>
+			public void Source(global::System.Collections.Generic.IReadOnlyDictionary<string, int>? source)
+			{
+				Keys._source = source;
+				Values._source = source;
+				Count._source = source;
+				Indexer._source = source;
+				ContainsKey._source = source;
+				TryGetValue._source = source;
+				GetEnumerator._source = source;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.Generic.IReadOnlyCollection<global::System.Collections.Generic.KeyValuePair<string, int>> delegation.</summary>
+			public void Source(global::System.Collections.Generic.IReadOnlyCollection<global::System.Collections.Generic.KeyValuePair<string, int>>? source)
+			{
+				Keys._source = null;
+				Values._source = null;
+				Count._source = source;
+				Indexer._source = null;
+				ContainsKey._source = null;
+				TryGetValue._source = null;
+				GetEnumerator._source = null;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.KeyValuePair<string, int>> delegation.</summary>
+			public void Source(global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.KeyValuePair<string, int>>? source)
+			{
+				Keys._source = null;
+				Values._source = null;
+				Count._source = null;
+				Indexer._source = null;
+				ContainsKey._source = null;
+				TryGetValue._source = null;
+				GetEnumerator._source = source;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.IEnumerable delegation.</summary>
+			public void Source(global::System.Collections.IEnumerable? source)
+			{
+				Keys._source = null;
+				Values._source = null;
+				Count._source = null;
+				Indexer._source = null;
+				ContainsKey._source = null;
+				TryGetValue._source = null;
+				GetEnumerator._source = null;
 			}
 
 		}

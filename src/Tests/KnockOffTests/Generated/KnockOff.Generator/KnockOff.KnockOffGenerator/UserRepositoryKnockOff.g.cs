@@ -8,6 +8,9 @@ partial class UserRepositoryKnockOff : global::KnockOff.Tests.IRepository<global
 	/// <summary>Tracks and configures behavior for GetById.</summary>
 	public sealed class GetByIdInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.IRepository<global::KnockOff.Tests.User>? _source;
+
 		/// <summary>Delegate for GetById.</summary>
 		public delegate global::KnockOff.Tests.User? GetByIdDelegate(UserRepositoryKnockOff ko, int id);
 
@@ -53,6 +56,9 @@ partial class UserRepositoryKnockOff : global::KnockOff.Tests.IRepository<global
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetById(id);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
 				return default!;
 			}
@@ -76,6 +82,7 @@ partial class UserRepositoryKnockOff : global::KnockOff.Tests.IRepository<global
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -165,6 +172,9 @@ partial class UserRepositoryKnockOff : global::KnockOff.Tests.IRepository<global
 	/// <summary>Tracks and configures behavior for Save.</summary>
 	public sealed class SaveInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.IRepository<global::KnockOff.Tests.User>? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<UserRepositoryKnockOff, global::KnockOff.Tests.User> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -207,6 +217,9 @@ partial class UserRepositoryKnockOff : global::KnockOff.Tests.IRepository<global
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = entity;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.Save(entity); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 				return;
 			}
@@ -230,6 +243,7 @@ partial class UserRepositoryKnockOff : global::KnockOff.Tests.IRepository<global
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -319,6 +333,9 @@ partial class UserRepositoryKnockOff : global::KnockOff.Tests.IRepository<global
 	/// <summary>Tracks and configures behavior for GetByIdAsync.</summary>
 	public sealed class GetByIdAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.IRepository<global::KnockOff.Tests.User>? _source;
+
 		/// <summary>Delegate for GetByIdAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> GetByIdAsyncDelegate(UserRepositoryKnockOff ko, int id);
 
@@ -364,6 +381,9 @@ partial class UserRepositoryKnockOff : global::KnockOff.Tests.IRepository<global
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetByIdAsync(id);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetByIdAsync");
 				return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.User?>(default!);
 			}
@@ -387,6 +407,7 @@ partial class UserRepositoryKnockOff : global::KnockOff.Tests.IRepository<global
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -503,6 +524,17 @@ partial class UserRepositoryKnockOff : global::KnockOff.Tests.IRepository<global
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Tests.IRepository<global::KnockOff.Tests.User>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Tests.IRepository<global::KnockOff.Tests.User>? source)
+	{
+		GetById._source = source;
+		Save._source = source;
+		GetByIdAsync._source = source;
 	}
 
 	global::KnockOff.Tests.User? global::KnockOff.Tests.IRepository<global::KnockOff.Tests.User>.GetById(int id)

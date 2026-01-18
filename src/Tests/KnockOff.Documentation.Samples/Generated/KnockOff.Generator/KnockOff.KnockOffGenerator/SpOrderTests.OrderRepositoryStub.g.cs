@@ -10,6 +10,9 @@ partial class OrderRepositoryStub : global::KnockOff.Documentation.Samples.Guide
 	/// <summary>Tracks and configures behavior for GetById.</summary>
 	public sealed class GetByIdInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.ISpOrderRepository? _source;
+
 		/// <summary>Delegate for GetById.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Guides.SpOrder? GetByIdDelegate(OrderRepositoryStub ko, int id);
 
@@ -55,6 +58,7 @@ partial class OrderRepositoryStub : global::KnockOff.Documentation.Samples.Guide
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				if (_source is { } src) return src.GetById(id);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
 				return default!;
 			}
@@ -78,6 +82,7 @@ partial class OrderRepositoryStub : global::KnockOff.Documentation.Samples.Guide
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -167,6 +172,9 @@ partial class OrderRepositoryStub : global::KnockOff.Documentation.Samples.Guide
 	/// <summary>Tracks and configures behavior for Save.</summary>
 	public sealed class SaveInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.ISpOrderRepository? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<OrderRepositoryStub, global::KnockOff.Documentation.Samples.Guides.SpOrder> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -209,6 +217,7 @@ partial class OrderRepositoryStub : global::KnockOff.Documentation.Samples.Guide
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = order;
+				if (_source is { } src) { src.Save(order); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 				return;
 			}
@@ -232,6 +241,7 @@ partial class OrderRepositoryStub : global::KnockOff.Documentation.Samples.Guide
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -344,6 +354,16 @@ partial class OrderRepositoryStub : global::KnockOff.Documentation.Samples.Guide
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.ISpOrderRepository).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.ISpOrderRepository? source)
+	{
+		GetById._source = source;
+		Save._source = source;
 	}
 
 	global::KnockOff.Documentation.Samples.Guides.SpOrder? global::KnockOff.Documentation.Samples.Guides.ISpOrderRepository.GetById(int id)

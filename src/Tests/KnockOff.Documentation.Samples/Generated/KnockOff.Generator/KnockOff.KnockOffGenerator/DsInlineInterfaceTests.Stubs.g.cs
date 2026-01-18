@@ -29,6 +29,9 @@ partial class DsInlineInterfaceTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public string Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::KnockOff.Documentation.Samples.Design.IDsUserService? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
@@ -36,7 +39,7 @@ partial class DsInlineInterfaceTests
 			public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDsUserService.Indexer.</summary>
@@ -69,13 +72,19 @@ partial class DsInlineInterfaceTests
 			/// <summary>Backing storage for this indexer.</summary>
 			public global::System.Collections.Generic.Dictionary<string, string?> Backing { get; } = new();
 
+			/// <summary>Source object for delegation when OnGet/OnSet is not set.</summary>
+			internal global::KnockOff.Documentation.Samples.Design.IDsUserService? _source;
+
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
+			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; _source = null; }
 		}
 
 		/// <summary>Tracks and configures behavior for GetUser.</summary>
 		public sealed class IDsUserService_GetUserInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Design.IDsUserService? _source;
+
 			/// <summary>Delegate for GetUser.</summary>
 			public delegate global::KnockOff.Documentation.Samples.Design.DsUser? GetUserDelegate(Stubs.IDsUserService ko, int id);
 
@@ -121,6 +130,7 @@ partial class DsInlineInterfaceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = id;
+					if (_source is { } src) return src.GetUser(id);
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetUser");
 					return default!;
 				}
@@ -144,6 +154,7 @@ partial class DsInlineInterfaceTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -253,6 +264,7 @@ partial class DsInlineInterfaceTests
 				{
 					Name.RecordGet();
 					if (Name.OnGet is { } onGet) return onGet(this);
+					if (Name._source is { } src) return src.Name;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsUserService", "Name");
 					return Name.Value;
 				}
@@ -260,6 +272,7 @@ partial class DsInlineInterfaceTests
 				{
 					Name.RecordSet(value);
 					if (Name.OnSet is { } onSet) { onSet(this, value); return; }
+					if (Name._source is { } src) { src.Name = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsUserService", "Name");
 					Name.Value = value;
 				}
@@ -271,6 +284,7 @@ partial class DsInlineInterfaceTests
 				{
 					Indexer.RecordGet(key);
 					if (Indexer.OnGet is { } onGet) return onGet(this, key);
+					if (Indexer._source is { } src) return src[key];
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsUserService", "this[]");
 					return Indexer.Backing.TryGetValue(key, out var v) ? v : default;
 				}
@@ -278,6 +292,7 @@ partial class DsInlineInterfaceTests
 				{
 					Indexer.RecordSet(key, value);
 					if (Indexer.OnSet is { } onSet) { onSet(this, key, value); return; }
+					if (Indexer._source is { } src) { src[key] = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsUserService", "this[]");
 					Indexer.Backing[key] = value;
 				}
@@ -294,6 +309,14 @@ partial class DsInlineInterfaceTests
 			public IDsUserService(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::KnockOff.Documentation.Samples.Design.IDsUserService delegation.</summary>
+			public void Source(global::KnockOff.Documentation.Samples.Design.IDsUserService? source)
+			{
+				Name._source = source;
+				Indexer._source = source;
+				GetUser._source = source;
 			}
 
 		}

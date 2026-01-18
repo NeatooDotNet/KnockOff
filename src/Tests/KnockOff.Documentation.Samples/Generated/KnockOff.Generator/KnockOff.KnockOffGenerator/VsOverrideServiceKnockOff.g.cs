@@ -35,6 +35,14 @@ partial class VsOverrideServiceKnockOff : global::KnockOff.Documentation.Samples
 	/// <summary>The global::KnockOff.Documentation.Samples.Comparison.IVsOverrideService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Comparison.IVsOverrideService Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Comparison.IVsOverrideService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Comparison.IVsOverrideService? source)
+	{
+	}
+
 	global::KnockOff.Documentation.Samples.Comparison.VsUser global::KnockOff.Documentation.Samples.Comparison.IVsOverrideService.GetUser(int id)
 	{
 		GetUser2.RecordCall(id);

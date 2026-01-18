@@ -20,11 +20,14 @@ partial class ReadOnlyListStringStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public int Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Collections.Generic.IReadOnlyCollection<string>? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IReadOnlyList.Indexer.</summary>
@@ -45,13 +48,19 @@ partial class ReadOnlyListStringStubTests
 			/// <summary>Backing storage for this indexer.</summary>
 			public global::System.Collections.Generic.Dictionary<int, string> Backing { get; } = new();
 
+			/// <summary>Source object for delegation when OnGet/OnSet is not set.</summary>
+			internal global::System.Collections.Generic.IReadOnlyList<string>? _source;
+
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
+			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; _source = null; }
 		}
 
 		/// <summary>Tracks and configures behavior for GetEnumerator.</summary>
 		public sealed class IReadOnlyList_GetEnumeratorInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IEnumerable<string>? _source;
+
 			/// <summary>Delegate for GetEnumerator.</summary>
 			public delegate global::System.Collections.Generic.IEnumerator<string> GetEnumeratorDelegate(Stubs.IReadOnlyList ko);
 
@@ -92,6 +101,9 @@ partial class ReadOnlyListStringStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetEnumerator();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
 					throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
 				}
@@ -114,6 +126,7 @@ partial class ReadOnlyListStringStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -214,6 +227,7 @@ partial class ReadOnlyListStringStubTests
 				{
 					Indexer.RecordGet(index);
 					if (Indexer.OnGet is { } onGet) return onGet(this, index);
+					if (Indexer._source is { } src) return src[index];
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IReadOnlyList<string>", "this[]");
 					return Indexer.Backing.TryGetValue(index, out var v) ? v : default!;
 				}
@@ -225,6 +239,7 @@ partial class ReadOnlyListStringStubTests
 				{
 					Count.RecordGet();
 					if (Count.OnGet is { } onGet) return onGet(this);
+					if (Count._source is { } src) return src.Count;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IReadOnlyCollection<string>", "Count");
 					return Count.Value;
 				}
@@ -251,6 +266,38 @@ partial class ReadOnlyListStringStubTests
 			public IReadOnlyList(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.Generic.IReadOnlyList<string> delegation.</summary>
+			public void Source(global::System.Collections.Generic.IReadOnlyList<string>? source)
+			{
+				Count._source = source;
+				Indexer._source = source;
+				GetEnumerator._source = source;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.Generic.IReadOnlyCollection<string> delegation.</summary>
+			public void Source(global::System.Collections.Generic.IReadOnlyCollection<string>? source)
+			{
+				Count._source = source;
+				Indexer._source = null;
+				GetEnumerator._source = null;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.Generic.IEnumerable<string> delegation.</summary>
+			public void Source(global::System.Collections.Generic.IEnumerable<string>? source)
+			{
+				Count._source = null;
+				Indexer._source = null;
+				GetEnumerator._source = source;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.IEnumerable delegation.</summary>
+			public void Source(global::System.Collections.IEnumerable? source)
+			{
+				Count._source = null;
+				Indexer._source = null;
+				GetEnumerator._source = null;
 			}
 
 		}

@@ -8,6 +8,9 @@ partial class BpPropertyServiceKnockOff : global::KnockOff.Documentation.Samples
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IBpPropertyService? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -33,12 +36,15 @@ partial class BpPropertyServiceKnockOff : global::KnockOff.Documentation.Samples
 		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsActive.</summary>
 	public sealed class IsActiveInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IBpPropertyService? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -64,7 +70,7 @@ partial class BpPropertyServiceKnockOff : global::KnockOff.Documentation.Samples
 		public void RecordSet(bool? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Interceptor for Name. Configure via .Value, track via .GetCount.</summary>
@@ -79,16 +85,26 @@ partial class BpPropertyServiceKnockOff : global::KnockOff.Documentation.Samples
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IBpPropertyService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IBpPropertyService Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.IBpPropertyService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.IBpPropertyService? source)
+	{
+		Name._source = source;
+		IsActive._source = source;
+	}
+
 	string global::KnockOff.Documentation.Samples.Guides.IBpPropertyService.Name
 	{
-		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpPropertyService", "Name"); return Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpPropertyService", "Name"); Name.Value = value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Name._source is { } src) return src.Name; if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpPropertyService", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Name._source is { } src) { src.Name = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpPropertyService", "Name"); Name.Value = value; }
 	}
 
 	bool global::KnockOff.Documentation.Samples.Guides.IBpPropertyService.IsActive
 	{
-		get { IsActive.RecordGet(); if (IsActive.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpPropertyService", "IsActive"); return IsActive.Value; }
-		set { IsActive.RecordSet(value); if (IsActive.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpPropertyService", "IsActive"); IsActive.Value = value; }
+		get { IsActive.RecordGet(); if (IsActive.OnGet is { } onGet) return onGet(this); if (IsActive._source is { } src) return src.IsActive; if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpPropertyService", "IsActive"); return IsActive.Value; }
+		set { IsActive.RecordSet(value); if (IsActive.OnSet is { } onSet) { onSet(this, value); return; } if (IsActive._source is { } src) { src.IsActive = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpPropertyService", "IsActive"); IsActive.Value = value; }
 	}
 
 }

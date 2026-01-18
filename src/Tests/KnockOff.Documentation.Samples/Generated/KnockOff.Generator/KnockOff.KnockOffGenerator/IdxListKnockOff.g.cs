@@ -8,6 +8,9 @@ partial class IdxListKnockOff : global::KnockOff.Documentation.Samples.Guides.II
 	/// <summary>Tracks and configures behavior for indexer.</summary>
 	public sealed class IndexerInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IIdxList? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -36,7 +39,7 @@ partial class IdxListKnockOff : global::KnockOff.Documentation.Samples.Guides.II
 		public global::System.Collections.Generic.Dictionary<int, object?> Backing { get; } = new();
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; }
+		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; _source = null; }
 	}
 
 	/// <summary>Interceptor for indexer. Configure callbacks and track access.</summary>
@@ -48,10 +51,19 @@ partial class IdxListKnockOff : global::KnockOff.Documentation.Samples.Guides.II
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IIdxList instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IIdxList Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.IIdxList).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.IIdxList? source)
+	{
+		Indexer._source = source;
+	}
+
 	object? global::KnockOff.Documentation.Samples.Guides.IIdxList.this[int index]
 	{
-		get { Indexer.RecordGet(index); if (Indexer.OnGet is { } onGet) return onGet(this, index); if (Strict) throw global::KnockOff.StubException.NotConfigured("IIdxList", "this[]"); return Indexer.Backing.TryGetValue(index, out var v) ? v : default; }
-		set { Indexer.RecordSet(index, value); if (Indexer.OnSet is { } onSet) { onSet(this, index, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IIdxList", "this[]"); Indexer.Backing[index] = value; }
+		get { Indexer.RecordGet(index); if (Indexer.OnGet is { } onGet) return onGet(this, index); if (Indexer._source is { } src) return src[index]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IIdxList", "this[]"); return Indexer.Backing.TryGetValue(index, out var v) ? v : default; }
+		set { Indexer.RecordSet(index, value); if (Indexer.OnSet is { } onSet) { onSet(this, index, value); return; } if (Indexer._source is { } src) { src[index] = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IIdxList", "this[]"); Indexer.Backing[index] = value; }
 	}
 
 }

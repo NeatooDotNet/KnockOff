@@ -20,11 +20,14 @@ partial class DbTransactionStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Data.IDbConnection? Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Data.IDbTransaction? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDbTransaction.IsolationLevel.</summary>
@@ -39,16 +42,22 @@ partial class DbTransactionStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Data.IsolationLevel Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Data.IDbTransaction? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Tracks and configures behavior for Commit.</summary>
 		public sealed class IDbTransaction_CommitInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDbTransaction? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IDbTransaction> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -86,6 +95,9 @@ partial class DbTransactionStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.Commit(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Commit");
 					return;
 				}
@@ -108,6 +120,7 @@ partial class DbTransactionStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -193,6 +206,9 @@ partial class DbTransactionStubTests
 		/// <summary>Tracks and configures behavior for Rollback.</summary>
 		public sealed class IDbTransaction_RollbackInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDbTransaction? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IDbTransaction> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -230,6 +246,9 @@ partial class DbTransactionStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.Rollback(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Rollback");
 					return;
 				}
@@ -252,6 +271,7 @@ partial class DbTransactionStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -337,6 +357,9 @@ partial class DbTransactionStubTests
 		/// <summary>Tracks and configures behavior for Dispose.</summary>
 		public sealed class IDbTransaction_DisposeInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IDisposable? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IDbTransaction> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -374,6 +397,9 @@ partial class DbTransactionStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.Dispose(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Dispose");
 					return;
 				}
@@ -396,6 +422,7 @@ partial class DbTransactionStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -512,6 +539,7 @@ partial class DbTransactionStubTests
 				{
 					Connection.RecordGet();
 					if (Connection.OnGet is { } onGet) return onGet(this);
+					if (Connection._source is { } src) return src.Connection;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbTransaction", "Connection");
 					return Connection.Value;
 				}
@@ -523,6 +551,7 @@ partial class DbTransactionStubTests
 				{
 					IsolationLevel.RecordGet();
 					if (IsolationLevel.OnGet is { } onGet) return onGet(this);
+					if (IsolationLevel._source is { } src) return src.IsolationLevel;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbTransaction", "IsolationLevel");
 					return IsolationLevel.Value;
 				}
@@ -544,6 +573,26 @@ partial class DbTransactionStubTests
 			public IDbTransaction(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.Data.IDbTransaction delegation.</summary>
+			public void Source(global::System.Data.IDbTransaction? source)
+			{
+				Connection._source = source;
+				IsolationLevel._source = source;
+				Commit._source = source;
+				Rollback._source = source;
+				Dispose._source = source;
+			}
+
+			/// <summary>Sets the source object for global::System.IDisposable delegation.</summary>
+			public void Source(global::System.IDisposable? source)
+			{
+				Connection._source = null;
+				IsolationLevel._source = null;
+				Commit._source = null;
+				Rollback._source = null;
+				Dispose._source = source;
 			}
 
 		}

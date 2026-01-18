@@ -8,6 +8,9 @@ partial class AsyncRepositoryKnockOff : global::KnockOff.Documentation.Samples.G
 	/// <summary>Tracks and configures behavior for InitializeAsync.</summary>
 	public sealed class InitializeAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IAsyncRepository? _source;
+
 		/// <summary>Delegate for InitializeAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task InitializeAsyncDelegate(AsyncRepositoryKnockOff ko);
 
@@ -48,6 +51,7 @@ partial class AsyncRepositoryKnockOff : global::KnockOff.Documentation.Samples.G
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.InitializeAsync();
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "InitializeAsync");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -70,6 +74,7 @@ partial class AsyncRepositoryKnockOff : global::KnockOff.Documentation.Samples.G
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -155,6 +160,9 @@ partial class AsyncRepositoryKnockOff : global::KnockOff.Documentation.Samples.G
 	/// <summary>Tracks and configures behavior for GetByIdAsync.</summary>
 	public sealed class GetByIdAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IAsyncRepository? _source;
+
 		/// <summary>Delegate for GetByIdAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.AsyncUser?> GetByIdAsyncDelegate(AsyncRepositoryKnockOff ko, int id);
 
@@ -200,6 +208,7 @@ partial class AsyncRepositoryKnockOff : global::KnockOff.Documentation.Samples.G
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				if (_source is { } src) return src.GetByIdAsync(id);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetByIdAsync");
 				return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Guides.AsyncUser?>(default!);
 			}
@@ -223,6 +232,7 @@ partial class AsyncRepositoryKnockOff : global::KnockOff.Documentation.Samples.G
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -312,6 +322,9 @@ partial class AsyncRepositoryKnockOff : global::KnockOff.Documentation.Samples.G
 	/// <summary>Tracks and configures behavior for CountAsync.</summary>
 	public sealed class CountAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IAsyncRepository? _source;
+
 		/// <summary>Delegate for CountAsync.</summary>
 		public delegate global::System.Threading.Tasks.ValueTask<int> CountAsyncDelegate(AsyncRepositoryKnockOff ko);
 
@@ -352,6 +365,7 @@ partial class AsyncRepositoryKnockOff : global::KnockOff.Documentation.Samples.G
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.CountAsync();
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "CountAsync");
 				return default;
 			}
@@ -374,6 +388,7 @@ partial class AsyncRepositoryKnockOff : global::KnockOff.Documentation.Samples.G
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -486,6 +501,17 @@ partial class AsyncRepositoryKnockOff : global::KnockOff.Documentation.Samples.G
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.IAsyncRepository).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.IAsyncRepository? source)
+	{
+		InitializeAsync._source = source;
+		GetByIdAsync._source = source;
+		CountAsync._source = source;
 	}
 
 	global::System.Threading.Tasks.Task global::KnockOff.Documentation.Samples.Guides.IAsyncRepository.InitializeAsync()

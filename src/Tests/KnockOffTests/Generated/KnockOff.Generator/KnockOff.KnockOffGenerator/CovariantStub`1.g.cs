@@ -8,6 +8,9 @@ partial class CovariantStub<T> : global::KnockOff.Tests.ICovariantService<T>, gl
 	/// <summary>Tracks and configures behavior for Get.</summary>
 	public sealed class GetInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.ICovariantService<T>? _source;
+
 		/// <summary>Delegate for Get.</summary>
 		public delegate T GetDelegate(CovariantStub<T> ko);
 
@@ -48,6 +51,9 @@ partial class CovariantStub<T> : global::KnockOff.Tests.ICovariantService<T>, gl
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Get();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Get");
 				throw new global::System.InvalidOperationException("No implementation provided for Get. Configure via OnCall.");
 			}
@@ -70,6 +76,7 @@ partial class CovariantStub<T> : global::KnockOff.Tests.ICovariantService<T>, gl
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -174,6 +181,15 @@ partial class CovariantStub<T> : global::KnockOff.Tests.ICovariantService<T>, gl
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Tests.ICovariantService<T>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Tests.ICovariantService<T>? source)
+	{
+		Get._source = source;
 	}
 
 	T global::KnockOff.Tests.ICovariantService<T>.Get()

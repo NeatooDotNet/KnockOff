@@ -11,6 +11,9 @@ partial class CustomFormatterStubTests
 		/// <summary>Tracks and configures behavior for Format.</summary>
 		public sealed class ICustomFormatter_FormatInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.ICustomFormatter? _source;
+
 			/// <summary>Delegate for Format.</summary>
 			public delegate string FormatDelegate(Stubs.ICustomFormatter ko, string? format, object? arg, global::System.IFormatProvider? formatProvider);
 
@@ -56,6 +59,9 @@ partial class CustomFormatterStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((format, arg, formatProvider));
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.Format(format, arg, formatProvider);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Format");
 					return default!;
 				}
@@ -79,6 +85,7 @@ partial class CustomFormatterStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -187,6 +194,12 @@ partial class CustomFormatterStubTests
 			public ICustomFormatter(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.ICustomFormatter delegation.</summary>
+			public void Source(global::System.ICustomFormatter? source)
+			{
+				Format._source = source;
 			}
 
 		}

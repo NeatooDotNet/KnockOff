@@ -8,6 +8,9 @@ partial class FcNotificationServiceStub : global::KnockOff.Documentation.Samples
 	/// <summary>Tracks and configures behavior for SendOrderConfirmation.</summary>
 	public sealed class SendOrderConfirmationInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Comparison.IFcNotificationService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<FcNotificationServiceStub, int, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -50,6 +53,7 @@ partial class FcNotificationServiceStub : global::KnockOff.Documentation.Samples
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((customerId, orderId));
+				if (_source is { } src) { src.SendOrderConfirmation(customerId, orderId); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SendOrderConfirmation");
 				return;
 			}
@@ -73,6 +77,7 @@ partial class FcNotificationServiceStub : global::KnockOff.Documentation.Samples
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -162,6 +167,9 @@ partial class FcNotificationServiceStub : global::KnockOff.Documentation.Samples
 	/// <summary>Tracks and configures behavior for SendPaymentFailure.</summary>
 	public sealed class SendPaymentFailureInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Comparison.IFcNotificationService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<FcNotificationServiceStub, int, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -204,6 +212,7 @@ partial class FcNotificationServiceStub : global::KnockOff.Documentation.Samples
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((customerId, reason));
+				if (_source is { } src) { src.SendPaymentFailure(customerId, reason); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SendPaymentFailure");
 				return;
 			}
@@ -227,6 +236,7 @@ partial class FcNotificationServiceStub : global::KnockOff.Documentation.Samples
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -339,6 +349,16 @@ partial class FcNotificationServiceStub : global::KnockOff.Documentation.Samples
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Comparison.IFcNotificationService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Comparison.IFcNotificationService? source)
+	{
+		SendOrderConfirmation._source = source;
+		SendPaymentFailure._source = source;
 	}
 
 	void global::KnockOff.Documentation.Samples.Comparison.IFcNotificationService.SendOrderConfirmation(int customerId, int orderId)

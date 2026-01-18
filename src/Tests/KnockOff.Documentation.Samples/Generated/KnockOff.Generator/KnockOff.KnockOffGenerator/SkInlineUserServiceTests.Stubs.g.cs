@@ -11,6 +11,9 @@ partial class SkInlineUserServiceTests
 		/// <summary>Tracks and configures behavior for GetUser.</summary>
 		public sealed class ISkInlineUserService_GetUserInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Skills.ISkInlineUserService? _source;
+
 			/// <summary>Delegate for GetUser.</summary>
 			public delegate global::KnockOff.Documentation.Samples.Skills.SkUser? GetUserDelegate(Stubs.ISkInlineUserService ko, int id);
 
@@ -56,6 +59,7 @@ partial class SkInlineUserServiceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = id;
+					if (_source is { } src) return src.GetUser(id);
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetUser");
 					return default!;
 				}
@@ -79,6 +83,7 @@ partial class SkInlineUserServiceTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -189,11 +194,20 @@ partial class SkInlineUserServiceTests
 				Strict = strict;
 			}
 
+			/// <summary>Sets the source object for global::KnockOff.Documentation.Samples.Skills.ISkInlineUserService delegation.</summary>
+			public void Source(global::KnockOff.Documentation.Samples.Skills.ISkInlineUserService? source)
+			{
+				GetUser._source = source;
+			}
+
 		}
 
 		/// <summary>Tracks and configures behavior for Log.</summary>
 		public sealed class ISkInlineLogger_LogInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Skills.ISkInlineLogger? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.ISkInlineLogger, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -236,6 +250,7 @@ partial class SkInlineUserServiceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = message;
+					if (_source is { } src) { src.Log(message); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Log");
 					return;
 				}
@@ -259,6 +274,7 @@ partial class SkInlineUserServiceTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -367,6 +383,12 @@ partial class SkInlineUserServiceTests
 			public ISkInlineLogger(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::KnockOff.Documentation.Samples.Skills.ISkInlineLogger delegation.</summary>
+			public void Source(global::KnockOff.Documentation.Samples.Skills.ISkInlineLogger? source)
+			{
+				Log._source = source;
 			}
 
 		}

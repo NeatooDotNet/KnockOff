@@ -11,6 +11,9 @@ partial class IPropertyInfoListTests
 		/// <summary>Tracks and configures behavior for GetPropertyInfo.</summary>
 		public sealed class IPropertyInfoList_GetPropertyInfoInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::Neatoo.IPropertyInfoList? _source;
+
 			/// <summary>Delegate for GetPropertyInfo.</summary>
 			public delegate global::Neatoo.IPropertyInfo? GetPropertyInfoDelegate(Stubs.IPropertyInfoList ko, string name);
 
@@ -56,6 +59,7 @@ partial class IPropertyInfoListTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = name;
+					if (_source is { } src) return src.GetPropertyInfo(name);
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetPropertyInfo");
 					return default!;
 				}
@@ -79,6 +83,7 @@ partial class IPropertyInfoListTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -168,6 +173,9 @@ partial class IPropertyInfoListTests
 		/// <summary>Tracks and configures behavior for Properties.</summary>
 		public sealed class IPropertyInfoList_PropertiesInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::Neatoo.IPropertyInfoList? _source;
+
 			/// <summary>Delegate for Properties.</summary>
 			public delegate global::System.Collections.Generic.IEnumerable<global::Neatoo.IPropertyInfo> PropertiesDelegate(Stubs.IPropertyInfoList ko);
 
@@ -208,6 +216,7 @@ partial class IPropertyInfoListTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					if (_source is { } src) return src.Properties();
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Properties");
 					throw new global::System.InvalidOperationException("No implementation provided for Properties. Configure via OnCall.");
 				}
@@ -230,6 +239,7 @@ partial class IPropertyInfoListTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -315,6 +325,9 @@ partial class IPropertyInfoListTests
 		/// <summary>Tracks and configures behavior for HasProperty.</summary>
 		public sealed class IPropertyInfoList_HasPropertyInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::Neatoo.IPropertyInfoList? _source;
+
 			/// <summary>Delegate for HasProperty.</summary>
 			public delegate bool HasPropertyDelegate(Stubs.IPropertyInfoList ko, string propertyName);
 
@@ -360,6 +373,7 @@ partial class IPropertyInfoListTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = propertyName;
+					if (_source is { } src) return src.HasProperty(propertyName);
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "HasProperty");
 					return default!;
 				}
@@ -383,6 +397,7 @@ partial class IPropertyInfoListTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -507,6 +522,14 @@ partial class IPropertyInfoListTests
 			public IPropertyInfoList(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::Neatoo.IPropertyInfoList delegation.</summary>
+			public void Source(global::Neatoo.IPropertyInfoList? source)
+			{
+				GetPropertyInfo._source = source;
+				Properties._source = source;
+				HasProperty._source = source;
 			}
 
 		}

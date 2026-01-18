@@ -8,6 +8,9 @@ partial class MethodRepositoryKnockOff : global::KnockOff.Documentation.Samples.
 	/// <summary>Tracks and configures behavior for GetById.</summary>
 	public sealed class GetByIdInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IMethodRepository? _source;
+
 		/// <summary>Delegate for GetById.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Guides.MethodUser? GetByIdDelegate(MethodRepositoryKnockOff ko, int id);
 
@@ -53,6 +56,7 @@ partial class MethodRepositoryKnockOff : global::KnockOff.Documentation.Samples.
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				if (_source is { } src) return src.GetById(id);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
 				return default!;
 			}
@@ -76,6 +80,7 @@ partial class MethodRepositoryKnockOff : global::KnockOff.Documentation.Samples.
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -165,6 +170,9 @@ partial class MethodRepositoryKnockOff : global::KnockOff.Documentation.Samples.
 	/// <summary>Tracks and configures behavior for Count.</summary>
 	public sealed class CountInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IMethodRepository? _source;
+
 		/// <summary>Delegate for Count.</summary>
 		public delegate int CountDelegate(MethodRepositoryKnockOff ko);
 
@@ -205,6 +213,7 @@ partial class MethodRepositoryKnockOff : global::KnockOff.Documentation.Samples.
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.Count();
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Count");
 				return default!;
 			}
@@ -227,6 +236,7 @@ partial class MethodRepositoryKnockOff : global::KnockOff.Documentation.Samples.
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -335,6 +345,16 @@ partial class MethodRepositoryKnockOff : global::KnockOff.Documentation.Samples.
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.IMethodRepository).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.IMethodRepository? source)
+	{
+		GetById._source = source;
+		Count._source = source;
 	}
 
 	global::KnockOff.Documentation.Samples.Guides.MethodUser? global::KnockOff.Documentation.Samples.Guides.IMethodRepository.GetById(int id)

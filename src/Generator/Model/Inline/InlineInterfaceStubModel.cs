@@ -36,4 +36,6 @@ internal sealed record InlineInterfaceStubModel(
     /// <summary>Interceptor properties to generate on the stub class.</summary>
     EquatableArray<InlineInterceptorPropertyModel> InterceptorProperties,
     /// <summary>All explicit interface implementations needed.</summary>
-    EquatableArray<InlineInterfaceImplementation> Implementations);
+    EquatableArray<InlineInterfaceImplementation> Implementations,
+    /// <summary>Source providers for Source(T) methods - one per interface in the hierarchy.</summary>
+    EquatableArray<SourceProviderInfo> SourceProviders);

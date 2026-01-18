@@ -8,6 +8,9 @@ partial class KeyLookupKnockOff : global::KnockOff.Tests.IKeyLookup, global::Kno
 	/// <summary>Tracks and configures behavior for Count.</summary>
 	public sealed class CountInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Tests.IKeyLookup? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -33,7 +36,7 @@ partial class KeyLookupKnockOff : global::KnockOff.Tests.IKeyLookup, global::Kno
 		public void RecordSet(int? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks calls to GetData (user-defined implementation).</summary>
@@ -69,10 +72,19 @@ partial class KeyLookupKnockOff : global::KnockOff.Tests.IKeyLookup, global::Kno
 	/// <summary>The global::KnockOff.Tests.IKeyLookup instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IKeyLookup Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Tests.IKeyLookup).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Tests.IKeyLookup? source)
+	{
+		Count._source = source;
+	}
+
 	int global::KnockOff.Tests.IKeyLookup.Count
 	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IKeyLookup", "Count"); return Count.Value; }
-		set { Count.RecordSet(value); if (Count.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IKeyLookup", "Count"); Count.Value = value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("IKeyLookup", "Count"); return Count.Value; }
+		set { Count.RecordSet(value); if (Count.OnSet is { } onSet) { onSet(this, value); return; } if (Count._source is { } src) { src.Count = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IKeyLookup", "Count"); Count.Value = value; }
 	}
 
 	int global::KnockOff.Tests.IKeyLookup.GetData(string key)

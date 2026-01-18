@@ -8,6 +8,9 @@ partial class AuditorKnockOff : global::KnockOff.Tests.IAuditor, global::KnockOf
 	/// <summary>Tracks and configures behavior for Log.</summary>
 	public sealed class LogInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.IAuditor? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<AuditorKnockOff, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -50,6 +53,9 @@ partial class AuditorKnockOff : global::KnockOff.Tests.IAuditor, global::KnockOf
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = message;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.Log(message); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Log");
 				return;
 			}
@@ -73,6 +79,7 @@ partial class AuditorKnockOff : global::KnockOff.Tests.IAuditor, global::KnockOf
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -162,6 +169,9 @@ partial class AuditorKnockOff : global::KnockOff.Tests.IAuditor, global::KnockOf
 	/// <summary>Tracks and configures behavior for Audit.</summary>
 	public sealed class AuditInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.IAuditor? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<AuditorKnockOff, string, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -204,6 +214,9 @@ partial class AuditorKnockOff : global::KnockOff.Tests.IAuditor, global::KnockOf
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((action, userId));
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.Audit(action, userId); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Audit");
 				return;
 			}
@@ -227,6 +240,7 @@ partial class AuditorKnockOff : global::KnockOff.Tests.IAuditor, global::KnockOf
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -339,6 +353,16 @@ partial class AuditorKnockOff : global::KnockOff.Tests.IAuditor, global::KnockOf
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Tests.IAuditor).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Tests.IAuditor? source)
+	{
+		Log._source = source;
+		Audit._source = source;
 	}
 
 	void global::KnockOff.Tests.IAuditor.Log(string message)

@@ -20,11 +20,14 @@ partial class QueryableStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Type Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Linq.IQueryable? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IQueryable.Expression.</summary>
@@ -39,11 +42,14 @@ partial class QueryableStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Linq.Expressions.Expression Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Linq.IQueryable? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IQueryable.Provider.</summary>
@@ -58,16 +64,22 @@ partial class QueryableStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Linq.IQueryProvider Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Linq.IQueryable? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Tracks and configures behavior for GetEnumerator.</summary>
 		public sealed class IQueryable_GetEnumeratorInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.IEnumerable? _source;
+
 			/// <summary>Delegate for GetEnumerator.</summary>
 			public delegate global::System.Collections.IEnumerator GetEnumeratorDelegate(Stubs.IQueryable ko);
 
@@ -108,6 +120,9 @@ partial class QueryableStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetEnumerator();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
 					throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
 				}
@@ -130,6 +145,7 @@ partial class QueryableStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -233,6 +249,7 @@ partial class QueryableStubTests
 				{
 					ElementType.RecordGet();
 					if (ElementType.OnGet is { } onGet) return onGet(this);
+					if (ElementType._source is { } src) return src.ElementType;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IQueryable", "ElementType");
 					return ElementType.Value;
 				}
@@ -244,6 +261,7 @@ partial class QueryableStubTests
 				{
 					Expression.RecordGet();
 					if (Expression.OnGet is { } onGet) return onGet(this);
+					if (Expression._source is { } src) return src.Expression;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IQueryable", "Expression");
 					return Expression.Value;
 				}
@@ -255,6 +273,7 @@ partial class QueryableStubTests
 				{
 					Provider.RecordGet();
 					if (Provider.OnGet is { } onGet) return onGet(this);
+					if (Provider._source is { } src) return src.Provider;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IQueryable", "Provider");
 					return Provider.Value;
 				}
@@ -276,6 +295,24 @@ partial class QueryableStubTests
 			public IQueryable(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.Linq.IQueryable delegation.</summary>
+			public void Source(global::System.Linq.IQueryable? source)
+			{
+				ElementType._source = source;
+				Expression._source = source;
+				Provider._source = source;
+				GetEnumerator._source = source;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.IEnumerable delegation.</summary>
+			public void Source(global::System.Collections.IEnumerable? source)
+			{
+				ElementType._source = null;
+				Expression._source = null;
+				Provider._source = null;
+				GetEnumerator._source = source;
 			}
 
 		}

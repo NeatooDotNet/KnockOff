@@ -20,11 +20,14 @@ partial class BpComplexInterfaceTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.IBpEditBase? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IBpEditBase.IsSelfValid.</summary>
@@ -39,11 +42,14 @@ partial class BpComplexInterfaceTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.IBpEditBase? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IBpEditBase.IsDirty.</summary>
@@ -58,11 +64,14 @@ partial class BpComplexInterfaceTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.IBpEditBase? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IBpEditBase.IsSelfDirty.</summary>
@@ -77,11 +86,14 @@ partial class BpComplexInterfaceTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.IBpEditBase? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IBpEditBase.IsDeleted.</summary>
@@ -96,11 +108,14 @@ partial class BpComplexInterfaceTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.IBpEditBase? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IBpEditBase.IsNew.</summary>
@@ -115,11 +130,14 @@ partial class BpComplexInterfaceTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.IBpEditBase? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IBpEditBase.IsSavable.</summary>
@@ -134,11 +152,14 @@ partial class BpComplexInterfaceTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.IBpEditBase? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IBpEditBase.Id.</summary>
@@ -162,6 +183,9 @@ partial class BpComplexInterfaceTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public int Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.IBpEditBase? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
@@ -169,7 +193,7 @@ partial class BpComplexInterfaceTests
 			public void RecordSet(int? value) { SetCount++; LastSetValue = value; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IBpEditBase.Name.</summary>
@@ -193,6 +217,9 @@ partial class BpComplexInterfaceTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public string Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.IBpEditBase? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
@@ -200,12 +227,15 @@ partial class BpComplexInterfaceTests
 			public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Tracks and configures behavior for BeginEdit.</summary>
 		public sealed class IBpEditBase_BeginEditInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.IBpEditBase? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IBpEditBase> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -243,6 +273,7 @@ partial class BpComplexInterfaceTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					if (_source is { } src) { src.BeginEdit(); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "BeginEdit");
 					return;
 				}
@@ -265,6 +296,7 @@ partial class BpComplexInterfaceTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -350,6 +382,9 @@ partial class BpComplexInterfaceTests
 		/// <summary>Tracks and configures behavior for CancelEdit.</summary>
 		public sealed class IBpEditBase_CancelEditInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.IBpEditBase? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IBpEditBase> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -387,6 +422,7 @@ partial class BpComplexInterfaceTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					if (_source is { } src) { src.CancelEdit(); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "CancelEdit");
 					return;
 				}
@@ -409,6 +445,7 @@ partial class BpComplexInterfaceTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -494,6 +531,9 @@ partial class BpComplexInterfaceTests
 		/// <summary>Tracks and configures behavior for ApplyEdit.</summary>
 		public sealed class IBpEditBase_ApplyEditInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.IBpEditBase? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IBpEditBase> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -531,6 +571,7 @@ partial class BpComplexInterfaceTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					if (_source is { } src) { src.ApplyEdit(); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ApplyEdit");
 					return;
 				}
@@ -553,6 +594,7 @@ partial class BpComplexInterfaceTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -638,6 +680,9 @@ partial class BpComplexInterfaceTests
 		/// <summary>Tracks and configures behavior for MarkDeleted.</summary>
 		public sealed class IBpEditBase_MarkDeletedInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.IBpEditBase? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IBpEditBase> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -675,6 +720,7 @@ partial class BpComplexInterfaceTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					if (_source is { } src) { src.MarkDeleted(); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "MarkDeleted");
 					return;
 				}
@@ -697,6 +743,7 @@ partial class BpComplexInterfaceTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -782,6 +829,9 @@ partial class BpComplexInterfaceTests
 		/// <summary>Tracks and configures behavior for MarkNew.</summary>
 		public sealed class IBpEditBase_MarkNewInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.IBpEditBase? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IBpEditBase> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -819,6 +869,7 @@ partial class BpComplexInterfaceTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					if (_source is { } src) { src.MarkNew(); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "MarkNew");
 					return;
 				}
@@ -841,6 +892,7 @@ partial class BpComplexInterfaceTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -926,6 +978,9 @@ partial class BpComplexInterfaceTests
 		/// <summary>Tracks and configures behavior for MarkOld.</summary>
 		public sealed class IBpEditBase_MarkOldInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.IBpEditBase? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IBpEditBase> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -963,6 +1018,7 @@ partial class BpComplexInterfaceTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					if (_source is { } src) { src.MarkOld(); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "MarkOld");
 					return;
 				}
@@ -985,6 +1041,7 @@ partial class BpComplexInterfaceTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1070,6 +1127,9 @@ partial class BpComplexInterfaceTests
 		/// <summary>Tracks and configures behavior for AddRule.</summary>
 		public sealed class IBpEditBase_AddRuleInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.IBpEditBase? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IBpEditBase, string, global::System.Func<bool>> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -1112,6 +1172,7 @@ partial class BpComplexInterfaceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((property, rule));
+					if (_source is { } src) { src.AddRule(property, rule); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "AddRule");
 					return;
 				}
@@ -1135,6 +1196,7 @@ partial class BpComplexInterfaceTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1224,6 +1286,9 @@ partial class BpComplexInterfaceTests
 		/// <summary>Tracks and configures behavior for RemoveRule.</summary>
 		public sealed class IBpEditBase_RemoveRuleInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.IBpEditBase? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IBpEditBase, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -1266,6 +1331,7 @@ partial class BpComplexInterfaceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = property;
+					if (_source is { } src) { src.RemoveRule(property); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "RemoveRule");
 					return;
 				}
@@ -1289,6 +1355,7 @@ partial class BpComplexInterfaceTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1378,6 +1445,9 @@ partial class BpComplexInterfaceTests
 		/// <summary>Tracks and configures behavior for GetBrokenRules.</summary>
 		public sealed class IBpEditBase_GetBrokenRulesInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.IBpEditBase? _source;
+
 			/// <summary>Delegate for GetBrokenRules.</summary>
 			public delegate global::System.Collections.Generic.IEnumerable<string> GetBrokenRulesDelegate(Stubs.IBpEditBase ko);
 
@@ -1418,6 +1488,7 @@ partial class BpComplexInterfaceTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					if (_source is { } src) return src.GetBrokenRules();
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetBrokenRules");
 					throw new global::System.InvalidOperationException("No implementation provided for GetBrokenRules. Configure via OnCall.");
 				}
@@ -1440,6 +1511,7 @@ partial class BpComplexInterfaceTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1525,6 +1597,9 @@ partial class BpComplexInterfaceTests
 		/// <summary>Tracks and configures behavior for AddChild.</summary>
 		public sealed class IBpEditBase_AddChildInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.IBpEditBase? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IBpEditBase, object> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -1567,6 +1642,7 @@ partial class BpComplexInterfaceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = child;
+					if (_source is { } src) { src.AddChild(child); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "AddChild");
 					return;
 				}
@@ -1590,6 +1666,7 @@ partial class BpComplexInterfaceTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1679,6 +1756,9 @@ partial class BpComplexInterfaceTests
 		/// <summary>Tracks and configures behavior for RemoveChild.</summary>
 		public sealed class IBpEditBase_RemoveChildInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.IBpEditBase? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IBpEditBase, object> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -1721,6 +1801,7 @@ partial class BpComplexInterfaceTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = child;
+					if (_source is { } src) { src.RemoveChild(child); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "RemoveChild");
 					return;
 				}
@@ -1744,6 +1825,7 @@ partial class BpComplexInterfaceTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1833,6 +1915,9 @@ partial class BpComplexInterfaceTests
 		/// <summary>Tracks and configures behavior for GetChildren.</summary>
 		public sealed class IBpEditBase_GetChildrenInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Guides.IBpEditBase? _source;
+
 			/// <summary>Delegate for GetChildren.</summary>
 			public delegate global::System.Collections.Generic.IEnumerable<object> GetChildrenDelegate(Stubs.IBpEditBase ko);
 
@@ -1873,6 +1958,7 @@ partial class BpComplexInterfaceTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					if (_source is { } src) return src.GetChildren();
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetChildren");
 					throw new global::System.InvalidOperationException("No implementation provided for GetChildren. Configure via OnCall.");
 				}
@@ -1895,6 +1981,7 @@ partial class BpComplexInterfaceTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -2124,6 +2211,7 @@ partial class BpComplexInterfaceTests
 				{
 					IsValid.RecordGet();
 					if (IsValid.OnGet is { } onGet) return onGet(this);
+					if (IsValid._source is { } src) return src.IsValid;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "IsValid");
 					return IsValid.Value;
 				}
@@ -2135,6 +2223,7 @@ partial class BpComplexInterfaceTests
 				{
 					IsSelfValid.RecordGet();
 					if (IsSelfValid.OnGet is { } onGet) return onGet(this);
+					if (IsSelfValid._source is { } src) return src.IsSelfValid;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "IsSelfValid");
 					return IsSelfValid.Value;
 				}
@@ -2146,6 +2235,7 @@ partial class BpComplexInterfaceTests
 				{
 					IsDirty.RecordGet();
 					if (IsDirty.OnGet is { } onGet) return onGet(this);
+					if (IsDirty._source is { } src) return src.IsDirty;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "IsDirty");
 					return IsDirty.Value;
 				}
@@ -2157,6 +2247,7 @@ partial class BpComplexInterfaceTests
 				{
 					IsSelfDirty.RecordGet();
 					if (IsSelfDirty.OnGet is { } onGet) return onGet(this);
+					if (IsSelfDirty._source is { } src) return src.IsSelfDirty;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "IsSelfDirty");
 					return IsSelfDirty.Value;
 				}
@@ -2168,6 +2259,7 @@ partial class BpComplexInterfaceTests
 				{
 					IsDeleted.RecordGet();
 					if (IsDeleted.OnGet is { } onGet) return onGet(this);
+					if (IsDeleted._source is { } src) return src.IsDeleted;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "IsDeleted");
 					return IsDeleted.Value;
 				}
@@ -2179,6 +2271,7 @@ partial class BpComplexInterfaceTests
 				{
 					IsNew.RecordGet();
 					if (IsNew.OnGet is { } onGet) return onGet(this);
+					if (IsNew._source is { } src) return src.IsNew;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "IsNew");
 					return IsNew.Value;
 				}
@@ -2190,6 +2283,7 @@ partial class BpComplexInterfaceTests
 				{
 					IsSavable.RecordGet();
 					if (IsSavable.OnGet is { } onGet) return onGet(this);
+					if (IsSavable._source is { } src) return src.IsSavable;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "IsSavable");
 					return IsSavable.Value;
 				}
@@ -2201,6 +2295,7 @@ partial class BpComplexInterfaceTests
 				{
 					Id.RecordGet();
 					if (Id.OnGet is { } onGet) return onGet(this);
+					if (Id._source is { } src) return src.Id;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "Id");
 					return Id.Value;
 				}
@@ -2208,6 +2303,7 @@ partial class BpComplexInterfaceTests
 				{
 					Id.RecordSet(value);
 					if (Id.OnSet is { } onSet) { onSet(this, value); return; }
+					if (Id._source is { } src) { src.Id = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "Id");
 					Id.Value = value;
 				}
@@ -2219,6 +2315,7 @@ partial class BpComplexInterfaceTests
 				{
 					Name.RecordGet();
 					if (Name.OnGet is { } onGet) return onGet(this);
+					if (Name._source is { } src) return src.Name;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "Name");
 					return Name.Value;
 				}
@@ -2226,6 +2323,7 @@ partial class BpComplexInterfaceTests
 				{
 					Name.RecordSet(value);
 					if (Name.OnSet is { } onSet) { onSet(this, value); return; }
+					if (Name._source is { } src) { src.Name = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IBpEditBase", "Name");
 					Name.Value = value;
 				}
@@ -2320,6 +2418,32 @@ partial class BpComplexInterfaceTests
 			public IBpEditBase(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::KnockOff.Documentation.Samples.Guides.IBpEditBase delegation.</summary>
+			public void Source(global::KnockOff.Documentation.Samples.Guides.IBpEditBase? source)
+			{
+				IsValid._source = source;
+				IsSelfValid._source = source;
+				IsDirty._source = source;
+				IsSelfDirty._source = source;
+				IsDeleted._source = source;
+				IsNew._source = source;
+				IsSavable._source = source;
+				Id._source = source;
+				Name._source = source;
+				BeginEdit._source = source;
+				CancelEdit._source = source;
+				ApplyEdit._source = source;
+				MarkDeleted._source = source;
+				MarkNew._source = source;
+				MarkOld._source = source;
+				AddRule._source = source;
+				RemoveRule._source = source;
+				GetBrokenRules._source = source;
+				AddChild._source = source;
+				RemoveChild._source = source;
+				GetChildren._source = source;
 			}
 
 		}

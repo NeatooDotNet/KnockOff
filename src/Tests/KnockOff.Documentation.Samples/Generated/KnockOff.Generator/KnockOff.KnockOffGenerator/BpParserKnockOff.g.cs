@@ -8,6 +8,9 @@ partial class BpParserKnockOff : global::KnockOff.Documentation.Samples.Guides.I
 	/// <summary>Tracks and configures behavior for TryParse.</summary>
 	public sealed class TryParseInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IBpParser? _source;
+
 		/// <summary>Delegate for TryParse.</summary>
 		public delegate bool TryParseDelegate(BpParserKnockOff ko, string input, out int result);
 
@@ -54,6 +57,9 @@ partial class BpParserKnockOff : global::KnockOff.Documentation.Samples.Guides.I
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = input;
+				#pragma warning disable CS8601
+				if (_source is { } src) return src.TryParse(input, out result);
+				#pragma warning restore CS8601
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "TryParse");
 				return default!;
 			}
@@ -77,6 +83,7 @@ partial class BpParserKnockOff : global::KnockOff.Documentation.Samples.Guides.I
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -185,6 +192,15 @@ partial class BpParserKnockOff : global::KnockOff.Documentation.Samples.Guides.I
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.IBpParser).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.IBpParser? source)
+	{
+		TryParse._source = source;
 	}
 
 	bool global::KnockOff.Documentation.Samples.Guides.IBpParser.TryParse(string input, out int result)

@@ -8,6 +8,9 @@ partial class AsyncNestedStub<T> : global::KnockOff.Tests.IAsyncNestedService<T>
 	/// <summary>Tracks and configures behavior for GetAsync.</summary>
 	public sealed class GetAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.IAsyncNestedService<T>? _source;
+
 		/// <summary>Delegate for GetAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<T?> GetAsyncDelegate(AsyncNestedStub<T> ko);
 
@@ -48,6 +51,9 @@ partial class AsyncNestedStub<T> : global::KnockOff.Tests.IAsyncNestedService<T>
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetAsync();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetAsync");
 				return global::System.Threading.Tasks.Task.FromResult<T?>(default!);
 			}
@@ -70,6 +76,7 @@ partial class AsyncNestedStub<T> : global::KnockOff.Tests.IAsyncNestedService<T>
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -174,6 +181,15 @@ partial class AsyncNestedStub<T> : global::KnockOff.Tests.IAsyncNestedService<T>
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Tests.IAsyncNestedService<T>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Tests.IAsyncNestedService<T>? source)
+	{
+		GetAsync._source = source;
 	}
 
 	global::System.Threading.Tasks.Task<T?> global::KnockOff.Tests.IAsyncNestedService<T>.GetAsync()

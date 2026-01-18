@@ -11,6 +11,9 @@ partial class EquatableStringStubTests
 		/// <summary>Tracks and configures behavior for Equals.</summary>
 		public sealed class IEquatable_EqualsInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IEquatable<string>? _source;
+
 			/// <summary>Delegate for Equals.</summary>
 			public delegate bool EqualsDelegate(Stubs.IEquatable ko, string? other);
 
@@ -56,6 +59,9 @@ partial class EquatableStringStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = other;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.Equals(other);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Equals");
 					return default!;
 				}
@@ -79,6 +85,7 @@ partial class EquatableStringStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -187,6 +194,12 @@ partial class EquatableStringStubTests
 			public IEquatable(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.IEquatable<string> delegation.</summary>
+			public void Source(global::System.IEquatable<string>? source)
+			{
+				Equals._source = source;
 			}
 
 		}

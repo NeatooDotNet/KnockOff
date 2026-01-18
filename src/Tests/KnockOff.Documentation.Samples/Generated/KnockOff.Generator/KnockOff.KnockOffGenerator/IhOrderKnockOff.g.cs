@@ -8,6 +8,9 @@ partial class IhOrderKnockOff : global::KnockOff.Documentation.Samples.Guides.II
 	/// <summary>Tracks and configures behavior for Total.</summary>
 	public sealed class TotalInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IIhOrder? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -21,12 +24,15 @@ partial class IhOrderKnockOff : global::KnockOff.Documentation.Samples.Guides.II
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsValid.</summary>
 	public sealed class IsValidInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IIhValidatable? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -40,12 +46,15 @@ partial class IhOrderKnockOff : global::KnockOff.Documentation.Samples.Guides.II
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for Submit.</summary>
 	public sealed class SubmitInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IIhOrder? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<IhOrderKnockOff> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -83,6 +92,7 @@ partial class IhOrderKnockOff : global::KnockOff.Documentation.Samples.Guides.II
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) { src.Submit(); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Submit");
 				return;
 			}
@@ -105,6 +115,7 @@ partial class IhOrderKnockOff : global::KnockOff.Documentation.Samples.Guides.II
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -190,6 +201,9 @@ partial class IhOrderKnockOff : global::KnockOff.Documentation.Samples.Guides.II
 	/// <summary>Tracks and configures behavior for GetErrors.</summary>
 	public sealed class GetErrorsInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IIhValidatable? _source;
+
 		/// <summary>Delegate for GetErrors.</summary>
 		public delegate global::System.Collections.Generic.IEnumerable<string> GetErrorsDelegate(IhOrderKnockOff ko);
 
@@ -230,6 +244,7 @@ partial class IhOrderKnockOff : global::KnockOff.Documentation.Samples.Guides.II
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.GetErrors();
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetErrors");
 				return new global::System.Collections.Generic.List<string>();
 			}
@@ -252,6 +267,7 @@ partial class IhOrderKnockOff : global::KnockOff.Documentation.Samples.Guides.II
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -368,14 +384,36 @@ partial class IhOrderKnockOff : global::KnockOff.Documentation.Samples.Guides.II
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
 	}
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.IIhOrder).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.IIhOrder? source)
+	{
+		Total._source = source;
+		IsValid._source = source;
+		Submit._source = source;
+		GetErrors._source = source;
+	}
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.IIhValidatable).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.IIhValidatable? source)
+	{
+		Total._source = null;
+		IsValid._source = source;
+		Submit._source = null;
+		GetErrors._source = source;
+	}
+
 	decimal global::KnockOff.Documentation.Samples.Guides.IIhOrder.Total
 	{
-		get { Total.RecordGet(); if (Total.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IIhOrder", "Total"); return Total.Value; }
+		get { Total.RecordGet(); if (Total.OnGet is { } onGet) return onGet(this); if (Total._source is { } src) return src.Total; if (Strict) throw global::KnockOff.StubException.NotConfigured("IIhOrder", "Total"); return Total.Value; }
 	}
 
 	bool global::KnockOff.Documentation.Samples.Guides.IIhValidatable.IsValid
 	{
-		get { IsValid.RecordGet(); if (IsValid.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IIhValidatable", "IsValid"); return IsValid.Value; }
+		get { IsValid.RecordGet(); if (IsValid.OnGet is { } onGet) return onGet(this); if (IsValid._source is { } src) return src.IsValid; if (Strict) throw global::KnockOff.StubException.NotConfigured("IIhValidatable", "IsValid"); return IsValid.Value; }
 	}
 
 	void global::KnockOff.Documentation.Samples.Guides.IIhOrder.Submit()

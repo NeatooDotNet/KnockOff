@@ -131,6 +131,14 @@ partial class EventSourceKnockOff : global::KnockOff.Tests.IEventSource, global:
 	/// <summary>The global::KnockOff.Tests.IEventSource instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IEventSource Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Tests.IEventSource).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Tests.IEventSource? source)
+	{
+	}
+
 	event global::System.EventHandler<string>? global::KnockOff.Tests.IEventSource.MessageReceived
 	{
 		add => MessageReceived.RecordAdd(value);

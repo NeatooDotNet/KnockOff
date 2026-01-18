@@ -8,6 +8,9 @@ partial class PropertyStoreKnockOff : global::KnockOff.Tests.IPropertyStore, glo
 	/// <summary>Tracks and configures behavior for indexer.</summary>
 	public sealed class IndexerInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Tests.IPropertyStore? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -24,7 +27,7 @@ partial class PropertyStoreKnockOff : global::KnockOff.Tests.IPropertyStore, glo
 		public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Tests.PropertyInfo?> Backing { get; } = new();
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
+		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; _source = null; }
 	}
 
 	/// <summary>Interceptor for indexer. Configure callbacks and track access.</summary>
@@ -36,9 +39,18 @@ partial class PropertyStoreKnockOff : global::KnockOff.Tests.IPropertyStore, glo
 	/// <summary>The global::KnockOff.Tests.IPropertyStore instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IPropertyStore Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Tests.IPropertyStore).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Tests.IPropertyStore? source)
+	{
+		Indexer._source = source;
+	}
+
 	global::KnockOff.Tests.PropertyInfo? global::KnockOff.Tests.IPropertyStore.this[string key]
 	{
-		get { Indexer.RecordGet(key); if (Indexer.OnGet is { } onGet) return onGet(this, key); if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyStore", "this[]"); return Indexer.Backing.TryGetValue(key, out var v) ? v : default; }
+		get { Indexer.RecordGet(key); if (Indexer.OnGet is { } onGet) return onGet(this, key); if (Indexer._source is { } src) return src[key]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyStore", "this[]"); return Indexer.Backing.TryGetValue(key, out var v) ? v : default; }
 	}
 
 }

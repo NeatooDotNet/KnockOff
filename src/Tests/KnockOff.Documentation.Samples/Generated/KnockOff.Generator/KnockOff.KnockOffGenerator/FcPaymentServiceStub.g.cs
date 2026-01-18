@@ -8,6 +8,9 @@ partial class FcPaymentServiceStub : global::KnockOff.Documentation.Samples.Comp
 	/// <summary>Tracks and configures behavior for ProcessPayment.</summary>
 	public sealed class ProcessPaymentInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Comparison.IFcPaymentService? _source;
+
 		/// <summary>Delegate for ProcessPayment.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Comparison.FcPaymentResult ProcessPaymentDelegate(FcPaymentServiceStub ko, int customerId, decimal amount);
 
@@ -53,6 +56,7 @@ partial class FcPaymentServiceStub : global::KnockOff.Documentation.Samples.Comp
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((customerId, amount));
+				if (_source is { } src) return src.ProcessPayment(customerId, amount);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ProcessPayment");
 				return new global::KnockOff.Documentation.Samples.Comparison.FcPaymentResult();
 			}
@@ -76,6 +80,7 @@ partial class FcPaymentServiceStub : global::KnockOff.Documentation.Samples.Comp
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -184,6 +189,15 @@ partial class FcPaymentServiceStub : global::KnockOff.Documentation.Samples.Comp
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Comparison.IFcPaymentService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Comparison.IFcPaymentService? source)
+	{
+		ProcessPayment._source = source;
 	}
 
 	global::KnockOff.Documentation.Samples.Comparison.FcPaymentResult global::KnockOff.Documentation.Samples.Comparison.IFcPaymentService.ProcessPayment(int customerId, decimal amount)

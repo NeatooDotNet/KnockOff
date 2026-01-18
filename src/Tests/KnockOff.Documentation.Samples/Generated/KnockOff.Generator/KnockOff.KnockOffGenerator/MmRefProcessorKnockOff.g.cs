@@ -8,6 +8,9 @@ partial class MmRefProcessorKnockOff : global::KnockOff.Documentation.Samples.Sk
 	/// <summary>Tracks and configures behavior for Increment.</summary>
 	public sealed class IncrementInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.IMmRefProcessor? _source;
+
 		/// <summary>Delegate for Increment.</summary>
 		public delegate void IncrementDelegate(MmRefProcessorKnockOff ko, ref int @value);
 
@@ -53,6 +56,7 @@ partial class MmRefProcessorKnockOff : global::KnockOff.Documentation.Samples.Sk
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = @value;
+				if (_source is { } src) { src.Increment(ref @value); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Increment");
 				return;
 			}
@@ -76,6 +80,7 @@ partial class MmRefProcessorKnockOff : global::KnockOff.Documentation.Samples.Sk
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -184,6 +189,15 @@ partial class MmRefProcessorKnockOff : global::KnockOff.Documentation.Samples.Sk
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Skills.IMmRefProcessor).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Skills.IMmRefProcessor? source)
+	{
+		Increment._source = source;
 	}
 
 	void global::KnockOff.Documentation.Samples.Skills.IMmRefProcessor.Increment(ref int @value)

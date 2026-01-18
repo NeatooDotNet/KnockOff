@@ -10,6 +10,9 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 	/// <summary>Tracks and configures behavior for Parent.</summary>
 	public sealed class ParentInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.IValidateBase? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -23,12 +26,15 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsPaused.</summary>
 	public sealed class IsPausedInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.IValidateBase? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -42,12 +48,15 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsBusy.</summary>
 	public sealed class IsBusyInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.IValidateMetaProperties? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -61,12 +70,15 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsValid.</summary>
 	public sealed class IsValidInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.IValidateMetaProperties? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -80,12 +92,15 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsSelfValid.</summary>
 	public sealed class IsSelfValidInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.IValidateMetaProperties? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -99,12 +114,15 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for PropertyMessages.</summary>
 	public sealed class PropertyMessagesInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.IValidateMetaProperties? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -118,12 +136,15 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for indexer.</summary>
 	public sealed class IndexerInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::Neatoo.IValidateBase? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -140,12 +161,15 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 		public global::System.Collections.Generic.Dictionary<string, global::Neatoo.IValidateProperty> Backing { get; } = new();
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
+		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for GetProperty.</summary>
 	public sealed class GetPropertyInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::Neatoo.IValidateBase? _source;
+
 		/// <summary>Delegate for GetProperty.</summary>
 		public delegate global::Neatoo.IValidateProperty GetPropertyDelegate(NestedValidateStub ko, string propertyName);
 
@@ -191,6 +215,9 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = propertyName;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetProperty(propertyName);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetProperty");
 				throw new global::System.InvalidOperationException("No implementation provided for GetProperty. Configure via OnCall.");
 			}
@@ -214,6 +241,7 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -303,6 +331,9 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 	/// <summary>Tracks and configures behavior for TryGetProperty.</summary>
 	public sealed class TryGetPropertyInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::Neatoo.IValidateBase? _source;
+
 		/// <summary>Delegate for TryGetProperty.</summary>
 		public delegate bool TryGetPropertyDelegate(NestedValidateStub ko, string propertyName, out global::Neatoo.IValidateProperty validateProperty);
 
@@ -349,6 +380,9 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = propertyName;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.TryGetProperty(propertyName, out validateProperty);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "TryGetProperty");
 				return default!;
 			}
@@ -372,6 +406,7 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -461,6 +496,9 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 	/// <summary>Tracks and configures behavior for WaitForTasks.</summary>
 	public sealed class WaitForTasksInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::Neatoo.IValidateMetaProperties? _source;
+
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for WaitForTasks().</summary>
@@ -527,6 +565,9 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 			if (_sequence_NoParams_Threading_Tasks_Task.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.WaitForTasks();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -551,6 +592,9 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 			if (_sequence_Threading_CancellationToken_Threading_Tasks_Task.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.WaitForTasks(token);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -573,6 +617,7 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence_NoParams_Threading_Tasks_Task)
 				tracking.Reset();
 			_sequenceIndex_NoParams_Threading_Tasks_Task = 0;
@@ -734,6 +779,9 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 	/// <summary>Tracks and configures behavior for RunRules.</summary>
 	public sealed class RunRulesInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::Neatoo.IValidateMetaProperties? _source;
+
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for RunRules(string, global::System.Threading.CancellationToken?).</summary>
@@ -800,6 +848,9 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 			if (_sequence_String_Threading_CancellationToken_Threading_Tasks_Task.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.RunRules(propertyName, token);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -824,6 +875,9 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 			if (_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.RunRules(runRules, token);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -846,6 +900,7 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence_String_Threading_CancellationToken_Threading_Tasks_Task)
 				tracking.Reset();
 			_sequenceIndex_String_Threading_CancellationToken_Threading_Tasks_Task = 0;
@@ -1011,6 +1066,9 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 	/// <summary>Tracks and configures behavior for ClearAllMessages.</summary>
 	public sealed class ClearAllMessagesInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::Neatoo.IValidateMetaProperties? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<NestedValidateStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -1048,6 +1106,9 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.ClearAllMessages(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ClearAllMessages");
 				return;
 			}
@@ -1070,6 +1131,7 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1155,6 +1217,9 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 	/// <summary>Tracks and configures behavior for ClearSelfMessages.</summary>
 	public sealed class ClearSelfMessagesInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::Neatoo.IValidateMetaProperties? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<NestedValidateStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -1192,6 +1257,9 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.ClearSelfMessages(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ClearSelfMessages");
 				return;
 			}
@@ -1214,6 +1282,7 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1421,39 +1490,117 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
 	}
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::Neatoo.IValidateBase).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::Neatoo.IValidateBase? source)
+	{
+		Parent._source = source;
+		IsPaused._source = source;
+		IsBusy._source = source;
+		IsValid._source = source;
+		IsSelfValid._source = source;
+		PropertyMessages._source = source;
+		Indexer._source = source;
+		GetProperty._source = source;
+		TryGetProperty._source = source;
+		WaitForTasks._source = source;
+		RunRules._source = source;
+		ClearAllMessages._source = source;
+		ClearSelfMessages._source = source;
+	}
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::System.ComponentModel.INotifyPropertyChanged).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::System.ComponentModel.INotifyPropertyChanged? source)
+	{
+		Parent._source = null;
+		IsPaused._source = null;
+		IsBusy._source = null;
+		IsValid._source = null;
+		IsSelfValid._source = null;
+		PropertyMessages._source = null;
+		Indexer._source = null;
+		GetProperty._source = null;
+		TryGetProperty._source = null;
+		WaitForTasks._source = null;
+		RunRules._source = null;
+		ClearAllMessages._source = null;
+		ClearSelfMessages._source = null;
+	}
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::Neatoo.INotifyNeatooPropertyChanged).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::Neatoo.INotifyNeatooPropertyChanged? source)
+	{
+		Parent._source = null;
+		IsPaused._source = null;
+		IsBusy._source = null;
+		IsValid._source = null;
+		IsSelfValid._source = null;
+		PropertyMessages._source = null;
+		Indexer._source = null;
+		GetProperty._source = null;
+		TryGetProperty._source = null;
+		WaitForTasks._source = null;
+		RunRules._source = null;
+		ClearAllMessages._source = null;
+		ClearSelfMessages._source = null;
+	}
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::Neatoo.IValidateMetaProperties).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::Neatoo.IValidateMetaProperties? source)
+	{
+		Parent._source = null;
+		IsPaused._source = null;
+		IsBusy._source = source;
+		IsValid._source = source;
+		IsSelfValid._source = source;
+		PropertyMessages._source = source;
+		Indexer._source = null;
+		GetProperty._source = null;
+		TryGetProperty._source = null;
+		WaitForTasks._source = source;
+		RunRules._source = source;
+		ClearAllMessages._source = source;
+		ClearSelfMessages._source = source;
+	}
+
 	global::Neatoo.IValidateBase? global::Neatoo.IValidateBase.Parent
 	{
-		get { Parent.RecordGet(); if (Parent.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "Parent"); return Parent.Value; }
+		get { Parent.RecordGet(); if (Parent.OnGet is { } onGet) return onGet(this); if (Parent._source is { } src) return src.Parent; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "Parent"); return Parent.Value; }
 	}
 
 	bool global::Neatoo.IValidateBase.IsPaused
 	{
-		get { IsPaused.RecordGet(); if (IsPaused.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "IsPaused"); return IsPaused.Value; }
+		get { IsPaused.RecordGet(); if (IsPaused.OnGet is { } onGet) return onGet(this); if (IsPaused._source is { } src) return src.IsPaused; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "IsPaused"); return IsPaused.Value; }
 	}
 
 	bool global::Neatoo.IValidateMetaProperties.IsBusy
 	{
-		get { IsBusy.RecordGet(); if (IsBusy.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsBusy"); return IsBusy.Value; }
+		get { IsBusy.RecordGet(); if (IsBusy.OnGet is { } onGet) return onGet(this); if (IsBusy._source is { } src) return src.IsBusy; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsBusy"); return IsBusy.Value; }
 	}
 
 	bool global::Neatoo.IValidateMetaProperties.IsValid
 	{
-		get { IsValid.RecordGet(); if (IsValid.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsValid"); return IsValid.Value; }
+		get { IsValid.RecordGet(); if (IsValid.OnGet is { } onGet) return onGet(this); if (IsValid._source is { } src) return src.IsValid; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsValid"); return IsValid.Value; }
 	}
 
 	bool global::Neatoo.IValidateMetaProperties.IsSelfValid
 	{
-		get { IsSelfValid.RecordGet(); if (IsSelfValid.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsSelfValid"); return IsSelfValid.Value; }
+		get { IsSelfValid.RecordGet(); if (IsSelfValid.OnGet is { } onGet) return onGet(this); if (IsSelfValid._source is { } src) return src.IsSelfValid; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsSelfValid"); return IsSelfValid.Value; }
 	}
 
 	global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> global::Neatoo.IValidateMetaProperties.PropertyMessages
 	{
-		get { PropertyMessages.RecordGet(); if (PropertyMessages.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "PropertyMessages"); return PropertyMessages.Value; }
+		get { PropertyMessages.RecordGet(); if (PropertyMessages.OnGet is { } onGet) return onGet(this); if (PropertyMessages._source is { } src) return src.PropertyMessages; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "PropertyMessages"); return PropertyMessages.Value; }
 	}
 
 	global::Neatoo.IValidateProperty global::Neatoo.IValidateBase.this[string propertyName]
 	{
-		get { Indexer.RecordGet(propertyName); if (Indexer.OnGet is { } onGet) return onGet(this, propertyName); if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "this[]"); return Indexer.Backing.TryGetValue(propertyName, out var v) ? v : default!; }
+		get { Indexer.RecordGet(propertyName); if (Indexer.OnGet is { } onGet) return onGet(this, propertyName); if (Indexer._source is { } src) return src[propertyName]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "this[]"); return Indexer.Backing.TryGetValue(propertyName, out var v) ? v : default!; }
 	}
 
 	global::Neatoo.IValidateProperty global::Neatoo.IValidateBase.GetProperty(string propertyName)

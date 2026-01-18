@@ -20,16 +20,22 @@ partial class OpenGenericInterfaceTest
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public int Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::KnockOff.Tests.IOGRepository<T>? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Tracks and configures behavior for Add.</summary>
 		public sealed class IOGRepository_AddInterceptor<T>
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Tests.IOGRepository<T>? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IOGRepository<T>, T> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -72,6 +78,9 @@ partial class OpenGenericInterfaceTest
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = item;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.Add(item); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 					return;
 				}
@@ -95,6 +104,7 @@ partial class OpenGenericInterfaceTest
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -184,6 +194,9 @@ partial class OpenGenericInterfaceTest
 		/// <summary>Tracks and configures behavior for GetById.</summary>
 		public sealed class IOGRepository_GetByIdInterceptor<T>
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Tests.IOGRepository<T>? _source;
+
 			/// <summary>Delegate for GetById.</summary>
 			public delegate T? GetByIdDelegate(Stubs.IOGRepository<T> ko, int id);
 
@@ -229,6 +242,9 @@ partial class OpenGenericInterfaceTest
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = id;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetById(id);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
 					return default!;
 				}
@@ -252,6 +268,7 @@ partial class OpenGenericInterfaceTest
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -341,6 +358,9 @@ partial class OpenGenericInterfaceTest
 		/// <summary>Tracks and configures behavior for GetAll.</summary>
 		public sealed class IOGRepository_GetAllInterceptor<T>
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Tests.IOGRepository<T>? _source;
+
 			/// <summary>Delegate for GetAll.</summary>
 			public delegate global::System.Collections.Generic.IEnumerable<T> GetAllDelegate(Stubs.IOGRepository<T> ko);
 
@@ -381,6 +401,9 @@ partial class OpenGenericInterfaceTest
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetAll();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetAll");
 					throw new global::System.InvalidOperationException("No implementation provided for GetAll. Configure via OnCall.");
 				}
@@ -403,6 +426,7 @@ partial class OpenGenericInterfaceTest
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -506,6 +530,7 @@ partial class OpenGenericInterfaceTest
 				{
 					Count.RecordGet();
 					if (Count.OnGet is { } onGet) return onGet(this);
+					if (Count._source is { } src) return src.Count;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IOGRepository<T>", "Count");
 					return Count.Value;
 				}
@@ -537,6 +562,15 @@ partial class OpenGenericInterfaceTest
 			public IOGRepository(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::KnockOff.Tests.IOGRepository<T> delegation.</summary>
+			public void Source(global::KnockOff.Tests.IOGRepository<T>? source)
+			{
+				Count._source = source;
+				Add._source = source;
+				GetById._source = source;
+				GetAll._source = source;
 			}
 
 		}

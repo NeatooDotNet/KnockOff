@@ -8,6 +8,9 @@ partial class IdxEntityBaseKnockOff : global::KnockOff.Documentation.Samples.Gui
 	/// <summary>Tracks and configures behavior for IsNew.</summary>
 	public sealed class IsNewInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IIdxEntityBase? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -21,12 +24,15 @@ partial class IdxEntityBaseKnockOff : global::KnockOff.Documentation.Samples.Gui
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for indexer.</summary>
 	public sealed class IndexerInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IIdxEntityBase? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -43,7 +49,7 @@ partial class IdxEntityBaseKnockOff : global::KnockOff.Documentation.Samples.Gui
 		public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Documentation.Samples.Guides.IIdxEntityProperty?> Backing { get; } = new();
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
+		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; _source = null; }
 	}
 
 	/// <summary>Interceptor for IsNew. Configure via .Value, track via .GetCount.</summary>
@@ -58,14 +64,24 @@ partial class IdxEntityBaseKnockOff : global::KnockOff.Documentation.Samples.Gui
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IIdxEntityBase instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IIdxEntityBase Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.IIdxEntityBase).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.IIdxEntityBase? source)
+	{
+		IsNew._source = source;
+		Indexer._source = source;
+	}
+
 	bool global::KnockOff.Documentation.Samples.Guides.IIdxEntityBase.IsNew
 	{
-		get { IsNew.RecordGet(); if (IsNew.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IIdxEntityBase", "IsNew"); return IsNew.Value; }
+		get { IsNew.RecordGet(); if (IsNew.OnGet is { } onGet) return onGet(this); if (IsNew._source is { } src) return src.IsNew; if (Strict) throw global::KnockOff.StubException.NotConfigured("IIdxEntityBase", "IsNew"); return IsNew.Value; }
 	}
 
 	global::KnockOff.Documentation.Samples.Guides.IIdxEntityProperty? global::KnockOff.Documentation.Samples.Guides.IIdxEntityBase.this[string propertyName]
 	{
-		get { Indexer.RecordGet(propertyName); if (Indexer.OnGet is { } onGet) return onGet(this, propertyName); if (Strict) throw global::KnockOff.StubException.NotConfigured("IIdxEntityBase", "this[]"); return Indexer.Backing.TryGetValue(propertyName, out var v) ? v : default; }
+		get { Indexer.RecordGet(propertyName); if (Indexer.OnGet is { } onGet) return onGet(this, propertyName); if (Indexer._source is { } src) return src[propertyName]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IIdxEntityBase", "this[]"); return Indexer.Backing.TryGetValue(propertyName, out var v) ? v : default; }
 	}
 
 }

@@ -8,6 +8,9 @@ partial class SkOnCallKnockOff : global::KnockOff.Documentation.Samples.Skills.I
 	/// <summary>Tracks and configures behavior for Clear.</summary>
 	public sealed class ClearInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.ISkOnCallService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<SkOnCallKnockOff> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -45,6 +48,7 @@ partial class SkOnCallKnockOff : global::KnockOff.Documentation.Samples.Skills.I
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) { src.Clear(); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Clear");
 				return;
 			}
@@ -67,6 +71,7 @@ partial class SkOnCallKnockOff : global::KnockOff.Documentation.Samples.Skills.I
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -152,6 +157,9 @@ partial class SkOnCallKnockOff : global::KnockOff.Documentation.Samples.Skills.I
 	/// <summary>Tracks and configures behavior for GetById.</summary>
 	public sealed class GetByIdInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.ISkOnCallService? _source;
+
 		/// <summary>Delegate for GetById.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.SkUser GetByIdDelegate(SkOnCallKnockOff ko, int id);
 
@@ -197,6 +205,7 @@ partial class SkOnCallKnockOff : global::KnockOff.Documentation.Samples.Skills.I
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				if (_source is { } src) return src.GetById(id);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
 				return new global::KnockOff.Documentation.Samples.Skills.SkUser();
 			}
@@ -220,6 +229,7 @@ partial class SkOnCallKnockOff : global::KnockOff.Documentation.Samples.Skills.I
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -309,6 +319,9 @@ partial class SkOnCallKnockOff : global::KnockOff.Documentation.Samples.Skills.I
 	/// <summary>Tracks and configures behavior for Find.</summary>
 	public sealed class FindInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.ISkOnCallService? _source;
+
 		/// <summary>Delegate for Find.</summary>
 		public delegate global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser> FindDelegate(SkOnCallKnockOff ko, string name, bool active);
 
@@ -354,6 +367,7 @@ partial class SkOnCallKnockOff : global::KnockOff.Documentation.Samples.Skills.I
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((name, active));
+				if (_source is { } src) return src.Find(name, active);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Find");
 				return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser>();
 			}
@@ -377,6 +391,7 @@ partial class SkOnCallKnockOff : global::KnockOff.Documentation.Samples.Skills.I
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -466,6 +481,9 @@ partial class SkOnCallKnockOff : global::KnockOff.Documentation.Samples.Skills.I
 	/// <summary>Tracks and configures behavior for Save.</summary>
 	public sealed class SaveInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.ISkOnCallService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<SkOnCallKnockOff, object> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -508,6 +526,7 @@ partial class SkOnCallKnockOff : global::KnockOff.Documentation.Samples.Skills.I
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = entity;
+				if (_source is { } src) { src.Save(entity); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 				return;
 			}
@@ -531,6 +550,7 @@ partial class SkOnCallKnockOff : global::KnockOff.Documentation.Samples.Skills.I
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -651,6 +671,18 @@ partial class SkOnCallKnockOff : global::KnockOff.Documentation.Samples.Skills.I
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Skills.ISkOnCallService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Skills.ISkOnCallService? source)
+	{
+		Clear._source = source;
+		GetById._source = source;
+		Find._source = source;
+		Save._source = source;
 	}
 
 	void global::KnockOff.Documentation.Samples.Skills.ISkOnCallService.Clear()

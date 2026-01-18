@@ -8,6 +8,9 @@ partial class SpUserRepositoryWithDefaultsStub : global::KnockOff.Documentation.
 	/// <summary>Tracks and configures behavior for Save.</summary>
 	public sealed class SaveInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.ISpUserRepository? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<SpUserRepositoryWithDefaultsStub, global::KnockOff.Documentation.Samples.Guides.SpUser> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -50,6 +53,7 @@ partial class SpUserRepositoryWithDefaultsStub : global::KnockOff.Documentation.
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = user;
+				if (_source is { } src) { src.Save(user); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 				return;
 			}
@@ -73,6 +77,7 @@ partial class SpUserRepositoryWithDefaultsStub : global::KnockOff.Documentation.
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -225,6 +230,15 @@ partial class SpUserRepositoryWithDefaultsStub : global::KnockOff.Documentation.
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.ISpUserRepository).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.ISpUserRepository? source)
+	{
+		Save._source = source;
 	}
 
 	global::KnockOff.Documentation.Samples.Guides.SpUser? global::KnockOff.Documentation.Samples.Guides.ISpUserRepository.GetById(int id)

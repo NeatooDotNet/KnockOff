@@ -8,6 +8,9 @@ partial class MgServiceKnockOff : global::KnockOff.Documentation.Samples.Skills.
 	/// <summary>Tracks and configures behavior for GetUser.</summary>
 	public sealed class GetUserInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.IMgService? _source;
+
 		/// <summary>Delegate for GetUser.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.MgUser? GetUserDelegate(MgServiceKnockOff ko, int id);
 
@@ -53,6 +56,7 @@ partial class MgServiceKnockOff : global::KnockOff.Documentation.Samples.Skills.
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				if (_source is { } src) return src.GetUser(id);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetUser");
 				return default!;
 			}
@@ -76,6 +80,7 @@ partial class MgServiceKnockOff : global::KnockOff.Documentation.Samples.Skills.
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -184,6 +189,15 @@ partial class MgServiceKnockOff : global::KnockOff.Documentation.Samples.Skills.
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Skills.IMgService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Skills.IMgService? source)
+	{
+		GetUser._source = source;
 	}
 
 	global::KnockOff.Documentation.Samples.Skills.MgUser? global::KnockOff.Documentation.Samples.Skills.IMgService.GetUser(int id)

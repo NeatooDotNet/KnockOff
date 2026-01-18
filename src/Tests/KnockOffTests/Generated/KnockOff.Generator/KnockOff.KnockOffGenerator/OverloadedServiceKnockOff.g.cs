@@ -8,6 +8,9 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 	/// <summary>Tracks and configures behavior for GetByIdAsync.</summary>
 	public sealed class GetByIdAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.IOverloadedService? _source;
+
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for GetByIdAsync(int).</summary>
@@ -74,6 +77,9 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 			if (_sequence_Int32_Threading_Tasks_Task_KnockOff_Tests_User.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetByIdAsync(id);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetByIdAsync");
 				return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.User?>(default!);
 			}
@@ -98,6 +104,9 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 			if (_sequence_Int32_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_User.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetByIdAsync(id, cancellationToken);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetByIdAsync");
 				return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.User?>(default!);
 			}
@@ -120,6 +129,7 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence_Int32_Threading_Tasks_Task_KnockOff_Tests_User)
 				tracking.Reset();
 			_sequenceIndex_Int32_Threading_Tasks_Task_KnockOff_Tests_User = 0;
@@ -285,6 +295,9 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 	/// <summary>Tracks and configures behavior for Process.</summary>
 	public sealed class ProcessInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.IOverloadedService? _source;
+
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for Process(string).</summary>
@@ -377,6 +390,9 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 			if (_sequence_String_void.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.Process(data); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return;
 			}
@@ -401,6 +417,9 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 			if (_sequence_String_Int32_void.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.Process(data, priority); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return;
 			}
@@ -425,6 +444,9 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 			if (_sequence_String_Int32_Boolean_void.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.Process(data, priority, async); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return;
 			}
@@ -447,6 +469,7 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence_String_void)
 				tracking.Reset();
 			_sequenceIndex_String_void = 0;
@@ -688,6 +711,9 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 	/// <summary>Tracks and configures behavior for Calculate.</summary>
 	public sealed class CalculateInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.IOverloadedService? _source;
+
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for Calculate(int).</summary>
@@ -754,6 +780,9 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 			if (_sequence_Int32_Int32.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Calculate(@value);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Calculate");
 				return default!;
 			}
@@ -778,6 +807,9 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 			if (_sequence_Int32_Int32_Int32.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Calculate(a, b);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Calculate");
 				return default!;
 			}
@@ -800,6 +832,7 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence_Int32_Int32)
 				tracking.Reset();
 			_sequenceIndex_Int32_Int32 = 0;
@@ -992,6 +1025,17 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Tests.IOverloadedService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Tests.IOverloadedService? source)
+	{
+		GetByIdAsync._source = source;
+		Process._source = source;
+		Calculate._source = source;
 	}
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> global::KnockOff.Tests.IOverloadedService.GetByIdAsync(int id)

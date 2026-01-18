@@ -11,6 +11,9 @@ partial class ConvertibleStubTests
 		/// <summary>Tracks and configures behavior for GetTypeCode.</summary>
 		public sealed class IConvertible_GetTypeCodeInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IConvertible? _source;
+
 			/// <summary>Delegate for GetTypeCode.</summary>
 			public delegate global::System.TypeCode GetTypeCodeDelegate(Stubs.IConvertible ko);
 
@@ -51,6 +54,9 @@ partial class ConvertibleStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetTypeCode();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetTypeCode");
 					return default!;
 				}
@@ -73,6 +79,7 @@ partial class ConvertibleStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -158,6 +165,9 @@ partial class ConvertibleStubTests
 		/// <summary>Tracks and configures behavior for ToBoolean.</summary>
 		public sealed class IConvertible_ToBooleanInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IConvertible? _source;
+
 			/// <summary>Delegate for ToBoolean.</summary>
 			public delegate bool ToBooleanDelegate(Stubs.IConvertible ko, global::System.IFormatProvider? provider);
 
@@ -203,6 +213,9 @@ partial class ConvertibleStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = provider;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.ToBoolean(provider);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToBoolean");
 					return default!;
 				}
@@ -226,6 +239,7 @@ partial class ConvertibleStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -315,6 +329,9 @@ partial class ConvertibleStubTests
 		/// <summary>Tracks and configures behavior for ToByte.</summary>
 		public sealed class IConvertible_ToByteInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IConvertible? _source;
+
 			/// <summary>Delegate for ToByte.</summary>
 			public delegate byte ToByteDelegate(Stubs.IConvertible ko, global::System.IFormatProvider? provider);
 
@@ -360,6 +377,9 @@ partial class ConvertibleStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = provider;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.ToByte(provider);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToByte");
 					return default!;
 				}
@@ -383,6 +403,7 @@ partial class ConvertibleStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -472,6 +493,9 @@ partial class ConvertibleStubTests
 		/// <summary>Tracks and configures behavior for ToChar.</summary>
 		public sealed class IConvertible_ToCharInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IConvertible? _source;
+
 			/// <summary>Delegate for ToChar.</summary>
 			public delegate char ToCharDelegate(Stubs.IConvertible ko, global::System.IFormatProvider? provider);
 
@@ -517,6 +541,9 @@ partial class ConvertibleStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = provider;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.ToChar(provider);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToChar");
 					return default!;
 				}
@@ -540,6 +567,7 @@ partial class ConvertibleStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -629,6 +657,9 @@ partial class ConvertibleStubTests
 		/// <summary>Tracks and configures behavior for ToDateTime.</summary>
 		public sealed class IConvertible_ToDateTimeInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IConvertible? _source;
+
 			/// <summary>Delegate for ToDateTime.</summary>
 			public delegate global::System.DateTime ToDateTimeDelegate(Stubs.IConvertible ko, global::System.IFormatProvider? provider);
 
@@ -674,6 +705,9 @@ partial class ConvertibleStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = provider;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.ToDateTime(provider);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToDateTime");
 					return default!;
 				}
@@ -697,6 +731,7 @@ partial class ConvertibleStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -786,6 +821,9 @@ partial class ConvertibleStubTests
 		/// <summary>Tracks and configures behavior for ToDecimal.</summary>
 		public sealed class IConvertible_ToDecimalInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IConvertible? _source;
+
 			/// <summary>Delegate for ToDecimal.</summary>
 			public delegate decimal ToDecimalDelegate(Stubs.IConvertible ko, global::System.IFormatProvider? provider);
 
@@ -831,6 +869,9 @@ partial class ConvertibleStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = provider;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.ToDecimal(provider);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToDecimal");
 					return default!;
 				}
@@ -854,6 +895,7 @@ partial class ConvertibleStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -943,6 +985,9 @@ partial class ConvertibleStubTests
 		/// <summary>Tracks and configures behavior for ToDouble.</summary>
 		public sealed class IConvertible_ToDoubleInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IConvertible? _source;
+
 			/// <summary>Delegate for ToDouble.</summary>
 			public delegate double ToDoubleDelegate(Stubs.IConvertible ko, global::System.IFormatProvider? provider);
 
@@ -988,6 +1033,9 @@ partial class ConvertibleStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = provider;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.ToDouble(provider);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToDouble");
 					return default!;
 				}
@@ -1011,6 +1059,7 @@ partial class ConvertibleStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1100,6 +1149,9 @@ partial class ConvertibleStubTests
 		/// <summary>Tracks and configures behavior for ToInt16.</summary>
 		public sealed class IConvertible_ToInt16Interceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IConvertible? _source;
+
 			/// <summary>Delegate for ToInt16.</summary>
 			public delegate short ToInt16Delegate(Stubs.IConvertible ko, global::System.IFormatProvider? provider);
 
@@ -1145,6 +1197,9 @@ partial class ConvertibleStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = provider;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.ToInt16(provider);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToInt16");
 					return default!;
 				}
@@ -1168,6 +1223,7 @@ partial class ConvertibleStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1257,6 +1313,9 @@ partial class ConvertibleStubTests
 		/// <summary>Tracks and configures behavior for ToInt32.</summary>
 		public sealed class IConvertible_ToInt32Interceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IConvertible? _source;
+
 			/// <summary>Delegate for ToInt32.</summary>
 			public delegate int ToInt32Delegate(Stubs.IConvertible ko, global::System.IFormatProvider? provider);
 
@@ -1302,6 +1361,9 @@ partial class ConvertibleStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = provider;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.ToInt32(provider);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToInt32");
 					return default!;
 				}
@@ -1325,6 +1387,7 @@ partial class ConvertibleStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1414,6 +1477,9 @@ partial class ConvertibleStubTests
 		/// <summary>Tracks and configures behavior for ToInt64.</summary>
 		public sealed class IConvertible_ToInt64Interceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IConvertible? _source;
+
 			/// <summary>Delegate for ToInt64.</summary>
 			public delegate long ToInt64Delegate(Stubs.IConvertible ko, global::System.IFormatProvider? provider);
 
@@ -1459,6 +1525,9 @@ partial class ConvertibleStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = provider;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.ToInt64(provider);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToInt64");
 					return default!;
 				}
@@ -1482,6 +1551,7 @@ partial class ConvertibleStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1571,6 +1641,9 @@ partial class ConvertibleStubTests
 		/// <summary>Tracks and configures behavior for ToSByte.</summary>
 		public sealed class IConvertible_ToSByteInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IConvertible? _source;
+
 			/// <summary>Delegate for ToSByte.</summary>
 			public delegate sbyte ToSByteDelegate(Stubs.IConvertible ko, global::System.IFormatProvider? provider);
 
@@ -1616,6 +1689,9 @@ partial class ConvertibleStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = provider;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.ToSByte(provider);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToSByte");
 					return default!;
 				}
@@ -1639,6 +1715,7 @@ partial class ConvertibleStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1728,6 +1805,9 @@ partial class ConvertibleStubTests
 		/// <summary>Tracks and configures behavior for ToSingle.</summary>
 		public sealed class IConvertible_ToSingleInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IConvertible? _source;
+
 			/// <summary>Delegate for ToSingle.</summary>
 			public delegate float ToSingleDelegate(Stubs.IConvertible ko, global::System.IFormatProvider? provider);
 
@@ -1773,6 +1853,9 @@ partial class ConvertibleStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = provider;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.ToSingle(provider);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToSingle");
 					return default!;
 				}
@@ -1796,6 +1879,7 @@ partial class ConvertibleStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1885,6 +1969,9 @@ partial class ConvertibleStubTests
 		/// <summary>Tracks and configures behavior for ToString.</summary>
 		public sealed class IConvertible_ToStringInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IConvertible? _source;
+
 			/// <summary>Delegate for ToString.</summary>
 			public delegate string ToStringDelegate(Stubs.IConvertible ko, global::System.IFormatProvider? provider);
 
@@ -1930,6 +2017,9 @@ partial class ConvertibleStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = provider;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.ToString(provider);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToString");
 					return default!;
 				}
@@ -1953,6 +2043,7 @@ partial class ConvertibleStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -2042,6 +2133,9 @@ partial class ConvertibleStubTests
 		/// <summary>Tracks and configures behavior for ToType.</summary>
 		public sealed class IConvertible_ToTypeInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IConvertible? _source;
+
 			/// <summary>Delegate for ToType.</summary>
 			public delegate object ToTypeDelegate(Stubs.IConvertible ko, global::System.Type conversionType, global::System.IFormatProvider? provider);
 
@@ -2087,6 +2181,9 @@ partial class ConvertibleStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((conversionType, provider));
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.ToType(conversionType, provider);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToType");
 					return default!;
 				}
@@ -2110,6 +2207,7 @@ partial class ConvertibleStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -2199,6 +2297,9 @@ partial class ConvertibleStubTests
 		/// <summary>Tracks and configures behavior for ToUInt16.</summary>
 		public sealed class IConvertible_ToUInt16Interceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IConvertible? _source;
+
 			/// <summary>Delegate for ToUInt16.</summary>
 			public delegate ushort ToUInt16Delegate(Stubs.IConvertible ko, global::System.IFormatProvider? provider);
 
@@ -2244,6 +2345,9 @@ partial class ConvertibleStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = provider;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.ToUInt16(provider);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToUInt16");
 					return default!;
 				}
@@ -2267,6 +2371,7 @@ partial class ConvertibleStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -2356,6 +2461,9 @@ partial class ConvertibleStubTests
 		/// <summary>Tracks and configures behavior for ToUInt32.</summary>
 		public sealed class IConvertible_ToUInt32Interceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IConvertible? _source;
+
 			/// <summary>Delegate for ToUInt32.</summary>
 			public delegate uint ToUInt32Delegate(Stubs.IConvertible ko, global::System.IFormatProvider? provider);
 
@@ -2401,6 +2509,9 @@ partial class ConvertibleStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = provider;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.ToUInt32(provider);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToUInt32");
 					return default!;
 				}
@@ -2424,6 +2535,7 @@ partial class ConvertibleStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -2513,6 +2625,9 @@ partial class ConvertibleStubTests
 		/// <summary>Tracks and configures behavior for ToUInt64.</summary>
 		public sealed class IConvertible_ToUInt64Interceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IConvertible? _source;
+
 			/// <summary>Delegate for ToUInt64.</summary>
 			public delegate ulong ToUInt64Delegate(Stubs.IConvertible ko, global::System.IFormatProvider? provider);
 
@@ -2558,6 +2673,9 @@ partial class ConvertibleStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = provider;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.ToUInt64(provider);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToUInt64");
 					return default!;
 				}
@@ -2581,6 +2699,7 @@ partial class ConvertibleStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -2817,6 +2936,28 @@ partial class ConvertibleStubTests
 			public IConvertible(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.IConvertible delegation.</summary>
+			public void Source(global::System.IConvertible? source)
+			{
+				GetTypeCode._source = source;
+				ToBoolean._source = source;
+				ToByte._source = source;
+				ToChar._source = source;
+				ToDateTime._source = source;
+				ToDecimal._source = source;
+				ToDouble._source = source;
+				ToInt16._source = source;
+				ToInt32._source = source;
+				ToInt64._source = source;
+				ToSByte._source = source;
+				ToSingle._source = source;
+				ToString._source = source;
+				ToType._source = source;
+				ToUInt16._source = source;
+				ToUInt32._source = source;
+				ToUInt64._source = source;
 			}
 
 		}

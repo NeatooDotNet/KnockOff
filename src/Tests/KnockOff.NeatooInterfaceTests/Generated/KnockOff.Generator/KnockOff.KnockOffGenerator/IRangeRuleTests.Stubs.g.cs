@@ -20,11 +20,14 @@ partial class IRangeRuleTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public string Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.Rules.Rules.IRangeRule? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IRangeRule.Minimum.</summary>
@@ -39,11 +42,14 @@ partial class IRangeRuleTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public object Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.Rules.Rules.IRangeRule? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IRangeRule.Maximum.</summary>
@@ -58,11 +64,14 @@ partial class IRangeRuleTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public object Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.Rules.Rules.IRangeRule? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IRangeRule.Executed.</summary>
@@ -77,11 +86,14 @@ partial class IRangeRuleTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.Rules.IRule? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IRangeRule.RuleOrder.</summary>
@@ -96,11 +108,14 @@ partial class IRangeRuleTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public int Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.Rules.IRule? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IRangeRule.UniqueIndex.</summary>
@@ -115,11 +130,14 @@ partial class IRangeRuleTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public uint Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.Rules.IRule? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IRangeRule.Messages.</summary>
@@ -134,11 +152,14 @@ partial class IRangeRuleTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.IRuleMessage> Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.Rules.IRule? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IRangeRule.TriggerProperties.</summary>
@@ -153,16 +174,22 @@ partial class IRangeRuleTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.ITriggerProperty> Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.Rules.IRule? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Tracks and configures behavior for RunRule.</summary>
 		public sealed class IRangeRule_RunRuleInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::Neatoo.Rules.IRule? _source;
+
 			/// <summary>Delegate for RunRule.</summary>
 			public delegate global::System.Threading.Tasks.Task<global::Neatoo.Rules.IRuleMessages> RunRuleDelegate(Stubs.IRangeRule ko, global::Neatoo.IValidateBase target, global::System.Threading.CancellationToken? token);
 
@@ -208,6 +235,7 @@ partial class IRangeRuleTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((target, token));
+					if (_source is { } src) return src.RunRule(target, token);
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "RunRule");
 					return global::System.Threading.Tasks.Task.FromResult<global::Neatoo.Rules.IRuleMessages>(default!);
 				}
@@ -231,6 +259,7 @@ partial class IRangeRuleTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -320,6 +349,9 @@ partial class IRangeRuleTests
 		/// <summary>Tracks and configures behavior for OnRuleAdded.</summary>
 		public sealed class IRangeRule_OnRuleAddedInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::Neatoo.Rules.IRule? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IRangeRule, global::Neatoo.Rules.IRuleManager, uint> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -362,6 +394,7 @@ partial class IRangeRuleTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((ruleManager, uniqueIndex));
+					if (_source is { } src) { src.OnRuleAdded(ruleManager, uniqueIndex); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "OnRuleAdded");
 					return;
 				}
@@ -385,6 +418,7 @@ partial class IRangeRuleTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -510,6 +544,7 @@ partial class IRangeRuleTests
 				{
 					ErrorMessage.RecordGet();
 					if (ErrorMessage.OnGet is { } onGet) return onGet(this);
+					if (ErrorMessage._source is { } src) return src.ErrorMessage;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRangeRule", "ErrorMessage");
 					return ErrorMessage.Value;
 				}
@@ -521,6 +556,7 @@ partial class IRangeRuleTests
 				{
 					Minimum.RecordGet();
 					if (Minimum.OnGet is { } onGet) return onGet(this);
+					if (Minimum._source is { } src) return src.Minimum;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRangeRule", "Minimum");
 					return Minimum.Value;
 				}
@@ -532,6 +568,7 @@ partial class IRangeRuleTests
 				{
 					Maximum.RecordGet();
 					if (Maximum.OnGet is { } onGet) return onGet(this);
+					if (Maximum._source is { } src) return src.Maximum;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRangeRule", "Maximum");
 					return Maximum.Value;
 				}
@@ -553,6 +590,7 @@ partial class IRangeRuleTests
 				{
 					Executed.RecordGet();
 					if (Executed.OnGet is { } onGet) return onGet(this);
+					if (Executed._source is { } src) return src.Executed;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "Executed");
 					return Executed.Value;
 				}
@@ -564,6 +602,7 @@ partial class IRangeRuleTests
 				{
 					RuleOrder.RecordGet();
 					if (RuleOrder.OnGet is { } onGet) return onGet(this);
+					if (RuleOrder._source is { } src) return src.RuleOrder;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "RuleOrder");
 					return RuleOrder.Value;
 				}
@@ -575,6 +614,7 @@ partial class IRangeRuleTests
 				{
 					UniqueIndex.RecordGet();
 					if (UniqueIndex.OnGet is { } onGet) return onGet(this);
+					if (UniqueIndex._source is { } src) return src.UniqueIndex;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "UniqueIndex");
 					return UniqueIndex.Value;
 				}
@@ -586,6 +626,7 @@ partial class IRangeRuleTests
 				{
 					Messages.RecordGet();
 					if (Messages.OnGet is { } onGet) return onGet(this);
+					if (Messages._source is { } src) return src.Messages;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "Messages");
 					return Messages.Value;
 				}
@@ -597,6 +638,7 @@ partial class IRangeRuleTests
 				{
 					TriggerProperties.RecordGet();
 					if (TriggerProperties.OnGet is { } onGet) return onGet(this);
+					if (TriggerProperties._source is { } src) return src.TriggerProperties;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "TriggerProperties");
 					return TriggerProperties.Value;
 				}
@@ -613,6 +655,36 @@ partial class IRangeRuleTests
 			public IRangeRule(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::Neatoo.Rules.Rules.IRangeRule delegation.</summary>
+			public void Source(global::Neatoo.Rules.Rules.IRangeRule? source)
+			{
+				ErrorMessage._source = source;
+				Minimum._source = source;
+				Maximum._source = source;
+				Executed._source = source;
+				RuleOrder._source = source;
+				UniqueIndex._source = source;
+				Messages._source = source;
+				TriggerProperties._source = source;
+				RunRule._source = source;
+				OnRuleAdded._source = source;
+			}
+
+			/// <summary>Sets the source object for global::Neatoo.Rules.IRule delegation.</summary>
+			public void Source(global::Neatoo.Rules.IRule? source)
+			{
+				ErrorMessage._source = null;
+				Minimum._source = null;
+				Maximum._source = null;
+				Executed._source = source;
+				RuleOrder._source = source;
+				UniqueIndex._source = source;
+				Messages._source = source;
+				TriggerProperties._source = source;
+				RunRule._source = source;
+				OnRuleAdded._source = source;
 			}
 
 		}

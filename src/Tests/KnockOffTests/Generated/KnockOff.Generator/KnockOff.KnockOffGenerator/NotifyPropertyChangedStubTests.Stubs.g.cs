@@ -55,6 +55,11 @@ partial class NotifyPropertyChangedStubTests
 				Strict = strict;
 			}
 
+			/// <summary>Sets the source object for global::System.ComponentModel.INotifyPropertyChanged delegation.</summary>
+			public void Source(global::System.ComponentModel.INotifyPropertyChanged? source)
+			{
+			}
+
 		}
 
 	}

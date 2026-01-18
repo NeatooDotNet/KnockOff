@@ -11,6 +11,9 @@ partial class SmInlineTests
 		/// <summary>Tracks and configures behavior for GetUser.</summary>
 		public sealed class ISmUserService_GetUserInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Skills.ISmUserService? _source;
+
 			/// <summary>Delegate for GetUser.</summary>
 			public delegate global::KnockOff.Documentation.Samples.SampleDomain.User GetUserDelegate(Stubs.ISmUserService ko, int id);
 
@@ -56,6 +59,7 @@ partial class SmInlineTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = id;
+					if (_source is { } src) return src.GetUser(id);
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetUser");
 					return default!;
 				}
@@ -79,6 +83,7 @@ partial class SmInlineTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -168,6 +173,9 @@ partial class SmInlineTests
 		/// <summary>Tracks and configures behavior for DeleteUser.</summary>
 		public sealed class ISmUserService_DeleteUserInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Skills.ISmUserService? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.ISmUserService, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -210,6 +218,7 @@ partial class SmInlineTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = id;
+					if (_source is { } src) { src.DeleteUser(id); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "DeleteUser");
 					return;
 				}
@@ -233,6 +242,7 @@ partial class SmInlineTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -351,11 +361,21 @@ partial class SmInlineTests
 				Strict = strict;
 			}
 
+			/// <summary>Sets the source object for global::KnockOff.Documentation.Samples.Skills.ISmUserService delegation.</summary>
+			public void Source(global::KnockOff.Documentation.Samples.Skills.ISmUserService? source)
+			{
+				GetUser._source = source;
+				DeleteUser._source = source;
+			}
+
 		}
 
 		/// <summary>Tracks and configures behavior for GetData.</summary>
 		public sealed class ISmStrictByDefault_GetDataInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.Skills.ISmStrictByDefault? _source;
+
 			/// <summary>Delegate for GetData.</summary>
 			public delegate int GetDataDelegate(Stubs.ISmStrictByDefault ko);
 
@@ -396,6 +416,7 @@ partial class SmInlineTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					if (_source is { } src) return src.GetData();
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetData");
 					return default!;
 				}
@@ -418,6 +439,7 @@ partial class SmInlineTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -522,6 +544,12 @@ partial class SmInlineTests
 			public ISmStrictByDefault(bool strict = true)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::KnockOff.Documentation.Samples.Skills.ISmStrictByDefault delegation.</summary>
+			public void Source(global::KnockOff.Documentation.Samples.Skills.ISmStrictByDefault? source)
+			{
+				GetData._source = source;
 			}
 
 		}

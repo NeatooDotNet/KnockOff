@@ -8,6 +8,9 @@ partial class GenAsyncUserRepositoryKnockOff : global::KnockOff.Documentation.Sa
 	/// <summary>Tracks and configures behavior for GetByIdAsync.</summary>
 	public sealed class GetByIdAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>? _source;
+
 		/// <summary>Delegate for GetByIdAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.GenUser?> GetByIdAsyncDelegate(GenAsyncUserRepositoryKnockOff ko, int id);
 
@@ -53,6 +56,7 @@ partial class GenAsyncUserRepositoryKnockOff : global::KnockOff.Documentation.Sa
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				if (_source is { } src) return src.GetByIdAsync(id);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetByIdAsync");
 				return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Guides.GenUser?>(default!);
 			}
@@ -76,6 +80,7 @@ partial class GenAsyncUserRepositoryKnockOff : global::KnockOff.Documentation.Sa
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -165,6 +170,9 @@ partial class GenAsyncUserRepositoryKnockOff : global::KnockOff.Documentation.Sa
 	/// <summary>Tracks and configures behavior for GetAllAsync.</summary>
 	public sealed class GetAllAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>? _source;
+
 		/// <summary>Delegate for GetAllAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Guides.GenUser>> GetAllAsyncDelegate(GenAsyncUserRepositoryKnockOff ko);
 
@@ -205,6 +213,7 @@ partial class GenAsyncUserRepositoryKnockOff : global::KnockOff.Documentation.Sa
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.GetAllAsync();
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetAllAsync");
 				return global::System.Threading.Tasks.Task.FromResult<global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Guides.GenUser>>(new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Guides.GenUser>());
 			}
@@ -227,6 +236,7 @@ partial class GenAsyncUserRepositoryKnockOff : global::KnockOff.Documentation.Sa
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -312,6 +322,9 @@ partial class GenAsyncUserRepositoryKnockOff : global::KnockOff.Documentation.Sa
 	/// <summary>Tracks and configures behavior for SaveAsync.</summary>
 	public sealed class SaveAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>? _source;
+
 		/// <summary>Delegate for SaveAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task SaveAsyncDelegate(GenAsyncUserRepositoryKnockOff ko, global::KnockOff.Documentation.Samples.Guides.GenUser entity);
 
@@ -357,6 +370,7 @@ partial class GenAsyncUserRepositoryKnockOff : global::KnockOff.Documentation.Sa
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = entity;
+				if (_source is { } src) return src.SaveAsync(entity);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SaveAsync");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
@@ -380,6 +394,7 @@ partial class GenAsyncUserRepositoryKnockOff : global::KnockOff.Documentation.Sa
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -496,6 +511,17 @@ partial class GenAsyncUserRepositoryKnockOff : global::KnockOff.Documentation.Sa
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>? source)
+	{
+		GetByIdAsync._source = source;
+		GetAllAsync._source = source;
+		SaveAsync._source = source;
 	}
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Guides.GenUser?> global::KnockOff.Documentation.Samples.Guides.IGenAsyncRepository<global::KnockOff.Documentation.Samples.Guides.GenUser>.GetByIdAsync(int id)

@@ -8,6 +8,9 @@ partial class BpProcessorKnockOff : global::KnockOff.Documentation.Samples.Guide
 	/// <summary>Tracks and configures behavior for Process.</summary>
 	public sealed class ProcessInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IBpProcessor? _source;
+
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for Process(string).</summary>
@@ -74,6 +77,7 @@ partial class BpProcessorKnockOff : global::KnockOff.Documentation.Samples.Guide
 			if (_sequence_String_void.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) { src.Process(data); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return;
 			}
@@ -98,6 +102,7 @@ partial class BpProcessorKnockOff : global::KnockOff.Documentation.Samples.Guide
 			if (_sequence_String_Int32_void.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) { src.Process(data, priority); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
 				return;
 			}
@@ -120,6 +125,7 @@ partial class BpProcessorKnockOff : global::KnockOff.Documentation.Samples.Guide
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence_String_void)
 				tracking.Reset();
 			_sequenceIndex_String_void = 0;
@@ -304,6 +310,15 @@ partial class BpProcessorKnockOff : global::KnockOff.Documentation.Samples.Guide
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.IBpProcessor).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.IBpProcessor? source)
+	{
+		Process._source = source;
 	}
 
 	void global::KnockOff.Documentation.Samples.Guides.IBpProcessor.Process(string data)

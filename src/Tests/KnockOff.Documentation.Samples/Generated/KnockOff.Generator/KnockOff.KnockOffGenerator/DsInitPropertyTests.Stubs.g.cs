@@ -84,15 +84,10 @@ partial class DsInitPropertyTests
 				get
 				{
 					Id.RecordGet();
-					if (Id.OnGet is { } onGet) return onGet(this);
-					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsEntity", "Id");
 					return Id.Value;
 				}
 				init
 				{
-					Id.RecordSet(value);
-					if (Id.OnSet is { } onSet) { onSet(this, value); return; }
-					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsEntity", "Id");
 					Id.Value = value;
 				}
 			}
@@ -102,15 +97,10 @@ partial class DsInitPropertyTests
 				get
 				{
 					Name.RecordGet();
-					if (Name.OnGet is { } onGet) return onGet(this);
-					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsEntity", "Name");
 					return Name.Value;
 				}
 				init
 				{
-					Name.RecordSet(value);
-					if (Name.OnSet is { } onSet) { onSet(this, value); return; }
-					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsEntity", "Name");
 					Name.Value = value;
 				}
 			}
@@ -126,6 +116,11 @@ partial class DsInitPropertyTests
 			public IDsEntity(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::KnockOff.Documentation.Samples.Design.IDsEntity delegation.</summary>
+			public void Source(global::KnockOff.Documentation.Samples.Design.IDsEntity? source)
+			{
 			}
 
 		}
@@ -182,6 +177,9 @@ partial class DsInitPropertyTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public string Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::KnockOff.Documentation.Samples.Design.IDsDocument? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
@@ -189,7 +187,7 @@ partial class DsInitPropertyTests
 			public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDsDocument.Version.</summary>
@@ -204,11 +202,14 @@ partial class DsInitPropertyTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public int Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::KnockOff.Documentation.Samples.Design.IDsDocument? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Stub implementation of global::KnockOff.Documentation.Samples.Design.IDsDocument.</summary>
@@ -228,15 +229,10 @@ partial class DsInitPropertyTests
 				get
 				{
 					Id.RecordGet();
-					if (Id.OnGet is { } onGet) return onGet(this);
-					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsDocument", "Id");
 					return Id.Value;
 				}
 				init
 				{
-					Id.RecordSet(value);
-					if (Id.OnSet is { } onSet) { onSet(this, value); return; }
-					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsDocument", "Id");
 					Id.Value = value;
 				}
 			}
@@ -247,6 +243,7 @@ partial class DsInitPropertyTests
 				{
 					Title.RecordGet();
 					if (Title.OnGet is { } onGet) return onGet(this);
+					if (Title._source is { } src) return src.Title;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsDocument", "Title");
 					return Title.Value;
 				}
@@ -254,6 +251,7 @@ partial class DsInitPropertyTests
 				{
 					Title.RecordSet(value);
 					if (Title.OnSet is { } onSet) { onSet(this, value); return; }
+					if (Title._source is { } src) { src.Title = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsDocument", "Title");
 					Title.Value = value;
 				}
@@ -265,6 +263,7 @@ partial class DsInitPropertyTests
 				{
 					Version.RecordGet();
 					if (Version.OnGet is { } onGet) return onGet(this);
+					if (Version._source is { } src) return src.Version;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsDocument", "Version");
 					return Version.Value;
 				}
@@ -281,6 +280,13 @@ partial class DsInitPropertyTests
 			public IDsDocument(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::KnockOff.Documentation.Samples.Design.IDsDocument delegation.</summary>
+			public void Source(global::KnockOff.Documentation.Samples.Design.IDsDocument? source)
+			{
+				Title._source = source;
+				Version._source = source;
 			}
 
 		}

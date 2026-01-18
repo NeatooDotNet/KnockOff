@@ -35,6 +35,14 @@ partial class CpCombinedRepoKnockOff : global::KnockOff.Documentation.Samples.Sk
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ICpCombinedRepository instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ICpCombinedRepository Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Skills.ICpCombinedRepository).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Skills.ICpCombinedRepository? source)
+	{
+	}
+
 	global::KnockOff.Documentation.Samples.Skills.CpUser? global::KnockOff.Documentation.Samples.Skills.ICpCombinedRepository.GetById(int id)
 	{
 		GetById2.RecordCall(id);

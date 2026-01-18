@@ -8,6 +8,9 @@ partial class NewConstraintStub<T> : global::KnockOff.Tests.INewConstraintServic
 	/// <summary>Tracks and configures behavior for Create.</summary>
 	public sealed class CreateInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.INewConstraintService<T>? _source;
+
 		/// <summary>Delegate for Create.</summary>
 		public delegate T CreateDelegate(NewConstraintStub<T> ko);
 
@@ -48,6 +51,9 @@ partial class NewConstraintStub<T> : global::KnockOff.Tests.INewConstraintServic
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Create();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Create");
 				throw new global::System.InvalidOperationException("No implementation provided for Create. Configure via OnCall.");
 			}
@@ -70,6 +76,7 @@ partial class NewConstraintStub<T> : global::KnockOff.Tests.INewConstraintServic
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -174,6 +181,15 @@ partial class NewConstraintStub<T> : global::KnockOff.Tests.INewConstraintServic
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Tests.INewConstraintService<T>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Tests.INewConstraintService<T>? source)
+	{
+		Create._source = source;
 	}
 
 	T global::KnockOff.Tests.INewConstraintService<T>.Create()

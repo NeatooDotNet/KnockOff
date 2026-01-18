@@ -41,6 +41,14 @@ partial class NotifyPropertyChangedKnockOff : global::System.ComponentModel.INot
 	/// <summary>The global::System.ComponentModel.INotifyPropertyChanged instance. Use for passing to code expecting the interface.</summary>
 	public global::System.ComponentModel.INotifyPropertyChanged Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::System.ComponentModel.INotifyPropertyChanged).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::System.ComponentModel.INotifyPropertyChanged? source)
+	{
+	}
+
 	event global::System.ComponentModel.PropertyChangedEventHandler? global::System.ComponentModel.INotifyPropertyChanged.PropertyChanged
 	{
 		add => PropertyChanged.RecordAdd(value);

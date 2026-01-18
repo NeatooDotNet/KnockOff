@@ -50,15 +50,11 @@ partial class InitPropertyInlineTests
 				get
 				{
 					Id.RecordGet();
-					if (Id.OnGet is { } onGet) return onGet(this);
-					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityWithInitProperty", "Id");
 					return Id.Value;
 				}
 				init
 				{
 					Id.RecordSet(value);
-					if (Id.OnSet is { } onSet) { onSet(this, value); return; }
-					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityWithInitProperty", "Id");
 					Id.Value = value;
 				}
 			}
@@ -74,6 +70,11 @@ partial class InitPropertyInlineTests
 			public IEntityWithInitProperty(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::KnockOffTests.IEntityWithInitProperty delegation.</summary>
+			public void Source(global::KnockOffTests.IEntityWithInitProperty? source)
+			{
 			}
 
 		}
@@ -130,6 +131,9 @@ partial class InitPropertyInlineTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public string Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::KnockOffTests.IDocumentWithMixedProperties? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
@@ -137,7 +141,7 @@ partial class InitPropertyInlineTests
 			public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDocumentWithMixedProperties.Version.</summary>
@@ -152,11 +156,14 @@ partial class InitPropertyInlineTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public int Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::KnockOffTests.IDocumentWithMixedProperties? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Stub implementation of global::KnockOffTests.IDocumentWithMixedProperties.</summary>
@@ -176,15 +183,11 @@ partial class InitPropertyInlineTests
 				get
 				{
 					Id.RecordGet();
-					if (Id.OnGet is { } onGet) return onGet(this);
-					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDocumentWithMixedProperties", "Id");
 					return Id.Value;
 				}
 				init
 				{
 					Id.RecordSet(value);
-					if (Id.OnSet is { } onSet) { onSet(this, value); return; }
-					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDocumentWithMixedProperties", "Id");
 					Id.Value = value;
 				}
 			}
@@ -195,6 +198,7 @@ partial class InitPropertyInlineTests
 				{
 					Title.RecordGet();
 					if (Title.OnGet is { } onGet) return onGet(this);
+					if (Title._source is { } src) return src.Title;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDocumentWithMixedProperties", "Title");
 					return Title.Value;
 				}
@@ -202,6 +206,7 @@ partial class InitPropertyInlineTests
 				{
 					Title.RecordSet(value);
 					if (Title.OnSet is { } onSet) { onSet(this, value); return; }
+					if (Title._source is { } src) { src.Title = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDocumentWithMixedProperties", "Title");
 					Title.Value = value;
 				}
@@ -213,6 +218,7 @@ partial class InitPropertyInlineTests
 				{
 					Version.RecordGet();
 					if (Version.OnGet is { } onGet) return onGet(this);
+					if (Version._source is { } src) return src.Version;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDocumentWithMixedProperties", "Version");
 					return Version.Value;
 				}
@@ -229,6 +235,13 @@ partial class InitPropertyInlineTests
 			public IDocumentWithMixedProperties(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::KnockOffTests.IDocumentWithMixedProperties delegation.</summary>
+			public void Source(global::KnockOffTests.IDocumentWithMixedProperties? source)
+			{
+				Title._source = source;
+				Version._source = source;
 			}
 
 		}
@@ -275,15 +288,11 @@ partial class InitPropertyInlineTests
 				get
 				{
 					Name.RecordGet();
-					if (Name.OnGet is { } onGet) return onGet(this);
-					if (Strict) throw global::KnockOff.StubException.NotConfigured("INullableInitProperty", "Name");
 					return Name.Value;
 				}
 				init
 				{
 					Name.RecordSet(value);
-					if (Name.OnSet is { } onSet) { onSet(this, value); return; }
-					if (Strict) throw global::KnockOff.StubException.NotConfigured("INullableInitProperty", "Name");
 					Name.Value = value;
 				}
 			}
@@ -299,6 +308,11 @@ partial class InitPropertyInlineTests
 			public INullableInitProperty(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::KnockOffTests.INullableInitProperty delegation.</summary>
+			public void Source(global::KnockOffTests.INullableInitProperty? source)
+			{
 			}
 
 		}

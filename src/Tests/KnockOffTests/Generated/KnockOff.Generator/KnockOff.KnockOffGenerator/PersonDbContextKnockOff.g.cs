@@ -8,6 +8,9 @@ partial class PersonDbContextKnockOff : global::Person.Ef.IPersonDbContext, glob
 	/// <summary>Tracks and configures behavior for SavePerson.</summary>
 	public sealed class SavePersonInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::Person.Ef.IPersonDbContext? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<PersonDbContextKnockOff, global::DomainModel.Person> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -50,6 +53,9 @@ partial class PersonDbContextKnockOff : global::Person.Ef.IPersonDbContext, glob
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = person;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.SavePerson(person); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SavePerson");
 				return;
 			}
@@ -73,6 +79,7 @@ partial class PersonDbContextKnockOff : global::Person.Ef.IPersonDbContext, glob
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -162,6 +169,9 @@ partial class PersonDbContextKnockOff : global::Person.Ef.IPersonDbContext, glob
 	/// <summary>Tracks and configures behavior for GetPerson.</summary>
 	public sealed class GetPersonInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::Person.Ef.IPersonDbContext? _source;
+
 		/// <summary>Delegate for GetPerson.</summary>
 		public delegate global::DomainModel.Person? GetPersonDelegate(PersonDbContextKnockOff ko, int id);
 
@@ -207,6 +217,9 @@ partial class PersonDbContextKnockOff : global::Person.Ef.IPersonDbContext, glob
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetPerson(id);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetPerson");
 				return default!;
 			}
@@ -230,6 +243,7 @@ partial class PersonDbContextKnockOff : global::Person.Ef.IPersonDbContext, glob
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -342,6 +356,16 @@ partial class PersonDbContextKnockOff : global::Person.Ef.IPersonDbContext, glob
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::Person.Ef.IPersonDbContext).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::Person.Ef.IPersonDbContext? source)
+	{
+		SavePerson._source = source;
+		GetPerson._source = source;
 	}
 
 	void global::Person.Ef.IPersonDbContext.SavePerson(global::DomainModel.Person person)

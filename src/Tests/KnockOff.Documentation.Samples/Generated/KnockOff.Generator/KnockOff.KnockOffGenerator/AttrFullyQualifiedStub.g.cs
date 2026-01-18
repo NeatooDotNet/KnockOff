@@ -8,6 +8,9 @@ partial class AttrFullyQualifiedStub : global::KnockOff.Documentation.Samples.Re
 	/// <summary>Tracks and configures behavior for DoWork.</summary>
 	public sealed class DoWorkInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Reference.IAttrService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<AttrFullyQualifiedStub> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -45,6 +48,7 @@ partial class AttrFullyQualifiedStub : global::KnockOff.Documentation.Samples.Re
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) { src.DoWork(); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "DoWork");
 				return;
 			}
@@ -67,6 +71,7 @@ partial class AttrFullyQualifiedStub : global::KnockOff.Documentation.Samples.Re
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -171,6 +176,15 @@ partial class AttrFullyQualifiedStub : global::KnockOff.Documentation.Samples.Re
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Reference.IAttrService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Reference.IAttrService? source)
+	{
+		DoWork._source = source;
 	}
 
 	void global::KnockOff.Documentation.Samples.Reference.IAttrService.DoWork()

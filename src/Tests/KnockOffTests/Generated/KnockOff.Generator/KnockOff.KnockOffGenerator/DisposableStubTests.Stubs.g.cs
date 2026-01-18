@@ -11,6 +11,9 @@ partial class DisposableStubTests
 		/// <summary>Tracks and configures behavior for Dispose.</summary>
 		public sealed class IDisposable_DisposeInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IDisposable? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IDisposable> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -48,6 +51,9 @@ partial class DisposableStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.Dispose(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Dispose");
 					return;
 				}
@@ -70,6 +76,7 @@ partial class DisposableStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -174,6 +181,12 @@ partial class DisposableStubTests
 			public IDisposable(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.IDisposable delegation.</summary>
+			public void Source(global::System.IDisposable? source)
+			{
+				Dispose._source = source;
 			}
 
 		}

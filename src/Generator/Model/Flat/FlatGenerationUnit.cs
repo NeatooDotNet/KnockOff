@@ -23,6 +23,8 @@ internal sealed record FlatGenerationUnit(
     EquatableArray<FlatMethodGroup> MethodGroups,
     EquatableArray<FlatGenericMethodHandlerModel> GenericMethodHandlers,
     EquatableArray<FlatEventModel> Events,
+    /// <summary>Source providers for Source(T) methods - one per interface in the hierarchy.</summary>
+    EquatableArray<SourceProviderInfo> SourceProviders,
     bool HasGenericMethods,
     bool ImplementsIKnockOffStub,
     bool Strict);

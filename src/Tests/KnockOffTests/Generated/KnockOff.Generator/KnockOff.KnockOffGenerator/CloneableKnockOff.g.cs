@@ -8,6 +8,9 @@ partial class CloneableKnockOff : global::System.ICloneable, global::KnockOff.IK
 	/// <summary>Tracks and configures behavior for Clone.</summary>
 	public sealed class CloneInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::System.ICloneable? _source;
+
 		/// <summary>Delegate for Clone.</summary>
 		public delegate object CloneDelegate(CloneableKnockOff ko);
 
@@ -48,6 +51,9 @@ partial class CloneableKnockOff : global::System.ICloneable, global::KnockOff.IK
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Clone();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Clone");
 				return new object();
 			}
@@ -70,6 +76,7 @@ partial class CloneableKnockOff : global::System.ICloneable, global::KnockOff.IK
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -174,6 +181,15 @@ partial class CloneableKnockOff : global::System.ICloneable, global::KnockOff.IK
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::System.ICloneable).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::System.ICloneable? source)
+	{
+		Clone._source = source;
 	}
 
 	object global::System.ICloneable.Clone()

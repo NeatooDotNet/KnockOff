@@ -55,6 +55,14 @@ partial class PatternRepositoryKnockOff : global::KnockOff.Documentation.Samples
 	/// <summary>The global::KnockOff.Documentation.Samples.Concepts.IPatternRepository instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Concepts.IPatternRepository Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Concepts.IPatternRepository).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Concepts.IPatternRepository? source)
+	{
+	}
+
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Concepts.PatternUser?> global::KnockOff.Documentation.Samples.Concepts.IPatternRepository.GetByIdAsync(int id)
 	{
 		GetByIdAsync2.RecordCall(id);

@@ -20,11 +20,14 @@ partial class DataReaderStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public int Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Data.IDataReader? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDataReader.IsClosed.</summary>
@@ -39,11 +42,14 @@ partial class DataReaderStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Data.IDataReader? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDataReader.RecordsAffected.</summary>
@@ -58,11 +64,14 @@ partial class DataReaderStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public int Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Data.IDataReader? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDataReader.FieldCount.</summary>
@@ -77,11 +86,14 @@ partial class DataReaderStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public int Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.Data.IDataRecord? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDataReader.IndexerInt32.</summary>
@@ -102,8 +114,11 @@ partial class DataReaderStubTests
 			/// <summary>Backing storage for this indexer.</summary>
 			public global::System.Collections.Generic.Dictionary<int, object> Backing { get; } = new();
 
+			/// <summary>Source object for delegation when OnGet/OnSet is not set.</summary>
+			internal global::System.Data.IDataRecord? _source;
+
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
+			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDataReader.IndexerString.</summary>
@@ -124,13 +139,19 @@ partial class DataReaderStubTests
 			/// <summary>Backing storage for this indexer.</summary>
 			public global::System.Collections.Generic.Dictionary<string, object> Backing { get; } = new();
 
+			/// <summary>Source object for delegation when OnGet/OnSet is not set.</summary>
+			internal global::System.Data.IDataRecord? _source;
+
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
+			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; _source = null; }
 		}
 
 		/// <summary>Tracks and configures behavior for Close.</summary>
 		public sealed class IDataReader_CloseInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDataReader? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IDataReader> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -168,6 +189,9 @@ partial class DataReaderStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.Close(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Close");
 					return;
 				}
@@ -190,6 +214,7 @@ partial class DataReaderStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -275,6 +300,9 @@ partial class DataReaderStubTests
 		/// <summary>Tracks and configures behavior for GetSchemaTable.</summary>
 		public sealed class IDataReader_GetSchemaTableInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDataReader? _source;
+
 			/// <summary>Delegate for GetSchemaTable.</summary>
 			public delegate global::System.Data.DataTable? GetSchemaTableDelegate(Stubs.IDataReader ko);
 
@@ -315,6 +343,9 @@ partial class DataReaderStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetSchemaTable();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetSchemaTable");
 					return default!;
 				}
@@ -337,6 +368,7 @@ partial class DataReaderStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -422,6 +454,9 @@ partial class DataReaderStubTests
 		/// <summary>Tracks and configures behavior for NextResult.</summary>
 		public sealed class IDataReader_NextResultInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDataReader? _source;
+
 			/// <summary>Delegate for NextResult.</summary>
 			public delegate bool NextResultDelegate(Stubs.IDataReader ko);
 
@@ -462,6 +497,9 @@ partial class DataReaderStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.NextResult();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "NextResult");
 					return default!;
 				}
@@ -484,6 +522,7 @@ partial class DataReaderStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -569,6 +608,9 @@ partial class DataReaderStubTests
 		/// <summary>Tracks and configures behavior for Read.</summary>
 		public sealed class IDataReader_ReadInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDataReader? _source;
+
 			/// <summary>Delegate for Read.</summary>
 			public delegate bool ReadDelegate(Stubs.IDataReader ko);
 
@@ -609,6 +651,9 @@ partial class DataReaderStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.Read();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Read");
 					return default!;
 				}
@@ -631,6 +676,7 @@ partial class DataReaderStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -716,6 +762,9 @@ partial class DataReaderStubTests
 		/// <summary>Tracks and configures behavior for GetBoolean.</summary>
 		public sealed class IDataReader_GetBooleanInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDataRecord? _source;
+
 			/// <summary>Delegate for GetBoolean.</summary>
 			public delegate bool GetBooleanDelegate(Stubs.IDataReader ko, int i);
 
@@ -761,6 +810,9 @@ partial class DataReaderStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = i;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetBoolean(i);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetBoolean");
 					return default!;
 				}
@@ -784,6 +836,7 @@ partial class DataReaderStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -873,6 +926,9 @@ partial class DataReaderStubTests
 		/// <summary>Tracks and configures behavior for GetByte.</summary>
 		public sealed class IDataReader_GetByteInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDataRecord? _source;
+
 			/// <summary>Delegate for GetByte.</summary>
 			public delegate byte GetByteDelegate(Stubs.IDataReader ko, int i);
 
@@ -918,6 +974,9 @@ partial class DataReaderStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = i;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetByte(i);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetByte");
 					return default!;
 				}
@@ -941,6 +1000,7 @@ partial class DataReaderStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1030,6 +1090,9 @@ partial class DataReaderStubTests
 		/// <summary>Tracks and configures behavior for GetBytes.</summary>
 		public sealed class IDataReader_GetBytesInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDataRecord? _source;
+
 			/// <summary>Delegate for GetBytes.</summary>
 			public delegate long GetBytesDelegate(Stubs.IDataReader ko, int i, long fieldOffset, byte[]? buffer, int bufferoffset, int length);
 
@@ -1075,6 +1138,9 @@ partial class DataReaderStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((i, fieldOffset, buffer, bufferoffset, length));
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetBytes(i, fieldOffset, buffer, bufferoffset, length);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetBytes");
 					return default!;
 				}
@@ -1098,6 +1164,7 @@ partial class DataReaderStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1187,6 +1254,9 @@ partial class DataReaderStubTests
 		/// <summary>Tracks and configures behavior for GetChar.</summary>
 		public sealed class IDataReader_GetCharInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDataRecord? _source;
+
 			/// <summary>Delegate for GetChar.</summary>
 			public delegate char GetCharDelegate(Stubs.IDataReader ko, int i);
 
@@ -1232,6 +1302,9 @@ partial class DataReaderStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = i;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetChar(i);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetChar");
 					return default!;
 				}
@@ -1255,6 +1328,7 @@ partial class DataReaderStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1344,6 +1418,9 @@ partial class DataReaderStubTests
 		/// <summary>Tracks and configures behavior for GetChars.</summary>
 		public sealed class IDataReader_GetCharsInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDataRecord? _source;
+
 			/// <summary>Delegate for GetChars.</summary>
 			public delegate long GetCharsDelegate(Stubs.IDataReader ko, int i, long fieldoffset, char[]? buffer, int bufferoffset, int length);
 
@@ -1389,6 +1466,9 @@ partial class DataReaderStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((i, fieldoffset, buffer, bufferoffset, length));
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetChars(i, fieldoffset, buffer, bufferoffset, length);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetChars");
 					return default!;
 				}
@@ -1412,6 +1492,7 @@ partial class DataReaderStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1501,6 +1582,9 @@ partial class DataReaderStubTests
 		/// <summary>Tracks and configures behavior for GetData.</summary>
 		public sealed class IDataReader_GetDataInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDataRecord? _source;
+
 			/// <summary>Delegate for GetData.</summary>
 			public delegate global::System.Data.IDataReader GetDataDelegate(Stubs.IDataReader ko, int i);
 
@@ -1546,6 +1630,9 @@ partial class DataReaderStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = i;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetData(i);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetData");
 					throw new global::System.InvalidOperationException("No implementation provided for GetData. Configure via OnCall.");
 				}
@@ -1569,6 +1656,7 @@ partial class DataReaderStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1658,6 +1746,9 @@ partial class DataReaderStubTests
 		/// <summary>Tracks and configures behavior for GetDataTypeName.</summary>
 		public sealed class IDataReader_GetDataTypeNameInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDataRecord? _source;
+
 			/// <summary>Delegate for GetDataTypeName.</summary>
 			public delegate string GetDataTypeNameDelegate(Stubs.IDataReader ko, int i);
 
@@ -1703,6 +1794,9 @@ partial class DataReaderStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = i;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetDataTypeName(i);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetDataTypeName");
 					return default!;
 				}
@@ -1726,6 +1820,7 @@ partial class DataReaderStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1815,6 +1910,9 @@ partial class DataReaderStubTests
 		/// <summary>Tracks and configures behavior for GetDateTime.</summary>
 		public sealed class IDataReader_GetDateTimeInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDataRecord? _source;
+
 			/// <summary>Delegate for GetDateTime.</summary>
 			public delegate global::System.DateTime GetDateTimeDelegate(Stubs.IDataReader ko, int i);
 
@@ -1860,6 +1958,9 @@ partial class DataReaderStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = i;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetDateTime(i);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetDateTime");
 					return default!;
 				}
@@ -1883,6 +1984,7 @@ partial class DataReaderStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1972,6 +2074,9 @@ partial class DataReaderStubTests
 		/// <summary>Tracks and configures behavior for GetDecimal.</summary>
 		public sealed class IDataReader_GetDecimalInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDataRecord? _source;
+
 			/// <summary>Delegate for GetDecimal.</summary>
 			public delegate decimal GetDecimalDelegate(Stubs.IDataReader ko, int i);
 
@@ -2017,6 +2122,9 @@ partial class DataReaderStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = i;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetDecimal(i);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetDecimal");
 					return default!;
 				}
@@ -2040,6 +2148,7 @@ partial class DataReaderStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -2129,6 +2238,9 @@ partial class DataReaderStubTests
 		/// <summary>Tracks and configures behavior for GetDouble.</summary>
 		public sealed class IDataReader_GetDoubleInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDataRecord? _source;
+
 			/// <summary>Delegate for GetDouble.</summary>
 			public delegate double GetDoubleDelegate(Stubs.IDataReader ko, int i);
 
@@ -2174,6 +2286,9 @@ partial class DataReaderStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = i;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetDouble(i);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetDouble");
 					return default!;
 				}
@@ -2197,6 +2312,7 @@ partial class DataReaderStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -2286,6 +2402,9 @@ partial class DataReaderStubTests
 		/// <summary>Tracks and configures behavior for GetFieldType.</summary>
 		public sealed class IDataReader_GetFieldTypeInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDataRecord? _source;
+
 			/// <summary>Delegate for GetFieldType.</summary>
 			public delegate global::System.Type GetFieldTypeDelegate(Stubs.IDataReader ko, int i);
 
@@ -2331,6 +2450,9 @@ partial class DataReaderStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = i;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetFieldType(i);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetFieldType");
 					return default!;
 				}
@@ -2354,6 +2476,7 @@ partial class DataReaderStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -2443,6 +2566,9 @@ partial class DataReaderStubTests
 		/// <summary>Tracks and configures behavior for GetFloat.</summary>
 		public sealed class IDataReader_GetFloatInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDataRecord? _source;
+
 			/// <summary>Delegate for GetFloat.</summary>
 			public delegate float GetFloatDelegate(Stubs.IDataReader ko, int i);
 
@@ -2488,6 +2614,9 @@ partial class DataReaderStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = i;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetFloat(i);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetFloat");
 					return default!;
 				}
@@ -2511,6 +2640,7 @@ partial class DataReaderStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -2600,6 +2730,9 @@ partial class DataReaderStubTests
 		/// <summary>Tracks and configures behavior for GetGuid.</summary>
 		public sealed class IDataReader_GetGuidInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDataRecord? _source;
+
 			/// <summary>Delegate for GetGuid.</summary>
 			public delegate global::System.Guid GetGuidDelegate(Stubs.IDataReader ko, int i);
 
@@ -2645,6 +2778,9 @@ partial class DataReaderStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = i;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetGuid(i);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetGuid");
 					return default!;
 				}
@@ -2668,6 +2804,7 @@ partial class DataReaderStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -2757,6 +2894,9 @@ partial class DataReaderStubTests
 		/// <summary>Tracks and configures behavior for GetInt16.</summary>
 		public sealed class IDataReader_GetInt16Interceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDataRecord? _source;
+
 			/// <summary>Delegate for GetInt16.</summary>
 			public delegate short GetInt16Delegate(Stubs.IDataReader ko, int i);
 
@@ -2802,6 +2942,9 @@ partial class DataReaderStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = i;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetInt16(i);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetInt16");
 					return default!;
 				}
@@ -2825,6 +2968,7 @@ partial class DataReaderStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -2914,6 +3058,9 @@ partial class DataReaderStubTests
 		/// <summary>Tracks and configures behavior for GetInt32.</summary>
 		public sealed class IDataReader_GetInt32Interceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDataRecord? _source;
+
 			/// <summary>Delegate for GetInt32.</summary>
 			public delegate int GetInt32Delegate(Stubs.IDataReader ko, int i);
 
@@ -2959,6 +3106,9 @@ partial class DataReaderStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = i;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetInt32(i);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetInt32");
 					return default!;
 				}
@@ -2982,6 +3132,7 @@ partial class DataReaderStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -3071,6 +3222,9 @@ partial class DataReaderStubTests
 		/// <summary>Tracks and configures behavior for GetInt64.</summary>
 		public sealed class IDataReader_GetInt64Interceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDataRecord? _source;
+
 			/// <summary>Delegate for GetInt64.</summary>
 			public delegate long GetInt64Delegate(Stubs.IDataReader ko, int i);
 
@@ -3116,6 +3270,9 @@ partial class DataReaderStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = i;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetInt64(i);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetInt64");
 					return default!;
 				}
@@ -3139,6 +3296,7 @@ partial class DataReaderStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -3228,6 +3386,9 @@ partial class DataReaderStubTests
 		/// <summary>Tracks and configures behavior for GetName.</summary>
 		public sealed class IDataReader_GetNameInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDataRecord? _source;
+
 			/// <summary>Delegate for GetName.</summary>
 			public delegate string GetNameDelegate(Stubs.IDataReader ko, int i);
 
@@ -3273,6 +3434,9 @@ partial class DataReaderStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = i;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetName(i);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetName");
 					return default!;
 				}
@@ -3296,6 +3460,7 @@ partial class DataReaderStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -3385,6 +3550,9 @@ partial class DataReaderStubTests
 		/// <summary>Tracks and configures behavior for GetOrdinal.</summary>
 		public sealed class IDataReader_GetOrdinalInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDataRecord? _source;
+
 			/// <summary>Delegate for GetOrdinal.</summary>
 			public delegate int GetOrdinalDelegate(Stubs.IDataReader ko, string name);
 
@@ -3430,6 +3598,9 @@ partial class DataReaderStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = name;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetOrdinal(name);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetOrdinal");
 					return default!;
 				}
@@ -3453,6 +3624,7 @@ partial class DataReaderStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -3542,6 +3714,9 @@ partial class DataReaderStubTests
 		/// <summary>Tracks and configures behavior for GetString.</summary>
 		public sealed class IDataReader_GetStringInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDataRecord? _source;
+
 			/// <summary>Delegate for GetString.</summary>
 			public delegate string GetStringDelegate(Stubs.IDataReader ko, int i);
 
@@ -3587,6 +3762,9 @@ partial class DataReaderStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = i;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetString(i);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetString");
 					return default!;
 				}
@@ -3610,6 +3788,7 @@ partial class DataReaderStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -3699,6 +3878,9 @@ partial class DataReaderStubTests
 		/// <summary>Tracks and configures behavior for GetValue.</summary>
 		public sealed class IDataReader_GetValueInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDataRecord? _source;
+
 			/// <summary>Delegate for GetValue.</summary>
 			public delegate object GetValueDelegate(Stubs.IDataReader ko, int i);
 
@@ -3744,6 +3926,9 @@ partial class DataReaderStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = i;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetValue(i);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetValue");
 					return default!;
 				}
@@ -3767,6 +3952,7 @@ partial class DataReaderStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -3856,6 +4042,9 @@ partial class DataReaderStubTests
 		/// <summary>Tracks and configures behavior for GetValues.</summary>
 		public sealed class IDataReader_GetValuesInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDataRecord? _source;
+
 			/// <summary>Delegate for GetValues.</summary>
 			public delegate int GetValuesDelegate(Stubs.IDataReader ko, object[] values);
 
@@ -3901,6 +4090,9 @@ partial class DataReaderStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = values;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetValues(values);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetValues");
 					return default!;
 				}
@@ -3924,6 +4116,7 @@ partial class DataReaderStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -4013,6 +4206,9 @@ partial class DataReaderStubTests
 		/// <summary>Tracks and configures behavior for IsDBNull.</summary>
 		public sealed class IDataReader_IsDBNullInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Data.IDataRecord? _source;
+
 			/// <summary>Delegate for IsDBNull.</summary>
 			public delegate bool IsDBNullDelegate(Stubs.IDataReader ko, int i);
 
@@ -4058,6 +4254,9 @@ partial class DataReaderStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = i;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.IsDBNull(i);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "IsDBNull");
 					return default!;
 				}
@@ -4081,6 +4280,7 @@ partial class DataReaderStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -4170,6 +4370,9 @@ partial class DataReaderStubTests
 		/// <summary>Tracks and configures behavior for Dispose.</summary>
 		public sealed class IDataReader_DisposeInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IDisposable? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IDataReader> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -4207,6 +4410,9 @@ partial class DataReaderStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.Dispose(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Dispose");
 					return;
 				}
@@ -4229,6 +4435,7 @@ partial class DataReaderStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -4439,6 +4646,7 @@ partial class DataReaderStubTests
 				{
 					Depth.RecordGet();
 					if (Depth.OnGet is { } onGet) return onGet(this);
+					if (Depth._source is { } src) return src.Depth;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDataReader", "Depth");
 					return Depth.Value;
 				}
@@ -4450,6 +4658,7 @@ partial class DataReaderStubTests
 				{
 					IsClosed.RecordGet();
 					if (IsClosed.OnGet is { } onGet) return onGet(this);
+					if (IsClosed._source is { } src) return src.IsClosed;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDataReader", "IsClosed");
 					return IsClosed.Value;
 				}
@@ -4461,6 +4670,7 @@ partial class DataReaderStubTests
 				{
 					RecordsAffected.RecordGet();
 					if (RecordsAffected.OnGet is { } onGet) return onGet(this);
+					if (RecordsAffected._source is { } src) return src.RecordsAffected;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDataReader", "RecordsAffected");
 					return RecordsAffected.Value;
 				}
@@ -4582,6 +4792,7 @@ partial class DataReaderStubTests
 				{
 					FieldCount.RecordGet();
 					if (FieldCount.OnGet is { } onGet) return onGet(this);
+					if (FieldCount._source is { } src) return src.FieldCount;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "FieldCount");
 					return FieldCount.Value;
 				}
@@ -4593,6 +4804,7 @@ partial class DataReaderStubTests
 				{
 					IndexerInt32.RecordGet(i);
 					if (IndexerInt32.OnGet is { } onGet) return onGet(this, i);
+					if (IndexerInt32._source is { } src) return src[i];
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "this[]");
 					return IndexerInt32.Backing.TryGetValue(i, out var v) ? v : new object();
 				}
@@ -4604,6 +4816,7 @@ partial class DataReaderStubTests
 				{
 					IndexerString.RecordGet(name);
 					if (IndexerString.OnGet is { } onGet) return onGet(this, name);
+					if (IndexerString._source is { } src) return src[name];
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "this[]");
 					return IndexerString.Backing.TryGetValue(name, out var v) ? v : new object();
 				}
@@ -4625,6 +4838,120 @@ partial class DataReaderStubTests
 			public IDataReader(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.Data.IDataReader delegation.</summary>
+			public void Source(global::System.Data.IDataReader? source)
+			{
+				Depth._source = source;
+				IsClosed._source = source;
+				RecordsAffected._source = source;
+				FieldCount._source = source;
+				IndexerInt32._source = source;
+				IndexerString._source = source;
+				Close._source = source;
+				GetSchemaTable._source = source;
+				NextResult._source = source;
+				Read._source = source;
+				GetBoolean._source = source;
+				GetByte._source = source;
+				GetBytes._source = source;
+				GetChar._source = source;
+				GetChars._source = source;
+				GetData._source = source;
+				GetDataTypeName._source = source;
+				GetDateTime._source = source;
+				GetDecimal._source = source;
+				GetDouble._source = source;
+				GetFieldType._source = source;
+				GetFloat._source = source;
+				GetGuid._source = source;
+				GetInt16._source = source;
+				GetInt32._source = source;
+				GetInt64._source = source;
+				GetName._source = source;
+				GetOrdinal._source = source;
+				GetString._source = source;
+				GetValue._source = source;
+				GetValues._source = source;
+				IsDBNull._source = source;
+				Dispose._source = source;
+			}
+
+			/// <summary>Sets the source object for global::System.Data.IDataRecord delegation.</summary>
+			public void Source(global::System.Data.IDataRecord? source)
+			{
+				Depth._source = null;
+				IsClosed._source = null;
+				RecordsAffected._source = null;
+				FieldCount._source = source;
+				IndexerInt32._source = source;
+				IndexerString._source = source;
+				Close._source = null;
+				GetSchemaTable._source = null;
+				NextResult._source = null;
+				Read._source = null;
+				GetBoolean._source = source;
+				GetByte._source = source;
+				GetBytes._source = source;
+				GetChar._source = source;
+				GetChars._source = source;
+				GetData._source = source;
+				GetDataTypeName._source = source;
+				GetDateTime._source = source;
+				GetDecimal._source = source;
+				GetDouble._source = source;
+				GetFieldType._source = source;
+				GetFloat._source = source;
+				GetGuid._source = source;
+				GetInt16._source = source;
+				GetInt32._source = source;
+				GetInt64._source = source;
+				GetName._source = source;
+				GetOrdinal._source = source;
+				GetString._source = source;
+				GetValue._source = source;
+				GetValues._source = source;
+				IsDBNull._source = source;
+				Dispose._source = null;
+			}
+
+			/// <summary>Sets the source object for global::System.IDisposable delegation.</summary>
+			public void Source(global::System.IDisposable? source)
+			{
+				Depth._source = null;
+				IsClosed._source = null;
+				RecordsAffected._source = null;
+				FieldCount._source = null;
+				IndexerInt32._source = null;
+				IndexerString._source = null;
+				Close._source = null;
+				GetSchemaTable._source = null;
+				NextResult._source = null;
+				Read._source = null;
+				GetBoolean._source = null;
+				GetByte._source = null;
+				GetBytes._source = null;
+				GetChar._source = null;
+				GetChars._source = null;
+				GetData._source = null;
+				GetDataTypeName._source = null;
+				GetDateTime._source = null;
+				GetDecimal._source = null;
+				GetDouble._source = null;
+				GetFieldType._source = null;
+				GetFloat._source = null;
+				GetGuid._source = null;
+				GetInt16._source = null;
+				GetInt32._source = null;
+				GetInt64._source = null;
+				GetName._source = null;
+				GetOrdinal._source = null;
+				GetString._source = null;
+				GetValue._source = null;
+				GetValues._source = null;
+				IsDBNull._source = null;
+				Dispose._source = source;
 			}
 
 		}

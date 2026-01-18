@@ -11,6 +11,9 @@ partial class InlineStubsExampleTests
 		/// <summary>Tracks and configures behavior for Save.</summary>
 		public sealed class IRepository_SaveInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.GettingStarted.IRepository? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IRepository, object> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -53,6 +56,7 @@ partial class InlineStubsExampleTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = entity;
+					if (_source is { } src) { src.Save(entity); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 					return;
 				}
@@ -76,6 +80,7 @@ partial class InlineStubsExampleTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -186,11 +191,20 @@ partial class InlineStubsExampleTests
 				Strict = strict;
 			}
 
+			/// <summary>Sets the source object for global::KnockOff.Documentation.Samples.GettingStarted.IRepository delegation.</summary>
+			public void Source(global::KnockOff.Documentation.Samples.GettingStarted.IRepository? source)
+			{
+				Save._source = source;
+			}
+
 		}
 
 		/// <summary>Tracks and configures behavior for Commit.</summary>
 		public sealed class IUnitOfWork_CommitInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IUnitOfWork> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -228,6 +242,7 @@ partial class InlineStubsExampleTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					if (_source is { } src) { src.Commit(); return; }
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Commit");
 					return;
 				}
@@ -250,6 +265,7 @@ partial class InlineStubsExampleTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -354,6 +370,12 @@ partial class InlineStubsExampleTests
 			public IUnitOfWork(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork delegation.</summary>
+			public void Source(global::KnockOff.Documentation.Samples.GettingStarted.IUnitOfWork? source)
+			{
+				Commit._source = source;
 			}
 
 		}

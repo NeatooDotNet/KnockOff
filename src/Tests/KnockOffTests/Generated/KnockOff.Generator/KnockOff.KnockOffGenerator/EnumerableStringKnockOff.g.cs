@@ -8,6 +8,9 @@ partial class EnumerableStringKnockOff : global::System.Collections.Generic.IEnu
 	/// <summary>Tracks and configures behavior for GetEnumerator.</summary>
 	public sealed class GetEnumeratorInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::System.Collections.Generic.IEnumerable<string>? _source;
+
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for GetEnumerator().</summary>
@@ -74,6 +77,9 @@ partial class EnumerableStringKnockOff : global::System.Collections.Generic.IEnu
 			if (_sequence_NoParams_Collections_Generic_IEnumerator_string.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetEnumerator();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
 			}
@@ -98,6 +104,9 @@ partial class EnumerableStringKnockOff : global::System.Collections.Generic.IEnu
 			if (_sequence_NoParams_Collections_IEnumerator.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetEnumerator();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
 			}
@@ -120,6 +129,7 @@ partial class EnumerableStringKnockOff : global::System.Collections.Generic.IEnu
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence_NoParams_Collections_Generic_IEnumerator_string)
 				tracking.Reset();
 			_sequenceIndex_NoParams_Collections_Generic_IEnumerator_string = 0;
@@ -296,6 +306,22 @@ partial class EnumerableStringKnockOff : global::System.Collections.Generic.IEnu
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::System.Collections.Generic.IEnumerable<string>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::System.Collections.Generic.IEnumerable<string>? source)
+	{
+		GetEnumerator._source = source;
+	}
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::System.Collections.IEnumerable).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::System.Collections.IEnumerable? source)
+	{
+		GetEnumerator._source = null;
 	}
 
 	global::System.Collections.Generic.IEnumerator<string> global::System.Collections.Generic.IEnumerable<string>.GetEnumerator()

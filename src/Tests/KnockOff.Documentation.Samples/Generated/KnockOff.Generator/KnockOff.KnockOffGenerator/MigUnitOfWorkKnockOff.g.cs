@@ -8,6 +8,9 @@ partial class MigUnitOfWorkKnockOff : global::KnockOff.Documentation.Samples.Com
 	/// <summary>Tracks and configures behavior for SaveChangesAsync.</summary>
 	public sealed class SaveChangesAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Comparison.IMigUnitOfWork? _source;
+
 		/// <summary>Delegate for SaveChangesAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<int> SaveChangesAsyncDelegate(MigUnitOfWorkKnockOff ko, global::System.Threading.CancellationToken cancellationToken);
 
@@ -53,6 +56,7 @@ partial class MigUnitOfWorkKnockOff : global::KnockOff.Documentation.Samples.Com
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = cancellationToken;
+				if (_source is { } src) return src.SaveChangesAsync(cancellationToken);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SaveChangesAsync");
 				return global::System.Threading.Tasks.Task.FromResult<int>(default!);
 			}
@@ -76,6 +80,7 @@ partial class MigUnitOfWorkKnockOff : global::KnockOff.Documentation.Samples.Com
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -184,6 +189,15 @@ partial class MigUnitOfWorkKnockOff : global::KnockOff.Documentation.Samples.Com
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Comparison.IMigUnitOfWork).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Comparison.IMigUnitOfWork? source)
+	{
+		SaveChangesAsync._source = source;
 	}
 
 	global::System.Threading.Tasks.Task<int> global::KnockOff.Documentation.Samples.Comparison.IMigUnitOfWork.SaveChangesAsync(global::System.Threading.CancellationToken cancellationToken)

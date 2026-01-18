@@ -354,6 +354,11 @@ partial class InlineMixedReturnTypesStub
 				Strict = strict;
 			}
 
+			/// <summary>Sets the source object for global::KnockOff.Tests.IFactoryWithMixedReturnTypes delegation.</summary>
+			public void Source(global::KnockOff.Tests.IFactoryWithMixedReturnTypes? source)
+			{
+			}
+
 		}
 
 	}

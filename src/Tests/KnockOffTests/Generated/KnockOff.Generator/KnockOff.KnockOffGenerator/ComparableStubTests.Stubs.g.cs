@@ -11,6 +11,9 @@ partial class ComparableStubTests
 		/// <summary>Tracks and configures behavior for CompareTo.</summary>
 		public sealed class IComparable_CompareToInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IComparable? _source;
+
 			/// <summary>Delegate for CompareTo.</summary>
 			public delegate int CompareToDelegate(Stubs.IComparable ko, object? obj);
 
@@ -56,6 +59,9 @@ partial class ComparableStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = obj;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.CompareTo(obj);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "CompareTo");
 					return default!;
 				}
@@ -79,6 +85,7 @@ partial class ComparableStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -187,6 +194,12 @@ partial class ComparableStubTests
 			public IComparable(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.IComparable delegation.</summary>
+			public void Source(global::System.IComparable? source)
+			{
+				CompareTo._source = source;
 			}
 
 		}

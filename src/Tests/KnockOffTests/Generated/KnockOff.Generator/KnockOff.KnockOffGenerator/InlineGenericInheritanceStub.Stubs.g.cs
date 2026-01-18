@@ -354,6 +354,21 @@ partial class InlineGenericInheritanceStub
 				Strict = strict;
 			}
 
+			/// <summary>Sets the source object for global::KnockOff.Tests.ISampleValidationRule delegation.</summary>
+			public void Source(global::KnockOff.Tests.ISampleValidationRule? source)
+			{
+			}
+
+			/// <summary>Sets the source object for global::KnockOff.Tests.ISampleRule<global::KnockOff.Tests.ISampleTarget> delegation.</summary>
+			public void Source(global::KnockOff.Tests.ISampleRule<global::KnockOff.Tests.ISampleTarget>? source)
+			{
+			}
+
+			/// <summary>Sets the source object for global::KnockOff.Tests.ISampleRule delegation.</summary>
+			public void Source(global::KnockOff.Tests.ISampleRule? source)
+			{
+			}
+
 		}
 
 	}

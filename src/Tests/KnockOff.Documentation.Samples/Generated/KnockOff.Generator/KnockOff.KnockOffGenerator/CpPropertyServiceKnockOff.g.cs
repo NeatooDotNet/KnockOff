@@ -8,6 +8,9 @@ partial class CpPropertyServiceKnockOff : global::KnockOff.Documentation.Samples
 	/// <summary>Tracks and configures behavior for CurrentUser.</summary>
 	public sealed class CurrentUserInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.ICpPropertyService? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -33,7 +36,7 @@ partial class CpPropertyServiceKnockOff : global::KnockOff.Documentation.Samples
 		public void RecordSet(global::KnockOff.Documentation.Samples.Skills.CpUser? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Interceptor for CurrentUser. Configure via .Value, track via .GetCount.</summary>
@@ -45,10 +48,19 @@ partial class CpPropertyServiceKnockOff : global::KnockOff.Documentation.Samples
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ICpPropertyService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ICpPropertyService Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Skills.ICpPropertyService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Skills.ICpPropertyService? source)
+	{
+		CurrentUser._source = source;
+	}
+
 	global::KnockOff.Documentation.Samples.Skills.CpUser? global::KnockOff.Documentation.Samples.Skills.ICpPropertyService.CurrentUser
 	{
-		get { CurrentUser.RecordGet(); if (CurrentUser.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ICpPropertyService", "CurrentUser"); return CurrentUser.Value; }
-		set { CurrentUser.RecordSet(value); if (CurrentUser.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ICpPropertyService", "CurrentUser"); CurrentUser.Value = value; }
+		get { CurrentUser.RecordGet(); if (CurrentUser.OnGet is { } onGet) return onGet(this); if (CurrentUser._source is { } src) return src.CurrentUser; if (Strict) throw global::KnockOff.StubException.NotConfigured("ICpPropertyService", "CurrentUser"); return CurrentUser.Value; }
+		set { CurrentUser.RecordSet(value); if (CurrentUser.OnSet is { } onSet) { onSet(this, value); return; } if (CurrentUser._source is { } src) { src.CurrentUser = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ICpPropertyService", "CurrentUser"); CurrentUser.Value = value; }
 	}
 
 }

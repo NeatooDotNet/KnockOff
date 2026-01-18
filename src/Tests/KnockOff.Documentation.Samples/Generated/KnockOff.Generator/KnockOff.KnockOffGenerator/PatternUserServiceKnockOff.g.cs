@@ -59,6 +59,14 @@ partial class PatternUserServiceKnockOff : global::KnockOff.Documentation.Sample
 	/// <summary>The global::KnockOff.Documentation.Samples.Concepts.IPatternUserService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Concepts.IPatternUserService Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Concepts.IPatternUserService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Concepts.IPatternUserService? source)
+	{
+	}
+
 	global::KnockOff.Documentation.Samples.Concepts.PatternUser global::KnockOff.Documentation.Samples.Concepts.IPatternUserService.GetUser(int id)
 	{
 		GetUser2.RecordCall(id);

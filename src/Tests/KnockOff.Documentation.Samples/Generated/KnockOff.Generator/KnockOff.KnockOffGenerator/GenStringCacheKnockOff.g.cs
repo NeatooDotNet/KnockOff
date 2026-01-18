@@ -8,6 +8,9 @@ partial class GenStringCacheKnockOff : global::KnockOff.Documentation.Samples.Gu
 	/// <summary>Tracks and configures behavior for Get.</summary>
 	public sealed class GetInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IGenCache<string, global::KnockOff.Documentation.Samples.Guides.GenUser>? _source;
+
 		/// <summary>Delegate for Get.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Guides.GenUser? GetDelegate(GenStringCacheKnockOff ko, string key);
 
@@ -53,6 +56,7 @@ partial class GenStringCacheKnockOff : global::KnockOff.Documentation.Samples.Gu
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = key;
+				if (_source is { } src) return src.Get(key);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Get");
 				return default!;
 			}
@@ -76,6 +80,7 @@ partial class GenStringCacheKnockOff : global::KnockOff.Documentation.Samples.Gu
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -165,6 +170,9 @@ partial class GenStringCacheKnockOff : global::KnockOff.Documentation.Samples.Gu
 	/// <summary>Tracks and configures behavior for Set.</summary>
 	public sealed class SetInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IGenCache<string, global::KnockOff.Documentation.Samples.Guides.GenUser>? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<GenStringCacheKnockOff, string, global::KnockOff.Documentation.Samples.Guides.GenUser> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -207,6 +215,7 @@ partial class GenStringCacheKnockOff : global::KnockOff.Documentation.Samples.Gu
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((key, @value));
+				if (_source is { } src) { src.Set(key, @value); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Set");
 				return;
 			}
@@ -230,6 +239,7 @@ partial class GenStringCacheKnockOff : global::KnockOff.Documentation.Samples.Gu
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -342,6 +352,16 @@ partial class GenStringCacheKnockOff : global::KnockOff.Documentation.Samples.Gu
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.IGenCache<string, global::KnockOff.Documentation.Samples.Guides.GenUser>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.IGenCache<string, global::KnockOff.Documentation.Samples.Guides.GenUser>? source)
+	{
+		Get._source = source;
+		Set._source = source;
 	}
 
 	global::KnockOff.Documentation.Samples.Guides.GenUser? global::KnockOff.Documentation.Samples.Guides.IGenCache<string, global::KnockOff.Documentation.Samples.Guides.GenUser>.Get(string key)

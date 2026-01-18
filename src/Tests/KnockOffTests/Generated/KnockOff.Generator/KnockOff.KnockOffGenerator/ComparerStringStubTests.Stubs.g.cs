@@ -11,6 +11,9 @@ partial class ComparerStringStubTests
 		/// <summary>Tracks and configures behavior for Compare.</summary>
 		public sealed class IComparer_CompareInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IComparer<string>? _source;
+
 			/// <summary>Delegate for Compare.</summary>
 			public delegate int CompareDelegate(Stubs.IComparer ko, string? x, string? y);
 
@@ -56,6 +59,9 @@ partial class ComparerStringStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((x, y));
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.Compare(x, y);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Compare");
 					return default!;
 				}
@@ -79,6 +85,7 @@ partial class ComparerStringStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -187,6 +194,12 @@ partial class ComparerStringStubTests
 			public IComparer(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.Generic.IComparer<string> delegation.</summary>
+			public void Source(global::System.Collections.Generic.IComparer<string>? source)
+			{
+				Compare._source = source;
 			}
 
 		}

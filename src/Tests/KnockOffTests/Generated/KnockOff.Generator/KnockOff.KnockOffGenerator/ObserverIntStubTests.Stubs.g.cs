@@ -11,6 +11,9 @@ partial class ObserverIntStubTests
 		/// <summary>Tracks and configures behavior for OnCompleted.</summary>
 		public sealed class IObserver_OnCompletedInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IObserver<int>? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IObserver> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -48,6 +51,9 @@ partial class ObserverIntStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.OnCompleted(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "OnCompleted");
 					return;
 				}
@@ -70,6 +76,7 @@ partial class ObserverIntStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -155,6 +162,9 @@ partial class ObserverIntStubTests
 		/// <summary>Tracks and configures behavior for OnError.</summary>
 		public sealed class IObserver_OnErrorInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IObserver<int>? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IObserver, global::System.Exception> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -197,6 +207,9 @@ partial class ObserverIntStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = error;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.OnError(error); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "OnError");
 					return;
 				}
@@ -220,6 +233,7 @@ partial class ObserverIntStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -309,6 +323,9 @@ partial class ObserverIntStubTests
 		/// <summary>Tracks and configures behavior for OnNext.</summary>
 		public sealed class IObserver_OnNextInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IObserver<int>? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IObserver, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -351,6 +368,9 @@ partial class ObserverIntStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = @value;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.OnNext(@value); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "OnNext");
 					return;
 				}
@@ -374,6 +394,7 @@ partial class ObserverIntStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -498,6 +519,14 @@ partial class ObserverIntStubTests
 			public IObserver(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.IObserver<int> delegation.</summary>
+			public void Source(global::System.IObserver<int>? source)
+			{
+				OnCompleted._source = source;
+				OnError._source = source;
+				OnNext._source = source;
 			}
 
 		}

@@ -8,6 +8,9 @@ partial class SkVerificationKnockOff : global::KnockOff.Documentation.Samples.Sk
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.ISkVerificationService? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -33,12 +36,15 @@ partial class SkVerificationKnockOff : global::KnockOff.Documentation.Samples.Sk
 		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for GetUser.</summary>
 	public sealed class GetUserInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.ISkVerificationService? _source;
+
 		/// <summary>Delegate for GetUser.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.SkUser GetUserDelegate(SkVerificationKnockOff ko, int id);
 
@@ -84,6 +90,7 @@ partial class SkVerificationKnockOff : global::KnockOff.Documentation.Samples.Sk
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				if (_source is { } src) return src.GetUser(id);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetUser");
 				return new global::KnockOff.Documentation.Samples.Skills.SkUser();
 			}
@@ -107,6 +114,7 @@ partial class SkVerificationKnockOff : global::KnockOff.Documentation.Samples.Sk
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -196,6 +204,9 @@ partial class SkVerificationKnockOff : global::KnockOff.Documentation.Samples.Sk
 	/// <summary>Tracks and configures behavior for Create.</summary>
 	public sealed class CreateInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.ISkVerificationService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<SkVerificationKnockOff, string, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -238,6 +249,7 @@ partial class SkVerificationKnockOff : global::KnockOff.Documentation.Samples.Sk
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((name, @value));
+				if (_source is { } src) { src.Create(name, @value); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Create");
 				return;
 			}
@@ -261,6 +273,7 @@ partial class SkVerificationKnockOff : global::KnockOff.Documentation.Samples.Sk
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -378,10 +391,21 @@ partial class SkVerificationKnockOff : global::KnockOff.Documentation.Samples.Sk
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
 	}
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Skills.ISkVerificationService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Skills.ISkVerificationService? source)
+	{
+		Name._source = source;
+		GetUser._source = source;
+		Create._source = source;
+	}
+
 	string global::KnockOff.Documentation.Samples.Skills.ISkVerificationService.Name
 	{
-		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkVerificationService", "Name"); return Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkVerificationService", "Name"); Name.Value = value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Name._source is { } src) return src.Name; if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkVerificationService", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Name._source is { } src) { src.Name = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkVerificationService", "Name"); Name.Value = value; }
 	}
 
 	global::KnockOff.Documentation.Samples.Skills.SkUser global::KnockOff.Documentation.Samples.Skills.ISkVerificationService.GetUser(int id)

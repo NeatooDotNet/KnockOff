@@ -8,6 +8,9 @@ partial class MultiConstraintStub<T> : global::KnockOff.Tests.IMultiConstraintSe
 	/// <summary>Tracks and configures behavior for Save.</summary>
 	public sealed class SaveInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.IMultiConstraintService<T>? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<MultiConstraintStub<T>, T> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -50,6 +53,9 @@ partial class MultiConstraintStub<T> : global::KnockOff.Tests.IMultiConstraintSe
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = entity;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.Save(entity); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 				return;
 			}
@@ -73,6 +79,7 @@ partial class MultiConstraintStub<T> : global::KnockOff.Tests.IMultiConstraintSe
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -162,6 +169,9 @@ partial class MultiConstraintStub<T> : global::KnockOff.Tests.IMultiConstraintSe
 	/// <summary>Tracks and configures behavior for Find.</summary>
 	public sealed class FindInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.IMultiConstraintService<T>? _source;
+
 		/// <summary>Delegate for Find.</summary>
 		public delegate T? FindDelegate(MultiConstraintStub<T> ko, int id);
 
@@ -207,6 +217,9 @@ partial class MultiConstraintStub<T> : global::KnockOff.Tests.IMultiConstraintSe
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Find(id);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Find");
 				return default!;
 			}
@@ -230,6 +243,7 @@ partial class MultiConstraintStub<T> : global::KnockOff.Tests.IMultiConstraintSe
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -342,6 +356,16 @@ partial class MultiConstraintStub<T> : global::KnockOff.Tests.IMultiConstraintSe
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Tests.IMultiConstraintService<T>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Tests.IMultiConstraintService<T>? source)
+	{
+		Save._source = source;
+		Find._source = source;
 	}
 
 	void global::KnockOff.Tests.IMultiConstraintService<T>.Save(T entity)

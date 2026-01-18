@@ -41,6 +41,14 @@ partial class NotifyNeatooPropertyChangedStub : global::Neatoo.INotifyNeatooProp
 	/// <summary>The global::Neatoo.INotifyNeatooPropertyChanged instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.INotifyNeatooPropertyChanged Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::Neatoo.INotifyNeatooPropertyChanged).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::Neatoo.INotifyNeatooPropertyChanged? source)
+	{
+	}
+
 	event global::Neatoo.NeatooPropertyChanged? global::Neatoo.INotifyNeatooPropertyChanged.NeatooPropertyChanged
 	{
 		add => NeatooPropertyChanged.RecordAdd(value);

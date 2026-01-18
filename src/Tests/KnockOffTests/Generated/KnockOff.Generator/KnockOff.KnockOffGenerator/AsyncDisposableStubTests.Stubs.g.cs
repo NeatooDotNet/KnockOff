@@ -11,6 +11,9 @@ partial class AsyncDisposableStubTests
 		/// <summary>Tracks and configures behavior for DisposeAsync.</summary>
 		public sealed class IAsyncDisposable_DisposeAsyncInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IAsyncDisposable? _source;
+
 			/// <summary>Delegate for DisposeAsync.</summary>
 			public delegate global::System.Threading.Tasks.ValueTask DisposeAsyncDelegate(Stubs.IAsyncDisposable ko);
 
@@ -51,6 +54,9 @@ partial class AsyncDisposableStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.DisposeAsync();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "DisposeAsync");
 					return default;
 				}
@@ -73,6 +79,7 @@ partial class AsyncDisposableStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -177,6 +184,12 @@ partial class AsyncDisposableStubTests
 			public IAsyncDisposable(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.IAsyncDisposable delegation.</summary>
+			public void Source(global::System.IAsyncDisposable? source)
+			{
+				DisposeAsync._source = source;
 			}
 
 		}

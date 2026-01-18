@@ -24,6 +24,11 @@ partial class INeatooObjectTests
 				Strict = strict;
 			}
 
+			/// <summary>Sets the source object for global::Neatoo.INeatooObject delegation.</summary>
+			public void Source(global::Neatoo.INeatooObject? source)
+			{
+			}
+
 		}
 
 	}

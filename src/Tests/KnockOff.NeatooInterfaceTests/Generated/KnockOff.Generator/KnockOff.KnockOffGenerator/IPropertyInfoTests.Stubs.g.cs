@@ -25,11 +25,14 @@ partial class IPropertyInfoTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Reflection.PropertyInfo Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.IPropertyInfo? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IPropertyInfo.Name.</summary>
@@ -44,11 +47,14 @@ partial class IPropertyInfoTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public string Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.IPropertyInfo? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IPropertyInfo.Type.</summary>
@@ -63,11 +69,14 @@ partial class IPropertyInfoTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Type Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.IPropertyInfo? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IPropertyInfo.Key.</summary>
@@ -82,11 +91,14 @@ partial class IPropertyInfoTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public string Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.IPropertyInfo? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IPropertyInfo.IsPrivateSetter.</summary>
@@ -101,16 +113,22 @@ partial class IPropertyInfoTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.IPropertyInfo? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Tracks and configures behavior for GetCustomAttributes.</summary>
 		public sealed class IPropertyInfo_GetCustomAttributesInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::Neatoo.IPropertyInfo? _source;
+
 			/// <summary>Delegate for GetCustomAttributes.</summary>
 			public delegate global::System.Collections.Generic.IEnumerable<global::System.Attribute> GetCustomAttributesDelegate(Stubs.IPropertyInfo ko);
 
@@ -151,6 +169,7 @@ partial class IPropertyInfoTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					if (_source is { } src) return src.GetCustomAttributes();
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetCustomAttributes");
 					throw new global::System.InvalidOperationException("No implementation provided for GetCustomAttributes. Configure via OnCall.");
 				}
@@ -173,6 +192,7 @@ partial class IPropertyInfoTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -362,6 +382,7 @@ partial class IPropertyInfoTests
 				{
 					PropertyInfo.RecordGet();
 					if (PropertyInfo.OnGet is { } onGet) return onGet(this);
+					if (PropertyInfo._source is { } src) return src.PropertyInfo;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "PropertyInfo");
 					return PropertyInfo.Value;
 				}
@@ -373,6 +394,7 @@ partial class IPropertyInfoTests
 				{
 					Name.RecordGet();
 					if (Name.OnGet is { } onGet) return onGet(this);
+					if (Name._source is { } src) return src.Name;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "Name");
 					return Name.Value;
 				}
@@ -384,6 +406,7 @@ partial class IPropertyInfoTests
 				{
 					Type.RecordGet();
 					if (Type.OnGet is { } onGet) return onGet(this);
+					if (Type._source is { } src) return src.Type;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "Type");
 					return Type.Value;
 				}
@@ -395,6 +418,7 @@ partial class IPropertyInfoTests
 				{
 					Key.RecordGet();
 					if (Key.OnGet is { } onGet) return onGet(this);
+					if (Key._source is { } src) return src.Key;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "Key");
 					return Key.Value;
 				}
@@ -406,6 +430,7 @@ partial class IPropertyInfoTests
 				{
 					IsPrivateSetter.RecordGet();
 					if (IsPrivateSetter.OnGet is { } onGet) return onGet(this);
+					if (IsPrivateSetter._source is { } src) return src.IsPrivateSetter;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "IsPrivateSetter");
 					return IsPrivateSetter.Value;
 				}
@@ -422,6 +447,17 @@ partial class IPropertyInfoTests
 			public IPropertyInfo(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::Neatoo.IPropertyInfo delegation.</summary>
+			public void Source(global::Neatoo.IPropertyInfo? source)
+			{
+				PropertyInfo._source = source;
+				Name._source = source;
+				Type._source = source;
+				Key._source = source;
+				IsPrivateSetter._source = source;
+				GetCustomAttributes._source = source;
 			}
 
 			/// <summary>Gets a smart default value for a generic type at runtime.</summary>

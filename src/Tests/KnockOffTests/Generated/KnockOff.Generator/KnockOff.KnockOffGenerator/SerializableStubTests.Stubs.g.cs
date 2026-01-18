@@ -11,6 +11,9 @@ partial class SerializableStubTests
 		/// <summary>Tracks and configures behavior for GetObjectData.</summary>
 		public sealed class ISerializable_GetObjectDataInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Runtime.Serialization.ISerializable? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.ISerializable, global::System.Runtime.Serialization.SerializationInfo, global::System.Runtime.Serialization.StreamingContext> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -53,6 +56,9 @@ partial class SerializableStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((info, context));
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.GetObjectData(info, context); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetObjectData");
 					return;
 				}
@@ -76,6 +82,7 @@ partial class SerializableStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -184,6 +191,12 @@ partial class SerializableStubTests
 			public ISerializable(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.Runtime.Serialization.ISerializable delegation.</summary>
+			public void Source(global::System.Runtime.Serialization.ISerializable? source)
+			{
+				GetObjectData._source = source;
 			}
 
 		}

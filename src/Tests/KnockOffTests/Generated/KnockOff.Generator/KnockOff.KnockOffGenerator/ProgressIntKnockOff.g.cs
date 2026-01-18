@@ -8,6 +8,9 @@ partial class ProgressIntKnockOff : global::System.IProgress<int>, global::Knock
 	/// <summary>Tracks and configures behavior for Report.</summary>
 	public sealed class ReportInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::System.IProgress<int>? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<ProgressIntKnockOff, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -50,6 +53,9 @@ partial class ProgressIntKnockOff : global::System.IProgress<int>, global::Knock
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = @value;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.Report(@value); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Report");
 				return;
 			}
@@ -73,6 +79,7 @@ partial class ProgressIntKnockOff : global::System.IProgress<int>, global::Knock
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -181,6 +188,15 @@ partial class ProgressIntKnockOff : global::System.IProgress<int>, global::Knock
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::System.IProgress<int>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::System.IProgress<int>? source)
+	{
+		Report._source = source;
 	}
 
 	void global::System.IProgress<int>.Report(int @value)

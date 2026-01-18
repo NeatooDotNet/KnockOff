@@ -8,6 +8,9 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Tests.ISampleService? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -33,12 +36,15 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for DoSomething.</summary>
 	public sealed class DoSomethingInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.ISampleService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<SampleKnockOff> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -76,6 +82,9 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.DoSomething(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "DoSomething");
 				return;
 			}
@@ -98,6 +107,7 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -183,6 +193,9 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 	/// <summary>Tracks and configures behavior for Calculate.</summary>
 	public sealed class CalculateInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.ISampleService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<SampleKnockOff, string, int, bool> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -225,6 +238,9 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((name, @value, flag));
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.Calculate(name, @value, flag); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Calculate");
 				return;
 			}
@@ -248,6 +264,7 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -337,6 +354,9 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 	/// <summary>Tracks and configures behavior for GetOptional.</summary>
 	public sealed class GetOptionalInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Tests.ISampleService? _source;
+
 		/// <summary>Delegate for GetOptional.</summary>
 		public delegate string? GetOptionalDelegate(SampleKnockOff ko);
 
@@ -377,6 +397,9 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetOptional();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetOptional");
 				return default!;
 			}
@@ -399,6 +422,7 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -540,10 +564,22 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
 	}
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Tests.ISampleService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Tests.ISampleService? source)
+	{
+		Name._source = source;
+		DoSomething._source = source;
+		Calculate._source = source;
+		GetOptional._source = source;
+	}
+
 	string global::KnockOff.Tests.ISampleService.Name
 	{
-		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ISampleService", "Name"); return Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ISampleService", "Name"); Name.Value = value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Name._source is { } src) return src.Name; if (Strict) throw global::KnockOff.StubException.NotConfigured("ISampleService", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Name._source is { } src) { src.Name = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ISampleService", "Name"); Name.Value = value; }
 	}
 
 	void global::KnockOff.Tests.ISampleService.DoSomething()

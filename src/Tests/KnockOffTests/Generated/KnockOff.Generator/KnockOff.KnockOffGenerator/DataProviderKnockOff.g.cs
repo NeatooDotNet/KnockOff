@@ -8,6 +8,9 @@ partial class DataProviderKnockOff : global::KnockOff.Tests.IDataProvider, globa
 	/// <summary>Tracks and configures behavior for Count.</summary>
 	public sealed class CountInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Tests.IDataProvider? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -21,7 +24,7 @@ partial class DataProviderKnockOff : global::KnockOff.Tests.IDataProvider, globa
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks calls to GetData (user-defined implementation).</summary>
@@ -57,9 +60,18 @@ partial class DataProviderKnockOff : global::KnockOff.Tests.IDataProvider, globa
 	/// <summary>The global::KnockOff.Tests.IDataProvider instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Tests.IDataProvider Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Tests.IDataProvider).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Tests.IDataProvider? source)
+	{
+		Count._source = source;
+	}
+
 	int global::KnockOff.Tests.IDataProvider.Count
 	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IDataProvider", "Count"); return Count.Value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("IDataProvider", "Count"); return Count.Value; }
 	}
 
 	string global::KnockOff.Tests.IDataProvider.GetData(int id)

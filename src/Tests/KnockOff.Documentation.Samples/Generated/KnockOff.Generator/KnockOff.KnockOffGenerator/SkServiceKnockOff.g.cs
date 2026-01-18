@@ -35,6 +35,14 @@ partial class SkServiceKnockOff : global::KnockOff.Documentation.Samples.Skills.
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ISkService Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Skills.ISkService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Skills.ISkService? source)
+	{
+	}
+
 	int global::KnockOff.Documentation.Samples.Skills.ISkService.GetValue(int id)
 	{
 		GetValue2.RecordCall(id);

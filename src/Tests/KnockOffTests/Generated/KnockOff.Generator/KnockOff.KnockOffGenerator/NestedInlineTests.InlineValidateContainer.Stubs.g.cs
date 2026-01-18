@@ -22,11 +22,14 @@ partial class InlineValidateContainer
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::Neatoo.IValidateBase? Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.IValidateBase? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IValidateBase.IsPaused.</summary>
@@ -41,11 +44,14 @@ partial class InlineValidateContainer
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.IValidateBase? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IValidateBase.IsBusy.</summary>
@@ -60,11 +66,14 @@ partial class InlineValidateContainer
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.IValidateMetaProperties? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IValidateBase.IsValid.</summary>
@@ -79,11 +88,14 @@ partial class InlineValidateContainer
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.IValidateMetaProperties? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IValidateBase.IsSelfValid.</summary>
@@ -98,11 +110,14 @@ partial class InlineValidateContainer
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.IValidateMetaProperties? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IValidateBase.PropertyMessages.</summary>
@@ -117,11 +132,14 @@ partial class InlineValidateContainer
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::Neatoo.IValidateMetaProperties? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IValidateBase.Indexer.</summary>
@@ -142,13 +160,19 @@ partial class InlineValidateContainer
 			/// <summary>Backing storage for this indexer.</summary>
 			public global::System.Collections.Generic.Dictionary<string, global::Neatoo.IValidateProperty> Backing { get; } = new();
 
+			/// <summary>Source object for delegation when OnGet/OnSet is not set.</summary>
+			internal global::Neatoo.IValidateBase? _source;
+
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; }
+			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; _source = null; }
 		}
 
 		/// <summary>Tracks and configures behavior for GetProperty.</summary>
 		public sealed class IValidateBase_GetPropertyInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::Neatoo.IValidateBase? _source;
+
 			/// <summary>Delegate for GetProperty.</summary>
 			public delegate global::Neatoo.IValidateProperty GetPropertyDelegate(Stubs.IValidateBase ko, string propertyName);
 
@@ -194,6 +218,9 @@ partial class InlineValidateContainer
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = propertyName;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetProperty(propertyName);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetProperty");
 					return default!;
 				}
@@ -217,6 +244,7 @@ partial class InlineValidateContainer
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -306,6 +334,9 @@ partial class InlineValidateContainer
 		/// <summary>Tracks and configures behavior for TryGetProperty.</summary>
 		public sealed class IValidateBase_TryGetPropertyInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::Neatoo.IValidateBase? _source;
+
 			/// <summary>Delegate for TryGetProperty.</summary>
 			public delegate bool TryGetPropertyDelegate(Stubs.IValidateBase ko, string propertyName, out global::Neatoo.IValidateProperty validateProperty);
 
@@ -352,6 +383,9 @@ partial class InlineValidateContainer
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArg = propertyName;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.TryGetProperty(propertyName, out validateProperty);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "TryGetProperty");
 					return default!;
 				}
@@ -375,6 +409,7 @@ partial class InlineValidateContainer
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -464,6 +499,9 @@ partial class InlineValidateContainer
 		/// <summary>Tracks and configures behavior for WaitForTasks.</summary>
 		public sealed class IValidateBase_WaitForTasksInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::Neatoo.IValidateMetaProperties? _source;
+
 			private int _unconfiguredCallCount;
 
 			/// <summary>Delegate for WaitForTasks().</summary>
@@ -530,6 +568,9 @@ partial class InlineValidateContainer
 				if (_sequence_NoParams_Threading_Tasks_Task.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.WaitForTasks();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "WaitForTasks");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
@@ -554,6 +595,9 @@ partial class InlineValidateContainer
 				if (_sequence_Threading_CancellationToken_Threading_Tasks_Task.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.WaitForTasks(token);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "WaitForTasks");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
@@ -576,6 +620,7 @@ partial class InlineValidateContainer
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence_NoParams_Threading_Tasks_Task)
 					tracking.Reset();
 				_sequenceIndex_NoParams_Threading_Tasks_Task = 0;
@@ -737,6 +782,9 @@ partial class InlineValidateContainer
 		/// <summary>Tracks and configures behavior for RunRules.</summary>
 		public sealed class IValidateBase_RunRulesInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::Neatoo.IValidateMetaProperties? _source;
+
 			private int _unconfiguredCallCount;
 
 			/// <summary>Delegate for RunRules(string, global::System.Threading.CancellationToken?).</summary>
@@ -803,6 +851,9 @@ partial class InlineValidateContainer
 				if (_sequence_String_Threading_CancellationToken_Threading_Tasks_Task.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.RunRules(propertyName, token);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
@@ -827,6 +878,9 @@ partial class InlineValidateContainer
 				if (_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.RunRules(runRules, token);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
@@ -849,6 +903,7 @@ partial class InlineValidateContainer
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence_String_Threading_CancellationToken_Threading_Tasks_Task)
 					tracking.Reset();
 				_sequenceIndex_String_Threading_CancellationToken_Threading_Tasks_Task = 0;
@@ -1014,6 +1069,9 @@ partial class InlineValidateContainer
 		/// <summary>Tracks and configures behavior for ClearAllMessages.</summary>
 		public sealed class IValidateBase_ClearAllMessagesInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::Neatoo.IValidateMetaProperties? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IValidateBase> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -1051,6 +1109,9 @@ partial class InlineValidateContainer
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.ClearAllMessages(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ClearAllMessages");
 					return;
 				}
@@ -1073,6 +1134,7 @@ partial class InlineValidateContainer
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1158,6 +1220,9 @@ partial class InlineValidateContainer
 		/// <summary>Tracks and configures behavior for ClearSelfMessages.</summary>
 		public sealed class IValidateBase_ClearSelfMessagesInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::Neatoo.IValidateMetaProperties? _source;
+
 			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IValidateBase> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 			private int _sequenceIndex;
 			private int _unconfiguredCallCount;
@@ -1195,6 +1260,9 @@ partial class InlineValidateContainer
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) { src.ClearSelfMessages(); return; }
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ClearSelfMessages");
 					return;
 				}
@@ -1217,6 +1285,7 @@ partial class InlineValidateContainer
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -1407,6 +1476,7 @@ partial class InlineValidateContainer
 				{
 					Parent.RecordGet();
 					if (Parent.OnGet is { } onGet) return onGet(this);
+					if (Parent._source is { } src) return src.Parent;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "Parent");
 					return Parent.Value;
 				}
@@ -1418,6 +1488,7 @@ partial class InlineValidateContainer
 				{
 					IsPaused.RecordGet();
 					if (IsPaused.OnGet is { } onGet) return onGet(this);
+					if (IsPaused._source is { } src) return src.IsPaused;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "IsPaused");
 					return IsPaused.Value;
 				}
@@ -1429,6 +1500,7 @@ partial class InlineValidateContainer
 				{
 					Indexer.RecordGet(propertyName);
 					if (Indexer.OnGet is { } onGet) return onGet(this, propertyName);
+					if (Indexer._source is { } src) return src[propertyName];
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "this[]");
 					return Indexer.Backing.TryGetValue(propertyName, out var v) ? v : default!;
 				}
@@ -1470,6 +1542,7 @@ partial class InlineValidateContainer
 				{
 					IsBusy.RecordGet();
 					if (IsBusy.OnGet is { } onGet) return onGet(this);
+					if (IsBusy._source is { } src) return src.IsBusy;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsBusy");
 					return IsBusy.Value;
 				}
@@ -1481,6 +1554,7 @@ partial class InlineValidateContainer
 				{
 					IsValid.RecordGet();
 					if (IsValid.OnGet is { } onGet) return onGet(this);
+					if (IsValid._source is { } src) return src.IsValid;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsValid");
 					return IsValid.Value;
 				}
@@ -1492,6 +1566,7 @@ partial class InlineValidateContainer
 				{
 					IsSelfValid.RecordGet();
 					if (IsSelfValid.OnGet is { } onGet) return onGet(this);
+					if (IsSelfValid._source is { } src) return src.IsSelfValid;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsSelfValid");
 					return IsSelfValid.Value;
 				}
@@ -1503,6 +1578,7 @@ partial class InlineValidateContainer
 				{
 					PropertyMessages.RecordGet();
 					if (PropertyMessages.OnGet is { } onGet) return onGet(this);
+					if (PropertyMessages._source is { } src) return src.PropertyMessages;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "PropertyMessages");
 					return PropertyMessages.Value;
 				}
@@ -1531,6 +1607,96 @@ partial class InlineValidateContainer
 			public IValidateBase(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::Neatoo.IValidateBase delegation.</summary>
+			public void Source(global::Neatoo.IValidateBase? source)
+			{
+				Parent._source = source;
+				IsPaused._source = source;
+				IsBusy._source = source;
+				IsValid._source = source;
+				IsSelfValid._source = source;
+				PropertyMessages._source = source;
+				Indexer._source = source;
+				GetProperty._source = source;
+				TryGetProperty._source = source;
+				WaitForTasks._source = source;
+				RunRules._source = source;
+				ClearAllMessages._source = source;
+				ClearSelfMessages._source = source;
+			}
+
+			/// <summary>Sets the source object for global::Neatoo.INeatooObject delegation.</summary>
+			public void Source(global::Neatoo.INeatooObject? source)
+			{
+				Parent._source = null;
+				IsPaused._source = null;
+				IsBusy._source = null;
+				IsValid._source = null;
+				IsSelfValid._source = null;
+				PropertyMessages._source = null;
+				Indexer._source = null;
+				GetProperty._source = null;
+				TryGetProperty._source = null;
+				WaitForTasks._source = null;
+				RunRules._source = null;
+				ClearAllMessages._source = null;
+				ClearSelfMessages._source = null;
+			}
+
+			/// <summary>Sets the source object for global::System.ComponentModel.INotifyPropertyChanged delegation.</summary>
+			public void Source(global::System.ComponentModel.INotifyPropertyChanged? source)
+			{
+				Parent._source = null;
+				IsPaused._source = null;
+				IsBusy._source = null;
+				IsValid._source = null;
+				IsSelfValid._source = null;
+				PropertyMessages._source = null;
+				Indexer._source = null;
+				GetProperty._source = null;
+				TryGetProperty._source = null;
+				WaitForTasks._source = null;
+				RunRules._source = null;
+				ClearAllMessages._source = null;
+				ClearSelfMessages._source = null;
+			}
+
+			/// <summary>Sets the source object for global::Neatoo.INotifyNeatooPropertyChanged delegation.</summary>
+			public void Source(global::Neatoo.INotifyNeatooPropertyChanged? source)
+			{
+				Parent._source = null;
+				IsPaused._source = null;
+				IsBusy._source = null;
+				IsValid._source = null;
+				IsSelfValid._source = null;
+				PropertyMessages._source = null;
+				Indexer._source = null;
+				GetProperty._source = null;
+				TryGetProperty._source = null;
+				WaitForTasks._source = null;
+				RunRules._source = null;
+				ClearAllMessages._source = null;
+				ClearSelfMessages._source = null;
+			}
+
+			/// <summary>Sets the source object for global::Neatoo.IValidateMetaProperties delegation.</summary>
+			public void Source(global::Neatoo.IValidateMetaProperties? source)
+			{
+				Parent._source = null;
+				IsPaused._source = null;
+				IsBusy._source = source;
+				IsValid._source = source;
+				IsSelfValid._source = source;
+				PropertyMessages._source = source;
+				Indexer._source = null;
+				GetProperty._source = null;
+				TryGetProperty._source = null;
+				WaitForTasks._source = source;
+				RunRules._source = source;
+				ClearAllMessages._source = source;
+				ClearSelfMessages._source = source;
 			}
 
 		}

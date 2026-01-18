@@ -16,6 +16,9 @@ partial class OrderedEnumerableStringStubTests
 		/// <summary>Tracks and configures behavior for GetEnumerator.</summary>
 		public sealed class IOrderedEnumerable_GetEnumeratorInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.Generic.IEnumerable<string>? _source;
+
 			/// <summary>Delegate for GetEnumerator.</summary>
 			public delegate global::System.Collections.Generic.IEnumerator<string> GetEnumeratorDelegate(Stubs.IOrderedEnumerable ko);
 
@@ -56,6 +59,9 @@ partial class OrderedEnumerableStringStubTests
 				if (_sequence.Count == 0)
 				{
 					_unconfiguredCallCount++;
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.GetEnumerator();
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
 					throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
 				}
@@ -78,6 +84,7 @@ partial class OrderedEnumerableStringStubTests
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -265,6 +272,24 @@ partial class OrderedEnumerableStringStubTests
 			public IOrderedEnumerable(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.Linq.IOrderedEnumerable<string> delegation.</summary>
+			public void Source(global::System.Linq.IOrderedEnumerable<string>? source)
+			{
+				GetEnumerator._source = source;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.Generic.IEnumerable<string> delegation.</summary>
+			public void Source(global::System.Collections.Generic.IEnumerable<string>? source)
+			{
+				GetEnumerator._source = source;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.IEnumerable delegation.</summary>
+			public void Source(global::System.Collections.IEnumerable? source)
+			{
+				GetEnumerator._source = null;
 			}
 
 			/// <summary>Gets a smart default value for a generic type at runtime.</summary>

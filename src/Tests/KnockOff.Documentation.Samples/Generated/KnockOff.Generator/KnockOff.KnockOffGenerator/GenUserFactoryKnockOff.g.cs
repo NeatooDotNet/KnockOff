@@ -8,6 +8,9 @@ partial class GenUserFactoryKnockOff : global::KnockOff.Documentation.Samples.Gu
 	/// <summary>Tracks and configures behavior for Create.</summary>
 	public sealed class CreateInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IGenFactory<global::KnockOff.Documentation.Samples.Guides.GenUser>? _source;
+
 		/// <summary>Delegate for Create.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Guides.GenUser CreateDelegate(GenUserFactoryKnockOff ko);
 
@@ -48,6 +51,7 @@ partial class GenUserFactoryKnockOff : global::KnockOff.Documentation.Samples.Gu
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.Create();
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Create");
 				return new global::KnockOff.Documentation.Samples.Guides.GenUser();
 			}
@@ -70,6 +74,7 @@ partial class GenUserFactoryKnockOff : global::KnockOff.Documentation.Samples.Gu
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -174,6 +179,15 @@ partial class GenUserFactoryKnockOff : global::KnockOff.Documentation.Samples.Gu
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.IGenFactory<global::KnockOff.Documentation.Samples.Guides.GenUser>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.IGenFactory<global::KnockOff.Documentation.Samples.Guides.GenUser>? source)
+	{
+		Create._source = source;
 	}
 
 	global::KnockOff.Documentation.Samples.Guides.GenUser global::KnockOff.Documentation.Samples.Guides.IGenFactory<global::KnockOff.Documentation.Samples.Guides.GenUser>.Create()

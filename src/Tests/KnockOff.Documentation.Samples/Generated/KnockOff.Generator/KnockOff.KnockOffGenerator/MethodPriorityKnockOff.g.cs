@@ -35,6 +35,14 @@ partial class MethodPriorityKnockOff : global::KnockOff.Documentation.Samples.Gu
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IMethodPriority instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IMethodPriority Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.IMethodPriority).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.IMethodPriority? source)
+	{
+	}
+
 	int global::KnockOff.Documentation.Samples.Guides.IMethodPriority.Calculate(int x)
 	{
 		Calculate2.RecordCall(x);

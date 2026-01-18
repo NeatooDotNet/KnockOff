@@ -8,6 +8,9 @@ partial class CollectionStringKnockOff : global::System.Collections.Generic.ICol
 	/// <summary>Tracks and configures behavior for Count.</summary>
 	public sealed class CountInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::System.Collections.Generic.ICollection<string>? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -21,12 +24,15 @@ partial class CollectionStringKnockOff : global::System.Collections.Generic.ICol
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for IsReadOnly.</summary>
 	public sealed class IsReadOnlyInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::System.Collections.Generic.ICollection<string>? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -40,12 +46,15 @@ partial class CollectionStringKnockOff : global::System.Collections.Generic.ICol
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for Add.</summary>
 	public sealed class AddInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::System.Collections.Generic.ICollection<string>? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<CollectionStringKnockOff, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -88,6 +97,9 @@ partial class CollectionStringKnockOff : global::System.Collections.Generic.ICol
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = item;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.Add(item); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 				return;
 			}
@@ -111,6 +123,7 @@ partial class CollectionStringKnockOff : global::System.Collections.Generic.ICol
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -200,6 +213,9 @@ partial class CollectionStringKnockOff : global::System.Collections.Generic.ICol
 	/// <summary>Tracks and configures behavior for Clear.</summary>
 	public sealed class ClearInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::System.Collections.Generic.ICollection<string>? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<CollectionStringKnockOff> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -237,6 +253,9 @@ partial class CollectionStringKnockOff : global::System.Collections.Generic.ICol
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.Clear(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Clear");
 				return;
 			}
@@ -259,6 +278,7 @@ partial class CollectionStringKnockOff : global::System.Collections.Generic.ICol
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -344,6 +364,9 @@ partial class CollectionStringKnockOff : global::System.Collections.Generic.ICol
 	/// <summary>Tracks and configures behavior for Contains.</summary>
 	public sealed class ContainsInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::System.Collections.Generic.ICollection<string>? _source;
+
 		/// <summary>Delegate for Contains.</summary>
 		public delegate bool ContainsDelegate(CollectionStringKnockOff ko, string item);
 
@@ -389,6 +412,9 @@ partial class CollectionStringKnockOff : global::System.Collections.Generic.ICol
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = item;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Contains(item);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Contains");
 				return default!;
 			}
@@ -412,6 +438,7 @@ partial class CollectionStringKnockOff : global::System.Collections.Generic.ICol
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -501,6 +528,9 @@ partial class CollectionStringKnockOff : global::System.Collections.Generic.ICol
 	/// <summary>Tracks and configures behavior for CopyTo.</summary>
 	public sealed class CopyToInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::System.Collections.Generic.ICollection<string>? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<CollectionStringKnockOff, string[], int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -543,6 +573,9 @@ partial class CollectionStringKnockOff : global::System.Collections.Generic.ICol
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((array, arrayIndex));
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.CopyTo(array, arrayIndex); return; }
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "CopyTo");
 				return;
 			}
@@ -566,6 +599,7 @@ partial class CollectionStringKnockOff : global::System.Collections.Generic.ICol
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -655,6 +689,9 @@ partial class CollectionStringKnockOff : global::System.Collections.Generic.ICol
 	/// <summary>Tracks and configures behavior for Remove.</summary>
 	public sealed class RemoveInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::System.Collections.Generic.ICollection<string>? _source;
+
 		/// <summary>Delegate for Remove.</summary>
 		public delegate bool RemoveDelegate(CollectionStringKnockOff ko, string item);
 
@@ -700,6 +737,9 @@ partial class CollectionStringKnockOff : global::System.Collections.Generic.ICol
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = item;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Remove(item);
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Remove");
 				return default!;
 			}
@@ -723,6 +763,7 @@ partial class CollectionStringKnockOff : global::System.Collections.Generic.ICol
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -812,6 +853,9 @@ partial class CollectionStringKnockOff : global::System.Collections.Generic.ICol
 	/// <summary>Tracks and configures behavior for GetEnumerator.</summary>
 	public sealed class GetEnumeratorInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::System.Collections.Generic.IEnumerable<string>? _source;
+
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for GetEnumerator().</summary>
@@ -878,6 +922,9 @@ partial class CollectionStringKnockOff : global::System.Collections.Generic.ICol
 			if (_sequence_NoParams_Collections_Generic_IEnumerator_string.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetEnumerator();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
 			}
@@ -902,6 +949,9 @@ partial class CollectionStringKnockOff : global::System.Collections.Generic.ICol
 			if (_sequence_NoParams_Collections_IEnumerator.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetEnumerator();
+				#pragma warning restore CS8601, SYSLIB0050
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
 			}
@@ -924,6 +974,7 @@ partial class CollectionStringKnockOff : global::System.Collections.Generic.ICol
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence_NoParams_Collections_Generic_IEnumerator_string)
 				tracking.Reset();
 			_sequenceIndex_NoParams_Collections_Generic_IEnumerator_string = 0;
@@ -1128,14 +1179,58 @@ partial class CollectionStringKnockOff : global::System.Collections.Generic.ICol
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
 	}
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::System.Collections.Generic.ICollection<string>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::System.Collections.Generic.ICollection<string>? source)
+	{
+		Count._source = source;
+		IsReadOnly._source = source;
+		Add._source = source;
+		Clear._source = source;
+		Contains._source = source;
+		CopyTo._source = source;
+		Remove._source = source;
+		GetEnumerator._source = source;
+	}
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::System.Collections.Generic.IEnumerable<string>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::System.Collections.Generic.IEnumerable<string>? source)
+	{
+		Count._source = null;
+		IsReadOnly._source = null;
+		Add._source = null;
+		Clear._source = null;
+		Contains._source = null;
+		CopyTo._source = null;
+		Remove._source = null;
+		GetEnumerator._source = source;
+	}
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::System.Collections.IEnumerable).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::System.Collections.IEnumerable? source)
+	{
+		Count._source = null;
+		IsReadOnly._source = null;
+		Add._source = null;
+		Clear._source = null;
+		Contains._source = null;
+		CopyTo._source = null;
+		Remove._source = null;
+		GetEnumerator._source = null;
+	}
+
 	int global::System.Collections.Generic.ICollection<string>.Count
 	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "Count"); return Count.Value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "Count"); return Count.Value; }
 	}
 
 	bool global::System.Collections.Generic.ICollection<string>.IsReadOnly
 	{
-		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "IsReadOnly"); return IsReadOnly.Value; }
+		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(this); if (IsReadOnly._source is { } src) return src.IsReadOnly; if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "IsReadOnly"); return IsReadOnly.Value; }
 	}
 
 	void global::System.Collections.Generic.ICollection<string>.Add(string item)

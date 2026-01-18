@@ -8,6 +8,9 @@ partial class MmTrackedPropServiceKnockOff : global::KnockOff.Documentation.Samp
 	/// <summary>Tracks and configures behavior for Active.</summary>
 	public sealed class ActiveInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.IMmTrackedPropService? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -33,12 +36,15 @@ partial class MmTrackedPropServiceKnockOff : global::KnockOff.Documentation.Samp
 		public void RecordSet(bool? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for NewDate.</summary>
 	public sealed class NewDateInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.IMmTrackedPropService? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -64,12 +70,15 @@ partial class MmTrackedPropServiceKnockOff : global::KnockOff.Documentation.Samp
 		public void RecordSet(global::System.DateTime? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for VisitId.</summary>
 	public sealed class VisitIdInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.IMmTrackedPropService? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -95,12 +104,15 @@ partial class MmTrackedPropServiceKnockOff : global::KnockOff.Documentation.Samp
 		public void RecordSet(long? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for VisitLabel.</summary>
 	public sealed class VisitLabelInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.IMmTrackedPropService? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -126,12 +138,15 @@ partial class MmTrackedPropServiceKnockOff : global::KnockOff.Documentation.Samp
 		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for PreviousVisitDate.</summary>
 	public sealed class PreviousVisitDateInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.IMmTrackedPropService? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -157,7 +172,7 @@ partial class MmTrackedPropServiceKnockOff : global::KnockOff.Documentation.Samp
 		public void RecordSet(global::System.DateTime? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Interceptor for Active. Configure via .Value, track via .GetCount.</summary>
@@ -181,34 +196,47 @@ partial class MmTrackedPropServiceKnockOff : global::KnockOff.Documentation.Samp
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.IMmTrackedPropService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.IMmTrackedPropService Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Skills.IMmTrackedPropService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Skills.IMmTrackedPropService? source)
+	{
+		Active._source = source;
+		NewDate._source = source;
+		VisitId._source = source;
+		VisitLabel._source = source;
+		PreviousVisitDate._source = source;
+	}
+
 	bool global::KnockOff.Documentation.Samples.Skills.IMmTrackedPropService.Active
 	{
-		get { Active.RecordGet(); if (Active.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmTrackedPropService", "Active"); return Active.Value; }
-		set { Active.RecordSet(value); if (Active.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmTrackedPropService", "Active"); Active.Value = value; }
+		get { Active.RecordGet(); if (Active.OnGet is { } onGet) return onGet(this); if (Active._source is { } src) return src.Active; if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmTrackedPropService", "Active"); return Active.Value; }
+		set { Active.RecordSet(value); if (Active.OnSet is { } onSet) { onSet(this, value); return; } if (Active._source is { } src) { src.Active = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmTrackedPropService", "Active"); Active.Value = value; }
 	}
 
 	global::System.DateTime global::KnockOff.Documentation.Samples.Skills.IMmTrackedPropService.NewDate
 	{
-		get { NewDate.RecordGet(); if (NewDate.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmTrackedPropService", "NewDate"); return NewDate.Value; }
-		set { NewDate.RecordSet(value); if (NewDate.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmTrackedPropService", "NewDate"); NewDate.Value = value; }
+		get { NewDate.RecordGet(); if (NewDate.OnGet is { } onGet) return onGet(this); if (NewDate._source is { } src) return src.NewDate; if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmTrackedPropService", "NewDate"); return NewDate.Value; }
+		set { NewDate.RecordSet(value); if (NewDate.OnSet is { } onSet) { onSet(this, value); return; } if (NewDate._source is { } src) { src.NewDate = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmTrackedPropService", "NewDate"); NewDate.Value = value; }
 	}
 
 	long global::KnockOff.Documentation.Samples.Skills.IMmTrackedPropService.VisitId
 	{
-		get { VisitId.RecordGet(); if (VisitId.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmTrackedPropService", "VisitId"); return VisitId.Value; }
-		set { VisitId.RecordSet(value); if (VisitId.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmTrackedPropService", "VisitId"); VisitId.Value = value; }
+		get { VisitId.RecordGet(); if (VisitId.OnGet is { } onGet) return onGet(this); if (VisitId._source is { } src) return src.VisitId; if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmTrackedPropService", "VisitId"); return VisitId.Value; }
+		set { VisitId.RecordSet(value); if (VisitId.OnSet is { } onSet) { onSet(this, value); return; } if (VisitId._source is { } src) { src.VisitId = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmTrackedPropService", "VisitId"); VisitId.Value = value; }
 	}
 
 	string global::KnockOff.Documentation.Samples.Skills.IMmTrackedPropService.VisitLabel
 	{
-		get { VisitLabel.RecordGet(); if (VisitLabel.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmTrackedPropService", "VisitLabel"); return VisitLabel.Value; }
-		set { VisitLabel.RecordSet(value); if (VisitLabel.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmTrackedPropService", "VisitLabel"); VisitLabel.Value = value; }
+		get { VisitLabel.RecordGet(); if (VisitLabel.OnGet is { } onGet) return onGet(this); if (VisitLabel._source is { } src) return src.VisitLabel; if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmTrackedPropService", "VisitLabel"); return VisitLabel.Value; }
+		set { VisitLabel.RecordSet(value); if (VisitLabel.OnSet is { } onSet) { onSet(this, value); return; } if (VisitLabel._source is { } src) { src.VisitLabel = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmTrackedPropService", "VisitLabel"); VisitLabel.Value = value; }
 	}
 
 	global::System.DateTime? global::KnockOff.Documentation.Samples.Skills.IMmTrackedPropService.PreviousVisitDate
 	{
-		get { PreviousVisitDate.RecordGet(); if (PreviousVisitDate.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmTrackedPropService", "PreviousVisitDate"); return PreviousVisitDate.Value; }
-		set { PreviousVisitDate.RecordSet(value); if (PreviousVisitDate.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmTrackedPropService", "PreviousVisitDate"); PreviousVisitDate.Value = value; }
+		get { PreviousVisitDate.RecordGet(); if (PreviousVisitDate.OnGet is { } onGet) return onGet(this); if (PreviousVisitDate._source is { } src) return src.PreviousVisitDate; if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmTrackedPropService", "PreviousVisitDate"); return PreviousVisitDate.Value; }
+		set { PreviousVisitDate.RecordSet(value); if (PreviousVisitDate.OnSet is { } onSet) { onSet(this, value); return; } if (PreviousVisitDate._source is { } src) { src.PreviousVisitDate = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IMmTrackedPropService", "PreviousVisitDate"); PreviousVisitDate.Value = value; }
 	}
 
 }

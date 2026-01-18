@@ -11,6 +11,9 @@ partial class FormattableStubTests
 		/// <summary>Tracks and configures behavior for ToString.</summary>
 		public sealed class IFormattable_ToStringInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.IFormattable? _source;
+
 			/// <summary>Delegate for ToString.</summary>
 			public delegate string ToStringDelegate(Stubs.IFormattable ko, string? format, global::System.IFormatProvider? formatProvider);
 
@@ -56,6 +59,9 @@ partial class FormattableStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((format, formatProvider));
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.ToString(format, formatProvider);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToString");
 					return default!;
 				}
@@ -79,6 +85,7 @@ partial class FormattableStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -187,6 +194,12 @@ partial class FormattableStubTests
 			public IFormattable(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.IFormattable delegation.</summary>
+			public void Source(global::System.IFormattable? source)
+			{
+				ToString._source = source;
 			}
 
 		}

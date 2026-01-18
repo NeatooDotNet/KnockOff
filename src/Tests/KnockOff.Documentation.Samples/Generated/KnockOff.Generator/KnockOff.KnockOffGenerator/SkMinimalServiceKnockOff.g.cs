@@ -8,6 +8,9 @@ partial class SkMinimalServiceKnockOff : global::KnockOff.Documentation.Samples.
 	/// <summary>Tracks and configures behavior for GetCount.</summary>
 	public sealed class GetCountInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.ISkMinimalService? _source;
+
 		/// <summary>Delegate for GetCount.</summary>
 		public delegate int GetCountDelegate(SkMinimalServiceKnockOff ko);
 
@@ -48,6 +51,7 @@ partial class SkMinimalServiceKnockOff : global::KnockOff.Documentation.Samples.
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.GetCount();
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetCount");
 				return default!;
 			}
@@ -70,6 +74,7 @@ partial class SkMinimalServiceKnockOff : global::KnockOff.Documentation.Samples.
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -155,6 +160,9 @@ partial class SkMinimalServiceKnockOff : global::KnockOff.Documentation.Samples.
 	/// <summary>Tracks and configures behavior for GetUsers.</summary>
 	public sealed class GetUsersInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.ISkMinimalService? _source;
+
 		/// <summary>Delegate for GetUsers.</summary>
 		public delegate global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser> GetUsersDelegate(SkMinimalServiceKnockOff ko);
 
@@ -195,6 +203,7 @@ partial class SkMinimalServiceKnockOff : global::KnockOff.Documentation.Samples.
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.GetUsers();
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetUsers");
 				return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser>();
 			}
@@ -217,6 +226,7 @@ partial class SkMinimalServiceKnockOff : global::KnockOff.Documentation.Samples.
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -349,6 +359,16 @@ partial class SkMinimalServiceKnockOff : global::KnockOff.Documentation.Samples.
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Skills.ISkMinimalService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Skills.ISkMinimalService? source)
+	{
+		GetCount._source = source;
+		GetUsers._source = source;
 	}
 
 	global::KnockOff.Documentation.Samples.Skills.SkUser? global::KnockOff.Documentation.Samples.Skills.ISkMinimalService.GetUser(int id)

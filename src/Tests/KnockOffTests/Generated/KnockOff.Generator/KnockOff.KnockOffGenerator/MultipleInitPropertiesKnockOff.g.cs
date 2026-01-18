@@ -68,6 +68,14 @@ partial class MultipleInitPropertiesKnockOff : global::KnockOffTests.IMultipleIn
 	/// <summary>The global::KnockOffTests.IMultipleInitProperties instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOffTests.IMultipleInitProperties Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOffTests.IMultipleInitProperties).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOffTests.IMultipleInitProperties? source)
+	{
+	}
+
 	string global::KnockOffTests.IMultipleInitProperties.Id
 	{
 		get { Id.RecordGet(); return Id.Value; }

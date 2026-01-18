@@ -8,6 +8,9 @@ partial class EmailServiceWithValidation : global::KnockOff.Documentation.Sample
 	/// <summary>Tracks and configures behavior for IsConnected.</summary>
 	public sealed class IsConnectedInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -21,12 +24,15 @@ partial class EmailServiceWithValidation : global::KnockOff.Documentation.Sample
 		public void RecordGet() => GetCount++;
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for SendEmail.</summary>
 	public sealed class SendEmailInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<EmailServiceWithValidation, string, string, string> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -69,6 +75,7 @@ partial class EmailServiceWithValidation : global::KnockOff.Documentation.Sample
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((to, subject, body));
+				if (_source is { } src) { src.SendEmail(to, subject, body); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SendEmail");
 				return;
 			}
@@ -92,6 +99,7 @@ partial class EmailServiceWithValidation : global::KnockOff.Documentation.Sample
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -229,9 +237,19 @@ partial class EmailServiceWithValidation : global::KnockOff.Documentation.Sample
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
 	}
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation? source)
+	{
+		IsConnected._source = source;
+		SendEmail._source = source;
+	}
+
 	bool global::KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation.IsConnected
 	{
-		get { IsConnected.RecordGet(); if (IsConnected.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IEmailServiceWithValidation", "IsConnected"); return IsConnected.Value; }
+		get { IsConnected.RecordGet(); if (IsConnected.OnGet is { } onGet) return onGet(this); if (IsConnected._source is { } src) return src.IsConnected; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEmailServiceWithValidation", "IsConnected"); return IsConnected.Value; }
 	}
 
 	void global::KnockOff.Documentation.Samples.GettingStarted.IEmailServiceWithValidation.SendEmail(string to, string subject, string body)

@@ -38,8 +38,11 @@ partial class DsIndexerTests
 			/// <summary>Backing storage for this indexer.</summary>
 			public global::System.Collections.Generic.Dictionary<string, string?> Backing { get; } = new();
 
+			/// <summary>Source object for delegation when OnGet/OnSet is not set.</summary>
+			internal global::KnockOff.Documentation.Samples.Design.IDsCache? _source;
+
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
+			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; _source = null; }
 		}
 
 		/// <summary>Stub implementation of global::KnockOff.Documentation.Samples.Design.IDsCache.</summary>
@@ -54,6 +57,7 @@ partial class DsIndexerTests
 				{
 					Indexer.RecordGet(key);
 					if (Indexer.OnGet is { } onGet) return onGet(this, key);
+					if (Indexer._source is { } src) return src[key];
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsCache", "this[]");
 					return Indexer.Backing.TryGetValue(key, out var v) ? v : default;
 				}
@@ -61,6 +65,7 @@ partial class DsIndexerTests
 				{
 					Indexer.RecordSet(key, value);
 					if (Indexer.OnSet is { } onSet) { onSet(this, key, value); return; }
+					if (Indexer._source is { } src) { src[key] = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsCache", "this[]");
 					Indexer.Backing[key] = value;
 				}
@@ -77,6 +82,12 @@ partial class DsIndexerTests
 			public IDsCache(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::KnockOff.Documentation.Samples.Design.IDsCache delegation.</summary>
+			public void Source(global::KnockOff.Documentation.Samples.Design.IDsCache? source)
+			{
+				Indexer._source = source;
 			}
 
 		}
@@ -111,8 +122,11 @@ partial class DsIndexerTests
 			/// <summary>Backing storage for this indexer.</summary>
 			public global::System.Collections.Generic.Dictionary<string, string?> Backing { get; } = new();
 
+			/// <summary>Source object for delegation when OnGet/OnSet is not set.</summary>
+			internal global::KnockOff.Documentation.Samples.Design.IDsMultiIndexer? _source;
+
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
+			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; _source = null; }
 		}
 
 		/// <summary>Interceptor for IDsMultiIndexer.IndexerInt32.</summary>
@@ -145,8 +159,11 @@ partial class DsIndexerTests
 			/// <summary>Backing storage for this indexer.</summary>
 			public global::System.Collections.Generic.Dictionary<int, string?> Backing { get; } = new();
 
+			/// <summary>Source object for delegation when OnGet/OnSet is not set.</summary>
+			internal global::KnockOff.Documentation.Samples.Design.IDsMultiIndexer? _source;
+
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; }
+			public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = default; OnSet = null; _source = null; }
 		}
 
 		/// <summary>Stub implementation of global::KnockOff.Documentation.Samples.Design.IDsMultiIndexer.</summary>
@@ -164,6 +181,7 @@ partial class DsIndexerTests
 				{
 					IndexerString.RecordGet(key);
 					if (IndexerString.OnGet is { } onGet) return onGet(this, key);
+					if (IndexerString._source is { } src) return src[key];
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsMultiIndexer", "this[]");
 					return IndexerString.Backing.TryGetValue(key, out var v) ? v : default;
 				}
@@ -171,6 +189,7 @@ partial class DsIndexerTests
 				{
 					IndexerString.RecordSet(key, value);
 					if (IndexerString.OnSet is { } onSet) { onSet(this, key, value); return; }
+					if (IndexerString._source is { } src) { src[key] = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsMultiIndexer", "this[]");
 					IndexerString.Backing[key] = value;
 				}
@@ -182,6 +201,7 @@ partial class DsIndexerTests
 				{
 					IndexerInt32.RecordGet(index);
 					if (IndexerInt32.OnGet is { } onGet) return onGet(this, index);
+					if (IndexerInt32._source is { } src) return src[index];
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsMultiIndexer", "this[]");
 					return IndexerInt32.Backing.TryGetValue(index, out var v) ? v : default;
 				}
@@ -189,6 +209,7 @@ partial class DsIndexerTests
 				{
 					IndexerInt32.RecordSet(index, value);
 					if (IndexerInt32.OnSet is { } onSet) { onSet(this, index, value); return; }
+					if (IndexerInt32._source is { } src) { src[index] = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDsMultiIndexer", "this[]");
 					IndexerInt32.Backing[index] = value;
 				}
@@ -205,6 +226,13 @@ partial class DsIndexerTests
 			public IDsMultiIndexer(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::KnockOff.Documentation.Samples.Design.IDsMultiIndexer delegation.</summary>
+			public void Source(global::KnockOff.Documentation.Samples.Design.IDsMultiIndexer? source)
+			{
+				IndexerString._source = source;
+				IndexerInt32._source = source;
 			}
 
 		}

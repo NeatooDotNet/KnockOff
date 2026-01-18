@@ -11,6 +11,9 @@ partial class StructuralComparableStubTests
 		/// <summary>Tracks and configures behavior for CompareTo.</summary>
 		public sealed class IStructuralComparable_CompareToInterceptor
 		{
+			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+			internal global::System.Collections.IStructuralComparable? _source;
+
 			/// <summary>Delegate for CompareTo.</summary>
 			public delegate int CompareToDelegate(Stubs.IStructuralComparable ko, object? other, global::System.Collections.IComparer comparer);
 
@@ -56,6 +59,9 @@ partial class StructuralComparableStubTests
 				{
 					_unconfiguredCallCount++;
 					_unconfiguredLastArgs = ((other, comparer));
+					#pragma warning disable CS8601, SYSLIB0050
+					if (_source is { } src) return src.CompareTo(other, comparer);
+					#pragma warning restore CS8601, SYSLIB0050
 					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "CompareTo");
 					return default!;
 				}
@@ -79,6 +85,7 @@ partial class StructuralComparableStubTests
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
+				_source = null;
 				foreach (var (_, _, tracking) in _sequence)
 					tracking.Reset();
 				_sequenceIndex = 0;
@@ -187,6 +194,12 @@ partial class StructuralComparableStubTests
 			public IStructuralComparable(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.Collections.IStructuralComparable delegation.</summary>
+			public void Source(global::System.Collections.IStructuralComparable? source)
+			{
+				CompareTo._source = source;
 			}
 
 		}

@@ -8,6 +8,9 @@ partial class HaAsyncRepositoryKnockOff : global::KnockOff.Documentation.Samples
 	/// <summary>Tracks and configures behavior for GetByIdAsync.</summary>
 	public sealed class GetByIdAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.IHaAsyncRepository? _source;
+
 		/// <summary>Delegate for GetByIdAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.HaUser?> GetByIdAsyncDelegate(HaAsyncRepositoryKnockOff ko, int id);
 
@@ -53,6 +56,7 @@ partial class HaAsyncRepositoryKnockOff : global::KnockOff.Documentation.Samples
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				if (_source is { } src) return src.GetByIdAsync(id);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetByIdAsync");
 				return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Skills.HaUser?>(default!);
 			}
@@ -76,6 +80,7 @@ partial class HaAsyncRepositoryKnockOff : global::KnockOff.Documentation.Samples
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -165,6 +170,9 @@ partial class HaAsyncRepositoryKnockOff : global::KnockOff.Documentation.Samples
 	/// <summary>Tracks and configures behavior for SaveAsync.</summary>
 	public sealed class SaveAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.IHaAsyncRepository? _source;
+
 		/// <summary>Delegate for SaveAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<int> SaveAsyncDelegate(HaAsyncRepositoryKnockOff ko, object entity);
 
@@ -210,6 +218,7 @@ partial class HaAsyncRepositoryKnockOff : global::KnockOff.Documentation.Samples
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = entity;
+				if (_source is { } src) return src.SaveAsync(entity);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SaveAsync");
 				return global::System.Threading.Tasks.Task.FromResult<int>(default!);
 			}
@@ -233,6 +242,7 @@ partial class HaAsyncRepositoryKnockOff : global::KnockOff.Documentation.Samples
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -345,6 +355,16 @@ partial class HaAsyncRepositoryKnockOff : global::KnockOff.Documentation.Samples
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Skills.IHaAsyncRepository).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Skills.IHaAsyncRepository? source)
+	{
+		GetByIdAsync._source = source;
+		SaveAsync._source = source;
 	}
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Skills.HaUser?> global::KnockOff.Documentation.Samples.Skills.IHaAsyncRepository.GetByIdAsync(int id)

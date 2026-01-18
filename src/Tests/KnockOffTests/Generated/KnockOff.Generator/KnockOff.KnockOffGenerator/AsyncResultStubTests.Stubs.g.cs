@@ -20,11 +20,14 @@ partial class AsyncResultStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public object? Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.IAsyncResult? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IAsyncResult.AsyncWaitHandle.</summary>
@@ -39,11 +42,14 @@ partial class AsyncResultStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public global::System.Threading.WaitHandle Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.IAsyncResult? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IAsyncResult.CompletedSynchronously.</summary>
@@ -58,11 +64,14 @@ partial class AsyncResultStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.IAsyncResult? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Interceptor for IAsyncResult.IsCompleted.</summary>
@@ -77,11 +86,14 @@ partial class AsyncResultStubTests
 			/// <summary>Value returned by getter when OnGet is not set.</summary>
 			public bool Value { get; set; } = default!;
 
+			/// <summary>Source object for delegation when OnGet is not set.</summary>
+			internal global::System.IAsyncResult? _source;
+
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; }
+			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
 		}
 
 		/// <summary>Stub implementation of global::System.IAsyncResult.</summary>
@@ -105,6 +117,7 @@ partial class AsyncResultStubTests
 				{
 					AsyncState.RecordGet();
 					if (AsyncState.OnGet is { } onGet) return onGet(this);
+					if (AsyncState._source is { } src) return src.AsyncState;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncResult", "AsyncState");
 					return AsyncState.Value;
 				}
@@ -116,6 +129,7 @@ partial class AsyncResultStubTests
 				{
 					AsyncWaitHandle.RecordGet();
 					if (AsyncWaitHandle.OnGet is { } onGet) return onGet(this);
+					if (AsyncWaitHandle._source is { } src) return src.AsyncWaitHandle;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncResult", "AsyncWaitHandle");
 					return AsyncWaitHandle.Value;
 				}
@@ -127,6 +141,7 @@ partial class AsyncResultStubTests
 				{
 					CompletedSynchronously.RecordGet();
 					if (CompletedSynchronously.OnGet is { } onGet) return onGet(this);
+					if (CompletedSynchronously._source is { } src) return src.CompletedSynchronously;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncResult", "CompletedSynchronously");
 					return CompletedSynchronously.Value;
 				}
@@ -138,6 +153,7 @@ partial class AsyncResultStubTests
 				{
 					IsCompleted.RecordGet();
 					if (IsCompleted.OnGet is { } onGet) return onGet(this);
+					if (IsCompleted._source is { } src) return src.IsCompleted;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncResult", "IsCompleted");
 					return IsCompleted.Value;
 				}
@@ -154,6 +170,15 @@ partial class AsyncResultStubTests
 			public IAsyncResult(bool strict = false)
 			{
 				Strict = strict;
+			}
+
+			/// <summary>Sets the source object for global::System.IAsyncResult delegation.</summary>
+			public void Source(global::System.IAsyncResult? source)
+			{
+				AsyncState._source = source;
+				AsyncWaitHandle._source = source;
+				CompletedSynchronously._source = source;
+				IsCompleted._source = source;
 			}
 
 		}

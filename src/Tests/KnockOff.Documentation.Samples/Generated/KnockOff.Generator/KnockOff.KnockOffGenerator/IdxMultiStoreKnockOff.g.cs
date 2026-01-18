@@ -8,6 +8,9 @@ partial class IdxMultiStoreKnockOff : global::KnockOff.Documentation.Samples.Gui
 	/// <summary>Tracks and configures behavior for indexer.</summary>
 	public sealed class IndexerStringInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IIdxMultiStore? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -36,12 +39,15 @@ partial class IdxMultiStoreKnockOff : global::KnockOff.Documentation.Samples.Gui
 		public global::System.Collections.Generic.Dictionary<string, object?> Backing { get; } = new();
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; }
+		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for indexer.</summary>
 	public sealed class IndexerInt32Interceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IIdxMultiStore? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -70,7 +76,7 @@ partial class IdxMultiStoreKnockOff : global::KnockOff.Documentation.Samples.Gui
 		public global::System.Collections.Generic.Dictionary<int, object?> Backing { get; } = new();
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; }
+		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; _source = null; }
 	}
 
 	/// <summary>Container for indexer interceptors with OfXxx access pattern.</summary>
@@ -99,16 +105,26 @@ partial class IdxMultiStoreKnockOff : global::KnockOff.Documentation.Samples.Gui
 	/// <summary>The global::KnockOff.Documentation.Samples.Guides.IIdxMultiStore instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Guides.IIdxMultiStore Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.IIdxMultiStore).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.IIdxMultiStore? source)
+	{
+		Indexer.OfString._source = source;
+		Indexer.OfInt32._source = source;
+	}
+
 	object? global::KnockOff.Documentation.Samples.Guides.IIdxMultiStore.this[string key]
 	{
-		get { Indexer.OfString.RecordGet(key); if (Indexer.OfString.OnGet is { } onGet) return onGet(this, key); if (Strict) throw global::KnockOff.StubException.NotConfigured("IIdxMultiStore", "this[]"); return Indexer.OfString.Backing.TryGetValue(key, out var v) ? v : default; }
-		set { Indexer.OfString.RecordSet(key, value); if (Indexer.OfString.OnSet is { } onSet) { onSet(this, key, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IIdxMultiStore", "this[]"); Indexer.OfString.Backing[key] = value; }
+		get { Indexer.OfString.RecordGet(key); if (Indexer.OfString.OnGet is { } onGet) return onGet(this, key); if (Indexer.OfString._source is { } src) return src[key]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IIdxMultiStore", "this[]"); return Indexer.OfString.Backing.TryGetValue(key, out var v) ? v : default; }
+		set { Indexer.OfString.RecordSet(key, value); if (Indexer.OfString.OnSet is { } onSet) { onSet(this, key, value); return; } if (Indexer.OfString._source is { } src) { src[key] = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IIdxMultiStore", "this[]"); Indexer.OfString.Backing[key] = value; }
 	}
 
 	object? global::KnockOff.Documentation.Samples.Guides.IIdxMultiStore.this[int index]
 	{
-		get { Indexer.OfInt32.RecordGet(index); if (Indexer.OfInt32.OnGet is { } onGet) return onGet(this, index); if (Strict) throw global::KnockOff.StubException.NotConfigured("IIdxMultiStore", "this[]"); return Indexer.OfInt32.Backing.TryGetValue(index, out var v) ? v : default; }
-		set { Indexer.OfInt32.RecordSet(index, value); if (Indexer.OfInt32.OnSet is { } onSet) { onSet(this, index, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IIdxMultiStore", "this[]"); Indexer.OfInt32.Backing[index] = value; }
+		get { Indexer.OfInt32.RecordGet(index); if (Indexer.OfInt32.OnGet is { } onGet) return onGet(this, index); if (Indexer.OfInt32._source is { } src) return src[index]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IIdxMultiStore", "this[]"); return Indexer.OfInt32.Backing.TryGetValue(index, out var v) ? v : default; }
+		set { Indexer.OfInt32.RecordSet(index, value); if (Indexer.OfInt32.OnSet is { } onSet) { onSet(this, index, value); return; } if (Indexer.OfInt32._source is { } src) { src[index] = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IIdxMultiStore", "this[]"); Indexer.OfInt32.Backing[index] = value; }
 	}
 
 }

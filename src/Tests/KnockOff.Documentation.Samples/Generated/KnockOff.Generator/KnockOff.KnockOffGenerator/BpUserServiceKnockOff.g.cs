@@ -8,6 +8,9 @@ partial class BpUserServiceKnockOff : global::KnockOff.Documentation.Samples.Gui
 	/// <summary>Tracks and configures behavior for GetCount.</summary>
 	public sealed class GetCountInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IBpUserService? _source;
+
 		/// <summary>Delegate for GetCount.</summary>
 		public delegate int GetCountDelegate(BpUserServiceKnockOff ko);
 
@@ -48,6 +51,7 @@ partial class BpUserServiceKnockOff : global::KnockOff.Documentation.Samples.Gui
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.GetCount();
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetCount");
 				return default!;
 			}
@@ -70,6 +74,7 @@ partial class BpUserServiceKnockOff : global::KnockOff.Documentation.Samples.Gui
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -155,6 +160,9 @@ partial class BpUserServiceKnockOff : global::KnockOff.Documentation.Samples.Gui
 	/// <summary>Tracks and configures behavior for GetUsers.</summary>
 	public sealed class GetUsersInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IBpUserService? _source;
+
 		/// <summary>Delegate for GetUsers.</summary>
 		public delegate global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.SampleDomain.User> GetUsersDelegate(BpUserServiceKnockOff ko);
 
@@ -195,6 +203,7 @@ partial class BpUserServiceKnockOff : global::KnockOff.Documentation.Samples.Gui
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.GetUsers();
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetUsers");
 				return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.SampleDomain.User>();
 			}
@@ -217,6 +226,7 @@ partial class BpUserServiceKnockOff : global::KnockOff.Documentation.Samples.Gui
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -302,6 +312,9 @@ partial class BpUserServiceKnockOff : global::KnockOff.Documentation.Samples.Gui
 	/// <summary>Tracks and configures behavior for Save.</summary>
 	public sealed class SaveInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IBpUserService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<BpUserServiceKnockOff, global::KnockOff.Documentation.Samples.SampleDomain.User> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -344,6 +357,7 @@ partial class BpUserServiceKnockOff : global::KnockOff.Documentation.Samples.Gui
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = user;
+				if (_source is { } src) { src.Save(user); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 				return;
 			}
@@ -367,6 +381,7 @@ partial class BpUserServiceKnockOff : global::KnockOff.Documentation.Samples.Gui
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -507,6 +522,17 @@ partial class BpUserServiceKnockOff : global::KnockOff.Documentation.Samples.Gui
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.IBpUserService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.IBpUserService? source)
+	{
+		GetCount._source = source;
+		GetUsers._source = source;
+		Save._source = source;
 	}
 
 	global::KnockOff.Documentation.Samples.SampleDomain.User? global::KnockOff.Documentation.Samples.Guides.IBpUserService.GetUser(int id)

@@ -8,6 +8,9 @@ partial class FcInventoryServiceStub : global::KnockOff.Documentation.Samples.Co
 	/// <summary>Tracks and configures behavior for ReserveItems.</summary>
 	public sealed class ReserveItemsInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Comparison.IFcInventoryService? _source;
+
 		/// <summary>Delegate for ReserveItems.</summary>
 		public delegate bool ReserveItemsDelegate(FcInventoryServiceStub ko, global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Comparison.FcOrderItem> items);
 
@@ -53,6 +56,7 @@ partial class FcInventoryServiceStub : global::KnockOff.Documentation.Samples.Co
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = items;
+				if (_source is { } src) return src.ReserveItems(items);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ReserveItems");
 				return default!;
 			}
@@ -76,6 +80,7 @@ partial class FcInventoryServiceStub : global::KnockOff.Documentation.Samples.Co
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -165,6 +170,9 @@ partial class FcInventoryServiceStub : global::KnockOff.Documentation.Samples.Co
 	/// <summary>Tracks and configures behavior for ReleaseItems.</summary>
 	public sealed class ReleaseItemsInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Comparison.IFcInventoryService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<FcInventoryServiceStub, global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Comparison.FcOrderItem>> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -207,6 +215,7 @@ partial class FcInventoryServiceStub : global::KnockOff.Documentation.Samples.Co
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = items;
+				if (_source is { } src) { src.ReleaseItems(items); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ReleaseItems");
 				return;
 			}
@@ -230,6 +239,7 @@ partial class FcInventoryServiceStub : global::KnockOff.Documentation.Samples.Co
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -342,6 +352,16 @@ partial class FcInventoryServiceStub : global::KnockOff.Documentation.Samples.Co
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Comparison.IFcInventoryService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Comparison.IFcInventoryService? source)
+	{
+		ReserveItems._source = source;
+		ReleaseItems._source = source;
 	}
 
 	bool global::KnockOff.Documentation.Samples.Comparison.IFcInventoryService.ReserveItems(global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Comparison.FcOrderItem> items)

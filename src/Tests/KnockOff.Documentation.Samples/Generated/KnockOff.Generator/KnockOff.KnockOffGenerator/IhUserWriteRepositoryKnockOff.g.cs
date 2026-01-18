@@ -8,6 +8,9 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 	/// <summary>Tracks and configures behavior for Add.</summary>
 	public sealed class AddInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IIhWriteRepository<global::KnockOff.Documentation.Samples.Guides.IhUser>? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<IhUserWriteRepositoryKnockOff, global::KnockOff.Documentation.Samples.Guides.IhUser> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -50,6 +53,7 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = entity;
+				if (_source is { } src) { src.Add(entity); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 				return;
 			}
@@ -73,6 +77,7 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -162,6 +167,9 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 	/// <summary>Tracks and configures behavior for Delete.</summary>
 	public sealed class DeleteInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IIhWriteRepository<global::KnockOff.Documentation.Samples.Guides.IhUser>? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<IhUserWriteRepositoryKnockOff, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -204,6 +212,7 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				if (_source is { } src) { src.Delete(id); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Delete");
 				return;
 			}
@@ -227,6 +236,7 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -316,6 +326,9 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 	/// <summary>Tracks and configures behavior for GetById.</summary>
 	public sealed class GetByIdInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IIhReadRepository<global::KnockOff.Documentation.Samples.Guides.IhUser>? _source;
+
 		/// <summary>Delegate for GetById.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Guides.IhUser? GetByIdDelegate(IhUserWriteRepositoryKnockOff ko, int id);
 
@@ -361,6 +374,7 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				if (_source is { } src) return src.GetById(id);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
 				return default!;
 			}
@@ -384,6 +398,7 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -473,6 +488,9 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 	/// <summary>Tracks and configures behavior for GetAll.</summary>
 	public sealed class GetAllInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Guides.IIhReadRepository<global::KnockOff.Documentation.Samples.Guides.IhUser>? _source;
+
 		/// <summary>Delegate for GetAll.</summary>
 		public delegate global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Guides.IhUser> GetAllDelegate(IhUserWriteRepositoryKnockOff ko);
 
@@ -513,6 +531,7 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.GetAll();
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetAll");
 				return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Guides.IhUser>();
 			}
@@ -535,6 +554,7 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -651,6 +671,28 @@ partial class IhUserWriteRepositoryKnockOff : global::KnockOff.Documentation.Sam
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.IIhWriteRepository<global::KnockOff.Documentation.Samples.Guides.IhUser>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.IIhWriteRepository<global::KnockOff.Documentation.Samples.Guides.IhUser>? source)
+	{
+		Add._source = source;
+		Delete._source = source;
+		GetById._source = source;
+		GetAll._source = source;
+	}
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Guides.IIhReadRepository<global::KnockOff.Documentation.Samples.Guides.IhUser>).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Guides.IIhReadRepository<global::KnockOff.Documentation.Samples.Guides.IhUser>? source)
+	{
+		Add._source = null;
+		Delete._source = null;
+		GetById._source = source;
+		GetAll._source = source;
 	}
 
 	void global::KnockOff.Documentation.Samples.Guides.IIhWriteRepository<global::KnockOff.Documentation.Samples.Guides.IhUser>.Add(global::KnockOff.Documentation.Samples.Guides.IhUser entity)

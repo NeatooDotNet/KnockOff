@@ -41,6 +41,14 @@ partial class SkEventSourceKnockOff : global::KnockOff.Documentation.Samples.Ski
 	/// <summary>The global::KnockOff.Documentation.Samples.Skills.ISkEventSource instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Skills.ISkEventSource Object => this;
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Skills.ISkEventSource).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Skills.ISkEventSource? source)
+	{
+	}
+
 	event global::System.EventHandler<string>? global::KnockOff.Documentation.Samples.Skills.ISkEventSource.DataReceived
 	{
 		add => DataReceived.RecordAdd(value);

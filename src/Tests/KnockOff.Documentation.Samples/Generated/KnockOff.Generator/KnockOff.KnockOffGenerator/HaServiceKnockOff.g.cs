@@ -8,6 +8,9 @@ partial class HaServiceKnockOff : global::KnockOff.Documentation.Samples.Skills.
 	/// <summary>Tracks and configures behavior for Initialize.</summary>
 	public sealed class InitializeInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.IHaService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<HaServiceKnockOff> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -45,6 +48,7 @@ partial class HaServiceKnockOff : global::KnockOff.Documentation.Samples.Skills.
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) { src.Initialize(); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Initialize");
 				return;
 			}
@@ -67,6 +71,7 @@ partial class HaServiceKnockOff : global::KnockOff.Documentation.Samples.Skills.
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -152,6 +157,9 @@ partial class HaServiceKnockOff : global::KnockOff.Documentation.Samples.Skills.
 	/// <summary>Tracks and configures behavior for GetById.</summary>
 	public sealed class GetByIdInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.IHaService? _source;
+
 		/// <summary>Delegate for GetById.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.HaUser GetByIdDelegate(HaServiceKnockOff ko, int id);
 
@@ -197,6 +205,7 @@ partial class HaServiceKnockOff : global::KnockOff.Documentation.Samples.Skills.
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				if (_source is { } src) return src.GetById(id);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
 				return new global::KnockOff.Documentation.Samples.Skills.HaUser();
 			}
@@ -220,6 +229,7 @@ partial class HaServiceKnockOff : global::KnockOff.Documentation.Samples.Skills.
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -309,6 +319,9 @@ partial class HaServiceKnockOff : global::KnockOff.Documentation.Samples.Skills.
 	/// <summary>Tracks and configures behavior for Create.</summary>
 	public sealed class CreateInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.IHaService? _source;
+
 		/// <summary>Delegate for Create.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.HaEntity CreateDelegate(HaServiceKnockOff ko, string name, int @value);
 
@@ -354,6 +367,7 @@ partial class HaServiceKnockOff : global::KnockOff.Documentation.Samples.Skills.
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((name, @value));
+				if (_source is { } src) return src.Create(name, @value);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Create");
 				return new global::KnockOff.Documentation.Samples.Skills.HaEntity();
 			}
@@ -377,6 +391,7 @@ partial class HaServiceKnockOff : global::KnockOff.Documentation.Samples.Skills.
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -493,6 +508,17 @@ partial class HaServiceKnockOff : global::KnockOff.Documentation.Samples.Skills.
 	{
 		if (!Verify())
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+	}
+
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Skills.IHaService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Skills.IHaService? source)
+	{
+		Initialize._source = source;
+		GetById._source = source;
+		Create._source = source;
 	}
 
 	void global::KnockOff.Documentation.Samples.Skills.IHaService.Initialize()

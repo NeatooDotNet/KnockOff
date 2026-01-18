@@ -8,6 +8,9 @@ partial class MigUserServiceKnockOff : global::KnockOff.Documentation.Samples.Co
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Comparison.IMigUserService? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -33,12 +36,15 @@ partial class MigUserServiceKnockOff : global::KnockOff.Documentation.Samples.Co
 		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for GetUser.</summary>
 	public sealed class GetUserInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Comparison.IMigUserService? _source;
+
 		/// <summary>Delegate for GetUser.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Comparison.MigUser GetUserDelegate(MigUserServiceKnockOff ko, int id);
 
@@ -84,6 +90,7 @@ partial class MigUserServiceKnockOff : global::KnockOff.Documentation.Samples.Co
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				if (_source is { } src) return src.GetUser(id);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetUser");
 				return new global::KnockOff.Documentation.Samples.Comparison.MigUser();
 			}
@@ -107,6 +114,7 @@ partial class MigUserServiceKnockOff : global::KnockOff.Documentation.Samples.Co
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -196,6 +204,9 @@ partial class MigUserServiceKnockOff : global::KnockOff.Documentation.Samples.Co
 	/// <summary>Tracks and configures behavior for GetUserAsync.</summary>
 	public sealed class GetUserAsyncInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Comparison.IMigUserService? _source;
+
 		/// <summary>Delegate for GetUserAsync.</summary>
 		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.Comparison.MigUser?> GetUserAsyncDelegate(MigUserServiceKnockOff ko, int id);
 
@@ -241,6 +252,7 @@ partial class MigUserServiceKnockOff : global::KnockOff.Documentation.Samples.Co
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				if (_source is { } src) return src.GetUserAsync(id);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetUserAsync");
 				return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Documentation.Samples.Comparison.MigUser?>(default!);
 			}
@@ -264,6 +276,7 @@ partial class MigUserServiceKnockOff : global::KnockOff.Documentation.Samples.Co
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -353,6 +366,9 @@ partial class MigUserServiceKnockOff : global::KnockOff.Documentation.Samples.Co
 	/// <summary>Tracks and configures behavior for Save.</summary>
 	public sealed class SaveInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Comparison.IMigUserService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<MigUserServiceKnockOff, global::KnockOff.Documentation.Samples.Comparison.MigUser> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -395,6 +411,7 @@ partial class MigUserServiceKnockOff : global::KnockOff.Documentation.Samples.Co
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = user;
+				if (_source is { } src) { src.Save(user); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 				return;
 			}
@@ -418,6 +435,7 @@ partial class MigUserServiceKnockOff : global::KnockOff.Documentation.Samples.Co
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -507,6 +525,9 @@ partial class MigUserServiceKnockOff : global::KnockOff.Documentation.Samples.Co
 	/// <summary>Tracks and configures behavior for Delete.</summary>
 	public sealed class DeleteInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Comparison.IMigUserService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<MigUserServiceKnockOff, int> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -549,6 +570,7 @@ partial class MigUserServiceKnockOff : global::KnockOff.Documentation.Samples.Co
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				if (_source is { } src) { src.Delete(id); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Delete");
 				return;
 			}
@@ -572,6 +594,7 @@ partial class MigUserServiceKnockOff : global::KnockOff.Documentation.Samples.Co
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -661,6 +684,9 @@ partial class MigUserServiceKnockOff : global::KnockOff.Documentation.Samples.Co
 	/// <summary>Tracks and configures behavior for GetAll.</summary>
 	public sealed class GetAllInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Comparison.IMigUserService? _source;
+
 		/// <summary>Delegate for GetAll.</summary>
 		public delegate global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.Comparison.MigUser> GetAllDelegate(MigUserServiceKnockOff ko);
 
@@ -701,6 +727,7 @@ partial class MigUserServiceKnockOff : global::KnockOff.Documentation.Samples.Co
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) return src.GetAll();
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetAll");
 				return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Comparison.MigUser>();
 			}
@@ -723,6 +750,7 @@ partial class MigUserServiceKnockOff : global::KnockOff.Documentation.Samples.Co
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -808,6 +836,9 @@ partial class MigUserServiceKnockOff : global::KnockOff.Documentation.Samples.Co
 	/// <summary>Tracks and configures behavior for Update.</summary>
 	public sealed class UpdateInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Comparison.IMigUserService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<MigUserServiceKnockOff, global::KnockOff.Documentation.Samples.Comparison.MigUser> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -850,6 +881,7 @@ partial class MigUserServiceKnockOff : global::KnockOff.Documentation.Samples.Co
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = user;
+				if (_source is { } src) { src.Update(user); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Update");
 				return;
 			}
@@ -873,6 +905,7 @@ partial class MigUserServiceKnockOff : global::KnockOff.Documentation.Samples.Co
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -1006,10 +1039,25 @@ partial class MigUserServiceKnockOff : global::KnockOff.Documentation.Samples.Co
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
 	}
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Comparison.IMigUserService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Comparison.IMigUserService? source)
+	{
+		Name._source = source;
+		GetUser._source = source;
+		GetUserAsync._source = source;
+		Save._source = source;
+		Delete._source = source;
+		GetAll._source = source;
+		Update._source = source;
+	}
+
 	string global::KnockOff.Documentation.Samples.Comparison.IMigUserService.Name
 	{
-		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("IMigUserService", "Name"); return Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IMigUserService", "Name"); Name.Value = value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Name._source is { } src) return src.Name; if (Strict) throw global::KnockOff.StubException.NotConfigured("IMigUserService", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Name._source is { } src) { src.Name = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IMigUserService", "Name"); Name.Value = value; }
 	}
 
 	global::KnockOff.Documentation.Samples.Comparison.MigUser global::KnockOff.Documentation.Samples.Comparison.IMigUserService.GetUser(int id)

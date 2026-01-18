@@ -8,6 +8,9 @@ partial class SkCallbackMethodKnockOff : global::KnockOff.Documentation.Samples.
 	/// <summary>Tracks and configures behavior for Name.</summary>
 	public sealed class NameInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.ISkCallbackService? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -33,12 +36,15 @@ partial class SkCallbackMethodKnockOff : global::KnockOff.Documentation.Samples.
 		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for CurrentUser.</summary>
 	public sealed class CurrentUserInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.ISkCallbackService? _source;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
@@ -64,12 +70,15 @@ partial class SkCallbackMethodKnockOff : global::KnockOff.Documentation.Samples.
 		public void RecordSet(global::KnockOff.Documentation.Samples.Skills.SkUser? value) { SetCount++; LastSetValue = value; }
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; }
+		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
 	}
 
 	/// <summary>Tracks and configures behavior for DoWork.</summary>
 	public sealed class DoWorkInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.ISkCallbackService? _source;
+
 		private readonly global::System.Collections.Generic.List<(global::System.Action<SkCallbackMethodKnockOff> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
 		private int _sequenceIndex;
 		private int _unconfiguredCallCount;
@@ -107,6 +116,7 @@ partial class SkCallbackMethodKnockOff : global::KnockOff.Documentation.Samples.
 			if (_sequence.Count == 0)
 			{
 				_unconfiguredCallCount++;
+				if (_source is { } src) { src.DoWork(); return; }
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "DoWork");
 				return;
 			}
@@ -129,6 +139,7 @@ partial class SkCallbackMethodKnockOff : global::KnockOff.Documentation.Samples.
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -214,6 +225,9 @@ partial class SkCallbackMethodKnockOff : global::KnockOff.Documentation.Samples.
 	/// <summary>Tracks and configures behavior for GetById.</summary>
 	public sealed class GetByIdInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.ISkCallbackService? _source;
+
 		/// <summary>Delegate for GetById.</summary>
 		public delegate global::KnockOff.Documentation.Samples.Skills.SkUser GetByIdDelegate(SkCallbackMethodKnockOff ko, int id);
 
@@ -259,6 +273,7 @@ partial class SkCallbackMethodKnockOff : global::KnockOff.Documentation.Samples.
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
+				if (_source is { } src) return src.GetById(id);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
 				return new global::KnockOff.Documentation.Samples.Skills.SkUser();
 			}
@@ -282,6 +297,7 @@ partial class SkCallbackMethodKnockOff : global::KnockOff.Documentation.Samples.
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -371,6 +387,9 @@ partial class SkCallbackMethodKnockOff : global::KnockOff.Documentation.Samples.
 	/// <summary>Tracks and configures behavior for Search.</summary>
 	public sealed class SearchInterceptor
 	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Skills.ISkCallbackService? _source;
+
 		/// <summary>Delegate for Search.</summary>
 		public delegate global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser> SearchDelegate(SkCallbackMethodKnockOff ko, string query, int limit, int offset);
 
@@ -416,6 +435,7 @@ partial class SkCallbackMethodKnockOff : global::KnockOff.Documentation.Samples.
 			{
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((query, limit, offset));
+				if (_source is { } src) return src.Search(query, limit, offset);
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Search");
 				return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.Skills.SkUser>();
 			}
@@ -439,6 +459,7 @@ partial class SkCallbackMethodKnockOff : global::KnockOff.Documentation.Samples.
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
+			_source = null;
 			foreach (var (_, _, tracking) in _sequence)
 				tracking.Reset();
 			_sequenceIndex = 0;
@@ -563,16 +584,29 @@ partial class SkCallbackMethodKnockOff : global::KnockOff.Documentation.Samples.
 			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
 	}
 
+	// Source(T) methods for interface delegation
+
+	/// <summary>Delegates unconfigured member access to the provided source object (global::KnockOff.Documentation.Samples.Skills.ISkCallbackService).</summary>
+	/// <param name="source">The source to delegate to, or null to clear.</param>
+	public void Source(global::KnockOff.Documentation.Samples.Skills.ISkCallbackService? source)
+	{
+		Name._source = source;
+		CurrentUser._source = source;
+		DoWork._source = source;
+		GetById._source = source;
+		Search._source = source;
+	}
+
 	string global::KnockOff.Documentation.Samples.Skills.ISkCallbackService.Name
 	{
-		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkCallbackService", "Name"); return Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkCallbackService", "Name"); Name.Value = value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Name._source is { } src) return src.Name; if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkCallbackService", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Name._source is { } src) { src.Name = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkCallbackService", "Name"); Name.Value = value; }
 	}
 
 	global::KnockOff.Documentation.Samples.Skills.SkUser? global::KnockOff.Documentation.Samples.Skills.ISkCallbackService.CurrentUser
 	{
-		get { CurrentUser.RecordGet(); if (CurrentUser.OnGet is { } onGet) return onGet(this); if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkCallbackService", "CurrentUser"); return CurrentUser.Value; }
-		set { CurrentUser.RecordSet(value); if (CurrentUser.OnSet is { } onSet) { onSet(this, value); return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkCallbackService", "CurrentUser"); CurrentUser.Value = value; }
+		get { CurrentUser.RecordGet(); if (CurrentUser.OnGet is { } onGet) return onGet(this); if (CurrentUser._source is { } src) return src.CurrentUser; if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkCallbackService", "CurrentUser"); return CurrentUser.Value; }
+		set { CurrentUser.RecordSet(value); if (CurrentUser.OnSet is { } onSet) { onSet(this, value); return; } if (CurrentUser._source is { } src) { src.CurrentUser = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ISkCallbackService", "CurrentUser"); CurrentUser.Value = value; }
 	}
 
 	void global::KnockOff.Documentation.Samples.Skills.ISkCallbackService.DoWork()
