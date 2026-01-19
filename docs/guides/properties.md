@@ -194,7 +194,9 @@ public void OnSet_SimulatesValidation()
 
 ## Verifying Property Access
 
-All property interceptors track access counts and the last value set.
+Property interceptors support verification similar to methods.
+
+### Using Verify() on Properties
 
 <!-- snippet: properties-verify-getcount -->
 ```cs
@@ -234,7 +236,37 @@ public void LastSetValue_CapturesLastWrittenValue()
 ```
 <!-- endSnippet -->
 
-**Available verification properties:**
+### Using Verifiable() on Properties
+
+<!-- snippet: properties-verifiable -->
+```cs
+[Fact]
+public void Verifiable_MarksPropertyForVerification()
+{
+    var stub = new ConfigPropsStub();
+
+    // Mark property get/set as verifiable
+    stub.Name.Value = "test";
+    stub.Name.MarkVerifiableGet();
+    stub.Age.MarkVerifiableSet();
+
+    IConfigProps service = stub;
+    _ = service.Name;
+    service.Age = 42;
+
+    // Verify all marked properties
+    stub.Verify();
+}
+```
+<!-- endSnippet -->
+
+**Available verification methods:**
+- `VerifyGet(Times)` - Verify property getter was called
+- `VerifySet(Times)` - Verify property setter was called
+- `MarkVerifiableGet(Times)` - Mark getter for batch verification
+- `MarkVerifiableSet(Times)` - Mark setter for batch verification
+
+**Available inspection properties:**
 - `GetCount` - Number of times property was read
 - `SetCount` - Number of times property was written
 - `LastSetValue` - The most recent value written (null if never set)
@@ -375,7 +407,7 @@ public void CompletePropertyExample_AllConfigurationApproaches()
 3. **Use OnSet for tracking** - When you need to verify writes or simulate validation
 4. **OnGet replaces Value** - You can upgrade from static to dynamic without conflicts
 5. **Reset() preserves Value** - Clears execution state but not test data configuration
-6. **Verify access patterns** - GetCount, SetCount, and LastSetValue provide test assertions
+6. **Verify access patterns** - Use `VerifyGet()` and `VerifySet()` like method verification
 
 ---
 

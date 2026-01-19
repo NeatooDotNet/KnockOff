@@ -224,6 +224,26 @@ public class PropertyVerificationTests
         Assert.Equal("Expected", stub.Name.LastSetValue);
     }
     #endregion
+
+    #region properties-verifiable
+    [Fact]
+    public void Verifiable_MarksPropertyForVerification()
+    {
+        var stub = new ConfigPropsStub();
+
+        // Mark property get/set as verifiable
+        stub.Name.Value = "test";
+        stub.Name.MarkVerifiableGet();
+        stub.Age.MarkVerifiableSet();
+
+        IConfigProps service = stub;
+        _ = service.Name;
+        service.Age = 42;
+
+        // Verify all marked properties
+        stub.Verify();
+    }
+    #endregion
 }
 
 // =============================================================================

@@ -1,3 +1,5 @@
+using KnockOff;
+
 namespace KnockOff.Documentation.Samples.Methods;
 
 // =============================================================================
@@ -13,6 +15,7 @@ public interface ILogSvcMethods
 public interface ISaveRepoMethods
 {
     void Save(object entity);
+    User GetById(int id);
 }
 
 public interface INotifierMethods
@@ -126,7 +129,9 @@ public class MethodConfigurationTests
 
         Assert.True(auth.ValidateCredentials("admin", "secret"));
         Assert.False(auth.ValidateCredentials("user", "wrong"));
-        Assert.Equal(2, tracking.CallCount);
+
+        // Verify exactly 2 calls were made
+        tracking.Verify(Times.Exactly(2));
     }
     #endregion
 }
@@ -139,22 +144,22 @@ public class MethodVerificationTests
 {
     #region methods-verify-wascalled
     [Fact]
-    public void WasCalled_VerifiesMethodInvocation()
+    public void Verify_VerifiesMethodInvocation()
     {
         var stub = new SaveRepoMethodsStub();
-        var tracking = stub.Save.OnCall((ko, entity) => { });
+        stub.Save.OnCall((ko, entity) => { }).Verifiable();
 
         ISaveRepoMethods repository = stub;
         repository.Save(new User { Id = 1 });
 
-        // WasCalled is true if method was invoked at least once
-        Assert.True(tracking.WasCalled);
+        // Verify() checks all members marked with .Verifiable()
+        stub.Verify();
     }
     #endregion
 
-    #region methods-verify-callcount
+    #region methods-verify-times
     [Fact]
-    public void CallCount_VerifiesExactInvocations()
+    public void Verify_WithTimesConstraint()
     {
         var stub = new NotifierMethodsStub();
         var tracking = stub.Notify.OnCall((ko, message) => { });
@@ -168,8 +173,48 @@ public class MethodVerificationTests
             notifier.Notify($"Processing {item}");
         }
 
-        // Verify exact call count via tracking object
-        Assert.Equal(2, tracking.CallCount);
+        // Verify exact call count using Times
+        tracking.Verify(Times.Exactly(2));
+    }
+    #endregion
+
+    #region methods-verify-callcount
+    [Fact]
+    public void Verify_ExactCallCount()
+    {
+        var stub = new NotifierMethodsStub();
+        var tracking = stub.Notify.OnCall((ko, message) => { });
+
+        INotifierMethods notifier = stub;
+
+        // Simulate processing a 2-item collection
+        var items = new[] { "item1", "item2" };
+        foreach (var item in items)
+        {
+            notifier.Notify($"Processing {item}");
+        }
+
+        // Verify exactly 2 calls (throws if different)
+        tracking.Verify(Times.Exactly(2));
+    }
+    #endregion
+
+    #region methods-verify-verifiable
+    [Fact]
+    public void Verifiable_BatchVerification()
+    {
+        var stub = new SaveRepoMethodsStub();
+
+        // Mark expected calls
+        stub.Save.OnCall((ko, entity) => { }).Verifiable(Times.Once);
+        stub.GetById.OnCall((ko, id) => new User { Id = id }).Verifiable();
+
+        ISaveRepoMethods repository = stub;
+        repository.Save(new User { Id = 1 });
+        repository.GetById(1);
+
+        // Verify all marked methods (throws if any not called correctly)
+        stub.Verify();
     }
     #endregion
 }
@@ -230,14 +275,14 @@ public class MethodResetTests
         IProcessorMethods processor = stub;
         processor.ProcessData("initial");
 
-        Assert.Equal(1, tracking.CallCount);
+        // Verify one call was made
+        tracking.Verify(Times.Once);
 
         // Reset clears CallCount, WasCalled on the interceptor
         stub.ProcessData.Reset();
 
-        // Tracking is also reset
-        Assert.Equal(0, tracking.CallCount);
-        Assert.False(tracking.WasCalled);
+        // After reset, Verify(Times.Never) passes via tracking
+        tracking.Verify(Times.Never);
     }
     #endregion
 }
@@ -286,8 +331,8 @@ public class CompleteMethodExampleTests
         var stub = new CompleteUserRepoStub();
 
         var testUser = new User { Id = 1, Name = "Alice", Email = "old@test.com" };
-        var getTracking = stub.GetUser.OnCall((ko, id) => id == 1 ? testUser : null);
-        var saveTracking = stub.SaveUser.OnCall((ko, user) => { });
+        var getTracking = stub.GetUser.OnCall((ko, id) => id == 1 ? testUser : null).Verifiable();
+        var saveTracking = stub.SaveUser.OnCall((ko, user) => { }).Verifiable();
 
         var service = new UserService(stub);
 
@@ -297,12 +342,11 @@ public class CompleteMethodExampleTests
         // Assert
         Assert.True(result);
 
-        // Verify GetUser was called with correct ID
-        Assert.True(getTracking.WasCalled);
-        Assert.Equal(1, getTracking.LastArg);
+        // Verify both methods were called
+        stub.Verify();
 
-        // Verify SaveUser was called
-        Assert.True(saveTracking.WasCalled);
+        // Verify GetUser was called with correct ID
+        Assert.Equal(1, getTracking.LastArg);
 
         // Verify saved user has new email via the tracking args
         var savedUser = saveTracking.LastArg;
@@ -326,11 +370,11 @@ public class OverloadedMethodTests
         // Overloads are distinguished by the callback parameter types
         // The fully-typed lambda tells KnockOff which overload to configure
         var findAllTracking = stub.Find.OnCall((SearchRepoStub ko) =>
-            new List<User>());
+            new List<User>()).Verifiable();
         var findByIdTracking = stub.Find.OnCall((SearchRepoStub ko, int id) =>
-            new User { Id = id, Name = "ById" });
+            new User { Id = id, Name = "ById" }).Verifiable();
         var findByNameTracking = stub.Find.OnCall((SearchRepoStub ko, string name) =>
-            new User { Id = 1, Name = name });
+            new User { Id = 1, Name = name }).Verifiable();
 
         ISearchRepo repo = stub;
 
@@ -339,11 +383,11 @@ public class OverloadedMethodTests
         repo.Find(42);
         repo.Find("Alice");
 
-        // Each tracking object is specific to its overload
-        Assert.Equal(1, findAllTracking.CallCount);
-        Assert.Equal(1, findByIdTracking.CallCount);
+        // Verify all overloads were called
+        stub.Verify();
+
+        // Access last arguments via tracking objects
         Assert.Equal(42, findByIdTracking.LastArg);
-        Assert.Equal(1, findByNameTracking.CallCount);
         Assert.Equal("Alice", findByNameTracking.LastArg);
     }
     #endregion

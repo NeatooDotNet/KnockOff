@@ -1,4 +1,5 @@
 using Moq;
+using KnockOff;
 
 namespace KnockOff.Documentation.Samples.MoqMigration;
 
@@ -165,10 +166,17 @@ public class VerifyCallsKnockOffTests
     {
         var stub = new MoqUserRepoStub();
 
+        // Mark method as verifiable during setup
+        stub.SaveUser.OnCall((ko, user) => { }).Verifiable();
+
         IMoqUserRepo repository = stub;
         repository.SaveUser(new User { Id = 1, Name = "Bob" });
 
-        Assert.Equal(1, stub.SaveUser.CallCount);
+        // Verify() checks all members marked with .Verifiable()
+        stub.Verify();
+
+        // Or verify with Times constraint directly on tracking
+        // stub.SaveUser.Verify(Times.Once);
     }
     #endregion
 }
@@ -401,28 +409,31 @@ public class CompleteKnockOffTests
     public async Task GetUser_ReturnsUser()
     {
         var user = new User { Id = 1, Name = "Alice" };
-        _stub.GetUserAsync.OnCall((ko, id) => Task.FromResult<User?>(user));
+        // Similar to Moq: Setup + Verifiable
+        _stub.GetUserAsync.OnCall((ko, id) => Task.FromResult<User?>(user)).Verifiable();
 
         var result = await _service.GetUserAsync(1);
 
         Assert.Equal("Alice", result?.Name);
-        Assert.Equal(1, _stub.GetUserAsync.CallCount);
+        // Similar to Moq: mock.Verify() -> stub.Verify()
+        _stub.Verify();
     }
 
     [Fact]
     public void SaveUser_CallsRepository()
     {
         User? savedUser = null;
-        _stub.SaveUser.OnCall((ko, user) =>
+        var tracking = _stub.SaveUser.OnCall((ko, user) =>
         {
             savedUser = user;
-        });
+        }).Verifiable();
 
         _service.SaveUser(new User { Id = 1, Name = "Bob" });
 
         Assert.NotNull(savedUser);
         Assert.Equal("Bob", savedUser?.Name);
-        Assert.Equal(1, _stub.SaveUser.CallCount);
+        // Similar to Moq: mock.Verify(x => x.SaveUser(...), Times.Once())
+        tracking.Verify(Times.Once);
     }
     #endregion
 }

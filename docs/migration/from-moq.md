@@ -37,7 +37,9 @@ This guide walks you through the migration step-by-step, with side-by-side compa
 | `.Setup(x => x.Property).Returns(value)` | `stub.IFoo_Property.Value = value` |
 | `.ReturnsAsync(value)` | `stub.IFoo_Method.OnCall = () => Task.FromResult(value)` |
 | `.Callback(x => ...)` | Logic in `OnCall` delegate |
-| `.Verify(x => x.Method(), Times.Once)` | `Assert.Equal(1, stub.IFoo_Method.CallCount)` |
+| `.Verify(x => x.Method(), Times.Once)` | `tracking.Verify(Times.Once)` or `stub.Verify()` |
+| `.Verifiable()` | `stub.Method.OnCall(...).Verifiable()` |
+| `mock.Verify()` | `stub.Verify()` |
 | `It.IsAny<T>()` | Callback receives all arguments for inspection |
 
 ---
@@ -117,20 +119,37 @@ Replace property `.Setup().Returns()` with `.Value` assignments.
 
 ## Step 5: Verify Calls
 
-Replace `.Verify()` calls with standard assertions on interceptor properties.
+Replace Moq's `.Verify()` calls with KnockOff's `.Verify()` or `.Verifiable()` API.
 
 **Moq:**
 
 <!-- snippet: moq-migration-verify-moq -->
+```cs
+// Moq verification
+mock.Verify(x => x.GetUser(42), Times.Once);
+mock.Verify(x => x.SaveUser(It.IsAny<User>()), Times.AtLeastOnce);
+```
+<!-- endSnippet -->
 
 **KnockOff:**
 
 <!-- snippet: moq-migration-verify-knockoff -->
+```cs
+// KnockOff direct verification
+tracking.Verify(Times.Once);
+
+// Or marked verification (recommended)
+stub.GetUser.OnCall((ko, id) => user).Verifiable(Times.Once);
+stub.SaveUser.OnCall((ko, u) => {}).Verifiable();
+stub.Verify();  // Check all marked
+```
+<!-- endSnippet -->
 
 **Key differences:**
-- Moq uses `.Verify()` with Times matchers
-- KnockOff exposes `CallCount` and `WasCalled` properties for direct assertions
-- Use your test framework's standard assertions (xUnit, NUnit, etc.)
+- Moq uses `mock.Verify(expression, times)` with expression trees
+- KnockOff uses `tracking.Verify(times)` on the object returned by `OnCall`
+- KnockOff also supports `.Verifiable()` + `stub.Verify()` for batch verification
+- Both support the same `Times` matchers (Once, AtLeastOnce, Exactly, etc.)
 
 ---
 

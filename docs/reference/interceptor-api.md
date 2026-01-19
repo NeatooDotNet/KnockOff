@@ -34,6 +34,15 @@ Generated for non-generic interface methods. Tracks call counts, captures argume
 | `LastCallArgs` | `(T1, T2, ...)` | Tuple of arguments from the most recent call (multi-parameter methods) |
 | `OnCall` | Delegate | Callback invoked when the method is called |
 
+### Verification Methods
+
+| Method | Description |
+|--------|-------------|
+| `Verify()` | Verify method was called at least once (throws if not) |
+| `Verify(Times)` | Verify method was called according to Times constraint |
+| `Verifiable()` | Mark interceptor for batch verification with default constraint (AtLeastOnce) |
+| `Verifiable(Times)` | Mark interceptor for batch verification with specific Times constraint |
+
 ### OnCall Signatures
 
 The `OnCall` property type varies based on method signature:
@@ -79,14 +88,10 @@ public void MethodInterceptor_CompleteApiDemonstration()
     var user = repository.GetById(42);
     repository.Update(1, "UpdatedName");
 
-    // Track call counts
-    Assert.Equal(1, stub.Save.CallCount);
-    Assert.Equal(1, stub.GetById.CallCount);
-    Assert.Equal(1, stub.Update.CallCount);
-
-    // Check WasCalled
-    Assert.True(stub.Save.WasCalled);
-    Assert.True(stub.GetById.WasCalled);
+    // Verify calls
+    saveTracking.Verify(Times.Once);
+    getTracking.Verify(Times.Once);
+    updateTracking.Verify(Times.Once);
 
     // Access last argument (single parameter) via tracking
     Assert.Equal(42, getTracking.LastArg);
@@ -120,6 +125,19 @@ Generated for interface properties. Tracks get/set operations, stores backing va
 | `OnGet` | `Func<T>` | Callback invoked when the property is read |
 | `OnSet` | `Action<T>` | Callback invoked when the property is written |
 
+### Verification Methods
+
+| Method | Description |
+|--------|-------------|
+| `VerifyGet()` | Verify property getter was called at least once (throws if not) |
+| `VerifyGet(Times)` | Verify property getter was called according to Times constraint |
+| `VerifySet()` | Verify property setter was called at least once (throws if not) |
+| `VerifySet(Times)` | Verify property setter was called according to Times constraint |
+| `MarkVerifiableGet()` | Mark getter for batch verification with default constraint (AtLeastOnce) |
+| `MarkVerifiableGet(Times)` | Mark getter for batch verification with specific Times constraint |
+| `MarkVerifiableSet()` | Mark setter for batch verification with default constraint (AtLeastOnce) |
+| `MarkVerifiableSet(Times)` | Mark setter for batch verification with specific Times constraint |
+
 ### Behavior Notes
 
 - **OnGet replaces Value**: When `OnGet` is set, the callback's return value is used instead of `Value`
@@ -148,14 +166,14 @@ public void PropertyInterceptor_CompleteApiDemonstration()
     var conn = repository.ConnectionString;
     Assert.Equal("Server=localhost", conn);
 
-    // GetCount tracks reads
-    Assert.Equal(1, stub.ConnectionString.GetCount);
+    // Verify property was read
+    stub.ConnectionString.VerifyGet(Times.Once);
 
     // Write property
     repository.ConnectionString = "Server=production";
 
-    // SetCount tracks writes
-    Assert.Equal(1, stub.ConnectionString.SetCount);
+    // Verify property was written
+    stub.ConnectionString.VerifySet(Times.Once);
 
     // LastSetValue captures what was written
     Assert.Equal("Server=production", stub.ConnectionString.LastSetValue);

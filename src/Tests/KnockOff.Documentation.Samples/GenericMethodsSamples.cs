@@ -1,3 +1,5 @@
+using KnockOff;
+
 namespace KnockOff.Documentation.Samples.GenericMethods;
 
 // =============================================================================
@@ -93,19 +95,19 @@ public class VerifyTypedCallsTests
 {
     #region generic-verify-typed
     [Fact]
-    public void VerifyTypedCalls_CallCountPerType()
+    public void VerifyTypedCalls_WithTimesConstraint()
     {
         var stub = new RepositoryStub();
 
-        stub.GetById.Of<User>().OnCall((ko, id) => new User { Id = id });
+        var tracking = stub.GetById.Of<User>().OnCall((ko, id) => new User { Id = id });
 
         IRepository repository = stub;
 
         repository.GetById<User>(1);
         repository.GetById<User>(2);
 
-        // Verify calls for specific type
-        Assert.Equal(2, stub.GetById.Of<User>().CallCount);
+        // Verify calls for specific type using Times
+        tracking.Verify(Times.Exactly(2));
         Assert.Equal(2, stub.GetById.Of<User>().LastCallArg);
     }
     #endregion
@@ -115,12 +117,12 @@ public class VerifyAggregateCallsTests
 {
     #region generic-verify-aggregate
     [Fact]
-    public void VerifyAggregateCalls_TotalCallCount()
+    public void VerifyAggregateCalls_VerifyPerType()
     {
         var stub = new RepositoryStub();
 
-        stub.GetById.Of<User>().OnCall((ko, id) => new User { Id = id });
-        stub.GetById.Of<Order>().OnCall((ko, id) => new Order { Id = id });
+        var userTracking = stub.GetById.Of<User>().OnCall((ko, id) => new User { Id = id });
+        var orderTracking = stub.GetById.Of<Order>().OnCall((ko, id) => new Order { Id = id });
 
         IRepository repository = stub;
 
@@ -128,9 +130,9 @@ public class VerifyAggregateCallsTests
         repository.GetById<User>(2);
         repository.GetById<Order>(3);
 
-        // TotalCallCount aggregates across all type arguments
-        Assert.Equal(3, stub.GetById.TotalCallCount);
-        Assert.True(stub.GetById.WasCalled);
+        // Verify each type was called using tracking
+        userTracking.Verify(Times.Exactly(2));
+        orderTracking.Verify(Times.Once);
     }
     #endregion
 }
@@ -262,17 +264,17 @@ public class CompleteGenericExampleTests
         var stub = new SerializerStub();
 
         // Configure Serialize for different types
-        stub.Serialize.Of<User>().OnCall((ko, obj) =>
+        var serializeUserTracking = stub.Serialize.Of<User>().OnCall((ko, obj) =>
             $"{{\"Id\":{obj.Id},\"Name\":\"{obj.Name}\"}}");
 
-        stub.Serialize.Of<Order>().OnCall((ko, obj) =>
+        var serializeOrderTracking = stub.Serialize.Of<Order>().OnCall((ko, obj) =>
             $"{{\"Id\":{obj.Id},\"Amount\":{obj.Amount}}}");
 
         // Configure Deserialize
-        stub.Deserialize.Of<User>().OnCall((ko, data) =>
+        var deserializeUserTracking = stub.Deserialize.Of<User>().OnCall((ko, data) =>
             new User { Id = 1, Name = "Deserialized User" });
 
-        stub.Deserialize.Of<Order>().OnCall((ko, data) =>
+        var deserializeOrderTracking = stub.Deserialize.Of<Order>().OnCall((ko, data) =>
             new Order { Id = 2, Amount = 50.00m });
 
         ISerializer serializer = stub;
@@ -285,15 +287,11 @@ public class CompleteGenericExampleTests
         var user = serializer.Deserialize<User>(userJson);
         var order = serializer.Deserialize<Order>(orderJson);
 
-        // Verify per-type calls
-        Assert.Equal(1, stub.Serialize.Of<User>().CallCount);
-        Assert.Equal(1, stub.Serialize.Of<Order>().CallCount);
-        Assert.Equal(1, stub.Deserialize.Of<User>().CallCount);
-        Assert.Equal(1, stub.Deserialize.Of<Order>().CallCount);
-
-        // Verify aggregate totals
-        Assert.Equal(2, stub.Serialize.TotalCallCount);
-        Assert.Equal(2, stub.Deserialize.TotalCallCount);
+        // Verify per-type calls with Times
+        serializeUserTracking.Verify(Times.Once);
+        serializeOrderTracking.Verify(Times.Once);
+        deserializeUserTracking.Verify(Times.Once);
+        deserializeOrderTracking.Verify(Times.Once);
 
         // Verify called type arguments
         Assert.Contains(typeof(User), stub.Serialize.CalledTypeArguments);

@@ -1,3 +1,5 @@
+using KnockOff;
+
 namespace KnockOff.Documentation.Samples.AttributeOptions;
 
 // =============================================================================
@@ -102,12 +104,12 @@ public partial class InlineClassPatternTests
         // .Object property returns the stub as the base class type
         EmailServiceBase service = stub.Object;
 
-        // Can intercept virtual members
-        stub.Send.OnCall((ko, to, subject, body) => { });
+        // Can intercept virtual members and mark verifiable
+        stub.Send.OnCall((ko, to, subject, body) => { }).Verifiable();
 
         service.Send("test@example.com", "Hello", "World");
 
-        Assert.True(stub.Send.WasCalled);
+        stub.Verify();
     }
 }
 #endregion
@@ -131,10 +133,10 @@ public partial class MultipleStubsPatternTests
         var emailService = new Stubs.IAttrEmailService();
         var logger = new Stubs.IAttrLogger();
 
-        // Configure each stub independently
-        userRepo.GetById.OnCall((ko, id) => new User { Id = id, Name = "Test" });
-        emailService.Send.OnCall((ko, to, subject, body) => { });
-        logger.Log.OnCall((ko, message) => { });
+        // Configure each stub independently with verifiable
+        userRepo.GetById.OnCall((ko, id) => new User { Id = id, Name = "Test" }).Verifiable();
+        emailService.Send.OnCall((ko, to, subject, body) => { }).Verifiable();
+        logger.Log.OnCall((ko, message) => { }).Verifiable();
 
         // Use in tests
         IAttrUserRepository repo = userRepo;
@@ -145,9 +147,10 @@ public partial class MultipleStubsPatternTests
         email.Send("a@b.com", "Subject", "Body");
         log.Log("Test message");
 
-        Assert.True(userRepo.GetById.WasCalled);
-        Assert.True(emailService.Send.WasCalled);
-        Assert.True(logger.Log.WasCalled);
+        // Verify all stubs
+        userRepo.Verify();
+        emailService.Verify();
+        logger.Verify();
     }
 }
 #endregion
@@ -163,18 +166,19 @@ public class ChoosingPatternTests
     {
         // Stand-alone pattern
         var standalone = new AttrUserRepositoryStub();
-        var saveTracking = standalone.Save.OnCall((ko, user) => { });
+        var saveTracking = standalone.Save.OnCall((ko, user) => { }).Verifiable();
 
         // All patterns have the same interceptor capabilities:
         // - OnCall for behavior
-        // - WasCalled, CallCount for verification
+        // - Verifiable() for batch verification
+        // - Verify() to check all marked members
         // - LastArg on tracking interface for argument capture
 
         IAttrUserRepository repo = standalone;
         repo.Save(new User { Id = 1, Name = "Alice" });
 
-        Assert.True(standalone.Save.WasCalled);
-        Assert.Equal(1, standalone.Save.CallCount);
+        // Verify using the new API
+        standalone.Verify();
         Assert.Equal("Alice", saveTracking.LastArg.Name);
     }
 }

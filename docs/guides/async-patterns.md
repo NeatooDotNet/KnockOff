@@ -16,15 +16,15 @@ public async Task TaskResult_ReturnedWithFromResult()
     var stub = new AsyncUserSvcStub();
 
     // Use Task.FromResult to return a value synchronously
-    var tracking = stub.GetUserAsync.OnCall((ko, id) =>
-        Task.FromResult<User?>(new User { Id = id, Name = "Alice" }));
+    stub.GetUserAsync.OnCall((ko, id) =>
+        Task.FromResult<User?>(new User { Id = id, Name = "Alice" })).Verifiable();
 
     IAsyncUserSvc service = stub;
     var user = await service.GetUserAsync(42);
 
     Assert.NotNull(user);
     Assert.Equal("Alice", user.Name);
-    Assert.True(tracking.WasCalled);
+    stub.Verify();
 }
 ```
 <!-- endSnippet -->
@@ -41,17 +41,17 @@ public async Task TaskVoid_ReturnedWithCompletedTask()
     var updatedUsers = new List<User>();
 
     // Use Task.CompletedTask for async void methods
-    var tracking = stub.UpdateUserAsync.OnCall((ko, user) =>
+    stub.UpdateUserAsync.OnCall((ko, user) =>
     {
         updatedUsers.Add(user);
         return Task.CompletedTask;
-    });
+    }).Verifiable();
 
     IAsyncUserSvc service = stub;
     await service.UpdateUserAsync(new User { Id = 1, Name = "Bob" });
 
     Assert.Single(updatedUsers);
-    Assert.True(tracking.WasCalled);
+    stub.Verify();
 }
 ```
 <!-- endSnippet -->
@@ -70,15 +70,15 @@ public async Task ValueTaskResult_ReturnedDirectly()
     var stub = new AsyncUserSvcStub();
 
     // Create ValueTask directly with the value
-    var tracking = stub.GetCachedUserAsync.OnCall((ko, id) =>
-        new ValueTask<User?>(new User { Id = id, Name = "Cached" }));
+    stub.GetCachedUserAsync.OnCall((ko, id) =>
+        new ValueTask<User?>(new User { Id = id, Name = "Cached" })).Verifiable();
 
     IAsyncUserSvc service = stub;
     var user = await service.GetCachedUserAsync(42);
 
     Assert.NotNull(user);
     Assert.Equal("Cached", user.Name);
-    Assert.True(tracking.WasCalled);
+    stub.Verify();
 }
 ```
 <!-- endSnippet -->
@@ -182,11 +182,11 @@ public async Task AsyncService_SuccessScenario()
 {
     var stub = new AsyncRepoStub();
 
-    // Configure success case
-    var findTracking = stub.FindAsync.OnCall((ko, id) =>
-        Task.FromResult<User?>(new User { Id = id, Name = "Original" }));
+    // Configure success case with Verifiable markers
+    stub.FindAsync.OnCall((ko, id) =>
+        Task.FromResult<User?>(new User { Id = id, Name = "Original" })).Verifiable();
 
-    var saveTracking = stub.SaveAsync.OnCall((ko, user) => Task.CompletedTask);
+    stub.SaveAsync.OnCall((ko, user) => Task.CompletedTask).Verifiable();
 
     var manager = new UserManager(stub);
 
@@ -195,8 +195,7 @@ public async Task AsyncService_SuccessScenario()
 
     // Assert
     Assert.True(result);
-    Assert.True(findTracking.WasCalled);
-    Assert.True(saveTracking.WasCalled);
+    stub.Verify(); // Verifies both FindAsync and SaveAsync were called
 }
 ```
 <!-- endSnippet -->

@@ -118,16 +118,17 @@ public class QuickStartVerifyTests
 {
     #region readme-quickstart-verify
     [Fact]
-    public void VerifyCalls_WithCallCount()
+    public void VerifyCalls_WithVerifiable()
     {
         var stub = new QuickStartRepoStub();
-        stub.GetUser.OnCall((ko, id) => new User { Id = id, Name = "Test" });
+        stub.GetUser.OnCall((ko, id) => new User { Id = id, Name = "Test" }).Verifiable();
 
         IQuickStartRepo repository = stub;
 
         var user = repository.GetUser(42);
 
-        Assert.Equal(1, stub.GetUser.CallCount);
+        // Verify() checks all members marked with .Verifiable()
+        stub.Verify();
     }
     #endregion
 }

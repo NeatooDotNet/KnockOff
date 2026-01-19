@@ -46,17 +46,16 @@ public class StandaloneUsageTests
         var stub = new UserRepoStub();
 
         // Configure method behavior using OnCall
-        // OnCall returns a tracking object for verification
-        var tracking = stub.SaveUser.OnCall((ko, user) => true);
+        // Chain .Verifiable() to mark for batch verification
+        stub.SaveUser.OnCall((ko, user) => true).Verifiable();
 
         // Act - use through the interface
         IUserRepo repository = stub;
         var result = repository.SaveUser(new User { Id = 1, Name = "Alice" });
 
-        // Assert - verify using the tracking object returned by OnCall
+        // Assert - Verify() checks all members marked with .Verifiable()
         Assert.True(result);
-        Assert.True(tracking.WasCalled);
-        Assert.Equal(1, tracking.CallCount);
+        stub.Verify();
     }
     #endregion
 }
@@ -89,15 +88,16 @@ public partial class InlineStubTests
         // Arrange - instantiate the generated stub
         var stub = new Stubs.IEmailSvc();
 
-        // Configure behavior and get tracking object
-        var tracking = stub.Send.OnCall((ko, to, subject, body) => { });
+        // Configure behavior and mark as verifiable
+        // OnCall returns a tracking object for argument access
+        var tracking = stub.Send.OnCall((ko, to, subject, body) => { }).Verifiable();
 
         // Act - use through the interface
         IEmailSvc emailService = stub;
         emailService.Send("user@example.com", "Welcome", "Hello!");
 
-        // Assert - verify using tracking object
-        Assert.True(tracking.WasCalled);
+        // Assert - Verify() checks method was called
+        stub.Verify();
         // Access last arguments from tracking
         var args = tracking.LastArgs;
         Assert.Equal("user@example.com", args.to);

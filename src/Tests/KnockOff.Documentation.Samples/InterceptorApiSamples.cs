@@ -1,3 +1,5 @@
+using KnockOff;
+
 namespace KnockOff.Documentation.Samples.InterceptorApi;
 
 // =============================================================================
@@ -66,15 +68,15 @@ public class MethodInterceptorApiTests
     {
         var stub = new ApiMethodRepoStub();
 
-        // Configure void method with OnCall
-        var saveTracking = stub.Save.OnCall((ko, user) => { });
+        // Configure void method with OnCall and mark verifiable
+        var saveTracking = stub.Save.OnCall((ko, user) => { }).Verifiable();
 
-        // Configure return method with OnCall
+        // Configure return method with OnCall and mark verifiable
         var getTracking = stub.GetById.OnCall((ko, id) =>
-            new User { Id = id, Name = $"User{id}" });
+            new User { Id = id, Name = $"User{id}" }).Verifiable();
 
-        // Configure multi-parameter method
-        var updateTracking = stub.Update.OnCall((ko, id, name) => { });
+        // Configure multi-parameter method and mark verifiable
+        var updateTracking = stub.Update.OnCall((ko, id, name) => { }).Verifiable();
 
         IApiMethodRepo repository = stub;
 
@@ -83,14 +85,8 @@ public class MethodInterceptorApiTests
         var user = repository.GetById(42);
         repository.Update(1, "UpdatedName");
 
-        // Track call counts
-        Assert.Equal(1, stub.Save.CallCount);
-        Assert.Equal(1, stub.GetById.CallCount);
-        Assert.Equal(1, stub.Update.CallCount);
-
-        // Check WasCalled
-        Assert.True(stub.Save.WasCalled);
-        Assert.True(stub.GetById.WasCalled);
+        // Verify all methods were called
+        stub.Verify();
 
         // Access last argument (single parameter) via tracking
         Assert.Equal(42, getTracking.LastArg);
@@ -287,10 +283,10 @@ public class GenericMethodInterceptorApiTests
         var stub = new ApiGenericRepoStub();
 
         // Configure OnCall for specific type arguments
-        stub.GetById.Of<User>().OnCall((ko, id) =>
+        var userTracking = stub.GetById.Of<User>().OnCall((ko, id) =>
             new User { Id = id, Name = $"User{id}" });
 
-        stub.GetById.Of<Product>().OnCall((ko, id) =>
+        var productTracking = stub.GetById.Of<Product>().OnCall((ko, id) =>
             new Product { Id = id, Name = $"Product{id}" });
 
         IApiGenericRepo repository = stub;
@@ -300,17 +296,13 @@ public class GenericMethodInterceptorApiTests
         var product = repository.GetById<Product>(2);
         var user2 = repository.GetById<User>(3);
 
-        // Base-level tracking: TotalCallCount across all types
-        Assert.Equal(3, stub.GetById.TotalCallCount);
-        Assert.True(stub.GetById.WasCalled);
+        // Verify calls via tracking with Times
+        userTracking.Verify(Times.Exactly(2));
+        productTracking.Verify(Times.Once);
 
         // CalledTypeArguments lists all types used
         Assert.Contains(typeof(User), stub.GetById.CalledTypeArguments);
         Assert.Contains(typeof(Product), stub.GetById.CalledTypeArguments);
-
-        // Typed tracking via Of<T>()
-        Assert.Equal(2, stub.GetById.Of<User>().CallCount);
-        Assert.Equal(1, stub.GetById.Of<Product>().CallCount);
 
         // LastCallArg for specific type (captures the 'id' parameter)
         Assert.Equal(3, stub.GetById.Of<User>().LastCallArg);
@@ -318,12 +310,13 @@ public class GenericMethodInterceptorApiTests
 
         // Reset typed tracking only
         stub.GetById.Of<User>().Reset();
-        Assert.Equal(0, stub.GetById.Of<User>().CallCount);
-        Assert.Equal(1, stub.GetById.Of<Product>().CallCount); // Preserved
+        stub.GetById.Of<User>().Verify(Times.Never);
+        productTracking.Verify(Times.Once); // Preserved
 
         // Reset all tracking
         stub.GetById.Reset();
-        Assert.Equal(0, stub.GetById.TotalCallCount);
+        stub.GetById.Of<User>().Verify(Times.Never);
+        stub.GetById.Of<Product>().Verify(Times.Never);
     }
     #endregion
 }

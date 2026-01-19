@@ -80,7 +80,9 @@ public void MethodWithMultipleParams_AllAvailableInOnCall()
 
     Assert.True(auth.ValidateCredentials("admin", "secret"));
     Assert.False(auth.ValidateCredentials("user", "wrong"));
-    Assert.Equal(2, tracking.CallCount);
+
+    // Verify exactly 2 calls were made
+    tracking.Verify(Times.Exactly(2));
 }
 ```
 <!-- endSnippet -->
@@ -89,35 +91,35 @@ public void MethodWithMultipleParams_AllAvailableInOnCall()
 
 ## Verifying Method Calls
 
-### Checking If Called
+### Using Verify()
 
-Use `WasCalled` to verify a method was invoked:
+The recommended approach is to call `.Verify()` on the tracking object returned by `OnCall`:
 
 <!-- snippet: methods-verify-wascalled -->
 ```cs
 [Fact]
-public void WasCalled_VerifiesMethodInvocation()
+public void Verify_VerifiesMethodInvocation()
 {
     var stub = new SaveRepoMethodsStub();
-    var tracking = stub.Save.OnCall((ko, entity) => { });
+    stub.Save.OnCall((ko, entity) => { }).Verifiable();
 
     ISaveRepoMethods repository = stub;
     repository.Save(new User { Id = 1 });
 
-    // WasCalled is true if method was invoked at least once
-    Assert.True(tracking.WasCalled);
+    // Verify() checks all members marked with .Verifiable()
+    stub.Verify();
 }
 ```
 <!-- endSnippet -->
 
-### Verifying Call Count
+### Verifying Call Frequency
 
-Use `CallCount` to verify the exact number of invocations:
+Use `Times` to specify exact call count requirements:
 
 <!-- snippet: methods-verify-callcount -->
 ```cs
 [Fact]
-public void CallCount_VerifiesExactInvocations()
+public void Verify_ExactCallCount()
 {
     var stub = new NotifierMethodsStub();
     var tracking = stub.Notify.OnCall((ko, message) => { });
@@ -131,8 +133,33 @@ public void CallCount_VerifiesExactInvocations()
         notifier.Notify($"Processing {item}");
     }
 
-    // Verify exact call count via tracking object
-    Assert.Equal(2, tracking.CallCount);
+    // Verify exactly 2 calls (throws if different)
+    tracking.Verify(Times.Exactly(2));
+}
+```
+<!-- endSnippet -->
+
+### Using Verifiable()
+
+For batch verification of multiple methods, use `.Verifiable()` then call `stub.Verify()`:
+
+<!-- snippet: methods-verify-verifiable -->
+```cs
+[Fact]
+public void Verifiable_BatchVerification()
+{
+    var stub = new SaveRepoMethodsStub();
+
+    // Mark expected calls
+    stub.Save.OnCall((ko, entity) => { }).Verifiable(Times.Once);
+    stub.GetById.OnCall((ko, id) => new User { Id = id }).Verifiable();
+
+    ISaveRepoMethods repository = stub;
+    repository.Save(new User { Id = 1 });
+    repository.GetById(1);
+
+    // Verify all marked methods (throws if any not called correctly)
+    stub.Verify();
 }
 ```
 <!-- endSnippet -->
@@ -202,11 +229,11 @@ public void Overloads_DistinguishedByCallbackSignature()
     // Overloads are distinguished by the callback parameter types
     // The fully-typed lambda tells KnockOff which overload to configure
     var findAllTracking = stub.Find.OnCall((SearchRepoStub ko) =>
-        new List<User>());
+        new List<User>()).Verifiable();
     var findByIdTracking = stub.Find.OnCall((SearchRepoStub ko, int id) =>
-        new User { Id = id, Name = "ById" });
+        new User { Id = id, Name = "ById" }).Verifiable();
     var findByNameTracking = stub.Find.OnCall((SearchRepoStub ko, string name) =>
-        new User { Id = 1, Name = name });
+        new User { Id = 1, Name = name }).Verifiable();
 
     ISearchRepo repo = stub;
 
@@ -215,11 +242,11 @@ public void Overloads_DistinguishedByCallbackSignature()
     repo.Find(42);
     repo.Find("Alice");
 
-    // Each tracking object is specific to its overload
-    Assert.Equal(1, findAllTracking.CallCount);
-    Assert.Equal(1, findByIdTracking.CallCount);
+    // Verify all overloads were called
+    stub.Verify();
+
+    // Access last arguments via tracking objects
     Assert.Equal(42, findByIdTracking.LastArg);
-    Assert.Equal(1, findByNameTracking.CallCount);
     Assert.Equal("Alice", findByNameTracking.LastArg);
 }
 ```
@@ -244,14 +271,14 @@ public void Reset_ClearsTrackingState()
     IProcessorMethods processor = stub;
     processor.ProcessData("initial");
 
-    Assert.Equal(1, tracking.CallCount);
+    // Verify one call was made
+    tracking.Verify(Times.Once);
 
     // Reset clears CallCount, WasCalled on the interceptor
     stub.ProcessData.Reset();
 
-    // Tracking is also reset
-    Assert.Equal(0, tracking.CallCount);
-    Assert.False(tracking.WasCalled);
+    // After reset, Verify(Times.Never) passes via tracking
+    tracking.Verify(Times.Never);
 }
 ```
 <!-- endSnippet -->
@@ -273,8 +300,8 @@ public void UserService_UpdateUserEmail_CallsRepositoryCorrectly()
     var stub = new CompleteUserRepoStub();
 
     var testUser = new User { Id = 1, Name = "Alice", Email = "old@test.com" };
-    var getTracking = stub.GetUser.OnCall((ko, id) => id == 1 ? testUser : null);
-    var saveTracking = stub.SaveUser.OnCall((ko, user) => { });
+    var getTracking = stub.GetUser.OnCall((ko, id) => id == 1 ? testUser : null).Verifiable();
+    var saveTracking = stub.SaveUser.OnCall((ko, user) => { }).Verifiable();
 
     var service = new UserService(stub);
 
@@ -284,12 +311,11 @@ public void UserService_UpdateUserEmail_CallsRepositoryCorrectly()
     // Assert
     Assert.True(result);
 
-    // Verify GetUser was called with correct ID
-    Assert.True(getTracking.WasCalled);
-    Assert.Equal(1, getTracking.LastArg);
+    // Verify both methods were called
+    stub.Verify();
 
-    // Verify SaveUser was called
-    Assert.True(saveTracking.WasCalled);
+    // Verify GetUser was called with correct ID
+    Assert.Equal(1, getTracking.LastArg);
 
     // Verify saved user has new email via the tracking args
     var savedUser = saveTracking.LastArg;
@@ -303,7 +329,7 @@ public void UserService_UpdateUserEmail_CallsRepositoryCorrectly()
 ## Key Takeaways
 
 - **OnCall signature**: First parameter is always the stub instance
-- **Verification**: Use `WasCalled` for existence, `CallCount` for exact count
+- **Verification**: Use `tracking.Verify()` or `.Verifiable()` + `stub.Verify()`
 - **Arguments**: `LastCallArg` for single parameters, `LastCallArgs` tuple for multiple
 - **Overloads**: Numbered suffixes (Method1, Method2, ...) in declaration order
 - **Reset**: Clears call tracking and callbacks

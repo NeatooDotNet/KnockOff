@@ -1,3 +1,5 @@
+using KnockOff;
+
 namespace KnockOff.Documentation.Samples.Verification;
 
 // =============================================================================
@@ -32,24 +34,26 @@ public partial class SvcVerifyStub : ISvcVerify { }
 
 public class BasicCallVerificationTests
 {
-    #region verify-wascalled
+    #region verify-verifiable
     [Fact]
-    public void WasCalled_VerifiesMethodInvoked()
+    public void Verifiable_MarksForBatchVerification()
     {
         var stub = new RepoVerifyStub();
-        var tracking = stub.GetById.OnCall((ko, id) => new User { Id = id });
+
+        // Chain .Verifiable() to mark for batch verification
+        stub.GetById.OnCall((ko, id) => new User { Id = id }).Verifiable();
 
         IRepoVerify repository = stub;
         repository.GetById(42);
 
-        // WasCalled is true if invoked at least once
-        Assert.True(tracking.WasCalled);
+        // Verify() checks all members marked with .Verifiable()
+        stub.Verify();
     }
     #endregion
 
-    #region verify-callcount-exact
+    #region verify-times-once
     [Fact]
-    public void CallCount_VerifiesExactNumber()
+    public void Verify_WithTimesOnce()
     {
         var stub = new RepoVerifyStub();
         var tracking = stub.Save.OnCall((ko, user) => { });
@@ -57,14 +61,14 @@ public class BasicCallVerificationTests
         IRepoVerify repository = stub;
         repository.Save(new User { Id = 1 });
 
-        // Verify exactly one call via tracking
-        Assert.Equal(1, tracking.CallCount);
+        // Verify exactly one call using Times.Once
+        tracking.Verify(Times.Once);
     }
     #endregion
 
-    #region verify-callcount-range
+    #region verify-times-atleast
     [Fact]
-    public void CallCount_VerifiesRange()
+    public void Verify_WithTimesAtLeast()
     {
         var stub = new RepoVerifyStub();
         var tracking = stub.Refresh.OnCall((ko) => { });
@@ -77,7 +81,76 @@ public class BasicCallVerificationTests
         repository.Refresh();
 
         // Verify at least 2 calls
-        Assert.True(tracking.CallCount >= 2);
+        tracking.Verify(Times.AtLeast(2));
+    }
+    #endregion
+
+    #region verify-times-never
+    [Fact]
+    public void Verify_WithTimesNever()
+    {
+        var stub = new RepoVerifyStub();
+        var tracking = stub.Refresh.OnCall((ko) => { });
+
+        IRepoVerify repository = stub;
+        // Don't call Refresh
+
+        // Verify method was never called via tracking
+        tracking.Verify(Times.Never);
+    }
+    #endregion
+
+    #region verify-times-exactly
+    [Fact]
+    public void Verify_WithTimesExactly()
+    {
+        var stub = new RepoVerifyStub();
+        var tracking = stub.Refresh.OnCall((ko) => { });
+
+        IRepoVerify repository = stub;
+        repository.Refresh();
+        repository.Refresh();
+        repository.Refresh();
+
+        // Verify exactly 3 calls
+        tracking.Verify(Times.Exactly(3));
+    }
+    #endregion
+
+    #region verify-verifiable-times
+    [Fact]
+    public void Verifiable_WithTimesConstraint()
+    {
+        var stub = new RepoVerifyStub();
+
+        // Mark with Times constraint for batch verification
+        stub.Refresh.OnCall((ko) => { }).Verifiable(Times.Exactly(2));
+
+        IRepoVerify repository = stub;
+        repository.Refresh();
+        repository.Refresh();
+
+        // Verify() respects the Times constraint
+        stub.Verify();
+    }
+    #endregion
+
+    #region verify-verifyall
+    [Fact]
+    public void VerifyAll_ChecksAllConfiguredMembers()
+    {
+        var stub = new RepoVerifyStub();
+
+        // Configure multiple members (no need to mark Verifiable)
+        stub.GetById.OnCall((ko, id) => new User { Id = id });
+        stub.Save.OnCall((ko, user) => { });
+
+        IRepoVerify repository = stub;
+        repository.GetById(1);
+        repository.Save(new User { Id = 1 });
+
+        // VerifyAll() checks all configured members were called at least once
+        stub.VerifyAll();
     }
     #endregion
 }
@@ -196,9 +269,10 @@ public class CrossInterceptorTests
     {
         var stub = new RepoVerifyStub();
 
-        var getTracking = stub.GetById.OnCall((ko, id) => new User { Id = id });
-        var saveTracking = stub.Save.OnCall((ko, user) => { });
-        var refreshTracking = stub.Refresh.OnCall((ko) => { });
+        // Mark all methods as verifiable
+        stub.GetById.OnCall((ko, id) => new User { Id = id }).Verifiable();
+        stub.Save.OnCall((ko, user) => { }).Verifiable();
+        stub.Refresh.OnCall((ko) => { }).Verifiable();
 
         IRepoVerify repository = stub;
 
@@ -207,15 +281,8 @@ public class CrossInterceptorTests
         repository.Save(new User { Id = 1 });
         repository.Refresh();
 
-        // Verify all methods were called
-        Assert.True(getTracking.WasCalled);
-        Assert.True(saveTracking.WasCalled);
-        Assert.True(refreshTracking.WasCalled);
-
-        // Verify total interactions
-        Assert.Equal(1, getTracking.CallCount);
-        Assert.Equal(1, saveTracking.CallCount);
-        Assert.Equal(1, refreshTracking.CallCount);
+        // Single Verify() checks all marked members
+        stub.Verify();
     }
     #endregion
 }
@@ -241,22 +308,23 @@ public class CompleteVerificationTests
         // Track call history
         var getIdHistory = new List<int>();
 
+        // Mark all methods as verifiable with specific constraints
         var getTracking = stub.GetById.OnCall((ko, id) =>
         {
             getIdHistory.Add(id);
             getOrder = ++order;
             return new User { Id = id, Name = $"User{id}" };
-        });
+        }).Verifiable(Times.Exactly(2));
 
         var saveTracking = stub.Save.OnCall((ko, user) =>
         {
             saveOrder = ++order;
-        });
+        }).Verifiable(Times.Once);
 
         var refreshTracking = stub.Refresh.OnCall((ko) =>
         {
             refreshOrder = ++order;
-        });
+        }).Verifiable(Times.Once);
 
         IRepoVerify repository = stub;
 
@@ -266,23 +334,16 @@ public class CompleteVerificationTests
         repository.Save(new User { Id = 1, Name = "Updated" });
         repository.Refresh();
 
-        // 1. Basic call verification
-        Assert.True(getTracking.WasCalled);
-        Assert.True(saveTracking.WasCalled);
-        Assert.True(refreshTracking.WasCalled);
+        // 1. Batch verification - checks all Times constraints
+        stub.Verify();
 
-        // 2. Call count verification
-        Assert.Equal(2, getTracking.CallCount);
-        Assert.Equal(1, saveTracking.CallCount);
-        Assert.Equal(1, refreshTracking.CallCount);
-
-        // 3. Argument verification
+        // 2. Argument verification
         Assert.Equal(2, getTracking.LastArg); // Last call was GetById(2)
 
-        // 4. Call history verification
+        // 3. Call history verification
         Assert.Equal(new[] { 1, 2 }, getIdHistory);
 
-        // 5. Call order verification
+        // 4. Call order verification
         Assert.True(getOrder < saveOrder, "Get before Save");
         Assert.True(saveOrder < refreshOrder, "Save before Refresh");
     }

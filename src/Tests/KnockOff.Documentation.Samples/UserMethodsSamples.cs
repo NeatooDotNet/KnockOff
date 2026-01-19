@@ -1,3 +1,5 @@
+using KnockOff;
+
 namespace KnockOff.Documentation.Samples.UserMethods;
 
 // =============================================================================
@@ -60,8 +62,8 @@ public class UserMethodPriorityTests
         Assert.NotNull(user);
         Assert.Equal("Default User", user.Name);
 
-        // Interceptor tracks that the method was called
-        Assert.Equal(1, stub.GetUserById2.CallCount);
+        // Interceptor tracks that the method was called - verify with Times
+        stub.GetUserById2.Verify(Times.Once);
         Assert.Equal(1, stub.GetUserById2.LastArg);
     }
     #endregion
@@ -86,7 +88,7 @@ public class UserMethodOverrideTests
 
         // User method interceptors are tracking-only
         // They don't have OnCall - use Source delegation to override
-        Assert.True(stub.IsActive2.WasCalled);
+        stub.IsActive2.Verify(Times.Once);
         Assert.Equal(42, stub.IsActive2.LastArg);
     }
     #endregion
@@ -107,16 +109,16 @@ public class UserMethodResetTests
 
         // Call method
         repository.GetBalance(1);
-        Assert.Equal(1, stub.GetBalance2.CallCount);
+        stub.GetBalance2.Verify(Times.Once);
 
         // Reset clears tracking
         stub.GetBalance2.Reset();
-        Assert.Equal(0, stub.GetBalance2.CallCount);
+        stub.GetBalance2.Verify(Times.Never);
 
         // User method still works after reset
         var balance = repository.GetBalance(2);
         Assert.Equal(100.00m, balance);
-        Assert.Equal(1, stub.GetBalance2.CallCount);
+        stub.GetBalance2.Verify(Times.Once);
     }
     #endregion
 }
@@ -145,10 +147,10 @@ public class CompleteUserMethodExampleTests
         Assert.True(isActive);
         Assert.Equal(100.00m, balance);
 
-        // All calls are tracked via *2 interceptors
-        Assert.Equal(1, stub.GetUserById2.CallCount);
-        Assert.Equal(1, stub.IsActive2.CallCount);
-        Assert.Equal(1, stub.GetBalance2.CallCount);
+        // All calls are tracked via *2 interceptors - verify with Times
+        stub.GetUserById2.Verify(Times.Once);
+        stub.IsActive2.Verify(Times.Once);
+        stub.GetBalance2.Verify(Times.Once);
     }
 
     [Fact]
@@ -162,8 +164,8 @@ public class CompleteUserMethodExampleTests
         repository.GetUserById(2);
         repository.GetUserById(3);
 
-        // All calls tracked
-        Assert.Equal(3, stub.GetUserById2.CallCount);
+        // Verify call count using Times
+        stub.GetUserById2.Verify(Times.Exactly(3));
         Assert.Equal(3, stub.GetUserById2.LastArg); // Last call was id=3
     }
     #endregion

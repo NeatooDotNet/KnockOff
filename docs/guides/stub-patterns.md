@@ -53,19 +53,19 @@ public void StandaloneStub_CanBeConfiguredAndVerified()
     // Arrange - instantiate the reusable stub
     var stub = new UserRepoStandaloneStub();
 
-    // Configure void method via OnCall
-    var saveTracking = stub.Save.OnCall((ko, user) => { });
+    // Configure void method via OnCall and mark verifiable
+    stub.Save.OnCall((ko, user) => { }).Verifiable();
 
     // Act - cast to interface for use
     IUserRepoStandalone repository = stub;
     var user = repository.GetById(42);
     repository.Save(user!);
 
-    // Assert - verify via tracking
+    // Assert - verify via Verify()
     Assert.NotNull(user);
-    Assert.True(saveTracking.WasCalled);
+    stub.Verify();
     // User method tracks via special interceptor
-    Assert.Equal(1, stub.GetById2.CallCount);
+    stub.GetById2.Verify(Times.Once);
 }
 ```
 <!-- endSnippet -->
@@ -117,9 +117,9 @@ public void InlineInterfaceStub_GeneratedInStubsNamespace()
     // Arrange - use generated Stubs.InterfaceName class
     var stub = new Stubs.IUserRepoInline();
 
-    // Configure behavior
-    var getByIdTracking = stub.GetById.OnCall((ko, id) => new User { Id = id, Name = "Test" });
-    var saveTracking = stub.Save.OnCall((ko, user) => { });
+    // Configure behavior and mark verifiable
+    stub.GetById.OnCall((ko, id) => new User { Id = id, Name = "Test" }).Verifiable();
+    stub.Save.OnCall((ko, user) => { }).Verifiable();
 
     // Act
     IUserRepoInline repository = stub;
@@ -129,7 +129,7 @@ public void InlineInterfaceStub_GeneratedInStubsNamespace()
     // Assert
     Assert.NotNull(user);
     Assert.Equal("Test", user.Name);
-    Assert.True(saveTracking.WasCalled);
+    stub.Verify();
 }
 ```
 <!-- endSnippet -->
@@ -188,8 +188,8 @@ public void InlineClassStub_UsesObjectProperty()
     // Arrange - create wrapper stub
     var stub = new Stubs.UserServiceClass();
 
-    // Configure virtual member behavior
-    var getTracking = stub.GetUser.OnCall((ko, id) => new User { Id = id, Name = "FromStub" });
+    // Configure virtual member behavior and mark verifiable
+    stub.GetUser.OnCall((ko, id) => new User { Id = id, Name = "FromStub" }).Verifiable();
 
     // Act - use .Object to get the actual class instance
     UserServiceClass service = stub.Object;
@@ -198,7 +198,7 @@ public void InlineClassStub_UsesObjectProperty()
     // Assert
     Assert.NotNull(user);
     Assert.Equal("FromStub", user.Name);
-    Assert.True(getTracking.WasCalled);
+    stub.Verify();
 }
 ```
 <!-- endSnippet -->
@@ -275,17 +275,17 @@ public partial class PatternComparisonTests
     {
         // Stand-Alone: Reusable email stub
         var emailStub = new EmailSvcPatternStub();
-        var sendTracking = emailStub.Send.OnCall((ko, to, subject, body) => true);
+        emailStub.Send.OnCall((ko, to, subject, body) => true).Verifiable();
         emailStub.IsConfigured.Value = true;
 
         // Inline Interface: Test-local logger stub
         var loggerStub = new Stubs.ILogSvc();
         var logMessages = new List<string>();
-        var logTracking = loggerStub.Log.OnCall((ko, msg) => logMessages.Add(msg));
+        var logTracking = loggerStub.Log.OnCall((ko, msg) => logMessages.Add(msg)).Verifiable(Times.Exactly(2));
 
         // Inline Class: Stub for abstract base class
         var auditStub = new Stubs.AuditSvcBase();
-        var auditTracking = auditStub.Audit.OnCall((ko, action) => { });
+        auditStub.Audit.OnCall((ko, action) => { }).Verifiable();
 
         // Act - simulate integration scenario
         IEmailSvcPattern email = emailStub;
@@ -297,10 +297,11 @@ public partial class PatternComparisonTests
         audit.Audit("email_sent");
         logger.Log("Operation complete");
 
-        // Assert - each pattern provides verification
+        // Assert - each pattern provides Verify()
         Assert.True(sent);
-        Assert.Equal(2, logTracking.CallCount);
-        Assert.True(auditTracking.WasCalled);
+        emailStub.Verify();
+        loggerStub.Verify();
+        auditStub.Verify();
         Assert.Contains("Starting operation", logMessages);
     }
 }

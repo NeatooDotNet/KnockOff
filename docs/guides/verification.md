@@ -1,6 +1,18 @@
 # Verification Guide
 
-After configuring stub behavior, you need to verify that your code under test interacted with the stub correctly. KnockOff provides properties and patterns for verifying calls, arguments, state changes, and call order.
+After configuring stub behavior, you need to verify that your code under test interacted with the stub correctly. KnockOff provides a fluent verification API inspired by Moq, plus lower-level properties for custom assertions.
+
+---
+
+## Quick Start
+
+KnockOff offers three verification approaches:
+
+1. **Direct verification** - Call `.Verify()` on individual interceptors
+2. **Marked verification** - Use `.Verifiable()` to mark expected calls, then `stub.Verify()`
+3. **Verify all** - Call `stub.VerifyAll()` to check everything configured
+
+**Recommended:** Use `.Verifiable()` + `stub.Verify()` for most tests. It's explicit, readable, and catches missing verifications.
 
 ---
 
@@ -9,45 +21,48 @@ After configuring stub behavior, you need to verify that your code under test in
 KnockOff enables verification of:
 
 - **Calls** - Whether a method or property was invoked
+- **Call frequency** - Exactly once, at least N times, never, etc.
 - **Arguments** - What values were passed to methods
 - **State** - Property get/set operations and final values
 - **Order** - The sequence of calls across multiple methods
 
-All verification uses standard assertion libraries (xUnit, NUnit, MSTest). KnockOff exposes properties you inspect—it doesn't provide its own assertion API.
-
 ---
 
-## Basic Call Verification
+## Direct Verification
 
-### WasCalled
+Call `.Verify()` directly on interceptors returned by `OnCall`. This approach is concise when you only need to verify one or two calls.
 
-The simplest verification checks whether a method or property was invoked.
+### At Least Once (Default)
 
-<!-- snippet: verify-wascalled -->
+The simplest verification checks whether a method was invoked at least once.
+
+<!-- snippet: verify-verifiable -->
 ```cs
 [Fact]
-public void WasCalled_VerifiesMethodInvoked()
+public void Verifiable_MarksForBatchVerification()
 {
     var stub = new RepoVerifyStub();
-    var tracking = stub.GetById.OnCall((ko, id) => new User { Id = id });
+
+    // Chain .Verifiable() to mark for batch verification
+    stub.GetById.OnCall((ko, id) => new User { Id = id }).Verifiable();
 
     IRepoVerify repository = stub;
     repository.GetById(42);
 
-    // WasCalled is true if invoked at least once
-    Assert.True(tracking.WasCalled);
+    // Verify() checks all members marked with .Verifiable()
+    stub.Verify();
 }
 ```
 <!-- endSnippet -->
 
-### Call Count (Exact)
+### Exactly Once
 
-For precise verification, check the exact number of calls.
+Verify a method was called exactly once.
 
-<!-- snippet: verify-callcount-exact -->
+<!-- snippet: verify-times-once -->
 ```cs
 [Fact]
-public void CallCount_VerifiesExactNumber()
+public void Verify_WithTimesOnce()
 {
     var stub = new RepoVerifyStub();
     var tracking = stub.Save.OnCall((ko, user) => { });
@@ -55,20 +70,20 @@ public void CallCount_VerifiesExactNumber()
     IRepoVerify repository = stub;
     repository.Save(new User { Id = 1 });
 
-    // Verify exactly one call via tracking
-    Assert.Equal(1, tracking.CallCount);
+    // Verify exactly one call using Times.Once
+    tracking.Verify(Times.Once);
 }
 ```
 <!-- endSnippet -->
 
-### Call Count (Range)
+### At Least N Calls
 
-For flexible verification, assert on call count ranges.
+Verify a method was called a minimum number of times.
 
-<!-- snippet: verify-callcount-range -->
+<!-- snippet: verify-times-atleast -->
 ```cs
 [Fact]
-public void CallCount_VerifiesRange()
+public void Verify_WithTimesAtLeast()
 {
     var stub = new RepoVerifyStub();
     var tracking = stub.Refresh.OnCall((ko) => { });
@@ -81,18 +96,146 @@ public void CallCount_VerifiesRange()
     repository.Refresh();
 
     // Verify at least 2 calls
-    Assert.True(tracking.CallCount >= 2);
+    tracking.Verify(Times.AtLeast(2));
 }
 ```
 <!-- endSnippet -->
+
+### Never Called
+
+Verify a method was never invoked.
+
+<!-- snippet: verify-times-never -->
+```cs
+[Fact]
+public void Verify_WithTimesNever()
+{
+    var stub = new RepoVerifyStub();
+    var tracking = stub.Refresh.OnCall((ko) => { });
+
+    IRepoVerify repository = stub;
+    // Don't call Refresh
+
+    // Verify method was never called via tracking
+    tracking.Verify(Times.Never);
+}
+```
+<!-- endSnippet -->
+
+### All Times Matchers
+
+The `Times` struct supports these verification modes:
+
+- `Times.AtLeastOnce` - Default, at least one call
+- `Times.Once` - Exactly one call
+- `Times.Exactly(n)` - Exactly N calls
+- `Times.AtLeast(n)` - At least N calls
+- `Times.AtMost(n)` - At most N calls
+- `Times.Between(min, max, Range)` - Between min and max calls (inclusive or exclusive)
+- `Times.Never` - Zero calls
+
+---
+
+## Marked Verification (Recommended)
+
+Use `.Verifiable()` to mark interceptors as requiring verification, then call `stub.Verify()` to check them all at once. This approach prevents "missing verification" bugs where you forget to check a critical call.
+
+### Basic Marked Verification
+
+<!-- snippet: verify-verifiable -->
+```cs
+[Fact]
+public void Verifiable_MarksForBatchVerification()
+{
+    var stub = new RepoVerifyStub();
+
+    // Chain .Verifiable() to mark for batch verification
+    stub.GetById.OnCall((ko, id) => new User { Id = id }).Verifiable();
+
+    IRepoVerify repository = stub;
+    repository.GetById(42);
+
+    // Verify() checks all members marked with .Verifiable()
+    stub.Verify();
+}
+```
+<!-- endSnippet -->
+
+### Verifiable with Times
+
+You can specify `Times` constraints when marking with `.Verifiable()`.
+
+<!-- snippet: verify-verifiable-times -->
+```cs
+[Fact]
+public void Verifiable_WithTimesConstraint()
+{
+    var stub = new RepoVerifyStub();
+
+    // Mark with Times constraint for batch verification
+    stub.Refresh.OnCall((ko) => { }).Verifiable(Times.Exactly(2));
+
+    IRepoVerify repository = stub;
+    repository.Refresh();
+    repository.Refresh();
+
+    // Verify() respects the Times constraint
+    stub.Verify();
+}
+```
+<!-- endSnippet -->
+
+### When to Use Marked Verification
+
+**Prefer `.Verifiable()` + `stub.Verify()` when:**
+- You have multiple method calls to verify
+- You want to ensure you don't forget verification
+- You want verification failures to clearly list what wasn't called
+
+**Use direct `.Verify()` when:**
+- You only need to check one or two calls
+- The verification logic is complex (argument inspection, etc.)
+
+---
+
+## Verify All
+
+Call `stub.VerifyAll()` to check every interceptor that has `OnCall` or `Value` configured, regardless of whether it was marked `.Verifiable()`.
+
+<!-- snippet: verify-verifyall -->
+```cs
+[Fact]
+public void VerifyAll_ChecksAllConfiguredMembers()
+{
+    var stub = new RepoVerifyStub();
+
+    // Configure multiple members (no need to mark Verifiable)
+    stub.GetById.OnCall((ko, id) => new User { Id = id });
+    stub.Save.OnCall((ko, user) => { });
+
+    IRepoVerify repository = stub;
+    repository.GetById(1);
+    repository.Save(new User { Id = 1 });
+
+    // VerifyAll() checks all configured members were called at least once
+    stub.VerifyAll();
+}
+```
+<!-- endSnippet -->
+
+**Use `VerifyAll()` when:**
+- You want strict verification that everything configured was used
+- You're testing integration scenarios where all dependencies should be touched
+
+**Warning:** `VerifyAll()` can be brittle. If you configure a callback for optional behavior, `VerifyAll()` will fail if it's not called.
 
 ---
 
 ## Argument Verification
 
-### Single Parameter (LastCallArg)
+For argument inspection, use `LastCallArg` or `LastCallArgs` from the tracking object returned by `OnCall`.
 
-For methods with one parameter, use `LastCallArg` to inspect the most recent argument.
+### Single Parameter (LastCallArg)
 
 <!-- snippet: verify-lastcallarg -->
 ```cs
@@ -112,8 +255,6 @@ public void LastArg_VerifiesSingleParameter()
 <!-- endSnippet -->
 
 ### Multiple Parameters (LastCallArgs)
-
-For methods with multiple parameters, `LastCallArgs` returns a named tuple with each parameter accessible by name.
 
 <!-- snippet: verify-lastcallargs-tuple -->
 ```cs
@@ -207,7 +348,7 @@ This approach scales to any number of methods and supports complex ordering asse
 
 ## Cross-Interceptor Verification
 
-You can verify relationships between different stub members by comparing their interceptor state.
+Verify multiple methods were called using `.Verifiable()` and `stub.Verify()`.
 
 <!-- snippet: verify-cross-interceptor -->
 ```cs
@@ -216,9 +357,10 @@ public void CrossInterceptor_VerifyMultipleMethodsCalled()
 {
     var stub = new RepoVerifyStub();
 
-    var getTracking = stub.GetById.OnCall((ko, id) => new User { Id = id });
-    var saveTracking = stub.Save.OnCall((ko, user) => { });
-    var refreshTracking = stub.Refresh.OnCall((ko) => { });
+    // Mark all methods as verifiable
+    stub.GetById.OnCall((ko, id) => new User { Id = id }).Verifiable();
+    stub.Save.OnCall((ko, user) => { }).Verifiable();
+    stub.Refresh.OnCall((ko) => { }).Verifiable();
 
     IRepoVerify repository = stub;
 
@@ -227,20 +369,13 @@ public void CrossInterceptor_VerifyMultipleMethodsCalled()
     repository.Save(new User { Id = 1 });
     repository.Refresh();
 
-    // Verify all methods were called
-    Assert.True(getTracking.WasCalled);
-    Assert.True(saveTracking.WasCalled);
-    Assert.True(refreshTracking.WasCalled);
-
-    // Verify total interactions
-    Assert.Equal(1, getTracking.CallCount);
-    Assert.Equal(1, saveTracking.CallCount);
-    Assert.Equal(1, refreshTracking.CallCount);
+    // Single Verify() checks all marked members
+    stub.Verify();
 }
 ```
 <!-- endSnippet -->
 
-Combine this with call order tracking for comprehensive verification of method interactions.
+This approach is cleaner than individual assertions and catches missing verifications.
 
 ---
 
@@ -263,7 +398,7 @@ These follow the same patterns as method verification but distinguish between re
 
 ## Complete Example
 
-Here's a comprehensive verification scenario combining multiple techniques.
+Here's a comprehensive verification scenario demonstrating the recommended patterns.
 
 <!-- snippet: verify-complete-example -->
 ```cs
@@ -281,22 +416,23 @@ public void CompleteVerification_AllTechniques()
     // Track call history
     var getIdHistory = new List<int>();
 
+    // Mark all methods as verifiable with specific constraints
     var getTracking = stub.GetById.OnCall((ko, id) =>
     {
         getIdHistory.Add(id);
         getOrder = ++order;
         return new User { Id = id, Name = $"User{id}" };
-    });
+    }).Verifiable(Times.Exactly(2));
 
     var saveTracking = stub.Save.OnCall((ko, user) =>
     {
         saveOrder = ++order;
-    });
+    }).Verifiable(Times.Once);
 
     var refreshTracking = stub.Refresh.OnCall((ko) =>
     {
         refreshOrder = ++order;
-    });
+    }).Verifiable(Times.Once);
 
     IRepoVerify repository = stub;
 
@@ -306,42 +442,35 @@ public void CompleteVerification_AllTechniques()
     repository.Save(new User { Id = 1, Name = "Updated" });
     repository.Refresh();
 
-    // 1. Basic call verification
-    Assert.True(getTracking.WasCalled);
-    Assert.True(saveTracking.WasCalled);
-    Assert.True(refreshTracking.WasCalled);
+    // 1. Batch verification - checks all Times constraints
+    stub.Verify();
 
-    // 2. Call count verification
-    Assert.Equal(2, getTracking.CallCount);
-    Assert.Equal(1, saveTracking.CallCount);
-    Assert.Equal(1, refreshTracking.CallCount);
-
-    // 3. Argument verification
+    // 2. Argument verification
     Assert.Equal(2, getTracking.LastArg); // Last call was GetById(2)
 
-    // 4. Call history verification
+    // 3. Call history verification
     Assert.Equal(new[] { 1, 2 }, getIdHistory);
 
-    // 5. Call order verification
+    // 4. Call order verification
     Assert.True(getOrder < saveOrder, "Get before Save");
     Assert.True(saveOrder < refreshOrder, "Save before Refresh");
 }
 ```
 <!-- endSnippet -->
 
-This example demonstrates how to combine verification techniques for thorough test coverage.
+This example shows the modern verification approach: mark what matters with `.Verifiable()`, verify with `stub.Verify()`, and add detailed assertions only when needed.
 
 ---
 
 ## Best Practices
 
-**Use the simplest verification that proves correctness.** Start with `WasCalled`, only add `CallCount` or argument checks if needed.
+**Prefer `.Verifiable()` + `stub.Verify()` over manual assertions.** This prevents forgetting to verify critical calls and makes test intent explicit.
 
-**Prefer built-in properties over callbacks.** Use `LastCallArg` and `CallCount` instead of capturing state in `OnCall` unless you need call history.
+**Use `Times` constraints to be precise.** `Times.Once` is better than `Times.AtLeastOnce` when you know the exact expected behavior.
 
 **Verify intent, not implementation details.** Test that the right methods were called with the right data, not the exact number of times internal helpers ran.
 
-**Combine verification techniques.** Real tests often need to verify both "was it called" and "with what arguments" and "in what order."
+**Combine with argument verification when needed.** Use `.Verify()` for call frequency, then inspect `LastCallArg` for argument values.
 
 **Keep assertions focused.** One logical verification per test makes failures easier to diagnose.
 
