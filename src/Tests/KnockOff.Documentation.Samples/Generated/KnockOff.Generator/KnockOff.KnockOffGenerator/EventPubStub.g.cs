@@ -261,8 +261,8 @@ partial class EventPubStub : global::KnockOff.Documentation.Samples.Events.IEven
 		/// <summary>Raises the event with the specified arguments.</summary>
 		public void Raise(object? sender, global::KnockOff.Documentation.Samples.DataEventArgs e) => _handler?.Invoke(sender, e);
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; _isVerifiable = false; _verifiableTimes = null; }
+		/// <summary>Resets tracking state (counts, handler) but preserves verifiable marking.</summary>
+		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
 
 		private bool _isVerifiable;
 		private global::KnockOff.Times? _verifiableTimes;
@@ -363,8 +363,8 @@ partial class EventPubStub : global::KnockOff.Documentation.Samples.Events.IEven
 		/// <summary>Raises the event with the specified arguments.</summary>
 		public void Raise(string obj) => _handler?.Invoke(obj);
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; _isVerifiable = false; _verifiableTimes = null; }
+		/// <summary>Resets tracking state (counts, handler) but preserves verifiable marking.</summary>
+		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
 
 		private bool _isVerifiable;
 		private global::KnockOff.Times? _verifiableTimes;

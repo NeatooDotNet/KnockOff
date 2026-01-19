@@ -32,8 +32,8 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
-		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public CountInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -113,8 +113,8 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
-		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public IsReadOnlyInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -200,8 +200,8 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		/// <summary>Backing storage for this indexer.</summary>
 		public global::System.Collections.Generic.Dictionary<int, global::Neatoo.Rules.IRuleMessage> Backing { get; } = new();
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; _source = null; _isVerifiable = false; _verifiableTimes = null; }
+		/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; LastGetKey = default; SetCount = 0; LastSetEntry = null; _source = null; }
 
 		private bool _isVerifiable;
 		private global::KnockOff.Times? _verifiableTimes;

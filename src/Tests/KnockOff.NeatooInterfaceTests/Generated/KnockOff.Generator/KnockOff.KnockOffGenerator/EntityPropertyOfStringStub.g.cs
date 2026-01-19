@@ -44,8 +44,8 @@ partial class EntityPropertyOfStringStub : global::Neatoo.IEntityProperty<string
 		/// <summary>Records a setter access.</summary>
 		public void RecordSet(bool? value) { SetCount++; LastSetValue = value; }
 
-		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; _value = default!; _valueSet = false; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public IsPausedInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -135,8 +135,8 @@ partial class EntityPropertyOfStringStub : global::Neatoo.IEntityProperty<string
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
-		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public IsModifiedInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -216,8 +216,8 @@ partial class EntityPropertyOfStringStub : global::Neatoo.IEntityProperty<string
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
-		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public IsSelfModifiedInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -297,8 +297,8 @@ partial class EntityPropertyOfStringStub : global::Neatoo.IEntityProperty<string
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
-		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public DisplayNameInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -390,8 +390,8 @@ partial class EntityPropertyOfStringStub : global::Neatoo.IEntityProperty<string
 		/// <summary>Records a setter access.</summary>
 		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
-		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; _value = default!; _valueSet = false; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public ValueInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -481,8 +481,8 @@ partial class EntityPropertyOfStringStub : global::Neatoo.IEntityProperty<string
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
-		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public NameInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -562,8 +562,8 @@ partial class EntityPropertyOfStringStub : global::Neatoo.IEntityProperty<string
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
-		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public TaskInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -643,8 +643,8 @@ partial class EntityPropertyOfStringStub : global::Neatoo.IEntityProperty<string
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
-		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public IsBusyInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -724,8 +724,8 @@ partial class EntityPropertyOfStringStub : global::Neatoo.IEntityProperty<string
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
-		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public IsReadOnlyInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -805,8 +805,8 @@ partial class EntityPropertyOfStringStub : global::Neatoo.IEntityProperty<string
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
-		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public TypeInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -886,8 +886,8 @@ partial class EntityPropertyOfStringStub : global::Neatoo.IEntityProperty<string
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
-		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public StringValueInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -967,8 +967,8 @@ partial class EntityPropertyOfStringStub : global::Neatoo.IEntityProperty<string
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
-		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public IsSelfValidInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -1048,8 +1048,8 @@ partial class EntityPropertyOfStringStub : global::Neatoo.IEntityProperty<string
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
-		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public IsValidInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -1129,8 +1129,8 @@ partial class EntityPropertyOfStringStub : global::Neatoo.IEntityProperty<string
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
-		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public PropertyMessagesInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -3268,8 +3268,8 @@ partial class EntityPropertyOfStringStub : global::Neatoo.IEntityProperty<string
 		/// <summary>Invokes the handler if subscribed.</summary>
 		public void Raise(object? sender, global::System.ComponentModel.PropertyChangedEventArgs e) => _handler?.DynamicInvoke(sender, e);
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; _isVerifiable = false; _verifiableTimes = null; }
+		/// <summary>Resets tracking state (counts, handler) but preserves verifiable marking.</summary>
+		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
 
 		private bool _isVerifiable;
 		private global::KnockOff.Times? _verifiableTimes;
@@ -3370,8 +3370,8 @@ partial class EntityPropertyOfStringStub : global::Neatoo.IEntityProperty<string
 		/// <summary>Invokes the handler if subscribed.</summary>
 		public void Raise(global::Neatoo.NeatooPropertyChangedEventArgs propertyNameBreadCrumbs) => _handler?.DynamicInvoke(propertyNameBreadCrumbs);
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; _isVerifiable = false; _verifiableTimes = null; }
+		/// <summary>Resets tracking state (counts, handler) but preserves verifiable marking.</summary>
+		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
 
 		private bool _isVerifiable;
 		private global::KnockOff.Times? _verifiableTimes;

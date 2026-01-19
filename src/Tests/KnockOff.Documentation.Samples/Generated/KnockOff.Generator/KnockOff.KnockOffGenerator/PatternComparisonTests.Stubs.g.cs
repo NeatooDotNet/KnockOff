@@ -317,7 +317,8 @@ partial class PatternComparisonTests
 
 			public void RecordCall(string action) { CallCount++; LastCallArg = action; }
 
-			public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }
+			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { CallCount = 0; LastCallArg = default; }
 
 			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);

@@ -28,8 +28,8 @@ partial class ApiEventRepoStub : global::KnockOff.Documentation.Samples.Intercep
 		/// <summary>Raises the event with the specified arguments.</summary>
 		public void Raise(object? sender, global::System.EventArgs e) => _handler?.Invoke(sender, e);
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; _isVerifiable = false; _verifiableTimes = null; }
+		/// <summary>Resets tracking state (counts, handler) but preserves verifiable marking.</summary>
+		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
 
 		private bool _isVerifiable;
 		private global::KnockOff.Times? _verifiableTimes;
@@ -130,8 +130,8 @@ partial class ApiEventRepoStub : global::KnockOff.Documentation.Samples.Intercep
 		/// <summary>Raises the event with the specified arguments.</summary>
 		public void Raise(global::KnockOff.Documentation.Samples.User obj) => _handler?.Invoke(obj);
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; _isVerifiable = false; _verifiableTimes = null; }
+		/// <summary>Resets tracking state (counts, handler) but preserves verifiable marking.</summary>
+		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
 
 		private bool _isVerifiable;
 		private global::KnockOff.Times? _verifiableTimes;

@@ -35,8 +35,8 @@ partial class DocumentWithMixedPropertiesKnockOff : global::KnockOffTests.IDocum
 		/// <summary>Records a setter access.</summary>
 		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
-		/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-		public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; _value = default!; _valueSet = false; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public IdInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -138,8 +138,8 @@ partial class DocumentWithMixedPropertiesKnockOff : global::KnockOffTests.IDocum
 		/// <summary>Records a setter access.</summary>
 		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
-		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; _value = default!; _valueSet = false; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public TitleInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -229,8 +229,8 @@ partial class DocumentWithMixedPropertiesKnockOff : global::KnockOffTests.IDocum
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
-		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public VersionInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }

@@ -46,8 +46,8 @@ partial class ClassInitPropertyTests
 			/// <summary>Records a setter access.</summary>
 			public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _onGet = null; SetCount = 0; LastSetValue = default; _onSet = null; _configured = false; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public EntityBaseWithVirtualInit_IdInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -223,8 +223,8 @@ partial class ClassInitPropertyTests
 			/// <summary>Records a setter access.</summary>
 			public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _onGet = null; SetCount = 0; LastSetValue = default; _onSet = null; _configured = false; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public EntityBaseWithAbstractInit_IdInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -399,8 +399,8 @@ partial class ClassInitPropertyTests
 			/// <summary>Records a setter access.</summary>
 			public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _onGet = null; SetCount = 0; LastSetValue = default; _onSet = null; _configured = false; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public EntityBaseWithMixedInit_IdInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -501,8 +501,8 @@ partial class ClassInitPropertyTests
 			/// <summary>Records a setter access.</summary>
 			public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _onGet = null; SetCount = 0; LastSetValue = default; _onSet = null; _configured = false; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public EntityBaseWithMixedInit_NameInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -603,8 +603,8 @@ partial class ClassInitPropertyTests
 			/// <summary>Records a setter access.</summary>
 			public void RecordSet(int? value) { SetCount++; LastSetValue = value; }
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _onGet = null; SetCount = 0; LastSetValue = default; _onSet = null; _configured = false; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public EntityBaseWithMixedInit_VersionInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -823,8 +823,8 @@ partial class ClassInitPropertyTests
 			/// <summary>Records a setter access.</summary>
 			public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _onGet = null; SetCount = 0; LastSetValue = default; _onSet = null; _configured = false; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public EntityBaseWithRequiredProperty_IdInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -1004,8 +1004,8 @@ partial class ClassInitPropertyTests
 			/// <summary>Records a setter access.</summary>
 			public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _onGet = null; SetCount = 0; LastSetValue = default; _onSet = null; _configured = false; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public EntityBaseWithRequiredInit_IdInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -1185,8 +1185,8 @@ partial class ClassInitPropertyTests
 			/// <summary>Records a setter access.</summary>
 			public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _onGet = null; SetCount = 0; LastSetValue = default; _onSet = null; _configured = false; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public EntityBaseWithMultipleRequired_IdInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -1287,8 +1287,8 @@ partial class ClassInitPropertyTests
 			/// <summary>Records a setter access.</summary>
 			public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _onGet = null; SetCount = 0; LastSetValue = default; _onSet = null; _configured = false; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public EntityBaseWithMultipleRequired_NameInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -1389,8 +1389,8 @@ partial class ClassInitPropertyTests
 			/// <summary>Records a setter access.</summary>
 			public void RecordSet(int? value) { SetCount++; LastSetValue = value; }
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _onGet = null; SetCount = 0; LastSetValue = default; _onSet = null; _configured = false; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public EntityBaseWithMultipleRequired_VersionInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }

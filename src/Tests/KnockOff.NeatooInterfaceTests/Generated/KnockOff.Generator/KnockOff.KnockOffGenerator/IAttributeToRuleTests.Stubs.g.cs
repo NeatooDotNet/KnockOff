@@ -39,12 +39,11 @@ partial class IAttributeToRuleTests
 			/// <summary>All type argument(s) that were used in calls.</summary>
 			public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
 
-			/// <summary>Resets all typed handlers.</summary>
+			/// <summary>Resets tracking state (call counts) but preserves configuration (OnCall callbacks).</summary>
 			public void Reset()
 			{
 				foreach (var handler in _typedHandlers.Values.Cast<IResettable>())
 					handler.Reset();
-				_typedHandlers.Clear();
 			}
 
 			internal bool IsVerifiable => false; // Generic handlers are not individually verifiable
@@ -86,8 +85,8 @@ partial class IAttributeToRuleTests
 				/// <summary>Records a method call.</summary>
 				public void RecordCall(global::Neatoo.IPropertyInfo r, object? attribute) { CallCount++; LastCallArgs = (r, attribute); }
 
-				/// <summary>Resets all tracking state.</summary>
-				public void Reset() { CallCount = 0; LastCallArgs = default; _onCall = null; }
+				/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+				public void Reset() { CallCount = 0; LastCallArgs = default; }
 
 				/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);

@@ -35,8 +35,8 @@ partial class EntityWithInitPropertyKnockOff : global::KnockOffTests.IEntityWith
 		/// <summary>Records a setter access.</summary>
 		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
-		/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-		public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; _value = default!; _valueSet = false; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public IdInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }

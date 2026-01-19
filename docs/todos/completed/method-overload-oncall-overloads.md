@@ -1,8 +1,9 @@
 # Method Interceptor Redesign: OnCall() Returns Tracking Stub
 
-**Status:** Design Complete
+**Status:** Completed
 **Priority:** High
 **Created:** 2026-01-16
+**Completed:** 2026-01-17
 
 ---
 
@@ -165,14 +166,14 @@ stub.Method.Reset();
 
 ## Tasks
 
-- [ ] Design IMethodStub interface hierarchy
-- [ ] Design Times enum/struct
-- [ ] Update generator to emit OnCall() overloads (one per method signature)
-- [ ] Implement sequencing logic
-- [ ] Implement CallerArgumentExpression tracking
-- [ ] Remove numeric suffix generation
-- [ ] Update tests
-- [ ] Update documentation
+- [x] Design IMethodStub interface hierarchy
+- [x] Design Times enum/struct
+- [x] Update generator to emit OnCall() overloads (one per method signature)
+- [x] Implement sequencing logic
+- [x] Implement CallerArgumentExpression tracking (dropped - not needed)
+- [x] Remove numeric suffix generation
+- [x] Update tests
+- [ ] Update documentation (pending documentation rewrite)
 
 ---
 
@@ -202,6 +203,14 @@ stub.Method.Reset();
 - Times.Forever for indefinite repeat, exhausted sequence throws
 - Dropped CallerArgumentExpression (just hold onto tracker)
 - Verify() at tracking, sequence, and stub levels
+
+### 2026-01-17
+- **Implementation completed** as part of [inline-interceptor-api-unification](../inline-interceptor-api-unification.md)
+- Created shared `UnifiedMethodInterceptorModel` and `UnifiedInterceptorBuilder`
+- Created `MethodInterceptorRenderer` for shared code generation
+- Updated both FlatRenderer and InlineRenderer to use new API
+- Updated all generic method handlers to use method-based OnCall() pattern
+- All 1,345+ tests passing
 
 ---
 
@@ -437,6 +446,8 @@ stub.DataReceived.Reset();
 
 ## Results / Conclusions
 
+**Completed 2026-01-17** - This design was implemented as part of the [inline-interceptor-api-unification](../inline-interceptor-api-unification.md) effort.
+
 Design complete. Formal design document: `docs/plans/2026-01-16-interceptor-api-redesign.md`
 
 **Key decisions:**
@@ -448,3 +459,9 @@ Design complete. Formal design document: `docs/plans/2026-01-16-interceptor-api-
 - Multiple interfaces: Diagnostic error for conflicting signatures
 
 **This is a major breaking change** but eliminates cascading breaks from interface evolution.
+
+**Implementation Status:**
+- ✅ Method API unification complete - both standalone and inline stubs use `OnCall()` method pattern
+- ✅ Generic method API unification complete - `.Of<T>().OnCall()` pattern works for both stub types
+- ✅ All 1,345+ tests passing
+- ⏳ Indexers (OfXxx pattern) - deferred to separate PR (see inline-interceptor-api-unification)

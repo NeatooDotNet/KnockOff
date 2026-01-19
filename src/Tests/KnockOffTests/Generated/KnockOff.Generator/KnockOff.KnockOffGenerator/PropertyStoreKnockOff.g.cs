@@ -26,8 +26,8 @@ partial class PropertyStoreKnockOff : global::KnockOff.Tests.IPropertyStore, glo
 		/// <summary>Backing storage for this indexer.</summary>
 		public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Tests.PropertyInfo?> Backing { get; } = new();
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; _source = null; _isVerifiable = false; _verifiableTimes = null; }
+		/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; LastGetKey = default; _source = null; }
 
 		private bool _isVerifiable;
 		private global::KnockOff.Times? _verifiableTimes;

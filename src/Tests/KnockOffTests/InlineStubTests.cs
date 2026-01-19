@@ -402,7 +402,7 @@ public class DelegateStubTests
 	}
 
 	[Fact]
-	public void DelegateStub_Reset_ClearsState()
+	public void DelegateStub_Reset_ClearsTrackingButPreservesConfiguration()
 	{
 		var stub = new DelegateInlineTest.Stubs.VoidOneParamDelegate();
 		stub.Interceptor.OnCall = (msg) => { };
@@ -412,10 +412,13 @@ public class DelegateStubTests
 
 		stub.Interceptor.Reset();
 
+		// Tracking state is cleared
 		Assert.Equal(0, stub.Interceptor.CallCount);
 		Assert.False(stub.Interceptor.WasCalled);
-		Assert.Null(stub.Interceptor.OnCall);
 		Assert.Null(stub.Interceptor.LastCallArg);
+
+		// Configuration is preserved (OnCall)
+		Assert.NotNull(stub.Interceptor.OnCall);
 	}
 
 	[Fact]
@@ -459,7 +462,7 @@ public class DelegateStubTests
 	}
 
 	[Fact]
-	public void DelegateStub_ClosedGeneric_Reset_Works()
+	public void DelegateStub_ClosedGeneric_Reset_ClearsTrackingButPreservesConfiguration()
 	{
 		var stub = new GenericDelegateInlineTest.Stubs.Converter();
 		stub.Interceptor.OnCall = (x) => "test";
@@ -470,10 +473,13 @@ public class DelegateStubTests
 
 		stub.Interceptor.Reset();
 
+		// Tracking state is cleared
 		Assert.Equal(0, stub.Interceptor.CallCount);
 		Assert.False(stub.Interceptor.WasCalled);
-		Assert.Null(stub.Interceptor.OnCall);
 		Assert.Null(stub.Interceptor.LastCallArg);
+
+		// Configuration is preserved (OnCall)
+		Assert.NotNull(stub.Interceptor.OnCall);
 	}
 }
 

@@ -32,8 +32,8 @@ partial class RequiredRuleStub : global::Neatoo.Rules.Rules.IRequiredRule, globa
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
-		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public ErrorMessageInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -113,8 +113,8 @@ partial class RequiredRuleStub : global::Neatoo.Rules.Rules.IRequiredRule, globa
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
-		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public ExecutedInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -194,8 +194,8 @@ partial class RequiredRuleStub : global::Neatoo.Rules.Rules.IRequiredRule, globa
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
-		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public RuleOrderInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -275,8 +275,8 @@ partial class RequiredRuleStub : global::Neatoo.Rules.Rules.IRequiredRule, globa
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
-		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public UniqueIndexInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -356,8 +356,8 @@ partial class RequiredRuleStub : global::Neatoo.Rules.Rules.IRequiredRule, globa
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
-		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public MessagesInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -437,8 +437,8 @@ partial class RequiredRuleStub : global::Neatoo.Rules.Rules.IRequiredRule, globa
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
-		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public TriggerPropertiesInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }

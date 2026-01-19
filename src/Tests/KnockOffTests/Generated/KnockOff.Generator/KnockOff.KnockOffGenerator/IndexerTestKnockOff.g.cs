@@ -38,8 +38,8 @@ partial class IndexerTestKnockOff : global::KnockOff.Tests.IIndexerTestService, 
 		/// <summary>Backing storage for this indexer.</summary>
 		public global::System.Collections.Generic.Dictionary<string, string> Backing { get; } = new();
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; _source = null; _isVerifiable = false; _verifiableTimes = null; }
+		/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; LastGetKey = default; SetCount = 0; LastSetEntry = null; _source = null; }
 
 		private bool _isVerifiable;
 		private global::KnockOff.Times? _verifiableTimes;
@@ -138,8 +138,8 @@ partial class IndexerTestKnockOff : global::KnockOff.Tests.IIndexerTestService, 
 		/// <summary>Backing storage for this indexer.</summary>
 		public global::System.Collections.Generic.Dictionary<int, int> Backing { get; } = new();
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; _source = null; _isVerifiable = false; _verifiableTimes = null; }
+		/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; LastGetKey = default; _source = null; }
 
 		private bool _isVerifiable;
 		private global::KnockOff.Times? _verifiableTimes;

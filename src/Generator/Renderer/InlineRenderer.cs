@@ -317,12 +317,11 @@ internal static class InlineRenderer
             w.Line();
         }
 
-        // Reset method - clears counts but preserves verifiable marking
-        w.Line("\t\t\t/// <summary>Resets tracking state but preserves verifiable marking.</summary>");
+        // Reset method - clears tracking state but preserves configuration (OnGet/OnSet/Value) and verifiable marking
+        w.Line("\t\t\t/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>");
         var resetParts = new List<string>();
-        if (prop.HasGetter) resetParts.Add("GetCount = 0; OnGet = null;");
-        if (prop.HasSetter) resetParts.Add("SetCount = 0; LastSetValue = default; OnSet = null;");
-        resetParts.Add("_value = default!; _valueSet = false;");
+        if (prop.HasGetter) resetParts.Add("GetCount = 0;");
+        if (prop.HasSetter) resetParts.Add("SetCount = 0; LastSetValue = default;");
         if (!string.IsNullOrEmpty(prop.DeclaringInterface) && !prop.IsInitOnly) resetParts.Add("_source = null;");
         w.Line($"\t\t\tpublic void Reset() {{ {string.Join(" ", resetParts)} }}");
         w.Line();
@@ -499,12 +498,11 @@ internal static class InlineRenderer
             w.Line();
         }
 
-        // Reset method - clears counts but preserves verifiable marking
-        w.Line("\t\t\t/// <summary>Resets tracking state but preserves verifiable marking.</summary>");
+        // Reset method - clears tracking state but preserves configuration (OnGet/OnSet/Backing) and verifiable marking
+        w.Line("\t\t\t/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>");
         var resetParts = new List<string>();
-        if (indexer.HasGetter) resetParts.Add("GetCount = 0; LastGetKey = default; _onGet = null;");
-        if (indexer.HasSetter) resetParts.Add("SetCount = 0; LastSetEntry = default; _onSet = null;");
-        resetParts.Add("_configured = false;");
+        if (indexer.HasGetter) resetParts.Add("GetCount = 0; LastGetKey = default;");
+        if (indexer.HasSetter) resetParts.Add("SetCount = 0; LastSetEntry = default;");
         if (!string.IsNullOrEmpty(indexer.DeclaringInterface)) resetParts.Add("_source = null;");
         w.Line($"\t\t\tpublic void Reset() {{ {string.Join(" ", resetParts)} }}");
         w.Line();
@@ -640,13 +638,12 @@ internal static class InlineRenderer
         w.Line($"\t\t\tpublic global::System.Collections.Generic.IReadOnlyList<{handler.KeyType}> CalledTypeArguments => _typedHandlers.Keys.ToList();");
         w.Line();
 
-        // Reset method
-        w.Line("\t\t\t/// <summary>Resets all typed handlers.</summary>");
+        // Reset method - clears tracking state but preserves configuration (typed handlers with OnCall)
+        w.Line("\t\t\t/// <summary>Resets tracking state (call counts) but preserves configuration (OnCall callbacks).</summary>");
         w.Line("\t\t\tpublic void Reset()");
         w.Line("\t\t\t{");
         w.Line("\t\t\t\tforeach (var handler in _typedHandlers.Values.Cast<IResettable>())");
         w.Line("\t\t\t\t\thandler.Reset();");
-        w.Line("\t\t\t\t_typedHandlers.Clear();");
         w.Line("\t\t\t}");
         w.Line();
 
@@ -743,19 +740,19 @@ internal static class InlineRenderer
         }
         w.Line();
 
-        // Reset
-        w.Line("\t\t\t\t/// <summary>Resets all tracking state.</summary>");
+        // Reset - clears tracking state but preserves configuration (OnCall callback)
+        w.Line("\t\t\t\t/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>");
         if (handler.NonGenericParameters.Count == 0)
         {
-            w.Line("\t\t\t\tpublic void Reset() { CallCount = 0; _onCall = null; }");
+            w.Line("\t\t\t\tpublic void Reset() { CallCount = 0; }");
         }
         else if (handler.NonGenericParameters.Count == 1)
         {
-            w.Line("\t\t\t\tpublic void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }");
+            w.Line("\t\t\t\tpublic void Reset() { CallCount = 0; LastCallArg = default; }");
         }
         else
         {
-            w.Line("\t\t\t\tpublic void Reset() { CallCount = 0; LastCallArgs = default; _onCall = null; }");
+            w.Line("\t\t\t\tpublic void Reset() { CallCount = 0; LastCallArgs = default; }");
         }
         w.Line();
 
@@ -807,8 +804,8 @@ internal static class InlineRenderer
         w.Line("\t\t\t/// <summary>Records an event unsubscription.</summary>");
         w.Line($"\t\t\tpublic void RecordRemove({evt.DelegateType}? handler) {{ RemoveCount++; Handler = ({evt.DelegateType}?)global::System.Delegate.Remove(Handler, handler); }}");
         w.Line();
-        w.Line("\t\t\t/// <summary>Resets all tracking state.</summary>");
-        w.Line("\t\t\tpublic void Reset() { AddCount = 0; RemoveCount = 0; Handler = null; _isVerifiable = false; _verifiableTimes = null; }");
+        w.Line("\t\t\t/// <summary>Resets tracking state (counts, Handler) but preserves verifiable marking.</summary>");
+        w.Line("\t\t\tpublic void Reset() { AddCount = 0; RemoveCount = 0; Handler = null; }");
         w.Line();
 
         // Verification API for events
@@ -1228,13 +1225,14 @@ internal static class InlineRenderer
         }
         w.Line();
 
-        // Reset method
+        // Reset method - clears tracking state but preserves configuration (OnCall)
+        w.Line("\t\t\t/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>");
         w.Append("\t\t\tpublic void Reset() { CallCount = 0; ");
         if (del.LastCallArgType != null)
             w.Append("LastCallArg = default; ");
         else if (del.LastCallArgsType != null)
             w.Append("LastCallArgs = default; ");
-        w.Line("OnCall = null; }");
+        w.Line("}");
 
         w.Line("\t\t}");
         w.Line();

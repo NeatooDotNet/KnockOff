@@ -40,8 +40,8 @@ partial class IPropertyInfoTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IPropertyInfo_PropertyInfoInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -121,8 +121,8 @@ partial class IPropertyInfoTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IPropertyInfo_NameInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -202,8 +202,8 @@ partial class IPropertyInfoTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IPropertyInfo_TypeInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -283,8 +283,8 @@ partial class IPropertyInfoTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IPropertyInfo_KeyInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -364,8 +364,8 @@ partial class IPropertyInfoTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IPropertyInfo_IsPrivateSetterInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -665,12 +665,11 @@ partial class IPropertyInfoTests
 			/// <summary>All type argument(s) that were used in calls.</summary>
 			public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
 
-			/// <summary>Resets all typed handlers.</summary>
+			/// <summary>Resets tracking state (call counts) but preserves configuration (OnCall callbacks).</summary>
 			public void Reset()
 			{
 				foreach (var handler in _typedHandlers.Values.Cast<IResettable>())
 					handler.Reset();
-				_typedHandlers.Clear();
 			}
 
 			internal bool IsVerifiable => false; // Generic handlers are not individually verifiable
@@ -709,8 +708,8 @@ partial class IPropertyInfoTests
 				/// <summary>Records a method call.</summary>
 				public void RecordCall() => CallCount++;
 
-				/// <summary>Resets all tracking state.</summary>
-				public void Reset() { CallCount = 0; _onCall = null; }
+				/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+				public void Reset() { CallCount = 0; }
 
 				/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);

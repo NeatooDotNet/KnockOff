@@ -35,8 +35,8 @@ partial class GenericCollisionTest
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IListString_CountInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -116,8 +116,8 @@ partial class GenericCollisionTest
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IListString_IsReadOnlyInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -217,8 +217,8 @@ partial class GenericCollisionTest
 			/// <summary>Source object for delegation when OnGet/OnSet is not set.</summary>
 			internal global::System.Collections.Generic.IList<string>? _source;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; _onGet = null; SetCount = 0; LastSetEntry = default; _onSet = null; _configured = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; LastGetKey = default; SetCount = 0; LastSetEntry = default; _source = null; }
 
 			/// <summary>Marks this indexer for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IListString_IndexerInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -2643,8 +2643,8 @@ partial class GenericCollisionTest
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IListInt32_CountInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -2724,8 +2724,8 @@ partial class GenericCollisionTest
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IListInt32_IsReadOnlyInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -2825,8 +2825,8 @@ partial class GenericCollisionTest
 			/// <summary>Source object for delegation when OnGet/OnSet is not set.</summary>
 			internal global::System.Collections.Generic.IList<int>? _source;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; _onGet = null; SetCount = 0; LastSetEntry = default; _onSet = null; _configured = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; LastGetKey = default; SetCount = 0; LastSetEntry = default; _source = null; }
 
 			/// <summary>Marks this indexer for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IListInt32_IndexerInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }

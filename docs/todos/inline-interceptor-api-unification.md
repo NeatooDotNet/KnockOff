@@ -1,9 +1,10 @@
 # Inline Interceptor API Unification
 
-**Status:** In Progress (Methods Complete, Indexers Pending)
+**Status:** In Progress (Methods Complete, Inline Indexers Pending)
 **Priority:** High
 **Created:** 2026-01-16
-**Updated:** 2026-01-17
+**Updated:** 2026-01-19
+**Worktree:** `feature/inlineindexersof`
 
 ---
 
@@ -158,6 +159,12 @@ stub.Indexer.OfString.GetCount
 
 ---
 
+## Plans
+
+- [Inline Indexer OfXxx Pattern Implementation](../plans/inline-indexer-ofxxx-pattern.md) - Phase 3 implementation plan
+
+---
+
 ## Reference
 
 ### Target API (Unified)
@@ -284,6 +291,13 @@ docs/
 - Updated BCL interface tests for new behavior (string returns null, not throws)
 - Updated Neatoo interface tests (IEnumerable methods require callbacks)
 - All 1,345+ tests passing across all projects
+
+### 2026-01-19
+- **Verified inline indexers missing OfXxx pattern** - Created `InlineMultiIndexerTests.cs` test file
+- Test confirmed inline stubs generate `IndexerString`/`IndexerInt32` (direct properties) instead of `Indexer.OfString`/`Indexer.OfInt32` (container pattern)
+- **Standalone indexers confirmed working** - `IndexerTestKnockOff.g.cs` correctly generates `IndexerContainer` with `OfXxx` properties
+- Created implementation plan: `docs/plans/inline-indexer-ofxxx-pattern.md`
+- Created git worktree: `feature/inlineindexersof`
 
 ---
 

@@ -22,7 +22,8 @@ partial class OpenGenericDelegateTests
 
 			public void RecordCall() { CallCount++; }
 
-			public void Reset() { CallCount = 0; OnCall = null; }
+			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { CallCount = 0; }
 		}
 
 		/// <summary>Stub for global::KnockOff.Tests.OGFactory<T> delegate.</summary>
@@ -62,7 +63,8 @@ partial class OpenGenericDelegateTests
 
 			public void RecordCall(TIn input) { CallCount++; LastCallArg = input; }
 
-			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { CallCount = 0; LastCallArg = default; }
 		}
 
 		/// <summary>Stub for global::KnockOff.Tests.OGConverter<TIn, TOut, TResult> delegate.</summary>

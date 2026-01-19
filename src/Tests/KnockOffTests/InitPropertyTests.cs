@@ -200,7 +200,7 @@ public class InitPropertyStandaloneTests
 	}
 
 	[Fact]
-	public void InitProperty_ResetClearsState()
+	public void InitProperty_ResetClearsTrackingButPreservesConfiguration()
 	{
 		// Arrange
 		var stub = new EntityWithInitPropertyKnockOff();
@@ -211,9 +211,9 @@ public class InitPropertyStandaloneTests
 		// Act
 		stub.Id.Reset();
 
-		// Assert - init properties only have GetCount and Value
+		// Assert - Reset() clears tracking but preserves configuration (Value)
 		Assert.Equal(0, stub.Id.GetCount);
-		Assert.Equal(default, stub.Id.Value);
+		Assert.Equal("reset-test", stub.Id.Value); // Value is preserved
 	}
 
 	/// <summary>
@@ -669,7 +669,7 @@ public class ClassRequiredPropertyStubTests
 	}
 
 	[Fact]
-	public void ClassStub_RequiredProperty_ResetWorks()
+	public void ClassStub_RequiredProperty_ResetClearsTrackingButPreservesConfiguration()
 	{
 		// Arrange
 		var stub = new ClassInitPropertyTests.Stubs.EntityBaseWithRequiredProperty();
@@ -679,8 +679,9 @@ public class ClassRequiredPropertyStubTests
 		// Act
 		stub.Id.Reset();
 
-		// Assert
+		// Assert - Reset() clears tracking but preserves configuration (OnGet)
 		Assert.Equal(0, stub.Id.GetCount);
-		Assert.Null(stub.Id.OnGet);
+		Assert.NotNull(stub.Id.OnGet); // OnGet is preserved
+		Assert.Equal("test", stub.Id.OnGet());
 	}
 }

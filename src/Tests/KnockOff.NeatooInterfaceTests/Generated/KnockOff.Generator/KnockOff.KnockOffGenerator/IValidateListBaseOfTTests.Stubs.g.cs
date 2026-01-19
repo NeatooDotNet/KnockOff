@@ -35,8 +35,8 @@ partial class IValidateListBaseOfTTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IValidateListBase_ParentInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -116,8 +116,8 @@ partial class IValidateListBaseOfTTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IValidateListBase_CountInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -197,8 +197,8 @@ partial class IValidateListBaseOfTTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IValidateListBase_IsReadOnlyInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -278,8 +278,8 @@ partial class IValidateListBaseOfTTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IValidateListBase_IsBusyInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -359,8 +359,8 @@ partial class IValidateListBaseOfTTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IValidateListBase_IsValidInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -440,8 +440,8 @@ partial class IValidateListBaseOfTTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IValidateListBase_IsSelfValidInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -521,8 +521,8 @@ partial class IValidateListBaseOfTTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IValidateListBase_PropertyMessagesInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -622,8 +622,8 @@ partial class IValidateListBaseOfTTests
 			/// <summary>Source object for delegation when OnGet/OnSet is not set.</summary>
 			internal global::System.Collections.Generic.IList<global::Neatoo.IValidateBase>? _source;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; _onGet = null; SetCount = 0; LastSetEntry = default; _onSet = null; _configured = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; LastGetKey = default; SetCount = 0; LastSetEntry = default; _source = null; }
 
 			/// <summary>Marks this indexer for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IValidateListBase_IndexerInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -4070,8 +4070,8 @@ partial class IValidateListBaseOfTTests
 			/// <summary>Records an event unsubscription.</summary>
 			public void RecordRemove(global::System.Collections.Specialized.NotifyCollectionChangedEventHandler? handler) { RemoveCount++; Handler = (global::System.Collections.Specialized.NotifyCollectionChangedEventHandler?)global::System.Delegate.Remove(Handler, handler); }
 
-			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { AddCount = 0; RemoveCount = 0; Handler = null; _isVerifiable = false; _verifiableTimes = null; }
+			/// <summary>Resets tracking state (counts, Handler) but preserves verifiable marking.</summary>
+			public void Reset() { AddCount = 0; RemoveCount = 0; Handler = null; }
 
 			private bool _isVerifiable;
 			private global::KnockOff.Times? _verifiableTimes;
@@ -4167,8 +4167,8 @@ partial class IValidateListBaseOfTTests
 			/// <summary>Records an event unsubscription.</summary>
 			public void RecordRemove(global::System.ComponentModel.PropertyChangedEventHandler? handler) { RemoveCount++; Handler = (global::System.ComponentModel.PropertyChangedEventHandler?)global::System.Delegate.Remove(Handler, handler); }
 
-			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { AddCount = 0; RemoveCount = 0; Handler = null; _isVerifiable = false; _verifiableTimes = null; }
+			/// <summary>Resets tracking state (counts, Handler) but preserves verifiable marking.</summary>
+			public void Reset() { AddCount = 0; RemoveCount = 0; Handler = null; }
 
 			private bool _isVerifiable;
 			private global::KnockOff.Times? _verifiableTimes;
@@ -4264,8 +4264,8 @@ partial class IValidateListBaseOfTTests
 			/// <summary>Records an event unsubscription.</summary>
 			public void RecordRemove(global::Neatoo.NeatooPropertyChanged? handler) { RemoveCount++; Handler = (global::Neatoo.NeatooPropertyChanged?)global::System.Delegate.Remove(Handler, handler); }
 
-			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { AddCount = 0; RemoveCount = 0; Handler = null; _isVerifiable = false; _verifiableTimes = null; }
+			/// <summary>Resets tracking state (counts, Handler) but preserves verifiable marking.</summary>
+			public void Reset() { AddCount = 0; RemoveCount = 0; Handler = null; }
 
 			private bool _isVerifiable;
 			private global::KnockOff.Times? _verifiableTimes;

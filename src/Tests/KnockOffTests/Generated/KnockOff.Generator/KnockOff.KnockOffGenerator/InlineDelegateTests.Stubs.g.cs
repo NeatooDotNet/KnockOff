@@ -25,7 +25,8 @@ partial class InlineDelegateTests
 
 			public void RecordCall(global::Neatoo.NeatooPropertyChangedEventArgs propertyNameBreadCrumbs) { CallCount++; LastCallArg = propertyNameBreadCrumbs; }
 
-			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { CallCount = 0; LastCallArg = default; }
 		}
 
 		/// <summary>Stub for global::Neatoo.NeatooPropertyChanged delegate.</summary>

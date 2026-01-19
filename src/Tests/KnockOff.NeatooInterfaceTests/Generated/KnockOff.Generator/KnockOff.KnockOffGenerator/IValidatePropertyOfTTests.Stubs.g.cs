@@ -47,8 +47,8 @@ partial class IValidatePropertyOfTTests
 			/// <summary>Records a setter access.</summary>
 			public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IValidateProperty_ValueInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -138,8 +138,8 @@ partial class IValidatePropertyOfTTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IValidateProperty_NameInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -219,8 +219,8 @@ partial class IValidatePropertyOfTTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IValidateProperty_TaskInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -300,8 +300,8 @@ partial class IValidatePropertyOfTTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IValidateProperty_IsBusyInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -381,8 +381,8 @@ partial class IValidatePropertyOfTTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IValidateProperty_IsReadOnlyInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -462,8 +462,8 @@ partial class IValidatePropertyOfTTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IValidateProperty_TypeInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -543,8 +543,8 @@ partial class IValidatePropertyOfTTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IValidateProperty_StringValueInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -624,8 +624,8 @@ partial class IValidatePropertyOfTTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IValidateProperty_IsSelfValidInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -705,8 +705,8 @@ partial class IValidatePropertyOfTTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IValidateProperty_IsValidInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -786,8 +786,8 @@ partial class IValidatePropertyOfTTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IValidateProperty_PropertyMessagesInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -2467,8 +2467,8 @@ partial class IValidatePropertyOfTTests
 			/// <summary>Records an event unsubscription.</summary>
 			public void RecordRemove(global::System.ComponentModel.PropertyChangedEventHandler? handler) { RemoveCount++; Handler = (global::System.ComponentModel.PropertyChangedEventHandler?)global::System.Delegate.Remove(Handler, handler); }
 
-			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { AddCount = 0; RemoveCount = 0; Handler = null; _isVerifiable = false; _verifiableTimes = null; }
+			/// <summary>Resets tracking state (counts, Handler) but preserves verifiable marking.</summary>
+			public void Reset() { AddCount = 0; RemoveCount = 0; Handler = null; }
 
 			private bool _isVerifiable;
 			private global::KnockOff.Times? _verifiableTimes;
@@ -2564,8 +2564,8 @@ partial class IValidatePropertyOfTTests
 			/// <summary>Records an event unsubscription.</summary>
 			public void RecordRemove(global::Neatoo.NeatooPropertyChanged? handler) { RemoveCount++; Handler = (global::Neatoo.NeatooPropertyChanged?)global::System.Delegate.Remove(Handler, handler); }
 
-			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { AddCount = 0; RemoveCount = 0; Handler = null; _isVerifiable = false; _verifiableTimes = null; }
+			/// <summary>Resets tracking state (counts, Handler) but preserves verifiable marking.</summary>
+			public void Reset() { AddCount = 0; RemoveCount = 0; Handler = null; }
 
 			private bool _isVerifiable;
 			private global::KnockOff.Times? _verifiableTimes;

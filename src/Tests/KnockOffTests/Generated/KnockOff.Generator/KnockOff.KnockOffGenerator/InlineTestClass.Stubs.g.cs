@@ -47,8 +47,8 @@ partial class InlineTestClass
 			/// <summary>Records a setter access.</summary>
 			public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public ISimpleService_NameInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }

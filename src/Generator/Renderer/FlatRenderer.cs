@@ -299,8 +299,8 @@ internal static class FlatRenderer
 		w.Line($"public void RecordSet({prop.NullableReturnType} value) {{ SetCount++; LastSetValue = value; }}");
 		w.Line();
 
-		w.Line("/// <summary>Resets tracking state but preserves verifiable marking.</summary>");
-		w.Line("public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; _value = default!; _valueSet = false; }");
+		w.Line("/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (Value) and verifiable marking.</summary>");
+		w.Line("public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; }");
 		w.Line();
 
 		// Verifiable methods (fluent)
@@ -448,12 +448,12 @@ internal static class FlatRenderer
 			w.Line();
 		}
 
-		// Reset method - clears counts but preserves verifiable marking (DD12)
-		w.Line("/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>");
+		// Reset method - clears tracking state but preserves configuration (OnGet/OnSet/Value) and verifiable marking
+		w.Line("/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>");
 		var resetParts = new System.Collections.Generic.List<string>();
-		if (prop.HasGetter) resetParts.Add("GetCount = 0; OnGet = null;");
-		if (prop.HasSetter) resetParts.Add("SetCount = 0; LastSetValue = default; OnSet = null;");
-		resetParts.Add("_value = default!; _valueSet = false; _source = null;");
+		if (prop.HasGetter) resetParts.Add("GetCount = 0;");
+		if (prop.HasSetter) resetParts.Add("SetCount = 0; LastSetValue = default;");
+		resetParts.Add("_source = null;");
 		w.Line($"public void Reset() {{ {string.Join(" ", resetParts)} }}");
 		w.Line();
 
@@ -698,12 +698,12 @@ internal static class FlatRenderer
 			w.Line($"public global::System.Collections.Generic.Dictionary<{indexer.KeyType}, {indexer.ReturnType}> Backing {{ get; }} = new();");
 			w.Line();
 
-			// Reset method
-			w.Line("/// <summary>Resets all tracking state.</summary>");
+			// Reset method - clears tracking state but preserves configuration (OnGet/OnSet/Backing) and verifiable marking
+			w.Line("/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>");
 			var resetParts = new System.Collections.Generic.List<string>();
-			if (indexer.HasGetter) resetParts.Add("GetCount = 0; LastGetKey = default; OnGet = null;");
-			if (indexer.HasSetter) resetParts.Add("SetCount = 0; LastSetEntry = null; OnSet = null;");
-			resetParts.Add("_source = null; _isVerifiable = false; _verifiableTimes = null;");
+			if (indexer.HasGetter) resetParts.Add("GetCount = 0; LastGetKey = default;");
+			if (indexer.HasSetter) resetParts.Add("SetCount = 0; LastSetEntry = null;");
+			resetParts.Add("_source = null;");
 			// Note: Backing dictionary is intentionally NOT cleared - pre-populated data is preserved
 			w.Line($"public void Reset() {{ {string.Join(" ", resetParts)} }}");
 			w.Line();
@@ -1871,9 +1871,9 @@ internal static class FlatRenderer
 			// Raise method
 			RenderEventRaiseMethod(w, evt);
 
-			// Reset
-			w.Line("/// <summary>Resets all tracking state.</summary>");
-			w.Line("public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; _isVerifiable = false; _verifiableTimes = null; }");
+			// Reset - clears tracking state but preserves verifiable marking
+			w.Line("/// <summary>Resets tracking state (counts, handler) but preserves verifiable marking.</summary>");
+			w.Line("public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }");
 			w.Line();
 
 			// Verification API for events

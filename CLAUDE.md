@@ -11,6 +11,7 @@ Key concept: A class marked with `[KnockOff]` that implements an interface will 
 2. Interface-named properties for test verification (call counts, args, callbacks)
 3. User-defined methods detected and called from generated interceptors
 
+**The solution file** is `src/KnockOff.sln
 ## TODOs and Plans
 
 **ON CODE-REVIEW** Check that plans in the PR are linked to a single todo in their plan markdown

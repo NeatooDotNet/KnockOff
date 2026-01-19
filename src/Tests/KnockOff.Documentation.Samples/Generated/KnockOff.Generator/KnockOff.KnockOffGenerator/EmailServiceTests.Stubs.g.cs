@@ -30,7 +30,8 @@ partial class EmailServiceTests
 
 			public void RecordCall(string to, string subject) { CallCount++; LastCallArgs = (to, subject); }
 
-			public void Reset() { CallCount = 0; LastCallArgs = default; _onCall = null; }
+			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { CallCount = 0; LastCallArgs = default; }
 
 			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);

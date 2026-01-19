@@ -46,8 +46,8 @@ partial class InlineClassTests
 			/// <summary>Records a setter access.</summary>
 			public void RecordSet(bool? value) { SetCount++; LastSetValue = value; }
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _onGet = null; SetCount = 0; LastSetValue = default; _onSet = null; _configured = false; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public UserServiceClass_IsConnectedInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -132,7 +132,8 @@ partial class InlineClassTests
 
 			public void RecordCall(int id) { CallCount++; LastCallArg = id; }
 
-			public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }
+			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { CallCount = 0; LastCallArg = default; }
 
 			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -194,7 +195,8 @@ partial class InlineClassTests
 
 			public void RecordCall(global::KnockOff.Documentation.Samples.User user) { CallCount++; LastCallArg = user; }
 
-			public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }
+			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { CallCount = 0; LastCallArg = default; }
 
 			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);

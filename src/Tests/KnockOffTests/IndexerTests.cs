@@ -132,7 +132,7 @@ public class IndexerTests
 	}
 
 	[Fact]
-	public void Indexer_Reset_ClearsAllState()
+	public void Indexer_Reset_ClearsTrackingButPreservesConfiguration()
 	{
 		var knockOff = new ReadWriteStoreKnockOff();
 		IReadWriteStore store = knockOff;
@@ -151,14 +151,14 @@ public class IndexerTests
 
 		knockOff.Indexer.Reset();
 
+		// Tracking state is cleared
 		Assert.Equal(0, knockOff.Indexer.GetCount);
 		Assert.Null(knockOff.Indexer.LastGetKey);
 		Assert.Equal(0, knockOff.Indexer.SetCount);
 		Assert.Null(knockOff.Indexer.LastSetEntry);
-		Assert.Null(knockOff.Indexer.OnGet);
-		Assert.Null(knockOff.Indexer.OnSet);
 
-		// Backing dictionary is NOT cleared by Reset
+		// Configuration is preserved (OnGet, OnSet, Backing dictionary)
+		Assert.NotNull(knockOff.Indexer.OnGet);
 		Assert.True(knockOff.Indexer.Backing.ContainsKey("Existing"));
 	}
 

@@ -160,12 +160,11 @@ internal static class ClassRenderer
             w.Line();
         }
 
-        // Reset method - clears counts but preserves verifiable marking
-        w.Line($"{indent1}/// <summary>Resets tracking state but preserves verifiable marking.</summary>");
+        // Reset method - clears tracking state but preserves configuration (OnGet/OnSet) and verifiable marking
+        w.Line($"{indent1}/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>");
         var resetParts = new List<string>();
-        if (prop.HasGetter) resetParts.Add("GetCount = 0; _onGet = null;");
-        if (prop.HasSetter) resetParts.Add("SetCount = 0; LastSetValue = default; _onSet = null;");
-        resetParts.Add("_configured = false;");
+        if (prop.HasGetter) resetParts.Add("GetCount = 0;");
+        if (prop.HasSetter) resetParts.Add("SetCount = 0; LastSetValue = default;");
         w.Line($"{indent1}public void Reset() {{ {string.Join(" ", resetParts)} }}");
         w.Line();
 
@@ -330,11 +329,11 @@ internal static class ClassRenderer
         w.Line($"{indent1}public global::System.Collections.Generic.Dictionary<{singleKeyType}, {indexer.ReturnType}> Backing {{ get; }} = new();");
         w.Line();
 
-        // Reset method
-        w.Line($"{indent1}/// <summary>Resets all tracking state.</summary>");
+        // Reset method - clears tracking state but preserves configuration (OnGet/OnSet/Backing)
+        w.Line($"{indent1}/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing).</summary>");
         var resetParts = new List<string>();
-        if (indexer.HasGetter) resetParts.Add("GetCount = 0; LastGetKey = default; OnGet = null;");
-        if (indexer.HasSetter) resetParts.Add("SetCount = 0; LastSetEntry = default; OnSet = null;");
+        if (indexer.HasGetter) resetParts.Add("GetCount = 0; LastGetKey = default;");
+        if (indexer.HasSetter) resetParts.Add("SetCount = 0; LastSetEntry = default;");
         // Note: Backing dictionary is intentionally NOT cleared
         w.Line($"{indent1}public void Reset() {{ {string.Join(" ", resetParts)} }}");
 
@@ -401,7 +400,8 @@ internal static class ClassRenderer
         w.Line("}");
         w.Line();
 
-        // Reset method
+        // Reset method - clears tracking state but preserves configuration (OnCall)
+        w.Line($"{indent1}/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>");
         w.Append($"{indent1}public void Reset() {{ CallCount = 0; ");
         if (method.LastCallArgType != null)
         {
@@ -411,7 +411,7 @@ internal static class ClassRenderer
         {
             w.Append("LastCallArgs = default; ");
         }
-        w.Line("_onCall = null; }");
+        w.Line("}");
         w.Line();
 
         // Verify methods - new API throws VerificationException
@@ -489,8 +489,8 @@ internal static class ClassRenderer
         w.Line($"{indent1}/// <summary>Records an event unsubscription.</summary>");
         w.Line($"{indent1}public void RecordRemove({evt.DelegateType}? handler) {{ RemoveCount++; Handler = ({evt.DelegateType}?)global::System.Delegate.Remove(Handler, handler); }}");
         w.Line();
-        w.Line($"{indent1}/// <summary>Resets all tracking state.</summary>");
-        w.Line($"{indent1}public void Reset() {{ AddCount = 0; RemoveCount = 0; Handler = null; _isVerifiable = false; _verifiableTimes = null; }}");
+        w.Line($"{indent1}/// <summary>Resets tracking state (counts, Handler) but preserves verifiable marking.</summary>");
+        w.Line($"{indent1}public void Reset() {{ AddCount = 0; RemoveCount = 0; Handler = null; }}");
         w.Line();
 
         // Verification API for events

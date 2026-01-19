@@ -35,8 +35,8 @@ partial class IEntityMetaPropertiesTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IEntityMetaProperties_IsChildInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -116,8 +116,8 @@ partial class IEntityMetaPropertiesTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IEntityMetaProperties_IsModifiedInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -197,8 +197,8 @@ partial class IEntityMetaPropertiesTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IEntityMetaProperties_IsSelfModifiedInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -278,8 +278,8 @@ partial class IEntityMetaPropertiesTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IEntityMetaProperties_IsMarkedModifiedInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -359,8 +359,8 @@ partial class IEntityMetaPropertiesTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IEntityMetaProperties_IsSavableInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -440,8 +440,8 @@ partial class IEntityMetaPropertiesTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IEntityMetaProperties_IsDeletedInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -521,8 +521,8 @@ partial class IEntityMetaPropertiesTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IEntityMetaProperties_IsNewInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }

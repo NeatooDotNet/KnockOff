@@ -26,8 +26,8 @@ partial class NotifyPropertyChangedStubTests
 			/// <summary>Records an event unsubscription.</summary>
 			public void RecordRemove(global::System.ComponentModel.PropertyChangedEventHandler? handler) { RemoveCount++; Handler = (global::System.ComponentModel.PropertyChangedEventHandler?)global::System.Delegate.Remove(Handler, handler); }
 
-			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { AddCount = 0; RemoveCount = 0; Handler = null; _isVerifiable = false; _verifiableTimes = null; }
+			/// <summary>Resets tracking state (counts, Handler) but preserves verifiable marking.</summary>
+			public void Reset() { AddCount = 0; RemoveCount = 0; Handler = null; }
 
 			private bool _isVerifiable;
 			private global::KnockOff.Times? _verifiableTimes;

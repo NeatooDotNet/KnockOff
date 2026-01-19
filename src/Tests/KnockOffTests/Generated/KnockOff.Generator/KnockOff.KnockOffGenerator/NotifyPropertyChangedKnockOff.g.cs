@@ -28,8 +28,8 @@ partial class NotifyPropertyChangedKnockOff : global::System.ComponentModel.INot
 		/// <summary>Invokes the handler if subscribed.</summary>
 		public void Raise(object? sender, global::System.ComponentModel.PropertyChangedEventArgs e) => _handler?.DynamicInvoke(sender, e);
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; _isVerifiable = false; _verifiableTimes = null; }
+		/// <summary>Resets tracking state (counts, handler) but preserves verifiable marking.</summary>
+		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
 
 		private bool _isVerifiable;
 		private global::KnockOff.Times? _verifiableTimes;

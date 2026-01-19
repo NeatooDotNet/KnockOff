@@ -35,8 +35,8 @@ partial class DataReaderStubTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IDataReader_DepthInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -116,8 +116,8 @@ partial class DataReaderStubTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IDataReader_IsClosedInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -197,8 +197,8 @@ partial class DataReaderStubTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IDataReader_RecordsAffectedInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -278,8 +278,8 @@ partial class DataReaderStubTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; _value = default!; _valueSet = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IDataReader_FieldCountInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -362,8 +362,8 @@ partial class DataReaderStubTests
 			/// <summary>Source object for delegation when OnGet/OnSet is not set.</summary>
 			internal global::System.Data.IDataRecord? _source;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; _onGet = null; _configured = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; LastGetKey = default; _source = null; }
 
 			/// <summary>Marks this indexer for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IDataReader_IndexerInt32Interceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -446,8 +446,8 @@ partial class DataReaderStubTests
 			/// <summary>Source object for delegation when OnGet/OnSet is not set.</summary>
 			internal global::System.Data.IDataRecord? _source;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; _onGet = null; _configured = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; LastGetKey = default; _source = null; }
 
 			/// <summary>Marks this indexer for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IDataReader_IndexerStringInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }

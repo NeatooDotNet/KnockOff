@@ -46,8 +46,8 @@ partial class MixedStubTestClass
 			/// <summary>Records a setter access.</summary>
 			public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _onGet = null; SetCount = 0; LastSetValue = default; _onSet = null; _configured = false; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public MixedService_VirtualPropertyInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -129,7 +129,8 @@ partial class MixedStubTestClass
 
 			public void RecordCall() { CallCount++; }
 
-			public void Reset() { CallCount = 0; _onCall = null; }
+			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { CallCount = 0; }
 
 			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
